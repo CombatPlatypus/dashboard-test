@@ -1,0 +1,235 @@
+<!doctype html>
+<html class="no-js" lang="pt-br">
+
+    <!-- METADADOS DA PÁGINA -->
+
+    <head>
+
+        <!-- TAGS META -->
+
+        <meta charset="utf-8" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="robots" content="nofollow, noindex, noimageindex, noarchive, nocache, nosnippet, notranslate" />
+
+        <!-- TÍTULO DA PÁGINA -->
+
+        <title>Dashboard do Inventário</title>
+
+        <!-- ARQUIVOS CSS E ICONE -->
+
+        <link rel="icon" href="images/hub-logo.svg">
+        <link rel="stylesheet" href="css/style.css">
+    </head>	
+
+    <!-- CONTEÚDO DA PÁGINA -->
+
+    <body class="dark-theme">
+
+        <!-- MENU PRINCIPAL -->
+
+        <nav class="main-menu">
+            <div class="flex-box-between">
+                <div class="container-1 flex-box-start">
+                    <img src="images/hub-logo.svg">
+
+                    <div>
+                        <h3>Dashboard do Inventário</h3>
+                        <p><i>Um agregado de ferramentas.</i></p>
+                    </div>
+                </div>
+
+                <ul class="flex-box-start tabs" data-tabs id="switch-1">
+                    <li class="tabs-title is-active flex-box-center">
+                        <a href="#spreadsheets">
+                            <div class="flex-box-center">
+                                <img src="images/files-type/sheets-icon.svg">
+                                <label>Planilhas</label>
+                            </div>
+                        </a>
+                    </li> 
+
+                    <!-- <li class="tabs-title">
+                        <a href="#drive" id="driveTabButton">
+                            <div class="flex-box-center">
+                                <img src="images/drive-icon.svg">
+                                <label>Drive</label>
+                            </div>
+                        </a>
+                    </li>  -->
+
+                    <a href="https://drive.google.com/drive/shared-with-me" target="_blank" class="link-button">
+                        <div class="flex-box-center">
+                            <img src="images/drive-icon.svg" style="margin-right: 10px;">
+                            <label>Drive</label>
+                        </div>
+                    </a>
+
+                    <a href="https://www.appsheet.com/start/9898e1c7-28cc-4bcc-9e15-b13a73533544?platform=desktop#appName=AVARIASLSP-63-957299733-25-10-22&vss=H4sIAAAAAAAAA6WRzU7CQBDHX4XMuREoWGBPihhjjB8BwoUSM7ZT2dh2m90tSJo-jM_iiznLR_TgBbjtzsxv5v-fqWAlaT2xGH2AmFe_vwfagIAqhOmmoBBECDcqt1qlIXghPGG2C758f73LHNsh1OCBIdTRcko6Y3Y49oPu4LLd6wwGfvuZ0xbfUnLoVE22lVx1vUIt0UDtnT78dUQWZeo01Avv0MaSAVEdZ0GcuwEZU25lIkm7Xo7kHnuO047iwIFh15CV27VsBTNTc-gU42co_9PlWAN79B8fMFbrnQ6M-v2g0_NFo9VttoKm3_ID0VhJq_SFkRmqK7NUBdFFpDKecKdVWQwZnPMpJ0rbw3tECZapnWFausvOF7XbVaKi0lA8Y--nezb3-e1ngXn8qGIWn2BqqP4BMXkggBsDAAA=&row=ac886372:%2004/06/2026:%20vitor.simao@shopee.com&view=P%C3%A1gina1_Detail" target="_blank" class="link-button">
+                        <div class="flex-box-center">
+                            <img src="images/avarias-icon.svg" style="margin-right: 5px;">
+                            <label>Avárias</label>
+                        </div>
+                    </a>
+                    
+                    <a href="https://www.appsheet.com/start/e90438ea-37a9-47f7-a28f-1499b53fbd35#appName=ColetasLMHub-510641030&page=gallery&sort=%5B%5D&table=MenuInicial&view=Menu" target="_blank" class="link-button">
+                        <div class="flex-box-center">
+                            <img src="images/coleta-icon.svg" style="margin-right: 10px;">
+                            <label>Coletas</label>
+                        </div>
+                    </a>
+
+                    <a href="https://www.appsheet.com/start/9898e1c7-28cc-4bcc-9e15-b13a73533544?platform=desktop#appName=PackRecover-51650155&vss=H4sIAAAAAAAAA6XOsQ7CIBgE4He5mSdg1Q6NUYeaLuKA5W9CbKEpVG0I7y5ojXPjyJHv_gu4a3pUXjY38HP4vXY0gyMInOaBBLjAxho_2k6ACRxk_wm3RVWXx0ogIl7Yl3ty4GGV5n_dZtCKjNetpjFXZZgqFpa-M0rBQhAZ-snLa0fvtYnEmLLWNpMjVach6we40hTPQRq1tyo1trJzFF-JXWqEYAEAAA==&view=DESVIOS" target="_blank" class="link-button">
+                        <div class="flex-box-center">
+                            <img src="images/pack-recover-icon.svg" style="margin-right: 10px;">
+                            <label>Pack Recover</label>
+                        </div>
+                    </a>
+                </ul> 
+            </div>        
+        </nav>
+
+        <!-- ESTRUTURA PRINCIPAL -->
+
+        <div class="main-structure">
+            <div class="tabs-content" data-tabs-content="switch-1">
+                <div class="tabs-panel is-active" id="spreadsheets">
+
+                    <div class="spreadsheets-layout">
+
+                        <!-- MENU DE NAVEGAÇÃO DAS PLANILHAS -->
+
+                        <ul class="tabs" data-tabs id="switch-spreadsheet"></ul>
+
+                        <!-- PLANILHAS -->
+
+                        <div class="tabs-content" data-tabs-content="switch-spreadsheet" id="spreadsheetPanels"></div>
+                        
+                    </div>
+                </div>
+
+                <div class="tabs-panel" id="drive">
+                    
+                    <!-- CONTEÚDO PRÉ LOGIN -->
+
+                    <div class="is-connected">
+                        <div class="drive-login">
+                            <div class="description">
+                                <div class="flex-box-center">
+                                    <img src="images/drive-icon.svg">
+                                    <h2>Compartilhados</h2>
+                                </div>
+                                <p>Conecte a seu google drive para ter acesso aos arquivos compartilhados pelo setor de inventário.</p>
+                            </div>
+
+                            <ul>
+                                <h4>Recursos Disponíveis:</h4>
+
+                                <li class="flex-box-start">
+                                    <img src="images/files-type/folder-icon.svg">
+                                    <p>Navegação por pastas</p>
+                                </li>
+
+                                <li class="flex-box-start">
+                                    <img src="images/files-type/image-icon.svg">
+                                    <p>Visualização de imagens</p>
+                                </li>
+
+                                <li class="flex-box-start">
+                                    <img src="images/files-type/file-icon.svg">
+                                    <p>Abertura de documentos</p>
+                                </li>
+
+                                <li class="flex-box-start">
+                                    <img src="images/padlock-icon.svg">
+                                    <p>Somente pastas autorizadas</p>
+                                </li>
+                            </ul>
+
+                            <div class="pre-button">
+                                <button class="button" id="loginButton">Conectar Google Drive</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CONTEÚDO PÓS LOGIN -->
+
+                    <div id="userInfo" hidden>
+                        <div class="flex-box-start">
+                            <div class="flex-box-start profile">
+                                <img id="userPhoto" src="">
+
+                                <div>
+                                    <h4 id="userName"></h4>
+                                    <p id="userEmail"></p>
+                                </div>
+                            </div>
+
+                            <div class="flex-box-start drive-nav">
+                                <div class="drive-view-controls">
+                                    <button type="button" id="driveListViewButton" class="button">
+                                        <img src="images/list-icon.svg">
+                                    </button>
+
+                                    <button type="button" id="driveGridViewButton" class="button">
+                                        <img src="images/grid-icon.svg">
+                                    </button>
+                                </div>
+
+                                <div>
+                                    <h4>Onde você está.</h4>
+
+                                    <div class="drive-toolbar">
+                                        <button type="button" id="driveBackButton" hidden>Voltar / </button>
+                                        <nav id="driveBreadcrumb" class="drive-breadcrumb" aria-label="Caminho da pasta"></nav>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CONTEÚDO DO DRIVE -->
+
+                        <div id="driveFiles-Style">
+                            <div id="driveFiles" aria-live="polite" aria-busy="false">
+
+                                <!-- ARQUIVOS QUE VÊEM DO DRIVE -->
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL -->  
+
+        <div id="imageViewer" class="image-viewer" hidden aria-hidden="true">
+            <button id="closeImageViewer" class="image-viewer-close" type="button" aria-label="Fechar visualização da imagem">×</button>
+
+            <div class="image-viewer-content">
+                <div id="imageViewerLoading" class="image-viewer-loading" aria-label="Carregando imagem">
+                    <span  class="image-viewer-spinner" aria-hidden="true"></span>
+
+                    <span>Carregando imagem...</span>
+                </div>
+
+                <img id="viewerImage" class="image-viewer-image" alt="" hidden >
+            </div>
+        </div>
+        
+        <!-- ARQUIVOS JS -->  
+
+        <script async src="js/pace.min.js"></script>
+        <script src="js/jquery-3.2.1.min.js"></script>
+        <script defer src="js/foundation.min.js"></script>
+        <script type="module" src="js/load-spreadsheets.js"></script>
+
+        <!-- GOOGLE IDENTITY SERVICES -->
+
+        <script src="https://accounts.google.com/gsi/client"></script>
+
+        <!-- PONTO DE ENTRADA DA APLICAÇÃO -->
+
+        <script type="module" src="js/app.js"></script>
+    </body>
+</html>
