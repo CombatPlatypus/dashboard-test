@@ -24,14 +24,14 @@
 
     <!-- CONTEÚDO DA PÁGINA -->
 
-    <body class="dark-theme">
+    <body>
 
         <!-- MENU PRINCIPAL -->
 
         <nav class="main-menu">
             <div class="flex-box-between">
                 <div class="container-1 flex-box-start">
-                    <img src="images/hub-logo.svg">
+                    <img src="images/geral-icons/hub-logo.svg">
 
                     <div>
                         <h3>Dashboard do Inventário</h3>
@@ -43,48 +43,20 @@
                     <li class="tabs-title is-active flex-box-center">
                         <a href="#spreadsheets">
                             <div class="flex-box-center">
-                                <img src="images/files-type/sheets-icon.svg">
+                                <img src="images/files-icons/sheets-icon.svg">
                                 <label>Planilhas</label>
                             </div>
                         </a>
                     </li> 
 
-                    <!-- <li class="tabs-title">
-                        <a href="#drive" id="driveTabButton">
+                    <li class="tabs-title">
+                        <a href="#statistics">
                             <div class="flex-box-center">
-                                <img src="images/drive-icon.svg">
-                                <label>Drive</label>
+                                <img src="images/geral-icons/statistics-icon.svg">
+                                <label>Estatísticas</label>
                             </div>
                         </a>
-                    </li>  -->
-
-                    <a href="https://drive.google.com/drive/shared-with-me" target="_blank" class="link-button">
-                        <div class="flex-box-center">
-                            <img src="images/drive-icon.svg" style="margin-right: 10px;">
-                            <label>Drive</label>
-                        </div>
-                    </a>
-
-                    <a href="https://www.appsheet.com/start/9898e1c7-28cc-4bcc-9e15-b13a73533544?platform=desktop#appName=AVARIASLSP-63-957299733-25-10-22&vss=H4sIAAAAAAAAA6WRzU7CQBDHX4XMuREoWGBPihhjjB8BwoUSM7ZT2dh2m90tSJo-jM_iiznLR_TgBbjtzsxv5v-fqWAlaT2xGH2AmFe_vwfagIAqhOmmoBBECDcqt1qlIXghPGG2C758f73LHNsh1OCBIdTRcko6Y3Y49oPu4LLd6wwGfvuZ0xbfUnLoVE22lVx1vUIt0UDtnT78dUQWZeo01Avv0MaSAVEdZ0GcuwEZU25lIkm7Xo7kHnuO047iwIFh15CV27VsBTNTc-gU42co_9PlWAN79B8fMFbrnQ6M-v2g0_NFo9VttoKm3_ID0VhJq_SFkRmqK7NUBdFFpDKecKdVWQwZnPMpJ0rbw3tECZapnWFausvOF7XbVaKi0lA8Y--nezb3-e1ngXn8qGIWn2BqqP4BMXkggBsDAAA=&row=ac886372:%2004/06/2026:%20vitor.simao@shopee.com&view=P%C3%A1gina1_Detail" target="_blank" class="link-button">
-                        <div class="flex-box-center">
-                            <img src="images/avarias-icon.svg" style="margin-right: 5px;">
-                            <label>Avárias</label>
-                        </div>
-                    </a>
-                    
-                    <a href="https://www.appsheet.com/start/e90438ea-37a9-47f7-a28f-1499b53fbd35#appName=ColetasLMHub-510641030&page=gallery&sort=%5B%5D&table=MenuInicial&view=Menu" target="_blank" class="link-button">
-                        <div class="flex-box-center">
-                            <img src="images/coleta-icon.svg" style="margin-right: 10px;">
-                            <label>Coletas</label>
-                        </div>
-                    </a>
-
-                    <a href="https://www.appsheet.com/start/9898e1c7-28cc-4bcc-9e15-b13a73533544?platform=desktop#appName=PackRecover-51650155&vss=H4sIAAAAAAAAA6XOsQ7CIBgE4He5mSdg1Q6NUYeaLuKA5W9CbKEpVG0I7y5ojXPjyJHv_gu4a3pUXjY38HP4vXY0gyMInOaBBLjAxho_2k6ACRxk_wm3RVWXx0ogIl7Yl3ty4GGV5n_dZtCKjNetpjFXZZgqFpa-M0rBQhAZ-snLa0fvtYnEmLLWNpMjVach6we40hTPQRq1tyo1trJzFF-JXWqEYAEAAA==&view=DESVIOS" target="_blank" class="link-button">
-                        <div class="flex-box-center">
-                            <img src="images/pack-recover-icon.svg" style="margin-right: 10px;">
-                            <label>Pack Recover</label>
-                        </div>
-                    </a>
+                    </li> 
                 </ul> 
             </div>        
         </nav>
@@ -93,8 +65,10 @@
 
         <div class="main-structure">
             <div class="tabs-content" data-tabs-content="switch-1">
-                <div class="tabs-panel is-active" id="spreadsheets">
 
+                <!-- PAINEL PLANILHAS -->
+
+                <div class="tabs-panel is-active" id="spreadsheets">
                     <div class="spreadsheets-layout">
 
                         <!-- MENU DE NAVEGAÇÃO DAS PLANILHAS -->
@@ -108,6 +82,18 @@
                     </div>
                 </div>
 
+                <!-- PAINEL ESTATÍSTICAS -->
+
+                <div class="tabs-panel" id="statistics">
+                    
+
+
+
+
+                </div>
+
+                <!-- PAINEL DO GOOGLE DRIVE -->
+
                 <div class="tabs-panel" id="drive">
                     
                     <!-- CONTEÚDO PRÉ LOGIN -->
@@ -116,7 +102,7 @@
                         <div class="drive-login">
                             <div class="description">
                                 <div class="flex-box-center">
-                                    <img src="images/drive-icon.svg">
+                                    <img src="images/links-icons/drive-icon.svg">
                                     <h2>Compartilhados</h2>
                                 </div>
                                 <p>Conecte a seu google drive para ter acesso aos arquivos compartilhados pelo setor de inventário.</p>
@@ -126,22 +112,22 @@
                                 <h4>Recursos Disponíveis:</h4>
 
                                 <li class="flex-box-start">
-                                    <img src="images/files-type/folder-icon.svg">
+                                    <img src="images/files-icons/folder-icon.svg">
                                     <p>Navegação por pastas</p>
                                 </li>
 
                                 <li class="flex-box-start">
-                                    <img src="images/files-type/image-icon.svg">
+                                    <img src="images/files-icons/image-icon.svg">
                                     <p>Visualização de imagens</p>
                                 </li>
 
                                 <li class="flex-box-start">
-                                    <img src="images/files-type/file-icon.svg">
+                                    <img src="images/files-icons/file-icon.svg">
                                     <p>Abertura de documentos</p>
                                 </li>
 
                                 <li class="flex-box-start">
-                                    <img src="images/padlock-icon.svg">
+                                    <img src="images/geral-icons/padlock-icon.svg">
                                     <p>Somente pastas autorizadas</p>
                                 </li>
                             </ul>
@@ -168,11 +154,11 @@
                             <div class="flex-box-start drive-nav">
                                 <div class="drive-view-controls">
                                     <button type="button" id="driveListViewButton" class="button">
-                                        <img src="images/list-icon.svg">
+                                        <img src="images/geral-icons/list-icon.svg">
                                     </button>
 
                                     <button type="button" id="driveGridViewButton" class="button">
-                                        <img src="images/grid-icon.svg">
+                                        <img src="images/geral-icons/grid-icon.svg">
                                     </button>
                                 </div>
 
