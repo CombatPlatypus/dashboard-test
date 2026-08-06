@@ -262,6 +262,16 @@ html {
 body {
     margin: 0;
 }
+body {
+    background-color: #141414;
+}
+body .main-menu {
+    background-color: #1f1f1f;
+    border-bottom: 2px solid #525252;
+}
+body hr {
+    border-bottom: 2px solid #525252;
+}
 article, aside, footer, header, nav, section {
     display: block;
 }
@@ -848,7 +858,13 @@ iframe {
     background-color: #2e2e2e
 }
 .tabs-title a img {
-    width: 40px;
+    width: 35px;
+}
+.tabs-title h4 {
+    cursor: pointer;
+    margin-bottom: 0;
+    font-size: 15px;
+    line-height: 1;
 }
 .tabs-title label {
     cursor: pointer;
@@ -1445,16 +1461,3 @@ a.thumbnail image {
     .image-viewer-image[hidden] {
         display: none;
     }
-
-/* TEMAS DO DASHBOARD */
-
-.dark-theme {
-    background-color: #141414;
-}
-.dark-theme .main-menu {
-    background-color: #1f1f1f;
-    border-bottom: 2px solid #525252;
-}
-.dark-theme hr {
-    border-bottom: 2px solid #525252;
-}
