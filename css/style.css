@@ -937,9 +937,13 @@ a.thumbnail image {
 .main-menu .link-button:hover {
     background: #2e2e2e;
 }
-.main-menu .link-button label {
+.main-menu .link-button h4 {
     cursor: pointer;
+    margin-bottom: 0;
+    font-size: 15px;
+    line-height: 1;
 }
+
 .main-menu .link-button .flex-box-center {
     align-items: center;
 }
