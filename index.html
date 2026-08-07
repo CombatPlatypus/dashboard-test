@@ -20,68 +20,6 @@
 
         <link rel="icon" href="images/hub-logo.svg">
         <link rel="stylesheet" href="css/style.css">
-
-        <style>
-
-            table {
-                border-collapse: collapse;
-                width: 100%;
-                margin: 0;
-                border-radius: 0;
-                color: #fff;
-                letter-spacing: 1px;
-            }
-            table thead, table tbody, table tfoot {
-                border: none;
-            }
-            table caption {
-                padding: 0.5rem 0.625rem 0.625rem;
-                font-weight: bold;
-            }
-            table thead {
-                color: #fff;
-            }
-            table tfoot {
-                background: #f1f1f1;
-                color: #0a0a0a;
-            }
-            table thead tr, table tfoot tr {
-                background: transparent;
-                border: none;
-            }
-            tr {
-                border-top: 2px solid #393a3b;
-            }
-            table thead th, table thead td, table tfoot th, table tfoot td {
-                padding: 15px 20px;
-                font-size: 14px;
-                text-align: center;
-                font-family: 'Open Sans', sans-serif;
-                font-weight: 400;
-                background: transparent;
-                letter-spacing: 1px;
-            }
-            table tbody th, table tbody td {
-                padding: 10px 0;
-                font-size: 14px;
-                font-family: 'Open Sans', sans-serif;
-                font-weight: 400;
-                background: transparent;
-                text-align: center;
-            }
-            table tbody tr:nth-child(even) {
-                border-bottom: 0;
-            }
-            table.unstriped tbody {
-                background-color: #fefefe;
-            }
-            table.unstriped tbody tr {
-                border-bottom: 0;
-                border-bottom: 1px solid #f1f1f1;
-                background-color: #fefefe;
-            }
-
-        </style>
     </head>	
 
     <!-- CONTEÚDO DA PÁGINA -->
@@ -122,14 +60,14 @@
 
                     <a href="https://www.appsheet.com/start/9898e1c7-28cc-4bcc-9e15-b13a73533544?platform=desktop#appName=AVARIASLSP-63-957299733-25-10-22&vss=H4sIAAAAAAAAA6WRzU7CQBDHX4XMuREoWGBPihhjjB8BwoUSM7ZT2dh2m90tSJo-jM_iiznLR_TgBbjtzsxv5v-fqWAlaT2xGH2AmFe_vwfagIAqhOmmoBBECDcqt1qlIXghPGG2C758f73LHNsh1OCBIdTRcko6Y3Y49oPu4LLd6wwGfvuZ0xbfUnLoVE22lVx1vUIt0UDtnT78dUQWZeo01Avv0MaSAVEdZ0GcuwEZU25lIkm7Xo7kHnuO047iwIFh15CV27VsBTNTc-gU42co_9PlWAN79B8fMFbrnQ6M-v2g0_NFo9VttoKm3_ID0VhJq_SFkRmqK7NUBdFFpDKecKdVWQwZnPMpJ0rbw3tECZapnWFausvOF7XbVaKi0lA8Y--nezb3-e1ngXn8qGIWn2BqqP4BMXkggBsDAAA=&row=ac886372:%2004/06/2026:%20vitor.simao@shopee.com&view=P%C3%A1gina1_Detail" target="_blank" class="link-button">
                         <div class="flex-box-center">
-                            <img src="images/links-icons/pack-recover-icon.svg" style="margin-right: 5px;">
+                            <img src="images/links-icons/pack-recover-icon.svg" style="margin-right: 10px;">
                             <h4>Pack Recover</h4>
                         </div>
                     </a>
 
                     <a href="https://www.appsheet.com/start/9898e1c7-28cc-4bcc-9e15-b13a73533544?platform=desktop#appName=AVARIASLSP-63-957299733-25-10-22&vss=H4sIAAAAAAAAA6WRzU7CQBDHX4XMuREoWGBPihhjjB8BwoUSM7ZT2dh2m90tSJo-jM_iiznLR_TgBbjtzsxv5v-fqWAlaT2xGH2AmFe_vwfagIAqhOmmoBBECDcqt1qlIXghPGG2C758f73LHNsh1OCBIdTRcko6Y3Y49oPu4LLd6wwGfvuZ0xbfUnLoVE22lVx1vUIt0UDtnT78dUQWZeo01Avv0MaSAVEdZ0GcuwEZU25lIkm7Xo7kHnuO047iwIFh15CV27VsBTNTc-gU42co_9PlWAN79B8fMFbrnQ6M-v2g0_NFo9VttoKm3_ID0VhJq_SFkRmqK7NUBdFFpDKecKdVWQwZnPMpJ0rbw3tECZapnWFausvOF7XbVaKi0lA8Y--nezb3-e1ngXn8qGIWn2BqqP4BMXkggBsDAAA=&row=ac886372:%2004/06/2026:%20vitor.simao@shopee.com&view=P%C3%A1gina1_Detail" target="_blank" class="link-button">
                         <div class="flex-box-center">
-                            <img src="images/links-icons/avarias-icon.svg" style="margin-right: 5px;">
+                            <img src="images/links-icons/avarias-icon.svg" style="margin-right: 10px;">
                             <h4>Avárias</h4>
                         </div>
                     </a>
@@ -170,27 +108,6 @@
 
                 <div class="tabs-panel" id="statistics">
 
-                    <button
-                        class="button"
-                        type="button"
-                        id="statisticsConnectButton"
-                    >
-                        Conectar e Carregar Planilha
-                    </button>
-
-                    <p id="statisticsStatus">
-                        Aguardando conexão com o Google.
-                    </p>
-
-                    <!-- TABELA -->
-
-                    <table id="statisticsTable" hidden>
-
-                        <thead id="statisticsTableHead"></thead>
-
-                        <tbody id="statisticsTableBody"></tbody>
-
-                    </table>
 
                 </div>
 
@@ -315,10 +232,6 @@
         <!-- GOOGLE IDENTITY SERVICES -->
 
         <script src="https://accounts.google.com/gsi/client"></script>
-
-        <!-- CONTROLE DAS ESTATÍSTICAS -->
-
-        <script type="module" src="js/statistics.js"></script>
 
         <!-- PONTO DE ENTRADA DA APLICAÇÃO -->
 
