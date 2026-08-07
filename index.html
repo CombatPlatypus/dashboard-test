@@ -23,21 +23,62 @@
 
         <style>
 
-            .main-structure .tabs-content #damaged-packages {
-                flex: 1 1 0;
-                min-width: 0;
-                display: flex;
-                overflow: hidden;
-                height: calc(100dvh - 162px - 30px);
-                max-height: calc(100dvh - 162px - 30px);
-            }
-
-            .main-structure .tabs-content #damaged-packages div {
+            table {
+                border-collapse: collapse;
                 width: 100%;
-                height: 100%;
-                background-color: transparent;
-                border: solid 2px #525252;
-                border-radius: 5px;
+                margin: 0;
+                border-radius: 0;
+                color: #fff;
+                letter-spacing: 1px;
+            }
+            table thead, table tbody, table tfoot {
+                border: none;
+            }
+            table caption {
+                padding: 0.5rem 0.625rem 0.625rem;
+                font-weight: bold;
+            }
+            table thead {
+                color: #fff;
+            }
+            table tfoot {
+                background: #f1f1f1;
+                color: #0a0a0a;
+            }
+            table thead tr, table tfoot tr {
+                background: transparent;
+                border: none;
+            }
+            tr {
+                border-top: 2px solid #393a3b;
+            }
+            table thead th, table thead td, table tfoot th, table tfoot td {
+                padding: 15px 20px;
+                font-size: 14px;
+                text-align: center;
+                font-family: 'Open Sans', sans-serif;
+                font-weight: 400;
+                background: transparent;
+                letter-spacing: 1px;
+            }
+            table tbody th, table tbody td {
+                padding: 10px 0;
+                font-size: 14px;
+                font-family: 'Open Sans', sans-serif;
+                font-weight: 400;
+                background: transparent;
+                text-align: center;
+            }
+            table tbody tr:nth-child(even) {
+                border-bottom: 0;
+            }
+            table.unstriped tbody {
+                background-color: #fefefe;
+            }
+            table.unstriped tbody tr {
+                border-bottom: 0;
+                border-bottom: 1px solid #f1f1f1;
+                background-color: #fefefe;
             }
 
         </style>
@@ -131,9 +172,33 @@
 
                     <!-- TABELA -->
 
-                    <div class="">
+                    <table>
+                        <thead>
+                            <tr>
+                            <th>Table Header</th>
+                            <th>Table Header</th>
+                            <th>Table Header</th>
+                            </tr>
+                        </thead>
 
-                    </div>
+                        <tbody>
+                            <tr>
+                            <td>Content Goes Here</td>
+                            <td>This is longer content Donec id elit non mi porta gravida at eget metus.</td>
+                            <td>Content Goes Here</td>
+                            </tr>
+                            <tr>
+                            <td>Content Goes Here</td>
+                            <td>This is longer content Donec id elit non mi porta gravida at eget metus.</td>
+                            <td>Content Goes Here</td>
+                            </tr>
+                            <tr>
+                            <td>Content Goes Here</td>
+                            <td>This is longer content Donec id elit non mi porta gravida at eget metus.</td>
+                            <td>Content Goes Here</td>
+                            </tr>
+                        </table>
+                    </table>
 
                 </div>
 
