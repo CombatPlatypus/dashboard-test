@@ -378,9 +378,6 @@ function renderStatisticsTable(
 }
 
 
-// INICIALIZA DEPOIS QUE A PÁGINA ESTIVER PRONTA
+/* INICIALIZA O PAINEL DE ESTATÍSTICAS */
 
-window.addEventListener(
-    "load",
-    initializeStatisticsAuth
-);
+initializeStatisticsAuth();
