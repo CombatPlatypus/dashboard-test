@@ -980,6 +980,14 @@ a.thumbnail image {
     border: solid 2px #525252;
     border-radius: 5px;
 }
+.main-structure #statistics {
+    width: 100%;
+    background-color: #ffffff;
+    border: solid 2px #525252;
+    border-radius: 5px;
+    height: calc(100dvh - 162px - 30px);
+    max-height: calc(100dvh - 162px - 30px);
+}
 .main-structure .tabs {
     flex: 0 0 220px;
     height: calc(100dvh - 162px - 30px);
