@@ -16,16 +16,6 @@ export const CONFIG = {
         linksSpreadsheetRange:
             "Planilhas!A2:F", // DETERMINA OS CAMPOS ONDE SERÁ BUSCADO AS INFORMAÇÕES DOS LINKS
 
-        statisticsSpreadsheetId:
-            "1WqOBDJmM2vzt2RXOsve726s9e4BbjENctcCYkvBpJsk",
-
-        statisticsSpreadsheetRange:
-            "A1:C",
-
-        statisticsScopes: [
-            "https://www.googleapis.com/auth/spreadsheets.readonly"
-        ],
-
         scopes: [
             "openid",
             "email",
