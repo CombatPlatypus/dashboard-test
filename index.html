@@ -18,7 +18,7 @@
 
         <!-- ARQUIVOS CSS E ICONE -->
 
-        <link rel="icon" href="images/geral-icons/hub-logo-black.svg">
+        <link rel="icon" href="images/geral-icons/hub-logo.svg">
         <link rel="stylesheet" href="css/style.css">
     </head>	
 
@@ -107,7 +107,62 @@
                 <!-- PAINEL ESTATÍSTICAS -->
 
                 <div class="tabs-panel" id="statistics">
-                    <iframe id="statisticsSpreadsheet" loading="lazy"></iframe>
+                    <div class="statistics-layout">
+
+                        <!-- IMPORTAÇÃO LOCAL -->
+
+                        <section class="statistics-import-panel" aria-labelledby="statisticsImportTitle">
+                            <div class="statistics-import-header flex-box-between">
+                                <div>
+                                    <h3 id="statisticsImportTitle">Importar dados locais</h3>
+                                    <p>Selecione uma cópia da planilha para visualizar os dados no navegador.</p>
+                                </div>
+
+                                <div class="statistics-import-actions flex-box-start">
+                                    <label class="statistics-file-button" for="statisticsFileInput">
+                                        Selecionar arquivo
+                                    </label>
+
+                                    <input
+                                        id="statisticsFileInput"
+                                        class="statistics-file-input"
+                                        type="file"
+                                        accept=".xlsx,.xls"
+                                    >
+
+                                    <button id="statisticsClearFile" class="statistics-clear-button" type="button" disabled>
+                                        Limpar
+                                    </button>
+                                </div>
+                            </div>
+
+                            <p id="statisticsFileStatus" class="statistics-file-status" role="status" aria-live="polite">
+                                Nenhum arquivo selecionado. O arquivo será lido somente neste navegador.
+                            </p>
+                        </section>
+
+                        <!-- PRÉVIA DOS DADOS IMPORTADOS -->
+
+                        <section id="statisticsLocalPreview" class="statistics-local-preview" hidden>
+                            <div class="statistics-preview-header flex-box-between">
+                                <h4>Prévia do arquivo</h4>
+                                <span id="statisticsPreviewSummary"></span>
+                            </div>
+
+                            <div class="statistics-table-container">
+                                <table id="statisticsLocalTable" class="statistics-local-table">
+                                    <thead></thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </section>
+
+                        <!-- PLANILHA RESUMO JÁ EXISTENTE -->
+
+                        <div class="statistics-spreadsheet-container">
+                            <iframe id="statisticsSpreadsheet" loading="lazy"></iframe>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -117,7 +172,9 @@
         <script async src="js/pace.min.js"></script>
         <script src="js/jquery-3.2.1.min.js"></script>
         <script defer src="js/foundation.min.js"></script>
+        <script src="js/xlsx.full.min.js"></script>
         <script type="module" src="js/load-spreadsheets.js"></script>
+        <script type="module" src="js/statistics.js"></script>
 
         <!-- PONTO DE ENTRADA DA APLICAÇÃO -->
 
