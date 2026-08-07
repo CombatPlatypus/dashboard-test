@@ -170,34 +170,26 @@
 
                 <div class="tabs-panel" id="statistics">
 
+                    <button
+                        class="button"
+                        type="button"
+                        id="statisticsConnectButton"
+                    >
+                        Conectar e Carregar Planilha
+                    </button>
+
+                    <p id="statisticsStatus">
+                        Aguardando conexão com o Google.
+                    </p>
+
                     <!-- TABELA -->
 
-                    <table>
-                        <thead>
-                            <tr>
-                            <th>Table Header</th>
-                            <th>Table Header</th>
-                            <th>Table Header</th>
-                            </tr>
-                        </thead>
+                    <table id="statisticsTable" hidden>
 
-                        <tbody>
-                            <tr>
-                            <td>Content Goes Here</td>
-                            <td>This is longer content Donec id elit non mi porta gravida at eget metus.</td>
-                            <td>Content Goes Here</td>
-                            </tr>
-                            <tr>
-                            <td>Content Goes Here</td>
-                            <td>This is longer content Donec id elit non mi porta gravida at eget metus.</td>
-                            <td>Content Goes Here</td>
-                            </tr>
-                            <tr>
-                            <td>Content Goes Here</td>
-                            <td>This is longer content Donec id elit non mi porta gravida at eget metus.</td>
-                            <td>Content Goes Here</td>
-                            </tr>
-                        </table>
+                        <thead id="statisticsTableHead"></thead>
+
+                        <tbody id="statisticsTableBody"></tbody>
+
                     </table>
 
                 </div>
@@ -323,6 +315,10 @@
         <!-- GOOGLE IDENTITY SERVICES -->
 
         <script src="https://accounts.google.com/gsi/client"></script>
+
+        <!-- CONTROLE DAS ESTATÍSTICAS -->
+
+        <script type="module" src="js/statistics.js"></script>
 
         <!-- PONTO DE ENTRADA DA APLICAÇÃO -->
 
