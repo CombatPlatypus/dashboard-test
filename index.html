@@ -110,115 +110,6 @@
 
 
                 </div>
-
-                <!-- PAINEL DO GOOGLE DRIVE -->
-
-                <div class="tabs-panel" id="drive">
-                    
-                    <!-- CONTEÚDO PRÉ LOGIN -->
-
-                    <div class="is-connected">
-                        <div class="drive-login">
-                            <div class="description">
-                                <div class="flex-box-center">
-                                    <img src="images/links-icons/drive-icon.svg">
-                                    <h2>Compartilhados</h2>
-                                </div>
-                                <p>Conecte a seu google drive para ter acesso aos arquivos compartilhados pelo setor de inventário.</p>
-                            </div>
-
-                            <ul>
-                                <h4>Recursos Disponíveis:</h4>
-
-                                <li class="flex-box-start">
-                                    <img src="images/files-icons/folder-icon.svg">
-                                    <p>Navegação por pastas</p>
-                                </li>
-
-                                <li class="flex-box-start">
-                                    <img src="images/files-icons/image-icon.svg">
-                                    <p>Visualização de imagens</p>
-                                </li>
-
-                                <li class="flex-box-start">
-                                    <img src="images/files-icons/file-icon.svg">
-                                    <p>Abertura de documentos</p>
-                                </li>
-
-                                <li class="flex-box-start">
-                                    <img src="images/geral-icons/padlock-icon.svg">
-                                    <p>Somente pastas autorizadas</p>
-                                </li>
-                            </ul>
-
-                            <div class="pre-button">
-                                <button class="button" id="loginButton">Conectar Google Drive</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- CONTEÚDO PÓS LOGIN -->
-
-                    <div id="userInfo" hidden>
-                        <div class="flex-box-start">
-                            <div class="flex-box-start profile">
-                                <img id="userPhoto" src="">
-
-                                <div>
-                                    <h4 id="userName"></h4>
-                                    <p id="userEmail"></p>
-                                </div>
-                            </div>
-
-                            <div class="flex-box-start drive-nav">
-                                <div class="drive-view-controls">
-                                    <button type="button" id="driveListViewButton" class="button">
-                                        <img src="images/geral-icons/list-icon.svg">
-                                    </button>
-
-                                    <button type="button" id="driveGridViewButton" class="button">
-                                        <img src="images/geral-icons/grid-icon.svg">
-                                    </button>
-                                </div>
-
-                                <div>
-                                    <h4>Onde você está.</h4>
-
-                                    <div class="drive-toolbar">
-                                        <button type="button" id="driveBackButton" hidden>Voltar / </button>
-                                        <nav id="driveBreadcrumb" class="drive-breadcrumb" aria-label="Caminho da pasta"></nav>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- CONTEÚDO DO DRIVE -->
-
-                        <div id="driveFiles-Style">
-                            <div id="driveFiles" aria-live="polite" aria-busy="false">
-
-                                <!-- ARQUIVOS QUE VÊEM DO DRIVE -->
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- MODAL -->  
-
-        <div id="imageViewer" class="image-viewer" hidden aria-hidden="true">
-            <button id="closeImageViewer" class="image-viewer-close" type="button" aria-label="Fechar visualização da imagem">×</button>
-
-            <div class="image-viewer-content">
-                <div id="imageViewerLoading" class="image-viewer-loading" aria-label="Carregando imagem">
-                    <span  class="image-viewer-spinner" aria-hidden="true"></span>
-
-                    <span>Carregando imagem...</span>
-                </div>
-
-                <img id="viewerImage" class="image-viewer-image" alt="" hidden >
             </div>
         </div>
         
@@ -228,10 +119,6 @@
         <script src="js/jquery-3.2.1.min.js"></script>
         <script defer src="js/foundation.min.js"></script>
         <script type="module" src="js/load-spreadsheets.js"></script>
-
-        <!-- GOOGLE IDENTITY SERVICES -->
-
-        <script src="https://accounts.google.com/gsi/client"></script>
 
         <!-- PONTO DE ENTRADA DA APLICAÇÃO -->
 
