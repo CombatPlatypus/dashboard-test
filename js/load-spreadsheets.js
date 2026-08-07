@@ -696,6 +696,31 @@ function initializeSpreadsheetNavigation(
             ".tabs-panel"
         );
 
+    const spreadsheetsPanel =
+        document.getElementById(
+            "spreadsheets"
+        );
+
+    const mainTabs =
+        document.getElementById(
+            "switch-1"
+        );
+
+
+    if (
+        !spreadsheetsPanel ||
+        !mainTabs
+    ) {
+
+        console.error(
+            "Elementos do painel principal de planilhas não foram encontrados."
+        );
+
+        return;
+    }
+
+
+    /* DESCARREGA UMA PLANILHA */
 
     function unloadSpreadsheet(
         panel
@@ -715,6 +740,8 @@ function initializeSpreadsheetNavigation(
         }
     }
 
+
+    /* CARREGA UMA PLANILHA */
 
     function loadSpreadsheet(
         panel
@@ -746,6 +773,9 @@ function initializeSpreadsheetNavigation(
                         if (
                             !panel.classList.contains(
                                 "is-active"
+                            ) ||
+                            !spreadsheetsPanel.classList.contains(
+                                "is-active"
                             )
                         ) {
 
@@ -764,7 +794,33 @@ function initializeSpreadsheetNavigation(
     }
 
 
+    /* ATUALIZA OS IFRAMES */
+
     function updateSpreadsheetIframes() {
+
+        // PAINEL PLANILHAS NÃO ESTÁ ABERTO:
+        // DESCARREGA TODAS AS PLANILHAS
+
+        if (
+            !spreadsheetsPanel.classList.contains(
+                "is-active"
+            )
+        ) {
+
+            panels.forEach(
+                function (panel) {
+
+                    unloadSpreadsheet(
+                        panel
+                    );
+                }
+            );
+
+            return;
+        }
+
+
+        // LOCALIZA A PLANILHA ATIVA
 
         const activePanel =
             panelsElement.querySelector(
@@ -777,6 +833,8 @@ function initializeSpreadsheetNavigation(
             return;
         }
 
+
+        // DESCARREGA TODAS AS OUTRAS
 
         panels.forEach(
             function (panel) {
@@ -794,11 +852,15 @@ function initializeSpreadsheetNavigation(
         );
 
 
+        // CARREGA SOMENTE A ATIVA
+
         loadSpreadsheet(
             activePanel
         );
     }
 
+
+    /* OBSERVA A TROCA ENTRE PLANILHAS */
 
     $(
         tabsElement
@@ -813,9 +875,23 @@ function initializeSpreadsheetNavigation(
     );
 
 
+    /* OBSERVA A TROCA ENTRE OS PAINÉIS PRINCIPAIS */
+
+    $(
+        mainTabs
+    ).on(
+        "change.zf.tabs",
+        function () {
+
+            requestAnimationFrame(
+                updateSpreadsheetIframes
+            );
+        }
+    );
+
+
     updateSpreadsheetIframes();
 }
-
 
 /* EXIBE UMA MENSAGEM DE ERRO */
 
