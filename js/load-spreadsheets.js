@@ -3,6 +3,14 @@ import {
 } from "./config.js";
 
 
+/* DEFINE A PLANILHA UTILIZADA NO PAINEL ESTATÍSTICAS */
+
+const STATISTICS_SPREADSHEET_KEY =
+    "resumo-operacao";
+
+
+/* PADRÕES DE VALIDAÇÃO */
+
 const KEY_PATTERN =
     /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
@@ -52,6 +60,7 @@ function shouldDisplaySpreadsheet(
             )
             .toLowerCase();
 
+
     return VISIBLE_VALUES.has(
         normalizedValue
     );
@@ -100,6 +109,7 @@ async function getSpreadsheetConfigurations() {
         `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}` +
         `/values/${spreadsheetRange}?majorDimension=ROWS`;
 
+
     const response =
         await fetch(
             requestUrl,
@@ -113,6 +123,7 @@ async function getSpreadsheetConfigurations() {
                 }
             }
         );
+
 
     if (!response.ok) {
 
@@ -135,10 +146,12 @@ async function getSpreadsheetConfigurations() {
 
         }
 
+
         throw new Error(
             errorMessage
         );
     }
+
 
     const responseData =
         await response.json();
@@ -463,69 +476,61 @@ function createSpreadsheetTab(
     tabLink.textContent =
         configuration.menuName;
 
-    tabLink.classList.toggle(
-        "main-spreadsheet",
-        isInitialSpreadsheet
-    );
-
 
     tabItem.appendChild(
         tabLink
     );
 
 
-    // A PRIMEIRA PLANILHA CONTINUA SEM BOTÃO EXTERNO
+    // TODAS AS PLANILHAS DESTE MENU POSSUEM BOTÃO EXTERNO
 
-    if (!isInitialSpreadsheet) {
+    const spreadsheetButton =
+        document.createElement(
+            "button"
+        );
 
-        const spreadsheetButton =
-            document.createElement(
-                "button"
+    spreadsheetButton.type =
+        "button";
+
+    spreadsheetButton.classList.add(
+        "spreadsheets-links"
+    );
+
+    spreadsheetButton.dataset.spreadsheetKey =
+        configuration.key;
+
+    spreadsheetButton.dataset.url =
+        configuration.url;
+
+    spreadsheetButton.setAttribute(
+        "aria-label",
+        `Abrir ${configuration.menuName} em uma nova aba`
+    );
+
+
+    spreadsheetButton.appendChild(
+        createSpreadsheetLinkIcon()
+    );
+
+
+    spreadsheetButton.addEventListener(
+        "click",
+        function (event) {
+
+            event.stopPropagation();
+
+            window.open(
+                configuration.url,
+                "_blank",
+                "noopener,noreferrer"
             );
-
-        spreadsheetButton.type =
-            "button";
-
-        spreadsheetButton.classList.add(
-            "spreadsheets-links"
-        );
-
-        spreadsheetButton.dataset.spreadsheetKey =
-            configuration.key;
-
-        spreadsheetButton.dataset.url =
-            configuration.url;
-
-        spreadsheetButton.setAttribute(
-            "aria-label",
-            `Abrir ${configuration.menuName} em uma nova aba`
-        );
+        }
+    );
 
 
-        spreadsheetButton.appendChild(
-            createSpreadsheetLinkIcon()
-        );
-
-
-        spreadsheetButton.addEventListener(
-            "click",
-            function (event) {
-
-                event.stopPropagation();
-
-                window.open(
-                    configuration.url,
-                    "_blank",
-                    "noopener,noreferrer"
-                );
-            }
-        );
-
-
-        tabItem.appendChild(
-            spreadsheetButton
-        );
-    }
+    tabItem.appendChild(
+        spreadsheetButton
+    );
 
 
     return tabItem;
@@ -565,7 +570,7 @@ function createSpreadsheetPanel(
     if (isInitialSpreadsheet) {
 
         panel.classList.add(
-            "is-active",
+            "is-active"
         );
     }
 
@@ -679,7 +684,7 @@ function initializeFoundationTabs(
 }
 
 
-/* CONFIGURA O CARREGAMENTO SELETIVO */
+/* CONFIGURA O CARREGAMENTO SELETIVO DAS PLANILHAS */
 
 function initializeSpreadsheetNavigation(
     tabsElement,
@@ -841,6 +846,124 @@ function showSpreadsheetConfigurationError(
 }
 
 
+/* CONFIGURA A PLANILHA DO PAINEL ESTATÍSTICAS */
+
+function initializeStatisticsSpreadsheet(
+    configuration
+) {
+
+    const statisticsPanel =
+        document.getElementById(
+            "statistics"
+        );
+
+    const statisticsIframe =
+        document.getElementById(
+            "statisticsSpreadsheet"
+        );
+
+    const mainTabs =
+        document.getElementById(
+            "switch-1"
+        );
+
+
+    if (
+        !statisticsPanel ||
+        !statisticsIframe ||
+        !mainTabs
+    ) {
+
+        console.error(
+            "Elementos do painel Estatísticas não foram encontrados."
+        );
+
+        return;
+    }
+
+
+    statisticsIframe.dataset.src =
+        configuration.url;
+
+    statisticsIframe.title =
+        configuration.spreadsheetName;
+
+
+    /* CARREGA A PLANILHA */
+
+    function loadStatisticsSpreadsheet() {
+
+        if (
+            statisticsIframe.hasAttribute(
+                "src"
+            )
+        ) {
+
+            return;
+        }
+
+
+        statisticsIframe.src =
+            statisticsIframe.dataset.src;
+    }
+
+
+    /* DESCARREGA A PLANILHA */
+
+    function unloadStatisticsSpreadsheet() {
+
+        if (
+            statisticsIframe.hasAttribute(
+                "src"
+            )
+        ) {
+
+            statisticsIframe.removeAttribute(
+                "src"
+            );
+        }
+    }
+
+
+    /* ATUALIZA O ESTADO DO IFRAME */
+
+    function updateStatisticsSpreadsheet() {
+
+        if (
+            statisticsPanel.classList.contains(
+                "is-active"
+            )
+        ) {
+
+            loadStatisticsSpreadsheet();
+
+            return;
+        }
+
+
+        unloadStatisticsSpreadsheet();
+    }
+
+
+    /* OBSERVA A TROCA DO PAINEL PRINCIPAL */
+
+    $(
+        mainTabs
+    ).on(
+        "change.zf.tabs",
+        function () {
+
+            requestAnimationFrame(
+                updateStatisticsSpreadsheet
+            );
+        }
+    );
+
+
+    updateStatisticsSpreadsheet();
+}
+
+
 /* INICIALIZA AS PLANILHAS */
 
 async function initializeSpreadsheets() {
@@ -884,17 +1007,68 @@ async function initializeSpreadsheets() {
             await getSpreadsheetConfigurations();
 
 
+        /* SEPARA A PLANILHA DE ESTATÍSTICAS */
+
+        const statisticsConfiguration =
+            configurations.find(
+                function (configuration) {
+
+                    return (
+                        configuration.key ===
+                        STATISTICS_SPREADSHEET_KEY
+                    );
+                }
+            );
+
+
+        /* REMOVE A PLANILHA DE ESTATÍSTICAS DO MENU PLANILHAS */
+
+        const spreadsheetConfigurations =
+            configurations.filter(
+                function (configuration) {
+
+                    return (
+                        configuration.key !==
+                        STATISTICS_SPREADSHEET_KEY
+                    );
+                }
+            );
+
+
+        /* MONTA O PAINEL PLANILHAS */
+
         renderSpreadsheetInterface(
-            configurations,
+            spreadsheetConfigurations,
             tabsElement,
             panelsElement
         );
 
 
+        /* CONFIGURA O PAINEL ESTATÍSTICAS */
+
+        if (statisticsConfiguration) {
+
+            initializeStatisticsSpreadsheet(
+                statisticsConfiguration
+            );
+
+        }
+        else {
+
+            console.warn(
+                'A planilha "resumo-operacao" não foi encontrada na configuração.'
+            );
+        }
+
+
+        /* INICIALIZA AS ABAS DAS PLANILHAS */
+
         initializeFoundationTabs(
             tabsElement
         );
 
+
+        /* INICIALIZA O CARREGAMENTO SELETIVO */
 
         initializeSpreadsheetNavigation(
             tabsElement,
@@ -925,7 +1099,6 @@ async function initializeSpreadsheets() {
         );
     }
 }
-
 
 /* EXECUTA A INICIALIZAÇÃO */
 
