@@ -28,7 +28,7 @@
             .warning {
                 width: 100%;
                 background-color: #1f1f1f;
-                border-bottom: 2px solid #525252;
+                border: 2px solid #525252;
                 position: relative;
                 margin: 0 0 30px 0;
                 padding: 20px;
@@ -302,9 +302,18 @@
 
                 <div class="tabs-panel is-active" id="statistics">
 
+                    <!-- BARRA DE NOTIFICAÇÕES DAS ESTATÍSTICAS -->
+
+                    <div class="warning">
+                        <div class="flex-box-start" id="warnings">
+                            <img src="images/geral-icons/bell-icon.svg">
+                            <h4>Tudo em silêncio por enquanto.</h4>
+                        </div>                
+                    </div> 
+
                     <!-- MENU DE NAVEGAÇÃO DAS ESTATÍSTICAS -->
 
-                    <ul class="flex-box-start tabs" data-tabs id="statistics-tabs">
+                    <ul class="flex-box-start tabs" data-tabs id="statistics-tabs" style="margin: 0 auto;">
                         <li class="tabs-title is-active">
                             <a href="#testes">
                                 <div class="flex-box-center">
@@ -351,18 +360,9 @@
                         </li> 
                     </ul> 
 
-                    <!-- BARRA DE NOTIFICAÇÕES DAS ESTATÍSTICAS -->
-
-                    <div class="warning">
-                        <div class="flex-box-start" id="warnings">
-                            <img src="images/geral-icons/bell-icon.svg">
-                            <h4>Tudo em silêncio por enquanto.</h4>
-                        </div>                
-                    </div> 
-
                     <!-- ESTATÍSTICAS -->
 
-                    <div class="tabs-content" data-tabs-content="switch-1">
+                    <div class="tabs-content" data-tabs-content="statistics-tabs">
                         <div class="tabs-panel is-active" id="testes">
 
                             <!-- IMPORTAÇÃO LOCAL -->
