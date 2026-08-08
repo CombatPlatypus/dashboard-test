@@ -111,28 +111,20 @@
 
                         <!-- IMPORTAÇÃO LOCAL -->
 
-                        <section class="statistics-import-panel" aria-labelledby="statisticsImportTitle">
+                        <section class="statistics-import-panel" aria-labelledby="statisticsImportTitle" style="width: 600px;margin: 30px auto;">
+
+
                             <div class="statistics-import-header flex-box-between">
+
                                 <div>
                                     <h3 id="statisticsImportTitle">Importar dados locais</h3>
                                     <p>Selecione uma cópia da planilha para visualizar os dados no navegador.</p>
                                 </div>
 
-                                <div class="statistics-import-actions flex-box-start">
-                                    <label class="statistics-file-button" for="statisticsFileInput">
-                                        Selecionar arquivo
-                                    </label>
-
-                                    <input
-                                        id="statisticsFileInput"
-                                        class="statistics-file-input"
-                                        type="file"
-                                        accept=".xlsx,.xls"
-                                    >
-
-                                    <button id="statisticsClearFile" class="statistics-clear-button" type="button" disabled>
-                                        Limpar
-                                    </button>
+                                <div class="statistics-import-actions">
+                                    <label class="statistics-file-button" for="statisticsFileInput" style="margin-bottom: 20px;">Selecionar arquivo</label>
+                                    <input id="statisticsFileInput" class="statistics-file-input" type="file" accept=".xlsx,.xls" style="margin-bottom: 15px;">
+                                    <button id="statisticsClearFile" class="button" type="button" disabled>Limpar</button>
                                 </div>
                             </div>
 
@@ -141,9 +133,11 @@
                             </p>
                         </section>
 
+                        <hr>
+
                         <!-- PRÉVIA DOS DADOS IMPORTADOS -->
 
-                        <section id="statisticsLocalPreview" class="statistics-local-preview" hidden>
+                        <section id="statisticsLocalPreview" class="statistics-local-preview" hidden width: 600px; margin: 30px auto;>
                             <div class="statistics-preview-header flex-box-between">
                                 <h4>Prévia do arquivo</h4>
                                 <span id="statisticsPreviewSummary"></span>
