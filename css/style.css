@@ -982,7 +982,7 @@ a.thumbnail image {
 }
 .main-structure #statistics {
     width: 100%;
-    background-color: #ffffff;
+    background-color: #1f1f1f;
     border: solid 2px #525252;
     border-radius: 5px;
     height: calc(100dvh - 162px - 30px);
