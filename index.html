@@ -52,8 +52,9 @@
 
 
             .main-structure #statistics {
-                width: 100%;
+                width: 1200px;
                 height: auto;
+                margin: 0 auto;
             }
 
 
@@ -365,38 +366,41 @@
                     <div class="tabs-content" data-tabs-content="statistics-tabs">
                         <div class="tabs-panel is-active" id="testes">
 
-                            <!-- IMPORTAÇÃO LOCAL -->
+                            <div class="">
+                                <!-- IMPORTAÇÃO LOCAL -->
 
-                            <section class="import-panel">
+                                <section class="import-panel">
 
-                                <h3>Importar dados locais</h3>
+                                    <h3>Importar dados locais</h3>
 
-                                <div class="statistics-import-actions flex-box-start">
-                                    <label class="statistics-file-button" for="statisticsFileInput">Selecionar arquivo</label>
-                                    
-                                    <input id="statisticsFileInput" class="statistics-file-input" type="file" accept=".xlsx,.xls" style="display: none;">
-                                    <button id="statisticsClearFile" class="button" disabled>Limpar</button>
-                                </div>
+                                    <div class="statistics-import-actions flex-box-start">
+                                        <label class="statistics-file-button" for="statisticsFileInput">Selecionar arquivo</label>
+                                        
+                                        <input id="statisticsFileInput" class="statistics-file-input" type="file" accept=".xlsx,.xls" style="display: none;">
+                                        <button id="statisticsClearFile" class="button" disabled>Limpar</button>
+                                    </div>
 
-                                <p id="statisticsFileStatus">Nenhum arquivo selecionado.</p>
+                                    <p id="statisticsFileStatus">Nenhum arquivo selecionado.</p>
 
-                            </section>
+                                </section>
 
-                            <!-- PRÉVIA DOS DADOS IMPORTADOS -->
+                                <!-- PRÉVIA DOS DADOS IMPORTADOS -->
 
-                            <section id="statisticsLocalPreview" class="statistics-local-preview" hidden width: 600px; margin: 30px auto;>
-                                <div class="statistics-preview-header flex-box-between">
-                                    <h4>Prévia do arquivo</h4>
-                                    <span id="statisticsPreviewSummary"></span>
-                                </div>
+                                <section id="statisticsLocalPreview" class="statistics-local-preview" hidden width: 600px; margin: 30px auto;>
+                                    <div class="statistics-preview-header flex-box-between">
+                                        <h4>Prévia do arquivo</h4>
+                                        <span id="statisticsPreviewSummary"></span>
+                                    </div>
 
-                                <div class="statistics-table-container">
-                                    <table id="statisticsLocalTable" class="statistics-local-table">
-                                        <thead></thead>
-                                        <tbody></tbody>
-                                    </table>
-                                </div>
-                            </section>
+                                    <div class="statistics-table-container">
+                                        <table id="statisticsLocalTable" class="statistics-local-table">
+                                            <thead></thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
+                                </section>
+                            </div>
+                            
                         </div>
 
                         <div class="tabs-panel" id="statistics-1"></div>
