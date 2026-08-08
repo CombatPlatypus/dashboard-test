@@ -980,7 +980,7 @@ a.thumbnail image {
     border: solid 2px #525252;
     border-radius: 5px;
 }
-.main-structure .tabs {
+.main-structure #spreadsheets .tabs {
     flex: 0 0 220px;
     height: calc(100dvh - 162px - 30px);
     max-height: calc(100dvh - 162px - 30px);
@@ -994,23 +994,23 @@ a.thumbnail image {
     -webkit-align-items: stretch;
     align-items: stretch;
 }
-.main-structure .tabs:-webkit-scrollbar-track {
+.main-structure #spreadsheets .tabs:-webkit-scrollbar-track {
     background-color: transparent;
 }
-.main-structure .tabs::-webkit-scrollbar {
+.main-structure #spreadsheets .tabs::-webkit-scrollbar {
     width: 5px;
     background: transparent;
 }
-.main-structure .tabs::-webkit-scrollbar-thumb {
+.main-structure #spreadsheets .tabs::-webkit-scrollbar-thumb {
     border-radius: 5px;
     background: #525252;
 }
-.main-structure .tabs .tabs-title {
+.main-structure #spreadsheets .tabs .tabs-title {
     border-radius: 5px;
     border: 2px solid #525252;
     align-items: center;
 }
-.main-structure .tabs .tabs-title a {
+.main-structure #spreadsheets .tabs .tabs-title a {
     width: 150px;
     min-height: 66px;
     padding: 12px;
@@ -1021,25 +1021,25 @@ a.thumbnail image {
     align-items: center;
     justify-content: center;
 }
-.main-structure .tabs-title:hover {
+.main-structure #spreadsheets .tabs-title:hover {
     background: #2e2e2e;
 }
-.main-structure .tabs-title.is-active{
+.main-structure #spreadsheets .tabs-title.is-active{
     background: #2e2e2e;
 }
-.main-structure .tabs-title:focus, .main-structure .tabs-title[aria-selected='true'] {
+.main-structure #spreadsheets .tabs-title:focus, .main-structure #spreadsheets .tabs-title[aria-selected='true'] {
     background-color: #2e2e2e
 }
-.main-structure .tabs-title>a:hover {
+.main-structure #spreadsheets .tabs-title>a:hover {
     background: transparent;
 }
-.main-structure .tabs-title>a:focus, .main-structure .tabs-title>a[aria-selected='true'] {
+.main-structure #spreadsheets .tabs-title>a:focus, .main-structure #spreadsheets .tabs-title>a[aria-selected='true'] {
     background-color: transparent;
 }
-.main-structure .tabs .main-spreadsheet {
+.main-structure #spreadsheets .tabs .main-spreadsheet {
     width: 195px !important;
 }
-.main-structure .tabs-content #spreadsheets .spreadsheets-links {
+.main-structure #spreadsheets .tabs-content #spreadsheets .spreadsheets-links {
     width: 45px;
     height: 45px;
     padding: 4px;
@@ -1055,16 +1055,16 @@ a.thumbnail image {
     cursor: pointer;
     transition: color 0.2s ease;
 }
-.main-structure .tabs-content #spreadsheets .spreadsheets-link-icon {
+.main-structure #spreadsheets .tabs-content #spreadsheets .spreadsheets-link-icon {
     display: block;
     width: 100%;
     height: 100%;
 }
-.main-structure .tabs-content #spreadsheets .spreadsheets-links:hover,
-.main-structure .tabs-content #spreadsheets .spreadsheets-links:focus-visible {
+.main-structure #spreadsheets .tabs-content #spreadsheets .spreadsheets-links:hover,
+.main-structure #spreadsheets .tabs-content #spreadsheets .spreadsheets-links:focus-visible {
     color: #1a73e8;
 }
-.main-structure .tabs-content #spreadsheets .spreadsheets-links:focus-visible {
+.main-structure #spreadsheets .tabs-content #spreadsheets .spreadsheets-links:focus-visible {
     outline: 2px solid #1a73e8;
     outline-offset: -3px;
 }
