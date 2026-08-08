@@ -20,6 +20,203 @@
 
         <link rel="icon" href="images/geral-icons/hub-logo.svg">
         <link rel="stylesheet" href="css/style.css">
+
+        <style>
+
+            /* AVISOS */
+
+            .warnings-box-support {
+                width: 100%;
+                background-color: #1f1f1f;
+                border-bottom: 2px solid #525252;
+            }
+            .warning {
+                width: 67%;
+                position: relative;
+                margin: 0 0 30px 0;
+                padding: 20px;
+                border-radius: 5px;
+                align-items: center;
+            }
+            .warning .container {
+                max-width: max-content !important;
+                align-items: center;
+            }
+            .warning .container img {
+                width: 25px;
+                margin-right: 15px;
+            }
+            .warning h4 {
+                margin-bottom: 0;
+                color: #e4e6eb;
+            }
+
+            /* PAINEL ESTATÍSTICAS */
+
+
+            .main-structure #statistics {
+                width: 100%;
+                height: auto;
+            }
+
+
+            .import-panel {
+                width: max-content;
+                margin: 30px auto;
+                text-align: center;
+                padding: 30px;
+                color: #e4e6eb;
+                background-color: #1f1f1f;
+                border: 2px solid #525252;
+                border-radius: 5px;
+            }
+
+            .import-panel h3,
+            .import-panel p,
+            .statistics-preview-header h4 {
+                margin: 0;
+            }
+
+            .import-panel h3 {
+                margin-bottom: 5px;
+                font-size: 17px;
+            }
+
+            .import-panel p {
+                font-size: 13px;
+                text-align: center;
+            }
+
+            .statistics-import-actions {
+                flex: 0 0 auto;
+                gap: 10px;
+                align-items: center;
+            }
+
+            .statistics-file-input {
+                display: none;
+            }
+
+            .statistics-file-button,
+            .statistics-clear-button {
+                min-height: 40px;
+                margin: 0;
+                padding: 10px 14px;
+                border: 2px solid #525252;
+                border-radius: 5px;
+                font-size: 13px;
+                line-height: 1.2;
+                letter-spacing: 1px;
+                font-family: 'Open Sans', sans-serif;
+                font-weight: 600;
+                cursor: pointer;
+            }
+
+            .statistics-file-button {
+                display: flex;
+                align-items: center;
+                color: #141414;
+                background-color: #e4e6eb;
+            }
+
+            .statistics-clear-button {
+                color: #e4e6eb;
+                background-color: transparent;
+            }
+
+            .statistics-file-button:hover,
+            .statistics-file-button:focus-visible {
+                background-color: #ffffff;
+            }
+
+            .statistics-clear-button:hover:not(:disabled),
+            .statistics-clear-button:focus-visible:not(:disabled) {
+                border-color: #e4e6eb;
+            }
+
+            .statistics-clear-button:disabled {
+                opacity: 0.45;
+                cursor: default;
+            }
+
+            .statistics-local-preview {
+                width: 700px;
+                margin: 0 auto;
+                min-height: 0;
+                padding: 14px 18px 18px;
+                color: #e4e6eb;
+            }
+
+            .statistics-local-preview[hidden] {
+                display: none;
+            }
+
+            .statistics-preview-header {
+                min-height: 32px;
+                gap: 15px;
+                align-items: center;
+            }
+
+            .statistics-preview-header h4,
+            .statistics-preview-header span {
+                font-size: 13px;
+            }
+
+            .statistics-preview-header span {
+                color: #b9bcc1;
+            }
+
+            .statistics-table-container {
+                height: calc(100% - 32px);
+                overflow: auto;
+                border: 1px solid #525252;
+            }
+
+            .statistics-local-table {
+                min-width: 650px;
+                color: #e4e6eb;
+                background-color: #141414;
+            }
+
+            .statistics-local-table thead {
+                position: sticky;
+                top: 0;
+                z-index: 1;
+                background-color: #2e2e2e;
+            }
+
+            .statistics-local-table thead th,
+            .statistics-local-table tbody td {
+                padding: 9px 12px;
+                border-right: 1px solid #393a3b;
+                font-size: 13px;
+                text-align: left;
+            }
+
+            .statistics-local-table thead th:last-child,
+            .statistics-local-table tbody td:last-child {
+                border-right: none;
+            }
+
+            .statistics-local-table tbody tr {
+                border-top: 1px solid #393a3b;
+            }
+
+            .statistics-local-table tbody tr:nth-child(even) {
+                background-color: #1b1b1b;
+            }
+
+            .statistics-spreadsheet-container {
+                flex: 1 1 auto;
+                min-height: 0;
+                background-color: #ffffff;
+            }
+
+            .statistics-spreadsheet-container iframe {
+                display: block;
+            }
+
+        </style>
     </head>	
 
     <!-- CONTEÚDO DA PÁGINA -->
@@ -107,19 +304,75 @@
                 <!-- PAINEL ESTATÍSTICAS -->
 
                 <div class="tabs-panel is-active" id="statistics">
-                    <div class="statistics-layout">
 
-                        <!-- IMPORTAÇÃO LOCAL -->
+                    <!-- MENU DE NAVEGAÇÃO DAS ESTATÍSTICAS -->
 
-                        <section class="statistics-import-panel" aria-labelledby="statisticsImportTitle" style="width: 600px;margin: 30px auto;">
-
-
-                            <div class="statistics-import-header flex-box-center">
-
-                                <div>
-                                    <h3 id="statisticsImportTitle">Importar dados locais</h3>
-                                    <p>Selecione uma cópia da planilha para visualizar os dados no navegador.</p>
+                    <ul class="flex-box-start tabs" data-tabs id="statistics-tabs">
+                        <li class="tabs-title is-active">
+                            <a href="#testes">
+                                <div class="flex-box-center">
+                                    <img src="images/geral-icons/sheets-icon.svg">
+                                    <h4>Testes</h4>
                                 </div>
+                            </a>
+                        </li> 
+
+                        <li class="tabs-title">
+                            <a href="#statistics-1">
+                                <div class="flex-box-center">
+                                    <img src="images/geral-icons/statistics-icon.svg">
+                                    <h4>Estatísticas 01</h4>
+                                </div>
+                            </a>
+                        </li> 
+
+                        <li class="tabs-title">
+                            <a href="#statistics-2">
+                                <div class="flex-box-center">
+                                    <img src="images/geral-icons/statistics-icon.svg">
+                                    <h4>Estatísticas 02</h4>
+                                </div>
+                            </a>
+                        </li> 
+
+                        <li class="tabs-title">
+                            <a href="#statistics-3">
+                                <div class="flex-box-center">
+                                    <img src="images/geral-icons/statistics-icon.svg">
+                                    <h4>Estatísticas 03</h4>
+                                </div>
+                            </a>
+                        </li> 
+
+                        <li class="tabs-title">
+                            <a href="#statistics-4">
+                                <div class="flex-box-center">
+                                    <img src="images/geral-icons/statistics-icon.svg">
+                                    <h4>Estatísticas 04</h4>
+                                </div>
+                            </a>
+                        </li> 
+                    </ul> 
+
+                    <!-- BARRA DE NOTIFICAÇÕES DAS ESTATÍSTICAS -->
+
+                    <div class="warning">
+                        <div class="flex-box-start" id="warnings">
+                            <img src="images/geral-icons/bell-icon.svg">
+                            <h4>Tudo em silêncio por enquanto.</h4>
+                        </div>                
+                    </div> 
+
+                    <!-- ESTATÍSTICAS -->
+
+                    <div class="tabs-content" data-tabs-content="switch-1">
+                        <div class="tabs-panel is-active" id="testes">
+
+                            <!-- IMPORTAÇÃO LOCAL -->
+
+                            <section class="import-panel">
+
+                                <h3>Importar dados locais</h3>
 
                                 <div class="statistics-import-actions flex-box-start">
                                     <label class="statistics-file-button" for="statisticsFileInput">Selecionar arquivo</label>
@@ -127,35 +380,32 @@
                                     <input id="statisticsFileInput" class="statistics-file-input" type="file" accept=".xlsx,.xls" style="display: none;">
                                     <button id="statisticsClearFile" class="button" disabled>Limpar</button>
                                 </div>
-                            </div>
 
-                            <p id="statisticsFileStatus" class="statistics-file-status" role="status" aria-live="polite">
-                                Nenhum arquivo selecionado. O arquivo será lido somente neste navegador.
-                            </p>
-                        </section>
+                                <p id="statisticsFileStatus">Nenhum arquivo selecionado.</p>
 
-                        <!-- PRÉVIA DOS DADOS IMPORTADOS -->
+                            </section>
 
-                        <section id="statisticsLocalPreview" class="statistics-local-preview" hidden width: 600px; margin: 30px auto;>
-                            <div class="statistics-preview-header flex-box-between">
-                                <h4>Prévia do arquivo</h4>
-                                <span id="statisticsPreviewSummary"></span>
-                            </div>
+                            <!-- PRÉVIA DOS DADOS IMPORTADOS -->
 
-                            <div class="statistics-table-container">
-                                <table id="statisticsLocalTable" class="statistics-local-table">
-                                    <thead></thead>
-                                    <tbody></tbody>
-                                </table>
-                            </div>
-                        </section>
+                            <section id="statisticsLocalPreview" class="statistics-local-preview" hidden width: 600px; margin: 30px auto;>
+                                <div class="statistics-preview-header flex-box-between">
+                                    <h4>Prévia do arquivo</h4>
+                                    <span id="statisticsPreviewSummary"></span>
+                                </div>
 
-                        <!-- PLANILHA RESUMO JÁ EXISTENTE -->
-<!-- 
-                        <div class="statistics-spreadsheet-container">
-                            <iframe id="statisticsSpreadsheet" loading="lazy"></iframe>
-                        </div> -->
-                        
+                                <div class="statistics-table-container">
+                                    <table id="statisticsLocalTable" class="statistics-local-table">
+                                        <thead></thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </section>
+                        </div>
+
+                        <div class="tabs-panel" id="statistics-1"></div>
+                        <div class="tabs-panel" id="statistics-2"></div>
+                        <div class="tabs-panel" id="statistics-3"></div>
+                        <div class="tabs-panel" id="statistics-4"></div>
                     </div>
                 </div>
             </div>
