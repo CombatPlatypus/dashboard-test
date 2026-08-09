@@ -56,7 +56,7 @@
                 margin: 0 auto;
             }
             .main-structure #statistics .function {
-                width: max-content;
+                max-width: 100%;
                 background-color: #1f1f1f;
                 border: 2px solid #525252;
                 border-radius: 5px;
@@ -94,41 +94,36 @@
             .main-structure #statistics .function .local-preview[hidden] {
                 display: none;
             }
-
-
-
-            .statistics-preview-header {
+            .main-structure #statistics .function .preview-header {
                 min-height: 32px;
                 gap: 15px;
                 align-items: center;
             }
-            .statistics-preview-header h4,
-            .statistics-preview-header span {
+            .main-structure #statistics .function .preview-header h4, .main-structure #statistics .function .preview-header span {
                 font-size: 13px;
             }
-            .statistics-preview-header span {
+            .main-structure #statistics .function .preview-header span {
                 color: #b9bcc1;
             }
+
+
 
             .statistics-table-container {
                 height: calc(100% - 32px);
                 overflow: auto;
                 border: 1px solid #525252;
             }
-
             .statistics-local-table {
                 min-width: 650px;
                 color: #e4e6eb;
                 background-color: #141414;
             }
-
             .statistics-local-table thead {
                 position: sticky;
                 top: 0;
                 z-index: 1;
                 background-color: #2e2e2e;
             }
-
             .statistics-local-table thead th,
             .statistics-local-table tbody td {
                 padding: 9px 12px;
@@ -136,26 +131,21 @@
                 font-size: 13px;
                 text-align: left;
             }
-
             .statistics-local-table thead th:last-child,
             .statistics-local-table tbody td:last-child {
                 border-right: none;
             }
-
             .statistics-local-table tbody tr {
                 border-top: 1px solid #393a3b;
             }
-
             .statistics-local-table tbody tr:nth-child(even) {
                 background-color: #1b1b1b;
             }
-
             .statistics-spreadsheet-container {
                 flex: 1 1 auto;
                 min-height: 0;
                 background-color: #ffffff;
             }
-
             .statistics-spreadsheet-container iframe {
                 display: block;
             }
@@ -249,15 +239,6 @@
 
                 <div class="tabs-panel is-active" id="statistics">
 
-                    <!-- BARRA DE NOTIFICAÇÕES DAS ESTATÍSTICAS -->
-
-                    <div class="warning">
-                        <div class="flex-box-start" id="warnings">
-                            <img src="images/geral-icons/bell-icon.svg">
-                            <h4>Tudo em silêncio por enquanto.</h4>
-                        </div>                
-                    </div> 
-
                     <!-- MENU DE NAVEGAÇÃO DAS ESTATÍSTICAS -->
 
                     <ul class="flex-box-start tabs" data-tabs id="statistics-tabs" style="margin: 0 auto;">
@@ -265,7 +246,7 @@
                             <a href="#statistics-1">
                                 <div class="flex-box-center">
                                     <img src="images/geral-icons/statistics-icon.svg">
-                                    <h4>Estatísticas 01</h4>
+                                    <h4>Geração de Tabela</h4>
                                 </div>
                             </a>
                         </li> 
@@ -274,7 +255,7 @@
                             <a href="#statistics-2">
                                 <div class="flex-box-center">
                                     <img src="images/geral-icons/statistics-icon.svg">
-                                    <h4>Estatísticas 02</h4>
+                                    <h4>Montagem de Gráficos</h4>
                                 </div>
                             </a>
                         </li> 
@@ -283,7 +264,7 @@
                             <a href="#statistics-3">
                                 <div class="flex-box-center">
                                     <img src="images/geral-icons/statistics-icon.svg">
-                                    <h4>Estatísticas 03</h4>
+                                    <h4>Comparação de Dados</h4>
                                 </div>
                             </a>
                         </li> 
@@ -292,7 +273,7 @@
                             <a href="#statistics-4">
                                 <div class="flex-box-center">
                                     <img src="images/geral-icons/statistics-icon.svg">
-                                    <h4>Estatísticas 04</h4>
+                                    <h4>Comparação de Planilhas</h4>
                                 </div>
                             </a>
                         </li> 
