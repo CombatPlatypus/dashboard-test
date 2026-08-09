@@ -1,78 +1,53 @@
 const MAX_PREVIEW_ROWS = 500;
 
-const SUPPORTED_EXTENSIONS = new Set([
-    "xlsx",
-    "xls",
-    "csv"
-]);
+const MAX_FREQUENCY_ROWS = 25;
+
+const SUPPORTED_EXTENSIONS = new Set(["xlsx", "xls", "csv"]);
 
 
 /* LOCALIZA OS ELEMENTOS DO PAINEL */
 
 const fileInput =
-    document.getElementById(
-        "statisticsFileInput"
-    );
+    document.getElementById("statisticsFileInput");
 
 const clearButton =
-    document.getElementById(
-        "statisticsClearFile"
-    );
+    document.getElementById("statisticsClearFile");
 
 const fileStatus =
-    document.getElementById(
-        "statisticsFileStatus"
-    );
+    document.getElementById("statisticsFileStatus");
 
 const preview =
-    document.getElementById(
-        "statisticsLocalPreview"
-    );
+    document.getElementById("statisticsLocalPreview");
 
 const previewSummary =
-    document.getElementById(
-        "statisticsPreviewSummary"
-    );
+    document.getElementById("statisticsPreviewSummary");
 
 const table =
-    document.getElementById(
-        "statisticsLocalTable"
-    );
+    document.getElementById("statisticsLocalTable");
 
 const quickAnalysis =
-    document.getElementById(
-        "statisticsQuickAnalysis"
-    );
+    document.getElementById("statisticsQuickAnalysis");
 
-const packagesLabel =
-    document.getElementById(
-        "statisticsPackagesLabel"
-    );
+const analysisColumns =
+    document.getElementById("statisticsAnalysisColumns");
 
-const totalPackages =
-    document.getElementById(
-        "statisticsTotalPackages"
-    );
+const selectAllColumnsButton =
+    document.getElementById("statisticsSelectAllColumns");
 
-const totalRoutes =
-    document.getElementById(
-        "statisticsTotalRoutes"
-    );
+const clearColumnsButton =
+    document.getElementById("statisticsClearColumns");
 
-const totalStatuses =
-    document.getElementById(
-        "statisticsTotalStatuses"
-    );
+const totalRecords =
+    document.getElementById("statisticsTotalRecords");
 
-const routesSummary =
-    document.getElementById(
-        "statisticsRoutesSummary"
-    );
+const analysisCards =
+    document.getElementById("statisticsAnalysisCards");
 
-const statusesSummary =
-    document.getElementById(
-        "statisticsStatusesSummary"
-    );
+const analysisResults =
+    document.getElementById("statisticsAnalysisResults");
+
+const analysisEmpty =
+    document.getElementById("statisticsAnalysisEmpty");
 
 
 /* ESTADO DA TABELA INTERATIVA */
@@ -87,6 +62,12 @@ const tableState = {
 
     rows:
         [],
+
+    columnProfiles:
+        [],
+
+    selectedAnalysisColumns:
+        new Set(),
 
     filters:
         [],
@@ -215,70 +196,6 @@ function normalizeSearchValue(
 }
 
 
-/* LOCALIZA UMA COLUNA PELO NOME */
-
-function findColumnIndex(
-    possibleNames
-) {
-
-    const normalizedNames =
-        possibleNames.map(
-            function (
-                name
-            ) {
-
-                return normalizeSearchValue(
-                    name
-                ).trim();
-            }
-        );
-
-
-    return tableState.headers.findIndex(
-        function (
-            header
-        ) {
-
-            return normalizedNames.includes(
-                normalizeSearchValue(
-                    header
-                ).trim()
-            );
-        }
-    );
-}
-
-
-/* CONTA REGISTROS PREENCHIDOS */
-
-function countFilledRows(
-    rows,
-    columnIndex
-) {
-
-    if (columnIndex < 0) {
-
-        return rows.length;
-    }
-
-
-    return rows.reduce(
-        function (
-            total,
-            row
-        ) {
-
-            return normalizeSearchValue(
-                row[columnIndex]
-            ).trim()
-                ? total + 1
-                : total;
-        },
-        0
-    );
-}
-
-
 /* AGRUPA OS VALORES DE UMA COLUNA */
 
 function createFrequencyData(
@@ -357,7 +274,7 @@ function createFrequencyData(
 
             return (
                 secondGroup.count -
-                firstGroup.count ||
+                    firstGroup.count ||
 
                 naturalCollator.compare(
                     firstGroup.label,
@@ -380,7 +297,9 @@ function renderFrequencyTable(
     tableBody.replaceChildren();
 
 
-    if (frequencyData.length === 0) {
+    if (
+        frequencyData.length === 0
+    ) {
 
         const row =
             document.createElement(
@@ -458,86 +377,1510 @@ function renderFrequencyTable(
 }
 
 
+/* VERIFICA SE UMA CÉLULA ESTÁ VAZIA */
+
+function isEmptyCell(
+    value
+) {
+
+    return formatCellValue(
+        value
+    ).trim() === "";
+}
+
+
+/* CONVERTE UM VALOR NUMÉRICO */
+
+function parseNumericValue(
+    value
+) {
+
+    if (
+        typeof value === "number" &&
+        Number.isFinite(value)
+    ) {
+
+        return value;
+    }
+
+
+    if (
+        value instanceof Date ||
+        isEmptyCell(value)
+    ) {
+
+        return null;
+    }
+
+
+    let normalizedValue =
+        formatCellValue(
+            value
+        )
+            .trim()
+            .replace(
+                /\s|\u00a0/g,
+                ""
+            )
+            .replace(
+                /^R\$/i,
+                ""
+            )
+            .replace(
+                /%$/,
+                ""
+            );
+
+
+    if (
+        !/^[+-]?\d[\d.,]*$/.test(
+            normalizedValue
+        )
+    ) {
+
+        return null;
+    }
+
+
+    const lastComma =
+        normalizedValue.lastIndexOf(
+            ","
+        );
+
+
+    const lastDot =
+        normalizedValue.lastIndexOf(
+            "."
+        );
+
+
+    if (
+        lastComma >= 0 &&
+        lastDot >= 0
+    ) {
+
+        const decimalSeparator =
+            lastComma > lastDot
+                ? ","
+                : ".";
+
+
+        const thousandsSeparator =
+            decimalSeparator === ","
+                ? "."
+                : ",";
+
+
+        normalizedValue =
+            normalizedValue
+                .replaceAll(
+                    thousandsSeparator,
+                    ""
+                )
+                .replace(
+                    decimalSeparator,
+                    "."
+                );
+
+    }
+    else if (
+        lastComma >= 0
+    ) {
+
+        normalizedValue =
+            normalizedValue
+                .replaceAll(
+                    ".",
+                    ""
+                )
+                .replace(
+                    ",",
+                    "."
+                );
+
+    }
+    else {
+
+        normalizedValue =
+            normalizedValue.replaceAll(
+                ",",
+                ""
+            );
+    }
+
+
+    const numericValue =
+        Number(
+            normalizedValue
+        );
+
+
+    return Number.isFinite(
+        numericValue
+    )
+        ? numericValue
+        : null;
+}
+
+
+/* CONVERTE UMA DATA OU DATA/HORA */
+
+function parseDateValue(
+    value
+) {
+
+    if (
+        value instanceof Date &&
+        !Number.isNaN(
+            value.getTime()
+        )
+    ) {
+
+        return value;
+    }
+
+
+    const displayValue =
+        formatCellValue(
+            value
+        ).trim();
+
+
+    if (!displayValue) {
+
+        return null;
+    }
+
+
+    const dateMatch =
+        displayValue.match(
+            /^(\d{4})[-/](\d{1,2})[-/](\d{1,2})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?)?$/
+        ) ||
+
+        displayValue.match(
+            /^(\d{1,2})\/(\d{1,2})\/(\d{2,4})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?)?$/
+        );
+
+
+    if (!dateMatch) {
+
+        return null;
+    }
+
+
+    const startsWithYear =
+        dateMatch[1].length === 4;
+
+
+    let year =
+        Number(
+            startsWithYear
+                ? dateMatch[1]
+                : dateMatch[3]
+        );
+
+
+    if (
+        year < 100
+    ) {
+
+        year +=
+            year >= 70
+                ? 1900
+                : 2000;
+    }
+
+
+    const month =
+        Number(
+            dateMatch[2]
+        );
+
+
+    const day =
+        Number(
+            startsWithYear
+                ? dateMatch[3]
+                : dateMatch[1]
+        );
+
+
+    const hour =
+        Number(
+            dateMatch[4] ?? 0
+        );
+
+
+    const minute =
+        Number(
+            dateMatch[5] ?? 0
+        );
+
+
+    const second =
+        Number(
+            dateMatch[6] ?? 0
+        );
+
+
+    const parsedDate =
+        new Date(
+            year,
+            month - 1,
+            day,
+            hour,
+            minute,
+            second
+        );
+
+
+    if (
+        parsedDate.getFullYear() !== year ||
+        parsedDate.getMonth() !== month - 1 ||
+        parsedDate.getDate() !== day ||
+        parsedDate.getHours() !== hour ||
+        parsedDate.getMinutes() !== minute ||
+        parsedDate.getSeconds() !== second
+    ) {
+
+        return null;
+    }
+
+
+    return parsedDate;
+}
+
+
+/* RETORNA O NOME VISÍVEL DO TIPO */
+
+function getColumnTypeLabel(
+    type
+) {
+
+    const labels = {
+
+        category:
+            "Categoria",
+
+        identifier:
+            "Identificador",
+
+        number:
+            "Número",
+
+        datetime:
+            "Data/hora",
+
+        empty:
+            "Vazia"
+    };
+
+
+    return labels[type] ??
+        "Texto";
+}
+
+
+/* DETECTA O TIPO DE UMA COLUNA */
+
+function detectColumnProfile(
+    columnIndex
+) {
+
+    const filledValues =
+        tableState.rows
+            .map(
+                function (
+                    row
+                ) {
+
+                    return row[
+                        columnIndex
+                    ];
+                }
+            )
+            .filter(
+                function (
+                    value
+                ) {
+
+                    return !isEmptyCell(
+                        value
+                    );
+                }
+            );
+
+
+    if (
+        filledValues.length === 0
+    ) {
+
+        return {
+            type:
+                "empty",
+
+            hasTime:
+                false
+        };
+    }
+
+
+    const dateValues =
+        filledValues.filter(
+            function (
+                value
+            ) {
+
+                return parseDateValue(
+                    value
+                ) !== null;
+            }
+        );
+
+
+    const numericValues =
+        filledValues.filter(
+            function (
+                value
+            ) {
+
+                return parseNumericValue(
+                    value
+                ) !== null;
+            }
+        );
+
+
+    const uniqueValues =
+        new Set(
+            filledValues.map(
+                function (
+                    value
+                ) {
+
+                    return normalizeSearchValue(
+                        value
+                    ).trim();
+                }
+            )
+        );
+
+
+    const uniqueRatio =
+        uniqueValues.size /
+        filledValues.length;
+
+
+    const headerValue =
+        normalizeSearchValue(
+            tableState.headers[
+                columnIndex
+            ]
+        ).trim();
+
+
+    const identifierHeader =
+        /^(id|codigo|code|pacotes?|packages?|pedidos?|orders?|at\/to|serial(?: number)?|tracking(?: number)?|uuid|chave|key|referencia|reference)$/.test(
+            headerValue
+        ) ||
+
+        /(^|[\s_-])(id|codigo|code)$/.test(
+            headerValue
+        );
+
+
+    if (
+        dateValues.length /
+            filledValues.length >= 0.8
+    ) {
+
+        return {
+            type:
+                "datetime",
+
+            hasTime:
+                filledValues.some(
+                    function (
+                        value
+                    ) {
+
+                        return /\d{1,2}:\d{2}/.test(
+                            formatCellValue(
+                                value
+                            )
+                        );
+                    }
+                )
+        };
+    }
+
+
+    if (
+        numericValues.length /
+            filledValues.length >= 0.8
+    ) {
+
+        return {
+            type:
+                identifierHeader &&
+                uniqueRatio >= 0.8
+                    ? "identifier"
+                    : "number",
+
+            hasTime:
+                false
+        };
+    }
+
+
+    return {
+        type:
+            uniqueRatio >= 0.8 &&
+            identifierHeader
+                ? "identifier"
+                : "category",
+
+        hasTime:
+            false
+    };
+}
+
+
+/* FORMATA UM NÚMERO DA ANÁLISE */
+
+function formatAnalysisNumber(
+    value
+) {
+
+    if (
+        !Number.isFinite(
+            value
+        )
+    ) {
+
+        return "—";
+    }
+
+
+    return new Intl.NumberFormat(
+        "pt-BR",
+        {
+            maximumFractionDigits:
+                2
+        }
+    ).format(
+        value
+    );
+}
+
+
+/* FORMATA UMA DATA DA ANÁLISE */
+
+function formatAnalysisDate(
+    value,
+    hasTime
+) {
+
+    if (
+        !(value instanceof Date)
+    ) {
+
+        return "—";
+    }
+
+
+    return new Intl.DateTimeFormat(
+        "pt-BR",
+
+        hasTime
+            ? {
+                dateStyle:
+                    "short",
+
+                timeStyle:
+                    "medium"
+            }
+            : {
+                dateStyle:
+                    "short"
+            }
+    ).format(
+        value
+    );
+}
+
+
+/* CRIA UM CARTÃO DA ANÁLISE */
+
+function createAnalysisCard(
+    label,
+    value
+) {
+
+    const card =
+        document.createElement(
+            "div"
+        );
+
+
+    const cardLabel =
+        document.createElement(
+            "span"
+        );
+
+
+    const cardValue =
+        document.createElement(
+            "strong"
+        );
+
+
+    card.classList.add(
+        "statistics-summary-card"
+    );
+
+
+    cardLabel.textContent =
+        label;
+
+
+    cardValue.textContent =
+        value;
+
+
+    card.append(
+        cardLabel,
+        cardValue
+    );
+
+
+    return card;
+}
+
+
+/* CRIA UM BLOCO DA ANÁLISE */
+
+function createAnalysisBlock(
+    title,
+    type
+) {
+
+    const block =
+        document.createElement(
+            "div"
+        );
+
+
+    const heading =
+        document.createElement(
+            "h4"
+        );
+
+
+    const typeLabel =
+        document.createElement(
+            "span"
+        );
+
+
+    block.classList.add(
+        "statistics-summary-block"
+    );
+
+
+    heading.append(
+        document.createTextNode(
+            title
+        )
+    );
+
+
+    typeLabel.classList.add(
+        "statistics-analysis-type"
+    );
+
+
+    typeLabel.textContent =
+        getColumnTypeLabel(
+            type
+        );
+
+
+    heading.appendChild(
+        typeLabel
+    );
+
+
+    block.appendChild(
+        heading
+    );
+
+
+    return block;
+}
+
+
+/* ADICIONA MÉTRICAS A UM BLOCO */
+
+function appendAnalysisMetrics(
+    block,
+    metrics
+) {
+
+    const metricsContainer =
+        document.createElement(
+            "div"
+        );
+
+
+    metricsContainer.classList.add(
+        "statistics-analysis-metrics"
+    );
+
+
+    metrics.forEach(
+        function (
+            metric
+        ) {
+
+            const metricElement =
+                document.createElement(
+                    "div"
+                );
+
+
+            const metricLabel =
+                document.createElement(
+                    "span"
+                );
+
+
+            const metricValue =
+                document.createElement(
+                    "strong"
+                );
+
+
+            metricElement.classList.add(
+                "statistics-analysis-metric"
+            );
+
+
+            metricLabel.textContent =
+                metric.label;
+
+
+            metricValue.textContent =
+                metric.value;
+
+
+            metricValue.title =
+                metric.value;
+
+
+            metricElement.append(
+                metricLabel,
+                metricValue
+            );
+
+
+            metricsContainer.appendChild(
+                metricElement
+            );
+        }
+    );
+
+
+    block.appendChild(
+        metricsContainer
+    );
+}
+
+
+/* ADICIONA UMA TABELA DE FREQUÊNCIA A UM BLOCO */
+
+function appendFrequencyAnalysis(
+    block,
+    frequencyData,
+    emptyMessage
+) {
+
+    const frequencyTable =
+        document.createElement(
+            "table"
+        );
+
+
+    const tableHead =
+        document.createElement(
+            "thead"
+        );
+
+
+    const headerRow =
+        document.createElement(
+            "tr"
+        );
+
+
+    const tableBody =
+        document.createElement(
+            "tbody"
+        );
+
+
+    frequencyTable.classList.add(
+        "statistics-summary-table"
+    );
+
+
+    headerRow.append(
+        createCell(
+            "th",
+            "Valor"
+        ),
+
+        createCell(
+            "th",
+            "Quantidade"
+        )
+    );
+
+
+    tableHead.appendChild(
+        headerRow
+    );
+
+
+    frequencyTable.append(
+        tableHead,
+        tableBody
+    );
+
+
+    renderFrequencyTable(
+        tableBody,
+
+        frequencyData.slice(
+            0,
+            MAX_FREQUENCY_ROWS
+        ),
+
+        emptyMessage
+    );
+
+
+    block.appendChild(
+        frequencyTable
+    );
+
+
+    if (
+        frequencyData.length >
+        MAX_FREQUENCY_ROWS
+    ) {
+
+        const note =
+            document.createElement(
+                "p"
+            );
+
+
+        note.classList.add(
+            "statistics-analysis-note"
+        );
+
+
+        note.textContent =
+            `Exibindo ${MAX_FREQUENCY_ROWS} de ${frequencyData.length} valores.`;
+
+
+        block.appendChild(
+            note
+        );
+    }
+}
+
+
+/* MONTA OS CHECKBOXES DAS COLUNAS */
+
+function renderAnalysisColumnSelector() {
+
+    analysisColumns.replaceChildren();
+
+
+    const fragment =
+        document.createDocumentFragment();
+
+
+    tableState.headers.forEach(
+        function (
+            header,
+            columnIndex
+        ) {
+
+            const option =
+                document.createElement(
+                    "div"
+                );
+
+
+            const label =
+                document.createElement(
+                    "label"
+                );
+
+
+            const checkbox =
+                document.createElement(
+                    "input"
+                );
+
+
+            const columnName =
+                document.createElement(
+                    "span"
+                );
+
+
+            const columnType =
+                document.createElement(
+                    "span"
+                );
+
+
+            const profile =
+                tableState.columnProfiles[
+                    columnIndex
+                ];
+
+
+            option.classList.add(
+                "statistics-column-option"
+            );
+
+
+            checkbox.type =
+                "checkbox";
+
+
+            checkbox.checked =
+                tableState
+                    .selectedAnalysisColumns
+                    .has(
+                        columnIndex
+                    );
+
+
+            checkbox.setAttribute(
+                "aria-label",
+                `Analisar coluna ${header}`
+            );
+
+
+            checkbox.addEventListener(
+                "change",
+                function () {
+
+                    if (
+                        checkbox.checked
+                    ) {
+
+                        tableState
+                            .selectedAnalysisColumns
+                            .add(
+                                columnIndex
+                            );
+
+                    }
+                    else {
+
+                        tableState
+                            .selectedAnalysisColumns
+                            .delete(
+                                columnIndex
+                            );
+                    }
+
+
+                    renderQuickAnalysis(
+                        getFilteredRows()
+                    );
+                }
+            );
+
+
+            columnName.classList.add(
+                "statistics-column-name"
+            );
+
+
+            columnName.textContent =
+                header;
+
+
+            columnName.title =
+                header;
+
+
+            columnType.classList.add(
+                "statistics-column-type"
+            );
+
+
+            columnType.textContent =
+                getColumnTypeLabel(
+                    profile.type
+                );
+
+
+            label.append(
+                checkbox,
+                columnName,
+                columnType
+            );
+
+
+            option.appendChild(
+                label
+            );
+
+
+            fragment.appendChild(
+                option
+            );
+        }
+    );
+
+
+    analysisColumns.appendChild(
+        fragment
+    );
+
+
+    const hasColumns =
+        tableState.columnCount > 0;
+
+
+    selectAllColumnsButton.disabled =
+        !hasColumns;
+
+
+    clearColumnsButton.disabled =
+        !hasColumns;
+}
+
+
+/* ANALISA UMA COLUNA SELECIONADA */
+
+function renderSelectedColumnAnalysis(
+    rows,
+    columnIndex
+) {
+
+    const header =
+        tableState.headers[
+            columnIndex
+        ];
+
+
+    const profile =
+        tableState.columnProfiles[
+            columnIndex
+        ];
+
+
+    const filledValues =
+        rows
+            .map(
+                function (
+                    row
+                ) {
+
+                    return row[
+                        columnIndex
+                    ];
+                }
+            )
+            .filter(
+                function (
+                    value
+                ) {
+
+                    return !isEmptyCell(
+                        value
+                    );
+                }
+            );
+
+
+    const emptyCount =
+        rows.length -
+        filledValues.length;
+
+
+    const block =
+        createAnalysisBlock(
+            header,
+            profile.type
+        );
+
+
+    if (
+        profile.type === "number"
+    ) {
+
+        const numericValues =
+            filledValues
+                .map(
+                    parseNumericValue
+                )
+                .filter(
+                    function (
+                        value
+                    ) {
+
+                        return value !== null;
+                    }
+                );
+
+
+        const total =
+            numericValues.reduce(
+                function (
+                    sum,
+                    value
+                ) {
+
+                    return sum +
+                        value;
+                },
+                0
+            );
+
+
+        const average =
+            numericValues.length > 0
+                ? total /
+                    numericValues.length
+                : NaN;
+
+
+        let minimum =
+            NaN;
+
+
+        let maximum =
+            NaN;
+
+
+        numericValues.forEach(
+            function (
+                value
+            ) {
+
+                minimum =
+                    Number.isNaN(
+                        minimum
+                    )
+                        ? value
+                        : Math.min(
+                            minimum,
+                            value
+                        );
+
+
+                maximum =
+                    Number.isNaN(
+                        maximum
+                    )
+                        ? value
+                        : Math.max(
+                            maximum,
+                            value
+                        );
+            }
+        );
+
+
+        analysisCards.appendChild(
+            createAnalysisCard(
+                `${header} • total`,
+
+                formatAnalysisNumber(
+                    total
+                )
+            )
+        );
+
+
+        appendAnalysisMetrics(
+            block,
+            [
+                {
+                    label:
+                        "Total",
+
+                    value:
+                        formatAnalysisNumber(
+                            total
+                        )
+                },
+                {
+                    label:
+                        "Média",
+
+                    value:
+                        formatAnalysisNumber(
+                            average
+                        )
+                },
+                {
+                    label:
+                        "Menor valor",
+
+                    value:
+                        formatAnalysisNumber(
+                            minimum
+                        )
+                },
+                {
+                    label:
+                        "Maior valor",
+
+                    value:
+                        formatAnalysisNumber(
+                            maximum
+                        )
+                },
+                {
+                    label:
+                        "Valores válidos",
+
+                    value:
+                        formatAnalysisNumber(
+                            numericValues.length
+                        )
+                },
+                {
+                    label:
+                        "Células vazias",
+
+                    value:
+                        formatAnalysisNumber(
+                            emptyCount
+                        )
+                }
+            ]
+        );
+
+    }
+    else if (
+        profile.type === "datetime"
+    ) {
+
+        const dateValues =
+            filledValues
+                .map(
+                    parseDateValue
+                )
+                .filter(
+                    function (
+                        value
+                    ) {
+
+                        return value !== null;
+                    }
+                );
+
+
+        const firstDate =
+            dateValues.reduce(
+                function (
+                    earliestDate,
+                    currentDate
+                ) {
+
+                    return (
+                        !earliestDate ||
+                        currentDate < earliestDate
+                    )
+                        ? currentDate
+                        : earliestDate;
+                },
+                null
+            );
+
+
+        const lastDate =
+            dateValues.reduce(
+                function (
+                    latestDate,
+                    currentDate
+                ) {
+
+                    return (
+                        !latestDate ||
+                        currentDate > latestDate
+                    )
+                        ? currentDate
+                        : latestDate;
+                },
+                null
+            );
+
+
+        analysisCards.appendChild(
+            createAnalysisCard(
+                `${header} • datas válidas`,
+
+                formatAnalysisNumber(
+                    dateValues.length
+                )
+            )
+        );
+
+
+        appendAnalysisMetrics(
+            block,
+            [
+                {
+                    label:
+                        "Data inicial",
+
+                    value:
+                        formatAnalysisDate(
+                            firstDate,
+                            profile.hasTime
+                        )
+                },
+                {
+                    label:
+                        "Data final",
+
+                    value:
+                        formatAnalysisDate(
+                            lastDate,
+                            profile.hasTime
+                        )
+                },
+                {
+                    label:
+                        "Valores válidos",
+
+                    value:
+                        formatAnalysisNumber(
+                            dateValues.length
+                        )
+                },
+                {
+                    label:
+                        "Células vazias",
+
+                    value:
+                        formatAnalysisNumber(
+                            emptyCount
+                        )
+                }
+            ]
+        );
+
+    }
+    else if (
+        profile.type === "category" ||
+        profile.type === "identifier"
+    ) {
+
+        const frequencyData =
+            createFrequencyData(
+                rows,
+                columnIndex
+            );
+
+
+        const duplicateCount =
+            filledValues.length -
+            frequencyData.length;
+
+
+        analysisCards.appendChild(
+            createAnalysisCard(
+                `${header} • valores únicos`,
+
+                formatAnalysisNumber(
+                    frequencyData.length
+                )
+            )
+        );
+
+
+        if (
+            profile.type === "identifier"
+        ) {
+
+            appendAnalysisMetrics(
+                block,
+                [
+                    {
+                        label:
+                            "Preenchidos",
+
+                        value:
+                            formatAnalysisNumber(
+                                filledValues.length
+                            )
+                    },
+                    {
+                        label:
+                            "Valores únicos",
+
+                        value:
+                            formatAnalysisNumber(
+                                frequencyData.length
+                            )
+                    },
+                    {
+                        label:
+                            "Repetições",
+
+                        value:
+                            formatAnalysisNumber(
+                                duplicateCount
+                            )
+                    },
+                    {
+                        label:
+                            "Células vazias",
+
+                        value:
+                            formatAnalysisNumber(
+                                emptyCount
+                            )
+                    }
+                ]
+            );
+
+
+            const duplicatedValues =
+                frequencyData.filter(
+                    function (
+                        group
+                    ) {
+
+                        return group.count > 1;
+                    }
+                );
+
+
+            if (
+                duplicatedValues.length > 0
+            ) {
+
+                appendFrequencyAnalysis(
+                    block,
+                    duplicatedValues,
+                    "Nenhum valor repetido."
+                );
+            }
+
+        }
+        else {
+
+            appendFrequencyAnalysis(
+                block,
+                frequencyData,
+                "Nenhum valor preenchido."
+            );
+        }
+
+    }
+    else {
+
+        analysisCards.appendChild(
+            createAnalysisCard(
+                `${header} • preenchidos`,
+                "0"
+            )
+        );
+
+
+        appendAnalysisMetrics(
+            block,
+            [
+                {
+                    label:
+                        "Valores preenchidos",
+
+                    value:
+                        "0"
+                },
+                {
+                    label:
+                        "Células vazias",
+
+                    value:
+                        formatAnalysisNumber(
+                            rows.length
+                        )
+                }
+            ]
+        );
+    }
+
+
+    analysisResults.appendChild(
+        block
+    );
+}
+
+
 /* ATUALIZA A ANÁLISE RÁPIDA */
 
 function renderQuickAnalysis(
     rows
 ) {
 
-    const packagesColumn =
-        findColumnIndex([
-            "pacotes",
-            "pacote"
-        ]);
-
-
-    const routesColumn =
-        findColumnIndex([
-            "rotas",
-            "rota"
-        ]);
-
-
-    const statusesColumn =
-        findColumnIndex([
-            "status"
-        ]);
-
-
-    const routesData =
-        createFrequencyData(
-            rows,
-            routesColumn
+    totalRecords.textContent =
+        formatAnalysisNumber(
+            rows.length
         );
 
 
-    const statusesData =
-        createFrequencyData(
-            rows,
-            statusesColumn
+    analysisCards.replaceChildren();
+
+    analysisResults.replaceChildren();
+
+
+    const selectedColumns =
+        Array.from(
+            tableState
+                .selectedAnalysisColumns
+        ).sort(
+            function (
+                firstColumn,
+                secondColumn
+            ) {
+
+                return firstColumn -
+                    secondColumn;
+            }
         );
 
 
-    packagesLabel.textContent =
-        packagesColumn >= 0
-            ? "Pacotes"
-            : "Registros";
+    analysisEmpty.hidden =
+        selectedColumns.length > 0;
 
 
-    totalPackages.textContent =
-        countFilledRows(
-            rows,
-            packagesColumn
-        );
+    selectedColumns.forEach(
+        function (
+            columnIndex
+        ) {
 
-
-    totalRoutes.textContent =
-        routesColumn >= 0
-            ? routesData.length
-            : "—";
-
-
-    totalStatuses.textContent =
-        statusesColumn >= 0
-            ? statusesData.length
-            : "—";
-
-
-    renderFrequencyTable(
-        routesSummary,
-        routesData,
-        routesColumn >= 0
-            ? "Nenhuma rota encontrada."
-            : "Coluna de rota não encontrada."
-    );
-
-
-    renderFrequencyTable(
-        statusesSummary,
-        statusesData,
-        statusesColumn >= 0
-            ? "Nenhum status encontrado."
-            : "Coluna de status não encontrada."
+            renderSelectedColumnAnalysis(
+                rows,
+                columnIndex
+            );
+        }
     );
 
 
@@ -816,7 +2159,9 @@ function getFilteredRows() {
                         ).trim();
 
 
-                    if (!normalizedFilter) {
+                    if (
+                        !normalizedFilter
+                    ) {
 
                         return true;
                     }
@@ -942,7 +2287,9 @@ function renderTableBody() {
     tableBody.replaceChildren();
 
 
-    if (visibleRows.length === 0) {
+    if (
+        visibleRows.length === 0
+    ) {
 
         const emptyRow =
             document.createElement(
@@ -976,7 +2323,6 @@ function renderTableBody() {
         );
 
     }
-
     else {
 
         const bodyFragment =
@@ -1088,7 +2434,9 @@ function renderTable(
         );
 
 
-    if (columnCount === 0) {
+    if (
+        columnCount === 0
+    ) {
 
         throw new Error(
             "A primeira aba do arquivo não possui dados."
@@ -1121,10 +2469,15 @@ function renderTable(
                 columnIndex
             ) {
 
-                return formatCellValue(
-                    headerValues[columnIndex]
-                ).trim() ||
-                `Coluna ${columnIndex + 1}`;
+                return (
+                    formatCellValue(
+                        headerValues[
+                            columnIndex
+                        ]
+                    ).trim() ||
+
+                    `Coluna ${columnIndex + 1}`
+                );
             }
         );
 
@@ -1133,6 +2486,25 @@ function renderTable(
         rows.slice(
             1
         );
+
+
+    tableState.columnProfiles =
+        tableState.headers.map(
+            function (
+                unusedHeader,
+                columnIndex
+            ) {
+
+                return detectColumnProfile(
+                    columnIndex
+                );
+            }
+        );
+
+
+    tableState
+        .selectedAnalysisColumns
+        .clear();
 
 
     tableState.filters =
@@ -1150,6 +2522,8 @@ function renderTable(
     tableState.sortDirection =
         "asc";
 
+
+    renderAnalysisColumnSelector();
 
     renderTableHeader();
 
@@ -1177,6 +2551,15 @@ function resetTableState() {
         [];
 
 
+    tableState.columnProfiles =
+        [];
+
+
+    tableState
+        .selectedAnalysisColumns
+        .clear();
+
+
     tableState.filters =
         [];
 
@@ -1202,25 +2585,27 @@ function clearQuickAnalysis() {
         true;
 
 
-    packagesLabel.textContent =
-        "Pacotes";
-
-
-    totalPackages.textContent =
+    totalRecords.textContent =
         "0";
 
 
-    totalRoutes.textContent =
-        "0";
+    analysisColumns.replaceChildren();
+
+    analysisCards.replaceChildren();
+
+    analysisResults.replaceChildren();
 
 
-    totalStatuses.textContent =
-        "0";
+    analysisEmpty.hidden =
+        false;
 
 
-    routesSummary.replaceChildren();
+    selectAllColumnsButton.disabled =
+        true;
 
-    statusesSummary.replaceChildren();
+
+    clearColumnsButton.disabled =
+        true;
 }
 
 
@@ -1278,7 +2663,11 @@ async function readSelectedFile(
     file
 ) {
 
-    if (!isSupportedFile(file)) {
+    if (
+        !isSupportedFile(
+            file
+        )
+    ) {
 
         throw new Error(
             "Formato não suportado. Selecione um arquivo .xlsx, .xls ou .csv."
@@ -1286,7 +2675,9 @@ async function readSelectedFile(
     }
 
 
-    if (!window.XLSX) {
+    if (
+        !window.XLSX
+    ) {
 
         throw new Error(
             "A biblioteca de leitura de planilhas não foi carregada."
@@ -1315,7 +2706,9 @@ async function readSelectedFile(
         workbook.SheetNames[0];
 
 
-    if (!sheetName) {
+    if (
+        !sheetName
+    ) {
 
         throw new Error(
             "O arquivo não possui nenhuma aba."
@@ -1348,7 +2741,9 @@ async function readSelectedFile(
         );
 
 
-    if (rows.length === 0) {
+    if (
+        rows.length === 0
+    ) {
 
         throw new Error(
             "A primeira aba do arquivo está vazia."
@@ -1384,12 +2779,13 @@ function initializeStatisticsImporter() {
         !previewSummary ||
         !table ||
         !quickAnalysis ||
-        !packagesLabel ||
-        !totalPackages ||
-        !totalRoutes ||
-        !totalStatuses ||
-        !routesSummary ||
-        !statusesSummary
+        !analysisColumns ||
+        !selectAllColumnsButton ||
+        !clearColumnsButton ||
+        !totalRecords ||
+        !analysisCards ||
+        !analysisResults ||
+        !analysisEmpty
     ) {
 
         console.error(
@@ -1401,7 +2797,9 @@ function initializeStatisticsImporter() {
     }
 
 
-    if (!window.XLSX) {
+    if (
+        !window.XLSX
+    ) {
 
         fileInput.disabled =
             true;
@@ -1425,7 +2823,9 @@ function initializeStatisticsImporter() {
                 fileInput.files?.[0];
 
 
-            if (!file) {
+            if (
+                !file
+            ) {
 
                 return;
             }
@@ -1443,8 +2843,9 @@ function initializeStatisticsImporter() {
                 );
 
             }
-
-            catch (error) {
+            catch (
+                error
+            ) {
 
                 table.querySelector(
                     "thead"
@@ -1487,6 +2888,53 @@ function initializeStatisticsImporter() {
     clearButton.addEventListener(
         "click",
         clearImportedFile
+    );
+
+
+    selectAllColumnsButton.addEventListener(
+        "click",
+        function () {
+
+            tableState.selectedAnalysisColumns =
+                new Set(
+                    tableState.headers.map(
+                        function (
+                            unusedHeader,
+                            columnIndex
+                        ) {
+
+                            return columnIndex;
+                        }
+                    )
+                );
+
+
+            renderAnalysisColumnSelector();
+
+
+            renderQuickAnalysis(
+                getFilteredRows()
+            );
+        }
+    );
+
+
+    clearColumnsButton.addEventListener(
+        "click",
+        function () {
+
+            tableState
+                .selectedAnalysisColumns
+                .clear();
+
+
+            renderAnalysisColumnSelector();
+
+
+            renderQuickAnalysis(
+                getFilteredRows()
+            );
+        }
     );
 }
 
