@@ -97,11 +97,12 @@
                     /* HEADER DA ANÁLISE */
 
                     #statisticsAnalysisColumnSelector {
-                        margin-bottom: 15px;
-                        padding: 16px;
+                        flex: 1 1 0;
+                        padding: 15px;
                         background-color: #141414;
                         border: 1px solid #525252;
                         border-radius: 5px;
+                        margin-bottom: 0;
                     }
                     #statisticsAnalysisColumnSelector .flex-box-between {
                         margin-bottom: 14px;
@@ -270,21 +271,13 @@
                     /*  */
 
                     .statistics-analysis-top {
-                        margin-bottom: 15px;
-                        display: grid;
-                        grid-template-columns: repeat(2, minmax(0, 1fr));
-                        gap: 15px;
+                        display: flex;
+                        column-gap: 15px;
+                        flex-direction: row-reverse;
+                        align-content: center;
+                        justify-content: center;
+                        flex-wrap: wrap;
                         align-items: stretch;
-                    }
-
-                    .statistics-analysis-top #statisticsAnalysisColumnSelector {
-                        margin-bottom: 0;
-                    }
-
-                    .statistics-total-records-card {
-                        width: 100%;
-                        height: 100%;
-                        align-self: stretch;
                     }
 
                     /* SUMARIO DA ANÁLISE */
@@ -295,8 +288,9 @@
                         gap: 15px;
                     }
                     .statistics-summary-card {
+                        flex: 0 0 max-content;
                         text-align: center;
-                        padding: 20px 15px;
+                        padding: 30px;
                         background-color: #141414;
                         border: 1px solid #525252;
                         border-radius: 5px;
@@ -311,8 +305,11 @@
                         font-size: 12px;
                         letter-spacing: 1px;
                     }
+                    .statistics-summary-card h4 {
+                        margin: 0;
+                        font-size: 14px;
+                    }
                     .statistics-summary-card strong {
-                        color: #ffffff;
                         font-size: 28px;
                         line-height: 1;
                     }
@@ -719,7 +716,7 @@
 
                                             <div>
                                                 <h4>Colunas para análise</h4>
-                                                <p>Escolha quais informações do arquivo devem ser analisadas.</p>
+                                                <p>Escolha quais colunas da planilha devem ser analisadas.</p>
                                             </div>
 
                                             <div class="statistics-column-actions">
@@ -733,7 +730,7 @@
                                     </div>
 
                                     <div class="statistics-summary-card statistics-total-records-card">
-                                        <span>Total de Registros</span>
+                                        <span>Linhas Encontradas</span>
                                         <strong id="statisticsTotalRecords">0</strong>
                                     </div>
                                 </div>
