@@ -23,16 +23,8 @@
 
         <style>
 
-            .main-structure #statistics {
-                width: 100%;
-            }
-            .main-structure #statistics .tabs-content {
-                flex: 1 1 0;
-                min-width: 0;
-                display: flex;
-            }
             .main-structure #statistics .tabs {
-                flex: 0 0 281px;
+                flex: 0 0 300px;
                 overflow: auto;
                 padding-right: 15px;
                 margin: 0;
@@ -42,6 +34,17 @@
                 flex-direction: column;
                 -webkit-align-items: stretch;
                 align-items: stretch;
+            }
+            .main-structure #statistics .tabs .tabs-title {
+                width: 100%;
+            }
+            .main-structure #statistics .tabs-content {
+                flex: 1 1 0;
+                min-width: 0;
+                display: flex;
+            }
+            .main-structure #statistics .tabs-panel.is-active {
+                width: 100%;
             }
 
             /* PAINEL ESTATÍSTICAS */
