@@ -1,1552 +1,2863 @@
-/* CHAMADA DAS FONTES */
+const MAX_PREVIEW_ROWS = 500;
 
-@charset "UTF-8";
+const MAX_FREQUENCY_ROWS = 25;
 
-@font-face {
-    font-family: 'Open Sans';
-    font-style: normal;
-    font-weight: 400;
-    font-stretch: normal;
-    font-display: swap;
-    src: url(../text-fonts/open-sans/memSYaGs126MiZpBA-UvWbX2vVnXBbObj2OVZyOOSr4dVJWUgsjZ0B4taVIGxA.woff2) format('woff2');
-    unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
-}
-@font-face {
-    font-family: 'Open Sans';
-    font-style: normal;
-    font-weight: 400;
-    font-stretch: normal;
-    font-display: swap;
-    src: url(../text-fonts/open-sans/memSYaGs126MiZpBA-UvWbX2vVnXBbObj2OVZyOOSr4dVJWUgsjZ0B4kaVIGxA.woff2) format('woff2');
-    unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
-}
-@font-face {
-    font-family: 'Open Sans';
-    font-style: normal;
-    font-weight: 400;
-    font-stretch: normal;
-    font-display: swap;
-    src: url(../text-fonts/open-sans/memSYaGs126MiZpBA-UvWbX2vVnXBbObj2OVZyOOSr4dVJWUgsjZ0B4saVIGxA.woff2) format('woff2');
-    unicode-range: U+1F00-1FFF;
-}
-@font-face {
-    font-family: 'Open Sans';
-    font-style: normal;
-    font-weight: 400;
-    font-stretch: normal;
-    font-display: swap;
-    src: url(../text-fonts/open-sans/memSYaGs126MiZpBA-UvWbX2vVnXBbObj2OVZyOOSr4dVJWUgsjZ0B4jaVIGxA.woff2) format('woff2');
-    unicode-range: U+0370-03FF;
-}
-@font-face {
-    font-family: 'Open Sans';
-    font-style: normal;
-    font-weight: 400;
-    font-stretch: normal;
-    font-display: swap;
-    src: url(../text-fonts/open-sans/memSYaGs126MiZpBA-UvWbX2vVnXBbObj2OVZyOOSr4dVJWUgsjZ0B4iaVIGxA.woff2) format('woff2');
-    unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F;
-}
-@font-face {
-    font-family: 'Open Sans';
-    font-style: normal;
-    font-weight: 400;
-    font-stretch: normal;
-    font-display: swap;
-    src: url(../text-fonts/open-sans/memSYaGs126MiZpBA-UvWbX2vVnXBbObj2OVZyOOSr4dVJWUgsjZ0B4vaVIGxA.woff2) format('woff2');
-    unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
-}
-@font-face {
-    font-family: 'Open Sans';
-    font-style: normal;
-    font-weight: 400;
-    font-stretch: normal;
-    font-display: swap;
-    src: url(../text-fonts/open-sans/memSYaGs126MiZpBA-UvWbX2vVnXBbObj2OVZyOOSr4dVJWUgsjZ0B4uaVIGxA.woff2) format('woff2');
-    unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-@font-face {
-    font-family: 'Open Sans';
-    font-style: normal;
-    font-weight: 400;
-    font-stretch: normal;
-    font-display: swap;
-    src: url(../text-fonts/open-sans/memSYaGs126MiZpBA-UvWbX2vVnXBbObj2OVZyOOSr4dVJWUgsjZ0B4gaVI.woff2) format('woff2');
-    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-@font-face {
-    font-family: 'Open Sans';
-    font-style: normal;
-    font-weight: 600;
-    font-stretch: normal;
-    font-display: swap;
-    src: url(../text-fonts/open-sans/memSYaGs126MiZpBA-UvWbX2vVnXBbObj2OVZyOOSr4dVJWUgsgH1x4taVIGxA.woff2) format('woff2');
-    unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
-}
-@font-face {
-    font-family: 'Open Sans';
-    font-style: normal;
-    font-weight: 600;
-    font-stretch: normal;
-    font-display: swap;
-    src: url(../text-fonts/open-sans/memSYaGs126MiZpBA-UvWbX2vVnXBbObj2OVZyOOSr4dVJWUgsgH1x4kaVIGxA.woff2) format('woff2');
-    unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
-}
-@font-face {
-    font-family: 'Open Sans';
-    font-style: normal;
-    font-weight: 600;
-    font-stretch: normal;
-    font-display: swap;
-    src: url(../text-fonts/open-sans/memSYaGs126MiZpBA-UvWbX2vVnXBbObj2OVZyOOSr4dVJWUgsgH1x4saVIGxA.woff2) format('woff2');
-    unicode-range: U+1F00-1FFF;
-}
-@font-face {
-    font-family: 'Open Sans';
-    font-style: normal;
-    font-weight: 600;
-    font-stretch: normal;
-    font-display: swap;
-    src: url(../text-fonts/open-sans/memSYaGs126MiZpBA-UvWbX2vVnXBbObj2OVZyOOSr4dVJWUgsgH1x4jaVIGxA.woff2) format('woff2');
-    unicode-range: U+0370-03FF;
-}
-@font-face {
-    font-family: 'Open Sans';
-    font-style: normal;
-    font-weight: 600;
-    font-stretch: normal;
-    font-display: swap;
-    src: url(../text-fonts/open-sans/memSYaGs126MiZpBA-UvWbX2vVnXBbObj2OVZyOOSr4dVJWUgsgH1x4iaVIGxA.woff2) format('woff2');
-    unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F;
-}
-@font-face {
-    font-family: 'Open Sans';
-    font-style: normal;
-    font-weight: 600;
-    font-stretch: normal;
-    font-display: swap;
-    src: url(../text-fonts/open-sans/memSYaGs126MiZpBA-UvWbX2vVnXBbObj2OVZyOOSr4dVJWUgsgH1x4vaVIGxA.woff2) format('woff2');
-    unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
-}
-@font-face {
-    font-family: 'Open Sans';
-    font-style: normal;
-    font-weight: 600;
-    font-stretch: normal;
-    font-display: swap;
-    src: url(../text-fonts/open-sans/memSYaGs126MiZpBA-UvWbX2vVnXBbObj2OVZyOOSr4dVJWUgsgH1x4uaVIGxA.woff2) format('woff2');
-    unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-@font-face {
-    font-family: 'Open Sans';
-    font-style: normal;
-    font-weight: 600;
-    font-stretch: normal;
-    font-display: swap;
-    src: url(../text-fonts/open-sans/memSYaGs126MiZpBA-UvWbX2vVnXBbObj2OVZyOOSr4dVJWUgsgH1x4gaVI.woff2) format('woff2');
-    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-@font-face {
-    font-family: 'Open Sans';
-    font-style: normal;
-    font-weight: 800;
-    font-stretch: normal;
-    font-display: swap;
-    src: url(../text-fonts/open-sans/memSYaGs126MiZpBA-UvWbX2vVnXBbObj2OVZyOOSr4dVJWUgshZ1x4taVIGxA.woff2) format('woff2');
-    unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
-}
-@font-face {
-    font-family: 'Open Sans';
-    font-style: normal;
-    font-weight: 800;
-    font-stretch: normal;
-    font-display: swap;
-    src: url(../text-fonts/open-sans/memSYaGs126MiZpBA-UvWbX2vVnXBbObj2OVZyOOSr4dVJWUgshZ1x4kaVIGxA.woff2) format('woff2');
-    unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
-}
-@font-face {
-    font-family: 'Open Sans';
-    font-style: normal;
-    font-weight: 800;
-    font-stretch: normal;
-    font-display: swap;
-    src: url(../text-fonts/open-sans/memSYaGs126MiZpBA-UvWbX2vVnXBbObj2OVZyOOSr4dVJWUgshZ1x4saVIGxA.woff2) format('woff2');
-    unicode-range: U+1F00-1FFF;
-}
-@font-face {
-    font-family: 'Open Sans';
-    font-style: normal;
-    font-weight: 800;
-    font-stretch: normal;
-    font-display: swap;
-    src: url(../text-fonts/open-sans/memSYaGs126MiZpBA-UvWbX2vVnXBbObj2OVZyOOSr4dVJWUgshZ1x4jaVIGxA.woff2) format('woff2');
-    unicode-range: U+0370-03FF;
-}
-@font-face {
-    font-family: 'Open Sans';
-    font-style: normal;
-    font-weight: 800;
-    font-stretch: normal;
-    font-display: swap;
-    src: url(../text-fonts/open-sans/memSYaGs126MiZpBA-UvWbX2vVnXBbObj2OVZyOOSr4dVJWUgshZ1x4iaVIGxA.woff2) format('woff2');
-    unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F;
-}
-@font-face {
-    font-family: 'Open Sans';
-    font-style: normal;
-    font-weight: 800;
-    font-stretch: normal;
-    font-display: swap;
-    src: url(../text-fonts/open-sans/memSYaGs126MiZpBA-UvWbX2vVnXBbObj2OVZyOOSr4dVJWUgshZ1x4vaVIGxA.woff2) format('woff2');
-    unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
-}
-@font-face {
-    font-family: 'Open Sans';
-    font-style: normal;
-    font-weight: 800;
-    font-stretch: normal;
-    font-display: swap;
-    src: url(../text-fonts/open-sans/memSYaGs126MiZpBA-UvWbX2vVnXBbObj2OVZyOOSr4dVJWUgshZ1x4uaVIGxA.woff2) format('woff2');
-    unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-@font-face {
-    font-family: 'Open Sans';
-    font-style: normal;
-    font-weight: 800;
-    font-stretch: normal;
-    font-display: swap;
-    src: url(../text-fonts/open-sans/memSYaGs126MiZpBA-UvWbX2vVnXBbObj2OVZyOOSr4dVJWUgshZ1x4gaVI.woff2) format('woff2');
-    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+const SUPPORTED_EXTENSIONS = new Set(["xlsx", "xls", "csv"]);
+
+/* LOCALIZA OS ELEMENTOS DO PAINEL */
+
+const fileInput = document.getElementById("statisticsFileInput");
+
+const clearButton = document.getElementById("statisticsClearFile");
+
+const fileStatus = document.getElementById("statisticsFileStatus");
+
+const preview = document.getElementById("statisticsLocalPreview");
+
+const previewSummary = document.getElementById("statisticsPreviewSummary");
+
+const table = document.getElementById("statisticsLocalTable");
+
+const quickAnalysis = document.getElementById("statisticsQuickAnalysis");
+
+const analysisColumns = document.getElementById("statisticsAnalysisColumns");
+
+const selectAllColumnsButton = document.getElementById(
+    "statisticsSelectAllColumns",
+);
+
+const clearColumnsButton = document.getElementById(
+    "statisticsClearColumns",
+);
+
+const totalRecords = document.getElementById(
+    "statisticsTotalRecords",
+);
+
+const analysisCards = document.getElementById(
+    "statisticsAnalysisCards",
+);
+
+const analysisResults = document.getElementById(
+    "statisticsAnalysisResults",
+);
+
+const analysisEmpty = document.getElementById(
+    "statisticsAnalysisEmpty",
+);
+
+
+/* ESTADO DA TABELA INTERATIVA */
+
+const tableState = {
+
+    sheetName: "",
+
+    headers: [],
+
+    rows: [],
+
+    columnProfiles: [],
+
+    selectedAnalysisColumns: new Set(),
+
+    filters: [],
+
+    columnCount: 0,
+
+    sortColumn: null,
+
+    sortDirection: "asc",
+};
+
+
+const naturalCollator = new Intl.Collator(
+    "pt-BR",
+    {
+        numeric: true,
+        sensitivity: "base",
+    },
+);
+
+
+/* ATUALIZA A MENSAGEM DO IMPORTADOR */
+
+function setStatus(
+    message,
+    isError = false,
+) {
+
+    fileStatus.textContent =
+        message;
+
+    fileStatus.classList.toggle(
+        "is-error",
+        isError,
+    );
 }
 
-/* DEFINE OS ESTILOS DA BARRA DE CARREGAMENTO */
 
-.pace {
-    -webkit-pointer-events: none;
-    pointer-events: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    user-select: none;
-}
-.pace-inactive {
-    display: none;
-}
-.pace .pace-progress {
-    background: #e4e6eb;
-    position: fixed;
-    z-index: 2000;
-    top: 0;
-    right: 100%;
-    width: 100%;
-    height: 5px;
+/* VERIFICA A EXTENSÃO DO ARQUIVO */
+
+function isSupportedFile(
+    file,
+) {
+
+    const extension =
+        file.name
+            .split(".")
+            .pop()
+            ?.toLowerCase();
+
+
+    return SUPPORTED_EXTENSIONS.has(
+        extension,
+    );
 }
 
-/* DEFINE OS ESTILOS DA CONTAINER REAVEL */
 
-@media print, screen and (min-width: 40em) {
-    .reveal, .reveal.tiny, .reveal.small, .reveal.large {
-        right: auto;
-        left: auto;
-        margin: 0 auto;
+/* PREPARA O VALOR PARA EXIBIÇÃO */
+
+function formatCellValue(
+    value,
+) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
+        return "";
+    }
+
+
+    return String(
+        value,
+    );
+}
+
+
+/* CRIA UMA CÉLULA */
+
+function createCell(
+    tagName,
+    value,
+) {
+
+    const cell =
+        document.createElement(
+            tagName,
+        );
+
+
+    cell.textContent =
+        formatCellValue(
+            value,
+        );
+
+
+    return cell;
+}
+
+
+/* NORMALIZA UM VALOR PARA PESQUISA */
+
+function normalizeSearchValue(
+    value,
+) {
+
+    return formatCellValue(
+        value,
+    )
+        .normalize("NFD")
+        .replace(
+            /[\u0300-\u036f]/g,
+            "",
+        )
+        .toLowerCase();
+}
+
+
+/* AGRUPA OS VALORES DE UMA COLUNA */
+
+function createFrequencyData(
+    rows,
+    columnIndex,
+) {
+
+    if (
+        columnIndex < 0
+    ) {
+
+        return [];
+    }
+
+
+    const groups =
+        new Map();
+
+
+    rows.forEach(
+        function (
+            row,
+        ) {
+
+            const displayValue =
+                formatCellValue(
+                    row[columnIndex],
+                ).trim();
+
+
+            if (
+                !displayValue
+            ) {
+
+                return;
+            }
+
+
+            const normalizedValue =
+                normalizeSearchValue(
+                    displayValue,
+                ).trim();
+
+
+            if (
+                groups.has(
+                    normalizedValue,
+                )
+            ) {
+
+                groups.get(
+                    normalizedValue,
+                ).count += 1;
+
+                return;
+            }
+
+
+            groups.set(
+                normalizedValue,
+                {
+                    label: displayValue,
+                    count: 1,
+                },
+            );
+        },
+    );
+
+
+    return Array.from(
+        groups.values(),
+    ).sort(
+        function (
+            firstGroup,
+            secondGroup,
+        ) {
+
+            return (
+                secondGroup.count -
+                    firstGroup.count ||
+
+                naturalCollator.compare(
+                    firstGroup.label,
+                    secondGroup.label,
+                )
+            );
+        },
+    );
+}
+
+
+/* MONTA UMA TABELA DE AGRUPAMENTO */
+
+function renderFrequencyTable(
+    tableBody,
+    frequencyData,
+    emptyMessage,
+) {
+
+    tableBody.replaceChildren();
+
+
+    if (
+        frequencyData.length === 0
+    ) {
+
+        const row =
+            document.createElement(
+                "tr",
+            );
+
+
+        const cell =
+            createCell(
+                "td",
+                emptyMessage,
+            );
+
+
+        cell.colSpan =
+            2;
+
+
+        cell.classList.add(
+            "statistics-summary-empty",
+        );
+
+
+        row.appendChild(
+            cell,
+        );
+
+
+        tableBody.appendChild(
+            row,
+        );
+
+
+        return;
+    }
+
+
+    const fragment =
+        document.createDocumentFragment();
+
+
+    frequencyData.forEach(
+        function (
+            group,
+        ) {
+
+            const row =
+                document.createElement(
+                    "tr",
+                );
+
+
+            row.appendChild(
+                createCell(
+                    "td",
+                    group.label,
+                ),
+            );
+
+
+            row.appendChild(
+                createCell(
+                    "td",
+                    group.count,
+                ),
+            );
+
+
+            fragment.appendChild(
+                row,
+            );
+        },
+    );
+
+
+    tableBody.appendChild(
+        fragment,
+    );
+}
+
+
+/* VERIFICA SE UMA CÉLULA ESTÁ VAZIA */
+
+function isEmptyCell(
+    value,
+) {
+
+    return formatCellValue(
+        value,
+    ).trim() === "";
+}
+
+
+/* CONVERTE UM VALOR NUMÉRICO */
+
+function parseNumericValue(
+    value,
+) {
+
+    if (
+        typeof value === "number" &&
+        Number.isFinite(value)
+    ) {
+
+        return value;
+    }
+
+
+    if (
+        value instanceof Date ||
+        isEmptyCell(value)
+    ) {
+
+        return null;
+    }
+
+
+    let normalizedValue =
+        formatCellValue(
+            value,
+        )
+            .trim()
+            .replace(
+                /\s|\u00a0/g,
+                "",
+            )
+            .replace(
+                /^R\$/i,
+                "",
+            )
+            .replace(
+                /%$/,
+                "",
+            );
+
+
+    if (
+        !/^[+-]?\d[\d.,]*$/.test(
+            normalizedValue,
+        )
+    ) {
+
+        return null;
+    }
+
+
+    const lastComma =
+        normalizedValue.lastIndexOf(
+            ",",
+        );
+
+
+    const lastDot =
+        normalizedValue.lastIndexOf(
+            ".",
+        );
+
+
+    if (
+        lastComma >= 0 &&
+        lastDot >= 0
+    ) {
+
+        const decimalSeparator =
+            lastComma > lastDot
+                ? ","
+                : ".";
+
+
+        const thousandsSeparator =
+            decimalSeparator === ","
+                ? "."
+                : ",";
+
+
+        normalizedValue =
+            normalizedValue
+                .replaceAll(
+                    thousandsSeparator,
+                    "",
+                )
+                .replace(
+                    decimalSeparator,
+                    ".",
+                );
+
+    }
+    else if (
+        lastComma >= 0
+    ) {
+
+        normalizedValue =
+            normalizedValue
+                .replaceAll(
+                    ".",
+                    "",
+                )
+                .replace(
+                    ",",
+                    ".",
+                );
+
+    }
+    else {
+
+        normalizedValue =
+            normalizedValue.replaceAll(
+                ",",
+                "",
+            );
+    }
+
+
+    const numericValue =
+        Number(
+            normalizedValue,
+        );
+
+
+    return Number.isFinite(
+        numericValue,
+    )
+        ? numericValue
+        : null;
+}
+
+
+/* CONVERTE UMA DATA OU DATA/HORA */
+
+function parseDateValue(
+    value,
+) {
+
+    if (
+        value instanceof Date &&
+        !Number.isNaN(
+            value.getTime(),
+        )
+    ) {
+
+        return value;
+    }
+
+
+    const displayValue =
+        formatCellValue(
+            value,
+        ).trim();
+
+
+    if (
+        !displayValue
+    ) {
+
+        return null;
+    }
+
+
+    const dateMatch =
+        displayValue.match(
+            /^(\d{4})[-/](\d{1,2})[-/](\d{1,2})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?)?$/,
+        ) ||
+
+        displayValue.match(
+            /^(\d{1,2})\/(\d{1,2})\/(\d{2,4})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?)?$/,
+        );
+
+
+    if (
+        !dateMatch
+    ) {
+
+        return null;
+    }
+
+
+    const startsWithYear =
+        dateMatch[1].length === 4;
+
+
+    let year =
+        Number(
+            startsWithYear
+                ? dateMatch[1]
+                : dateMatch[3],
+        );
+
+
+    if (
+        year < 100
+    ) {
+
+        year +=
+            year >= 70
+                ? 1900
+                : 2000;
+    }
+
+
+    const month =
+        Number(
+            dateMatch[2],
+        );
+
+
+    const day =
+        Number(
+            startsWithYear
+                ? dateMatch[3]
+                : dateMatch[1],
+        );
+
+
+    const hour =
+        Number(
+            dateMatch[4] ?? 0,
+        );
+
+
+    const minute =
+        Number(
+            dateMatch[5] ?? 0,
+        );
+
+
+    const second =
+        Number(
+            dateMatch[6] ?? 0,
+        );
+
+
+    const parsedDate =
+        new Date(
+            year,
+            month - 1,
+            day,
+            hour,
+            minute,
+            second,
+        );
+
+
+    if (
+        parsedDate.getFullYear() !== year ||
+        parsedDate.getMonth() !== month - 1 ||
+        parsedDate.getDate() !== day ||
+        parsedDate.getHours() !== hour ||
+        parsedDate.getMinutes() !== minute ||
+        parsedDate.getSeconds() !== second
+    ) {
+
+        return null;
+    }
+
+
+    return parsedDate;
+}
+
+
+/* RETORNA O NOME VISÍVEL DO TIPO */
+
+function getColumnTypeLabel(
+    type,
+) {
+
+    const labels = {
+
+        category: "Categoria",
+
+        identifier: "Identificador",
+
+        number: "Número",
+
+        datetime: "Data/hora",
+
+        empty: "Vazia",
+    };
+
+
+    return labels[type] ??
+        "Texto";
+}
+
+
+/* DETECTA O TIPO DE UMA COLUNA */
+
+function detectColumnProfile(
+    columnIndex,
+) {
+
+    const filledValues =
+        tableState.rows
+            .map(
+                function (
+                    row,
+                ) {
+
+                    return row[
+                        columnIndex
+                    ];
+                },
+            )
+            .filter(
+                function (
+                    value,
+                ) {
+
+                    return !isEmptyCell(
+                        value,
+                    );
+                },
+            );
+
+
+    if (
+        filledValues.length === 0
+    ) {
+
+        return {
+            type: "empty",
+            hasTime: false,
+        };
+    }
+
+
+    const dateValues =
+        filledValues.filter(
+            function (
+                value,
+            ) {
+
+                return parseDateValue(
+                    value,
+                ) !== null;
+            },
+        );
+
+
+    const numericValues =
+        filledValues.filter(
+            function (
+                value,
+            ) {
+
+                return parseNumericValue(
+                    value,
+                ) !== null;
+            },
+        );
+
+
+    const uniqueValues =
+        new Set(
+            filledValues.map(
+                function (
+                    value,
+                ) {
+
+                    return normalizeSearchValue(
+                        value,
+                    ).trim();
+                },
+            ),
+        );
+
+
+    const uniqueRatio =
+        uniqueValues.size /
+        filledValues.length;
+
+
+    const headerValue =
+        normalizeSearchValue(
+            tableState.headers[
+                columnIndex
+            ],
+        ).trim();
+
+
+    const identifierHeader =
+        /^(id|codigo|code|pacotes?|packages?|pedidos?|orders?|at\/to|serial(?: number)?|tracking(?: number)?|uuid|chave|key|referencia|reference)$/.test(
+            headerValue,
+        ) ||
+
+        /(^|[\s_-])(id|codigo|code)$/.test(
+            headerValue,
+        );
+
+
+    if (
+        dateValues.length /
+            filledValues.length >= 0.8
+    ) {
+
+        return {
+            type: "datetime",
+
+            hasTime:
+                filledValues.some(
+                    function (
+                        value,
+                    ) {
+
+                        return /\d{1,2}:\d{2}/.test(
+                            formatCellValue(
+                                value,
+                            ),
+                        );
+                    },
+                ),
+        };
+    }
+
+
+    if (
+        numericValues.length /
+            filledValues.length >= 0.8
+    ) {
+
+        return {
+            type:
+                identifierHeader &&
+                uniqueRatio >= 0.8
+                    ? "identifier"
+                    : "number",
+
+            hasTime: false,
+        };
+    }
+
+
+    return {
+        type:
+            uniqueRatio >= 0.8 &&
+            identifierHeader
+                ? "identifier"
+                : "category",
+
+        hasTime: false,
+    };
+}
+
+
+/* FORMATA UM NÚMERO DA ANÁLISE */
+
+function formatAnalysisNumber(
+    value,
+) {
+
+    if (
+        !Number.isFinite(
+            value,
+        )
+    ) {
+
+        return "—";
+    }
+
+
+    return new Intl.NumberFormat(
+        "pt-BR",
+        {
+            maximumFractionDigits: 2,
+        },
+    ).format(
+        value,
+    );
+}
+
+
+/* FORMATA UMA DATA DA ANÁLISE */
+
+function formatAnalysisDate(
+    value,
+    hasTime,
+) {
+
+    if (
+        !(value instanceof Date)
+    ) {
+
+        return "—";
+    }
+
+
+    return new Intl.DateTimeFormat(
+        "pt-BR",
+
+        hasTime
+            ? {
+                dateStyle: "short",
+                timeStyle: "medium",
+            }
+            : {
+                dateStyle: "short",
+            },
+    ).format(
+        value,
+    );
+}
+
+
+/* CRIA UM CARTÃO DA ANÁLISE */
+
+function createAnalysisCard(
+    label,
+    value,
+) {
+
+    const card =
+        document.createElement(
+            "div",
+        );
+
+
+    const cardLabel =
+        document.createElement(
+            "span",
+        );
+
+
+    const cardValue =
+        document.createElement(
+            "strong",
+        );
+
+
+    card.classList.add(
+        "statistics-summary-card",
+    );
+
+
+    cardLabel.textContent =
+        label;
+
+
+    cardValue.textContent =
+        value;
+
+
+    card.append(
+        cardLabel,
+        cardValue,
+    );
+
+
+    return card;
+}
+
+
+/* CRIA UM BLOCO DA ANÁLISE */
+
+function createAnalysisBlock(
+    title,
+) {
+
+    const block =
+        document.createElement(
+            "div",
+        );
+
+
+    const heading =
+        document.createElement(
+            "h4",
+        );
+
+
+    block.classList.add(
+        "statistics-summary-block",
+    );
+
+
+    heading.textContent =
+        title;
+
+
+    block.appendChild(
+        heading,
+    );
+
+
+    return block;
+}
+
+
+/* ADICIONA MÉTRICAS A UM BLOCO */
+
+function appendAnalysisMetrics(
+    block,
+    metrics,
+) {
+
+    const metricsContainer =
+        document.createElement(
+            "div",
+        );
+
+
+    metricsContainer.classList.add(
+        "statistics-analysis-metrics",
+    );
+
+
+    metrics.forEach(
+        function (
+            metric,
+        ) {
+
+            const metricElement =
+                document.createElement(
+                    "div",
+                );
+
+
+            const metricLabel =
+                document.createElement(
+                    "span",
+                );
+
+
+            const metricValue =
+                document.createElement(
+                    "strong",
+                );
+
+
+            metricElement.classList.add(
+                "statistics-analysis-metric",
+            );
+
+
+            metricLabel.textContent =
+                metric.label;
+
+
+            metricValue.textContent =
+                metric.value;
+
+
+            metricValue.title =
+                metric.value;
+
+
+            metricElement.append(
+                metricLabel,
+                metricValue,
+            );
+
+
+            metricsContainer.appendChild(
+                metricElement,
+            );
+        },
+    );
+
+
+    block.appendChild(
+        metricsContainer,
+    );
+}
+
+
+/* ADICIONA UMA TABELA DE FREQUÊNCIA A UM BLOCO */
+
+function appendFrequencyAnalysis(
+    block,
+    frequencyData,
+    emptyMessage,
+) {
+
+    const frequencyTable =
+        document.createElement(
+            "table",
+        );
+
+
+    const tableHead =
+        document.createElement(
+            "thead",
+        );
+
+
+    const headerRow =
+        document.createElement(
+            "tr",
+        );
+
+
+    const tableBody =
+        document.createElement(
+            "tbody",
+        );
+
+
+    frequencyTable.classList.add(
+        "statistics-summary-table",
+    );
+
+
+    headerRow.append(
+        createCell(
+            "th",
+            "Valor",
+        ),
+
+        createCell(
+            "th",
+            "Qtd",
+        ),
+    );
+
+
+    tableHead.appendChild(
+        headerRow,
+    );
+
+
+    frequencyTable.append(
+        tableHead,
+        tableBody,
+    );
+
+
+    renderFrequencyTable(
+        tableBody,
+
+        frequencyData.slice(
+            0,
+            MAX_FREQUENCY_ROWS,
+        ),
+
+        emptyMessage,
+    );
+
+
+    block.appendChild(
+        frequencyTable,
+    );
+
+
+    if (
+        frequencyData.length >
+        MAX_FREQUENCY_ROWS
+    ) {
+
+        const note =
+            document.createElement(
+                "p",
+            );
+
+
+        note.classList.add(
+            "statistics-analysis-note",
+        );
+
+
+        note.textContent =
+            `Exibindo ${MAX_FREQUENCY_ROWS} de ${frequencyData.length} valores.`;
+
+
+        block.appendChild(
+            note,
+        );
     }
 }
 
-/* DEFINE O ESTILO DE TAGS GERAIS HTML */
 
-html {
-    font-family: sans-serif;
-    line-height: 1.15;
-    -ms-text-size-adjust: 100%;
-    -webkit-text-size-adjust: 100%;
-}
-body {
-    margin: 0;
-}
-body {
-    background-color: #141414;
-}
-body .main-menu {
-    background-color: #1f1f1f;
-    border-bottom: 2px solid #525252;
-}
-body hr {
-    border-bottom: 2px solid #525252;
-}
-article, aside, footer, header, nav, section {
-    display: block;
-}
-h1 {
-    font-size: 2em;
-    margin: 0.67em 0;
-}
-figcaption, figure {
-    display: block;
-}
-figure {
-    margin: 1em 40px;
-}
-hr {
-    box-sizing: content-box;
-    height: 0;
-    overflow: visible;
-}
-main {
-    display: block;
-}
-pre {
-    font-family: monospace, monospace;
-    font-size: 1em;
-}
-a {
-    background-color: transparent;
-    -webkit-text-decoration-skip: objects;
-}
-a:active, a:hover {
-    outline-width: 0;
-}
-abbr[title] {
-    border-bottom: none;
-    text-decoration: underline;
-    text-decoration: underline dotted;
-}
-b, strong {
-    font-weight: inherit;
-}
-b, strong {
-    font-weight: bolder;
-}
-code, kbd, samp {
-    font-family: monospace, monospace;
-    font-size: 1em;
-}
-dfn {
-    font-style: italic;
-}
-mark {
-    background-color: #ff0;
-    color: #000;
-}
-small {
-    font-size: 80%;
-}
-sub, sup {
-    font-size: 75%;
-    line-height: 0;
-    position: relative;
-    vertical-align: baseline;
-}
-sub {
-    bottom: -0.25em;
-}
-sup {
-    top: -0.5em;
-}
-audio, video {
-    display: inline-block;
-}
-audio:not([controls]) {
-    display: none;
-    height: 0;
-}
-img {
-    border-style: none;
-}
-svg:not(:root) {
-    overflow: hidden;
-}
-button, input, optgroup, select, textarea {
-    font-family: sans-serif;
-    font-size: 100%;
-    line-height: 1.15;
-    margin: 0;
-}
-button {
-    overflow: visible;
-}
-button, select {
-    text-transform: none;
-}
-button, html [type="button"], [type="reset"], [type="submit"] {
-    -webkit-appearance: button;
-    border-top: none;
-    border-left: none;
-    border-right: none;
-}
-button::-moz-focus-inner, [type="button"]::-moz-focus-inner, [type="reset"]::-moz-focus-inner, [type="submit"]::-moz-focus-inner {
-    border-style: none;
-    padding: 0;
-}
-button:-moz-focusring, [type="button"]:-moz-focusring, [type="reset"]:-moz-focusring, [type="submit"]:-moz-focusring {
-    outline: 1px dotted ButtonText;
-}
-::-webkit-file-upload-button {
-    -webkit-appearance: button;
-    font: inherit;
-}
-fieldset {
-    border: 1px solid #c0c0c0;
-    margin: 0 2px;
-    padding: 0.35em 0.625em 0.75em;
-}
-legend {
-    box-sizing: border-box;
-    display: table;
-    max-width: 100%;
-    padding: 0;
-    color: inherit;
-    white-space: normal;
-}
-[hidden] {
-    display: none !important;
-}
-.foundation-mq {
-    font-family: "small=0em&medium=40em&large=64em&xlarge=75em&xxlarge=90em";
-}
-html {
-    box-sizing: border-box;
-    font-size: 100%;
-}
-*, *::before, *::after {
-    box-sizing: inherit;
-}
-body {
-    margin: 0;
-    padding: 0;
-    color: #e4e6eb;
-    background-color: #18191a;
-    font-weight: normal;
-    line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
-img {
-    display: inline-block;
-    vertical-align: middle;
-    max-width: 100%;
-    height: auto;
-    -ms-interpolation-mode: bicubic;
-}
-button {
-    padding: 0;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    border: 0;
-    border-radius: 0;
-    background: transparent;
-    line-height: 1;
-    cursor: auto;
-}
-[data-whatinput='mouse'] button {
-    outline: 0;
-}
-input, optgroup, select, textarea {
-    font-family: inherit;
-}
-.is-visible {
-    display: block !important;
-}
-.is-hidden {
-    display: none !important;
-}
-div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, form, p, blockquote, th, td {
-    margin: 0;
-    padding: 0;
-}
-p {
-    margin-bottom: 20px;
-    line-height: 1.6;
-    color: #e4e6eb;
-    text-align: left;
-    font-size: 16px;
-    letter-spacing: 1px;
-    font-family: 'Open Sans', sans-serif;
-    font-weight: 400;
-    text-rendering: optimizeLegibility;
-}
-em, i {
-    font-style: italic;
-    line-height: inherit;
-}
-strong, b {
-    font-weight: bold;
-    line-height: inherit;
-}
-h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6 {
-    color: #e4e6eb;
-    letter-spacing: 1px;
-    font-style: normal;
-    text-rendering: optimizeLegibility;
-    font-family: 'Open Sans', sans-serif;
-}
-h1, .h1 {
-    font-size: 3rem;
-    line-height: 1.3;
-    margin-top: 0;
-    margin-bottom: 0.5rem;
-    font-weight: 800;
-}
-h2, .h2 {
-    font-size: 32px;
-    line-height: 1.3;
-    margin-top: 0;
-    font-weight: 800;
-    margin-bottom: 0.5rem;
-}
-h3, .h3 {
-    font-size: 20px;
-    line-height: 1.3;
-    margin-top: 0;
-    margin-bottom: 0.5rem;
-    font-weight: 600;
-}
-h4, .h4 {
-    font-size: 16px;
-    line-height: 1.3;
-    margin-top: 0;
-    margin-bottom: 0.5rem;
-    font-weight: 600;
-}
-h5, .h5 {
-    font-size: 1.0625rem;
-    line-height: 1.3;
-    margin-top: 0;
-    margin-bottom: 0.5rem;
-    font-weight: 600;
-}
-h6, .h6 {
-    font-size: 1rem;
-    line-height: 1.3;
-    margin-top: 0;
-    margin-bottom: 0.5rem;
-}
-a {
-    font-size: 14px;
-    color: #e4e6eb;
-    font-family: 'Open Sans', sans-serif;
-    font-weight: 600;
-    text-decoration: none;
-    cursor: pointer;
-    letter-spacing: 1px;
-    line-height: inherit;
-    outline: none;
-}
-a:hover, a:focus {
-    color: #e4e6eb;
-}
-a img {
-    border: 0;
-}
-.link {
-    color: #27a1f3;
-    font-size: 14px;
-    font-family: 'Open Sans', sans-serif;
-    font-weight: 600;
-    text-decoration: none;
-    cursor: pointer;
-    letter-spacing: 1px;
-    line-height: inherit;
-}
-.link:hover, .link:focus{
-    color: #2284c5;
-}
-hr {
-    clear: both;
-    max-width: 75rem;
-    height: 0;
-    margin: 30px auto;
-    border-top: 0;
-    border-right: 0;
-    border-bottom: 2px solid #525252;
-    border-left: 0;
-}
-ul, ol, dl {
-    margin: 0;
-    list-style-position: outside;
-    line-height: 1.6;
-}
-li {
-    font-size: 14px;
-    color: #e4e6eb;
-    letter-spacing: 1px;
-    font-family: 'Open Sans', sans-serif;
-    font-weight: 400;
-}
-ul {
-    margin-left: 0;
-    list-style-type: none;
-}
-ol {
-    margin-left: 1.25rem;
-}
-ul ul, ol ul, ul ol, ol ol {
-    margin-left: 0;
-    margin-bottom: 0;
-    color: #2A2E31;
-}
-label {
-    display: block;
-    margin: 0;
-    font-size: 16px;
-    line-height: 1.2;
-    color: #e4e6eb;
-    font-family: 'Open Sans', sans-serif;
-    font-weight: 600;
-    letter-spacing: 1px;
-}
-iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
-}
-.hide {
-     display: none !important;
-}
- .invisible {
-     visibility: hidden;
-}
-/* DEFINE ESTILO DOS BOTÕES */
+/* MONTA OS CHECKBOXES DAS COLUNAS */
 
-.button-support {
-    height: 55px;
-    overflow: hidden;
-}
-.button-support .button, .button-support .fake-button {
-    width: 100%;
-}
-.button {
-    min-height: 55px;
-    font-size: 16px;
-    padding: 15px 15px;
-    border-radius: 5px;
-    color: #000;
-    background-color: #e4e6eb;
-    border-bottom: 6px solid rgb(163, 165, 169);
-    cursor: pointer;
-    display: inline-block;
-    letter-spacing: 1px;
-    outline: none;
-    line-height: 1;
-    position: relative;
-    text-align: center;
-    font-family: 'Open Sans', sans-serif;
-    font-weight: 600;
-    user-select: none;
-}
-.button:after {
-    content: '';
-    position: absolute;
-    z-index: -1;
-    -webkit-transition: all 0.3s;
-    -moz-transition: all 0.3s;
-    transition: all 0.3s;
-}
-.button:hover, .button:focus {
-    color: #000;
-    background-color: #e4e6eb;
-    border-radius: 5px;
-    top: 2px;
-}
-.button:active {
-    border-radius: 5px;
-    top: 6px;
-}
-.two-buttons {
-    width: 100%;
-    height: 55px;
-    margin-top: 20px;
-    overflow: hidden;
-    display: -webkit-flex;
-    display: flex;
-    -webkit-flex-wrap: wrap;
-    flex-wrap: wrap;
-    -webkit-justify-content: space-between;
-    justify-content: space-between;
-}
-.two-buttons .button, .two-buttons .fake-button {
-    width: 49%;
-}
-.fake-button {
-    color: #000;
-    background-color: #e4e6eb;
-    border-bottom: 6px solid rgb(163, 165, 169);
-    opacity: 0.8;
-    cursor: not-allowed;
-    min-height: 55px;
-    font-size: 16px;
-    padding: 13px 15px 12px 15px;
-    border-radius: 5px;
-    display: inline-block;
-    letter-spacing: 1px;
-    outline: none;
-    position: relative;
-    text-align: center;
-    font-family: 'Open Sans', sans-serif;
-    font-weight: 600;
-    user-select: none;
-}
-.fake-button:hover, .fake-button:focus {
-    color: #000;
-    background-color: #e4e6eb;
-}
-.link-button {
-    display: inline-block;
-    vertical-align: middle;
-    padding: 15px 15px;
-    -webkit-appearance: none;
-    border-radius: 5px;
-    transition: background-color 0.25s ease-out, color 0.25s ease-out;
-    font-size: 16px;
-    line-height: 1;
-    text-align: center;
-    cursor: pointer;
-    letter-spacing: 1px;
-    border: 2px solid #e4e6eb;
-    color: #e4e6eb;
-    font-family: 'Open Sans', sans-serif;
-    font-weight: 600;
-}
-.link-button:last-of-type {
-    margin-right: 0px;
+function renderAnalysisColumnSelector() {
+
+    analysisColumns.replaceChildren();
+
+
+    const fragment =
+        document.createDocumentFragment();
+
+
+    tableState.headers.forEach(
+        function (
+            header,
+            columnIndex,
+        ) {
+
+            const option =
+                document.createElement(
+                    "div",
+                );
+
+
+            const label =
+                document.createElement(
+                    "label",
+                );
+
+
+            const checkbox =
+                document.createElement(
+                    "input",
+                );
+
+
+            const columnName =
+                document.createElement(
+                    "span",
+                );
+
+
+            const columnType =
+                document.createElement(
+                    "span",
+                );
+
+
+            const profile =
+                tableState.columnProfiles[
+                    columnIndex
+                ];
+
+
+            option.classList.add(
+                "statistics-column-option",
+            );
+
+
+            checkbox.type =
+                "checkbox";
+
+
+            checkbox.checked =
+                tableState
+                    .selectedAnalysisColumns
+                    .has(
+                        columnIndex,
+                    );
+
+
+            checkbox.setAttribute(
+                "aria-label",
+                `Analisar coluna ${header}`,
+            );
+
+
+            checkbox.addEventListener(
+                "change",
+                function () {
+
+                    if (
+                        checkbox.checked
+                    ) {
+
+                        tableState
+                            .selectedAnalysisColumns
+                            .add(
+                                columnIndex,
+                            );
+
+                    }
+                    else {
+
+                        tableState
+                            .selectedAnalysisColumns
+                            .delete(
+                                columnIndex,
+                            );
+                    }
+
+
+                    renderQuickAnalysis(
+                        getFilteredRows(),
+                    );
+                },
+            );
+
+
+            columnName.classList.add(
+                "statistics-column-name",
+            );
+
+
+            columnName.textContent =
+                header;
+
+
+            columnName.title =
+                header;
+
+
+            columnType.classList.add(
+                "statistics-column-type",
+            );
+
+
+            columnType.textContent =
+                getColumnTypeLabel(
+                    profile.type,
+                );
+
+
+            label.append(
+                checkbox,
+                columnName,
+                columnType,
+            );
+
+
+            option.appendChild(
+                label,
+            );
+
+
+            fragment.appendChild(
+                option,
+            );
+        },
+    );
+
+
+    analysisColumns.appendChild(
+        fragment,
+    );
+
+
+    const hasColumns =
+        tableState.columnCount > 0;
+
+
+    selectAllColumnsButton.disabled =
+        !hasColumns;
+
+
+    clearColumnsButton.disabled =
+        !hasColumns;
 }
 
-/* CONTAINER FLEXIVEIS */
 
-.flex-box-between {
-    display: -webkit-flex;
-    display: flex;
-    -webkit-flex-wrap: wrap;
-    flex-wrap: wrap;
-    -webkit-justify-content: space-between;
-    justify-content: space-between;
-}
-.flex-box-start {
-    display: -webkit-flex;
-    display: flex;
-    -webkit-flex-wrap: wrap;
-    flex-wrap: wrap;
-    -webkit-justify-content: flex-start;
-    justify-content: flex-start;
-}
-.flex-box-end {
-    display: -webkit-flex;
-    display: flex;
-    -webkit-flex-wrap: wrap;
-    flex-wrap: wrap;
-    -webkit-justify-content: flex-end;
-    justify-content: flex-end;
-}
-.flex-box-center {
-    display: -webkit-flex;
-    display: flex;
-    -webkit-flex-wrap: wrap;
-    flex-wrap: wrap;
-    -webkit-justify-content: center;
-    justify-content: center;
-}
-.flex-box-around {
-    display: -webkit-flex;
-    display: flex;
-    -webkit-flex-wrap: wrap;
-    flex-wrap: wrap;
-    -webkit-justify-content: space-around;
-    justify-content: space-around;
-}
-.flex-box-full-center {
-    display: -webkit-flex;
-    display: flex;
-    -webkit-flex-direction: column;
-    flex-direction: column;
-    -webkit-align-items: stretch;
-    align-items: center;
-    align-content: center;
-    justify-content: center;
-}
-.flex-box-column {
-    display: -webkit-flex;
-    display: flex;
-    -webkit-flex-direction: column;
-    flex-direction: column;
-    -webkit-align-items: stretch;
-    align-items: stretch;
-}
+/* ANALISA UMA COLUNA SELECIONADA */
 
-/* DEFINE O ESTILO DO BREADCRUMBS */
+function renderSelectedColumnAnalysis(
+    rows,
+    columnIndex,
+) {
 
-.breadcrumbs {
-    margin: 0;
-    list-style: none;
-}
-.breadcrumbs::before, .breadcrumbs::after {
-    display: table;
-    content: ' ';
-    -ms-flex-preferred-size: 0;
-    flex-basis: 0;
-    -ms-flex-order: 1;
-    order: 1;
-}
-.breadcrumbs::after {
-    clear: both;
-}
-.breadcrumbs li {
-    float: left;
-    font-size: 16px;
-    color: #0a0a0a;
-    cursor: default;
-}
-.breadcrumbs li:not(:last-child)::after {
-    position: relative;
-    margin: 0 0.75rem;
-    opacity: 1;
-    content: "/";
-    color: #cacaca;
-}
-.breadcrumbs a {
-    color: #ffffff;
-    font-size: 14px;
-}
-.breadcrumbs a:hover {
-    text-decoration: underline;
-}
-.breadcrumbs .disabled {
-    color: #cacaca;
-    cursor: not-allowed;
-}
+    const header =
+        tableState.headers[
+            columnIndex
+        ];
 
-/* DEFINE O ESTILO DO TABS */
 
-.tabs {
-    width: max-content;
-    column-gap: 10px;
-    row-gap: 10px;
-}
-.tabs::before, .tabs::after {
-    display: table;
-    -ms-flex-preferred-size: 0;
-    flex-basis: 0;
-    -ms-flex-order: 1;
-    order: 1;
-}
-.tabs::after {
-    clear: both;
-}
-.tabs-title {
-    width: max-content;
-    height: auto;
-    float: none;
-    text-align: center;
-    margin-bottom: 0;
-    border-radius: 5px;
-    border: 2px solid #525252;
-    align-items: center;
-}
-.tabs .tabs-title .flex-box-center {
-    max-width: max-content;
-    align-items: center;
-    column-gap: 10px;
-}
-.tabs-title > a {
-    display: block;
-    padding: 15px;
-    line-height: 1;
-    outline: none;
-}
-.tabs-title>a:hover {
-    background: #2e2e2e;
-}
-.tabs-title>a:focus, .tabs-title>a[aria-selected='true'] {
-    background-color: #2e2e2e
-}
-.tabs-title a img {
-    width: 35px;
-}
-.tabs-title h4 {
-    cursor: pointer;
-    margin-bottom: 0;
-    font-size: 15px;
-    line-height: 1;
-}
-.tabs-title label {
-    cursor: pointer;
-}
-.tabs-panel {
-    display: none;
-}
-.tabs-panel.is-active {
-    display: block;
-}
-.tabs-content {
-    width: 100%;
-    border-top: 0;
-    transition: all 0.5s ease;
-}
+    const profile =
+        tableState.columnProfiles[
+            columnIndex
+        ];
 
-/* DEFINE O ESTILO DA THUMBNAIL */
 
-.thumbnail {
-    display: inline-block;
-    max-width: 100%;
-    border: solid 4px #fefefe;
-    border-radius: 0;
-    box-shadow: 0 0 0 1px rgba(10, 10, 10, 0.2);
-    line-height: 0;
-}
-a.thumbnail {
-    transition: box-shadow 200ms ease-out;
-}
-a.thumbnail:hover, a.thumbnail:focus {
-    box-shadow: 0 0 6px 1px rgba(23, 121, 186, 0.5);
-}
-a.thumbnail image {
-    box-shadow: none;
-}
+    const filledValues =
+        rows
+            .map(
+                function (
+                    row,
+                ) {
 
-/* MENU PRINCIPAL */
+                    return row[
+                        columnIndex
+                    ];
+                },
+            )
+            .filter(
+                function (
+                    value,
+                ) {
 
-.main-menu {
-    padding: 25px;
-    user-select: none;
-}
-.main-menu .flex-box-between {
-    max-width: 1356px;
-    margin: 0 auto;
-    align-items: center;
-}
-.main-menu .container-1 {
-    width: max-content;
-    justify-content: left;
-    align-items: center;
-}
-.main-menu .container-1 img {
-    width: 80px;
-    height: 80px;
-    margin-right: 15px;
-}
-.main-menu h3, .main-menu p {
-    margin: 0;
-}
-.main-menu p {
-    font-size: 14px;
-}
-.main-menu .link-button {
-    border: 2px solid #525252;
-}
-.main-menu .link-button img {
-    width: 35px;
-}
-.main-menu .link-button:hover {
-    background: #2e2e2e;
-}
-.main-menu .link-button h4 {
-    cursor: pointer;
-    margin-bottom: 0;
-    font-size: 15px;
-    line-height: 1;
-}
+                    return !isEmptyCell(
+                        value,
+                    );
+                },
+            );
 
-.main-menu .link-button .flex-box-center {
-    align-items: center;
-}
 
-/* BASE ESTRUTURAL */
+    const emptyCount =
+        rows.length -
+        filledValues.length;
 
-.main-structure {
-    width: 100%;
-    height: auto;
-    margin: 0 auto;
-    padding: 30px 30px;
-}
-.main-structure .spreadsheets-layout {
-    width: 100%;
-    display: flex;
-    flex-direction: row-reverse;
-    flex-wrap: nowrap;
-    align-items: stretch;
-    column-gap: 15px;
-    min-width: 0;
-}
-.main-structure  #spreadsheets .tabs-content {
-    flex: 1 1 0;
-    min-width: 0;
-    display: flex;
-    overflow: hidden;
-    height: calc(100dvh - 162px - 30px);
-    max-height: calc(100dvh - 162px - 30px);
-}
-.main-structure  #spreadsheets .tabs-content .tabs-panel {
-    width: 100%;
-    height: 100%;
-    background-color: #ffffff;
-    border: solid 2px #525252;
-    border-radius: 5px;
-}
-.main-structure #spreadsheets .tabs {
-    flex: 0 0 220px;
-    height: calc(100dvh - 162px - 30px);
-    max-height: calc(100dvh - 162px - 30px);
-    overflow: auto;
-    padding-right: 15px;
-    margin: 0;
-    display: -webkit-flex;
-    display: flex;
-    -webkit-flex-direction: column;
-    flex-direction: column;
-    -webkit-align-items: stretch;
-    align-items: stretch;
-}
-.main-structure #spreadsheets .tabs:-webkit-scrollbar-track {
-    background-color: transparent;
-}
-.main-structure #spreadsheets .tabs::-webkit-scrollbar {
-    width: 5px;
-    background: transparent;
-}
-.main-structure #spreadsheets .tabs::-webkit-scrollbar-thumb {
-    border-radius: 5px;
-    background: #525252;
-}
-.main-structure #spreadsheets .tabs .tabs-title {
-    border-radius: 5px;
-    border: 2px solid #525252;
-    align-items: center;
-}
-.main-structure #spreadsheets .tabs .tabs-title a {
-    width: 150px;
-    min-height: 66px;
-    padding: 12px;
-    line-height: 1.5;
-    user-select: none;
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.main-structure #spreadsheets .tabs-title:hover {
-    background: #2e2e2e;
-}
-.main-structure #spreadsheets .tabs-title.is-active{
-    background: #2e2e2e;
-}
-.main-structure #spreadsheets .tabs-title:focus, .main-structure #spreadsheets .tabs-title[aria-selected='true'] {
-    background-color: #2e2e2e
-}
-.main-structure #spreadsheets .tabs-title>a:hover {
-    background: transparent;
-}
-.main-structure #spreadsheets .tabs-title>a:focus, .main-structure #spreadsheets .tabs-title>a[aria-selected='true'] {
-    background-color: transparent;
-}
-.main-structure #spreadsheets .tabs .main-spreadsheet {
-    width: 195px !important;
-}
-.main-structure #spreadsheets .tabs-content #spreadsheets .spreadsheets-links {
-    width: 45px;
-    height: 45px;
-    padding: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    color: #e4e6eb;
-    background-color: transparent;
-    border: none;
-    border-left: 2px solid #525252;
-    outline: none;
-    cursor: pointer;
-    transition: color 0.2s ease;
-}
-.main-structure #spreadsheets .tabs-content #spreadsheets .spreadsheets-link-icon {
-    display: block;
-    width: 100%;
-    height: 100%;
-}
-.main-structure #spreadsheets .tabs-content #spreadsheets .spreadsheets-links:hover,
-.main-structure #spreadsheets .tabs-content #spreadsheets .spreadsheets-links:focus-visible {
-    color: #1a73e8;
-}
-.main-structure #spreadsheets .tabs-content #spreadsheets .spreadsheets-links:focus-visible {
-    outline: 2px solid #1a73e8;
-    outline-offset: -3px;
-}
 
-/* TABELAS */
+    const block =
+        createAnalysisBlock(
+            header,
+        );
 
-table {
-    border-collapse: collapse;
-    width: 100%;
-    margin: 0;
-    border-radius: 0;
-    color: #fff;
-    letter-spacing: 1px;
-}
-table thead, table tbody, table tfoot {
-    border: none;
-}
-table caption {
-    padding: 0.5rem 0.625rem 0.625rem;
-    font-weight: bold;
-}
-table thead {
-    color: #fff;
-}
-table tfoot {
-    background: #f1f1f1;
-    color: #0a0a0a;
-}
-table thead tr, table tfoot tr {
-    background: transparent;
-    border: none;
-}
-tr {
-    border-top: 2px solid #393a3b;
-}
-table thead th, table thead td, table tfoot th, table tfoot td {
-    padding: 15px 20px;
-    font-size: 14px;
-    text-align: center;
-    font-family: 'Open Sans', sans-serif;
-    font-weight: 400;
-    background: transparent;
-    letter-spacing: 1px;
-}
-table tbody th, table tbody td {
-    padding: 10px 0;
-    font-size: 14px;
-    font-family: 'Open Sans', sans-serif;
-    font-weight: 400;
-    background: transparent;
-    text-align: center;
-}
-table tbody tr:nth-child(even) {
-    border-bottom: 0;
-}
-table.unstriped tbody {
-    background-color: #fefefe;
-}
-table.unstriped tbody tr {
-    border-bottom: 0;
-    border-bottom: 1px solid #f1f1f1;
-    background-color: #fefefe;
-}
 
-/* API DO GOOGLE DRIVE */
+    if (
+        profile.type === "number"
+    ) {
 
-    /* TELA DE LOGIN */
+        const numericValues =
+            filledValues
+                .map(
+                    parseNumericValue,
+                )
+                .filter(
+                    function (
+                        value,
+                    ) {
 
-    #drive .is-connected {
-        width: 100%;
-        height: calc(100dvh - 162px - 30px);
-        max-height: calc(100dvh - 162px - 30px);
-        display: flex;
-        align-items: center;
-        justify-content: center;
+                        return value !== null;
+                    },
+                );
+
+
+        const total =
+            numericValues.reduce(
+                function (
+                    sum,
+                    value,
+                ) {
+
+                    return sum +
+                        value;
+                },
+                0,
+            );
+
+
+        const average =
+            numericValues.length > 0
+                ? total /
+                    numericValues.length
+                : NaN;
+
+
+        let minimum =
+            NaN;
+
+
+        let maximum =
+            NaN;
+
+
+        numericValues.forEach(
+            function (
+                value,
+            ) {
+
+                minimum =
+                    Number.isNaN(
+                        minimum,
+                    )
+                        ? value
+                        : Math.min(
+                            minimum,
+                            value,
+                        );
+
+
+                maximum =
+                    Number.isNaN(
+                        maximum,
+                    )
+                        ? value
+                        : Math.max(
+                            maximum,
+                            value,
+                        );
+            },
+        );
+
+
+        analysisCards.appendChild(
+            createAnalysisCard(
+                header,
+
+                formatAnalysisNumber(
+                    total,
+                ),
+            ),
+        );
+
+
+        appendAnalysisMetrics(
+            block,
+            [
+                {
+                    label: "Total",
+
+                    value:
+                        formatAnalysisNumber(
+                            total,
+                        ),
+                },
+                {
+                    label: "Média",
+
+                    value:
+                        formatAnalysisNumber(
+                            average,
+                        ),
+                },
+                {
+                    label: "Menor valor",
+
+                    value:
+                        formatAnalysisNumber(
+                            minimum,
+                        ),
+                },
+                {
+                    label: "Maior valor",
+
+                    value:
+                        formatAnalysisNumber(
+                            maximum,
+                        ),
+                },
+                {
+                    label: "Valores válidos",
+
+                    value:
+                        formatAnalysisNumber(
+                            numericValues.length,
+                        ),
+                },
+                {
+                    label: "Células vazias",
+
+                    value:
+                        formatAnalysisNumber(
+                            emptyCount,
+                        ),
+                },
+            ],
+        );
+
     }
-    #drive .drive-login {
-        width: max-content;
-        height: auto;
-        background-color: #1f1f1f;
-        border: solid 2px #525252;
-        border-radius: 5px;
-        padding: 35px;
-    }
-    #drive .drive-login .description .flex-box-center {
-        column-gap: 15px;
-        align-items: center;
-        margin-bottom: 10px;
-    }
-    #drive .drive-login .description .flex-box-center img {
-        width: 40px;
-    }
-    #drive .drive-login .description .flex-box-center h2 {
-        margin-bottom: 0;
-    }
-    #drive .drive-login .description p {
-        width: 470px;
-        text-align: center;
-    }
-    #drive .drive-login ul, #drive .drive-login ul h4 {
-        margin-bottom: 20px;
-    }
-    #drive .drive-login ul li  {
-        column-gap: 15px;
-        align-items: center;
-        border-bottom: 2px solid #525252;
-        padding-bottom: 15px;
-        margin-bottom: 15px;
-    }
-    #drive .drive-login ul li:last-of-type  {
-        margin-bottom: 0px;
-    }
-    #drive .drive-login ul li img {
-        width: 25px;
-    }
-    #drive .drive-login ul li p {
-        width: max-content !important;
-        margin-bottom: 0;
-    }
-    #drive .drive-login .pre-button {
-        height: 55px;
-        overflow: hidden;
-        margin-top: 30px;
-    }
-    #drive .drive-login .pre-button .button {
-        width: 100%;
-    }
+    else if (
+        profile.type === "datetime"
+    ) {
 
-    /* CARREGAMENTO */
+        const dateValues =
+            filledValues
+                .map(
+                    parseDateValue,
+                )
+                .filter(
+                    function (
+                        value,
+                    ) {
 
-    .drive-loading {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        column-gap: 12px;
-        min-height: 120px;
-        font-size: 14px;
+                        return value !== null;
+                    },
+                );
+
+
+        const firstDate =
+            dateValues.reduce(
+                function (
+                    earliestDate,
+                    currentDate,
+                ) {
+
+                    return (
+                        !earliestDate ||
+                        currentDate < earliestDate
+                    )
+                        ? currentDate
+                        : earliestDate;
+                },
+                null,
+            );
+
+
+        const lastDate =
+            dateValues.reduce(
+                function (
+                    latestDate,
+                    currentDate,
+                ) {
+
+                    return (
+                        !latestDate ||
+                        currentDate > latestDate
+                    )
+                        ? currentDate
+                        : latestDate;
+                },
+                null,
+            );
+
+
+        analysisCards.appendChild(
+            createAnalysisCard(
+                header,
+
+                formatAnalysisNumber(
+                    dateValues.length,
+                ),
+            ),
+        );
+
+
+        appendAnalysisMetrics(
+            block,
+            [
+                {
+                    label: "Data inicial",
+
+                    value:
+                        formatAnalysisDate(
+                            firstDate,
+                            profile.hasTime,
+                        ),
+                },
+                {
+                    label: "Data final",
+
+                    value:
+                        formatAnalysisDate(
+                            lastDate,
+                            profile.hasTime,
+                        ),
+                },
+                {
+                    label: "Valores válidos",
+
+                    value:
+                        formatAnalysisNumber(
+                            dateValues.length,
+                        ),
+                },
+                {
+                    label: "Células vazias",
+
+                    value:
+                        formatAnalysisNumber(
+                            emptyCount,
+                        ),
+                },
+            ],
+        );
+
     }
-    .drive-loading-spinner {
-        width: 24px;
-        height: 24px;
-        border: 3px solid rgba(255, 255, 255, 0.25);
-        border-top-color: currentColor;
-        border-radius: 50%;
-        animation: drive-spinner-rotation 0.8s linear infinite;
-    }
-    .drive-error {
-        padding: 15px;
-        border: 1px solid #d9534f;
-        border-radius: 5px;
-        color: #ff8a85;
-    }
-    @keyframes drive-spinner-rotation {
-        from {
-            transform: rotate(0deg);
+    else if (
+        profile.type === "category" ||
+        profile.type === "identifier"
+    ) {
+
+        const frequencyData =
+            createFrequencyData(
+                rows,
+                columnIndex,
+            );
+
+
+        const duplicateCount =
+            filledValues.length -
+            frequencyData.length;
+
+
+        analysisCards.appendChild(
+            createAnalysisCard(
+                header,
+
+                formatAnalysisNumber(
+                    frequencyData.length,
+                ),
+            ),
+        );
+
+
+        if (
+            profile.type === "identifier"
+        ) {
+
+            appendAnalysisMetrics(
+                block,
+                [
+                    {
+                        label: "Preenchidos",
+
+                        value:
+                            formatAnalysisNumber(
+                                filledValues.length,
+                            ),
+                    },
+                    {
+                        label: "Valores únicos",
+
+                        value:
+                            formatAnalysisNumber(
+                                frequencyData.length,
+                            ),
+                    },
+                    {
+                        label: "Repetições",
+
+                        value:
+                            formatAnalysisNumber(
+                                duplicateCount,
+                            ),
+                    },
+                    {
+                        label: "Células vazias",
+
+                        value:
+                            formatAnalysisNumber(
+                                emptyCount,
+                            ),
+                    },
+                ],
+            );
+
+
+            const duplicatedValues =
+                frequencyData.filter(
+                    function (
+                        group,
+                    ) {
+
+                        return group.count > 1;
+                    },
+                );
+
+
+            if (
+                duplicatedValues.length > 0
+            ) {
+
+                appendFrequencyAnalysis(
+                    block,
+                    duplicatedValues,
+                    "Nenhum valor repetido.",
+                );
+            }
+
         }
-        to {
-            transform: rotate(360deg);
+        else {
+
+            appendFrequencyAnalysis(
+                block,
+                frequencyData,
+                "Nenhum valor preenchido.",
+            );
         }
+
+    }
+    else {
+
+        analysisCards.appendChild(
+            createAnalysisCard(
+                header,
+                "0",
+            ),
+        );
+
+
+        appendAnalysisMetrics(
+            block,
+            [
+                {
+                    label: "Valores preenchidos",
+                    value: "0",
+                },
+                {
+                    label: "Células vazias",
+
+                    value:
+                        formatAnalysisNumber(
+                            rows.length,
+                        ),
+                },
+            ],
+        );
     }
 
-    /* INFORMAÇÕES DO USUÁRIO */
 
-    #userInfo .who-is {
-        width: max-content;
-        column-gap: 20px;
-        align-items: center;
-    }
-    #userInfo .who-is p, #userInfo .who-is p {
-        margin: 0;
-    }
-    #userInfo .flex-box-start {
-        column-gap: 15px;
-    }
-    #userInfo .profile {
-        flex: 0 0 max-content;
-        background-color: #1f1f1f;
-        border: 2px solid #525252;
-        border-radius: 5px;
-        padding: 30px;
-        column-gap: 15px;
-        align-items: center;
-    }
-    #userInfo .profile h4 {
-        margin-bottom: 5px;
-    }
-    #userInfo .profile p {
-        margin: 0;
-    }
-    #userInfo .drive-nav {
-        flex: 1 1 0;
-        padding: 35px;
-        border-radius: 5px;
-        background-color: #1f1f1f;
-        border: 2px solid #525252;
-        align-items: center;
-    }
-    #userInfo .drive-nav h4 {
-        margin-bottom: 0px;
-    }
+    analysisResults.appendChild(
+        block,
+    );
+}
 
-    /* BARRA DE NAVEGAÇÃO */
 
-    .drive-toolbar {
-        width: max-content;
-        display: flex;
-        align-items: center;
-        column-gap: 5px;
-        row-gap: 10px;
-        flex-wrap: wrap;
-    }
-    .drive-breadcrumb {
-        display: flex;
-        align-items: center;
-        column-gap: 8px;
-        row-gap: 5px;
-        flex-wrap: wrap;
-    }
-    .drive-toolbar button, .drive-breadcrumb-current, .drive-breadcrumb-separator {
-        border: none;
-        cursor: pointer;
-        color: #e4e6eb;
-        font-size: 15px;
-        letter-spacing: 1px;
-        font-family: 'Open Sans', sans-serif;
-        font-weight: 400;
-        text-rendering: optimizeLegibility;
-        line-height: 1.6;
-    }
-    .drive-breadcrumb-current, .drive-breadcrumb-separator {
-        cursor: default !important;
-    }
-    .drive-breadcrumb-separator {
-        opacity: 0.6;
-        user-select: none;
-    }
-    .drive-view-controls {
-        width: max-content;
-        height: 56px;
-        overflow: hidden;
-    }
-    .drive-view-controls button {
-        width: 60px;
-        min-height: 56px;
-        font-size: 14px;
-        padding: 10px;
-    }
-    .drive-view-controls img {
-        width: 25px;
-        height: 25px;
+/* ATUALIZA A ANÁLISE RÁPIDA */
+
+function renderQuickAnalysis(
+    rows,
+) {
+
+    totalRecords.textContent =
+        formatAnalysisNumber(
+            rows.length,
+        );
+
+
+    analysisCards.replaceChildren();
+
+    analysisResults.replaceChildren();
+
+
+    const selectedColumns =
+        Array.from(
+            tableState.selectedAnalysisColumns,
+        ).sort(
+            function (
+                firstColumn,
+                secondColumn,
+            ) {
+
+                return firstColumn -
+                    secondColumn;
+            },
+        );
+
+
+    analysisEmpty.hidden =
+        selectedColumns.length > 0;
+
+
+    selectedColumns.forEach(
+        function (
+            columnIndex,
+        ) {
+
+            renderSelectedColumnAnalysis(
+                rows,
+                columnIndex,
+            );
+        },
+    );
+
+
+    quickAnalysis.hidden =
+        false;
+}
+
+
+/* RETORNA O ÍCONE DA ORDENAÇÃO */
+
+function getSortIndicator(
+    columnIndex,
+) {
+
+    if (
+        tableState.sortColumn !==
+        columnIndex
+    ) {
+
+        return "↕";
     }
 
-    /* ARQUIVOS DO DRIVE */
 
-    #driveFiles-Style {
-        width: 100%;
-        height: calc(100dvh - 30px - 30px);
-        margin: 30px 0 0 0;
-        padding: 35px;
-        border-radius: 5px;
-        background-color: #1f1f1f;
-        border: 2px solid #525252;
+    return tableState.sortDirection ===
+        "asc"
+            ? "↑"
+            : "↓";
+}
+
+
+/* ALTERA A ORDENAÇÃO */
+
+function changeSort(
+    columnIndex,
+) {
+
+    if (
+        tableState.sortColumn ===
+        columnIndex
+    ) {
+
+        tableState.sortDirection =
+            tableState.sortDirection ===
+            "asc"
+                ? "desc"
+                : "asc";
+
     }
-    #driveFiles {
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        row-gap: 10px;
-        overflow: auto;
-        padding-right: 15px;
-    }
-    #driveFiles:-webkit-scrollbar-track {
-        background-color: transparent;
-    }
-    #driveFiles::-webkit-scrollbar {
-        width: 5px;
-        background: transparent;
-    }
-    #driveFiles::-webkit-scrollbar-thumb {
-        border-radius: 5px;
-        background: #525252;
-    }
-    .drive-file {
-        display: flex;
-        align-items: center;
-        column-gap: 12px;
-        padding: 12px;
-        color: #e4e6eb;
-        text-decoration: none;
-        border: 1px solid #525252;
-        cursor: pointer;
-    }
-    .drive-file:hover {
-        background-color: #2e2e2e;
-    }
-    .drive-file-icon {
-        width: 32px;
-        height: 32px;
-        object-fit: contain;
-    }
-    .drive-file-info {
-        display: flex;
-        flex-direction: column;
-        row-gap: 4px;
-    }
-    .drive-file-name {
-        font-size: 15px;
-    }
-    .drive-file-date {
-        font-size: 12px;
-        opacity: 0.7;
-    }
-    #driveFiles.drive-list-view {
-        display: flex;
-        flex-direction: column;
-        row-gap: 10px;
-    }
-    #driveFiles.drive-list-view .drive-file {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        text-align: left;
-        padding: 12px;
-    }
-    #driveFiles.drive-list-view .drive-file-icon {
-        width: 32px;
-        height: 32px;
-        object-fit: contain;
-    }
-    #driveFiles.drive-grid-view {
-        display: grid;
-        grid-template-columns: repeat(auto-fill,minmax(220px, 1fr));
-        gap: 18px;
-        align-content: start;
-    }
-    #driveFiles.drive-grid-view .drive-file {
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
-        padding: 20px;
-        background-color: #1f1f1f;
-        border: 2px solid #525252;
-        border-radius: 5px;
-        cursor: pointer;
-    }
-    #driveFiles.drive-grid-view .drive-file:hover {
-        background-color: #2a2b2e;
-    }
-    #driveFiles.drive-grid-view .drive-file-icon {
-        width: 100%;
-        height: 150px;
-        border-radius: 5px;
-    }
-    #driveFiles.drive-grid-view .drive-file-info {
-        width: 100%;
-        padding: 10px 6px 6px;
-        row-gap: 5px;
-    }
-    #driveFiles.drive-grid-view .drive-file-name {
-        display: block;
-        width: 100%;
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        font-size: 14px;
-    }
-    #driveFiles.drive-grid-view .drive-file-date {
-        font-size: 11px;
-        opacity: 0.65;
-    }
-    #driveFiles.drive-grid-view .drive-folder .drive-file-icon {
-        width: 80px;
-        height: 100px;
-        margin: 25px auto 10px;
-        object-fit: contain;
-    }
-    #driveFiles.drive-grid-view .drive-folder {
-        justify-content: center;
+    else {
+
+        tableState.sortColumn =
+            columnIndex;
+
+
+        tableState.sortDirection =
+            "asc";
     }
 
-    /*  VISUALIZADOR DE IMAGENS */
 
-    .image-viewer {
-        position: fixed;
-        inset: 0;
-        z-index: 9999;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 30px;
-        background-color: rgba(0, 0, 0, 0.88);
-    }
-    .image-viewer[hidden] {
-        display: none !important;
-    }
-    .image-viewer-content {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        height: 100%;
-    }
-    .image-viewer-image {
-        display: block;
-        max-width: 100%;
-        max-height: 100%;
-        object-fit: contain;
-        user-select: none;
-        -webkit-user-drag: none;
-    }
-    .image-viewer-close {
-        position: absolute;
-        top: 20px;
-        right: 24px;
-        z-index: 1;
-        width: 44px;
-        height: 44px;
-        border: none;
-        border-radius: 50%;
-        background-color: rgba(255, 255, 255, 0.12);
-        color: #ffffff;
-        font-size: 32px;
-        line-height: 1;
-        cursor: pointer;
-    }
-    .image-viewer-close:hover {
-        background-color: rgba(255, 255, 255, 0.22);
-    }
-    body.image-viewer-open {
-        overflow: hidden;
-    }
-    .image-viewer-loading {
-        position: absolute;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 14px;
-        color: #ffffff;
-    }
-    .image-viewer-loading[hidden] {
-        display: none;
+    renderTableHeader();
+
+    renderTableBody();
+}
+
+
+/* MONTA OS CABEÇALHOS E FILTROS */
+
+function renderTableHeader() {
+
+    const tableHead =
+        table.querySelector(
+            "thead",
+        );
+
+
+    const headerRow =
+        document.createElement(
+            "tr",
+        );
+
+
+    const filterRow =
+        document.createElement(
+            "tr",
+        );
+
+
+    filterRow.classList.add(
+        "statistics-filter-row",
+    );
+
+
+    tableHead.replaceChildren();
+
+
+    for (
+        let columnIndex = 0;
+        columnIndex < tableState.columnCount;
+        columnIndex += 1
+    ) {
+
+        const headerCell =
+            document.createElement(
+                "th",
+            );
+
+
+        const sortButton =
+            document.createElement(
+                "button",
+            );
+
+
+        const sortIndicator =
+            document.createElement(
+                "span",
+            );
+
+
+        const filterCell =
+            document.createElement(
+                "th",
+            );
+
+
+        const filterInput =
+            document.createElement(
+                "input",
+            );
+
+
+        const headerValue =
+            tableState.headers[
+                columnIndex
+            ];
+
+
+        /* ORDENAÇÃO */
+
+        sortButton.type =
+            "button";
+
+
+        sortButton.classList.add(
+            "statistics-sort-button",
+        );
+
+
+        sortButton.setAttribute(
+            "aria-label",
+            `Ordenar pela coluna ${headerValue}`,
+        );
+
+
+        sortButton.append(
+            document.createTextNode(
+                headerValue,
+            ),
+        );
+
+
+        sortIndicator.classList.add(
+            "statistics-sort-indicator",
+        );
+
+
+        sortIndicator.textContent =
+            getSortIndicator(
+                columnIndex,
+            );
+
+
+        sortButton.appendChild(
+            sortIndicator,
+        );
+
+
+        sortButton.addEventListener(
+            "click",
+            function () {
+
+                changeSort(
+                    columnIndex,
+                );
+            },
+        );
+
+
+        headerCell.appendChild(
+            sortButton,
+        );
+
+
+        headerRow.appendChild(
+            headerCell,
+        );
+
+
+        /* FILTRO */
+
+        filterInput.type =
+            "search";
+
+
+        filterInput.classList.add(
+            "statistics-column-filter",
+        );
+
+
+        filterInput.placeholder =
+            "Filtrar...";
+
+
+        filterInput.value =
+            tableState.filters[
+                columnIndex
+            ];
+
+
+        filterInput.setAttribute(
+            "aria-label",
+            `Filtrar coluna ${headerValue}`,
+        );
+
+
+        filterInput.addEventListener(
+            "input",
+            function () {
+
+                tableState.filters[
+                    columnIndex
+                ] =
+                    filterInput.value;
+
+
+                renderTableBody();
+            },
+        );
+
+
+        filterCell.appendChild(
+            filterInput,
+        );
+
+
+        filterRow.appendChild(
+            filterCell,
+        );
     }
 
-    .image-viewer-spinner {
-        width: 42px;
-        height: 42px;
-        border: 4px solid rgba(255, 255, 255, 0.25);
-        border-top-color: #ffffff;
-        border-radius: 50%;
-        animation: image-viewer-spin 0.8s linear infinite;
-    }
-    @keyframes image-viewer-spin {
-        to {
-            transform: rotate(360deg);
-        }
-    }
-    .image-viewer-image[hidden] {
-        display: none;
+
+    tableHead.append(
+        headerRow,
+        filterRow,
+    );
+}
+
+
+/* APLICA OS FILTROS */
+
+function getFilteredRows() {
+
+    return tableState.rows.filter(
+        function (
+            row,
+        ) {
+
+            return tableState.filters.every(
+                function (
+                    filterValue,
+                    columnIndex,
+                ) {
+
+                    const normalizedFilter =
+                        normalizeSearchValue(
+                            filterValue,
+                        ).trim();
+
+
+                    if (
+                        !normalizedFilter
+                    ) {
+
+                        return true;
+                    }
+
+
+                    return normalizeSearchValue(
+                        row[columnIndex],
+                    ).includes(
+                        normalizedFilter,
+                    );
+                },
+            );
+        },
+    );
+}
+
+
+/* ORDENA OS REGISTROS */
+
+function getSortedRows(
+    rows,
+) {
+
+    if (
+        tableState.sortColumn ===
+        null
+    ) {
+
+        return rows;
     }
 
-    /* AVISOS */
 
-    .warning {
-        width: 100%;
-        background-color: #1f1f1f;
-        border: 2px solid #525252;
-        position: relative;
-        margin: 0 0 30px 0;
-        padding: 20px;
-        border-radius: 5px;
-        align-items: center;
+    const sortedRows =
+        [...rows];
+
+
+    const columnIndex =
+        tableState.sortColumn;
+
+
+    sortedRows.sort(
+        function (
+            firstRow,
+            secondRow,
+        ) {
+
+            const firstValue =
+                formatCellValue(
+                    firstRow[columnIndex],
+                ).trim();
+
+
+            const secondValue =
+                formatCellValue(
+                    secondRow[columnIndex],
+                ).trim();
+
+
+            if (
+                !firstValue &&
+                secondValue
+            ) {
+
+                return 1;
+            }
+
+
+            if (
+                firstValue &&
+                !secondValue
+            ) {
+
+                return -1;
+            }
+
+
+            const comparison =
+                naturalCollator.compare(
+                    firstValue,
+                    secondValue,
+                );
+
+
+            return tableState.sortDirection ===
+                "asc"
+                    ? comparison
+                    : -comparison;
+        },
+    );
+
+
+    return sortedRows;
+}
+
+
+/* MONTA AS LINHAS VISÍVEIS */
+
+function renderTableBody() {
+
+    const tableBody =
+        table.querySelector(
+            "tbody",
+        );
+
+
+    const filteredRows =
+        getFilteredRows();
+
+
+    const sortedRows =
+        getSortedRows(
+            filteredRows,
+        );
+
+
+    const visibleRows =
+        sortedRows.slice(
+            0,
+            MAX_PREVIEW_ROWS,
+        );
+
+
+    tableBody.replaceChildren();
+
+
+    if (
+        visibleRows.length === 0
+    ) {
+
+        const emptyRow =
+            document.createElement(
+                "tr",
+            );
+
+
+        const emptyCell =
+            createCell(
+                "td",
+                "Nenhum resultado encontrado para os filtros aplicados.",
+            );
+
+
+        emptyRow.classList.add(
+            "statistics-empty-row",
+        );
+
+
+        emptyCell.colSpan =
+            tableState.columnCount;
+
+
+        emptyRow.appendChild(
+            emptyCell,
+        );
+
+
+        tableBody.appendChild(
+            emptyRow,
+        );
+
     }
-    .warning .flex-box-start {
-        max-width: max-content !important;
-        align-items: center;
+    else {
+
+        const bodyFragment =
+            document.createDocumentFragment();
+
+
+        visibleRows.forEach(
+            function (
+                row,
+            ) {
+
+                const tableRow =
+                    document.createElement(
+                        "tr",
+                    );
+
+
+                for (
+                    let columnIndex = 0;
+                    columnIndex < tableState.columnCount;
+                    columnIndex += 1
+                ) {
+
+                    tableRow.appendChild(
+                        createCell(
+                            "td",
+                            row[columnIndex],
+                        ),
+                    );
+                }
+
+
+                bodyFragment.appendChild(
+                    tableRow,
+                );
+            },
+        );
+
+
+        tableBody.appendChild(
+            bodyFragment,
+        );
     }
-    .warning .flex-box-start img {
-        width: 25px;
-        margin-right: 15px;
+
+
+    /* ATUALIZA A ANÁLISE COM OS DADOS FILTRADOS */
+
+    renderQuickAnalysis(
+        filteredRows,
+    );
+
+
+    /* ATUALIZA O RESUMO */
+
+    const totalRows =
+        tableState.rows.length;
+
+
+    const filteredRowCount =
+        filteredRows.length;
+
+
+    const isFiltered =
+        tableState.filters.some(
+            function (
+                filterValue,
+            ) {
+
+                return normalizeSearchValue(
+                    filterValue,
+                ).trim().length > 0;
+            },
+        );
+
+
+    const previewLimitMessage =
+        filteredRowCount > MAX_PREVIEW_ROWS
+            ? ` • exibindo as primeiras ${MAX_PREVIEW_ROWS}`
+            : "";
+
+
+    previewSummary.textContent =
+        isFiltered
+            ? `${tableState.sheetName} • ${filteredRowCount} de ${totalRows} linhas • ${tableState.columnCount} colunas${previewLimitMessage}`
+            : `${tableState.sheetName} • ${totalRows} linhas • ${tableState.columnCount} colunas${previewLimitMessage}`;
+}
+
+
+/* MONTA A TABELA INTERATIVA */
+
+function renderTable(
+    rows,
+    sheetName,
+) {
+
+    const columnCount =
+        rows.reduce(
+            function (
+                largestColumnCount,
+                row,
+            ) {
+
+                return Math.max(
+                    largestColumnCount,
+                    row.length,
+                );
+            },
+            0,
+        );
+
+
+    if (
+        columnCount === 0
+    ) {
+
+        throw new Error(
+            "A primeira aba do arquivo não possui dados.",
+        );
     }
-    .warning .flex-box-start h4 {
-        margin-bottom: 0;
-        color: #e4e6eb;
+
+
+    const headerValues =
+        rows[0] ??
+        [];
+
+
+    tableState.sheetName =
+        sheetName;
+
+
+    tableState.columnCount =
+        columnCount;
+
+
+    tableState.headers =
+        Array.from(
+            {
+                length: columnCount,
+            },
+
+            function (
+                unusedValue,
+                columnIndex,
+            ) {
+
+                return (
+                    formatCellValue(
+                        headerValues[
+                            columnIndex
+                        ],
+                    ).trim() ||
+
+                    `Coluna ${columnIndex + 1}`
+                );
+            },
+        );
+
+
+    tableState.rows =
+        rows.slice(
+            1,
+        );
+
+
+    tableState.columnProfiles =
+        tableState.headers.map(
+            function (
+                unusedHeader,
+                columnIndex,
+            ) {
+
+                return detectColumnProfile(
+                    columnIndex,
+                );
+            },
+        );
+
+
+    tableState
+        .selectedAnalysisColumns
+        .clear();
+
+
+    tableState.filters =
+        Array(
+            columnCount,
+        ).fill(
+            "",
+        );
+
+
+    tableState.sortColumn =
+        null;
+
+
+    tableState.sortDirection =
+        "asc";
+
+
+    renderAnalysisColumnSelector();
+
+    renderTableHeader();
+
+    renderTableBody();
+
+
+    preview.hidden =
+        false;
+}
+
+
+/* LIMPA O ESTADO DA TABELA */
+
+function resetTableState() {
+
+    tableState.sheetName =
+        "";
+
+
+    tableState.headers =
+        [];
+
+
+    tableState.rows =
+        [];
+
+
+    tableState.columnProfiles =
+        [];
+
+
+    tableState
+        .selectedAnalysisColumns
+        .clear();
+
+
+    tableState.filters =
+        [];
+
+
+    tableState.columnCount =
+        0;
+
+
+    tableState.sortColumn =
+        null;
+
+
+    tableState.sortDirection =
+        "asc";
+}
+
+
+/* LIMPA A ANÁLISE RÁPIDA */
+
+function clearQuickAnalysis() {
+
+    quickAnalysis.hidden =
+        true;
+
+
+    totalRecords.textContent =
+        "0";
+
+
+    analysisColumns.replaceChildren();
+
+    analysisCards.replaceChildren();
+
+    analysisResults.replaceChildren();
+
+
+    analysisEmpty.hidden =
+        false;
+
+
+    selectAllColumnsButton.disabled =
+        true;
+
+
+    clearColumnsButton.disabled =
+        true;
+}
+
+
+/* REMOVE OS DADOS DA TELA */
+
+function clearImportedFile() {
+
+    const tableHead =
+        table.querySelector(
+            "thead",
+        );
+
+
+    const tableBody =
+        table.querySelector(
+            "tbody",
+        );
+
+
+    fileInput.value =
+        "";
+
+
+    tableHead.replaceChildren();
+
+    tableBody.replaceChildren();
+
+
+    resetTableState();
+
+    clearQuickAnalysis();
+
+
+    previewSummary.textContent =
+        "";
+
+
+    preview.hidden =
+        true;
+
+
+    clearButton.disabled =
+        true;
+
+
+    setStatus(
+        "Nenhum arquivo selecionado. O arquivo será lido somente neste navegador.",
+    );
+}
+
+
+/* LÊ O ARQUIVO SELECIONADO */
+
+async function readSelectedFile(
+    file,
+) {
+
+    if (
+        !isSupportedFile(
+            file,
+        )
+    ) {
+
+        throw new Error(
+            "Formato não suportado. Selecione um arquivo .xlsx, .xls ou .csv.",
+        );
     }
+
+
+    if (
+        !window.XLSX
+    ) {
+
+        throw new Error(
+            "A biblioteca de leitura de planilhas não foi carregada.",
+        );
+    }
+
+
+    const fileData =
+        await file.arrayBuffer();
+
+
+    const workbook =
+        window.XLSX.read(
+            fileData,
+            {
+                cellDates: true,
+                cellFormula: false,
+            },
+        );
+
+
+    const sheetName =
+        workbook.SheetNames[0];
+
+
+    if (
+        !sheetName
+    ) {
+
+        throw new Error(
+            "O arquivo não possui nenhuma aba.",
+        );
+    }
+
+
+    const worksheet =
+        workbook.Sheets[
+            sheetName
+        ];
+
+
+    const rows =
+        window.XLSX.utils.sheet_to_json(
+            worksheet,
+            {
+                header: 1,
+                defval: "",
+                raw: false,
+                blankrows: false,
+            },
+        );
+
+
+    if (
+        rows.length === 0
+    ) {
+
+        throw new Error(
+            "A primeira aba do arquivo está vazia.",
+        );
+    }
+
+
+    renderTable(
+        rows,
+        sheetName,
+    );
+
+
+    clearButton.disabled =
+        false;
+
+
+    setStatus(
+        `Arquivo "${file.name}" carregado localmente com sucesso.`,
+    );
+}
+
+
+/* INICIALIZA O IMPORTADOR */
+
+function initializeStatisticsImporter() {
+
+    if (
+        !fileInput ||
+        !clearButton ||
+        !fileStatus ||
+        !preview ||
+        !previewSummary ||
+        !table ||
+        !quickAnalysis ||
+        !analysisColumns ||
+        !selectAllColumnsButton ||
+        !clearColumnsButton ||
+        !totalRecords ||
+        !analysisCards ||
+        !analysisResults ||
+        !analysisEmpty
+    ) {
+
+        console.error(
+            "Elementos do importador de Estatísticas não foram encontrados.",
+        );
+
+
+        return;
+    }
+
+
+    if (
+        !window.XLSX
+    ) {
+
+        fileInput.disabled =
+            true;
+
+
+        setStatus(
+            "Não foi possível carregar a biblioteca de leitura de planilhas.",
+            true,
+        );
+
+
+        return;
+    }
+
+
+    fileInput.addEventListener(
+        "change",
+        async function () {
+
+            const file =
+                fileInput.files?.[0];
+
+
+            if (
+                !file
+            ) {
+
+                return;
+            }
+
+
+            setStatus(
+                `Lendo "${file.name}"...`,
+            );
+
+
+            try {
+
+                await readSelectedFile(
+                    file,
+                );
+
+            }
+            catch (
+                error
+            ) {
+
+                table.querySelector(
+                    "thead",
+                ).replaceChildren();
+
+
+                table.querySelector(
+                    "tbody",
+                ).replaceChildren();
+
+
+                resetTableState();
+
+                clearQuickAnalysis();
+
+
+                previewSummary.textContent =
+                    "";
+
+
+                preview.hidden =
+                    true;
+
+
+                clearButton.disabled =
+                    false;
+
+
+                setStatus(
+                    error instanceof Error
+                        ? error.message
+                        : "Não foi possível ler o arquivo selecionado.",
+                    true,
+                );
+            }
+        },
+    );
+
+
+    clearButton.addEventListener(
+        "click",
+        clearImportedFile,
+    );
+
+
+    selectAllColumnsButton.addEventListener(
+        "click",
+        function () {
+
+            tableState.selectedAnalysisColumns =
+                new Set(
+                    tableState.headers.map(
+                        function (
+                            unusedHeader,
+                            columnIndex,
+                        ) {
+
+                            return columnIndex;
+                        },
+                    ),
+                );
+
+
+            renderAnalysisColumnSelector();
+
+
+            renderQuickAnalysis(
+                getFilteredRows(),
+            );
+        },
+    );
+
+
+    clearColumnsButton.addEventListener(
+        "click",
+        function () {
+
+            tableState
+                .selectedAnalysisColumns
+                .clear();
+
+
+            renderAnalysisColumnSelector();
+
+
+            renderQuickAnalysis(
+                getFilteredRows(),
+            );
+        },
+    );
+}
+
+
+/* INICIALIZA */
+
+initializeStatisticsImporter();
