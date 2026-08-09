@@ -38,6 +38,41 @@ const table =
         "statisticsLocalTable"
     );
 
+const quickAnalysis =
+    document.getElementById(
+        "statisticsQuickAnalysis"
+    );
+
+const packagesLabel =
+    document.getElementById(
+        "statisticsPackagesLabel"
+    );
+
+const totalPackages =
+    document.getElementById(
+        "statisticsTotalPackages"
+    );
+
+const totalRoutes =
+    document.getElementById(
+        "statisticsTotalRoutes"
+    );
+
+const totalStatuses =
+    document.getElementById(
+        "statisticsTotalStatuses"
+    );
+
+const routesSummary =
+    document.getElementById(
+        "statisticsRoutesSummary"
+    );
+
+const statusesSummary =
+    document.getElementById(
+        "statisticsStatusesSummary"
+    );
+
 
 /* ESTADO DA TABELA INTERATIVA */
 
@@ -136,7 +171,7 @@ function formatCellValue(
 }
 
 
-/* CRIA UMA CÉLULA SEM INJETAR HTML DO ARQUIVO */
+/* CRIA UMA CÉLULA */
 
 function createCell(
     tagName,
@@ -179,6 +214,337 @@ function normalizeSearchValue(
 }
 
 
+/* LOCALIZA UMA COLUNA PELO NOME */
+
+function findColumnIndex(
+    possibleNames
+) {
+
+    const normalizedNames =
+        possibleNames.map(
+            function (
+                name
+            ) {
+
+                return normalizeSearchValue(
+                    name
+                ).trim();
+            }
+        );
+
+
+    return tableState.headers.findIndex(
+        function (
+            header
+        ) {
+
+            return normalizedNames.includes(
+                normalizeSearchValue(
+                    header
+                ).trim()
+            );
+        }
+    );
+}
+
+
+/* CONTA REGISTROS PREENCHIDOS */
+
+function countFilledRows(
+    rows,
+    columnIndex
+) {
+
+    if (columnIndex < 0) {
+
+        return rows.length;
+    }
+
+
+    return rows.reduce(
+        function (
+            total,
+            row
+        ) {
+
+            return normalizeSearchValue(
+                row[columnIndex]
+            ).trim()
+                ? total + 1
+                : total;
+        },
+        0
+    );
+}
+
+
+/* AGRUPA OS VALORES DE UMA COLUNA */
+
+function createFrequencyData(
+    rows,
+    columnIndex
+) {
+
+    if (columnIndex < 0) {
+
+        return [];
+    }
+
+
+    const groups =
+        new Map();
+
+
+    rows.forEach(
+        function (
+            row
+        ) {
+
+            const displayValue =
+                formatCellValue(
+                    row[columnIndex]
+                ).trim();
+
+
+            if (!displayValue) {
+
+                return;
+            }
+
+
+            const normalizedValue =
+                normalizeSearchValue(
+                    displayValue
+                ).trim();
+
+
+            if (
+                groups.has(
+                    normalizedValue
+                )
+            ) {
+
+                groups.get(
+                    normalizedValue
+                ).count += 1;
+
+                return;
+            }
+
+
+            groups.set(
+                normalizedValue,
+                {
+                    label:
+                        displayValue,
+
+                    count:
+                        1
+                }
+            );
+        }
+    );
+
+
+    return Array.from(
+        groups.values()
+    ).sort(
+        function (
+            firstGroup,
+            secondGroup
+        ) {
+
+            return (
+                secondGroup.count -
+                firstGroup.count ||
+
+                naturalCollator.compare(
+                    firstGroup.label,
+                    secondGroup.label
+                )
+            );
+        }
+    );
+}
+
+
+/* MONTA UMA TABELA DE AGRUPAMENTO */
+
+function renderFrequencyTable(
+    tableBody,
+    frequencyData,
+    emptyMessage
+) {
+
+    tableBody.replaceChildren();
+
+
+    if (frequencyData.length === 0) {
+
+        const row =
+            document.createElement(
+                "tr"
+            );
+
+        const cell =
+            createCell(
+                "td",
+                emptyMessage
+            );
+
+
+        cell.colSpan =
+            2;
+
+        cell.classList.add(
+            "statistics-summary-empty"
+        );
+
+
+        row.appendChild(
+            cell
+        );
+
+        tableBody.appendChild(
+            row
+        );
+
+        return;
+    }
+
+
+    const fragment =
+        document.createDocumentFragment();
+
+
+    frequencyData.forEach(
+        function (
+            group
+        ) {
+
+            const row =
+                document.createElement(
+                    "tr"
+                );
+
+
+            row.appendChild(
+                createCell(
+                    "td",
+                    group.label
+                )
+            );
+
+
+            row.appendChild(
+                createCell(
+                    "td",
+                    group.count
+                )
+            );
+
+
+            fragment.appendChild(
+                row
+            );
+        }
+    );
+
+
+    tableBody.appendChild(
+        fragment
+    );
+}
+
+
+/* ATUALIZA A ANÁLISE RÁPIDA */
+
+function renderQuickAnalysis(
+    rows
+) {
+
+    const packagesColumn =
+        findColumnIndex([
+            "pacotes",
+            "pacote"
+        ]);
+
+
+    const routesColumn =
+        findColumnIndex([
+            "rotas",
+            "rota"
+        ]);
+
+
+    const statusesColumn =
+        findColumnIndex([
+            "status"
+        ]);
+
+
+    const routesData =
+        createFrequencyData(
+            rows,
+            routesColumn
+        );
+
+
+    const statusesData =
+        createFrequencyData(
+            rows,
+            statusesColumn
+        );
+
+
+    packagesLabel.textContent =
+        packagesColumn >= 0
+            ? "Pacotes"
+            : "Registros";
+
+
+    totalPackages.textContent =
+        countFilledRows(
+            rows,
+            packagesColumn
+        );
+
+
+    totalRoutes.textContent =
+        routesColumn >= 0
+            ? routesData.length
+            : "—";
+
+
+    totalStatuses.textContent =
+        statusesColumn >= 0
+            ? statusesData.length
+            : "—";
+
+
+    renderFrequencyTable(
+        routesSummary,
+        routesData,
+        routesColumn >= 0
+            ? "Nenhuma rota encontrada."
+            : "Coluna de rota não encontrada."
+    );
+
+
+    renderFrequencyTable(
+        statusesSummary,
+        statusesData,
+        statusesColumn >= 0
+            ? "Nenhum status encontrado."
+            : "Coluna de status não encontrada."
+    );
+
+
+    quickAnalysis.hidden =
+        false;
+}
+
+
 /* RETORNA O ÍCONE DA ORDENAÇÃO */
 
 function getSortIndicator(
@@ -201,7 +567,7 @@ function getSortIndicator(
 }
 
 
-/* ALTERA A ORDENAÇÃO DA TABELA */
+/* ALTERA A ORDENAÇÃO */
 
 function changeSort(
     columnIndex
@@ -230,6 +596,7 @@ function changeSort(
 
 
     renderTableHeader();
+
     renderTableBody();
 }
 
@@ -243,10 +610,12 @@ function renderTableHeader() {
             "thead"
         );
 
+
     const headerRow =
         document.createElement(
             "tr"
         );
+
 
     const filterRow =
         document.createElement(
@@ -273,25 +642,30 @@ function renderTableHeader() {
                 "th"
             );
 
+
         const sortButton =
             document.createElement(
                 "button"
             );
+
 
         const sortIndicator =
             document.createElement(
                 "span"
             );
 
+
         const filterCell =
             document.createElement(
                 "th"
             );
 
+
         const filterInput =
             document.createElement(
                 "input"
             );
+
 
         const headerValue =
             tableState.headers[
@@ -299,19 +673,22 @@ function renderTableHeader() {
             ];
 
 
-        /* BOTÃO DE ORDENAÇÃO */
+        /* ORDENAÇÃO */
 
         sortButton.type =
             "button";
+
 
         sortButton.classList.add(
             "statistics-sort-button"
         );
 
+
         sortButton.setAttribute(
             "aria-label",
             `Ordenar pela coluna ${headerValue}`
         );
+
 
         sortButton.append(
             document.createTextNode(
@@ -323,6 +700,7 @@ function renderTableHeader() {
         sortIndicator.classList.add(
             "statistics-sort-indicator"
         );
+
 
         sortIndicator.textContent =
             getSortIndicator(
@@ -350,27 +728,32 @@ function renderTableHeader() {
             sortButton
         );
 
+
         headerRow.appendChild(
             headerCell
         );
 
 
-        /* CAMPO DE FILTRO */
+        /* FILTRO */
 
         filterInput.type =
             "search";
+
 
         filterInput.classList.add(
             "statistics-column-filter"
         );
 
+
         filterInput.placeholder =
             "Filtrar...";
+
 
         filterInput.value =
             tableState.filters[
                 columnIndex
             ];
+
 
         filterInput.setAttribute(
             "aria-label",
@@ -384,7 +767,9 @@ function renderTableHeader() {
 
                 tableState.filters[
                     columnIndex
-                ] = filterInput.value;
+                ] =
+                    filterInput.value;
+
 
                 renderTableBody();
             }
@@ -394,6 +779,7 @@ function renderTableHeader() {
         filterCell.appendChild(
             filterInput
         );
+
 
         filterRow.appendChild(
             filterCell
@@ -465,6 +851,7 @@ function getSortedRows(
     const sortedRows =
         [...rows];
 
+
     const columnIndex =
         tableState.sortColumn;
 
@@ -480,13 +867,12 @@ function getSortedRows(
                     firstRow[columnIndex]
                 ).trim();
 
+
             const secondValue =
                 formatCellValue(
                     secondRow[columnIndex]
                 ).trim();
 
-
-            /* VALORES VAZIOS FICAM POR ÚLTIMO */
 
             if (
                 !firstValue &&
@@ -535,21 +921,15 @@ function renderTableBody() {
         );
 
 
-    /* FILTRA TODOS OS REGISTROS */
-
     const filteredRows =
         getFilteredRows();
 
-
-    /* ORDENA O RESULTADO DO FILTRO */
 
     const sortedRows =
         getSortedRows(
             filteredRows
         );
 
-
-    /* LIMITA APENAS A RENDERIZAÇÃO */
 
     const visibleRows =
         sortedRows.slice(
@@ -561,14 +941,13 @@ function renderTableBody() {
     tableBody.replaceChildren();
 
 
-    /* NENHUM RESULTADO */
-
     if (visibleRows.length === 0) {
 
         const emptyRow =
             document.createElement(
                 "tr"
             );
+
 
         const emptyCell =
             createCell(
@@ -581,20 +960,21 @@ function renderTableBody() {
             "statistics-empty-row"
         );
 
+
         emptyCell.colSpan =
             tableState.columnCount;
+
 
         emptyRow.appendChild(
             emptyCell
         );
+
 
         tableBody.appendChild(
             emptyRow
         );
 
     }
-
-    /* RESULTADOS ENCONTRADOS */
 
     else {
 
@@ -641,13 +1021,22 @@ function renderTableBody() {
     }
 
 
+    /* ATUALIZA A ANÁLISE COM OS DADOS FILTRADOS */
+
+    renderQuickAnalysis(
+        filteredRows
+    );
+
+
     /* ATUALIZA O RESUMO */
 
     const totalRows =
         tableState.rows.length;
 
+
     const filteredRowCount =
         filteredRows.length;
+
 
     const isFiltered =
         tableState.filters.some(
@@ -711,10 +1100,9 @@ function renderTable(
         [];
 
 
-    /* SALVA OS DADOS NO ESTADO */
-
     tableState.sheetName =
         sheetName;
+
 
     tableState.columnCount =
         columnCount;
@@ -726,6 +1114,7 @@ function renderTable(
                 length:
                     columnCount
             },
+
             function (
                 unusedValue,
                 columnIndex
@@ -756,6 +1145,7 @@ function renderTable(
     tableState.sortColumn =
         null;
 
+
     tableState.sortDirection =
         "asc";
 
@@ -777,23 +1167,59 @@ function resetTableState() {
     tableState.sheetName =
         "";
 
+
     tableState.headers =
         [];
+
 
     tableState.rows =
         [];
 
+
     tableState.filters =
         [];
+
 
     tableState.columnCount =
         0;
 
+
     tableState.sortColumn =
         null;
 
+
     tableState.sortDirection =
         "asc";
+}
+
+
+/* LIMPA A ANÁLISE RÁPIDA */
+
+function clearQuickAnalysis() {
+
+    quickAnalysis.hidden =
+        true;
+
+
+    packagesLabel.textContent =
+        "Pacotes";
+
+
+    totalPackages.textContent =
+        "0";
+
+
+    totalRoutes.textContent =
+        "0";
+
+
+    totalStatuses.textContent =
+        "0";
+
+
+    routesSummary.replaceChildren();
+
+    statusesSummary.replaceChildren();
 }
 
 
@@ -805,6 +1231,7 @@ function clearImportedFile() {
         table.querySelector(
             "thead"
         );
+
 
     const tableBody =
         table.querySelector(
@@ -822,6 +1249,8 @@ function clearImportedFile() {
 
 
     resetTableState();
+
+    clearQuickAnalysis();
 
 
     previewSummary.textContent =
@@ -848,8 +1277,6 @@ async function readSelectedFile(
     file
 ) {
 
-    /* VERIFICA O FORMATO */
-
     if (!isSupportedFile(file)) {
 
         throw new Error(
@@ -858,8 +1285,6 @@ async function readSelectedFile(
     }
 
 
-    /* VERIFICA O SHEETJS */
-
     if (!window.XLSX) {
 
         throw new Error(
@@ -867,8 +1292,6 @@ async function readSelectedFile(
         );
     }
 
-
-    /* LÊ O ARQUIVO LOCAL */
 
     const fileData =
         await file.arrayBuffer();
@@ -887,8 +1310,6 @@ async function readSelectedFile(
         );
 
 
-    /* PRIMEIRA ABA */
-
     const sheetName =
         workbook.SheetNames[0];
 
@@ -906,8 +1327,6 @@ async function readSelectedFile(
             sheetName
         ];
 
-
-    /* CONVERTE A PLANILHA EM MATRIZ */
 
     const rows =
         window.XLSX.utils.sheet_to_json(
@@ -962,18 +1381,24 @@ function initializeStatisticsImporter() {
         !fileStatus ||
         !preview ||
         !previewSummary ||
-        !table
+        !table ||
+        !quickAnalysis ||
+        !packagesLabel ||
+        !totalPackages ||
+        !totalRoutes ||
+        !totalStatuses ||
+        !routesSummary ||
+        !statusesSummary
     ) {
 
         console.error(
             "Elementos do importador de Estatísticas não foram encontrados."
         );
 
+
         return;
     }
 
-
-    /* VERIFICA SE O SHEETJS FOI CARREGADO */
 
     if (!window.XLSX) {
 
@@ -990,8 +1415,6 @@ function initializeStatisticsImporter() {
         return;
     }
 
-
-    /* SELECIONA UM ARQUIVO */
 
     fileInput.addEventListener(
         "change",
@@ -1034,6 +1457,8 @@ function initializeStatisticsImporter() {
 
                 resetTableState();
 
+                clearQuickAnalysis();
+
 
                 previewSummary.textContent =
                     "";
@@ -1057,8 +1482,6 @@ function initializeStatisticsImporter() {
         }
     );
 
-
-    /* LIMPA O ARQUIVO */
 
     clearButton.addEventListener(
         "click",
