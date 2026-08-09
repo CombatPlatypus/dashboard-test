@@ -23,9 +23,29 @@
 
         <style>
 
+            .main-structure #statistics .tabs-content {
+                flex: 1 1 0;
+                min-width: 0;
+                display: flex;
+            }
+
+            .main-structure #statistics .tabs {
+                flex: 0 0 281px;
+                overflow: auto;
+                padding-right: 15px;
+                margin: 0;
+                display: -webkit-flex;
+                display: flex;
+                -webkit-flex-direction: column;
+                flex-direction: column;
+                -webkit-align-items: stretch;
+                align-items: stretch;
+            }
+
             /* PAINEL ESTATÍSTICAS */
 
                 .main-structure #statistics section {
+                    max-width: 100%;
                     padding: 25px;
                     background-color: #1f1f1f;
                     border: 2px solid #525252;
@@ -232,7 +252,7 @@
 
                     .local-preview {
                         width: 100%;
-                        margin: 0 auto;
+                        margin: 30px auto;
                         min-height: 0;
                     }
                     .local-preview[hidden] {
@@ -520,6 +540,89 @@
 
                 <div class="tabs-panel is-active" id="statistics">
 
+                    <!-- ESTATÍSTICAS -->
+
+                    <div class="tabs-content" data-tabs-content="statistics-tabs">
+                        <div class="tabs-panel is-active" id="statistics-1">
+
+                            <!-- IMPORTAÇÃO LOCAL -->
+
+                            <section class="import-panel">
+
+                                <h3>Importe a Planilha</h3>
+
+                                <div class="flex-box-start">
+                                    <label class="button statistics-file-button" for="statisticsFileInput">Selecionar arquivo</label>
+                                    
+                                    <input id="statisticsFileInput" type="file" accept=".xlsx,.xls,.csv" style="display: none;">
+                                    <button id="statisticsClearFile" class="button" disabled>Apagar Resultados</button>
+                                </div>
+
+                                <p id="statisticsFileStatus">Nenhum arquivo selecionado.</p>
+
+                            </section>
+
+                            <!-- TABELA GERADA DE ACORDO COM A PLANILHA -->
+
+                            <section id="statisticsLocalPreview" class="local-preview" hidden>
+                                <div class="preview-header flex-box-between">
+                                    <h4>Prévia do arquivo</h4>
+                                    <span id="statisticsPreviewSummary"></span>
+                                </div>
+
+                                <div class="statistics-table-container">
+                                    <table id="statisticsLocalTable" class="statistics-local-table">
+                                        <thead></thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </section>
+
+                            <!-- ANÁLISE RÁPIDA DA TABELA -->
+
+                            <section id="statisticsQuickAnalysis" hidden>
+                                <div id="statisticsAnalysisColumnSelector">
+
+                                    <div class="flex-box-between">
+
+                                        <div>
+                                            <h4>Colunas para análise</h4>
+                                            <p>Escolha quais informações do arquivo devem ser analisadas.</p>
+                                        </div>
+
+                                        <div class="statistics-column-actions">
+                                            <button id="statisticsSelectAllColumns" class="statistics-analysis-action" type="button">Analisar Tudo</button>
+
+                                            <button id="statisticsClearColumns" class="statistics-analysis-action" type="button">Limpar seleção</button>
+                                        </div>
+
+                                    </div>
+
+                                    <div id="statisticsAnalysisColumns" class="statistics-column-options"></div>
+                                </div>
+                                
+
+                                <div class="statistics-summary-cards">
+                                    <div class="statistics-summary-card">
+                                        <span>Total de Registros</span>
+                                        <strong id="statisticsTotalRecords">0</strong>
+                                    </div>
+
+                                    <div id="statisticsAnalysisCards" style="display: contents;"></div>
+                                </div>
+
+                                <p id="statisticsAnalysisEmpty" class="statistics-analysis-empty">Selecione ao menos uma coluna para visualizar a análise.</p>
+
+                                <div id="statisticsAnalysisResults" class="statistics-summary-tables"></div>
+                            </section>
+
+                        </div>
+
+                        <div class="tabs-panel" id="statistics-2"></div>
+                        <div class="tabs-panel" id="statistics-3"></div>
+                        <div class="tabs-panel" id="statistics-4"></div>
+                    </div>
+
                     <!-- MENU DE NAVEGAÇÃO DAS ESTATÍSTICAS -->
 
                     <ul class="flex-box-start tabs" data-tabs id="statistics-tabs" style="margin: 0 auto 30px auto;">
@@ -559,92 +662,6 @@
                             </a>
                         </li> 
                     </ul> 
-
-                    <!-- ESTATÍSTICAS -->
-
-                    <div class="tabs-content" data-tabs-content="statistics-tabs">
-                        <div class="tabs-panel is-active" id="statistics-1">
-
-                            <!-- IMPORTAÇÃO LOCAL -->
-
-                            <section class="import-panel">
-
-                                <h3>Importe a Planilha</h3>
-
-                                <div class="flex-box-start">
-                                    <label class="button statistics-file-button" for="statisticsFileInput">Selecionar arquivo</label>
-                                    
-                                    <input id="statisticsFileInput" type="file" accept=".xlsx,.xls,.csv" style="display: none;">
-                                    <button id="statisticsClearFile" class="button" disabled>Apagar Resultados</button>
-                                </div>
-
-                                <p id="statisticsFileStatus">Nenhum arquivo selecionado.</p>
-
-                            </section>
-
-                            <div class="flex-box-start" style="column-gap: 15px;">
-
-                                <!-- TABELA GERADA DE ACORDO COM A PLANILHA -->
-
-                                <section id="statisticsLocalPreview" class="local-preview" hidden>
-                                    <div class="preview-header flex-box-between">
-                                        <h4>Prévia do arquivo</h4>
-                                        <span id="statisticsPreviewSummary"></span>
-                                    </div>
-
-                                    <div class="statistics-table-container">
-                                        <table id="statisticsLocalTable" class="statistics-local-table">
-                                            <thead></thead>
-                                            <tbody></tbody>
-                                        </table>
-                                    </div>
-                                </section>
-
-                                <!-- ANÁLISE RÁPIDA DA TABELA -->
-
-                                <section id="statisticsQuickAnalysis" hidden>
-                                    <div id="statisticsAnalysisColumnSelector">
-
-                                        <div class="flex-box-between">
-
-                                            <div>
-                                                <h4>Colunas para análise</h4>
-                                                <p>Escolha quais informações do arquivo devem ser analisadas.</p>
-                                            </div>
-
-                                            <div class="statistics-column-actions">
-                                                <button id="statisticsSelectAllColumns" class="statistics-analysis-action" type="button">Analisar Tudo</button>
-
-                                                <button id="statisticsClearColumns" class="statistics-analysis-action" type="button">Limpar seleção</button>
-                                            </div>
-
-                                        </div>
-
-                                        <div id="statisticsAnalysisColumns" class="statistics-column-options"></div>
-                                    </div>
-                                    
-
-                                    <div class="statistics-summary-cards">
-                                        <div class="statistics-summary-card">
-                                            <span>Total de Registros</span>
-                                            <strong id="statisticsTotalRecords">0</strong>
-                                        </div>
-
-                                        <div id="statisticsAnalysisCards" style="display: contents;"></div>
-                                    </div>
-
-                                    <p id="statisticsAnalysisEmpty" class="statistics-analysis-empty">Selecione ao menos uma coluna para visualizar a análise.</p>
-
-                                    <div id="statisticsAnalysisResults" class="statistics-summary-tables"></div>
-                                </section>
-
-                            </div>
-                        </div>
-
-                        <div class="tabs-panel" id="statistics-2"></div>
-                        <div class="tabs-panel" id="statistics-3"></div>
-                        <div class="tabs-panel" id="statistics-4"></div>
-                    </div>
                 </div>
             </div>
         </div>
