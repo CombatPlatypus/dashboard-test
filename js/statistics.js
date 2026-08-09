@@ -1091,7 +1091,7 @@ function appendFrequencyAnalysis(
 
         createCell(
             "th",
-            "Quantidade",
+            "Qtd",
         ),
     );
 
