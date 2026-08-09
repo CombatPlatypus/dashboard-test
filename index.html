@@ -178,13 +178,72 @@
                         background-color: #1b1b1b;
                         border: 1px solid #393a3b;
                         border-radius: 3px;
+                        display: flex;
+                        align-items: center;
+                        flex-wrap: wrap;
+                        gap: 8px;
                     }
                     #statisticsAnalysisColumnSelector #statisticsAnalysisColumns .statistics-column-option label {
+                        min-width: 90px;
+                        flex: 1 1 auto;
                         display: flex;
                         align-items: center;
                         gap: 9px;
                         cursor: pointer;
                     }
+
+                    #statisticsAnalysisColumnSelector
+                    #statisticsAnalysisColumns
+                    .statistics-column-modes {
+                        margin-left: auto;
+                        display: flex;
+                        align-items: center;
+                        justify-content: flex-end;
+                        flex-wrap: wrap;
+                        gap: 4px;
+                    }
+
+                    #statisticsAnalysisColumnSelector
+                    #statisticsAnalysisColumns
+                    .statistics-analysis-mode-button {
+                        min-height: 0;
+                        margin: 0;
+                        padding: 3px 7px;
+                        color: #b9bcc1;
+                        background-color: #2e2e2e;
+                        border: 1px solid transparent;
+                        border-radius: 3px;
+                        font-size: 10px;
+                        letter-spacing: 0.4px;
+                        line-height: 1.2;
+                        cursor: pointer;
+                    }
+
+                    #statisticsAnalysisColumnSelector
+                    #statisticsAnalysisColumns
+                    .statistics-analysis-mode-button:hover,
+                    #statisticsAnalysisColumnSelector
+                    #statisticsAnalysisColumns
+                    .statistics-analysis-mode-button:focus-visible {
+                        color: #ffffff;
+                        border-color: #73767a;
+                    }
+
+                    #statisticsAnalysisColumnSelector
+                    #statisticsAnalysisColumns
+                    .statistics-analysis-mode-button.is-active {
+                        color: #ffffff;
+                        background-color: #525252;
+                        border-color: #8b8d91;
+                    }
+
+                    #statisticsAnalysisColumnSelector
+                    #statisticsAnalysisColumns
+                    .statistics-analysis-mode-button:disabled {
+                        cursor: default;
+                        opacity: 0.7;
+                    }
+                    
                     #statisticsAnalysisColumnSelector #statisticsAnalysisColumns .statistics-column-option input {
                         flex: 0 0 auto;
                         margin: 0;
