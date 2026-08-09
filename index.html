@@ -47,17 +47,16 @@
                 width: 100%;
             }
 
-            /* PAINEL ESTATÍSTICAS */
+            /* PAINEL ANÁLISES */
 
                 .main-structure #statistics section {
-                    max-width: 100%;
                     padding: 25px;
                     background-color: #1f1f1f;
                     border: 2px solid #525252;
                     border-radius: 5px;
                 }
 
-                /* PAINEL ESTATÍSTICAS */
+                /* PAINEL ANÁLISES */
 
                 .import-panel {
                     width: 100%;
@@ -257,22 +256,20 @@
 
                     #statisticsLocalPreview {
                         width: 100%;
-                        margin: 30px auto;
+                        margin: 0 auto;
                         min-height: 0;
                     }
                     #statisticsLocalPreview[hidden] {
                         display: none;
                     }
                     .preview-header {
-                        min-height: 32px;
-                        gap: 15px;
-                        align-items: center;
-                    }
-                    .preview-header h4, .preview-header span {
-                        font-size: 13px;
+                        text-align: center;
+                        margin-bottom: 20px;
                     }
                     .preview-header span {
                         color: #b9bcc1;
+                        font-size: 14px;
+                        letter-spacing: 1px;
                     }
                     .statistics-summary-table {
                         width: 100%;
@@ -481,7 +478,7 @@
                         <a href="#spreadsheets">
                             <div class="flex-box-center">
                                 <img src="images/geral-icons/sheets-icon.svg">
-                                <h4>Planilhas</h4>
+                                <h4>Planilhas do Hub</h4>
                             </div>
                         </a>
                     </li> 
@@ -490,17 +487,17 @@
                         <a href="#statistics">
                             <div class="flex-box-center">
                                 <img src="images/geral-icons/statistics-icon.svg">
-                                <h4>Análise</h4>
+                                <h4>Análise de Planilhas</h4>
                             </div>
                         </a>
                     </li> 
-
+<!-- 
                     <a href="https://www.appsheet.com/start/9898e1c7-28cc-4bcc-9e15-b13a73533544?platform=desktop#appName=AVARIASLSP-63-957299733-25-10-22&vss=H4sIAAAAAAAAA6WRzU7CQBDHX4XMuREoWGBPihhjjB8BwoUSM7ZT2dh2m90tSJo-jM_iiznLR_TgBbjtzsxv5v-fqWAlaT2xGH2AmFe_vwfagIAqhOmmoBBECDcqt1qlIXghPGG2C758f73LHNsh1OCBIdTRcko6Y3Y49oPu4LLd6wwGfvuZ0xbfUnLoVE22lVx1vUIt0UDtnT78dUQWZeo01Avv0MaSAVEdZ0GcuwEZU25lIkm7Xo7kHnuO047iwIFh15CV27VsBTNTc-gU42co_9PlWAN79B8fMFbrnQ6M-v2g0_NFo9VttoKm3_ID0VhJq_SFkRmqK7NUBdFFpDKecKdVWQwZnPMpJ0rbw3tECZapnWFausvOF7XbVaKi0lA8Y--nezb3-e1ngXn8qGIWn2BqqP4BMXkggBsDAAA=&row=ac886372:%2004/06/2026:%20vitor.simao@shopee.com&view=P%C3%A1gina1_Detail" target="_blank" class="link-button">
                         <div class="flex-box-center">
                             <img src="images/links-icons/pack-recover-icon.svg" style="margin-right: 10px;">
                             <h4>Pack Recover</h4>
                         </div>
-                    </a>
+                    </a> -->
 
                     <a href="https://www.appsheet.com/start/9898e1c7-28cc-4bcc-9e15-b13a73533544?platform=desktop#appName=AVARIASLSP-63-957299733-25-10-22&vss=H4sIAAAAAAAAA6WRzU7CQBDHX4XMuREoWGBPihhjjB8BwoUSM7ZT2dh2m90tSJo-jM_iiznLR_TgBbjtzsxv5v-fqWAlaT2xGH2AmFe_vwfagIAqhOmmoBBECDcqt1qlIXghPGG2C758f73LHNsh1OCBIdTRcko6Y3Y49oPu4LLd6wwGfvuZ0xbfUnLoVE22lVx1vUIt0UDtnT78dUQWZeo01Avv0MaSAVEdZ0GcuwEZU25lIkm7Xo7kHnuO047iwIFh15CV27VsBTNTc-gU42co_9PlWAN79B8fMFbrnQ6M-v2g0_NFo9VttoKm3_ID0VhJq_SFkRmqK7NUBdFFpDKecKdVWQwZnPMpJ0rbw3tECZapnWFausvOF7XbVaKi0lA8Y--nezb3-e1ngXn8qGIWn2BqqP4BMXkggBsDAAA=&row=ac886372:%2004/06/2026:%20vitor.simao@shopee.com&view=P%C3%A1gina1_Detail" target="_blank" class="link-button">
                         <div class="flex-box-center">
@@ -545,7 +542,7 @@
 
                 <div class="tabs-panel is-active" id="statistics">
 
-                    <div class="flex-box-start" style="column-gap: 15px;">
+                    <div class="flex-box-start" style="column-gap: 15px;margin-bottom: 30px;">
 
                         <!-- IMPORTAÇÃO LOCAL -->
 
@@ -609,7 +606,6 @@
                         <div class="tabs-panel is-active" id="statistics-1">
                             <section id="statisticsLocalPreview" hidden>
                                 <div class="preview-header flex-box-between">
-                                    <h4>Prévia do arquivo</h4>
                                     <span id="statisticsPreviewSummary"></span>
                                 </div>
 
