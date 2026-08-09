@@ -2,7 +2,8 @@ const MAX_PREVIEW_ROWS = 500;
 
 const SUPPORTED_EXTENSIONS = new Set([
     "xlsx",
-    "xls"
+    "xls",
+    "csv"
 ]);
 
 
@@ -1280,7 +1281,7 @@ async function readSelectedFile(
     if (!isSupportedFile(file)) {
 
         throw new Error(
-            "Formato não suportado. Selecione um arquivo .xlsx ou .xls."
+            "Formato não suportado. Selecione um arquivo .xlsx, .xls ou .csv."
         );
     }
 
