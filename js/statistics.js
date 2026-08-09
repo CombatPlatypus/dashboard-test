@@ -4,103 +4,87 @@ const MAX_FREQUENCY_ROWS = 25;
 
 const SUPPORTED_EXTENSIONS = new Set(["xlsx", "xls", "csv"]);
 
-
 /* LOCALIZA OS ELEMENTOS DO PAINEL */
 
-const fileInput =
-    document.getElementById("statisticsFileInput");
+const fileInput = document.getElementById("statisticsFileInput");
 
-const clearButton =
-    document.getElementById("statisticsClearFile");
+const clearButton = document.getElementById("statisticsClearFile");
 
-const fileStatus =
-    document.getElementById("statisticsFileStatus");
+const fileStatus = document.getElementById("statisticsFileStatus");
 
-const preview =
-    document.getElementById("statisticsLocalPreview");
+const preview = document.getElementById("statisticsLocalPreview");
 
-const previewSummary =
-    document.getElementById("statisticsPreviewSummary");
+const previewSummary = document.getElementById("statisticsPreviewSummary");
 
-const table =
-    document.getElementById("statisticsLocalTable");
+const table = document.getElementById("statisticsLocalTable");
 
-const quickAnalysis =
-    document.getElementById("statisticsQuickAnalysis");
+const quickAnalysis = document.getElementById("statisticsQuickAnalysis");
 
-const analysisColumns =
-    document.getElementById("statisticsAnalysisColumns");
+const analysisColumns = document.getElementById("statisticsAnalysisColumns");
 
-const selectAllColumnsButton =
-    document.getElementById("statisticsSelectAllColumns");
+const selectAllColumnsButton = document.getElementById(
+    "statisticsSelectAllColumns",
+);
 
-const clearColumnsButton =
-    document.getElementById("statisticsClearColumns");
+const clearColumnsButton = document.getElementById(
+    "statisticsClearColumns",
+);
 
-const totalRecords =
-    document.getElementById("statisticsTotalRecords");
+const totalRecords = document.getElementById(
+    "statisticsTotalRecords",
+);
 
-const analysisCards =
-    document.getElementById("statisticsAnalysisCards");
+const analysisCards = document.getElementById(
+    "statisticsAnalysisCards",
+);
 
-const analysisResults =
-    document.getElementById("statisticsAnalysisResults");
+const analysisResults = document.getElementById(
+    "statisticsAnalysisResults",
+);
 
-const analysisEmpty =
-    document.getElementById("statisticsAnalysisEmpty");
+const analysisEmpty = document.getElementById(
+    "statisticsAnalysisEmpty",
+);
 
 
 /* ESTADO DA TABELA INTERATIVA */
 
 const tableState = {
 
-    sheetName:
-        "",
+    sheetName: "",
 
-    headers:
-        [],
+    headers: [],
 
-    rows:
-        [],
+    rows: [],
 
-    columnProfiles:
-        [],
+    columnProfiles: [],
 
-    selectedAnalysisColumns:
-        new Set(),
+    selectedAnalysisColumns: new Set(),
 
-    filters:
-        [],
+    filters: [],
 
-    columnCount:
-        0,
+    columnCount: 0,
 
-    sortColumn:
-        null,
+    sortColumn: null,
 
-    sortDirection:
-        "asc"
+    sortDirection: "asc",
 };
 
 
-const naturalCollator =
-    new Intl.Collator(
-        "pt-BR",
-        {
-            numeric:
-                true,
-
-            sensitivity:
-                "base"
-        }
-    );
+const naturalCollator = new Intl.Collator(
+    "pt-BR",
+    {
+        numeric: true,
+        sensitivity: "base",
+    },
+);
 
 
 /* ATUALIZA A MENSAGEM DO IMPORTADOR */
 
 function setStatus(
     message,
-    isError = false
+    isError = false,
 ) {
 
     fileStatus.textContent =
@@ -108,7 +92,7 @@ function setStatus(
 
     fileStatus.classList.toggle(
         "is-error",
-        isError
+        isError,
     );
 }
 
@@ -116,7 +100,7 @@ function setStatus(
 /* VERIFICA A EXTENSÃO DO ARQUIVO */
 
 function isSupportedFile(
-    file
+    file,
 ) {
 
     const extension =
@@ -127,7 +111,7 @@ function isSupportedFile(
 
 
     return SUPPORTED_EXTENSIONS.has(
-        extension
+        extension,
     );
 }
 
@@ -135,7 +119,7 @@ function isSupportedFile(
 /* PREPARA O VALOR PARA EXIBIÇÃO */
 
 function formatCellValue(
-    value
+    value,
 ) {
 
     if (
@@ -148,7 +132,7 @@ function formatCellValue(
 
 
     return String(
-        value
+        value,
     );
 }
 
@@ -157,18 +141,18 @@ function formatCellValue(
 
 function createCell(
     tagName,
-    value
+    value,
 ) {
 
     const cell =
         document.createElement(
-            tagName
+            tagName,
         );
 
 
     cell.textContent =
         formatCellValue(
-            value
+            value,
         );
 
 
@@ -179,18 +163,16 @@ function createCell(
 /* NORMALIZA UM VALOR PARA PESQUISA */
 
 function normalizeSearchValue(
-    value
+    value,
 ) {
 
     return formatCellValue(
-        value
+        value,
     )
-        .normalize(
-            "NFD"
-        )
+        .normalize("NFD")
         .replace(
             /[\u0300-\u036f]/g,
-            ""
+            "",
         )
         .toLowerCase();
 }
@@ -200,10 +182,12 @@ function normalizeSearchValue(
 
 function createFrequencyData(
     rows,
-    columnIndex
+    columnIndex,
 ) {
 
-    if (columnIndex < 0) {
+    if (
+        columnIndex < 0
+    ) {
 
         return [];
     }
@@ -215,16 +199,18 @@ function createFrequencyData(
 
     rows.forEach(
         function (
-            row
+            row,
         ) {
 
             const displayValue =
                 formatCellValue(
-                    row[columnIndex]
+                    row[columnIndex],
                 ).trim();
 
 
-            if (!displayValue) {
+            if (
+                !displayValue
+            ) {
 
                 return;
             }
@@ -232,18 +218,18 @@ function createFrequencyData(
 
             const normalizedValue =
                 normalizeSearchValue(
-                    displayValue
+                    displayValue,
                 ).trim();
 
 
             if (
                 groups.has(
-                    normalizedValue
+                    normalizedValue,
                 )
             ) {
 
                 groups.get(
-                    normalizedValue
+                    normalizedValue,
                 ).count += 1;
 
                 return;
@@ -253,23 +239,20 @@ function createFrequencyData(
             groups.set(
                 normalizedValue,
                 {
-                    label:
-                        displayValue,
-
-                    count:
-                        1
-                }
+                    label: displayValue,
+                    count: 1,
+                },
             );
-        }
+        },
     );
 
 
     return Array.from(
-        groups.values()
+        groups.values(),
     ).sort(
         function (
             firstGroup,
-            secondGroup
+            secondGroup,
         ) {
 
             return (
@@ -278,10 +261,10 @@ function createFrequencyData(
 
                 naturalCollator.compare(
                     firstGroup.label,
-                    secondGroup.label
+                    secondGroup.label,
                 )
             );
-        }
+        },
     );
 }
 
@@ -291,7 +274,7 @@ function createFrequencyData(
 function renderFrequencyTable(
     tableBody,
     frequencyData,
-    emptyMessage
+    emptyMessage,
 ) {
 
     tableBody.replaceChildren();
@@ -303,31 +286,35 @@ function renderFrequencyTable(
 
         const row =
             document.createElement(
-                "tr"
+                "tr",
             );
+
 
         const cell =
             createCell(
                 "td",
-                emptyMessage
+                emptyMessage,
             );
 
 
         cell.colSpan =
             2;
 
+
         cell.classList.add(
-            "statistics-summary-empty"
+            "statistics-summary-empty",
         );
 
 
         row.appendChild(
-            cell
+            cell,
         );
 
+
         tableBody.appendChild(
-            row
+            row,
         );
+
 
         return;
     }
@@ -339,40 +326,40 @@ function renderFrequencyTable(
 
     frequencyData.forEach(
         function (
-            group
+            group,
         ) {
 
             const row =
                 document.createElement(
-                    "tr"
+                    "tr",
                 );
 
 
             row.appendChild(
                 createCell(
                     "td",
-                    group.label
-                )
+                    group.label,
+                ),
             );
 
 
             row.appendChild(
                 createCell(
                     "td",
-                    group.count
-                )
+                    group.count,
+                ),
             );
 
 
             fragment.appendChild(
-                row
+                row,
             );
-        }
+        },
     );
 
 
     tableBody.appendChild(
-        fragment
+        fragment,
     );
 }
 
@@ -380,11 +367,11 @@ function renderFrequencyTable(
 /* VERIFICA SE UMA CÉLULA ESTÁ VAZIA */
 
 function isEmptyCell(
-    value
+    value,
 ) {
 
     return formatCellValue(
-        value
+        value,
     ).trim() === "";
 }
 
@@ -392,7 +379,7 @@ function isEmptyCell(
 /* CONVERTE UM VALOR NUMÉRICO */
 
 function parseNumericValue(
-    value
+    value,
 ) {
 
     if (
@@ -415,26 +402,26 @@ function parseNumericValue(
 
     let normalizedValue =
         formatCellValue(
-            value
+            value,
         )
             .trim()
             .replace(
                 /\s|\u00a0/g,
-                ""
+                "",
             )
             .replace(
                 /^R\$/i,
-                ""
+                "",
             )
             .replace(
                 /%$/,
-                ""
+                "",
             );
 
 
     if (
         !/^[+-]?\d[\d.,]*$/.test(
-            normalizedValue
+            normalizedValue,
         )
     ) {
 
@@ -444,13 +431,13 @@ function parseNumericValue(
 
     const lastComma =
         normalizedValue.lastIndexOf(
-            ","
+            ",",
         );
 
 
     const lastDot =
         normalizedValue.lastIndexOf(
-            "."
+            ".",
         );
 
 
@@ -475,11 +462,11 @@ function parseNumericValue(
             normalizedValue
                 .replaceAll(
                     thousandsSeparator,
-                    ""
+                    "",
                 )
                 .replace(
                     decimalSeparator,
-                    "."
+                    ".",
                 );
 
     }
@@ -491,11 +478,11 @@ function parseNumericValue(
             normalizedValue
                 .replaceAll(
                     ".",
-                    ""
+                    "",
                 )
                 .replace(
                     ",",
-                    "."
+                    ".",
                 );
 
     }
@@ -504,19 +491,19 @@ function parseNumericValue(
         normalizedValue =
             normalizedValue.replaceAll(
                 ",",
-                ""
+                "",
             );
     }
 
 
     const numericValue =
         Number(
-            normalizedValue
+            normalizedValue,
         );
 
 
     return Number.isFinite(
-        numericValue
+        numericValue,
     )
         ? numericValue
         : null;
@@ -526,13 +513,13 @@ function parseNumericValue(
 /* CONVERTE UMA DATA OU DATA/HORA */
 
 function parseDateValue(
-    value
+    value,
 ) {
 
     if (
         value instanceof Date &&
         !Number.isNaN(
-            value.getTime()
+            value.getTime(),
         )
     ) {
 
@@ -542,11 +529,13 @@ function parseDateValue(
 
     const displayValue =
         formatCellValue(
-            value
+            value,
         ).trim();
 
 
-    if (!displayValue) {
+    if (
+        !displayValue
+    ) {
 
         return null;
     }
@@ -554,15 +543,17 @@ function parseDateValue(
 
     const dateMatch =
         displayValue.match(
-            /^(\d{4})[-/](\d{1,2})[-/](\d{1,2})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?)?$/
+            /^(\d{4})[-/](\d{1,2})[-/](\d{1,2})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?)?$/,
         ) ||
 
         displayValue.match(
-            /^(\d{1,2})\/(\d{1,2})\/(\d{2,4})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?)?$/
+            /^(\d{1,2})\/(\d{1,2})\/(\d{2,4})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?)?$/,
         );
 
 
-    if (!dateMatch) {
+    if (
+        !dateMatch
+    ) {
 
         return null;
     }
@@ -576,7 +567,7 @@ function parseDateValue(
         Number(
             startsWithYear
                 ? dateMatch[1]
-                : dateMatch[3]
+                : dateMatch[3],
         );
 
 
@@ -593,7 +584,7 @@ function parseDateValue(
 
     const month =
         Number(
-            dateMatch[2]
+            dateMatch[2],
         );
 
 
@@ -601,25 +592,25 @@ function parseDateValue(
         Number(
             startsWithYear
                 ? dateMatch[3]
-                : dateMatch[1]
+                : dateMatch[1],
         );
 
 
     const hour =
         Number(
-            dateMatch[4] ?? 0
+            dateMatch[4] ?? 0,
         );
 
 
     const minute =
         Number(
-            dateMatch[5] ?? 0
+            dateMatch[5] ?? 0,
         );
 
 
     const second =
         Number(
-            dateMatch[6] ?? 0
+            dateMatch[6] ?? 0,
         );
 
 
@@ -630,7 +621,7 @@ function parseDateValue(
             day,
             hour,
             minute,
-            second
+            second,
         );
 
 
@@ -654,25 +645,20 @@ function parseDateValue(
 /* RETORNA O NOME VISÍVEL DO TIPO */
 
 function getColumnTypeLabel(
-    type
+    type,
 ) {
 
     const labels = {
 
-        category:
-            "Categoria",
+        category: "Categoria",
 
-        identifier:
-            "Identificador",
+        identifier: "Identificador",
 
-        number:
-            "Número",
+        number: "Número",
 
-        datetime:
-            "Data/hora",
+        datetime: "Data/hora",
 
-        empty:
-            "Vazia"
+        empty: "Vazia",
     };
 
 
@@ -684,30 +670,30 @@ function getColumnTypeLabel(
 /* DETECTA O TIPO DE UMA COLUNA */
 
 function detectColumnProfile(
-    columnIndex
+    columnIndex,
 ) {
 
     const filledValues =
         tableState.rows
             .map(
                 function (
-                    row
+                    row,
                 ) {
 
                     return row[
                         columnIndex
                     ];
-                }
+                },
             )
             .filter(
                 function (
-                    value
+                    value,
                 ) {
 
                     return !isEmptyCell(
-                        value
+                        value,
                     );
-                }
+                },
             );
 
 
@@ -716,11 +702,8 @@ function detectColumnProfile(
     ) {
 
         return {
-            type:
-                "empty",
-
-            hasTime:
-                false
+            type: "empty",
+            hasTime: false,
         };
     }
 
@@ -728,26 +711,26 @@ function detectColumnProfile(
     const dateValues =
         filledValues.filter(
             function (
-                value
+                value,
             ) {
 
                 return parseDateValue(
-                    value
+                    value,
                 ) !== null;
-            }
+            },
         );
 
 
     const numericValues =
         filledValues.filter(
             function (
-                value
+                value,
             ) {
 
                 return parseNumericValue(
-                    value
+                    value,
                 ) !== null;
-            }
+            },
         );
 
 
@@ -755,14 +738,14 @@ function detectColumnProfile(
         new Set(
             filledValues.map(
                 function (
-                    value
+                    value,
                 ) {
 
                     return normalizeSearchValue(
-                        value
+                        value,
                     ).trim();
-                }
-            )
+                },
+            ),
         );
 
 
@@ -775,17 +758,17 @@ function detectColumnProfile(
         normalizeSearchValue(
             tableState.headers[
                 columnIndex
-            ]
+            ],
         ).trim();
 
 
     const identifierHeader =
         /^(id|codigo|code|pacotes?|packages?|pedidos?|orders?|at\/to|serial(?: number)?|tracking(?: number)?|uuid|chave|key|referencia|reference)$/.test(
-            headerValue
+            headerValue,
         ) ||
 
         /(^|[\s_-])(id|codigo|code)$/.test(
-            headerValue
+            headerValue,
         );
 
 
@@ -795,22 +778,21 @@ function detectColumnProfile(
     ) {
 
         return {
-            type:
-                "datetime",
+            type: "datetime",
 
             hasTime:
                 filledValues.some(
                     function (
-                        value
+                        value,
                     ) {
 
                         return /\d{1,2}:\d{2}/.test(
                             formatCellValue(
-                                value
-                            )
+                                value,
+                            ),
                         );
-                    }
-                )
+                    },
+                ),
         };
     }
 
@@ -827,8 +809,7 @@ function detectColumnProfile(
                     ? "identifier"
                     : "number",
 
-            hasTime:
-                false
+            hasTime: false,
         };
     }
 
@@ -840,8 +821,7 @@ function detectColumnProfile(
                 ? "identifier"
                 : "category",
 
-        hasTime:
-            false
+        hasTime: false,
     };
 }
 
@@ -849,12 +829,12 @@ function detectColumnProfile(
 /* FORMATA UM NÚMERO DA ANÁLISE */
 
 function formatAnalysisNumber(
-    value
+    value,
 ) {
 
     if (
         !Number.isFinite(
-            value
+            value,
         )
     ) {
 
@@ -865,11 +845,10 @@ function formatAnalysisNumber(
     return new Intl.NumberFormat(
         "pt-BR",
         {
-            maximumFractionDigits:
-                2
-        }
+            maximumFractionDigits: 2,
+        },
     ).format(
-        value
+        value,
     );
 }
 
@@ -878,7 +857,7 @@ function formatAnalysisNumber(
 
 function formatAnalysisDate(
     value,
-    hasTime
+    hasTime,
 ) {
 
     if (
@@ -894,18 +873,14 @@ function formatAnalysisDate(
 
         hasTime
             ? {
-                dateStyle:
-                    "short",
-
-                timeStyle:
-                    "medium"
+                dateStyle: "short",
+                timeStyle: "medium",
             }
             : {
-                dateStyle:
-                    "short"
-            }
+                dateStyle: "short",
+            },
     ).format(
-        value
+        value,
     );
 }
 
@@ -914,29 +889,29 @@ function formatAnalysisDate(
 
 function createAnalysisCard(
     label,
-    value
+    value,
 ) {
 
     const card =
         document.createElement(
-            "div"
+            "div",
         );
 
 
     const cardLabel =
         document.createElement(
-            "span"
+            "span",
         );
 
 
     const cardValue =
         document.createElement(
-            "strong"
+            "strong",
         );
 
 
     card.classList.add(
-        "statistics-summary-card"
+        "statistics-summary-card",
     );
 
 
@@ -950,7 +925,7 @@ function createAnalysisCard(
 
     card.append(
         cardLabel,
-        cardValue
+        cardValue,
     );
 
 
@@ -962,57 +937,31 @@ function createAnalysisCard(
 
 function createAnalysisBlock(
     title,
-    type
 ) {
 
     const block =
         document.createElement(
-            "div"
+            "div",
         );
 
 
     const heading =
         document.createElement(
-            "h4"
-        );
-
-
-    const typeLabel =
-        document.createElement(
-            "span"
+            "h4",
         );
 
 
     block.classList.add(
-        "statistics-summary-block"
+        "statistics-summary-block",
     );
 
 
-    heading.append(
-        document.createTextNode(
-            title
-        )
-    );
-
-
-    typeLabel.classList.add(
-        "statistics-analysis-type"
-    );
-
-
-    typeLabel.textContent =
-        getColumnTypeLabel(
-            type
-        );
-
-
-    heading.appendChild(
-        typeLabel
-    );
+    heading.textContent =
+        title;
 
 
     block.appendChild(
-        heading
+        heading,
     );
 
 
@@ -1024,45 +973,45 @@ function createAnalysisBlock(
 
 function appendAnalysisMetrics(
     block,
-    metrics
+    metrics,
 ) {
 
     const metricsContainer =
         document.createElement(
-            "div"
+            "div",
         );
 
 
     metricsContainer.classList.add(
-        "statistics-analysis-metrics"
+        "statistics-analysis-metrics",
     );
 
 
     metrics.forEach(
         function (
-            metric
+            metric,
         ) {
 
             const metricElement =
                 document.createElement(
-                    "div"
+                    "div",
                 );
 
 
             const metricLabel =
                 document.createElement(
-                    "span"
+                    "span",
                 );
 
 
             const metricValue =
                 document.createElement(
-                    "strong"
+                    "strong",
                 );
 
 
             metricElement.classList.add(
-                "statistics-analysis-metric"
+                "statistics-analysis-metric",
             );
 
 
@@ -1080,19 +1029,19 @@ function appendAnalysisMetrics(
 
             metricElement.append(
                 metricLabel,
-                metricValue
+                metricValue,
             );
 
 
             metricsContainer.appendChild(
-                metricElement
+                metricElement,
             );
-        }
+        },
     );
 
 
     block.appendChild(
-        metricsContainer
+        metricsContainer,
     );
 }
 
@@ -1102,59 +1051,59 @@ function appendAnalysisMetrics(
 function appendFrequencyAnalysis(
     block,
     frequencyData,
-    emptyMessage
+    emptyMessage,
 ) {
 
     const frequencyTable =
         document.createElement(
-            "table"
+            "table",
         );
 
 
     const tableHead =
         document.createElement(
-            "thead"
+            "thead",
         );
 
 
     const headerRow =
         document.createElement(
-            "tr"
+            "tr",
         );
 
 
     const tableBody =
         document.createElement(
-            "tbody"
+            "tbody",
         );
 
 
     frequencyTable.classList.add(
-        "statistics-summary-table"
+        "statistics-summary-table",
     );
 
 
     headerRow.append(
         createCell(
             "th",
-            "Valor"
+            "Valor",
         ),
 
         createCell(
             "th",
-            "Quantidade"
-        )
+            "Quantidade",
+        ),
     );
 
 
     tableHead.appendChild(
-        headerRow
+        headerRow,
     );
 
 
     frequencyTable.append(
         tableHead,
-        tableBody
+        tableBody,
     );
 
 
@@ -1163,15 +1112,15 @@ function appendFrequencyAnalysis(
 
         frequencyData.slice(
             0,
-            MAX_FREQUENCY_ROWS
+            MAX_FREQUENCY_ROWS,
         ),
 
-        emptyMessage
+        emptyMessage,
     );
 
 
     block.appendChild(
-        frequencyTable
+        frequencyTable,
     );
 
 
@@ -1182,12 +1131,12 @@ function appendFrequencyAnalysis(
 
         const note =
             document.createElement(
-                "p"
+                "p",
             );
 
 
         note.classList.add(
-            "statistics-analysis-note"
+            "statistics-analysis-note",
         );
 
 
@@ -1196,7 +1145,7 @@ function appendFrequencyAnalysis(
 
 
         block.appendChild(
-            note
+            note,
         );
     }
 }
@@ -1216,36 +1165,36 @@ function renderAnalysisColumnSelector() {
     tableState.headers.forEach(
         function (
             header,
-            columnIndex
+            columnIndex,
         ) {
 
             const option =
                 document.createElement(
-                    "div"
+                    "div",
                 );
 
 
             const label =
                 document.createElement(
-                    "label"
+                    "label",
                 );
 
 
             const checkbox =
                 document.createElement(
-                    "input"
+                    "input",
                 );
 
 
             const columnName =
                 document.createElement(
-                    "span"
+                    "span",
                 );
 
 
             const columnType =
                 document.createElement(
-                    "span"
+                    "span",
                 );
 
 
@@ -1256,7 +1205,7 @@ function renderAnalysisColumnSelector() {
 
 
             option.classList.add(
-                "statistics-column-option"
+                "statistics-column-option",
             );
 
 
@@ -1268,13 +1217,13 @@ function renderAnalysisColumnSelector() {
                 tableState
                     .selectedAnalysisColumns
                     .has(
-                        columnIndex
+                        columnIndex,
                     );
 
 
             checkbox.setAttribute(
                 "aria-label",
-                `Analisar coluna ${header}`
+                `Analisar coluna ${header}`,
             );
 
 
@@ -1289,7 +1238,7 @@ function renderAnalysisColumnSelector() {
                         tableState
                             .selectedAnalysisColumns
                             .add(
-                                columnIndex
+                                columnIndex,
                             );
 
                     }
@@ -1298,20 +1247,20 @@ function renderAnalysisColumnSelector() {
                         tableState
                             .selectedAnalysisColumns
                             .delete(
-                                columnIndex
+                                columnIndex,
                             );
                     }
 
 
                     renderQuickAnalysis(
-                        getFilteredRows()
+                        getFilteredRows(),
                     );
-                }
+                },
             );
 
 
             columnName.classList.add(
-                "statistics-column-name"
+                "statistics-column-name",
             );
 
 
@@ -1324,37 +1273,37 @@ function renderAnalysisColumnSelector() {
 
 
             columnType.classList.add(
-                "statistics-column-type"
+                "statistics-column-type",
             );
 
 
             columnType.textContent =
                 getColumnTypeLabel(
-                    profile.type
+                    profile.type,
                 );
 
 
             label.append(
                 checkbox,
                 columnName,
-                columnType
+                columnType,
             );
 
 
             option.appendChild(
-                label
+                label,
             );
 
 
             fragment.appendChild(
-                option
+                option,
             );
-        }
+        },
     );
 
 
     analysisColumns.appendChild(
-        fragment
+        fragment,
     );
 
 
@@ -1375,7 +1324,7 @@ function renderAnalysisColumnSelector() {
 
 function renderSelectedColumnAnalysis(
     rows,
-    columnIndex
+    columnIndex,
 ) {
 
     const header =
@@ -1394,23 +1343,23 @@ function renderSelectedColumnAnalysis(
         rows
             .map(
                 function (
-                    row
+                    row,
                 ) {
 
                     return row[
                         columnIndex
                     ];
-                }
+                },
             )
             .filter(
                 function (
-                    value
+                    value,
                 ) {
 
                     return !isEmptyCell(
-                        value
+                        value,
                     );
-                }
+                },
             );
 
 
@@ -1422,7 +1371,6 @@ function renderSelectedColumnAnalysis(
     const block =
         createAnalysisBlock(
             header,
-            profile.type
         );
 
 
@@ -1433,15 +1381,15 @@ function renderSelectedColumnAnalysis(
         const numericValues =
             filledValues
                 .map(
-                    parseNumericValue
+                    parseNumericValue,
                 )
                 .filter(
                     function (
-                        value
+                        value,
                     ) {
 
                         return value !== null;
-                    }
+                    },
                 );
 
 
@@ -1449,13 +1397,13 @@ function renderSelectedColumnAnalysis(
             numericValues.reduce(
                 function (
                     sum,
-                    value
+                    value,
                 ) {
 
                     return sum +
                         value;
                 },
-                0
+                0,
             );
 
 
@@ -1476,41 +1424,41 @@ function renderSelectedColumnAnalysis(
 
         numericValues.forEach(
             function (
-                value
+                value,
             ) {
 
                 minimum =
                     Number.isNaN(
-                        minimum
+                        minimum,
                     )
                         ? value
                         : Math.min(
                             minimum,
-                            value
+                            value,
                         );
 
 
                 maximum =
                     Number.isNaN(
-                        maximum
+                        maximum,
                     )
                         ? value
                         : Math.max(
                             maximum,
-                            value
+                            value,
                         );
-            }
+            },
         );
 
 
         analysisCards.appendChild(
             createAnalysisCard(
-                `${header} • total`,
+                header,
 
                 formatAnalysisNumber(
-                    total
-                )
-            )
+                    total,
+                ),
+            ),
         );
 
 
@@ -1518,60 +1466,54 @@ function renderSelectedColumnAnalysis(
             block,
             [
                 {
-                    label:
-                        "Total",
+                    label: "Total",
 
                     value:
                         formatAnalysisNumber(
-                            total
-                        )
+                            total,
+                        ),
                 },
                 {
-                    label:
-                        "Média",
+                    label: "Média",
 
                     value:
                         formatAnalysisNumber(
-                            average
-                        )
+                            average,
+                        ),
                 },
                 {
-                    label:
-                        "Menor valor",
+                    label: "Menor valor",
 
                     value:
                         formatAnalysisNumber(
-                            minimum
-                        )
+                            minimum,
+                        ),
                 },
                 {
-                    label:
-                        "Maior valor",
+                    label: "Maior valor",
 
                     value:
                         formatAnalysisNumber(
-                            maximum
-                        )
+                            maximum,
+                        ),
                 },
                 {
-                    label:
-                        "Valores válidos",
+                    label: "Valores válidos",
 
                     value:
                         formatAnalysisNumber(
-                            numericValues.length
-                        )
+                            numericValues.length,
+                        ),
                 },
                 {
-                    label:
-                        "Células vazias",
+                    label: "Células vazias",
 
                     value:
                         formatAnalysisNumber(
-                            emptyCount
-                        )
-                }
-            ]
+                            emptyCount,
+                        ),
+                },
+            ],
         );
 
     }
@@ -1582,15 +1524,15 @@ function renderSelectedColumnAnalysis(
         const dateValues =
             filledValues
                 .map(
-                    parseDateValue
+                    parseDateValue,
                 )
                 .filter(
                     function (
-                        value
+                        value,
                     ) {
 
                         return value !== null;
-                    }
+                    },
                 );
 
 
@@ -1598,7 +1540,7 @@ function renderSelectedColumnAnalysis(
             dateValues.reduce(
                 function (
                     earliestDate,
-                    currentDate
+                    currentDate,
                 ) {
 
                     return (
@@ -1608,7 +1550,7 @@ function renderSelectedColumnAnalysis(
                         ? currentDate
                         : earliestDate;
                 },
-                null
+                null,
             );
 
 
@@ -1616,7 +1558,7 @@ function renderSelectedColumnAnalysis(
             dateValues.reduce(
                 function (
                     latestDate,
-                    currentDate
+                    currentDate,
                 ) {
 
                     return (
@@ -1626,18 +1568,18 @@ function renderSelectedColumnAnalysis(
                         ? currentDate
                         : latestDate;
                 },
-                null
+                null,
             );
 
 
         analysisCards.appendChild(
             createAnalysisCard(
-                `${header} • datas válidas`,
+                header,
 
                 formatAnalysisNumber(
-                    dateValues.length
-                )
-            )
+                    dateValues.length,
+                ),
+            ),
         );
 
 
@@ -1645,44 +1587,40 @@ function renderSelectedColumnAnalysis(
             block,
             [
                 {
-                    label:
-                        "Data inicial",
+                    label: "Data inicial",
 
                     value:
                         formatAnalysisDate(
                             firstDate,
-                            profile.hasTime
-                        )
+                            profile.hasTime,
+                        ),
                 },
                 {
-                    label:
-                        "Data final",
+                    label: "Data final",
 
                     value:
                         formatAnalysisDate(
                             lastDate,
-                            profile.hasTime
-                        )
+                            profile.hasTime,
+                        ),
                 },
                 {
-                    label:
-                        "Valores válidos",
+                    label: "Valores válidos",
 
                     value:
                         formatAnalysisNumber(
-                            dateValues.length
-                        )
+                            dateValues.length,
+                        ),
                 },
                 {
-                    label:
-                        "Células vazias",
+                    label: "Células vazias",
 
                     value:
                         formatAnalysisNumber(
-                            emptyCount
-                        )
-                }
-            ]
+                            emptyCount,
+                        ),
+                },
+            ],
         );
 
     }
@@ -1694,7 +1632,7 @@ function renderSelectedColumnAnalysis(
         const frequencyData =
             createFrequencyData(
                 rows,
-                columnIndex
+                columnIndex,
             );
 
 
@@ -1705,12 +1643,12 @@ function renderSelectedColumnAnalysis(
 
         analysisCards.appendChild(
             createAnalysisCard(
-                `${header} • valores únicos`,
+                header,
 
                 formatAnalysisNumber(
-                    frequencyData.length
-                )
-            )
+                    frequencyData.length,
+                ),
+            ),
         );
 
 
@@ -1722,53 +1660,49 @@ function renderSelectedColumnAnalysis(
                 block,
                 [
                     {
-                        label:
-                            "Preenchidos",
+                        label: "Preenchidos",
 
                         value:
                             formatAnalysisNumber(
-                                filledValues.length
-                            )
+                                filledValues.length,
+                            ),
                     },
                     {
-                        label:
-                            "Valores únicos",
+                        label: "Valores únicos",
 
                         value:
                             formatAnalysisNumber(
-                                frequencyData.length
-                            )
+                                frequencyData.length,
+                            ),
                     },
                     {
-                        label:
-                            "Repetições",
+                        label: "Repetições",
 
                         value:
                             formatAnalysisNumber(
-                                duplicateCount
-                            )
+                                duplicateCount,
+                            ),
                     },
                     {
-                        label:
-                            "Células vazias",
+                        label: "Células vazias",
 
                         value:
                             formatAnalysisNumber(
-                                emptyCount
-                            )
-                    }
-                ]
+                                emptyCount,
+                            ),
+                    },
+                ],
             );
 
 
             const duplicatedValues =
                 frequencyData.filter(
                     function (
-                        group
+                        group,
                     ) {
 
                         return group.count > 1;
-                    }
+                    },
                 );
 
 
@@ -1779,7 +1713,7 @@ function renderSelectedColumnAnalysis(
                 appendFrequencyAnalysis(
                     block,
                     duplicatedValues,
-                    "Nenhum valor repetido."
+                    "Nenhum valor repetido.",
                 );
             }
 
@@ -1789,7 +1723,7 @@ function renderSelectedColumnAnalysis(
             appendFrequencyAnalysis(
                 block,
                 frequencyData,
-                "Nenhum valor preenchido."
+                "Nenhum valor preenchido.",
             );
         }
 
@@ -1798,9 +1732,9 @@ function renderSelectedColumnAnalysis(
 
         analysisCards.appendChild(
             createAnalysisCard(
-                `${header} • preenchidos`,
-                "0"
-            )
+                header,
+                "0",
+            ),
         );
 
 
@@ -1808,28 +1742,24 @@ function renderSelectedColumnAnalysis(
             block,
             [
                 {
-                    label:
-                        "Valores preenchidos",
-
-                    value:
-                        "0"
+                    label: "Valores preenchidos",
+                    value: "0",
                 },
                 {
-                    label:
-                        "Células vazias",
+                    label: "Células vazias",
 
                     value:
                         formatAnalysisNumber(
-                            rows.length
-                        )
-                }
-            ]
+                            rows.length,
+                        ),
+                },
+            ],
         );
     }
 
 
     analysisResults.appendChild(
-        block
+        block,
     );
 }
 
@@ -1837,12 +1767,12 @@ function renderSelectedColumnAnalysis(
 /* ATUALIZA A ANÁLISE RÁPIDA */
 
 function renderQuickAnalysis(
-    rows
+    rows,
 ) {
 
     totalRecords.textContent =
         formatAnalysisNumber(
-            rows.length
+            rows.length,
         );
 
 
@@ -1853,17 +1783,16 @@ function renderQuickAnalysis(
 
     const selectedColumns =
         Array.from(
-            tableState
-                .selectedAnalysisColumns
+            tableState.selectedAnalysisColumns,
         ).sort(
             function (
                 firstColumn,
-                secondColumn
+                secondColumn,
             ) {
 
                 return firstColumn -
                     secondColumn;
-            }
+            },
         );
 
 
@@ -1873,14 +1802,14 @@ function renderQuickAnalysis(
 
     selectedColumns.forEach(
         function (
-            columnIndex
+            columnIndex,
         ) {
 
             renderSelectedColumnAnalysis(
                 rows,
-                columnIndex
+                columnIndex,
             );
-        }
+        },
     );
 
 
@@ -1892,7 +1821,7 @@ function renderQuickAnalysis(
 /* RETORNA O ÍCONE DA ORDENAÇÃO */
 
 function getSortIndicator(
-    columnIndex
+    columnIndex,
 ) {
 
     if (
@@ -1914,7 +1843,7 @@ function getSortIndicator(
 /* ALTERA A ORDENAÇÃO */
 
 function changeSort(
-    columnIndex
+    columnIndex,
 ) {
 
     if (
@@ -1934,6 +1863,7 @@ function changeSort(
         tableState.sortColumn =
             columnIndex;
 
+
         tableState.sortDirection =
             "asc";
     }
@@ -1951,24 +1881,24 @@ function renderTableHeader() {
 
     const tableHead =
         table.querySelector(
-            "thead"
+            "thead",
         );
 
 
     const headerRow =
         document.createElement(
-            "tr"
+            "tr",
         );
 
 
     const filterRow =
         document.createElement(
-            "tr"
+            "tr",
         );
 
 
     filterRow.classList.add(
-        "statistics-filter-row"
+        "statistics-filter-row",
     );
 
 
@@ -1983,31 +1913,31 @@ function renderTableHeader() {
 
         const headerCell =
             document.createElement(
-                "th"
+                "th",
             );
 
 
         const sortButton =
             document.createElement(
-                "button"
+                "button",
             );
 
 
         const sortIndicator =
             document.createElement(
-                "span"
+                "span",
             );
 
 
         const filterCell =
             document.createElement(
-                "th"
+                "th",
             );
 
 
         const filterInput =
             document.createElement(
-                "input"
+                "input",
             );
 
 
@@ -2024,36 +1954,36 @@ function renderTableHeader() {
 
 
         sortButton.classList.add(
-            "statistics-sort-button"
+            "statistics-sort-button",
         );
 
 
         sortButton.setAttribute(
             "aria-label",
-            `Ordenar pela coluna ${headerValue}`
+            `Ordenar pela coluna ${headerValue}`,
         );
 
 
         sortButton.append(
             document.createTextNode(
-                headerValue
-            )
+                headerValue,
+            ),
         );
 
 
         sortIndicator.classList.add(
-            "statistics-sort-indicator"
+            "statistics-sort-indicator",
         );
 
 
         sortIndicator.textContent =
             getSortIndicator(
-                columnIndex
+                columnIndex,
             );
 
 
         sortButton.appendChild(
-            sortIndicator
+            sortIndicator,
         );
 
 
@@ -2062,19 +1992,19 @@ function renderTableHeader() {
             function () {
 
                 changeSort(
-                    columnIndex
+                    columnIndex,
                 );
-            }
+            },
         );
 
 
         headerCell.appendChild(
-            sortButton
+            sortButton,
         );
 
 
         headerRow.appendChild(
-            headerCell
+            headerCell,
         );
 
 
@@ -2085,7 +2015,7 @@ function renderTableHeader() {
 
 
         filterInput.classList.add(
-            "statistics-column-filter"
+            "statistics-column-filter",
         );
 
 
@@ -2101,7 +2031,7 @@ function renderTableHeader() {
 
         filterInput.setAttribute(
             "aria-label",
-            `Filtrar coluna ${headerValue}`
+            `Filtrar coluna ${headerValue}`,
         );
 
 
@@ -2116,24 +2046,24 @@ function renderTableHeader() {
 
 
                 renderTableBody();
-            }
+            },
         );
 
 
         filterCell.appendChild(
-            filterInput
+            filterInput,
         );
 
 
         filterRow.appendChild(
-            filterCell
+            filterCell,
         );
     }
 
 
     tableHead.append(
         headerRow,
-        filterRow
+        filterRow,
     );
 }
 
@@ -2144,18 +2074,18 @@ function getFilteredRows() {
 
     return tableState.rows.filter(
         function (
-            row
+            row,
         ) {
 
             return tableState.filters.every(
                 function (
                     filterValue,
-                    columnIndex
+                    columnIndex,
                 ) {
 
                     const normalizedFilter =
                         normalizeSearchValue(
-                            filterValue
+                            filterValue,
                         ).trim();
 
 
@@ -2168,13 +2098,13 @@ function getFilteredRows() {
 
 
                     return normalizeSearchValue(
-                        row[columnIndex]
+                        row[columnIndex],
                     ).includes(
-                        normalizedFilter
+                        normalizedFilter,
                     );
-                }
+                },
             );
-        }
+        },
     );
 }
 
@@ -2182,7 +2112,7 @@ function getFilteredRows() {
 /* ORDENA OS REGISTROS */
 
 function getSortedRows(
-    rows
+    rows,
 ) {
 
     if (
@@ -2205,18 +2135,18 @@ function getSortedRows(
     sortedRows.sort(
         function (
             firstRow,
-            secondRow
+            secondRow,
         ) {
 
             const firstValue =
                 formatCellValue(
-                    firstRow[columnIndex]
+                    firstRow[columnIndex],
                 ).trim();
 
 
             const secondValue =
                 formatCellValue(
-                    secondRow[columnIndex]
+                    secondRow[columnIndex],
                 ).trim();
 
 
@@ -2241,7 +2171,7 @@ function getSortedRows(
             const comparison =
                 naturalCollator.compare(
                     firstValue,
-                    secondValue
+                    secondValue,
                 );
 
 
@@ -2249,7 +2179,7 @@ function getSortedRows(
                 "asc"
                     ? comparison
                     : -comparison;
-        }
+        },
     );
 
 
@@ -2263,7 +2193,7 @@ function renderTableBody() {
 
     const tableBody =
         table.querySelector(
-            "tbody"
+            "tbody",
         );
 
 
@@ -2273,14 +2203,14 @@ function renderTableBody() {
 
     const sortedRows =
         getSortedRows(
-            filteredRows
+            filteredRows,
         );
 
 
     const visibleRows =
         sortedRows.slice(
             0,
-            MAX_PREVIEW_ROWS
+            MAX_PREVIEW_ROWS,
         );
 
 
@@ -2293,19 +2223,19 @@ function renderTableBody() {
 
         const emptyRow =
             document.createElement(
-                "tr"
+                "tr",
             );
 
 
         const emptyCell =
             createCell(
                 "td",
-                "Nenhum resultado encontrado para os filtros aplicados."
+                "Nenhum resultado encontrado para os filtros aplicados.",
             );
 
 
         emptyRow.classList.add(
-            "statistics-empty-row"
+            "statistics-empty-row",
         );
 
 
@@ -2314,12 +2244,12 @@ function renderTableBody() {
 
 
         emptyRow.appendChild(
-            emptyCell
+            emptyCell,
         );
 
 
         tableBody.appendChild(
-            emptyRow
+            emptyRow,
         );
 
     }
@@ -2331,12 +2261,12 @@ function renderTableBody() {
 
         visibleRows.forEach(
             function (
-                row
+                row,
             ) {
 
                 const tableRow =
                     document.createElement(
-                        "tr"
+                        "tr",
                     );
 
 
@@ -2349,21 +2279,21 @@ function renderTableBody() {
                     tableRow.appendChild(
                         createCell(
                             "td",
-                            row[columnIndex]
-                        )
+                            row[columnIndex],
+                        ),
                     );
                 }
 
 
                 bodyFragment.appendChild(
-                    tableRow
+                    tableRow,
                 );
-            }
+            },
         );
 
 
         tableBody.appendChild(
-            bodyFragment
+            bodyFragment,
         );
     }
 
@@ -2371,7 +2301,7 @@ function renderTableBody() {
     /* ATUALIZA A ANÁLISE COM OS DADOS FILTRADOS */
 
     renderQuickAnalysis(
-        filteredRows
+        filteredRows,
     );
 
 
@@ -2388,13 +2318,13 @@ function renderTableBody() {
     const isFiltered =
         tableState.filters.some(
             function (
-                filterValue
+                filterValue,
             ) {
 
                 return normalizeSearchValue(
-                    filterValue
+                    filterValue,
                 ).trim().length > 0;
-            }
+            },
         );
 
 
@@ -2415,22 +2345,22 @@ function renderTableBody() {
 
 function renderTable(
     rows,
-    sheetName
+    sheetName,
 ) {
 
     const columnCount =
         rows.reduce(
             function (
                 largestColumnCount,
-                row
+                row,
             ) {
 
                 return Math.max(
                     largestColumnCount,
-                    row.length
+                    row.length,
                 );
             },
-            0
+            0,
         );
 
 
@@ -2439,7 +2369,7 @@ function renderTable(
     ) {
 
         throw new Error(
-            "A primeira aba do arquivo não possui dados."
+            "A primeira aba do arquivo não possui dados.",
         );
     }
 
@@ -2460,31 +2390,30 @@ function renderTable(
     tableState.headers =
         Array.from(
             {
-                length:
-                    columnCount
+                length: columnCount,
             },
 
             function (
                 unusedValue,
-                columnIndex
+                columnIndex,
             ) {
 
                 return (
                     formatCellValue(
                         headerValues[
                             columnIndex
-                        ]
+                        ],
                     ).trim() ||
 
                     `Coluna ${columnIndex + 1}`
                 );
-            }
+            },
         );
 
 
     tableState.rows =
         rows.slice(
-            1
+            1,
         );
 
 
@@ -2492,13 +2421,13 @@ function renderTable(
         tableState.headers.map(
             function (
                 unusedHeader,
-                columnIndex
+                columnIndex,
             ) {
 
                 return detectColumnProfile(
-                    columnIndex
+                    columnIndex,
                 );
-            }
+            },
         );
 
 
@@ -2509,9 +2438,9 @@ function renderTable(
 
     tableState.filters =
         Array(
-            columnCount
+            columnCount,
         ).fill(
-            ""
+            "",
         );
 
 
@@ -2615,13 +2544,13 @@ function clearImportedFile() {
 
     const tableHead =
         table.querySelector(
-            "thead"
+            "thead",
         );
 
 
     const tableBody =
         table.querySelector(
-            "tbody"
+            "tbody",
         );
 
 
@@ -2652,7 +2581,7 @@ function clearImportedFile() {
 
 
     setStatus(
-        "Nenhum arquivo selecionado. O arquivo será lido somente neste navegador."
+        "Nenhum arquivo selecionado. O arquivo será lido somente neste navegador.",
     );
 }
 
@@ -2660,17 +2589,17 @@ function clearImportedFile() {
 /* LÊ O ARQUIVO SELECIONADO */
 
 async function readSelectedFile(
-    file
+    file,
 ) {
 
     if (
         !isSupportedFile(
-            file
+            file,
         )
     ) {
 
         throw new Error(
-            "Formato não suportado. Selecione um arquivo .xlsx, .xls ou .csv."
+            "Formato não suportado. Selecione um arquivo .xlsx, .xls ou .csv.",
         );
     }
 
@@ -2680,7 +2609,7 @@ async function readSelectedFile(
     ) {
 
         throw new Error(
-            "A biblioteca de leitura de planilhas não foi carregada."
+            "A biblioteca de leitura de planilhas não foi carregada.",
         );
     }
 
@@ -2693,12 +2622,9 @@ async function readSelectedFile(
         window.XLSX.read(
             fileData,
             {
-                cellDates:
-                    true,
-
-                cellFormula:
-                    false
-            }
+                cellDates: true,
+                cellFormula: false,
+            },
         );
 
 
@@ -2711,7 +2637,7 @@ async function readSelectedFile(
     ) {
 
         throw new Error(
-            "O arquivo não possui nenhuma aba."
+            "O arquivo não possui nenhuma aba.",
         );
     }
 
@@ -2726,18 +2652,11 @@ async function readSelectedFile(
         window.XLSX.utils.sheet_to_json(
             worksheet,
             {
-                header:
-                    1,
-
-                defval:
-                    "",
-
-                raw:
-                    false,
-
-                blankrows:
-                    false
-            }
+                header: 1,
+                defval: "",
+                raw: false,
+                blankrows: false,
+            },
         );
 
 
@@ -2746,14 +2665,14 @@ async function readSelectedFile(
     ) {
 
         throw new Error(
-            "A primeira aba do arquivo está vazia."
+            "A primeira aba do arquivo está vazia.",
         );
     }
 
 
     renderTable(
         rows,
-        sheetName
+        sheetName,
     );
 
 
@@ -2762,7 +2681,7 @@ async function readSelectedFile(
 
 
     setStatus(
-        `Arquivo "${file.name}" carregado localmente com sucesso.`
+        `Arquivo "${file.name}" carregado localmente com sucesso.`,
     );
 }
 
@@ -2789,7 +2708,7 @@ function initializeStatisticsImporter() {
     ) {
 
         console.error(
-            "Elementos do importador de Estatísticas não foram encontrados."
+            "Elementos do importador de Estatísticas não foram encontrados.",
         );
 
 
@@ -2807,7 +2726,7 @@ function initializeStatisticsImporter() {
 
         setStatus(
             "Não foi possível carregar a biblioteca de leitura de planilhas.",
-            true
+            true,
         );
 
 
@@ -2832,14 +2751,14 @@ function initializeStatisticsImporter() {
 
 
             setStatus(
-                `Lendo "${file.name}"...`
+                `Lendo "${file.name}"...`,
             );
 
 
             try {
 
                 await readSelectedFile(
-                    file
+                    file,
                 );
 
             }
@@ -2848,12 +2767,12 @@ function initializeStatisticsImporter() {
             ) {
 
                 table.querySelector(
-                    "thead"
+                    "thead",
                 ).replaceChildren();
 
 
                 table.querySelector(
-                    "tbody"
+                    "tbody",
                 ).replaceChildren();
 
 
@@ -2878,16 +2797,16 @@ function initializeStatisticsImporter() {
                     error instanceof Error
                         ? error.message
                         : "Não foi possível ler o arquivo selecionado.",
-                    true
+                    true,
                 );
             }
-        }
+        },
     );
 
 
     clearButton.addEventListener(
         "click",
-        clearImportedFile
+        clearImportedFile,
     );
 
 
@@ -2900,12 +2819,12 @@ function initializeStatisticsImporter() {
                     tableState.headers.map(
                         function (
                             unusedHeader,
-                            columnIndex
+                            columnIndex,
                         ) {
 
                             return columnIndex;
-                        }
-                    )
+                        },
+                    ),
                 );
 
 
@@ -2913,9 +2832,9 @@ function initializeStatisticsImporter() {
 
 
             renderQuickAnalysis(
-                getFilteredRows()
+                getFilteredRows(),
             );
-        }
+        },
     );
 
 
@@ -2932,9 +2851,9 @@ function initializeStatisticsImporter() {
 
 
             renderQuickAnalysis(
-                getFilteredRows()
+                getFilteredRows(),
             );
-        }
+        },
     );
 }
 
