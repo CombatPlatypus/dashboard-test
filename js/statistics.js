@@ -18,6 +18,26 @@ const previewSummary = document.getElementById("statisticsPreviewSummary");
 
 const table = document.getElementById("statisticsLocalTable");
 
+/* ELEMENTOS DO CONTROLE DE COLUNAS VISÍVEIS */
+
+const visibleColumns = document.getElementById("statisticsVisibleColumns");
+
+const visibleColumnCount = document.getElementById(
+    "statisticsVisibleColumnCount",
+);
+
+const showAllColumnsButton = document.getElementById(
+    "statisticsShowAllColumns",
+);
+
+const hideAllColumnsButton = document.getElementById(
+    "statisticsHideAllColumns",
+);
+
+const hideEmptyColumnsButton = document.getElementById(
+    "statisticsHideEmptyColumns",
+);
+
 const quickAnalysis = document.getElementById("statisticsQuickAnalysis");
 
 const analysisColumns = document.getElementById("statisticsAnalysisColumns");
@@ -26,31 +46,19 @@ const selectAllColumnsButton = document.getElementById(
     "statisticsSelectAllColumns",
 );
 
-const clearColumnsButton = document.getElementById(
-    "statisticsClearColumns",
-);
+const clearColumnsButton = document.getElementById("statisticsClearColumns");
 
-const totalRecords = document.getElementById(
-    "statisticsTotalRecords",
-);
+const totalRecords = document.getElementById("statisticsTotalRecords");
 
-const analysisCards = document.getElementById(
-    "statisticsAnalysisCards",
-);
+const analysisCards = document.getElementById("statisticsAnalysisCards");
 
-const analysisResults = document.getElementById(
-    "statisticsAnalysisResults",
-);
+const analysisResults = document.getElementById("statisticsAnalysisResults");
 
-const analysisEmpty = document.getElementById(
-    "statisticsAnalysisEmpty",
-);
-
+const analysisEmpty = document.getElementById("statisticsAnalysisEmpty");
 
 /* ESTADO DA TABELA INTERATIVA */
 
 const tableState = {
-
     sheetName: "",
 
     headers: [],
@@ -59,8 +67,9 @@ const tableState = {
 
     columnProfiles: [],
 
-    analysisModes:
-    new Map(),
+    visibleColumns: new Set(),
+
+    analysisModes: new Map(),
 
     selectedAnalysisColumns: new Set(),
 
@@ -73,560 +82,224 @@ const tableState = {
     sortDirection: "asc",
 };
 
-
-const naturalCollator = new Intl.Collator(
-    "pt-BR",
-    {
-        numeric: true,
-        sensitivity: "base",
-    },
-);
-
+const naturalCollator = new Intl.Collator("pt-BR", {
+    numeric: true,
+    sensitivity: "base",
+});
 
 /* ATUALIZA A MENSAGEM DO IMPORTADOR */
 
-function setStatus(
-    message,
-    isError = false,
-) {
+function setStatus(message, isError = false) {
+    fileStatus.textContent = message;
 
-    fileStatus.textContent =
-        message;
-
-    fileStatus.classList.toggle(
-        "is-error",
-        isError,
-    );
+    fileStatus.classList.toggle("is-error", isError);
 }
-
 
 /* VERIFICA A EXTENSÃO DO ARQUIVO */
 
-function isSupportedFile(
-    file,
-) {
+function isSupportedFile(file) {
+    const extension = file.name.split(".").pop()?.toLowerCase();
 
-    const extension =
-        file.name
-            .split(".")
-            .pop()
-            ?.toLowerCase();
-
-
-    return SUPPORTED_EXTENSIONS.has(
-        extension,
-    );
+    return SUPPORTED_EXTENSIONS.has(extension);
 }
-
 
 /* PREPARA O VALOR PARA EXIBIÇÃO */
 
-function formatCellValue(
-    value,
-) {
-
-    if (
-        value === null ||
-        value === undefined
-    ) {
-
+function formatCellValue(value) {
+    if (value === null || value === undefined) {
         return "";
     }
 
-
-    return String(
-        value,
-    );
+    return String(value);
 }
-
 
 /* CRIA UMA CÉLULA */
 
-function createCell(
-    tagName,
-    value,
-) {
+function createCell(tagName, value) {
+    const cell = document.createElement(tagName);
 
-    const cell =
-        document.createElement(
-            tagName,
-        );
-
-
-    cell.textContent =
-        formatCellValue(
-            value,
-        );
-
+    cell.textContent = formatCellValue(value);
 
     return cell;
 }
 
-
 /* NORMALIZA UM VALOR PARA PESQUISA */
 
-function normalizeSearchValue(
-    value,
-) {
-
-    return formatCellValue(
-        value,
-    )
+function normalizeSearchValue(value) {
+    return formatCellValue(value)
         .normalize("NFD")
-        .replace(
-            /[\u0300-\u036f]/g,
-            "",
-        )
+        .replace(/[\u0300-\u036f]/g, "")
         .toLowerCase();
 }
 
-
 /* AGRUPA OS VALORES DE UMA COLUNA */
 
-function createFrequencyData(
-    rows,
-    columnIndex,
-) {
-
-    if (
-        columnIndex < 0
-    ) {
-
+function createFrequencyData(rows, columnIndex) {
+    if (columnIndex < 0) {
         return [];
     }
 
+    const groups = new Map();
 
-    const groups =
-        new Map();
+    rows.forEach(function (row) {
+        const displayValue = formatCellValue(row[columnIndex]).trim();
 
+        if (!displayValue) {
+            return;
+        }
 
-    rows.forEach(
-        function (
-            row,
-        ) {
+        const normalizedValue = normalizeSearchValue(displayValue).trim();
 
-            const displayValue =
-                formatCellValue(
-                    row[columnIndex],
-                ).trim();
+        if (groups.has(normalizedValue)) {
+            groups.get(normalizedValue).count += 1;
 
+            return;
+        }
 
-            if (
-                !displayValue
-            ) {
+        groups.set(normalizedValue, {
+            label: displayValue,
+            count: 1,
+        });
+    });
 
-                return;
-            }
-
-
-            const normalizedValue =
-                normalizeSearchValue(
-                    displayValue,
-                ).trim();
-
-
-            if (
-                groups.has(
-                    normalizedValue,
-                )
-            ) {
-
-                groups.get(
-                    normalizedValue,
-                ).count += 1;
-
-                return;
-            }
-
-
-            groups.set(
-                normalizedValue,
-                {
-                    label: displayValue,
-                    count: 1,
-                },
-            );
-        },
-    );
-
-
-    return Array.from(
-        groups.values(),
-    ).sort(
-        function (
-            firstGroup,
-            secondGroup,
-        ) {
-
-            return (
-                secondGroup.count -
-                    firstGroup.count ||
-
-                naturalCollator.compare(
-                    firstGroup.label,
-                    secondGroup.label,
-                )
-            );
-        },
-    );
+    return Array.from(groups.values()).sort(function (firstGroup, secondGroup) {
+        return (
+            secondGroup.count - firstGroup.count ||
+            naturalCollator.compare(firstGroup.label, secondGroup.label)
+        );
+    });
 }
-
 
 /* MONTA UMA TABELA DE AGRUPAMENTO */
 
-function renderFrequencyTable(
-    tableBody,
-    frequencyData,
-    emptyMessage,
-) {
-
+function renderFrequencyTable(tableBody, frequencyData, emptyMessage) {
     tableBody.replaceChildren();
 
+    if (frequencyData.length === 0) {
+        const row = document.createElement("tr");
 
-    if (
-        frequencyData.length === 0
-    ) {
+        const cell = createCell("td", emptyMessage);
 
-        const row =
-            document.createElement(
-                "tr",
-            );
+        cell.colSpan = 2;
 
+        cell.classList.add("statistics-summary-empty");
 
-        const cell =
-            createCell(
-                "td",
-                emptyMessage,
-            );
+        row.appendChild(cell);
 
-
-        cell.colSpan =
-            2;
-
-
-        cell.classList.add(
-            "statistics-summary-empty",
-        );
-
-
-        row.appendChild(
-            cell,
-        );
-
-
-        tableBody.appendChild(
-            row,
-        );
-
+        tableBody.appendChild(row);
 
         return;
     }
 
+    const fragment = document.createDocumentFragment();
 
-    const fragment =
-        document.createDocumentFragment();
+    frequencyData.forEach(function (group) {
+        const row = document.createElement("tr");
 
+        row.appendChild(createCell("td", group.label));
 
-    frequencyData.forEach(
-        function (
-            group,
-        ) {
+        row.appendChild(createCell("td", group.count));
 
-            const row =
-                document.createElement(
-                    "tr",
-                );
+        fragment.appendChild(row);
+    });
 
-
-            row.appendChild(
-                createCell(
-                    "td",
-                    group.label,
-                ),
-            );
-
-
-            row.appendChild(
-                createCell(
-                    "td",
-                    group.count,
-                ),
-            );
-
-
-            fragment.appendChild(
-                row,
-            );
-        },
-    );
-
-
-    tableBody.appendChild(
-        fragment,
-    );
+    tableBody.appendChild(fragment);
 }
-
 
 /* VERIFICA SE UMA CÉLULA ESTÁ VAZIA */
 
-function isEmptyCell(
-    value,
-) {
-
-    return formatCellValue(
-        value,
-    ).trim() === "";
+function isEmptyCell(value) {
+    return formatCellValue(value).trim() === "";
 }
-
 
 /* CONVERTE UM VALOR NUMÉRICO */
 
-function parseNumericValue(
-    value,
-) {
-
-    if (
-        typeof value === "number" &&
-        Number.isFinite(value)
-    ) {
-
+function parseNumericValue(value) {
+    if (typeof value === "number" && Number.isFinite(value)) {
         return value;
     }
 
-
-    if (
-        value instanceof Date ||
-        isEmptyCell(value)
-    ) {
-
+    if (value instanceof Date || isEmptyCell(value)) {
         return null;
     }
 
+    let normalizedValue = formatCellValue(value)
+        .trim()
+        .replace(/\s|\u00a0/g, "")
+        .replace(/^R\$/i, "")
+        .replace(/%$/, "");
 
-    let normalizedValue =
-        formatCellValue(
-            value,
-        )
-            .trim()
-            .replace(
-                /\s|\u00a0/g,
-                "",
-            )
-            .replace(
-                /^R\$/i,
-                "",
-            )
-            .replace(
-                /%$/,
-                "",
-            );
-
-
-    if (
-        !/^[+-]?\d[\d.,]*$/.test(
-            normalizedValue,
-        )
-    ) {
-
+    if (!/^[+-]?\d[\d.,]*$/.test(normalizedValue)) {
         return null;
     }
 
+    const lastComma = normalizedValue.lastIndexOf(",");
 
-    const lastComma =
-        normalizedValue.lastIndexOf(
-            ",",
-        );
+    const lastDot = normalizedValue.lastIndexOf(".");
 
+    if (lastComma >= 0 && lastDot >= 0) {
+        const decimalSeparator = lastComma > lastDot ? "," : ".";
 
-    const lastDot =
-        normalizedValue.lastIndexOf(
-            ".",
-        );
+        const thousandsSeparator = decimalSeparator === "," ? "." : ",";
 
-
-    if (
-        lastComma >= 0 &&
-        lastDot >= 0
-    ) {
-
-        const decimalSeparator =
-            lastComma > lastDot
-                ? ","
-                : ".";
-
-
-        const thousandsSeparator =
-            decimalSeparator === ","
-                ? "."
-                : ",";
-
-
-        normalizedValue =
-            normalizedValue
-                .replaceAll(
-                    thousandsSeparator,
-                    "",
-                )
-                .replace(
-                    decimalSeparator,
-                    ".",
-                );
-
-    }
-    else if (
-        lastComma >= 0
-    ) {
-
-        normalizedValue =
-            normalizedValue
-                .replaceAll(
-                    ".",
-                    "",
-                )
-                .replace(
-                    ",",
-                    ".",
-                );
-
-    }
-    else {
-
-        normalizedValue =
-            normalizedValue.replaceAll(
-                ",",
-                "",
-            );
+        normalizedValue = normalizedValue
+            .replaceAll(thousandsSeparator, "")
+            .replace(decimalSeparator, ".");
+    } else if (lastComma >= 0) {
+        normalizedValue = normalizedValue.replaceAll(".", "").replace(",", ".");
+    } else {
+        normalizedValue = normalizedValue.replaceAll(",", "");
     }
 
+    const numericValue = Number(normalizedValue);
 
-    const numericValue =
-        Number(
-            normalizedValue,
-        );
-
-
-    return Number.isFinite(
-        numericValue,
-    )
-        ? numericValue
-        : null;
+    return Number.isFinite(numericValue) ? numericValue : null;
 }
-
 
 /* CONVERTE UMA DATA OU DATA/HORA */
 
-function parseDateValue(
-    value,
-) {
-
-    if (
-        value instanceof Date &&
-        !Number.isNaN(
-            value.getTime(),
-        )
-    ) {
-
+function parseDateValue(value) {
+    if (value instanceof Date && !Number.isNaN(value.getTime())) {
         return value;
     }
 
+    const displayValue = formatCellValue(value).trim();
 
-    const displayValue =
-        formatCellValue(
-            value,
-        ).trim();
-
-
-    if (
-        !displayValue
-    ) {
-
+    if (!displayValue) {
         return null;
     }
-
 
     const dateMatch =
         displayValue.match(
             /^(\d{4})[-/](\d{1,2})[-/](\d{1,2})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?)?$/,
         ) ||
-
         displayValue.match(
             /^(\d{1,2})\/(\d{1,2})\/(\d{2,4})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?)?$/,
         );
 
-
-    if (
-        !dateMatch
-    ) {
-
+    if (!dateMatch) {
         return null;
     }
 
+    const startsWithYear = dateMatch[1].length === 4;
 
-    const startsWithYear =
-        dateMatch[1].length === 4;
+    let year = Number(startsWithYear ? dateMatch[1] : dateMatch[3]);
 
-
-    let year =
-        Number(
-            startsWithYear
-                ? dateMatch[1]
-                : dateMatch[3],
-        );
-
-
-    if (
-        year < 100
-    ) {
-
-        year +=
-            year >= 70
-                ? 1900
-                : 2000;
+    if (year < 100) {
+        year += year >= 70 ? 1900 : 2000;
     }
 
+    const month = Number(dateMatch[2]);
 
-    const month =
-        Number(
-            dateMatch[2],
-        );
+    const day = Number(startsWithYear ? dateMatch[3] : dateMatch[1]);
 
+    const hour = Number(dateMatch[4] ?? 0);
 
-    const day =
-        Number(
-            startsWithYear
-                ? dateMatch[3]
-                : dateMatch[1],
-        );
+    const minute = Number(dateMatch[5] ?? 0);
 
+    const second = Number(dateMatch[6] ?? 0);
 
-    const hour =
-        Number(
-            dateMatch[4] ?? 0,
-        );
-
-
-    const minute =
-        Number(
-            dateMatch[5] ?? 0,
-        );
-
-
-    const second =
-        Number(
-            dateMatch[6] ?? 0,
-        );
-
-
-    const parsedDate =
-        new Date(
-            year,
-            month - 1,
-            day,
-            hour,
-            minute,
-            second,
-        );
-
+    const parsedDate = new Date(year, month - 1, day, hour, minute, second);
 
     if (
         parsedDate.getFullYear() !== year ||
@@ -636,22 +309,16 @@ function parseDateValue(
         parsedDate.getMinutes() !== minute ||
         parsedDate.getSeconds() !== second
     ) {
-
         return null;
     }
-
 
     return parsedDate;
 }
 
 /* RETORNA O NOME VISÍVEL DO TIPO */
 
-function getColumnTypeLabel(
-    type,
-) {
-
+function getColumnTypeLabel(type) {
     const labels = {
-
         category: "Categoria",
 
         identifier: "Identificador",
@@ -663,192 +330,84 @@ function getColumnTypeLabel(
         empty: "Vazia",
     };
 
-
-    return labels[type] ??
-        "Texto";
+    return labels[type] ?? "Texto";
 }
 
 /* RETORNA OS MODOS COMPATÍVEIS COM A COLUNA */
 
-function getAvailableAnalysisModes(
-    detectedType
-) {
-
+function getAvailableAnalysisModes(detectedType) {
     const modesByType = {
+        category: ["category", "identifier"],
 
-        category: [
-            "category",
-            "identifier"
-        ],
+        identifier: ["identifier", "category"],
 
-        identifier: [
-            "identifier",
-            "category"
-        ],
+        number: ["number", "category", "identifier"],
 
-        number: [
-            "number",
-            "category",
-            "identifier"
-        ],
+        datetime: ["datetime", "category"],
 
-        datetime: [
-            "datetime",
-            "category"
-        ],
-
-        empty: [
-            "empty"
-        ]
+        empty: ["empty"],
     };
 
-
-    return modesByType[
-        detectedType
-    ] ?? [
-        "category"
-    ];
+    return modesByType[detectedType] ?? ["category"];
 }
 
 /* DETECTA O TIPO DE UMA COLUNA */
 
-function detectColumnProfile(
-    columnIndex,
-) {
+function detectColumnProfile(columnIndex) {
+    const filledValues = tableState.rows
+        .map(function (row) {
+            return row[columnIndex];
+        })
+        .filter(function (value) {
+            return !isEmptyCell(value);
+        });
 
-    const filledValues =
-        tableState.rows
-            .map(
-                function (
-                    row,
-                ) {
-
-                    return row[
-                        columnIndex
-                    ];
-                },
-            )
-            .filter(
-                function (
-                    value,
-                ) {
-
-                    return !isEmptyCell(
-                        value,
-                    );
-                },
-            );
-
-
-    if (
-        filledValues.length === 0
-    ) {
-
+    if (filledValues.length === 0) {
         return {
             type: "empty",
             hasTime: false,
         };
     }
 
+    const dateValues = filledValues.filter(function (value) {
+        return parseDateValue(value) !== null;
+    });
 
-    const dateValues =
-        filledValues.filter(
-            function (
-                value,
-            ) {
+    const numericValues = filledValues.filter(function (value) {
+        return parseNumericValue(value) !== null;
+    });
 
-                return parseDateValue(
-                    value,
-                ) !== null;
-            },
-        );
+    const uniqueValues = new Set(
+        filledValues.map(function (value) {
+            return normalizeSearchValue(value).trim();
+        }),
+    );
 
+    const uniqueRatio = uniqueValues.size / filledValues.length;
 
-    const numericValues =
-        filledValues.filter(
-            function (
-                value,
-            ) {
-
-                return parseNumericValue(
-                    value,
-                ) !== null;
-            },
-        );
-
-
-    const uniqueValues =
-        new Set(
-            filledValues.map(
-                function (
-                    value,
-                ) {
-
-                    return normalizeSearchValue(
-                        value,
-                    ).trim();
-                },
-            ),
-        );
-
-
-    const uniqueRatio =
-        uniqueValues.size /
-        filledValues.length;
-
-
-    const headerValue =
-        normalizeSearchValue(
-            tableState.headers[
-                columnIndex
-            ],
-        ).trim();
-
+    const headerValue = normalizeSearchValue(
+        tableState.headers[columnIndex],
+    ).trim();
 
     const identifierHeader =
         /^(id|codigo|code|pacotes?|packages?|pedidos?|orders?|at\/to|serial(?: number)?|tracking(?: number)?|uuid|chave|key|referencia|reference)$/.test(
             headerValue,
-        ) ||
+        ) || /(^|[\s_-])(id|codigo|code)$/.test(headerValue);
 
-        /(^|[\s_-])(id|codigo|code)$/.test(
-            headerValue,
-        );
-
-
-    if (
-        dateValues.length /
-            filledValues.length >= 0.8
-    ) {
-
+    if (dateValues.length / filledValues.length >= 0.8) {
         return {
             type: "datetime",
 
-            hasTime:
-                filledValues.some(
-                    function (
-                        value,
-                    ) {
-
-                        return /\d{1,2}:\d{2}/.test(
-                            formatCellValue(
-                                value,
-                            ),
-                        );
-                    },
-                ),
+            hasTime: filledValues.some(function (value) {
+                return /\d{1,2}:\d{2}/.test(formatCellValue(value));
+            }),
         };
     }
 
-
-    if (
-        numericValues.length /
-            filledValues.length >= 0.8
-    ) {
-
+    if (numericValues.length / filledValues.length >= 0.8) {
         return {
             type:
-                identifierHeader &&
-                uniqueRatio >= 0.8
+                identifierHeader && uniqueRatio >= 0.8
                     ? "identifier"
                     : "number",
 
@@ -856,1751 +415,950 @@ function detectColumnProfile(
         };
     }
 
-
     return {
         type:
-            uniqueRatio >= 0.8 &&
-            identifierHeader
-                ? "identifier"
-                : "category",
+            uniqueRatio >= 0.8 && identifierHeader ? "identifier" : "category",
 
         hasTime: false,
     };
 }
 
-
 /* FORMATA UM NÚMERO DA ANÁLISE */
 
-function formatAnalysisNumber(
-    value,
-) {
-
-    if (
-        !Number.isFinite(
-            value,
-        )
-    ) {
-
+function formatAnalysisNumber(value) {
+    if (!Number.isFinite(value)) {
         return "—";
     }
 
-
-    return new Intl.NumberFormat(
-        "pt-BR",
-        {
-            maximumFractionDigits: 2,
-        },
-    ).format(
-        value,
-    );
+    return new Intl.NumberFormat("pt-BR", {
+        maximumFractionDigits: 2,
+    }).format(value);
 }
-
 
 /* FORMATA UMA DATA DA ANÁLISE */
 
-function formatAnalysisDate(
-    value,
-    hasTime,
-) {
-
-    if (
-        !(value instanceof Date)
-    ) {
-
+function formatAnalysisDate(value, hasTime) {
+    if (!(value instanceof Date)) {
         return "—";
     }
-
 
     return new Intl.DateTimeFormat(
         "pt-BR",
 
         hasTime
             ? {
-                dateStyle: "short",
-                timeStyle: "medium",
-            }
+                  dateStyle: "short",
+                  timeStyle: "medium",
+              }
             : {
-                dateStyle: "short",
-            },
-    ).format(
-        value,
-    );
+                  dateStyle: "short",
+              },
+    ).format(value);
 }
-
 
 /* CRIA UM CARTÃO DA ANÁLISE */
 
-function createAnalysisCard(
-    label,
-    value,
-) {
+function createAnalysisCard(label, value) {
+    const card = document.createElement("div");
 
-    const card =
-        document.createElement(
-            "div",
-        );
+    const cardLabel = document.createElement("span");
 
+    const cardValue = document.createElement("strong");
 
-    const cardLabel =
-        document.createElement(
-            "span",
-        );
+    card.classList.add("statistics-summary-card");
 
+    cardLabel.textContent = label;
 
-    const cardValue =
-        document.createElement(
-            "strong",
-        );
+    cardValue.textContent = value;
 
-
-    card.classList.add(
-        "statistics-summary-card",
-    );
-
-
-    cardLabel.textContent =
-        label;
-
-
-    cardValue.textContent =
-        value;
-
-
-    card.append(
-        cardLabel,
-        cardValue,
-    );
-
+    card.append(cardLabel, cardValue);
 
     return card;
 }
 
-
 /* CRIA UM BLOCO DA ANÁLISE */
 
-function createAnalysisBlock(
-    title,
-) {
+function createAnalysisBlock(title) {
+    const block = document.createElement("div");
 
-    const block =
-        document.createElement(
-            "div",
-        );
+    const heading = document.createElement("h4");
 
+    block.classList.add("statistics-summary-block");
 
-    const heading =
-        document.createElement(
-            "h4",
-        );
+    heading.textContent = title;
 
-
-    block.classList.add(
-        "statistics-summary-block",
-    );
-
-
-    heading.textContent =
-        title;
-
-
-    block.appendChild(
-        heading,
-    );
-
+    block.appendChild(heading);
 
     return block;
 }
 
-
 /* ADICIONA MÉTRICAS A UM BLOCO */
 
-function appendAnalysisMetrics(
-    block,
-    metrics,
-) {
+function appendAnalysisMetrics(block, metrics) {
+    const metricsContainer = document.createElement("div");
 
-    const metricsContainer =
-        document.createElement(
-            "div",
-        );
+    metricsContainer.classList.add("statistics-analysis-metrics");
 
+    metrics.forEach(function (metric) {
+        const metricElement = document.createElement("div");
 
-    metricsContainer.classList.add(
-        "statistics-analysis-metrics",
-    );
+        const metricLabel = document.createElement("span");
 
+        const metricValue = document.createElement("strong");
 
-    metrics.forEach(
-        function (
-            metric,
-        ) {
+        metricElement.classList.add("statistics-analysis-metric");
 
-            const metricElement =
-                document.createElement(
-                    "div",
-                );
+        metricLabel.textContent = metric.label;
 
+        metricValue.textContent = metric.value;
 
-            const metricLabel =
-                document.createElement(
-                    "span",
-                );
+        metricValue.title = metric.value;
 
+        metricElement.append(metricLabel, metricValue);
 
-            const metricValue =
-                document.createElement(
-                    "strong",
-                );
+        metricsContainer.appendChild(metricElement);
+    });
 
-
-            metricElement.classList.add(
-                "statistics-analysis-metric",
-            );
-
-
-            metricLabel.textContent =
-                metric.label;
-
-
-            metricValue.textContent =
-                metric.value;
-
-
-            metricValue.title =
-                metric.value;
-
-
-            metricElement.append(
-                metricLabel,
-                metricValue,
-            );
-
-
-            metricsContainer.appendChild(
-                metricElement,
-            );
-        },
-    );
-
-
-    block.appendChild(
-        metricsContainer,
-    );
+    block.appendChild(metricsContainer);
 }
-
 
 /* ADICIONA UMA TABELA DE FREQUÊNCIA A UM BLOCO */
 
-function appendFrequencyAnalysis(
-    block,
-    frequencyData,
-    emptyMessage,
-) {
+function appendFrequencyAnalysis(block, frequencyData, emptyMessage) {
+    const frequencyTable = document.createElement("table");
 
-    const frequencyTable =
-        document.createElement(
-            "table",
-        );
+    const tableHead = document.createElement("thead");
 
+    const headerRow = document.createElement("tr");
 
-    const tableHead =
-        document.createElement(
-            "thead",
-        );
+    const tableBody = document.createElement("tbody");
 
-
-    const headerRow =
-        document.createElement(
-            "tr",
-        );
-
-
-    const tableBody =
-        document.createElement(
-            "tbody",
-        );
-
-
-    frequencyTable.classList.add(
-        "statistics-summary-table",
-    );
-
+    frequencyTable.classList.add("statistics-summary-table");
 
     headerRow.append(
-        createCell(
-            "th",
-            "Valor",
-        ),
+        createCell("th", "Valor"),
 
-        createCell(
-            "th",
-            "Qtd",
-        ),
+        createCell("th", "Qtd"),
     );
 
+    tableHead.appendChild(headerRow);
 
-    tableHead.appendChild(
-        headerRow,
-    );
-
-
-    frequencyTable.append(
-        tableHead,
-        tableBody,
-    );
-
+    frequencyTable.append(tableHead, tableBody);
 
     renderFrequencyTable(
         tableBody,
 
-        frequencyData.slice(
-            0,
-            MAX_FREQUENCY_ROWS,
-        ),
+        frequencyData.slice(0, MAX_FREQUENCY_ROWS),
 
         emptyMessage,
     );
 
+    block.appendChild(frequencyTable);
 
-    block.appendChild(
-        frequencyTable,
-    );
+    if (frequencyData.length > MAX_FREQUENCY_ROWS) {
+        const note = document.createElement("p");
 
+        note.classList.add("statistics-analysis-note");
 
-    if (
-        frequencyData.length >
-        MAX_FREQUENCY_ROWS
-    ) {
+        note.textContent = `Exibindo ${MAX_FREQUENCY_ROWS} de ${frequencyData.length} valores.`;
 
-        const note =
-            document.createElement(
-                "p",
-            );
-
-
-        note.classList.add(
-            "statistics-analysis-note",
-        );
-
-
-        note.textContent =
-            `Exibindo ${MAX_FREQUENCY_ROWS} de ${frequencyData.length} valores.`;
-
-
-        block.appendChild(
-            note,
-        );
+        block.appendChild(note);
     }
 }
 
-
-/* MONTA OS CHECKBOXES DAS COLUNAS */
-/* MONTA OS CHECKBOXES E MODOS DAS COLUNAS */
-
-function renderAnalysisColumnSelector() {
-
-    analysisColumns.replaceChildren();
-
-
-    const fragment =
-        document.createDocumentFragment();
-
-
-    tableState.headers.forEach(
-        function (
-            header,
-            columnIndex
-        ) {
-
-            const option =
-                document.createElement(
-                    "div"
-                );
-
-
-            const label =
-                document.createElement(
-                    "label"
-                );
-
-
-            const checkbox =
-                document.createElement(
-                    "input"
-                );
-
-
-            const columnName =
-                document.createElement(
-                    "span"
-                );
-
-
-            const columnModes =
-                document.createElement(
-                    "div"
-                );
-
-
-            const profile =
-                tableState.columnProfiles[
-                    columnIndex
-                ];
-
-
-            const availableModes =
-                getAvailableAnalysisModes(
-                    profile.type
-                );
-
-
-            const selectedMode =
-                tableState.analysisModes.get(
-                    columnIndex
-                ) ?? profile.type;
-
-
-            option.classList.add(
-                "statistics-column-option"
-            );
-
-
-            checkbox.type =
-                "checkbox";
-
-
-            checkbox.checked =
-                tableState
-                    .selectedAnalysisColumns
-                    .has(
-                        columnIndex
-                    );
-
-
-            checkbox.setAttribute(
-                "aria-label",
-                `Analisar coluna ${header}`
-            );
-
-
-            checkbox.addEventListener(
-                "change",
-                function () {
-
-                    if (
-                        checkbox.checked
-                    ) {
-
-                        tableState
-                            .selectedAnalysisColumns
-                            .add(
-                                columnIndex
-                            );
-
-                    }
-                    else {
-
-                        tableState
-                            .selectedAnalysisColumns
-                            .delete(
-                                columnIndex
-                            );
-                    }
-
-
-                    renderQuickAnalysis(
-                        getFilteredRows()
-                    );
-                }
-            );
-
-
-            columnName.classList.add(
-                "statistics-column-name"
-            );
-
-
-            columnName.textContent =
-                header;
-
-
-            columnName.title =
-                header;
-
-
-            columnModes.classList.add(
-                "statistics-column-modes"
-            );
-
-
-            label.append(
-                checkbox,
-                columnName
-            );
-
-
-            availableModes.forEach(
-                function (
-                    mode
-                ) {
-
-                    const modeButton =
-                        document.createElement(
-                            "button"
-                        );
-
-
-                    const isActive =
-                        selectedMode === mode;
-
-
-                    modeButton.type =
-                        "button";
-
-
-                    modeButton.classList.add(
-                        "statistics-analysis-mode-button"
-                    );
-
-
-                    modeButton.classList.toggle(
-                        "is-active",
-                        isActive
-                    );
-
-
-                    modeButton.textContent =
-                        getColumnTypeLabel(
-                            mode
-                        );
-
-
-                    modeButton.setAttribute(
-                        "aria-pressed",
-                        String(
-                            isActive
-                        )
-                    );
-
-
-                    modeButton.setAttribute(
-                        "aria-label",
-                        `Analisar ${header} como ${getColumnTypeLabel(mode)}`
-                    );
-
-
-                    modeButton.disabled =
-                        mode === "empty";
-
-
-                    modeButton.addEventListener(
-                        "click",
-                        function () {
-
-                            tableState.analysisModes.set(
-                                columnIndex,
-                                mode
-                            );
-
-
-                            renderAnalysisColumnSelector();
-
-
-                            renderQuickAnalysis(
-                                getFilteredRows()
-                            );
-                        }
-                    );
-
-
-                    columnModes.appendChild(
-                        modeButton
-                    );
-                }
-            );
-
-
-            option.append(
-                label,
-                columnModes
-            );
-
-
-            fragment.appendChild(
-                option
-            );
-        }
-    );
-
-
-    analysisColumns.appendChild(
-        fragment
-    );
-
-
-    const hasColumns =
-        tableState.columnCount > 0;
-
-
-    selectAllColumnsButton.disabled =
-        !hasColumns;
-
-
-    clearColumnsButton.disabled =
-        !hasColumns;
+/* RETORNA OS ÍNDICES DAS COLUNAS VISÍVEIS */
+
+function getVisibleColumnIndexes() {
+    return Array.from(tableState.visibleColumns)
+        .filter(function (columnIndex) {
+            return columnIndex >= 0 && columnIndex < tableState.columnCount;
+        })
+        .sort(function (firstColumn, secondColumn) {
+            return firstColumn - secondColumn;
+        });
 }
 
-/* ANALISA UMA COLUNA SELECIONADA */
+/* MONTA OS CHECKBOXES DAS COLUNAS VISÍVEIS */
 
-function renderSelectedColumnAnalysis(
-    rows,
-    columnIndex,
-) {
+function renderVisibleColumnSelector() {
+    visibleColumns.replaceChildren();
 
-    const header =
-        tableState.headers[
-            columnIndex
-        ];
+    const fragment = document.createDocumentFragment();
 
+    const visibleColumnIndexes = getVisibleColumnIndexes();
 
-    const profile =
-        tableState.columnProfiles[
-            columnIndex
-        ];
+    /* ATUALIZA O CONTADOR */
 
-    const analysisMode =
-    tableState.analysisModes.get(
-        columnIndex
-    ) ?? profile.type;
+    visibleColumnCount.textContent = `${visibleColumnIndexes.length} de ${tableState.columnCount}`;
 
-    const filledValues =
-        rows
-            .map(
-                function (
-                    row,
-                ) {
+    /* ATUALIZA OS BOTÕES */
 
-                    return row[
-                        columnIndex
-                    ];
-                },
-            )
-            .filter(
-                function (
-                    value,
-                ) {
+    showAllColumnsButton.disabled =
+        tableState.columnCount === 0 ||
+        visibleColumnIndexes.length === tableState.columnCount;
 
-                    return !isEmptyCell(
-                        value,
-                    );
-                },
-            );
+    hideAllColumnsButton.disabled = visibleColumnIndexes.length === 0;
 
-
-    const emptyCount =
-        rows.length -
-        filledValues.length;
-
-
-    const block =
-        createAnalysisBlock(
-            header,
-        );
-
-
-    if (
-        analysisMode === "number"
-    ) {
-
-        const numericValues =
-            filledValues
-                .map(
-                    parseNumericValue,
-                )
-                .filter(
-                    function (
-                        value,
-                    ) {
-
-                        return value !== null;
-                    },
-                );
-
-
-        const total =
-            numericValues.reduce(
-                function (
-                    sum,
-                    value,
-                ) {
-
-                    return sum +
-                        value;
-                },
-                0,
-            );
-
-
-        const average =
-            numericValues.length > 0
-                ? total /
-                    numericValues.length
-                : NaN;
-
-
-        let minimum =
-            NaN;
-
-
-        let maximum =
-            NaN;
-
-
-        numericValues.forEach(
-            function (
-                value,
-            ) {
-
-                minimum =
-                    Number.isNaN(
-                        minimum,
-                    )
-                        ? value
-                        : Math.min(
-                            minimum,
-                            value,
-                        );
-
-
-                maximum =
-                    Number.isNaN(
-                        maximum,
-                    )
-                        ? value
-                        : Math.max(
-                            maximum,
-                            value,
-                        );
-            },
-        );
-
-
-        analysisCards.appendChild(
-            createAnalysisCard(
-                header,
-
-                formatAnalysisNumber(
-                    total,
-                ),
-            ),
-        );
-
-
-        appendAnalysisMetrics(
-            block,
-            [
-                {
-                    label: "Total",
-
-                    value:
-                        formatAnalysisNumber(
-                            total,
-                        ),
-                },
-                {
-                    label: "Média",
-
-                    value:
-                        formatAnalysisNumber(
-                            average,
-                        ),
-                },
-                {
-                    label: "Menor valor",
-
-                    value:
-                        formatAnalysisNumber(
-                            minimum,
-                        ),
-                },
-                {
-                    label: "Maior valor",
-
-                    value:
-                        formatAnalysisNumber(
-                            maximum,
-                        ),
-                },
-                {
-                    label: "Valores válidos",
-
-                    value:
-                        formatAnalysisNumber(
-                            numericValues.length,
-                        ),
-                },
-                {
-                    label: "Células vazias",
-
-                    value:
-                        formatAnalysisNumber(
-                            emptyCount,
-                        ),
-                },
-            ],
-        );
-
-    }
-    else if (
-        analysisMode === "datetime"
-    ) {
-
-        const dateValues =
-            filledValues
-                .map(
-                    parseDateValue,
-                )
-                .filter(
-                    function (
-                        value,
-                    ) {
-
-                        return value !== null;
-                    },
-                );
-
-
-        const firstDate =
-            dateValues.reduce(
-                function (
-                    earliestDate,
-                    currentDate,
-                ) {
-
-                    return (
-                        !earliestDate ||
-                        currentDate < earliestDate
-                    )
-                        ? currentDate
-                        : earliestDate;
-                },
-                null,
-            );
-
-
-        const lastDate =
-            dateValues.reduce(
-                function (
-                    latestDate,
-                    currentDate,
-                ) {
-
-                    return (
-                        !latestDate ||
-                        currentDate > latestDate
-                    )
-                        ? currentDate
-                        : latestDate;
-                },
-                null,
-            );
-
-
-        analysisCards.appendChild(
-            createAnalysisCard(
-                header,
-
-                formatAnalysisNumber(
-                    dateValues.length,
-                ),
-            ),
-        );
-
-
-        appendAnalysisMetrics(
-            block,
-            [
-                {
-                    label: "Data inicial",
-
-                    value:
-                        formatAnalysisDate(
-                            firstDate,
-                            profile.hasTime,
-                        ),
-                },
-                {
-                    label: "Data final",
-
-                    value:
-                        formatAnalysisDate(
-                            lastDate,
-                            profile.hasTime,
-                        ),
-                },
-                {
-                    label: "Valores válidos",
-
-                    value:
-                        formatAnalysisNumber(
-                            dateValues.length,
-                        ),
-                },
-                {
-                    label: "Células vazias",
-
-                    value:
-                        formatAnalysisNumber(
-                            emptyCount,
-                        ),
-                },
-            ],
-        );
-
-    }
-    else if (
-        analysisMode === "category" ||
-        analysisMode === "identifier"
-    ) {
-
-        const frequencyData =
-            createFrequencyData(
-                rows,
-                columnIndex,
-            );
-
-
-        const duplicateCount =
-            filledValues.length -
-            frequencyData.length;
-
-
-        analysisCards.appendChild(
-            createAnalysisCard(
-                header,
-
-                formatAnalysisNumber(
-                    frequencyData.length,
-                ),
-            ),
-        );
-
-
-        if (
-            analysisMode === "identifier"
-        ) {
-
-            appendAnalysisMetrics(
-                block,
-                [
-                    {
-                        label: "Preenchidos",
-
-                        value:
-                            formatAnalysisNumber(
-                                filledValues.length,
-                            ),
-                    },
-                    {
-                        label: "Valores únicos",
-
-                        value:
-                            formatAnalysisNumber(
-                                frequencyData.length,
-                            ),
-                    },
-                    {
-                        label: "Repetições",
-
-                        value:
-                            formatAnalysisNumber(
-                                duplicateCount,
-                            ),
-                    },
-                    {
-                        label: "Células vazias",
-
-                        value:
-                            formatAnalysisNumber(
-                                emptyCount,
-                            ),
-                    },
-                ],
-            );
-
-
-            const duplicatedValues =
-                frequencyData.filter(
-                    function (
-                        group,
-                    ) {
-
-                        return group.count > 1;
-                    },
-                );
-
-
-            if (
-                duplicatedValues.length > 0
-            ) {
-
-                appendFrequencyAnalysis(
-                    block,
-                    duplicatedValues,
-                    "Nenhum valor repetido.",
-                );
-            }
-
-        }
-        else {
-
-            appendFrequencyAnalysis(
-                block,
-                frequencyData,
-                "Nenhum valor preenchido.",
-            );
-        }
-
-    }
-    else {
-
-        analysisCards.appendChild(
-            createAnalysisCard(
-                header,
-                "0",
-            ),
-        );
-
-
-        appendAnalysisMetrics(
-            block,
-            [
-                {
-                    label: "Valores preenchidos",
-                    value: "0",
-                },
-                {
-                    label: "Células vazias",
-
-                    value:
-                        formatAnalysisNumber(
-                            rows.length,
-                        ),
-                },
-            ],
-        );
-    }
-
-
-    analysisResults.appendChild(
-        block,
-    );
-}
-
-
-/* ATUALIZA A ANÁLISE RÁPIDA */
-
-function renderQuickAnalysis(
-    rows,
-) {
-
-    totalRecords.textContent =
-        formatAnalysisNumber(
-            rows.length,
-        );
-
-
-    analysisCards.replaceChildren();
-
-    analysisResults.replaceChildren();
-
-
-    const selectedColumns =
-        Array.from(
-            tableState.selectedAnalysisColumns,
-        ).sort(
-            function (
-                firstColumn,
-                secondColumn,
-            ) {
-
-                return firstColumn -
-                    secondColumn;
-            },
-        );
-
-
-    analysisEmpty.hidden =
-        selectedColumns.length > 0;
-
-
-    selectedColumns.forEach(
-        function (
-            columnIndex,
-        ) {
-
-            renderSelectedColumnAnalysis(
-                rows,
-                columnIndex,
+    hideEmptyColumnsButton.disabled = !tableState.columnProfiles.some(
+        function (profile, columnIndex) {
+            return (
+                profile.type === "empty" &&
+                tableState.visibleColumns.has(columnIndex)
             );
         },
     );
 
+    /* CRIA UM CHECKBOX PARA CADA COLUNA */
 
-    quickAnalysis.hidden =
-        false;
+    tableState.headers.forEach(function (header, columnIndex) {
+        const option = document.createElement("div");
+
+        const label = document.createElement("label");
+
+        const checkbox = document.createElement("input");
+
+        const columnName = document.createElement("span");
+
+        const profile = tableState.columnProfiles[columnIndex];
+
+        option.classList.add("statistics-visible-column-option");
+
+        option.classList.toggle("is-empty", profile.type === "empty");
+
+        checkbox.type = "checkbox";
+
+        checkbox.checked = tableState.visibleColumns.has(columnIndex);
+
+        checkbox.setAttribute("aria-label", `Exibir coluna ${header}`);
+
+        checkbox.addEventListener("change", function () {
+            if (checkbox.checked) {
+                tableState.visibleColumns.add(columnIndex);
+            } else {
+                tableState.visibleColumns.delete(columnIndex);
+            }
+
+            refreshVisibleColumns();
+        });
+
+        columnName.classList.add("statistics-visible-column-name");
+
+        columnName.textContent = header;
+
+        columnName.title =
+            profile.type === "empty" ? `${header} — coluna vazia` : header;
+
+        label.append(checkbox, columnName);
+
+        option.appendChild(label);
+
+        fragment.appendChild(option);
+    });
+
+    visibleColumns.appendChild(fragment);
 }
 
+/* ATUALIZA A INTERFACE APÓS MUDAR A VISIBILIDADE */
 
-/* RETORNA O ÍCONE DA ORDENAÇÃO */
+function refreshVisibleColumns() {
+    tableState.headers.forEach(function (unusedHeader, columnIndex) {
+        const isVisible = tableState.visibleColumns.has(columnIndex);
 
-function getSortIndicator(
-    columnIndex,
-) {
+        if (isVisible) {
+            return;
+        }
+
+        /*
+         * Remove filtros de colunas ocultadas.
+         * Isso impede filtros invisíveis.
+         */
+
+        tableState.filters[columnIndex] = "";
+
+        /*
+         * Remove a coluna da análise.
+         */
+
+        tableState.selectedAnalysisColumns.delete(columnIndex);
+    });
+
+    /*
+     * Cancela a ordenação se a coluna
+     * usada para ordenar foi ocultada.
+     */
 
     if (
-        tableState.sortColumn !==
-        columnIndex
+        tableState.sortColumn !== null &&
+        !tableState.visibleColumns.has(tableState.sortColumn)
     ) {
+        tableState.sortColumn = null;
 
-        return "↕";
+        tableState.sortDirection = "asc";
     }
 
+    renderVisibleColumnSelector();
 
-    return tableState.sortDirection ===
-        "asc"
-            ? "↑"
-            : "↓";
-}
-
-
-/* ALTERA A ORDENAÇÃO */
-
-function changeSort(
-    columnIndex,
-) {
-
-    if (
-        tableState.sortColumn ===
-        columnIndex
-    ) {
-
-        tableState.sortDirection =
-            tableState.sortDirection ===
-            "asc"
-                ? "desc"
-                : "asc";
-
-    }
-    else {
-
-        tableState.sortColumn =
-            columnIndex;
-
-
-        tableState.sortDirection =
-            "asc";
-    }
-
+    renderAnalysisColumnSelector();
 
     renderTableHeader();
 
     renderTableBody();
 }
 
+/* MONTA OS CHECKBOXES E MODOS DAS COLUNAS PARA ANÁLISE */
+
+function renderAnalysisColumnSelector() {
+    analysisColumns.replaceChildren();
+
+    const fragment = document.createDocumentFragment();
+
+    tableState.headers.forEach(function (header, columnIndex) {
+        if (!tableState.visibleColumns.has(columnIndex)) {
+            return;
+        }
+
+        const option = document.createElement("div");
+
+        const label = document.createElement("label");
+
+        const checkbox = document.createElement("input");
+
+        const columnName = document.createElement("span");
+
+        const columnModes = document.createElement("div");
+
+        const profile = tableState.columnProfiles[columnIndex];
+
+        const availableModes = getAvailableAnalysisModes(profile.type);
+
+        const selectedMode =
+            tableState.analysisModes.get(columnIndex) ?? profile.type;
+
+        option.classList.add("statistics-column-option");
+
+        checkbox.type = "checkbox";
+
+        checkbox.checked = tableState.selectedAnalysisColumns.has(columnIndex);
+
+        checkbox.setAttribute("aria-label", `Analisar coluna ${header}`);
+
+        checkbox.addEventListener("change", function () {
+            if (checkbox.checked) {
+                tableState.selectedAnalysisColumns.add(columnIndex);
+            } else {
+                tableState.selectedAnalysisColumns.delete(columnIndex);
+            }
+
+            renderQuickAnalysis(getFilteredRows());
+        });
+
+        columnName.classList.add("statistics-column-name");
+
+        columnName.textContent = header;
+
+        columnName.title = header;
+
+        columnModes.classList.add("statistics-column-modes");
+
+        label.append(checkbox, columnName);
+
+        availableModes.forEach(function (mode) {
+            const modeButton = document.createElement("button");
+
+            const isActive = selectedMode === mode;
+
+            modeButton.type = "button";
+
+            modeButton.classList.add("statistics-analysis-mode-button");
+
+            modeButton.classList.toggle("is-active", isActive);
+
+            modeButton.textContent = getColumnTypeLabel(mode);
+
+            modeButton.setAttribute("aria-pressed", String(isActive));
+
+            modeButton.setAttribute(
+                "aria-label",
+                `Analisar ${header} como ${getColumnTypeLabel(mode)}`,
+            );
+
+            modeButton.disabled = mode === "empty";
+
+            modeButton.addEventListener("click", function () {
+                tableState.analysisModes.set(columnIndex, mode);
+
+                renderAnalysisColumnSelector();
+
+                renderQuickAnalysis(getFilteredRows());
+            });
+
+            columnModes.appendChild(modeButton);
+        });
+
+        option.append(label, columnModes);
+
+        fragment.appendChild(option);
+    });
+
+    analysisColumns.appendChild(fragment);
+
+    const hasColumns = getVisibleColumnIndexes().length > 0;
+
+    selectAllColumnsButton.disabled = !hasColumns;
+
+    clearColumnsButton.disabled = !hasColumns;
+}
+
+/* ANALISA UMA COLUNA SELECIONADA */
+
+function renderSelectedColumnAnalysis(rows, columnIndex) {
+    const header = tableState.headers[columnIndex];
+
+    const profile = tableState.columnProfiles[columnIndex];
+
+    const analysisMode =
+        tableState.analysisModes.get(columnIndex) ?? profile.type;
+
+    const filledValues = rows
+        .map(function (row) {
+            return row[columnIndex];
+        })
+        .filter(function (value) {
+            return !isEmptyCell(value);
+        });
+
+    const emptyCount = rows.length - filledValues.length;
+
+    const block = createAnalysisBlock(header);
+
+    if (analysisMode === "number") {
+        const numericValues = filledValues
+            .map(parseNumericValue)
+            .filter(function (value) {
+                return value !== null;
+            });
+
+        const total = numericValues.reduce(function (sum, value) {
+            return sum + value;
+        }, 0);
+
+        const average =
+            numericValues.length > 0 ? total / numericValues.length : NaN;
+
+        let minimum = NaN;
+
+        let maximum = NaN;
+
+        numericValues.forEach(function (value) {
+            minimum = Number.isNaN(minimum) ? value : Math.min(minimum, value);
+
+            maximum = Number.isNaN(maximum) ? value : Math.max(maximum, value);
+        });
+
+        analysisCards.appendChild(
+            createAnalysisCard(
+                header,
+
+                formatAnalysisNumber(total),
+            ),
+        );
+
+        appendAnalysisMetrics(block, [
+            {
+                label: "Total",
+
+                value: formatAnalysisNumber(total),
+            },
+            {
+                label: "Média",
+
+                value: formatAnalysisNumber(average),
+            },
+            {
+                label: "Menor valor",
+
+                value: formatAnalysisNumber(minimum),
+            },
+            {
+                label: "Maior valor",
+
+                value: formatAnalysisNumber(maximum),
+            },
+            {
+                label: "Valores válidos",
+
+                value: formatAnalysisNumber(numericValues.length),
+            },
+            {
+                label: "Células vazias",
+
+                value: formatAnalysisNumber(emptyCount),
+            },
+        ]);
+    } else if (analysisMode === "datetime") {
+        const dateValues = filledValues
+            .map(parseDateValue)
+            .filter(function (value) {
+                return value !== null;
+            });
+
+        const firstDate = dateValues.reduce(function (
+            earliestDate,
+            currentDate,
+        ) {
+            return !earliestDate || currentDate < earliestDate
+                ? currentDate
+                : earliestDate;
+        }, null);
+
+        const lastDate = dateValues.reduce(function (latestDate, currentDate) {
+            return !latestDate || currentDate > latestDate
+                ? currentDate
+                : latestDate;
+        }, null);
+
+        analysisCards.appendChild(
+            createAnalysisCard(
+                header,
+
+                formatAnalysisNumber(dateValues.length),
+            ),
+        );
+
+        appendAnalysisMetrics(block, [
+            {
+                label: "Data inicial",
+
+                value: formatAnalysisDate(firstDate, profile.hasTime),
+            },
+            {
+                label: "Data final",
+
+                value: formatAnalysisDate(lastDate, profile.hasTime),
+            },
+            {
+                label: "Valores válidos",
+
+                value: formatAnalysisNumber(dateValues.length),
+            },
+            {
+                label: "Células vazias",
+
+                value: formatAnalysisNumber(emptyCount),
+            },
+        ]);
+    } else if (analysisMode === "category" || analysisMode === "identifier") {
+        const frequencyData = createFrequencyData(rows, columnIndex);
+
+        const duplicateCount = filledValues.length - frequencyData.length;
+
+        analysisCards.appendChild(
+            createAnalysisCard(
+                header,
+
+                formatAnalysisNumber(frequencyData.length),
+            ),
+        );
+
+        if (analysisMode === "identifier") {
+            appendAnalysisMetrics(block, [
+                {
+                    label: "Preenchidos",
+
+                    value: formatAnalysisNumber(filledValues.length),
+                },
+                {
+                    label: "Valores únicos",
+
+                    value: formatAnalysisNumber(frequencyData.length),
+                },
+                {
+                    label: "Repetições",
+
+                    value: formatAnalysisNumber(duplicateCount),
+                },
+                {
+                    label: "Células vazias",
+
+                    value: formatAnalysisNumber(emptyCount),
+                },
+            ]);
+
+            const duplicatedValues = frequencyData.filter(function (group) {
+                return group.count > 1;
+            });
+
+            if (duplicatedValues.length > 0) {
+                appendFrequencyAnalysis(
+                    block,
+                    duplicatedValues,
+                    "Nenhum valor repetido.",
+                );
+            }
+        } else {
+            appendFrequencyAnalysis(
+                block,
+                frequencyData,
+                "Nenhum valor preenchido.",
+            );
+        }
+    } else {
+        analysisCards.appendChild(createAnalysisCard(header, "0"));
+
+        appendAnalysisMetrics(block, [
+            {
+                label: "Valores preenchidos",
+                value: "0",
+            },
+            {
+                label: "Células vazias",
+
+                value: formatAnalysisNumber(rows.length),
+            },
+        ]);
+    }
+
+    analysisResults.appendChild(block);
+}
+
+/* ATUALIZA A ANÁLISE RÁPIDA */
+
+function renderQuickAnalysis(rows) {
+    totalRecords.textContent = formatAnalysisNumber(rows.length);
+
+    analysisCards.replaceChildren();
+
+    analysisResults.replaceChildren();
+
+    const selectedColumns = Array.from(tableState.selectedAnalysisColumns)
+        .filter(function (columnIndex) {
+            return tableState.visibleColumns.has(columnIndex);
+        })
+        .sort(function (firstColumn, secondColumn) {
+            return firstColumn - secondColumn;
+        });
+
+    analysisEmpty.hidden = selectedColumns.length > 0;
+
+    selectedColumns.forEach(function (columnIndex) {
+        renderSelectedColumnAnalysis(rows, columnIndex);
+    });
+
+    quickAnalysis.hidden = false;
+}
+
+/* RETORNA O ÍCONE DA ORDENAÇÃO */
+
+function getSortIndicator(columnIndex) {
+    if (tableState.sortColumn !== columnIndex) {
+        return "↕";
+    }
+
+    return tableState.sortDirection === "asc" ? "↑" : "↓";
+}
+
+/* ALTERA A ORDENAÇÃO */
+
+function changeSort(columnIndex) {
+    if (tableState.sortColumn === columnIndex) {
+        tableState.sortDirection =
+            tableState.sortDirection === "asc" ? "desc" : "asc";
+    } else {
+        tableState.sortColumn = columnIndex;
+
+        tableState.sortDirection = "asc";
+    }
+
+    renderTableHeader();
+
+    renderTableBody();
+}
 
 /* MONTA OS CABEÇALHOS E FILTROS */
 
 function renderTableHeader() {
+    const tableHead = table.querySelector("thead");
 
-    const tableHead =
-        table.querySelector(
-            "thead",
-        );
+    const headerRow = document.createElement("tr");
 
+    const filterRow = document.createElement("tr");
 
-    const headerRow =
-        document.createElement(
-            "tr",
-        );
+    const visibleColumnIndexes = getVisibleColumnIndexes();
 
-
-    const filterRow =
-        document.createElement(
-            "tr",
-        );
-
-
-    filterRow.classList.add(
-        "statistics-filter-row",
-    );
-
+    filterRow.classList.add("statistics-filter-row");
 
     tableHead.replaceChildren();
 
+    for (const columnIndex of visibleColumnIndexes) {
+        const headerCell = document.createElement("th");
 
-    for (
-        let columnIndex = 0;
-        columnIndex < tableState.columnCount;
-        columnIndex += 1
-    ) {
+        const sortButton = document.createElement("button");
 
-        const headerCell =
-            document.createElement(
-                "th",
-            );
+        const sortIndicator = document.createElement("span");
 
+        const filterCell = document.createElement("th");
 
-        const sortButton =
-            document.createElement(
-                "button",
-            );
+        const filterInput = document.createElement("input");
 
-
-        const sortIndicator =
-            document.createElement(
-                "span",
-            );
-
-
-        const filterCell =
-            document.createElement(
-                "th",
-            );
-
-
-        const filterInput =
-            document.createElement(
-                "input",
-            );
-
-
-        const headerValue =
-            tableState.headers[
-                columnIndex
-            ];
-
+        const headerValue = tableState.headers[columnIndex];
 
         /* ORDENAÇÃO */
 
-        sortButton.type =
-            "button";
+        sortButton.type = "button";
 
-
-        sortButton.classList.add(
-            "statistics-sort-button",
-        );
-
+        sortButton.classList.add("statistics-sort-button");
 
         sortButton.setAttribute(
             "aria-label",
             `Ordenar pela coluna ${headerValue}`,
         );
 
+        sortButton.append(document.createTextNode(headerValue));
 
-        sortButton.append(
-            document.createTextNode(
-                headerValue,
-            ),
-        );
+        sortIndicator.classList.add("statistics-sort-indicator");
 
+        sortIndicator.textContent = getSortIndicator(columnIndex);
 
-        sortIndicator.classList.add(
-            "statistics-sort-indicator",
-        );
+        sortButton.appendChild(sortIndicator);
 
+        sortButton.addEventListener("click", function () {
+            changeSort(columnIndex);
+        });
 
-        sortIndicator.textContent =
-            getSortIndicator(
-                columnIndex,
-            );
+        headerCell.appendChild(sortButton);
 
-
-        sortButton.appendChild(
-            sortIndicator,
-        );
-
-
-        sortButton.addEventListener(
-            "click",
-            function () {
-
-                changeSort(
-                    columnIndex,
-                );
-            },
-        );
-
-
-        headerCell.appendChild(
-            sortButton,
-        );
-
-
-        headerRow.appendChild(
-            headerCell,
-        );
-
+        headerRow.appendChild(headerCell);
 
         /* FILTRO */
 
-        filterInput.type =
-            "search";
+        filterInput.type = "search";
 
+        filterInput.classList.add("statistics-column-filter");
 
-        filterInput.classList.add(
-            "statistics-column-filter",
-        );
+        filterInput.placeholder = "Filtrar...";
 
+        filterInput.value = tableState.filters[columnIndex];
 
-        filterInput.placeholder =
-            "Filtrar...";
+        filterInput.setAttribute("aria-label", `Filtrar coluna ${headerValue}`);
 
+        filterInput.addEventListener("input", function () {
+            tableState.filters[columnIndex] = filterInput.value;
 
-        filterInput.value =
-            tableState.filters[
-                columnIndex
-            ];
+            renderTableBody();
+        });
 
+        filterCell.appendChild(filterInput);
 
-        filterInput.setAttribute(
-            "aria-label",
-            `Filtrar coluna ${headerValue}`,
-        );
-
-
-        filterInput.addEventListener(
-            "input",
-            function () {
-
-                tableState.filters[
-                    columnIndex
-                ] =
-                    filterInput.value;
-
-
-                renderTableBody();
-            },
-        );
-
-
-        filterCell.appendChild(
-            filterInput,
-        );
-
-
-        filterRow.appendChild(
-            filterCell,
-        );
+        filterRow.appendChild(filterCell);
     }
 
+    /*
+     * Se não houver colunas visíveis,
+     * o cabeçalho permanece vazio.
+     */
 
-    tableHead.append(
-        headerRow,
-        filterRow,
-    );
+    if (visibleColumnIndexes.length > 0) {
+        tableHead.append(headerRow, filterRow);
+    }
 }
-
 
 /* APLICA OS FILTROS */
 
 function getFilteredRows() {
+    return tableState.rows.filter(function (row) {
+        return tableState.filters.every(function (filterValue, columnIndex) {
+            const normalizedFilter = normalizeSearchValue(filterValue).trim();
 
-    return tableState.rows.filter(
-        function (
-            row,
-        ) {
+            if (!normalizedFilter) {
+                return true;
+            }
 
-            return tableState.filters.every(
-                function (
-                    filterValue,
-                    columnIndex,
-                ) {
-
-                    const normalizedFilter =
-                        normalizeSearchValue(
-                            filterValue,
-                        ).trim();
-
-
-                    if (
-                        !normalizedFilter
-                    ) {
-
-                        return true;
-                    }
-
-
-                    return normalizeSearchValue(
-                        row[columnIndex],
-                    ).includes(
-                        normalizedFilter,
-                    );
-                },
+            return normalizeSearchValue(row[columnIndex]).includes(
+                normalizedFilter,
             );
-        },
-    );
+        });
+    });
 }
-
 
 /* ORDENA OS REGISTROS */
 
-function getSortedRows(
-    rows,
-) {
-
-    if (
-        tableState.sortColumn ===
-        null
-    ) {
-
+function getSortedRows(rows) {
+    if (tableState.sortColumn === null) {
         return rows;
     }
 
+    const sortedRows = [...rows];
 
-    const sortedRows =
-        [...rows];
+    const columnIndex = tableState.sortColumn;
 
+    sortedRows.sort(function (firstRow, secondRow) {
+        const firstValue = formatCellValue(firstRow[columnIndex]).trim();
 
-    const columnIndex =
-        tableState.sortColumn;
+        const secondValue = formatCellValue(secondRow[columnIndex]).trim();
 
+        if (!firstValue && secondValue) {
+            return 1;
+        }
 
-    sortedRows.sort(
-        function (
-            firstRow,
-            secondRow,
-        ) {
+        if (firstValue && !secondValue) {
+            return -1;
+        }
 
-            const firstValue =
-                formatCellValue(
-                    firstRow[columnIndex],
-                ).trim();
+        const comparison = naturalCollator.compare(firstValue, secondValue);
 
-
-            const secondValue =
-                formatCellValue(
-                    secondRow[columnIndex],
-                ).trim();
-
-
-            if (
-                !firstValue &&
-                secondValue
-            ) {
-
-                return 1;
-            }
-
-
-            if (
-                firstValue &&
-                !secondValue
-            ) {
-
-                return -1;
-            }
-
-
-            const comparison =
-                naturalCollator.compare(
-                    firstValue,
-                    secondValue,
-                );
-
-
-            return tableState.sortDirection ===
-                "asc"
-                    ? comparison
-                    : -comparison;
-        },
-    );
-
+        return tableState.sortDirection === "asc" ? comparison : -comparison;
+    });
 
     return sortedRows;
 }
 
-
 /* MONTA AS LINHAS VISÍVEIS */
 
 function renderTableBody() {
+    const tableBody = table.querySelector("tbody");
 
-    const tableBody =
-        table.querySelector(
-            "tbody",
-        );
+    const filteredRows = getFilteredRows();
 
+    const sortedRows = getSortedRows(filteredRows);
 
-    const filteredRows =
-        getFilteredRows();
+    const visibleRows = sortedRows.slice(0, MAX_PREVIEW_ROWS);
 
-
-    const sortedRows =
-        getSortedRows(
-            filteredRows,
-        );
-
-
-    const visibleRows =
-        sortedRows.slice(
-            0,
-            MAX_PREVIEW_ROWS,
-        );
-
+    const visibleColumnIndexes = getVisibleColumnIndexes();
 
     tableBody.replaceChildren();
 
+    if (visibleColumnIndexes.length === 0) {
+        const emptyRow = document.createElement("tr");
 
-    if (
-        visibleRows.length === 0
-    ) {
-
-        const emptyRow =
-            document.createElement(
-                "tr",
-            );
-
-
-        const emptyCell =
-            createCell(
-                "td",
-                "Nenhum resultado encontrado para os filtros aplicados.",
-            );
-
-
-        emptyRow.classList.add(
-            "statistics-empty-row",
+        const emptyCell = createCell(
+            "td",
+            "Selecione ao menos uma coluna para visualizar a tabela.",
         );
 
+        emptyRow.classList.add("statistics-empty-row");
 
-        emptyCell.colSpan =
-            tableState.columnCount;
+        emptyCell.colSpan = 1;
 
+        emptyRow.appendChild(emptyCell);
 
-        emptyRow.appendChild(
-            emptyCell,
+        tableBody.appendChild(emptyRow);
+    } else if (visibleRows.length === 0) {
+        const emptyRow = document.createElement("tr");
+
+        const emptyCell = createCell(
+            "td",
+            "Nenhum resultado encontrado para os filtros aplicados.",
         );
 
+        emptyRow.classList.add("statistics-empty-row");
 
-        tableBody.appendChild(
-            emptyRow,
-        );
+        emptyCell.colSpan = visibleColumnIndexes.length;
 
-    }
-    else {
+        emptyRow.appendChild(emptyCell);
 
-        const bodyFragment =
-            document.createDocumentFragment();
+        tableBody.appendChild(emptyRow);
+    } else {
+        const bodyFragment = document.createDocumentFragment();
 
+        visibleRows.forEach(function (row) {
+            const tableRow = document.createElement("tr");
 
-        visibleRows.forEach(
-            function (
-                row,
-            ) {
+            for (const columnIndex of visibleColumnIndexes) {
+                tableRow.appendChild(createCell("td", row[columnIndex]));
+            }
 
-                const tableRow =
-                    document.createElement(
-                        "tr",
-                    );
+            bodyFragment.appendChild(tableRow);
+        });
 
-
-                for (
-                    let columnIndex = 0;
-                    columnIndex < tableState.columnCount;
-                    columnIndex += 1
-                ) {
-
-                    tableRow.appendChild(
-                        createCell(
-                            "td",
-                            row[columnIndex],
-                        ),
-                    );
-                }
-
-
-                bodyFragment.appendChild(
-                    tableRow,
-                );
-            },
-        );
-
-
-        tableBody.appendChild(
-            bodyFragment,
-        );
+        tableBody.appendChild(bodyFragment);
     }
 
+    renderQuickAnalysis(filteredRows);
 
-    /* ATUALIZA A ANÁLISE COM OS DADOS FILTRADOS */
+    const totalRows = tableState.rows.length;
 
-    renderQuickAnalysis(
-        filteredRows,
-    );
+    const filteredRowCount = filteredRows.length;
 
-
-    /* ATUALIZA O RESUMO */
-
-    const totalRows =
-        tableState.rows.length;
-
-
-    const filteredRowCount =
-        filteredRows.length;
-
-
-    const isFiltered =
-        tableState.filters.some(
-            function (
-                filterValue,
-            ) {
-
-                return normalizeSearchValue(
-                    filterValue,
-                ).trim().length > 0;
-            },
-        );
-
+    const isFiltered = tableState.filters.some(function (filterValue) {
+        return normalizeSearchValue(filterValue).trim().length > 0;
+    });
 
     const previewLimitMessage =
         filteredRowCount > MAX_PREVIEW_ROWS
             ? ` • exibindo as primeiras ${MAX_PREVIEW_ROWS}`
             : "";
 
+    const visibleColumnCountMessage =
+        visibleColumnIndexes.length === tableState.columnCount
+            ? `${tableState.columnCount} colunas`
+            : `${visibleColumnIndexes.length} de ${tableState.columnCount} colunas`;
 
-    previewSummary.textContent =
-        isFiltered
-            ? `${tableState.sheetName} • ${filteredRowCount} de ${totalRows} linhas • ${tableState.columnCount} colunas${previewLimitMessage}`
-            : `${tableState.sheetName} • ${totalRows} linhas • ${tableState.columnCount} colunas${previewLimitMessage}`;
+    previewSummary.textContent = isFiltered
+        ? `${tableState.sheetName} • ${filteredRowCount} de ${totalRows} linhas • ${visibleColumnCountMessage}${previewLimitMessage}`
+        : `${tableState.sheetName} • ${totalRows} linhas • ${visibleColumnCountMessage}${previewLimitMessage}`;
 }
-
 
 /* MONTA A TABELA INTERATIVA */
 
-function renderTable(
-    rows,
-    sheetName,
-) {
+function renderTable(rows, sheetName) {
+    const columnCount = rows.reduce(function (largestColumnCount, row) {
+        return Math.max(largestColumnCount, row.length);
+    }, 0);
 
-    const columnCount =
-        rows.reduce(
-            function (
-                largestColumnCount,
-                row,
-            ) {
-
-                return Math.max(
-                    largestColumnCount,
-                    row.length,
-                );
-            },
-            0,
-        );
-
-
-    if (
-        columnCount === 0
-    ) {
-
-        throw new Error(
-            "A primeira aba do arquivo não possui dados.",
-        );
+    if (columnCount === 0) {
+        throw new Error("A primeira aba do arquivo não possui dados.");
     }
 
+    const headerValues = rows[0] ?? [];
 
-    const headerValues =
-        rows[0] ??
-        [];
+    tableState.sheetName = sheetName;
 
+    tableState.columnCount = columnCount;
 
-    tableState.sheetName =
-        sheetName;
+    tableState.headers = Array.from(
+        {
+            length: columnCount,
+        },
 
-
-    tableState.columnCount =
-        columnCount;
-
-
-    tableState.headers =
-        Array.from(
-            {
-                length: columnCount,
-            },
-
-            function (
-                unusedValue,
-                columnIndex,
-            ) {
-
-                return (
-                    formatCellValue(
-                        headerValues[
-                            columnIndex
-                        ],
-                    ).trim() ||
-
-                    `Coluna ${columnIndex + 1}`
-                );
-            },
-        );
-
-
-    tableState.rows =
-        rows.slice(
-            1,
-        );
-
-
-    tableState.columnProfiles =
-        tableState.headers.map(
-            function (
-                unusedHeader,
-                columnIndex,
-            ) {
-
-                return detectColumnProfile(
-                    columnIndex,
-                );
-            },
-        );
-
-
-    tableState.analysisModes =
-    new Map(
-        tableState.columnProfiles.map(
-            function (
-                profile,
-                columnIndex
-            ) {
-
-                return [
-                    columnIndex,
-                    profile.type
-                ];
-            }
-        )
+        function (unusedValue, columnIndex) {
+            return (
+                formatCellValue(headerValues[columnIndex]).trim() ||
+                `Coluna ${columnIndex + 1}`
+            );
+        },
     );
 
-    tableState
-        .selectedAnalysisColumns
-        .clear();
+    tableState.rows = rows.slice(1);
 
+    tableState.columnProfiles = tableState.headers.map(
+        function (unusedHeader, columnIndex) {
+            return detectColumnProfile(columnIndex);
+        },
+    );
 
-    tableState.filters =
-        Array(
-            columnCount,
-        ).fill(
-            "",
-        );
+    /* TODAS AS COLUNAS COMEÇAM VISÍVEIS */
 
+    tableState.visibleColumns = new Set(
+        tableState.headers.map(function (unusedHeader, columnIndex) {
+            return columnIndex;
+        }),
+    );
 
-    tableState.sortColumn =
-        null;
+    tableState.analysisModes = new Map(
+        tableState.columnProfiles.map(function (profile, columnIndex) {
+            return [columnIndex, profile.type];
+        }),
+    );
 
+    tableState.selectedAnalysisColumns.clear();
 
-    tableState.sortDirection =
-        "asc";
+    tableState.filters = Array(columnCount).fill("");
 
+    tableState.sortColumn = null;
+
+    tableState.sortDirection = "asc";
+
+    renderVisibleColumnSelector();
 
     renderAnalysisColumnSelector();
 
@@ -2608,239 +1366,144 @@ function renderTable(
 
     renderTableBody();
 
-
-    preview.hidden =
-        false;
+    preview.hidden = false;
 }
-
 
 /* LIMPA O ESTADO DA TABELA */
 
 function resetTableState() {
+    tableState.sheetName = "";
 
-    tableState.sheetName =
-        "";
+    tableState.headers = [];
 
+    tableState.rows = [];
 
-    tableState.headers =
-        [];
+    tableState.columnProfiles = [];
 
-
-    tableState.rows =
-        [];
-
-
-    tableState.columnProfiles =
-        [];
+    tableState.visibleColumns.clear();
 
     tableState.analysisModes.clear();
 
-    tableState
-        .selectedAnalysisColumns
-        .clear();
+    tableState.selectedAnalysisColumns.clear();
 
+    tableState.filters = [];
 
-    tableState.filters =
-        [];
+    tableState.columnCount = 0;
 
+    tableState.sortColumn = null;
 
-    tableState.columnCount =
-        0;
-
-
-    tableState.sortColumn =
-        null;
-
-
-    tableState.sortDirection =
-        "asc";
+    tableState.sortDirection = "asc";
 }
-
 
 /* LIMPA A ANÁLISE RÁPIDA */
 
 function clearQuickAnalysis() {
+    quickAnalysis.hidden = true;
 
-    quickAnalysis.hidden =
-        true;
-
-
-    totalRecords.textContent =
-        "0";
-
+    totalRecords.textContent = "0";
 
     analysisColumns.replaceChildren();
+
+    visibleColumns.replaceChildren();
+
+    visibleColumnCount.textContent = "0 de 0";
 
     analysisCards.replaceChildren();
 
     analysisResults.replaceChildren();
 
+    analysisEmpty.hidden = false;
 
-    analysisEmpty.hidden =
-        false;
+    selectAllColumnsButton.disabled = true;
 
+    clearColumnsButton.disabled = true;
 
-    selectAllColumnsButton.disabled =
-        true;
+    showAllColumnsButton.disabled = true;
 
+    hideAllColumnsButton.disabled = true;
 
-    clearColumnsButton.disabled =
-        true;
+    hideEmptyColumnsButton.disabled = true;
 }
-
 
 /* REMOVE OS DADOS DA TELA */
 
 function clearImportedFile() {
+    const tableHead = table.querySelector("thead");
 
-    const tableHead =
-        table.querySelector(
-            "thead",
-        );
+    const tableBody = table.querySelector("tbody");
 
-
-    const tableBody =
-        table.querySelector(
-            "tbody",
-        );
-
-
-    fileInput.value =
-        "";
-
+    fileInput.value = "";
 
     tableHead.replaceChildren();
 
     tableBody.replaceChildren();
 
-
     resetTableState();
 
     clearQuickAnalysis();
 
+    previewSummary.textContent = "";
 
-    previewSummary.textContent =
-        "";
+    preview.hidden = true;
 
-
-    preview.hidden =
-        true;
-
-
-    clearButton.disabled =
-        true;
-
+    clearButton.disabled = true;
 
     setStatus(
         "Nenhum arquivo selecionado. O arquivo será lido somente neste navegador.",
     );
 }
 
-
 /* LÊ O ARQUIVO SELECIONADO */
 
-async function readSelectedFile(
-    file,
-) {
-
-    if (
-        !isSupportedFile(
-            file,
-        )
-    ) {
-
+async function readSelectedFile(file) {
+    if (!isSupportedFile(file)) {
         throw new Error(
             "Formato não suportado. Selecione um arquivo .xlsx, .xls ou .csv.",
         );
     }
 
-
-    if (
-        !window.XLSX
-    ) {
-
+    if (!window.XLSX) {
         throw new Error(
             "A biblioteca de leitura de planilhas não foi carregada.",
         );
     }
 
+    const fileData = await file.arrayBuffer();
 
-    const fileData =
-        await file.arrayBuffer();
+    const workbook = window.XLSX.read(fileData, {
+        cellDates: true,
+        cellFormula: false,
+    });
 
+    const sheetName = workbook.SheetNames[0];
 
-    const workbook =
-        window.XLSX.read(
-            fileData,
-            {
-                cellDates: true,
-                cellFormula: false,
-            },
-        );
-
-
-    const sheetName =
-        workbook.SheetNames[0];
-
-
-    if (
-        !sheetName
-    ) {
-
-        throw new Error(
-            "O arquivo não possui nenhuma aba.",
-        );
+    if (!sheetName) {
+        throw new Error("O arquivo não possui nenhuma aba.");
     }
 
+    const worksheet = workbook.Sheets[sheetName];
 
-    const worksheet =
-        workbook.Sheets[
-            sheetName
-        ];
+    const rows = window.XLSX.utils.sheet_to_json(worksheet, {
+        header: 1,
+        defval: "",
+        raw: false,
+        blankrows: false,
+    });
 
-
-    const rows =
-        window.XLSX.utils.sheet_to_json(
-            worksheet,
-            {
-                header: 1,
-                defval: "",
-                raw: false,
-                blankrows: false,
-            },
-        );
-
-
-    if (
-        rows.length === 0
-    ) {
-
-        throw new Error(
-            "A primeira aba do arquivo está vazia.",
-        );
+    if (rows.length === 0) {
+        throw new Error("A primeira aba do arquivo está vazia.");
     }
 
+    renderTable(rows, sheetName);
 
-    renderTable(
-        rows,
-        sheetName,
-    );
+    clearButton.disabled = false;
 
-
-    clearButton.disabled =
-        false;
-
-
-    setStatus(
-        `Arquivo "${file.name}" carregado localmente com sucesso.`,
-    );
+    setStatus(`Arquivo "${file.name}" carregado localmente com sucesso.`);
 }
-
 
 /* INICIALIZA O IMPORTADOR */
 
 function initializeStatisticsImporter() {
-
     if (
         !fileInput ||
         !clearButton ||
@@ -2848,6 +1511,11 @@ function initializeStatisticsImporter() {
         !preview ||
         !previewSummary ||
         !table ||
+        !visibleColumns ||
+        !visibleColumnCount ||
+        !showAllColumnsButton ||
+        !hideAllColumnsButton ||
+        !hideEmptyColumnsButton ||
         !quickAnalysis ||
         !analysisColumns ||
         !selectAllColumnsButton ||
@@ -2857,157 +1525,103 @@ function initializeStatisticsImporter() {
         !analysisResults ||
         !analysisEmpty
     ) {
-
         console.error(
             "Elementos do importador de Estatísticas não foram encontrados.",
         );
 
-
         return;
     }
 
-
-    if (
-        !window.XLSX
-    ) {
-
-        fileInput.disabled =
-            true;
-
+    if (!window.XLSX) {
+        fileInput.disabled = true;
 
         setStatus(
             "Não foi possível carregar a biblioteca de leitura de planilhas.",
             true,
         );
 
-
         return;
     }
 
+    fileInput.addEventListener("change", async function () {
+        const file = fileInput.files?.[0];
 
-    fileInput.addEventListener(
-        "change",
-        async function () {
+        if (!file) {
+            return;
+        }
 
-            const file =
-                fileInput.files?.[0];
+        setStatus(`Lendo "${file.name}"...`);
 
+        try {
+            await readSelectedFile(file);
+        } catch (error) {
+            table.querySelector("thead").replaceChildren();
 
-            if (
-                !file
-            ) {
+            table.querySelector("tbody").replaceChildren();
 
-                return;
-            }
+            resetTableState();
 
+            clearQuickAnalysis();
+
+            previewSummary.textContent = "";
+
+            preview.hidden = true;
+
+            clearButton.disabled = false;
 
             setStatus(
-                `Lendo "${file.name}"...`,
+                error instanceof Error
+                    ? error.message
+                    : "Não foi possível ler o arquivo selecionado.",
+                true,
             );
+        }
+    });
 
+    clearButton.addEventListener("click", clearImportedFile);
 
-            try {
+    selectAllColumnsButton.addEventListener("click", function () {
+        tableState.selectedAnalysisColumns = new Set(getVisibleColumnIndexes());
 
-                await readSelectedFile(
-                    file,
-                );
+        renderAnalysisColumnSelector();
 
+        renderQuickAnalysis(getFilteredRows());
+    });
+
+    clearColumnsButton.addEventListener("click", function () {
+        tableState.selectedAnalysisColumns.clear();
+
+        renderAnalysisColumnSelector();
+
+        renderQuickAnalysis(getFilteredRows());
+    });
+
+    showAllColumnsButton.addEventListener("click", function () {
+        tableState.visibleColumns = new Set(
+            tableState.headers.map(function (unusedHeader, columnIndex) {
+                return columnIndex;
+            }),
+        );
+
+        refreshVisibleColumns();
+    });
+
+    hideAllColumnsButton.addEventListener("click", function () {
+        tableState.visibleColumns.clear();
+
+        refreshVisibleColumns();
+    });
+
+    hideEmptyColumnsButton.addEventListener("click", function () {
+        tableState.columnProfiles.forEach(function (profile, columnIndex) {
+            if (profile.type === "empty") {
+                tableState.visibleColumns.delete(columnIndex);
             }
-            catch (
-                error
-            ) {
+        });
 
-                table.querySelector(
-                    "thead",
-                ).replaceChildren();
-
-
-                table.querySelector(
-                    "tbody",
-                ).replaceChildren();
-
-
-                resetTableState();
-
-                clearQuickAnalysis();
-
-
-                previewSummary.textContent =
-                    "";
-
-
-                preview.hidden =
-                    true;
-
-
-                clearButton.disabled =
-                    false;
-
-
-                setStatus(
-                    error instanceof Error
-                        ? error.message
-                        : "Não foi possível ler o arquivo selecionado.",
-                    true,
-                );
-            }
-        },
-    );
-
-
-    clearButton.addEventListener(
-        "click",
-        clearImportedFile,
-    );
-
-
-    selectAllColumnsButton.addEventListener(
-        "click",
-        function () {
-
-            tableState.selectedAnalysisColumns =
-                new Set(
-                    tableState.headers.map(
-                        function (
-                            unusedHeader,
-                            columnIndex,
-                        ) {
-
-                            return columnIndex;
-                        },
-                    ),
-                );
-
-
-            renderAnalysisColumnSelector();
-
-
-            renderQuickAnalysis(
-                getFilteredRows(),
-            );
-        },
-    );
-
-
-    clearColumnsButton.addEventListener(
-        "click",
-        function () {
-
-            tableState
-                .selectedAnalysisColumns
-                .clear();
-
-
-            renderAnalysisColumnSelector();
-
-
-            renderQuickAnalysis(
-                getFilteredRows(),
-            );
-        },
-    );
+        refreshVisibleColumns();
+    });
 }
-
 
 /* INICIALIZA */
 
