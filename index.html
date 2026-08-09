@@ -277,12 +277,14 @@
                         align-content: center;
                         justify-content: center;
                         flex-wrap: wrap;
+                        margin-bottom: 15px;
                         align-items: stretch;
                     }
 
                     /* SUMARIO DA ANÁLISE */
 
                     .statistics-summary-cards {
+                        
                         display: grid;
                         grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
                         gap: 15px;
@@ -347,15 +349,228 @@
                     #statisticsLocalPreview[hidden] {
                         display: none;
                     }
-                    .preview-header {
-                        text-align: center;
-                        margin-bottom: 20px;
-                    }
-                    .preview-header span {
-                        color: #b9bcc1;
-                        font-size: 14px;
-                        letter-spacing: 1px;
-                    }
+
+
+/* CABEÇALHO DA PRÉVIA */
+
+.preview-header {
+    margin-bottom: 20px;
+
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+
+    text-align: left;
+}
+
+#statisticsPreviewSummary {
+    flex: 0 0 auto;
+    padding-top: 14px;
+
+    color: #b9bcc1;
+    font-size: 14px;
+    letter-spacing: 1px;
+}
+
+
+/* SELETOR DE COLUNAS VISÍVEIS */
+
+#statisticsVisibleColumnSelector {
+    flex: 1 1 700px;
+    min-width: 0;
+    width: 100%;
+    max-width: 1050px;
+
+    padding: 12px;
+
+    background-color: #141414;
+    border: 1px solid #525252;
+    border-radius: 5px;
+}
+
+
+/* CABEÇALHO DO SELETOR */
+
+.statistics-visible-columns-header {
+    margin-bottom: 10px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.statistics-visible-columns-title {
+    min-width: 0;
+
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.statistics-visible-columns-title h4 {
+    margin: 0;
+    font-size: 13px;
+}
+
+#statisticsVisibleColumnCount {
+    color: #b9bcc1;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+}
+
+
+/* BOTÕES DO SELETOR */
+
+.statistics-visible-columns-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.statistics-visible-columns-action {
+    min-height: 0;
+    margin: 0;
+    padding: 5px 8px;
+
+    color: #e4e6eb;
+    background-color: #242424;
+    border: 1px solid #525252;
+    border-radius: 3px;
+
+    font-family: "Open Sans", sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    line-height: 1.2;
+
+    cursor: pointer;
+}
+
+.statistics-visible-columns-action:hover,
+.statistics-visible-columns-action:focus-visible {
+    color: #ffffff;
+    background-color: #2e2e2e;
+    border-color: #73767a;
+}
+
+.statistics-visible-columns-action:disabled {
+    cursor: default;
+    opacity: 0.5;
+}
+
+
+/* ÁREA DOS CHECKBOXES */
+
+#statisticsVisibleColumns {
+    max-height: 124px;
+    padding-right: 6px;
+
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(180px, 1fr)
+    );
+
+    gap: 7px;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+
+/* BARRA DE ROLAGEM */
+
+#statisticsVisibleColumns::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+#statisticsVisibleColumns::-webkit-scrollbar {
+    width: 5px;
+    background-color: transparent;
+}
+
+#statisticsVisibleColumns::-webkit-scrollbar-thumb {
+    background-color: #525252;
+    border-radius: 5px;
+}
+
+
+/* CHECKBOX INDIVIDUAL */
+
+.statistics-visible-column-option {
+    min-width: 0;
+    padding: 7px 9px;
+
+    background-color: #1b1b1b;
+    border: 1px solid #393a3b;
+    border-radius: 3px;
+}
+
+.statistics-visible-column-option label {
+    min-width: 0;
+    margin: 0;
+
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    cursor: pointer;
+}
+
+.statistics-visible-column-option input {
+    flex: 0 0 auto;
+    margin: 0;
+}
+
+.statistics-visible-column-name {
+    min-width: 0;
+
+    overflow: hidden;
+
+    color: #e4e6eb;
+    font-size: 11px;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+/* IDENTIFICA VISUALMENTE COLUNAS VAZIAS */
+
+.statistics-visible-column-option.is-empty
+.statistics-visible-column-name {
+    color: #8b8d91;
+}
+
+
+/* RESPONSIVIDADE */
+
+@media (max-width: 900px) {
+
+    .preview-header {
+        flex-direction: column;
+    }
+
+    #statisticsPreviewSummary {
+        padding-top: 0;
+    }
+
+    #statisticsVisibleColumnSelector {
+        max-width: none;
+    }
+
+    #statisticsVisibleColumns {
+        grid-template-columns: repeat(
+            auto-fit,
+            minmax(150px, 1fr)
+        );
+    }
+}
+
                     .statistics-summary-table {
                         width: 100%;
                     }
@@ -692,9 +907,38 @@
 
                         <div class="tabs-panel is-active" id="statistics-1">
                             <section id="statisticsLocalPreview" hidden>
+
                                 <div class="preview-header flex-box-between">
+
+                                    <!-- CONTAGEM DE LINHAS ENCONTRADAS -->
+
                                     <span id="statisticsPreviewSummary"></span>
+
+                                    <!-- BOTÕES DE OCULTAR E REVELAR COLUNAS -->
+
+                                    <div id="statisticsVisibleColumnSelector">
+                                        <div class="statistics-visible-columns-header">
+
+                                            <div class="statistics-visible-columns-title">
+                                                <h4>Colunas visíveis</h4>
+
+                                                <span id="statisticsVisibleColumnCount">
+                                                    0 de 0
+                                                </span>
+                                            </div>
+
+                                            <div class="statistics-visible-columns-actions">
+                                                <button id="statisticsShowAllColumns" class="statistics-visible-columns-action" type="button">Marcar todas</button>
+                                                <button id="statisticsHideAllColumns" class="statistics-visible-columns-action" type="button">Desmarcar todas</button>
+                                                <button id="statisticsHideEmptyColumns" class="statistics-visible-columns-action" type="button">Ocultar vazias</button>
+                                            </div>
+                                        </div>
+
+                                        <div id="statisticsVisibleColumns"></div>
+                                    </div>
                                 </div>
+
+                                <!-- TABELA GERADA DE ACORDO COM A PLANILHA -->
 
                                 <div class="statistics-table-container">
                                     <table id="statisticsLocalTable" class="statistics-local-table">
