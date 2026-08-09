@@ -23,465 +23,413 @@
 
         <style>
 
-            /* AVISOS */
-
-            .warning {
-                width: 100%;
-                background-color: #1f1f1f;
-                border: 2px solid #525252;
-                position: relative;
-                margin: 0 0 30px 0;
-                padding: 20px;
-                border-radius: 5px;
-                align-items: center;
-            }
-            .warning .flex-box-start {
-                max-width: max-content !important;
-                align-items: center;
-            }
-            .warning .flex-box-start img {
-                width: 25px;
-                margin-right: 15px;
-            }
-            .warning .flex-box-start h4 {
-                margin-bottom: 0;
-                color: #e4e6eb;
-            }
-
             /* PAINEL ESTATÍSTICAS */
 
-            .main-structure #statistics {
-                width: 1200px;
-                height: auto;
-                margin: 0 auto;
-            }
-            .main-structure #statistics .function {
-                max-width: 100%;
-                background-color: #1f1f1f;
-                border: 2px solid #525252;
-                border-radius: 5px;
-                margin-top: 30px;
-            }
-            .main-structure #statistics .function .import-panel {
-                width: 100%;
-                text-align: center;
-                padding: 30px;
-            }
-            .main-structure #statistics .function .import-panel button, .main-structure #statistics .function .import-panel label {
-                min-height: 40px;
-                font-size: 14px;
-                padding: 10px 15px;
-            }
-            .main-structure #statistics .function .import-panel div {
-                width: max-content;
-                margin: 20px auto;
-                gap: 10px;
-                align-items: center;
-            }
-            .main-structure #statistics .function .import-panel p {
-                font-size: 13px;
-                text-align: center;
-                margin-bottom: 0;
-            }
-            .main-structure #statistics .function .local-preview {
-                width: 100%;
-                margin: 0 auto;
-                min-height: 0;
-                padding: 14px 18px 18px;
-                color: #e4e6eb;
-                border-top: 2px solid #525252;
-            }
-            .main-structure #statistics .function .local-preview[hidden] {
-                display: none;
-            }
-            .main-structure #statistics .function .preview-header {
-                min-height: 32px;
-                gap: 15px;
-                align-items: center;
-            }
-            .main-structure #statistics .function .preview-header h4, .main-structure #statistics .function .preview-header span {
-                font-size: 13px;
-            }
-            .main-structure #statistics .function .preview-header span {
-                color: #b9bcc1;
-            }
+                .main-structure #statistics section {
+                    padding: 25px;
+                    background-color: #1f1f1f;
+                    border: 2px solid #525252;
+                    border-radius: 5px;
+                }
 
+                /* PAINEL ESTATÍSTICAS */
 
+                .import-panel {
+                    width: 100%;
+                    text-align: center;
+                }
+                .import-panel button, .import-panel label {
+                    min-height: 40px;
+                    font-size: 14px;
+                    padding: 10px 15px;
+                }
+                .import-panel div {
+                    width: max-content;
+                    margin: 20px auto;
+                    gap: 10px;
+                    align-items: center;
+                }
+                .import-panel p {
+                    font-size: 13px;
+                    text-align: center;
+                    margin-bottom: 0;
+                }
 
-            .statistics-table-container {
-                height: calc(100% - 32px);
-                overflow: auto;
-                border: 1px solid #525252;
-            }
-            .statistics-local-table {
-                min-width: 650px;
-                color: #e4e6eb;
-                background-color: #141414;
-            }
-            .statistics-local-table thead {
-                position: sticky;
-                top: 0;
-                z-index: 1;
-                background-color: #2e2e2e;
-            }
-            .statistics-local-table thead th,
-            .statistics-local-table tbody td {
-                padding: 9px 12px;
-                border-right: 1px solid #393a3b;
-                font-size: 13px;
-                text-align: left;
-            }
-            .statistics-sort-button {
-                width: 100%;
-                padding: 0;
-                color: #e4e6eb;
-                background: transparent;
-                border: none;
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                gap: 10px;
-                font: inherit;
-                text-align: left;
-                cursor: pointer;
-            }
-            .statistics-sort-button:hover,
-            .statistics-sort-button:focus-visible {
-                color: #ffffff;
-            }
-            .statistics-sort-indicator {
-                flex: 0 0 auto;
-                color: #b9bcc1;
-                font-size: 15px;
-            }
-            .statistics-filter-row th {
-                padding: 7px 8px !important;
-                background-color: #242424;
-            }
-            .statistics-column-filter {
-                width: 100%;
-                height: 34px;
-                margin: 0;
-                padding: 6px 9px;
-                color: #e4e6eb;
-                background-color: #141414;
-                border: 1px solid #525252;
-                border-radius: 3px;
-                box-shadow: none;
-                font-size: 12px;
-            }
-            .statistics-column-filter:focus {
-                border-color: #8b8d91;
-                background-color: #141414;
-                box-shadow: none;
-            }
-            .statistics-column-filter::placeholder {
-                color: #8b8d91;
-            }
-            .statistics-empty-row td {
-                padding: 18px 12px !important;
-                color: #b9bcc1;
-                text-align: center !important;
-            }
-            /* ANÁLISE RÁPIDA */
+                /* ANÁLISE RÁPIDA */
 
-.statistics-quick-analysis {
-    padding: 18px;
-    color: #e4e6eb;
-    border-top: 2px solid #525252;
-}
+                    #statistics-quick-analysis[hidden] {
+                        display: none;
+                    }
+                    
+                    /* HEADER DA ANÁLISE */
 
-.statistics-quick-analysis[hidden] {
-    display: none;
-}
+                    #statisticsAnalysisColumnSelector {
+                        margin-bottom: 15px;
+                        padding: 16px;
+                        background-color: #141414;
+                        border: 1px solid #525252;
+                        border-radius: 5px;
+                    }
+                    #statisticsAnalysisColumnSelector .flex-box-between {
+                        margin-bottom: 14px;
+                        gap: 15px;
+                        align-items: center;
+                    }
+                    #statisticsAnalysisColumnSelector .flex-box-between h4 {
+                        margin: 0 0 4px;
+                        font-size: 14px;
+                    }
+                    #statisticsAnalysisColumnSelector .flex-box-between p {
+                        margin: 0;
+                        color: #b9bcc1;
+                        font-size: 12px;
+                    }
 
-.statistics-analysis-selector {
-    margin-bottom: 15px;
-    padding: 16px;
-    background-color: #141414;
-    border: 1px solid #525252;
-    border-radius: 5px;
-}
+                    /* BOTÕES DA ANÁLISE */
 
-.statistics-analysis-selector-header {
-    margin-bottom: 14px;
-    gap: 15px;
-    align-items: center;
-}
+                    .statistics-column-actions {
+                        display: flex;
+                        flex: 0 0 auto;
+                        gap: 8px;
+                    }
+                    .statistics-analysis-action {
+                        min-height: 40px;
+                        margin: 0;
+                        padding: 10px 15px;
+                        color: #e4e6eb;
+                        background-color: #242424;
+                        border: 2px solid #525252;
+                        border-radius: 3px;
+                        font-size: 13px;
+                        cursor: pointer;
+                        letter-spacing: 1px;
+                        outline: none;
+                        line-height: 1;
+                        position: relative;
+                        text-align: center;
+                        font-family: 'Open Sans', sans-serif;
+                        font-weight: 600;
+                        user-select: none;
+                    }
+                    .statistics-analysis-action:hover,
+                    .statistics-analysis-action:focus-visible {
+                        color: #ffffff;
+                        background-color: #2e2e2e;
+                    }
 
-.statistics-analysis-selector-header h4 {
-    margin: 0 0 4px;
-    font-size: 14px;
-}
+                    /* CHECKBOXS DA ANÁLISE */
 
-.statistics-analysis-selector-header p {
-    margin: 0;
-    color: #b9bcc1;
-    font-size: 12px;
-}
+                    #statisticsAnalysisColumnSelector #statisticsAnalysisColumns {
+                        display: grid;
+                        grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+                        gap: 8px;
+                        overflow: auto;
+                        max-height: 124px;
+                        padding: 0 10px;
+                    }
+                    #statisticsAnalysisColumnSelector #statisticsAnalysisColumns:-webkit-scrollbar-track {
+                        background-color: transparent;
+                    }
+                    #statisticsAnalysisColumnSelector #statisticsAnalysisColumns::-webkit-scrollbar {
+                        width: 5px;
+                        background: transparent;
+                    }
+                    #statisticsAnalysisColumnSelector #statisticsAnalysisColumns::-webkit-scrollbar-thumb {
+                        border-radius: 5px;
+                        background: #525252;
+                    }
 
-.statistics-column-actions {
-    display: flex;
-    flex: 0 0 auto;
-    gap: 8px;
-}
+                    #statisticsAnalysisColumnSelector #statisticsAnalysisColumns .statistics-column-option {
+                        min-width: 0;
+                        padding: 9px 10px;
+                        background-color: #1b1b1b;
+                        border: 1px solid #393a3b;
+                        border-radius: 3px;
+                    }
+                    #statisticsAnalysisColumnSelector #statisticsAnalysisColumns .statistics-column-option label {
+                        display: flex;
+                        align-items: center;
+                        gap: 9px;
+                        cursor: pointer;
+                    }
+                    #statisticsAnalysisColumnSelector #statisticsAnalysisColumns .statistics-column-option input {
+                        flex: 0 0 auto;
+                        margin: 0;
+                    }
+                    #statisticsAnalysisColumnSelector #statisticsAnalysisColumns .statistics-column-option .statistics-column-name {
+                        min-width: 0;
+                        overflow: hidden;
+                        color: #e4e6eb;
+                        font-size: 12px;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                    }
+                    #statisticsAnalysisColumnSelector #statisticsAnalysisColumns .statistics-column-option .statistics-column-type {
+                        flex: 0 0 auto;
+                        margin-left: auto;
+                        padding: 2px 6px;
+                        color: #b9bcc1;
+                        background-color: #2e2e2e;
+                        border-radius: 3px;
+                        font-size: 10px;
+                        letter-spacing: 0.4px;
+                    }
 
-.statistics-analysis-action {
-    min-height: 40px;
-    margin: 0;
-    padding: 10px 15px;
-    color: #e4e6eb;
-    background-color: #242424;
-    border: 2px solid #525252;
-    border-radius: 3px;
-    font-size: 13px;
-    cursor: pointer;
-    letter-spacing: 1px;
-    outline: none;
-    line-height: 1;
-    position: relative;
-    text-align: center;
-    font-family: 'Open Sans', sans-serif;
-    font-weight: 600;
-    user-select: none;
-}
-.statistics-analysis-action:hover,
-.statistics-analysis-action:focus-visible {
-    color: #ffffff;
-    background-color: #2e2e2e;
-}
+                    /* SUMARIO DA ANÁLISE */
 
-.statistics-column-options {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-    gap: 8px;
-    overflow: auto;
-    max-height: 124px;
-    padding: 0 10px;
-}
+                    .statistics-summary-cards {
+                        display: grid;
+                        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+                        gap: 15px;
+                    }
+                    .statistics-summary-card {
+                        text-align: center;
+                        padding: 20px 15px;
+                        background-color: #141414;
+                        border: 1px solid #525252;
+                        border-radius: 5px;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                        gap: 10px;
+                        align-items: center;
+                    }
+                    .statistics-summary-card span {
+                        color: #b9bcc1;
+                        font-size: 12px;
+                        letter-spacing: 1px;
+                    }
+                    .statistics-summary-card strong {
+                        color: #ffffff;
+                        font-size: 28px;
+                        line-height: 1;
+                    }
+                    .statistics-summary-tables {
+                        margin-top: 15px;
+                        display: grid;
+                        gap: 15px;
+                        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                    }
+                    .statistics-summary-block {
+                        min-width: 0;
+                        background-color: #141414;
+                        border: 1px solid #525252;
+                        border-radius: 5px;
+                        overflow: hidden;
+                    }
 
-.statistics-column-options:-webkit-scrollbar-track {
-    background-color: transparent;
-}
-.statistics-column-options::-webkit-scrollbar {
-    width: 5px;
-    background: transparent;
-}
-.statistics-column-options::-webkit-scrollbar-thumb {
-    border-radius: 5px;
-    background: #525252;
-}
+                    .statistics-summary-block h4 {
+                        margin: 0;
+                        padding: 12px 14px;
+                        font-size: 13px;
+                        border-bottom: 1px solid #525252;
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+                    }
 
+                    /* TABELA GERADA  */
 
-.statistics-column-option {
-    min-width: 0;
-    padding: 9px 10px;
-    background-color: #1b1b1b;
-    border: 1px solid #393a3b;
-    border-radius: 3px;
-}
+                    .local-preview {
+                        width: 100%;
+                        margin: 0 auto;
+                        min-height: 0;
+                    }
+                    .local-preview[hidden] {
+                        display: none;
+                    }
+                    .preview-header {
+                        min-height: 32px;
+                        gap: 15px;
+                        align-items: center;
+                    }
+                    .preview-header h4, .preview-header span {
+                        font-size: 13px;
+                    }
+                    .preview-header span {
+                        color: #b9bcc1;
+                    }
+                    .statistics-summary-table {
+                        width: 100%;
+                    }
+                    .statistics-summary-table thead {
+                        background-color: #2e2e2e;
+                    }
+                    .statistics-summary-table thead th,
+                    .statistics-summary-table tbody td {
+                        padding: 8px 12px;
+                        font-size: 12px;
+                        text-align: left;
+                    }
+                    .statistics-summary-table thead th:last-child,
+                    .statistics-summary-table tbody td:last-child {
+                        width: 90px;
+                        text-align: right;
+                    }
+                    .statistics-summary-table tbody tr {
+                        border-top: 1px solid #393a3b;
+                    }
+                    .statistics-summary-empty {
+                        color: #b9bcc1;
+                        text-align: center !important;
+                    }
+                    .statistics-table-container {
+                        height: calc(100% - 32px);
+                        overflow: auto;
+                        border: 1px solid #525252;
+                    }
+                    .statistics-local-table {
+                        min-width: 650px;
+                        color: #e4e6eb;
+                        background-color: #141414;
+                    }
+                    .statistics-local-table thead {
+                        position: sticky;
+                        top: 0;
+                        z-index: 1;
+                        background-color: #2e2e2e;
+                    }
+                    .statistics-local-table thead th,
+                    .statistics-local-table tbody td {
+                        padding: 9px 12px;
+                        border-right: 1px solid #393a3b;
+                        font-size: 13px;
+                        text-align: left;
+                    }
+                    .statistics-local-table thead th:last-child,
+                    .statistics-local-table tbody td:last-child {
+                        border-right: none;
+                    }
+                    .statistics-local-table tbody tr {
+                        border-top: 1px solid #393a3b;
+                    }
+                    .statistics-local-table tbody tr:nth-child(even) {
+                        background-color: #1b1b1b;
+                    }
+                    .statistics-sort-button {
+                        width: 100%;
+                        padding: 0;
+                        color: #e4e6eb;
+                        background: transparent;
+                        border: none;
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        gap: 10px;
+                        font: inherit;
+                        text-align: left;
+                        cursor: pointer;
+                    }
+                    .statistics-sort-button:hover,
+                    .statistics-sort-button:focus-visible {
+                        color: #ffffff;
+                    }
+                    .statistics-sort-indicator {
+                        flex: 0 0 auto;
+                        color: #b9bcc1;
+                        font-size: 15px;
+                    }
+                    .statistics-filter-row th {
+                        padding: 7px 8px !important;
+                        background-color: #242424;
+                    }
+                    .statistics-column-filter {
+                        width: 100%;
+                        height: 34px;
+                        margin: 0;
+                        padding: 6px 9px;
+                        color: #e4e6eb;
+                        background-color: #141414;
+                        border: 1px solid #525252;
+                        border-radius: 3px;
+                        box-shadow: none;
+                        font-size: 12px;
+                    }
+                    .statistics-column-filter:focus {
+                        border-color: #8b8d91;
+                        background-color: #141414;
+                        box-shadow: none;
+                    }
+                    .statistics-column-filter::placeholder {
+                        color: #8b8d91;
+                    }
+                    .statistics-empty-row td {
+                        padding: 18px 12px !important;
+                        color: #b9bcc1;
+                        text-align: center !important;
+                    }
 
-.statistics-column-option label {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    cursor: pointer;
-}
+                    /* ? */
 
-.statistics-column-option input {
-    flex: 0 0 auto;
-    margin: 0;
-}
+                    .statistics-analysis-metrics {
+                        padding: 12px;
+                        display: grid;
+                        grid-template-columns: repeat(2, minmax(0, 1fr));
+                        gap: 8px;
+                    }
+                    .statistics-analysis-metric {
+                        min-width: 0;
+                        padding: 10px;
+                        background-color: #1b1b1b;
+                        border: 1px solid #393a3b;
+                        border-radius: 3px;
+                    }
+                    .statistics-analysis-metric span,
+                    .statistics-analysis-metric strong {
+                        display: block;
+                    }
+                    .statistics-analysis-metric span {
+                        margin-bottom: 5px;
+                        color: #b9bcc1;
+                        font-size: 10px;
+                        letter-spacing: 0.6px;
+                        text-transform: uppercase;
+                    }
+                    .statistics-analysis-metric strong {
+                        overflow: hidden;
+                        color: #ffffff;
+                        font-size: 15px;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                    }
 
-.statistics-column-name {
-    min-width: 0;
-    overflow: hidden;
-    color: #e4e6eb;
-    font-size: 12px;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
+                    /* ? */
 
-.statistics-column-type {
-    flex: 0 0 auto;
-    margin-left: auto;
-    padding: 2px 6px;
-    color: #b9bcc1;
-    background-color: #2e2e2e;
-    border-radius: 3px;
-    font-size: 10px;
-    letter-spacing: 0.4px;
-}
+                    .statistics-analysis-type {
+                        margin-left: auto;
+                    }
+                    .statistics-analysis-empty {
+                        margin: 15px 0 0;
+                        padding: 18px;
+                        color: #b9bcc1;
+                        background-color: #141414;
+                        border: 1px solid #525252;
+                        border-radius: 5px;
+                        font-size: 12px;
+                        text-align: center;
+                    }
+                    .statistics-analysis-empty[hidden] {
+                        display: none;
+                    }
+                    .statistics-analysis-note {
+                        margin: 0;
+                        padding: 9px 12px;
+                        color: #b9bcc1;
+                        border-top: 1px solid #393a3b;
+                        font-size: 10px;
+                        text-align: right;
+                    }
 
-.statistics-summary-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 15px;
-}
+                /* PARTE DO IFRAME, POR HORA NÃO PRESENTE NO HTML */
 
-.statistics-summary-card {
-    text-align: center;
-    padding: 25px 15px;
-    background-color: #141414;
-    border: 1px solid #525252;
-    border-radius: 5px;
-    display: flex;
-    flex-direction: row-reverse;
-    justify-content: center;
-    gap: 10px;
-    align-items: center;
-}
-
-.statistics-summary-card span {
-    color: #b9bcc1;
-    font-size: 12px;
-    letter-spacing: 1px;
-}
-
-.statistics-summary-card strong {
-    color: #ffffff;
-    font-size: 28px;
-    line-height: 1;
-}
-
-.statistics-summary-tables {
-    margin-top: 15px;
-    display: grid;
-    gap: 15px;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-}
-
-.statistics-summary-block {
-    min-width: 0;
-    background-color: #141414;
-    border: 1px solid #525252;
-    border-radius: 5px;
-    overflow: hidden;
-}
-
-.statistics-summary-block h4 {
-    margin: 0;
-    padding: 12px 14px;
-    font-size: 13px;
-    border-bottom: 1px solid #525252;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.statistics-analysis-type {
-    margin-left: auto;
-}
-
-.statistics-analysis-metrics {
-    padding: 12px;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-}
-
-.statistics-analysis-metric {
-    min-width: 0;
-    padding: 10px;
-    background-color: #1b1b1b;
-    border: 1px solid #393a3b;
-    border-radius: 3px;
-}
-
-.statistics-analysis-metric span,
-.statistics-analysis-metric strong {
-    display: block;
-}
-
-.statistics-analysis-metric span {
-    margin-bottom: 5px;
-    color: #b9bcc1;
-    font-size: 10px;
-    letter-spacing: 0.6px;
-    text-transform: uppercase;
-}
-
-.statistics-analysis-metric strong {
-    overflow: hidden;
-    color: #ffffff;
-    font-size: 15px;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.statistics-analysis-empty {
-    margin: 15px 0 0;
-    padding: 18px;
-    color: #b9bcc1;
-    background-color: #141414;
-    border: 1px solid #525252;
-    border-radius: 5px;
-    font-size: 12px;
-    text-align: center;
-}
-
-.statistics-analysis-empty[hidden] {
-    display: none;
-}
-
-.statistics-analysis-note {
-    margin: 0;
-    padding: 9px 12px;
-    color: #b9bcc1;
-    border-top: 1px solid #393a3b;
-    font-size: 10px;
-    text-align: right;
-}
-
-.statistics-summary-table {
-    width: 100%;
-}
-
-.statistics-summary-table thead {
-    background-color: #2e2e2e;
-}
-
-.statistics-summary-table thead th,
-.statistics-summary-table tbody td {
-    padding: 8px 12px;
-    font-size: 12px;
-    text-align: left;
-}
-
-.statistics-summary-table thead th:last-child,
-.statistics-summary-table tbody td:last-child {
-    width: 90px;
-    text-align: right;
-}
-
-.statistics-summary-table tbody tr {
-    border-top: 1px solid #393a3b;
-}
-
-.statistics-summary-empty {
-    color: #b9bcc1;
-    text-align: center !important;
-}
-/*  */
-
-            .statistics-local-table thead th:last-child,
-            .statistics-local-table tbody td:last-child {
-                border-right: none;
-            }
-            .statistics-local-table tbody tr {
-                border-top: 1px solid #393a3b;
-            }
-            .statistics-local-table tbody tr:nth-child(even) {
-                background-color: #1b1b1b;
-            }
-            .statistics-spreadsheet-container {
-                flex: 1 1 auto;
-                min-height: 0;
-                background-color: #ffffff;
-            }
-            .statistics-spreadsheet-container iframe {
-                display: block;
-            }
+                .statistics-spreadsheet-container {
+                    flex: 1 1 auto;
+                    min-height: 0;
+                    background-color: #ffffff;
+                }
+                .statistics-spreadsheet-container iframe {
+                    display: block;
+                }
 
         </style>
     </head>	
@@ -579,7 +527,7 @@
                             <a href="#statistics-1">
                                 <div class="flex-box-center">
                                     <img src="images/geral-icons/statistics-icon.svg">
-                                    <h4>Geração de Tabela</h4>
+                                    <h4>Análise de Planilhas</h4>
                                 </div>
                             </a>
                         </li> 
@@ -617,84 +565,26 @@
                     <div class="tabs-content" data-tabs-content="statistics-tabs">
                         <div class="tabs-panel is-active" id="statistics-1">
 
-                            <div class="function">
+                            <!-- IMPORTAÇÃO LOCAL -->
 
-                                <!-- IMPORTAÇÃO LOCAL -->
+                            <section class="import-panel">
 
-                                <section class="import-panel">
+                                <h3>Importe a Planilha</h3>
 
-                                    <h3>Importar Planilha</h3>
+                                <div class="flex-box-start">
+                                    <label class="button statistics-file-button" for="statisticsFileInput">Selecionar arquivo</label>
+                                    
+                                    <input id="statisticsFileInput" type="file" accept=".xlsx,.xls,.csv" style="display: none;">
+                                    <button id="statisticsClearFile" class="button" disabled>Apagar Resultados</button>
+                                </div>
 
-                                    <div class="flex-box-start">
-                                        <label class="button statistics-file-button" for="statisticsFileInput">Selecionar arquivo</label>
-                                        
-                                        <input id="statisticsFileInput" type="file" accept=".xlsx,.xls,.csv" style="display: none;">
-                                        <button id="statisticsClearFile" class="button" disabled>Limpar</button>
-                                    </div>
+                                <p id="statisticsFileStatus">Nenhum arquivo selecionado.</p>
 
-                                    <p id="statisticsFileStatus">Nenhum arquivo selecionado.</p>
+                            </section>
 
-                                </section>
+                            <div class="flex-box-start" style="column-gap: 15px;">
 
-
-                                <!-- ANÁLISE RÁPIDA -->
-
-                                <section id="statisticsQuickAnalysis" class="statistics-quick-analysis" hidden>
-
-                                    <div id="statisticsAnalysisColumnSelector" class="statistics-analysis-selector">
-
-                                        <div class="statistics-analysis-selector-header flex-box-between">
-
-                                            <div>
-                                                <h4>Colunas para análise</h4>
-                                                <p>Escolha quais informações do arquivo devem ser analisadas.</p>
-                                            </div>
-
-                                            <div class="statistics-column-actions">
-                                                <button id="statisticsSelectAllColumns" class="statistics-analysis-action" type="button">Analisar Tudo</button>
-
-                                                <button id="statisticsClearColumns" class="statistics-analysis-action" type="button">Limpar seleção</button>
-                                            </div>
-
-                                        </div>
-
-                                        <div
-                                            id="statisticsAnalysisColumns"
-                                            class="statistics-column-options"
-                                        ></div>
-
-                                    </div>
-
-                                    <div class="statistics-summary-cards">
-
-                                        <div class="statistics-summary-card">
-                                            <span>Registros</span>
-                                            <strong id="statisticsTotalRecords">0</strong>
-                                        </div>
-
-                                        <div
-                                            id="statisticsAnalysisCards"
-                                            style="display: contents;"
-                                        ></div>
-
-                                    </div>
-
-                                    <p
-                                        id="statisticsAnalysisEmpty"
-                                        class="statistics-analysis-empty"
-                                    >
-                                        Selecione ao menos uma coluna para visualizar a análise.
-                                    </p>
-
-                                    <div
-                                        id="statisticsAnalysisResults"
-                                        class="statistics-summary-tables"
-                                    ></div>
-
-                                </section>
-
-
-                                <!-- PRÉVIA DOS DADOS IMPORTADOS -->
+                                <!-- TABELA GERADA DE ACORDO COM A PLANILHA -->
 
                                 <section id="statisticsLocalPreview" class="local-preview" hidden>
                                     <div class="preview-header flex-box-between">
@@ -709,8 +599,43 @@
                                         </table>
                                     </div>
                                 </section>
-                            </div>
 
+                                <!-- ANÁLISE RÁPIDA DA TABELA -->
+
+                                <section id="statisticsQuickAnalysis" hidden>
+                                    <div id="statisticsAnalysisColumnSelector">
+
+                                        <div class="flex-box-between">
+
+                                            <div>
+                                                <h4>Colunas para análise</h4>
+                                                <p>Escolha quais informações do arquivo devem ser analisadas.</p>
+                                            </div>
+
+                                            <div class="statistics-column-actions">
+                                                <button id="statisticsSelectAllColumns" class="statistics-analysis-action" type="button">Analisar Tudo</button>
+
+                                                <button id="statisticsClearColumns" class="statistics-analysis-action" type="button">Limpar seleção</button>
+                                            </div>
+
+                                        </div>
+
+                                        <div id="statisticsAnalysisColumns" class="statistics-column-options"></div>
+                                    </div>
+
+                                    <div class="statistics-summary-cards">
+                                        <div class="statistics-summary-card">
+                                            <span>Total de Registros</span>
+                                            <strong id="statisticsTotalRecords">0</strong>
+                                        </div>
+
+                                        <div id="statisticsAnalysisCards" style="display: contents;"></div>
+                                    </div>
+
+                                    <div id="statisticsAnalysisResults" class="statistics-summary-tables"></div>
+                                </section>
+
+                            </div>
                         </div>
 
                         <div class="tabs-panel" id="statistics-2"></div>
