@@ -59,6 +59,9 @@ const tableState = {
 
     columnProfiles: [],
 
+    analysisModes:
+    new Map(),
+
     selectedAnalysisColumns: new Set(),
 
     filters: [],
@@ -641,7 +644,6 @@ function parseDateValue(
     return parsedDate;
 }
 
-
 /* RETORNA O NOME VISÍVEL DO TIPO */
 
 function getColumnTypeLabel(
@@ -666,6 +668,47 @@ function getColumnTypeLabel(
         "Texto";
 }
 
+/* RETORNA OS MODOS COMPATÍVEIS COM A COLUNA */
+
+function getAvailableAnalysisModes(
+    detectedType
+) {
+
+    const modesByType = {
+
+        category: [
+            "category",
+            "identifier"
+        ],
+
+        identifier: [
+            "identifier",
+            "category"
+        ],
+
+        number: [
+            "number",
+            "category",
+            "identifier"
+        ],
+
+        datetime: [
+            "datetime",
+            "category"
+        ],
+
+        empty: [
+            "empty"
+        ]
+    };
+
+
+    return modesByType[
+        detectedType
+    ] ?? [
+        "category"
+    ];
+}
 
 /* DETECTA O TIPO DE UMA COLUNA */
 
@@ -1152,6 +1195,7 @@ function appendFrequencyAnalysis(
 
 
 /* MONTA OS CHECKBOXES DAS COLUNAS */
+/* MONTA OS CHECKBOXES E MODOS DAS COLUNAS */
 
 function renderAnalysisColumnSelector() {
 
@@ -1165,36 +1209,36 @@ function renderAnalysisColumnSelector() {
     tableState.headers.forEach(
         function (
             header,
-            columnIndex,
+            columnIndex
         ) {
 
             const option =
                 document.createElement(
-                    "div",
+                    "div"
                 );
 
 
             const label =
                 document.createElement(
-                    "label",
+                    "label"
                 );
 
 
             const checkbox =
                 document.createElement(
-                    "input",
+                    "input"
                 );
 
 
             const columnName =
                 document.createElement(
-                    "span",
+                    "span"
                 );
 
 
-            const columnType =
+            const columnModes =
                 document.createElement(
-                    "span",
+                    "div"
                 );
 
 
@@ -1204,8 +1248,20 @@ function renderAnalysisColumnSelector() {
                 ];
 
 
+            const availableModes =
+                getAvailableAnalysisModes(
+                    profile.type
+                );
+
+
+            const selectedMode =
+                tableState.analysisModes.get(
+                    columnIndex
+                ) ?? profile.type;
+
+
             option.classList.add(
-                "statistics-column-option",
+                "statistics-column-option"
             );
 
 
@@ -1217,13 +1273,13 @@ function renderAnalysisColumnSelector() {
                 tableState
                     .selectedAnalysisColumns
                     .has(
-                        columnIndex,
+                        columnIndex
                     );
 
 
             checkbox.setAttribute(
                 "aria-label",
-                `Analisar coluna ${header}`,
+                `Analisar coluna ${header}`
             );
 
 
@@ -1238,7 +1294,7 @@ function renderAnalysisColumnSelector() {
                         tableState
                             .selectedAnalysisColumns
                             .add(
-                                columnIndex,
+                                columnIndex
                             );
 
                     }
@@ -1247,20 +1303,20 @@ function renderAnalysisColumnSelector() {
                         tableState
                             .selectedAnalysisColumns
                             .delete(
-                                columnIndex,
+                                columnIndex
                             );
                     }
 
 
                     renderQuickAnalysis(
-                        getFilteredRows(),
+                        getFilteredRows()
                     );
-                },
+                }
             );
 
 
             columnName.classList.add(
-                "statistics-column-name",
+                "statistics-column-name"
             );
 
 
@@ -1272,38 +1328,113 @@ function renderAnalysisColumnSelector() {
                 header;
 
 
-            columnType.classList.add(
-                "statistics-column-type",
+            columnModes.classList.add(
+                "statistics-column-modes"
             );
-
-
-            columnType.textContent =
-                getColumnTypeLabel(
-                    profile.type,
-                );
 
 
             label.append(
                 checkbox,
-                columnName,
-                columnType,
+                columnName
             );
 
 
-            option.appendChild(
+            availableModes.forEach(
+                function (
+                    mode
+                ) {
+
+                    const modeButton =
+                        document.createElement(
+                            "button"
+                        );
+
+
+                    const isActive =
+                        selectedMode === mode;
+
+
+                    modeButton.type =
+                        "button";
+
+
+                    modeButton.classList.add(
+                        "statistics-analysis-mode-button"
+                    );
+
+
+                    modeButton.classList.toggle(
+                        "is-active",
+                        isActive
+                    );
+
+
+                    modeButton.textContent =
+                        getColumnTypeLabel(
+                            mode
+                        );
+
+
+                    modeButton.setAttribute(
+                        "aria-pressed",
+                        String(
+                            isActive
+                        )
+                    );
+
+
+                    modeButton.setAttribute(
+                        "aria-label",
+                        `Analisar ${header} como ${getColumnTypeLabel(mode)}`
+                    );
+
+
+                    modeButton.disabled =
+                        mode === "empty";
+
+
+                    modeButton.addEventListener(
+                        "click",
+                        function () {
+
+                            tableState.analysisModes.set(
+                                columnIndex,
+                                mode
+                            );
+
+
+                            renderAnalysisColumnSelector();
+
+
+                            renderQuickAnalysis(
+                                getFilteredRows()
+                            );
+                        }
+                    );
+
+
+                    columnModes.appendChild(
+                        modeButton
+                    );
+                }
+            );
+
+
+            option.append(
                 label,
+                columnModes
             );
 
 
             fragment.appendChild(
-                option,
+                option
             );
-        },
+        }
     );
 
 
     analysisColumns.appendChild(
-        fragment,
+        fragment
     );
 
 
@@ -1318,7 +1449,6 @@ function renderAnalysisColumnSelector() {
     clearColumnsButton.disabled =
         !hasColumns;
 }
-
 
 /* ANALISA UMA COLUNA SELECIONADA */
 
@@ -1338,6 +1468,10 @@ function renderSelectedColumnAnalysis(
             columnIndex
         ];
 
+    const analysisMode =
+    tableState.analysisModes.get(
+        columnIndex
+    ) ?? profile.type;
 
     const filledValues =
         rows
@@ -1375,7 +1509,7 @@ function renderSelectedColumnAnalysis(
 
 
     if (
-        profile.type === "number"
+        analysisMode === "number"
     ) {
 
         const numericValues =
@@ -1518,7 +1652,7 @@ function renderSelectedColumnAnalysis(
 
     }
     else if (
-        profile.type === "datetime"
+        analysisMode === "datetime"
     ) {
 
         const dateValues =
@@ -1625,8 +1759,8 @@ function renderSelectedColumnAnalysis(
 
     }
     else if (
-        profile.type === "category" ||
-        profile.type === "identifier"
+        analysisMode === "category" ||
+        analysisMode === "identifier"
     ) {
 
         const frequencyData =
@@ -1653,7 +1787,7 @@ function renderSelectedColumnAnalysis(
 
 
         if (
-            profile.type === "identifier"
+            analysisMode === "identifier"
         ) {
 
             appendAnalysisMetrics(
@@ -2431,6 +2565,22 @@ function renderTable(
         );
 
 
+    tableState.analysisModes =
+    new Map(
+        tableState.columnProfiles.map(
+            function (
+                profile,
+                columnIndex
+            ) {
+
+                return [
+                    columnIndex,
+                    profile.type
+                ];
+            }
+        )
+    );
+
     tableState
         .selectedAnalysisColumns
         .clear();
@@ -2483,6 +2633,7 @@ function resetTableState() {
     tableState.columnProfiles =
         [];
 
+    tableState.analysisModes.clear();
 
     tableState
         .selectedAnalysisColumns
