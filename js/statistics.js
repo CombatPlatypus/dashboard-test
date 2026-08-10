@@ -476,10 +476,56 @@ function detectColumnProfile(columnIndex) {
         tableState.headers[columnIndex],
     ).trim();
 
+    /* VERIFICA SE O NOME INDICA UM IDENTIFICADOR */
+
     const identifierHeader =
-        /^(id|codigo|code|pacotes?|packages?|pedidos?|orders?|at\/to|serial(?: number)?|tracking(?: number)?|uuid|chave|key|referencia|reference)$/.test(
+        /(^|[\s_-])(id|codigo|code|uuid|chave|key|referencia|reference|pacotes?|packages?|pedidos?|orders?)([\s_-]|$)/.test(
             headerValue,
-        ) || /(^|[\s_-])(id|codigo|code)$/.test(headerValue);
+        ) ||
+
+        /(^|[\s_-])(tracking|serial)(?:[\s_-]+number)?([\s_-]|$)/.test(
+            headerValue,
+        ) ||
+
+        headerValue === "at/to";
+
+    /* VERIFICA SE OS VALORES PARECEM CÓDIGOS */
+
+    const identifierLikeValues =
+        filledValues.filter(
+            function (value) {
+
+                const textValue =
+                    formatCellValue(
+                        value,
+                    ).trim();
+
+
+                return (
+                    textValue.length >= 6 &&
+                    !/\s/.test(
+                        textValue,
+                    ) &&
+                    /[a-z]/i.test(
+                        textValue,
+                    ) &&
+                    /\d/.test(
+                        textValue,
+                    )
+                );
+            },
+        );
+
+
+    const identifierValueRatio =
+        identifierLikeValues.length /
+        filledValues.length;
+
+
+    const isLikelyIdentifier =
+        identifierHeader ||
+        identifierValueRatio >= 0.8;
+
 
     if (dateValues.length / filledValues.length >= 0.8) {
         return {
@@ -494,7 +540,8 @@ function detectColumnProfile(columnIndex) {
     if (numericValues.length / filledValues.length >= 0.8) {
         return {
             type:
-                identifierHeader && uniqueRatio >= 0.8
+                isLikelyIdentifier &&
+                uniqueRatio >= 0.8
                     ? "identifier"
                     : "number",
 
@@ -504,7 +551,10 @@ function detectColumnProfile(columnIndex) {
 
     return {
         type:
-            uniqueRatio >= 0.8 && identifierHeader ? "identifier" : "category",
+            uniqueRatio >= 0.8 &&
+            isLikelyIdentifier
+                ? "identifier"
+                : "category",
 
         hasTime: false,
     };
