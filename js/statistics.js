@@ -1990,20 +1990,18 @@ function renderTableBody() {
             isColumnFilterActive,
         );
 
-    const previewLimitMessage =
-        filteredRowCount > MAX_PREVIEW_ROWS
-            ? ` • exibindo as primeiras ${MAX_PREVIEW_ROWS}`
-            : "";
+    const rowCountMessage = isFiltered
+        ? `${filteredRowCount} de ${totalRows} linhas`
+        : `${totalRows} linhas`;
 
-    const visibleColumnCountMessage =
-        visibleColumnIndexes.length === tableState.columnCount
+    const columnCountMessage =
+        visibleColumnIndexes.length ===
+        tableState.columnCount
             ? `${tableState.columnCount} colunas`
             : `${visibleColumnIndexes.length} de ${tableState.columnCount} colunas`;
 
-    previewSummary.textContent = isFiltered
-        ? `${tableState.sheetName} • ${filteredRowCount} de ${totalRows} linhas • ${visibleColumnCountMessage}${previewLimitMessage}`
-        : `${tableState.sheetName} • ${totalRows} linhas • ${visibleColumnCountMessage}${previewLimitMessage}`;
-}
+    previewSummary.textContent =
+        `${tableState.sheetName} / ${rowCountMessage} - ${columnCountMessage}`;
 
 /* MONTA A TABELA INTERATIVA */
 
