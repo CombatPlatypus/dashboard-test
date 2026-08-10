@@ -26,7 +26,6 @@
             .main-structure #statistics .tabs {
                 flex: 0 0 300px;
                 overflow: auto;
-                padding-right: 15px;
                 margin: 0;
                 display: -webkit-flex;
                 display: flex;
@@ -907,7 +906,7 @@
                     width: 35px;
                 }
 
-                .charts-panel > .flex-box-between h2,
+                .charts-panel > .flex-box-between h3,
                 .charts-panel > .flex-box-between p {
                     margin-bottom: 0;
                 }
@@ -944,16 +943,13 @@
                     display: flex;
                     flex-direction: column;
                     row-gap: 10px;
-                }
-
-                .operation-choice > div {
-                    align-items: center;
-                    flex-wrap: wrap;
+                    padding: 15px 15px 0 15px;
                 }
 
                 .operation-choice h4 {
                     width: 100%;
-                    margin-bottom: 5px;
+                    margin-bottom: 15px;
+                    font-size: 13px;
                 }
 
                 .operation-choice select,
@@ -1035,7 +1031,6 @@
                     padding: 20px;
                     row-gap: 20px;
                     flex-direction: column;
-                    background-color: #18191a;
                 }
 
                 .chart-view > div:first-child {
@@ -1044,6 +1039,11 @@
 
                 .chart-view h3 {
                     margin-bottom: 0;
+                }
+
+                .chart-view .flex-box-between div  {
+                    max-height: 40px;
+                    overflow: hidden;
                 }
 
                 .chart-view button {
@@ -1312,7 +1312,7 @@
 
                                     <div class="flex-box-start">
                                         <img src="images/geral-icons/statistics-icon.svg" alt="">
-                                        <h2>Montagem de Gráficos</h2>
+                                        <h3>Montagem de Gráficos</h2>
                                     </div>
 
                                     <p id="statisticsChartSummary">Nenhuma planilha carregada.</p>
@@ -1326,36 +1326,28 @@
 
                                     <div class="charts-control">
 
-                                        <h4>Dados</h4>
+                                        <h4>Escolha de Dados</h4>
 
                                         <div class="operation-choice">
+                                            <h4>Categoria</h4>
 
-                                            <div class="flex-box-start">
-                                                <h4>Categoria</h4>
+                                            <select id="statisticsChartCategory" class="standard-select">
+                                                <option value="">Selecione uma coluna</option>
+                                            </select>
 
-                                                <select id="statisticsChartCategory" class="standard-select">
-                                                    <option value="">Selecione uma coluna</option>
-                                                </select>
-                                            </div>
+                                            <h4>Valor</h4>
 
-                                            <div class="flex-box-start">
-                                                <h4>Valor</h4>
+                                            <select id="statisticsChartValue" class="standard-select">
+                                                <option value="">Selecione uma coluna</option>
+                                            </select>
 
-                                                <select id="statisticsChartValue" class="standard-select">
-                                                    <option value="">Selecione uma coluna</option>
-                                                </select>
-                                            </div>
+                                            <h4>Agrupamento</h4>
 
-                                            <div class="flex-box-start">
-                                                <h4>Agrupamento</h4>
-
-                                                <select id="statisticsChartOperation" class="standard-select">
-                                                    <option value="count">Contagem</option>
-                                                    <option value="sum">Soma</option>
-                                                    <option value="average">Média</option>
-                                                </select>
-                                            </div>
-
+                                            <select id="statisticsChartOperation" class="standard-select">
+                                                <option value="count">Contagem</option>
+                                                <option value="sum">Soma</option>
+                                                <option value="average">Média</option>
+                                            </select>
                                         </div>
 
                                         <hr>
@@ -1413,7 +1405,9 @@
                                     <div class="chart-view">
                                         <div class="flex-box-between">
                                             <h3>Prévia do Gráfico</h3>
-                                            <button id="statisticsChartDownload" type="button" disabled>Baixar PNG</button>
+                                            <div>
+                                                <button class="button" id="statisticsChartDownload" type="button" disabled>Baixar PNG</button>
+                                            </div>
                                         </div>
 
                                         <div class="chart-box">
