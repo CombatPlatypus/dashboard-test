@@ -746,6 +746,14 @@ label > [type='checkbox'], label > [type='radio'] {
     width: 100%;
 }
 
+[type='text'], [type='password'], [type='date'], [type='datetime'], [type='datetime-local'], [type='month'], [type='week'], [type='email'], [type='number'], [type='tel'], [type='time'], [type='url'], [type='color'], textarea {
+    background-color: #141414;
+    border: 1px solid #525252;
+}
+[type='text']:focus, [type='password']:focus, [type='date']:focus, [type='datetime']:focus, [type='datetime-local']:focus, [type='month']:focus, [type='week']:focus, [type='email']:focus, [type='number']:focus, [type='tel']:focus, [type='time']:focus, [type='url']:focus, [type='color']:focus, textarea:focus {
+    color: #e4e6eb;
+}
+
 /* DEFINE ESTILO DOS BOTÕES */
 
 .button-support {
