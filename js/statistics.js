@@ -88,6 +88,12 @@ const chartPanel = document.getElementById("statisticsChartPanel");
 
 const chartSummary = document.getElementById("statisticsChartSummary");
 
+const chartCategory = document.getElementById("statisticsChartCategory");
+
+const chartValue = document.getElementById("statisticsChartValue");
+
+const chartOperation = document.getElementById("statisticsChartOperation");
+
 const chartDownloadButton = document.getElementById("statisticsChartDownload");
 
 /* ESTADO DA TABELA INTERATIVA */
@@ -1492,6 +1498,8 @@ function refreshVisibleColumns() {
     renderTableHeader();
 
     renderTableBody();
+
+    showChartPanel();
 }
 
 /* MONTA OS CHECKBOXES E MODOS DAS COLUNAS PARA ANÁLISE */
@@ -2947,6 +2955,138 @@ function renderTableBody() {
     );
 }
 
+/* ATUALIZA A APARÊNCIA DE UM SELECT2 */
+
+function updateChartSelect2(select) {
+    if (
+        !window.jQuery ||
+        typeof window.jQuery.fn.select2 !== "function" ||
+        !select.classList.contains("select2-hidden-accessible")
+    ) {
+        return;
+    }
+
+    window.jQuery(select).trigger("change.select2");
+}
+
+/* CRIA UMA OPÇÃO DE COLUNA PARA O GRÁFICO */
+
+function createChartColumnOption(columnIndex) {
+    const option = document.createElement("option");
+
+    option.value = String(columnIndex);
+
+    option.textContent = tableState.headers[columnIndex];
+
+    return option;
+}
+
+/* ATUALIZA OS CAMPOS CONFORME O AGRUPAMENTO */
+
+function updateChartValueField() {
+    const numericColumnsAvailable = chartValue.options.length > 1;
+
+    const sumOption = chartOperation.querySelector('option[value="sum"]');
+
+    const averageOption = chartOperation.querySelector('option[value="average"]');
+
+    sumOption.disabled = !numericColumnsAvailable;
+
+    averageOption.disabled = !numericColumnsAvailable;
+
+    if (!numericColumnsAvailable && chartOperation.value !== "count") {
+        chartOperation.value = "count";
+    }
+
+    const countOperation = chartOperation.value === "count";
+
+    const placeholder = chartValue.options[0];
+
+    if (countOperation) {
+        chartValue.value = "";
+
+        chartValue.disabled = true;
+
+        placeholder.textContent = "Não necessário para contagem";
+    } else {
+        chartValue.disabled = !numericColumnsAvailable;
+
+        placeholder.textContent = numericColumnsAvailable
+            ? "Selecione uma coluna"
+            : "Nenhuma coluna numérica";
+    }
+
+    updateChartSelect2(chartOperation);
+
+    updateChartSelect2(chartValue);
+}
+
+/* PREENCHE OS CAMPOS DE COLUNAS DO GRÁFICO */
+
+function renderChartColumnSelectors() {
+    const previousCategory = chartCategory.value;
+
+    const previousValue = chartValue.value;
+
+    const visibleColumnIndexes = getVisibleColumnIndexes().filter(
+        function (columnIndex) {
+            return tableState.columnProfiles[columnIndex].type !== "empty";
+        },
+    );
+
+    const numericColumnIndexes = visibleColumnIndexes.filter(
+        function (columnIndex) {
+            return tableState.columnProfiles[columnIndex].type === "number";
+        },
+    );
+
+    const categoryPlaceholder = document.createElement("option");
+
+    categoryPlaceholder.value = "";
+
+    categoryPlaceholder.textContent = "Selecione uma coluna";
+
+    chartCategory.replaceChildren(categoryPlaceholder);
+
+    visibleColumnIndexes.forEach(function (columnIndex) {
+        chartCategory.appendChild(createChartColumnOption(columnIndex));
+    });
+
+    const valuePlaceholder = document.createElement("option");
+
+    valuePlaceholder.value = "";
+
+    valuePlaceholder.textContent = "Selecione uma coluna";
+
+    chartValue.replaceChildren(valuePlaceholder);
+
+    numericColumnIndexes.forEach(function (columnIndex) {
+        chartValue.appendChild(createChartColumnOption(columnIndex));
+    });
+
+    const categoryStillVisible = visibleColumnIndexes.some(
+        function (columnIndex) {
+            return String(columnIndex) === previousCategory;
+        },
+    );
+
+    const valueStillVisible = numericColumnIndexes.some(
+        function (columnIndex) {
+            return String(columnIndex) === previousValue;
+        },
+    );
+
+    chartCategory.value = categoryStillVisible ? previousCategory : "";
+
+    chartValue.value = valueStillVisible ? previousValue : "";
+
+    chartCategory.disabled = visibleColumnIndexes.length === 0;
+
+    updateChartSelect2(chartCategory);
+
+    updateChartValueField();
+}
+
 /* MOSTRA O PAINEL DE GRÁFICOS */
 
 function showChartPanel() {
@@ -2956,17 +3096,47 @@ function showChartPanel() {
 
     chartSummary.textContent = `Página: ${tableState.sheetName} / ${filteredRows.length} linhas - ${visibleColumnIndexes.length} colunas`;
 
+    renderChartColumnSelectors();
+
     chartPanel.hidden = false;
 }
 
 /* LIMPA E OCULTA O PAINEL DE GRÁFICOS */
 
 function clearChartPanel() {
-    chartPanel.hidden = true;
+    const categoryPlaceholder = document.createElement("option");
+
+    const valuePlaceholder = document.createElement("option");
+
+    categoryPlaceholder.value = "";
+
+    categoryPlaceholder.textContent = "Selecione uma coluna";
+
+    valuePlaceholder.value = "";
+
+    valuePlaceholder.textContent = "Selecione uma coluna";
+
+    chartCategory.replaceChildren(categoryPlaceholder);
+
+    chartValue.replaceChildren(valuePlaceholder);
+
+    chartCategory.disabled = true;
+
+    chartValue.disabled = true;
+
+    chartOperation.value = "count";
 
     chartSummary.textContent = "Nenhuma planilha carregada.";
 
     chartDownloadButton.disabled = true;
+
+    updateChartSelect2(chartCategory);
+
+    updateChartSelect2(chartValue);
+
+    updateChartSelect2(chartOperation);
+
+    chartPanel.hidden = true;
 }
 
 /* MONTA A TABELA INTERATIVA */
@@ -3664,10 +3834,13 @@ function initializeStatisticsImporter() {
         !totalRecords ||
         !analysisCards ||
         !analysisResults ||
-        !analysisEmpty
+        !analysisEmpty ||
         !chartPanel ||
         !chartSummary ||
         !chartDownloadButton ||
+        !chartCategory ||
+        !chartValue ||
+        !chartOperation
     ) {
         console.error(
             "Elementos do importador de Estatísticas não foram encontrados.",
@@ -3686,6 +3859,27 @@ function initializeStatisticsImporter() {
         );
 
         return;
+    }
+
+    const handleChartOperationChange = function () {
+        updateChartValueField();
+    };
+
+    if (
+        window.jQuery &&
+        typeof window.jQuery.fn.select2 === "function"
+    ) {
+        window
+            .jQuery(chartOperation)
+            .on(
+                "change.statisticsChartOperation",
+                handleChartOperationChange,
+            );
+    } else {
+        chartOperation.addEventListener(
+            "change",
+            handleChartOperationChange,
+        );
     }
 
     downloadCsvButton.addEventListener(
