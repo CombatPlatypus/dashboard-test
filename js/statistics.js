@@ -613,69 +613,15 @@ function createAnalysisCard(title, columnName, value) {
 /* CRIA UM BLOCO DA ANÁLISE */
 
 function createAnalysisBlock(title) {
-    const block =
-        document.createElement(
-            "div",
-        );
+    const block = document.createElement("div");
 
+    const heading = document.createElement("h4");
 
-    const header =
-        document.createElement(
-            "div",
-        );
+    block.classList.add("statistics-summary-block");
 
+    heading.textContent = title;
 
-    const columnIcon =
-        document.createElement(
-            "img",
-        );
-
-
-    const heading =
-        document.createElement(
-            "h4",
-        );
-
-
-    block.classList.add(
-        "statistics-summary-block",
-    );
-
-
-    header.classList.add(
-        "statistics-summary-block-header",
-        "flex-box-start",
-    );
-
-
-    columnIcon.src =
-        "images/geral-icons/column-icon.svg";
-
-
-    columnIcon.alt =
-        "";
-
-
-    columnIcon.setAttribute(
-        "aria-hidden",
-        "true",
-    );
-
-
-    heading.textContent =
-        title;
-
-
-    header.append(
-        columnIcon,
-        heading,
-    );
-
-
-    block.appendChild(
-        header,
-    );
-
+    block.appendChild(heading);
 
     return block;
 }
@@ -717,7 +663,7 @@ function appendFrequencyAnalysis(
     frequencyData,
     emptyMessage,
     totalOccurrences,
- ) {
+) {
 
     const frequencyTable =
         document.createElement(
