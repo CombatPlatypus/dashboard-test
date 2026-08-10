@@ -605,6 +605,147 @@ iframe {
  .invisible {
      visibility: hidden;
 }
+
+/* DEFINE O ESTILO DOS ELEMENTOS DE UM FORMULÁRIO */
+
+select {
+    margin-bottom: 0;
+    font-size: 1rem;
+    line-height: 1.5;
+    box-shadow: inset 0 1px 2px rgb(34, 34, 34);
+    border-radius: 5px;
+    color: #e4e6eb;
+    height: 50px;
+    letter-spacing: 1px;
+    padding: 0.5rem 20px 0.5rem 20px;
+    transition: background-color 0.3s ease;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 400;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' width='32' height='24' viewBox='0 0 32 24'><polygon points='0,0 32,0 16,24' style='fill: rgb%28138, 138, 138%29'></polygon></svg>");
+    background-origin: content-box;
+    background-position: right -5px center;
+    background-repeat: no-repeat;
+    background-size: 9px 6px;
+    padding-right: 1.5rem;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;  
+}
+select:focus {
+    outline: none;
+    background-color: #fefefe;
+    color: #1c1e21;
+    transition: background-color 0s;
+}
+select:disabled {
+    background-color: #313132;
+    cursor: not-allowed;
+}
+select::-ms-expand {
+    display: none;
+}
+select[multiple] {
+    height: auto;
+    background-image: none;
+}
+@media screen and (min-width: 0\0) {
+    select {
+      background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAYCAYAAACbU/80AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAIpJREFUeNrEkckNgDAMBBfRkEt0ObRBBdsGXUDgmQfK4XhH2m8czQAAy27R3tsw4Qfe2x8uOO6oYLb6GlOor3GF+swURAOmUJ+RwtEJs9WvTGEYxBXqI1MQAZhCfUQKRzDMVj+TwrAIV6jvSUEkYAr1LSkcyTBb/V+KYfX7xAeusq3sLDtGH3kEGACPWIflNZfhRQAAAABJRU5ErkJggg=="); 
+    }
+}
+[type='text'], [type='password'], [type='date'], [type='datetime'], [type='datetime-local'], [type='month'], [type='week'], [type='email'], [type='number'], [type='search'], [type='tel'], [type='time'], [type='url'], [type='color'], textarea {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    margin-bottom: 0;
+    font-size: 1rem;
+    line-height: 1.5;
+    box-shadow: none;
+    border-radius: 5px;
+    color: #e4e6eb;
+    height: 50px;
+    letter-spacing: 1px;
+    padding: 0.5rem 20px 0.5rem 20px;
+    transition: background-color 0.3s ease;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 400;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+[type='text']:focus, [type='password']:focus, [type='date']:focus, [type='datetime']:focus, [type='datetime-local']:focus, [type='month']:focus, [type='week']:focus, [type='email']:focus, [type='number']:focus, [type='search']:focus, [type='tel']:focus, [type='time']:focus, [type='url']:focus, [type='color']:focus, textarea:focus {
+    outline: none;
+    background-color: #fefefe;
+    color: #000;
+}
+[type='email'] {
+    text-transform: lowercase;
+}
+textarea {
+    max-width: 100%;
+}
+textarea[rows] {
+    height: auto;
+}
+input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
+    color: #cacaca;
+    text-transform: initial;
+}
+input::-moz-placeholder, textarea::-moz-placeholder {
+    color: #cacaca;
+}
+input:-ms-input-placeholder, textarea:-ms-input-placeholder {
+    color: #cacaca;
+}
+input::placeholder, textarea::placeholder {
+    color: #cacaca;
+}
+input:disabled, input[readonly], textarea:disabled, textarea[readonly] {
+    cursor: not-allowed;
+}
+input::-webkit-calendar-picker-indicator {
+    display: none;
+}
+input:disabled, textarea:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+input[type=number]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+input[type=number] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+textarea:disabled, textarea[readonly] {
+    cursor: not-allowed;
+    margin-bottom: 0px;
+}
+[type='submit'], [type='button'] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+input[type='search'] {
+    box-sizing: border-box;
+}
+[type='file'], [type='checkbox'], [type='radio'] {
+    margin: 0;
+}
+[type='checkbox'] + label, [type='radio'] + label {
+    display: inline-block;
+    vertical-align: baseline;
+}
+[type='checkbox'] + label[for], [type='radio'] + label[for] {
+    cursor: pointer;
+}
+label > [type='checkbox'], label > [type='radio'] {
+    margin-right: 0.5rem;
+}
+[type='file'] {
+    width: 100%;
+}
+
 /* DEFINE ESTILO DOS BOTÕES */
 
 .button-support {
