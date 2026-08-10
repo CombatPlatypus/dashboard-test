@@ -375,10 +375,8 @@
                     /* CABEÇALHO DA PRÉVIA */
 
                     .preview-header {
+                        width: 100%;
                         margin-bottom: 20px;
-                        display: flex;
-                        align-items: flex-end;
-                        gap: 15px;
                     }
 
                     #statisticsPreviewSummary {
@@ -392,13 +390,10 @@
                     /* SELETOR DE COLUNAS VISÍVEIS */
 
                     #statisticsVisibleColumnSelector {
-                        flex: 1 1 700px;
-                        min-width: 0;
                         width: 100%;
-                        max-width: 1050px;
-
+                        min-width: 0;
+                        max-width: none;
                         padding: 15px;
-
                         background-color: #141414;
                         border: 1px solid #525252;
                         border-radius: 5px;
@@ -409,33 +404,34 @@
 
                     .statistics-visible-columns-header {
                         margin-bottom: 10px;
-
                         display: flex;
                         align-items: center;
                         justify-content: space-between;
                         flex-wrap: wrap;
                         gap: 10px;
                     }
-
                     .statistics-visible-columns-title {
                         min-width: 0;
-
                         display: flex;
                         align-items: baseline;
-                        gap: 8px;
+                        flex-wrap: wrap;
+                        gap: 4px;
                     }
-
                     .statistics-visible-columns-title h4 {
                         margin: 0;
                         font-size: 14px;
                     }
-
+                    #statisticsPreviewSummary {
+                        color: #e4e6eb;
+                        font-size: 14px;
+                        letter-spacing: 1px;
+                        margin: 0;
+                    }
                     #statisticsVisibleColumnCount {
                         color: #b9bcc1;
                         font-size: 13px;
                         letter-spacing: 0.5px;
                     }
-
 
                     /* BOTÕES DO SELETOR */
 
@@ -1039,11 +1035,7 @@
                         <div class="tabs-panel is-active" id="statistics-1">
                             <section id="statisticsLocalPreview" hidden>
 
-                                <div class="preview-header flex-box-between">
-
-                                    <!-- CONTAGEM DE LINHAS ENCONTRADAS -->
-
-                                    <h4 id="statisticsPreviewSummary"></h4>
+                                <div class="preview-header">
 
                                     <!-- BOTÕES DE OCULTAR E REVELAR COLUNAS -->
 
@@ -1051,6 +1043,8 @@
                                         <div class="statistics-visible-columns-header">
 
                                             <div class="statistics-visible-columns-title">
+
+                                                <h4 id="statisticsPreviewSummary"></h4>
                                                 <h4>Colunas visíveis</h4>
 
                                                 <span id="statisticsVisibleColumnCount">
