@@ -692,10 +692,14 @@ select[multiple] {
 
     .select2-container--default
     .select2-selection--single {
+        color: #e4e6eb;
+        background-color: #141414;
         border: 1px solid #525252;
         border-radius: 5px;
         outline: none;
-        transition: background-color 0.2s ease, border-color 0.2s ease;
+        transition:
+            background-color 0.2s ease,
+            border-color 0.2s ease;
     }
     .select2-container--default
     .select2-selection--single
@@ -713,18 +717,38 @@ select[multiple] {
         color: #8b8d91;
     }
 
-    /* OPÇÃO QUE ESTÁ SELECIONADA ATUALMENTE, FOCUS BASICAMENTE */
+    /* SELECT COM FOCO */
 
     .select2-container--default.select2-container--focus
     .select2-selection--single {
-        border-color: transparent;
+        background-color: #141414;
+        border-color: #8b8d91;
     }
 
-    /* OPÇÃO QUE ESTÁ SENDO SELECIONADA, HOVER BASICAMENTE */
+    /* OPÇÃO ATUALMENTE SELECIONADA */
 
     .select2-container--default
-    .select2-results__option--highlighted.select2-results__option--selectable {
+    .select2-results__option--selected {
+        color: #ffffff;
+        background-color: #1f1f1f;
+    }
+
+    /* HOVER SOMENTE EM OPÇÕES NÃO SELECIONADAS */
+
+    .select2-container--default
+    .select2-results__option--highlighted.select2-results__option--selectable:not(
+        .select2-results__option--selected
+    ) {
+        color: #ffffff;
         background-color: #252525;
+    }
+
+    /* GARANTE QUE A SELECIONADA MANTENHA SUA COR */
+
+    .select2-container--default
+    .select2-results__option--selected.select2-results__option--highlighted {
+        color: #ffffff;
+        background-color: #1f1f1f;
     }
 
     /* SETA */
@@ -766,8 +790,9 @@ select[multiple] {
 
     .select2-container--default.select2-container--open
     .select2-selection--single {
+        color: #e4e6eb;
         background-color: #1f1f1f;
-        border: 1px solid #525252;
+        border-color: #525252;
     }
     .select2-container--default.select2-container--open.select2-container--below
     .select2-selection--single {
@@ -786,9 +811,13 @@ select[multiple] {
 
     .select2-container--default.select2-container--disabled
     .select2-selection--single {
-        color: #777777;
         background-color: #1b1b1b;
         cursor: default;
+    }
+    .select2-container--default.select2-container--disabled
+    .select2-selection--single
+    .select2-selection__rendered {
+        color: #777777;
     }
 
     /* DROPDOWN */
@@ -878,10 +907,6 @@ select[multiple] {
         cursor: pointer;
         user-select: none;
         -webkit-user-select: none;
-    }
-    .select2-container--default
-    .select2-results__option--selected {
-        background-color: #1f1f1f;
     }
     .select2-container--default
     .select2-results__option--disabled {
