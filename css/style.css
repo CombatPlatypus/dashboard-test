@@ -1080,7 +1080,7 @@ label > [type='checkbox'], label > [type='radio'] {
     font-weight: 600;
     user-select: none;
 }
-.button:after {
+.button:not(:disabled):after {
     content: '';
     position: absolute;
     z-index: -1;
@@ -1088,7 +1088,7 @@ label > [type='checkbox'], label > [type='radio'] {
     -moz-transition: all 0.3s;
     transition: all 0.3s;
 }
-.button:hover, .button:focus {
+.button:not(:disabled):hover, .button:not(:disabled):focus {
     color: #000;
     background-color: #e4e6eb;
     border-radius: 5px;
@@ -1955,6 +1955,7 @@ table.unstriped tbody tr {
     .image-viewer-loading[hidden] {
         display: none;
     }
+
     .image-viewer-spinner {
         width: 42px;
         height: 42px;
