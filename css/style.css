@@ -606,7 +606,7 @@ iframe {
      visibility: hidden;
 }
 
-/* DEFINE O ESTILO DOS ELEMENTOS DE UM FORMULÁRIO */
+/* ESTILO PADRÃO DO SELECT */
 
 select {
     margin-bottom: 0;
@@ -653,6 +653,276 @@ select[multiple] {
       background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAYCAYAAACbU/80AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAIpJREFUeNrEkckNgDAMBBfRkEt0ObRBBdsGXUDgmQfK4XhH2m8czQAAy27R3tsw4Qfe2x8uOO6oYLb6GlOor3GF+swURAOmUJ+RwtEJs9WvTGEYxBXqI1MQAZhCfUQKRzDMVj+TwrAIV6jvSUEkYAr1LSkcyTBb/V+KYfX7xAeusq3sLDtGH3kEGACPWIflNZfhRQAAAABJRU5ErkJggg=="); 
     }
 }
+
+/* SELECT PERSONALIZADO */
+
+    /* SELECT2 — ESTRUTURA BÁSICA */
+
+    .select2-container {
+        box-sizing: border-box;
+        display: inline-block;
+        position: relative;
+        margin: 0;
+        vertical-align: middle;
+    }
+    .select2-container *,
+    .select2-container *::before,
+    .select2-container *::after {
+        box-sizing: border-box;
+    }
+
+    /* SELECT SIMPLES */
+
+    .select2-container .select2-selection--single {
+        display: block;
+        height: 34px;
+        cursor: pointer;
+        user-select: none;
+        -webkit-user-select: none;
+    }
+    .select2-container .select2-selection--single
+    .select2-selection__rendered {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /* TEMA PADRÃO */
+
+    .select2-container--default
+    .select2-selection--single {
+        border: 1px solid #525252;
+        border-radius: 5px;
+        outline: none;
+        transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+    .select2-container--default
+    .select2-selection--single
+    .select2-selection__rendered {
+        padding: 0 30px 0 10px;
+        color: #e4e6eb;
+        font-family: inherit;
+        font-size: 12px;
+        line-height: 32px;
+        letter-spacing: 0.5px;
+    }
+    .select2-container--default
+    .select2-selection--single
+    .select2-selection__placeholder {
+        color: #8b8d91;
+    }
+
+    /* OPÇÃO QUE ESTÁ SELECIONADA ATUALMENTE, FOCUS BASICAMENTE */
+
+    .select2-container--default.select2-container--focus
+    .select2-selection--single {
+        border-color: transparent;
+    }
+
+    /* OPÇÃO QUE ESTÁ SENDO SELECIONADA, HOVER BASICAMENTE */
+
+    .select2-container--default
+    .select2-results__option--highlighted.select2-results__option--selectable {
+        background-color: #252525;
+    }
+
+    /* SETA */
+
+    .select2-container--default
+    .select2-selection--single
+    .select2-selection__arrow {
+        width: 24px;
+        height: 32px;
+        position: absolute;
+        top: 1px;
+        right: 4px;
+    }
+    .select2-container--default
+    .select2-selection--single
+    .select2-selection__arrow b {
+        width: 0;
+        height: 0;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin-top: -2px;
+        margin-left: -4px;
+        border-color: #8b8d91 transparent transparent;
+        border-style: solid;
+        border-width: 5px 4px 0;
+    }
+
+    /* SETA QUANDO ABERTO */
+
+    .select2-container--default.select2-container--open
+    .select2-selection--single
+    .select2-selection__arrow b {
+        border-color: transparent transparent #e4e6eb;
+        border-width: 0 4px 5px;
+    }
+
+    /* SELECT ABERTO */
+
+    .select2-container--default.select2-container--open
+    .select2-selection--single {
+        background-color: #1f1f1f;
+        border: 1px solid #525252;
+    }
+    .select2-container--default.select2-container--open.select2-container--below
+    .select2-selection--single {
+        /* border-bottom-color: transparent; */
+        border-bottom-right-radius: 0;
+        border-bottom-left-radius: 0;
+    }
+    .select2-container--default.select2-container--open.select2-container--above
+    .select2-selection--single {
+        border-top-color: transparent;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+    }
+
+    /* SELECT DESATIVADO */
+
+    .select2-container--default.select2-container--disabled
+    .select2-selection--single {
+        color: #777777;
+        background-color: #1b1b1b;
+        cursor: default;
+    }
+
+    /* DROPDOWN */
+
+    .select2-dropdown {
+        box-sizing: border-box;
+        display: block;
+        width: 100%;
+        position: absolute;
+        left: -100000px;
+        color: #e4e6eb;
+        background-color: #2e2e2e;
+        border: 1px solid #525252;
+        border-radius: 5px;
+        z-index: 99999;
+    }
+    .select2-container--open .select2-dropdown {
+        left: 0;
+    }
+    .select2-container--open
+    .select2-dropdown--below {
+        border-top: none;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+    }
+    .select2-container--open
+    .select2-dropdown--above {
+        border-bottom: none;
+        border-bottom-right-radius: 0;
+        border-bottom-left-radius: 0;
+    }
+
+    /* CAMPO DE PESQUISA */
+
+    .select2-search--dropdown {
+        display: block;
+        padding: 5px;
+    }
+    .select2-search--dropdown
+    .select2-search__field {
+        width: 100%;
+        height: 34px;
+        margin: 0;
+        padding: 7px 10px;
+        color: #e4e6eb;
+        background-color: #141414;
+        border: 1px solid #525252;
+        border-radius: 3px;
+        box-shadow: none;
+        font-family: inherit;
+        font-size: 12px;
+        outline: none;
+    }
+    .select2-search--dropdown
+    .select2-search__field:focus {
+        color: #e4e6eb;
+        background-color: #141414;
+        border-color: #8b8d91;
+        box-shadow: none;
+    }
+    .select2-search--dropdown
+    .select2-search__field::-webkit-search-cancel-button {
+        -webkit-appearance: none;
+    }
+    .select2-search--dropdown.select2-search--hide {
+        display: none;
+    }
+
+    /* RESULTADOS */
+
+    .select2-results {
+        display: block;
+    }
+    .select2-results__options {
+        max-height: 180px;
+        margin: 0;
+        padding: 0;
+        overflow-y: auto;
+        list-style: none;
+    }
+    .select2-results__option {
+        padding: 7px 12px;
+        color: #e4e6eb;
+        font-family: inherit;
+        font-size: 12px;
+        letter-spacing: 0.5px;
+        cursor: pointer;
+        user-select: none;
+        -webkit-user-select: none;
+    }
+    .select2-container--default
+    .select2-results__option--selected {
+        background-color: #1f1f1f;
+    }
+    .select2-container--default
+    .select2-results__option--disabled {
+        display: none;
+    }
+    .select2-results__message {
+        color: #b9bcc1;
+        cursor: default;
+    }
+
+    /* BARRA DE ROLAGEM */
+
+    .select2-results__options::-webkit-scrollbar-track {
+        background-color: transparent;
+    }
+    .select2-results__options::-webkit-scrollbar {
+        width: 5px;
+        background-color: transparent;
+    }
+    .select2-results__options::-webkit-scrollbar-thumb {
+        background-color: #525252;
+        border-radius: 5px;
+    }
+
+    /* ESCONDE O SELECT ORIGINAL */
+
+    .select2-hidden-accessible {
+        width: 1px !important;
+        height: 1px !important;
+        position: absolute !important;
+        margin: -1px !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+        clip: rect(0 0 0 0) !important;
+        clip-path: inset(50%) !important;
+        border: 0 !important;
+        white-space: nowrap !important;
+    }
+
+/* DEFINE O ESTILO PADRÃO PARA OS CAMPOS INPUT */
+
 [type='text'], [type='password'], [type='date'], [type='datetime'], [type='datetime-local'], [type='month'], [type='week'], [type='email'], [type='number'], [type='search'], [type='tel'], [type='time'], [type='url'], [type='color'], textarea {
     display: block;
     box-sizing: border-box;
@@ -663,6 +933,8 @@ select[multiple] {
     box-shadow: none;
     border-radius: 5px;
     color: #e4e6eb;
+    background-color: #141414;
+    border: 1px solid #525252;
     height: 50px;
     letter-spacing: 1px;
     padding: 0.5rem 20px 0.5rem 20px;
@@ -675,8 +947,7 @@ select[multiple] {
 }
 [type='text']:focus, [type='password']:focus, [type='date']:focus, [type='datetime']:focus, [type='datetime-local']:focus, [type='month']:focus, [type='week']:focus, [type='email']:focus, [type='number']:focus, [type='search']:focus, [type='tel']:focus, [type='time']:focus, [type='url']:focus, [type='color']:focus, textarea:focus {
     outline: none;
-    background-color: #fefefe;
-    color: #000;
+    color: #e4e6eb;
 }
 [type='email'] {
     text-transform: lowercase;
@@ -744,14 +1015,6 @@ label > [type='checkbox'], label > [type='radio'] {
 }
 [type='file'] {
     width: 100%;
-}
-
-[type='text'], [type='password'], [type='date'], [type='datetime'], [type='datetime-local'], [type='month'], [type='week'], [type='email'], [type='number'], [type='tel'], [type='time'], [type='url'], [type='color'], textarea {
-    background-color: #141414;
-    border: 1px solid #525252;
-}
-[type='text']:focus, [type='password']:focus, [type='date']:focus, [type='datetime']:focus, [type='datetime-local']:focus, [type='month']:focus, [type='week']:focus, [type='email']:focus, [type='number']:focus, [type='tel']:focus, [type='time']:focus, [type='url']:focus, [type='color']:focus, textarea:focus {
-    color: #e4e6eb;
 }
 
 /* DEFINE ESTILO DOS BOTÕES */
