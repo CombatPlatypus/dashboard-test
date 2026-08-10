@@ -82,6 +82,14 @@ const analysisEmpty = document.getElementById(
     "statisticsAnalysisEmpty",
 );
 
+/* ELEMENTOS DA MONTAGEM DE GRÁFICOS */
+
+const chartPanel = document.getElementById("statisticsChartPanel");
+
+const chartSummary = document.getElementById("statisticsChartSummary");
+
+const chartDownloadButton = document.getElementById("statisticsChartDownload");
+
 /* ESTADO DA TABELA INTERATIVA */
 
 const tableState = {
@@ -2939,6 +2947,28 @@ function renderTableBody() {
     );
 }
 
+/* MOSTRA O PAINEL DE GRÁFICOS */
+
+function showChartPanel() {
+    const filteredRows = getFilteredRows();
+
+    const visibleColumnIndexes = getVisibleColumnIndexes();
+
+    chartSummary.textContent = `Página: ${tableState.sheetName} / ${filteredRows.length} linhas - ${visibleColumnIndexes.length} colunas`;
+
+    chartPanel.hidden = false;
+}
+
+/* LIMPA E OCULTA O PAINEL DE GRÁFICOS */
+
+function clearChartPanel() {
+    chartPanel.hidden = true;
+
+    chartSummary.textContent = "Nenhuma planilha carregada.";
+
+    chartDownloadButton.disabled = true;
+}
+
 /* MONTA A TABELA INTERATIVA */
 
 function renderTable(
@@ -3081,6 +3111,8 @@ function renderTable(
     renderTableBody();
 
     preview.hidden = false;
+
+    showChartPanel();
 }
 
 /* LIMPA O ESTADO DA TABELA */
@@ -3181,6 +3213,8 @@ function clearImportedFile() {
     resetTableState();
 
     clearQuickAnalysis();
+
+    clearChartPanel();
 
     previewSummary.textContent =
         "";
@@ -3631,6 +3665,9 @@ function initializeStatisticsImporter() {
         !analysisCards ||
         !analysisResults ||
         !analysisEmpty
+        !chartPanel ||
+        !chartSummary ||
+        !chartDownloadButton ||
     ) {
         console.error(
             "Elementos do importador de Estatísticas não foram encontrados.",
@@ -3707,6 +3744,8 @@ function initializeStatisticsImporter() {
                 resetTableState();
 
                 clearQuickAnalysis();
+
+                clearChartPanel();
 
                 previewSummary.textContent =
                     "";
