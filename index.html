@@ -335,8 +335,8 @@
                         min-width: 0;
                         background-color: #141414;
                         border: 1px solid #525252;
-                        border-radius: 5px;
-                        overflow: hidden;
+                        overflow-y: auto;
+                        max-height: 600px;
                     }
                     .statistics-summary-block::-webkit-scrollbar-track {
                         background-color: transparent;
@@ -988,6 +988,7 @@
 
                             <p id="statisticsFileStatus">Nenhum arquivo selecionado.</p>
 
+                            <button id="statisticsDownloadFile" type="button" disabled>Baixar Nova Versão</button>
                         </section>
 
                         <!-- MENU DE NAVEGAÇÃO DO PAINEL -->
