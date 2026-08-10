@@ -372,222 +372,220 @@
                         display: none;
                     }
 
+                    /* CABEÇALHO DA PRÉVIA */
 
-/* CABEÇALHO DA PRÉVIA */
+                    .preview-header {
+                        margin-bottom: 20px;
+                        display: flex;
+                        align-items: flex-end;
+                        gap: 15px;
+                    }
 
-.preview-header {
-    margin-bottom: 20px;
-    display: flex;
-    align-items: flex-end;
-    gap: 15px;
-}
+                    #statisticsPreviewSummary {
+                        flex: 0 0 auto;
+                        color: #b9bcc1;
+                        font-size: 16px;
+                        letter-spacing: 1px;
+                        margin-bottom: 0;
+                    }
 
-#statisticsPreviewSummary {
-    flex: 0 0 auto;
-    color: #b9bcc1;
-    font-size: 16px;
-    letter-spacing: 1px;
-    margin-bottom: 0;
-}
+                    /* SELETOR DE COLUNAS VISÍVEIS */
 
+                    #statisticsVisibleColumnSelector {
+                        flex: 1 1 700px;
+                        min-width: 0;
+                        width: 100%;
+                        max-width: 1050px;
 
-/* SELETOR DE COLUNAS VISÍVEIS */
+                        padding: 15px;
 
-#statisticsVisibleColumnSelector {
-    flex: 1 1 700px;
-    min-width: 0;
-    width: 100%;
-    max-width: 1050px;
-
-    padding: 15px;
-
-    background-color: #141414;
-    border: 1px solid #525252;
-    border-radius: 5px;
-}
+                        background-color: #141414;
+                        border: 1px solid #525252;
+                        border-radius: 5px;
+                    }
 
 
-/* CABEÇALHO DO SELETOR */
+                    /* CABEÇALHO DO SELETOR */
 
-.statistics-visible-columns-header {
-    margin-bottom: 10px;
+                    .statistics-visible-columns-header {
+                        margin-bottom: 10px;
 
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 10px;
-}
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        flex-wrap: wrap;
+                        gap: 10px;
+                    }
 
-.statistics-visible-columns-title {
-    min-width: 0;
+                    .statistics-visible-columns-title {
+                        min-width: 0;
 
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-}
+                        display: flex;
+                        align-items: baseline;
+                        gap: 8px;
+                    }
 
-.statistics-visible-columns-title h4 {
-    margin: 0;
-    font-size: 14px;
-}
+                    .statistics-visible-columns-title h4 {
+                        margin: 0;
+                        font-size: 14px;
+                    }
 
-#statisticsVisibleColumnCount {
-    color: #b9bcc1;
-    font-size: 13px;
-    letter-spacing: 0.5px;
-}
-
-
-/* BOTÕES DO SELETOR */
-
-.statistics-visible-columns-actions {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 6px;
-}
-
-.statistics-visible-columns-action {
-    min-height: 40px;
-    margin: 0;
-    padding: 10px 15px;
-    color: #e4e6eb;
-    background-color: #242424;
-    border: 2px solid #525252;
-    border-radius: 3px;
-    font-size: 13px;
-    cursor: pointer;
-    letter-spacing: 1px;
-    outline: none;
-    line-height: 1;
-    position: relative;
-    text-align: center;
-    font-family: 'Open Sans', sans-serif;
-    font-weight: 600;
-    user-select: none;
-}
-
-.statistics-visible-columns-action:hover,
-.statistics-visible-columns-action:focus-visible {
-    color: #ffffff;
-    background-color: #2e2e2e;
-    border-color: #73767a;
-}
-
-.statistics-visible-columns-action:disabled {
-    cursor: default;
-    opacity: 0.5;
-}
+                    #statisticsVisibleColumnCount {
+                        color: #b9bcc1;
+                        font-size: 13px;
+                        letter-spacing: 0.5px;
+                    }
 
 
-/* ÁREA DOS CHECKBOXES */
+                    /* BOTÕES DO SELETOR */
 
-#statisticsVisibleColumns {
-    max-height: 124px;
-    padding-right: 6px;
+                    .statistics-visible-columns-actions {
+                        display: flex;
+                        align-items: center;
+                        flex-wrap: wrap;
+                        gap: 6px;
+                    }
 
-    display: grid;
-    grid-template-columns: repeat(
-        auto-fit,
-        minmax(180px, 1fr)
-    );
+                    .statistics-visible-columns-action {
+                        min-height: 40px;
+                        margin: 0;
+                        padding: 10px 15px;
+                        color: #e4e6eb;
+                        background-color: #242424;
+                        border: 2px solid #525252;
+                        border-radius: 3px;
+                        font-size: 13px;
+                        cursor: pointer;
+                        letter-spacing: 1px;
+                        outline: none;
+                        line-height: 1;
+                        position: relative;
+                        text-align: center;
+                        font-family: 'Open Sans', sans-serif;
+                        font-weight: 600;
+                        user-select: none;
+                    }
 
-    gap: 7px;
+                    .statistics-visible-columns-action:hover,
+                    .statistics-visible-columns-action:focus-visible {
+                        color: #ffffff;
+                        background-color: #2e2e2e;
+                        border-color: #73767a;
+                    }
 
-    overflow-x: hidden;
-    overflow-y: auto;
-}
-
-
-/* BARRA DE ROLAGEM */
-
-#statisticsVisibleColumns::-webkit-scrollbar-track {
-    background-color: transparent;
-}
-
-#statisticsVisibleColumns::-webkit-scrollbar {
-    width: 5px;
-    background-color: transparent;
-}
-
-#statisticsVisibleColumns::-webkit-scrollbar-thumb {
-    background-color: #525252;
-    border-radius: 5px;
-}
-
-
-/* CHECKBOX INDIVIDUAL */
-
-.statistics-visible-column-option {
-    min-width: 0;
-    padding: 7px 9px;
-
-    background-color: #1b1b1b;
-    border: 1px solid #393a3b;
-    border-radius: 3px;
-}
-
-.statistics-visible-column-option label {
-    min-width: 0;
-    margin: 0;
-
-    display: flex;
-    align-items: center;
-    gap: 8px;
-
-    cursor: pointer;
-}
-
-.statistics-visible-column-option input {
-    flex: 0 0 auto;
-    margin: 0;
-}
-
-.statistics-visible-column-name {
-    min-width: 0;
-
-    overflow: hidden;
-
-    color: #e4e6eb;
-    font-size: 11px;
-
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
+                    .statistics-visible-columns-action:disabled {
+                        cursor: default;
+                        opacity: 0.5;
+                    }
 
 
-/* IDENTIFICA VISUALMENTE COLUNAS VAZIAS */
+                    /* ÁREA DOS CHECKBOXES */
 
-.statistics-visible-column-option.is-empty
-.statistics-visible-column-name {
-    color: #8b8d91;
-}
+                    #statisticsVisibleColumns {
+                        max-height: 124px;
+                        padding-right: 6px;
+
+                        display: grid;
+                        grid-template-columns: repeat(
+                            auto-fit,
+                            minmax(180px, 1fr)
+                        );
+
+                        gap: 7px;
+
+                        overflow-x: hidden;
+                        overflow-y: auto;
+                    }
 
 
-/* RESPONSIVIDADE */
+                    /* BARRA DE ROLAGEM */
 
-@media (max-width: 900px) {
+                    #statisticsVisibleColumns::-webkit-scrollbar-track {
+                        background-color: transparent;
+                    }
 
-    .preview-header {
-        flex-direction: column;
-    }
+                    #statisticsVisibleColumns::-webkit-scrollbar {
+                        width: 5px;
+                        background-color: transparent;
+                    }
 
-    #statisticsPreviewSummary {
-        padding-top: 0;
-    }
+                    #statisticsVisibleColumns::-webkit-scrollbar-thumb {
+                        background-color: #525252;
+                        border-radius: 5px;
+                    }
 
-    #statisticsVisibleColumnSelector {
-        max-width: none;
-    }
 
-    #statisticsVisibleColumns {
-        grid-template-columns: repeat(
-            auto-fit,
-            minmax(150px, 1fr)
-        );
-    }
-}
+                    /* CHECKBOX INDIVIDUAL */
+
+                    .statistics-visible-column-option {
+                        min-width: 0;
+                        padding: 7px 9px;
+
+                        background-color: #1b1b1b;
+                        border: 1px solid #393a3b;
+                        border-radius: 3px;
+                    }
+
+                    .statistics-visible-column-option label {
+                        min-width: 0;
+                        margin: 0;
+
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+
+                        cursor: pointer;
+                    }
+
+                    .statistics-visible-column-option input {
+                        flex: 0 0 auto;
+                        margin: 0;
+                    }
+
+                    .statistics-visible-column-name {
+                        min-width: 0;
+
+                        overflow: hidden;
+
+                        color: #e4e6eb;
+                        font-size: 11px;
+
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                    }
+
+
+                    /* IDENTIFICA VISUALMENTE COLUNAS VAZIAS */
+
+                    .statistics-visible-column-option.is-empty
+                    .statistics-visible-column-name {
+                        color: #8b8d91;
+                    }
+
+
+                    /* RESPONSIVIDADE */
+
+                    @media (max-width: 900px) {
+
+                        .preview-header {
+                            flex-direction: column;
+                        }
+
+                        #statisticsPreviewSummary {
+                            padding-top: 0;
+                        }
+
+                        #statisticsVisibleColumnSelector {
+                            max-width: none;
+                        }
+
+                        #statisticsVisibleColumns {
+                            grid-template-columns: repeat(
+                                auto-fit,
+                                minmax(150px, 1fr)
+                            );
+                        }
+                    }
 
                     .statistics-summary-table {
                         width: 100%;
@@ -617,6 +615,7 @@
                         height: calc(100% - 32px);
                         overflow: auto;
                         border: 1px solid #525252;
+                        border-radius: 5px;
                     }
                     .statistics-local-table {
                         min-width: 650px;
