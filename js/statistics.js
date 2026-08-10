@@ -1206,7 +1206,7 @@ function renderSelectedColumnAnalysis(rows, columnIndex) {
         if (analysisMode === "identifier") {
             appendAnalysisMetrics(block, [
                 {
-                    label: "Preenchidos",
+                    label: "Valores Preenchidos",
 
                     value: formatAnalysisNumber(filledValues.length),
                 },
