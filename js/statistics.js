@@ -96,6 +96,8 @@ const chartOperation = document.getElementById("statisticsChartOperation");
 
 const chartDownloadButton = document.getElementById("statisticsChartDownload");
 
+const chartCanvas = document.getElementById("statisticsChartCanvas");
+
 /* ESTADO DA TABELA INTERATIVA */
 
 const tableState = {
@@ -124,6 +126,16 @@ const tableState = {
     sortColumn: null,
 
     sortDirection: "asc",
+};
+
+/* ESTADO DO GRÁFICO */
+
+const chartState = {
+    instance: null,
+
+    type: "bar",
+
+    color: "#1abc9c",
 };
 
 const naturalCollator = new Intl.Collator("pt-BR", {
@@ -3840,7 +3852,8 @@ function initializeStatisticsImporter() {
         !chartDownloadButton ||
         !chartCategory ||
         !chartValue ||
-        !chartOperation
+        !chartOperation ||
+        !chartCanvas
     ) {
         console.error(
             "Elementos do importador de Estatísticas não foram encontrados.",
@@ -3859,6 +3872,12 @@ function initializeStatisticsImporter() {
         );
 
         return;
+    }
+
+    if (!window.Chart) {
+        console.error("A biblioteca Chart.js não foi carregada.");
+
+        chartDownloadButton.disabled = true;
     }
 
     const handleChartOperationChange = function () {
