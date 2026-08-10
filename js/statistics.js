@@ -172,38 +172,125 @@ function createFrequencyData(rows, columnIndex) {
 
 /* MONTA UMA TABELA DE AGRUPAMENTO */
 
-function renderFrequencyTable(tableBody, frequencyData, emptyMessage) {
+/* MONTA UMA TABELA DE AGRUPAMENTO */
+
+function renderFrequencyTable(
+    tableBody,
+    frequencyData,
+    emptyMessage,
+    totalOccurrences,
+) {
+
     tableBody.replaceChildren();
 
-    if (frequencyData.length === 0) {
-        const row = document.createElement("tr");
 
-        const cell = createCell("td", emptyMessage);
+    if (
+        frequencyData.length === 0
+    ) {
 
-        cell.colSpan = 2;
+        const row =
+            document.createElement(
+                "tr",
+            );
 
-        cell.classList.add("statistics-summary-empty");
 
-        row.appendChild(cell);
+        const cell =
+            createCell(
+                "td",
+                emptyMessage,
+            );
 
-        tableBody.appendChild(row);
+
+        cell.colSpan =
+            3;
+
+
+        cell.classList.add(
+            "statistics-summary-empty",
+        );
+
+
+        row.appendChild(
+            cell,
+        );
+
+
+        tableBody.appendChild(
+            row,
+        );
+
 
         return;
     }
 
-    const fragment = document.createDocumentFragment();
 
-    frequencyData.forEach(function (group) {
-        const row = document.createElement("tr");
+    const fragment =
+        document.createDocumentFragment();
 
-        row.appendChild(createCell("td", group.label));
 
-        row.appendChild(createCell("td", group.count));
+    frequencyData.forEach(
+        function (
+            group,
+        ) {
 
-        fragment.appendChild(row);
-    });
+            const row =
+                document.createElement(
+                    "tr",
+                );
 
-    tableBody.appendChild(fragment);
+
+            const valueCell =
+                createCell(
+                    "td",
+                    group.label,
+                );
+
+
+            const quantityCell =
+                createCell(
+                    "td",
+                    group.count,
+                );
+
+
+            const percentageCell =
+                createCell(
+                    "td",
+
+                    formatAnalysisPercentage(
+                        group.count,
+                        totalOccurrences,
+                    ),
+                );
+
+
+            quantityCell.classList.add(
+                "statistics-summary-number",
+            );
+
+
+            percentageCell.classList.add(
+                "statistics-summary-number",
+            );
+
+
+            row.append(
+                valueCell,
+                quantityCell,
+                percentageCell,
+            );
+
+
+            fragment.appendChild(
+                row,
+            );
+        },
+    );
+
+
+    tableBody.appendChild(
+        fragment,
+    );
 }
 
 /* VERIFICA SE UMA CÉLULA ESTÁ VAZIA */
@@ -435,6 +522,35 @@ function formatAnalysisNumber(value) {
     }).format(value);
 }
 
+/* FORMATA UM PERCENTUAL DA ANÁLISE */
+
+function formatAnalysisPercentage(
+    quantity,
+    total,
+ ) {
+
+    if (
+        !Number.isFinite(quantity) ||
+        !Number.isFinite(total) ||
+        total <= 0
+    ) {
+
+        return "0,0%";
+    }
+
+
+    return new Intl.NumberFormat(
+        "pt-BR",
+        {
+            style: "percent",
+            minimumFractionDigits: 1,
+            maximumFractionDigits: 1,
+        },
+    ).format(
+        quantity / total,
+    );
+}
+
 /* FORMATA UMA DATA DA ANÁLISE */
 
 function formatAnalysisDate(value, hasTime) {
@@ -458,20 +574,38 @@ function formatAnalysisDate(value, hasTime) {
 
 /* CRIA UM CARTÃO DA ANÁLISE */
 
-function createAnalysisCard(label, value) {
+function createAnalysisCard(title, columnName, value) {
     const card = document.createElement("div");
-
-    const cardLabel = document.createElement("span");
-
+    const cardTitle = document.createElement("span");
+    const cardSource = document.createElement("span");
     const cardValue = document.createElement("strong");
 
-    card.classList.add("statistics-summary-card");
+    card.classList.add(
+        "statistics-summary-card",
+    );
 
-    cardLabel.textContent = label;
+    cardTitle.classList.add(
+        "statistics-summary-card-title",
+    );
 
-    cardValue.textContent = value;
+    cardSource.classList.add(
+        "statistics-summary-card-source",
+    );
 
-    card.append(cardLabel, cardValue);
+    cardTitle.textContent =
+        title;
+
+    cardSource.textContent =
+        `De: ${columnName}`;
+
+    cardValue.textContent =
+        value;
+
+    card.append(
+        cardTitle,
+        cardSource,
+        cardValue,
+    );
 
     return card;
 }
@@ -479,15 +613,69 @@ function createAnalysisCard(label, value) {
 /* CRIA UM BLOCO DA ANÁLISE */
 
 function createAnalysisBlock(title) {
-    const block = document.createElement("div");
+    const block =
+        document.createElement(
+            "div",
+        );
 
-    const heading = document.createElement("h4");
 
-    block.classList.add("statistics-summary-block");
+    const header =
+        document.createElement(
+            "div",
+        );
 
-    heading.textContent = title;
 
-    block.appendChild(heading);
+    const columnIcon =
+        document.createElement(
+            "img",
+        );
+
+
+    const heading =
+        document.createElement(
+            "h4",
+        );
+
+
+    block.classList.add(
+        "statistics-summary-block",
+    );
+
+
+    header.classList.add(
+        "statistics-summary-block-header",
+        "flex-box-start",
+    );
+
+
+    columnIcon.src =
+        "images/geral-icons/column-icon.svg";
+
+
+    columnIcon.alt =
+        "";
+
+
+    columnIcon.setAttribute(
+        "aria-hidden",
+        "true",
+    );
+
+
+    heading.textContent =
+        title;
+
+
+    header.append(
+        columnIcon,
+        heading,
+    );
+
+
+    block.appendChild(
+        header,
+    );
+
 
     return block;
 }
@@ -524,45 +712,151 @@ function appendAnalysisMetrics(block, metrics) {
 
 /* ADICIONA UMA TABELA DE FREQUÊNCIA A UM BLOCO */
 
-function appendFrequencyAnalysis(block, frequencyData, emptyMessage) {
-    const frequencyTable = document.createElement("table");
+function appendFrequencyAnalysis(
+    block,
+    frequencyData,
+    emptyMessage,
+    totalOccurrences,
+ ) {
 
-    const tableHead = document.createElement("thead");
+    const frequencyTable =
+        document.createElement(
+            "table",
+        );
 
-    const headerRow = document.createElement("tr");
 
-    const tableBody = document.createElement("tbody");
+    const tableHead =
+        document.createElement(
+            "thead",
+        );
 
-    frequencyTable.classList.add("statistics-summary-table");
 
-    headerRow.append(
-        createCell("th", "Valor"),
+    const headerRow =
+        document.createElement(
+            "tr",
+        );
 
-        createCell("th", "Qtd"),
+
+    const tableBody =
+        document.createElement(
+            "tbody",
+        );
+
+
+    const valueHeader =
+        createCell(
+            "th",
+            "Valores da Coluna",
+        );
+
+
+    const quantityHeader =
+        createCell(
+            "th",
+            "Quantidade",
+        );
+
+
+    const percentageHeader =
+        createCell(
+            "th",
+            "Percentual",
+        );
+
+
+    frequencyTable.classList.add(
+        "statistics-summary-table",
     );
 
-    tableHead.appendChild(headerRow);
 
-    frequencyTable.append(tableHead, tableBody);
+    quantityHeader.classList.add(
+        "statistics-summary-number",
+    );
+
+
+    percentageHeader.classList.add(
+        "statistics-summary-number",
+    );
+
+
+    headerRow.append(
+        valueHeader,
+        quantityHeader,
+        percentageHeader,
+    );
+
+
+    tableHead.appendChild(
+        headerRow,
+    );
+
+
+    frequencyTable.append(
+        tableHead,
+        tableBody,
+    );
+
+
+    const percentageBase =
+        Number.isFinite(
+            totalOccurrences,
+        )
+            ? totalOccurrences
+            : frequencyData.reduce(
+                  function (
+                      total,
+                      group,
+                  ) {
+
+                      return total +
+                          group.count;
+                  },
+                  0,
+              );
+
 
     renderFrequencyTable(
         tableBody,
 
-        frequencyData.slice(0, MAX_FREQUENCY_ROWS),
+        frequencyData.slice(
+            0,
+            MAX_FREQUENCY_ROWS,
+        ),
 
         emptyMessage,
+
+        percentageBase,
     );
 
-    block.appendChild(frequencyTable);
 
-    if (frequencyData.length > MAX_FREQUENCY_ROWS) {
-        const note = document.createElement("p");
+    block.appendChild(
+        frequencyTable,
+    );
 
-        note.classList.add("statistics-analysis-note");
 
-        note.textContent = `Exibindo ${MAX_FREQUENCY_ROWS} de ${frequencyData.length} valores.`;
+    if (
+        frequencyData.length >
+        MAX_FREQUENCY_ROWS
+    ) {
 
-        block.appendChild(note);
+        const note =
+            document.createElement(
+                "p",
+            );
+
+
+        note.classList.add(
+            "statistics-analysis-note",
+        );
+
+
+        note.textContent =
+            `Exibindo ${MAX_FREQUENCY_ROWS} de ${frequencyData.length} valores.`;
+
+
+        block.appendChild(
+            note,
+        );
     }
 }
 
@@ -857,6 +1151,7 @@ function renderSelectedColumnAnalysis(rows, columnIndex) {
 
         analysisCards.appendChild(
             createAnalysisCard(
+                "Total da Coluna",
                 header,
 
                 formatAnalysisNumber(total),
@@ -919,6 +1214,7 @@ function renderSelectedColumnAnalysis(rows, columnIndex) {
 
         analysisCards.appendChild(
             createAnalysisCard(
+                "Datas Válidas",
                 header,
 
                 formatAnalysisNumber(dateValues.length),
@@ -954,6 +1250,7 @@ function renderSelectedColumnAnalysis(rows, columnIndex) {
 
         analysisCards.appendChild(
             createAnalysisCard(
+                "Valores Únicos",
                 header,
 
                 formatAnalysisNumber(frequencyData.length),
@@ -973,7 +1270,7 @@ function renderSelectedColumnAnalysis(rows, columnIndex) {
                     value: formatAnalysisNumber(frequencyData.length),
                 },
                 {
-                    label: "Repetições",
+                    label: "Duplicidades na Coluna",
 
                     value: formatAnalysisNumber(duplicateCount),
                 },
@@ -1003,7 +1300,7 @@ function renderSelectedColumnAnalysis(rows, columnIndex) {
             );
         }
     } else {
-        analysisCards.appendChild(createAnalysisCard(header, "0"));
+        analysisCards.appendChild(createAnalysisCard("Valores Preenchidos", header, "0"));
 
         appendAnalysisMetrics(block, [
             {
