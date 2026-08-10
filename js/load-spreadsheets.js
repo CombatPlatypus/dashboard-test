@@ -683,7 +683,7 @@ function initializeFoundationTabs(
     foundationTabs.foundation();
 }
 
-
+/* CONFIGURA O CARREGAMENTO SELETIVO DAS PLANILHAS */
 /* CONFIGURA O CARREGAMENTO SELETIVO DAS PLANILHAS */
 
 function initializeSpreadsheetNavigation(
