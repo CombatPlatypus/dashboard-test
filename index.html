@@ -891,6 +891,10 @@
                     width: 100%;
                 }
 
+                .charts-panel[hidden] {
+                    display: none;
+                }
+
                 .charts-panel > .flex-box-between {
                     width: 100%;
                     padding-bottom: 20px;
@@ -1306,7 +1310,7 @@
                         <!-- GERAÇÃO DE GRÁFICOS -->
 
                         <div class="tabs-panel" id="statistics-3">
-                            <section class="charts-panel">
+                            <section id="statisticsChartPanel" class="charts-panel" hidden>
 
                                 <!-- HEADER -->
 
@@ -1314,7 +1318,7 @@
 
                                     <div class="flex-box-start">
                                         <img src="images/geral-icons/statistics-icon.svg" alt="">
-                                        <h3>Montagem de Gráficos</h2>
+                                        <h3>Montagem de Gráficos</h3>
                                     </div>
 
                                     <p id="statisticsChartSummary">Nenhuma planilha carregada.</p>
