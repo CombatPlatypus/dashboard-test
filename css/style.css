@@ -1955,7 +1955,6 @@ table.unstriped tbody tr {
     .image-viewer-loading[hidden] {
         display: none;
     }
-
     .image-viewer-spinner {
         width: 42px;
         height: 42px;
