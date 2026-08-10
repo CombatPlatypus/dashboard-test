@@ -2002,6 +2002,7 @@ function renderTableBody() {
 
     previewSummary.textContent =
         `${tableState.sheetName} / ${rowCountMessage} - ${columnCountMessage}`;
+    }
 
 /* MONTA A TABELA INTERATIVA */
 
