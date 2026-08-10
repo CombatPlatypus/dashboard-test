@@ -2017,7 +2017,7 @@ function renderTableBody() {
             : `${visibleColumnIndexes.length} de ${tableState.columnCount} colunas`;
 
     previewSummary.textContent =
-        `${tableState.sheetName} / ${rowCountMessage} - ${columnCountMessage}`;
+        `Página: ${tableState.sheetName} / ${rowCountMessage} -`;
     }
 
 /* MONTA A TABELA INTERATIVA */
