@@ -1718,15 +1718,31 @@ function renderTableHeader() {
                 `Comparação numérica da coluna ${headerValue}`,
             );
 
-            numericOperator.addEventListener(
-                "change",
+            const updateNumericOperator =
                 function () {
                     columnFilter.numericOperator =
                         numericOperator.value;
 
                     renderTableBody();
-                },
-            );
+                };
+
+            if (
+                window.jQuery &&
+                typeof window.jQuery.fn.select2 ===
+                    "function"
+            ) {
+                window
+                    .jQuery(numericOperator)
+                    .on(
+                        "change.statisticsNumericFilter",
+                        updateNumericOperator,
+                    );
+            } else {
+                numericOperator.addEventListener(
+                    "change",
+                    updateNumericOperator,
+                );
+            }
 
             numericValue.type = "text";
 
