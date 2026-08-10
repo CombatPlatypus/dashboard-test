@@ -928,14 +928,13 @@ select[multiple] {
     box-sizing: border-box;
     width: 100%;
     margin-bottom: 0;
-    font-size: 1rem;
+    font-size: 14px;
     line-height: 1.5;
     box-shadow: none;
     border-radius: 5px;
     color: #e4e6eb;
     background-color: #141414;
     border: 1px solid #525252;
-    height: 50px;
     letter-spacing: 1px;
     padding: 0.5rem 20px 0.5rem 20px;
     transition: background-color 0.3s ease;
