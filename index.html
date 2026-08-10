@@ -886,6 +886,183 @@
                     display: block;
                 }
 
+                /* GRÁFICOS */
+
+                .charts-panel {
+                    width: 100%;
+                }
+
+                .charts-panel > .flex-box-between {
+                    width: 100%;
+                    padding-bottom: 15px;
+                    border-bottom: 2px solid #525252;
+                }
+
+                .charts-panel > .flex-box-between div {
+                    gap: 10px;
+                    align-items: center;
+                }
+
+                .charts-panel > .flex-box-between img {
+                    width: 35px;
+                }
+
+                .charts-panel > .flex-box-between h2,
+                .charts-panel > .flex-box-between p {
+                    margin-bottom: 0;
+                }
+
+                .charts-panel > .flex-box-between p {
+                    width: max-content;
+                    height: auto;
+                    font-size: 13px;
+                }
+
+                .charts-body {
+                    width: 100%;
+                    align-items: stretch;
+                }
+
+                .charts-control {
+                    flex: 0 0 500px;
+                    padding-top: 30px;
+                    padding-right: 30px;
+                    border-right: 2px solid #525252;
+                }
+
+                .charts-control > h4 {
+                    margin-bottom: 15px;
+                }
+
+                .charts-control hr {
+                    margin: 30px 0;
+                    border: 0;
+                    border-top: 2px solid #525252;
+                }
+
+                .operation-choice {
+                    display: flex;
+                    flex-direction: column;
+                    row-gap: 10px;
+                }
+
+                .operation-choice > div {
+                    align-items: center;
+                    flex-wrap: wrap;
+                }
+
+                .operation-choice h4 {
+                    width: 100%;
+                    margin-bottom: 5px;
+                }
+
+                .operation-choice select,
+                .operation-choice .select2-container {
+                    width: 100% !important;
+                }
+
+                .types-of-charts {
+                    gap: 10px;
+                    align-items: flex-start;
+                }
+
+                .types-of-charts > div {
+                    flex: 1 1 0;
+                    text-align: center;
+                }
+
+                .types-of-charts button {
+                    width: 100%;
+                    min-height: 55px;
+                    padding: 10px;
+                }
+
+                .types-of-charts button[aria-pressed="true"] {
+                    border-color: #3478d4;
+                    background-color: #242424;
+                }
+
+                .types-of-charts img {
+                    width: 30px;
+                }
+
+                .types-of-charts h4 {
+                    margin-top: 8px;
+                    margin-bottom: 0;
+                }
+
+                .colors-change {
+                    gap: 20px;
+                    align-items: center;
+                }
+
+                .colors-change h4 {
+                    margin-bottom: 0;
+                }
+
+                .colors-change div {
+                    gap: 10px;
+                }
+
+                .colors-change button {
+                    width: 35px;
+                    height: 35px;
+                    padding: 0;
+                    border: 3px solid #383838;
+                }
+
+                .colors-change button[aria-pressed="true"] {
+                    border-color: #e4e6eb;
+                }
+
+                .colors-change .color-1 {
+                    background-color: #1abc9c;
+                }
+
+                .colors-change .color-2 {
+                    background-color: #3478d4;
+                }
+
+                .colors-change .color-3 {
+                    background-color: #f2a900;
+                }
+
+                .chart-view {
+                    flex: 1 1 0;
+                    min-width: 0;
+                    min-height: 525px;
+                    display: flex;
+                    padding: 20px;
+                    row-gap: 20px;
+                    flex-direction: column;
+                    background-color: #18191a;
+                }
+
+                .chart-view > div:first-child {
+                    align-items: center;
+                }
+
+                .chart-view h3 {
+                    margin-bottom: 0;
+                }
+
+                .chart-view button {
+                    min-height: 40px;
+                    padding: 10px 15px;
+                }
+
+                .chart-box {
+                    flex: 1 1 0;
+                    min-height: 450px;
+                    position: relative;
+                }
+
+                .chart-box canvas {
+                    width: 100%;
+                    height: 100%;
+                }
+
+
         </style>
     </head>	
 
@@ -1127,95 +1304,90 @@
                         <!-- GERAÇÃO DE GRÁFICOS -->
 
                         <div class="tabs-panel" id="statistics-3">
-                            <section class="" id="">
+                            <section class="charts-panel">
 
                                 <!-- HEADER -->
 
                                 <div class="flex-box-between">
 
-                                    <!-- TITULO -->
-
                                     <div class="flex-box-start">
-                                        <img src="">
-                                        <h2>Montagem de Gráficos</h2>>
+                                        <img src="images/geral-icons/statistics-icon.svg" alt="">
+                                        <h2>Montagem de Gráficos</h2>
                                     </div>
 
-                                    <!-- CONTAGEM DE LINHAS -->
-
-                                    <div id="">
-
-                                    </div>
+                                    <p id="statisticsChartSummary">Nenhuma planilha carregada.</p>
                                 </div>
 
-                                <!-- CONTEÚDO DA FUNÇÃO -->
+                                <!-- CONTEÚDO -->
 
-                                <div class="flex-box-start">
+                                <div class="charts-body flex-box-start">
 
-                                    <!-- ÁREA DOS CONTROLES -->
+                                    <!-- CONTROLES -->
 
-                                    <div class="" id="">
+                                    <div class="charts-control">
+
                                         <h4>Dados</h4>
 
-                                        <div class="operation-choice" id="">
-                                            <div class="flex-box-start">
-                                                <h3>Categoria</h3>
+                                        <div class="operation-choice">
 
-                                                <select class="standard-select" style="width: 100%;">
-                                                    <option value="">Opção</option>
-                                                    <option value="">Opção</option>
-                                                    <option value="">Opção</option>
+                                            <div class="flex-box-start">
+                                                <h4>Categoria</h4>
+
+                                                <select id="statisticsChartCategory" class="standard-select">
+                                                    <option value="">Selecione uma coluna</option>
                                                 </select>
                                             </div>
 
                                             <div class="flex-box-start">
-                                                <h3>Valor</h3>
+                                                <h4>Valor</h4>
 
-                                                <select class="standard-select" style="width: 100%;">
-                                                    <option value="">Opção</option>
-                                                    <option value="">Opção</option>
-                                                    <option value="">Opção</option>
+                                                <select id="statisticsChartValue" class="standard-select">
+                                                    <option value="">Selecione uma coluna</option>
                                                 </select>
                                             </div>
 
                                             <div class="flex-box-start">
-                                                <h3>Agrupamento</h3>
+                                                <h4>Agrupamento</h4>
 
-                                                <select class="standard-select" style="width: 100%;">
-                                                    <option value="">Opção</option>
-                                                    <option value="">Opção</option>
-                                                    <option value="">Opção</option>
+                                                <select id="statisticsChartOperation" class="standard-select">
+                                                    <option value="count">Contagem</option>
+                                                    <option value="sum">Soma</option>
+                                                    <option value="average">Média</option>
                                                 </select>
                                             </div>
+
                                         </div>
 
                                         <hr>
 
                                         <h4>Tipos de Gráfico</h4>
 
-                                        <div class="types-of-charts flex-box-between">
-                                            <div class="" id="">
-                                                <button class="" id="">
-                                                    <img src="">
+                                        <div id="statisticsChartTypes" class="types-of-charts flex-box-between">
+
+                                            <div>
+                                                <button type="button" data-chart-type="bar" aria-label="Gráfico de colunas" aria-pressed="true">
+                                                    <img src="images/geral-icons/chart-columns.svg" alt="">
                                                 </button>
 
-                                                <h3>Colunas</h3>
+                                                <h4>Colunas</h4>
                                             </div>
 
-                                            <div class="" id="">
-                                                <button class="" id="">
-                                                    <img src="">
+                                            <div>
+                                                <button type="button" data-chart-type="line" aria-label="Gráfico de linhas" aria-pressed="false">
+                                                    <img src="images/geral-icons/chart-line.svg" alt="">
                                                 </button>
 
-                                                <h3>Linhas</h3>
+                                                <h4>Linhas</h4>
                                             </div>
 
-                                            <div class="" id="">
-                                                <button class="" id="">
-                                                    <img src="">
+                                            <div>
+                                                <button type="button" data-chart-type="pie" aria-label="Gráfico de pizza" aria-pressed="false">
+                                                    <img src="images/geral-icons/chart-pie.svg" alt="">
                                                 </button>
 
-                                                <h3>Pizza</h3>
+                                                <h4>Pizza</h4>
                                             </div>
+
                                         </div>
 
                                         <hr>
@@ -1223,22 +1395,33 @@
                                         <h4>Aparência</h4>
 
                                         <div class="colors-change flex-box-start">
-                                            <h3>Cores</h3>
 
-                                            <div class="flex-box-start" id="">
-                                                <button class="color-1" id=""></button>
-                                                <button class="color-2" id=""></button>
-                                                <button class="color-3" id=""></button>
+                                            <h4>Cores</h4>
+
+                                            <div id="statisticsChartColors" class="flex-box-start">
+                                                <button type="button" class="color-1" data-chart-color="#1abc9c" aria-label="Cor verde" aria-pressed="true"></button>
+                                                <button type="button" class="color-2" data-chart-color="#3478d4" aria-label="Cor azul" aria-pressed="false"></button>
+                                                <button type="button" class="color-3" data-chart-color="#f2a900" aria-label="Cor amarela" aria-pressed="false"></button>
                                             </div>
+
                                         </div>
+
                                     </div>
 
                                     <!-- ÁREA DO GRÁFICO -->
 
-                                    <div class="" id="">
+                                    <div class="chart-view">
+                                        <div class="flex-box-between">
+                                            <h3>Prévia do Gráfico</h3>
+                                            <button id="statisticsChartDownload" type="button" disabled>Baixar PNG</button>
+                                        </div>
 
+                                        <div class="chart-box">
+                                            <canvas id="statisticsChartCanvas">Seu navegador não suporta gráficos em canvas.</canvas>
+                                        </div>
                                     </div>
                                 </div>
+
                             </section>
                         </div>
 
