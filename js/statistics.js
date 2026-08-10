@@ -75,6 +75,8 @@ const tableState = {
 
     filters: [],
 
+    columnValueCounts: [],
+
     columnCount: 0,
 
     sortColumn: null,
@@ -86,6 +88,113 @@ const naturalCollator = new Intl.Collator("pt-BR", {
     numeric: true,
     sensitivity: "base",
 });
+
+/* CRIA O ESTADO INICIAL DE UM FILTRO */
+
+function createEmptyColumnFilter() {
+    return {
+        text: "",
+        duplicatesOnly: false,
+        numericOperator: "",
+        numericValue: "",
+    };
+}
+
+/* VERIFICA SE UM FILTRO ESTÁ ATIVO */
+
+function isColumnFilterActive(filter) {
+    const hasTextFilter =
+        normalizeSearchValue(filter.text).trim().length > 0;
+
+    const hasNumericFilter =
+        filter.numericOperator !== "" &&
+        parseNumericValue(filter.numericValue) !== null;
+
+    return (
+        hasTextFilter ||
+        filter.duplicatesOnly ||
+        hasNumericFilter
+    );
+}
+
+/* CONTA OS VALORES DE UMA COLUNA */
+
+function createColumnValueCounts(columnIndex) {
+    const valueCounts = new Map();
+
+    tableState.rows.forEach(function (row) {
+        const normalizedValue = normalizeSearchValue(
+            row[columnIndex],
+        ).trim();
+
+        /*
+         * Células vazias não são consideradas duplicadas.
+         */
+
+        if (!normalizedValue) {
+            return;
+        }
+
+        const currentCount =
+            valueCounts.get(normalizedValue) ?? 0;
+
+        valueCounts.set(
+            normalizedValue,
+            currentCount + 1,
+        );
+    });
+
+    return valueCounts;
+}
+
+/* CRIA UMA OPÇÃO DO FILTRO NUMÉRICO */
+
+function createNumericFilterOption(value, label) {
+    const option = document.createElement("option");
+
+    option.value = value;
+
+    option.textContent = label;
+
+    return option;
+}
+
+/* APLICA UMA COMPARAÇÃO NUMÉRICA */
+
+function matchesNumericFilter(
+    cellValue,
+    operator,
+    comparisonValue,
+ ) {
+    const numericCellValue = parseNumericValue(cellValue);
+
+    if (numericCellValue === null) {
+        return false;
+    }
+
+    switch (operator) {
+        case "greaterThan":
+            return numericCellValue > comparisonValue;
+
+        case "greaterThanOrEqual":
+            return numericCellValue >= comparisonValue;
+
+        case "lessThan":
+            return numericCellValue < comparisonValue;
+
+        case "lessThanOrEqual":
+            return numericCellValue <= comparisonValue;
+
+        case "equal":
+            return numericCellValue === comparisonValue;
+
+        case "notEqual":
+            return numericCellValue !== comparisonValue;
+
+        default:
+            return true;
+    }
+}
 
 /* ATUALIZA A MENSAGEM DO IMPORTADOR */
 
@@ -963,7 +1072,8 @@ function refreshVisibleColumns() {
          * Isso impede filtros invisíveis.
          */
 
-        tableState.filters[columnIndex] = "";
+        tableState.filters[columnIndex] =
+            createEmptyColumnFilter();
 
         /*
          * Remove a coluna da análise.
@@ -1391,67 +1501,262 @@ function renderTableHeader() {
 
         const filterCell = document.createElement("th");
 
+        const filterControls = document.createElement("div");
+
         const filterInput = document.createElement("input");
 
         const headerValue = tableState.headers[columnIndex];
+
+        const columnProfile =
+            tableState.columnProfiles[columnIndex];
+
+        const columnFilter =
+            tableState.filters[columnIndex];
 
         /* ORDENAÇÃO */
 
         sortButton.type = "button";
 
-        sortButton.classList.add("statistics-sort-button");
+        sortButton.classList.add(
+            "statistics-sort-button",
+        );
 
         sortButton.setAttribute(
             "aria-label",
             `Ordenar pela coluna ${headerValue}`,
         );
 
-        sortButton.append(document.createTextNode(headerValue));
+        sortButton.append(
+            document.createTextNode(headerValue),
+        );
 
-        sortIndicator.classList.add("statistics-sort-indicator");
+        sortIndicator.classList.add(
+            "statistics-sort-indicator",
+        );
 
-        sortIndicator.textContent = getSortIndicator(columnIndex);
+        sortIndicator.textContent =
+            getSortIndicator(columnIndex);
 
         sortButton.appendChild(sortIndicator);
 
-        sortButton.addEventListener("click", function () {
-            changeSort(columnIndex);
-        });
+        sortButton.addEventListener(
+            "click",
+            function () {
+                changeSort(columnIndex);
+            },
+        );
 
         headerCell.appendChild(sortButton);
 
         headerRow.appendChild(headerCell);
 
-        /* FILTRO */
+        /* CONTAINER DOS FILTROS */
+
+        filterControls.classList.add(
+            "statistics-column-filter-controls",
+        );
+
+        /* FILTRO POR TEXTO */
 
         filterInput.type = "search";
 
-        filterInput.classList.add("statistics-column-filter");
+        filterInput.classList.add(
+            "statistics-column-filter",
+        );
 
         filterInput.placeholder = "Filtrar...";
 
-        filterInput.value = tableState.filters[columnIndex];
+        filterInput.value = columnFilter.text;
 
-        filterInput.setAttribute("aria-label", `Filtrar coluna ${headerValue}`);
+        filterInput.setAttribute(
+            "aria-label",
+            `Filtrar coluna ${headerValue}`,
+        );
 
-        filterInput.addEventListener("input", function () {
-            tableState.filters[columnIndex] = filterInput.value;
+        filterInput.addEventListener(
+            "input",
+            function () {
+                columnFilter.text =
+                    filterInput.value;
 
-            renderTableBody();
-        });
+                renderTableBody();
+            },
+        );
 
-        filterCell.appendChild(filterInput);
+        filterControls.appendChild(filterInput);
+
+        /* FILTRO DE DUPLICIDADE */
+
+        if (columnProfile.type !== "empty") {
+            const duplicateLabel =
+                document.createElement("label");
+
+            const duplicateCheckbox =
+                document.createElement("input");
+
+            const duplicateText =
+                document.createElement("span");
+
+            duplicateLabel.classList.add(
+                "statistics-duplicate-filter",
+            );
+
+            duplicateCheckbox.type = "checkbox";
+
+            duplicateCheckbox.checked =
+                columnFilter.duplicatesOnly;
+
+            duplicateCheckbox.setAttribute(
+                "aria-label",
+                `Mostrar somente duplicados da coluna ${headerValue}`,
+            );
+
+            duplicateText.textContent =
+                "Somente duplicados";
+
+            duplicateCheckbox.addEventListener(
+                "change",
+                function () {
+                    columnFilter.duplicatesOnly =
+                        duplicateCheckbox.checked;
+
+                    renderTableBody();
+                },
+            );
+
+            duplicateLabel.append(
+                duplicateCheckbox,
+                duplicateText,
+            );
+
+            filterControls.appendChild(
+                duplicateLabel,
+            );
+        }
+
+        /* FILTRO PARA COLUNAS NUMÉRICAS */
+
+        if (columnProfile.type === "number") {
+            const numericFilter =
+                document.createElement("div");
+
+            const numericOperator =
+                document.createElement("select");
+
+            const numericValue =
+                document.createElement("input");
+
+            numericFilter.classList.add(
+                "statistics-numeric-filter",
+            );
+
+            numericOperator.classList.add(
+                "statistics-numeric-operator",
+            );
+
+            numericOperator.append(
+                createNumericFilterOption(
+                    "",
+                    "Comparar...",
+                ),
+
+                createNumericFilterOption(
+                    "greaterThan",
+                    "Maior que",
+                ),
+
+                createNumericFilterOption(
+                    "greaterThanOrEqual",
+                    "Maior ou igual",
+                ),
+
+                createNumericFilterOption(
+                    "lessThan",
+                    "Menor que",
+                ),
+
+                createNumericFilterOption(
+                    "lessThanOrEqual",
+                    "Menor ou igual",
+                ),
+
+                createNumericFilterOption(
+                    "equal",
+                    "Igual a",
+                ),
+
+                createNumericFilterOption(
+                    "notEqual",
+                    "Diferente de",
+                ),
+            );
+
+            numericOperator.value =
+                columnFilter.numericOperator;
+
+            numericOperator.setAttribute(
+                "aria-label",
+                `Comparação numérica da coluna ${headerValue}`,
+            );
+
+            numericOperator.addEventListener(
+                "change",
+                function () {
+                    columnFilter.numericOperator =
+                        numericOperator.value;
+
+                    renderTableBody();
+                },
+            );
+
+            numericValue.type = "text";
+
+            numericValue.inputMode = "decimal";
+
+            numericValue.placeholder = "Valor";
+
+            numericValue.value =
+                columnFilter.numericValue;
+
+            numericValue.classList.add(
+                "statistics-numeric-value",
+            );
+
+            numericValue.setAttribute(
+                "aria-label",
+                `Valor numérico para filtrar a coluna ${headerValue}`,
+            );
+
+            numericValue.addEventListener(
+                "input",
+                function () {
+                    columnFilter.numericValue =
+                        numericValue.value;
+
+                    renderTableBody();
+                },
+            );
+
+            numericFilter.append(
+                numericOperator,
+                numericValue,
+            );
+
+            filterControls.appendChild(
+                numericFilter,
+            );
+        }
+
+        filterCell.appendChild(filterControls);
 
         filterRow.appendChild(filterCell);
     }
 
-    /*
-     * Se não houver colunas visíveis,
-     * o cabeçalho permanece vazio.
-     */
-
     if (visibleColumnIndexes.length > 0) {
-        tableHead.append(headerRow, filterRow);
+        tableHead.append(
+            headerRow,
+            filterRow,
+        );
     }
 }
 
@@ -1459,17 +1764,88 @@ function renderTableHeader() {
 
 function getFilteredRows() {
     return tableState.rows.filter(function (row) {
-        return tableState.filters.every(function (filterValue, columnIndex) {
-            const normalizedFilter = normalizeSearchValue(filterValue).trim();
+        return tableState.filters.every(
+            function (columnFilter, columnIndex) {
+                /*
+                 * Colunas ocultas não aplicam filtros.
+                 */
 
-            if (!normalizedFilter) {
+                if (
+                    !tableState.visibleColumns.has(
+                        columnIndex,
+                    )
+                ) {
+                    return true;
+                }
+
+                const normalizedCellValue =
+                    normalizeSearchValue(
+                        row[columnIndex],
+                    ).trim();
+
+                const normalizedTextFilter =
+                    normalizeSearchValue(
+                        columnFilter.text,
+                    ).trim();
+
+                /* FILTRO POR TEXTO */
+
+                if (
+                    normalizedTextFilter &&
+                    !normalizedCellValue.includes(
+                        normalizedTextFilter,
+                    )
+                ) {
+                    return false;
+                }
+
+                /* FILTRO DE DUPLICIDADE */
+
+                if (columnFilter.duplicatesOnly) {
+                    const valueCounts =
+                        tableState.columnValueCounts[
+                            columnIndex
+                        ];
+
+                    const valueCount =
+                        valueCounts?.get(
+                            normalizedCellValue,
+                        ) ?? 0;
+
+                    if (
+                        !normalizedCellValue ||
+                        valueCount <= 1
+                    ) {
+                        return false;
+                    }
+                }
+
+                /* FILTRO NUMÉRICO */
+
+                const numericFilterValue =
+                    parseNumericValue(
+                        columnFilter.numericValue,
+                    );
+
+                const hasNumericFilter =
+                    columnFilter.numericOperator !==
+                        "" &&
+                    numericFilterValue !== null;
+
+                if (
+                    hasNumericFilter &&
+                    !matchesNumericFilter(
+                        row[columnIndex],
+                        columnFilter.numericOperator,
+                        numericFilterValue,
+                    )
+                ) {
+                    return false;
+                }
+
                 return true;
-            }
-
-            return normalizeSearchValue(row[columnIndex]).includes(
-                normalizedFilter,
-            );
-        });
+            },
+        );
     });
 }
 
@@ -1572,9 +1948,10 @@ function renderTableBody() {
 
     const filteredRowCount = filteredRows.length;
 
-    const isFiltered = tableState.filters.some(function (filterValue) {
-        return normalizeSearchValue(filterValue).trim().length > 0;
-    });
+    const isFiltered =
+        tableState.filters.some(
+            isColumnFilterActive,
+        );
 
     const previewLimitMessage =
         filteredRowCount > MAX_PREVIEW_ROWS
@@ -1629,6 +2006,15 @@ function renderTable(rows, sheetName) {
         },
     );
 
+    tableState.columnValueCounts =
+        tableState.headers.map(
+            function (unusedHeader, columnIndex) {
+                return createColumnValueCounts(
+                    columnIndex,
+                );
+            },
+        );
+
     /* TODAS AS COLUNAS COMEÇAM VISÍVEIS */
 
     tableState.visibleColumns = new Set(
@@ -1645,7 +2031,15 @@ function renderTable(rows, sheetName) {
 
     tableState.selectedAnalysisColumns.clear();
 
-    tableState.filters = Array(columnCount).fill("");
+    tableState.filters = Array.from(
+        {
+            length: columnCount,
+        },
+
+        function () {
+            return createEmptyColumnFilter();
+        },
+    );
 
     tableState.sortColumn = null;
 
@@ -1680,6 +2074,8 @@ function resetTableState() {
     tableState.selectedAnalysisColumns.clear();
 
     tableState.filters = [];
+
+    tableState.columnValueCounts = [];
 
     tableState.columnCount = 0;
 
