@@ -1,5 +1,3 @@
-const MAX_PREVIEW_ROWS = 500;
-
 const MAX_FREQUENCY_ROWS = 25;
 
 const SUPPORTED_EXTENSIONS = new Set(["xlsx", "xls", "csv"]);
@@ -1489,6 +1487,15 @@ function renderTableHeader() {
     const visibleColumnIndexes = getVisibleColumnIndexes();
 
     filterRow.classList.add("statistics-filter-row");
+    
+    if (
+        typeof window.destroySelect2Fields ===
+        "function"
+    ) {
+        window.destroySelect2Fields(
+            tableHead,
+        );
+    }
 
     tableHead.replaceChildren();
 
@@ -1661,7 +1668,10 @@ function renderTableHeader() {
 
             numericOperator.classList.add(
                 "statistics-numeric-operator",
+                "standard-select",
             );
+
+            numericOperator.style.width = "100%";
 
             numericOperator.append(
                 createNumericFilterOption(
@@ -1771,6 +1781,19 @@ function renderTableHeader() {
             headerRow,
             filterRow,
         );
+
+        if (
+            typeof window.initializeSelect2Fields ===
+            "function"
+        ) {
+            window.initializeSelect2Fields(
+                filterRow,
+            );
+        } else {
+            console.error(
+                "A função initializeSelect2Fields não foi encontrada.",
+            );
+        }
     }
 }
 
@@ -1904,7 +1927,7 @@ function renderTableBody() {
 
     const sortedRows = getSortedRows(filteredRows);
 
-    const visibleRows = sortedRows.slice(0, MAX_PREVIEW_ROWS);
+    const visibleRows = sortedRows;
 
     const visibleColumnIndexes = getVisibleColumnIndexes();
 
