@@ -1501,9 +1501,14 @@ function renderTableHeader() {
 
         const filterCell = document.createElement("th");
 
-        const filterControls = document.createElement("div");
+        const filterControls =
+            document.createElement("div");
 
-        const filterInput = document.createElement("input");
+        const advancedFilters =
+            document.createElement("div");
+
+        const filterInput =
+            document.createElement("input");
 
         const headerValue = tableState.headers[columnIndex];
 
@@ -1554,6 +1559,10 @@ function renderTableHeader() {
 
         filterControls.classList.add(
             "statistics-column-filter-controls",
+        );
+
+        advancedFilters.classList.add(
+            "statistics-advanced-filters",
         );
 
         /* FILTRO POR TEXTO */
@@ -1629,7 +1638,7 @@ function renderTableHeader() {
                 duplicateText,
             );
 
-            filterControls.appendChild(
+            advancedFilters.appendChild(
                 duplicateLabel,
             );
         }
@@ -1741,9 +1750,14 @@ function renderTableHeader() {
                 numericOperator,
                 numericValue,
             );
-
-            filterControls.appendChild(
+            advancedFilters.appendChild(
                 numericFilter,
+            );
+        }
+
+        if (advancedFilters.childElementCount > 0) {
+            filterControls.appendChild(
+                advancedFilters,
             );
         }
 
