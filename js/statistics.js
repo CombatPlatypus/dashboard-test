@@ -8,17 +8,24 @@ const fileInput = document.getElementById("statisticsFileInput");
 
 const clearButton = document.getElementById("statisticsClearFile");
 
+const downloadButton =
+    document.getElementById("statisticsDownloadFile");
+
 const fileStatus = document.getElementById("statisticsFileStatus");
 
 const preview = document.getElementById("statisticsLocalPreview");
 
-const previewSummary = document.getElementById("statisticsPreviewSummary");
+const previewSummary = document.getElementById(
+    "statisticsPreviewSummary",
+);
 
 const table = document.getElementById("statisticsLocalTable");
 
 /* ELEMENTOS DO CONTROLE DE COLUNAS VISÍVEIS */
 
-const visibleColumns = document.getElementById("statisticsVisibleColumns");
+const visibleColumns = document.getElementById(
+    "statisticsVisibleColumns",
+);
 
 const visibleColumnCount = document.getElementById(
     "statisticsVisibleColumnCount",
@@ -36,27 +43,45 @@ const hideEmptyColumnsButton = document.getElementById(
     "statisticsHideEmptyColumns",
 );
 
-const quickAnalysis = document.getElementById("statisticsQuickAnalysis");
+const quickAnalysis = document.getElementById(
+    "statisticsQuickAnalysis",
+);
 
-const analysisColumns = document.getElementById("statisticsAnalysisColumns");
+const analysisColumns = document.getElementById(
+    "statisticsAnalysisColumns",
+);
 
 const selectAllColumnsButton = document.getElementById(
     "statisticsSelectAllColumns",
 );
 
-const clearColumnsButton = document.getElementById("statisticsClearColumns");
+const clearColumnsButton = document.getElementById(
+    "statisticsClearColumns",
+);
 
-const totalRecords = document.getElementById("statisticsTotalRecords");
+const totalRecords = document.getElementById(
+    "statisticsTotalRecords",
+);
 
-const analysisCards = document.getElementById("statisticsAnalysisCards");
+const analysisCards = document.getElementById(
+    "statisticsAnalysisCards",
+);
 
-const analysisResults = document.getElementById("statisticsAnalysisResults");
+const analysisResults = document.getElementById(
+    "statisticsAnalysisResults",
+);
 
-const analysisEmpty = document.getElementById("statisticsAnalysisEmpty");
+const analysisEmpty = document.getElementById(
+    "statisticsAnalysisEmpty",
+);
 
 /* ESTADO DA TABELA INTERATIVA */
 
 const tableState = {
+    sourceFileName: "",
+
+    sourceExtension: "",
+
     sheetName: "",
 
     headers: [],
@@ -84,6 +109,7 @@ const tableState = {
 
 const naturalCollator = new Intl.Collator("pt-BR", {
     numeric: true,
+
     sensitivity: "base",
 });
 
@@ -92,8 +118,11 @@ const naturalCollator = new Intl.Collator("pt-BR", {
 function createEmptyColumnFilter() {
     return {
         text: "",
+
         duplicatesOnly: false,
+
         numericOperator: "",
+
         numericValue: "",
     };
 }
@@ -102,11 +131,15 @@ function createEmptyColumnFilter() {
 
 function isColumnFilterActive(filter) {
     const hasTextFilter =
-        normalizeSearchValue(filter.text).trim().length > 0;
+        normalizeSearchValue(
+            filter.text,
+        ).trim().length > 0;
 
     const hasNumericFilter =
         filter.numericOperator !== "" &&
-        parseNumericValue(filter.numericValue) !== null;
+        parseNumericValue(
+            filter.numericValue,
+        ) !== null;
 
     return (
         hasTextFilter ||
@@ -121,9 +154,10 @@ function createColumnValueCounts(columnIndex) {
     const valueCounts = new Map();
 
     tableState.rows.forEach(function (row) {
-        const normalizedValue = normalizeSearchValue(
-            row[columnIndex],
-        ).trim();
+        const normalizedValue =
+            normalizeSearchValue(
+                row[columnIndex],
+            ).trim();
 
         /*
          * Células vazias não são consideradas duplicadas.
@@ -134,7 +168,9 @@ function createColumnValueCounts(columnIndex) {
         }
 
         const currentCount =
-            valueCounts.get(normalizedValue) ?? 0;
+            valueCounts.get(
+                normalizedValue,
+            ) ?? 0;
 
         valueCounts.set(
             normalizedValue,
@@ -147,8 +183,12 @@ function createColumnValueCounts(columnIndex) {
 
 /* CRIA UMA OPÇÃO DO FILTRO NUMÉRICO */
 
-function createNumericFilterOption(value, label) {
-    const option = document.createElement("option");
+function createNumericFilterOption(
+    value,
+    label,
+) {
+    const option =
+        document.createElement("option");
 
     option.value = value;
 
@@ -163,8 +203,9 @@ function matchesNumericFilter(
     cellValue,
     operator,
     comparisonValue,
- ) {
-    const numericCellValue = parseNumericValue(cellValue);
+) {
+    const numericCellValue =
+        parseNumericValue(cellValue);
 
     if (numericCellValue === null) {
         return false;
@@ -172,22 +213,40 @@ function matchesNumericFilter(
 
     switch (operator) {
         case "greaterThan":
-            return numericCellValue > comparisonValue;
+            return (
+                numericCellValue >
+                comparisonValue
+            );
 
         case "greaterThanOrEqual":
-            return numericCellValue >= comparisonValue;
+            return (
+                numericCellValue >=
+                comparisonValue
+            );
 
         case "lessThan":
-            return numericCellValue < comparisonValue;
+            return (
+                numericCellValue <
+                comparisonValue
+            );
 
         case "lessThanOrEqual":
-            return numericCellValue <= comparisonValue;
+            return (
+                numericCellValue <=
+                comparisonValue
+            );
 
         case "equal":
-            return numericCellValue === comparisonValue;
+            return (
+                numericCellValue ===
+                comparisonValue
+            );
 
         case "notEqual":
-            return numericCellValue !== comparisonValue;
+            return (
+                numericCellValue !==
+                comparisonValue
+            );
 
         default:
             return true;
@@ -196,24 +255,39 @@ function matchesNumericFilter(
 
 /* ATUALIZA A MENSAGEM DO IMPORTADOR */
 
-function setStatus(message, isError = false) {
+function setStatus(
+    message,
+    isError = false,
+) {
     fileStatus.textContent = message;
 
-    fileStatus.classList.toggle("is-error", isError);
+    fileStatus.classList.toggle(
+        "is-error",
+        isError,
+    );
 }
 
 /* VERIFICA A EXTENSÃO DO ARQUIVO */
 
 function isSupportedFile(file) {
-    const extension = file.name.split(".").pop()?.toLowerCase();
+    const extension =
+        file.name
+            .split(".")
+            .pop()
+            ?.toLowerCase();
 
-    return SUPPORTED_EXTENSIONS.has(extension);
+    return SUPPORTED_EXTENSIONS.has(
+        extension,
+    );
 }
 
 /* PREPARA O VALOR PARA EXIBIÇÃO */
 
 function formatCellValue(value) {
-    if (value === null || value === undefined) {
+    if (
+        value === null ||
+        value === undefined
+    ) {
         return "";
     }
 
@@ -223,9 +297,11 @@ function formatCellValue(value) {
 /* CRIA UMA CÉLULA */
 
 function createCell(tagName, value) {
-    const cell = document.createElement(tagName);
+    const cell =
+        document.createElement(tagName);
 
-    cell.textContent = formatCellValue(value);
+    cell.textContent =
+        formatCellValue(value);
 
     return cell;
 }
@@ -235,13 +311,19 @@ function createCell(tagName, value) {
 function normalizeSearchValue(value) {
     return formatCellValue(value)
         .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
+        .replace(
+            /[\u0300-\u036f]/g,
+            "",
+        )
         .toLowerCase();
 }
 
 /* AGRUPA OS VALORES DE UMA COLUNA */
 
-function createFrequencyData(rows, columnIndex) {
+function createFrequencyData(
+    rows,
+    columnIndex,
+) {
     if (columnIndex < 0) {
         return [];
     }
@@ -249,35 +331,60 @@ function createFrequencyData(rows, columnIndex) {
     const groups = new Map();
 
     rows.forEach(function (row) {
-        const displayValue = formatCellValue(row[columnIndex]).trim();
+        const displayValue =
+            formatCellValue(
+                row[columnIndex],
+            ).trim();
 
         if (!displayValue) {
             return;
         }
 
-        const normalizedValue = normalizeSearchValue(displayValue).trim();
+        const normalizedValue =
+            normalizeSearchValue(
+                displayValue,
+            ).trim();
 
-        if (groups.has(normalizedValue)) {
-            groups.get(normalizedValue).count += 1;
+        if (
+            groups.has(
+                normalizedValue,
+            )
+        ) {
+            groups.get(
+                normalizedValue,
+            ).count += 1;
 
             return;
         }
 
-        groups.set(normalizedValue, {
-            label: displayValue,
-            count: 1,
-        });
-    });
+        groups.set(
+            normalizedValue,
+            {
+                label: displayValue,
 
-    return Array.from(groups.values()).sort(function (firstGroup, secondGroup) {
-        return (
-            secondGroup.count - firstGroup.count ||
-            naturalCollator.compare(firstGroup.label, secondGroup.label)
+                count: 1,
+            },
         );
     });
-}
 
-/* MONTA UMA TABELA DE AGRUPAMENTO */
+    return Array.from(
+        groups.values(),
+    ).sort(
+        function (
+            firstGroup,
+            secondGroup,
+        ) {
+            return (
+                secondGroup.count -
+                    firstGroup.count ||
+                naturalCollator.compare(
+                    firstGroup.label,
+                    secondGroup.label,
+                )
+            );
+        },
+    );
+}
 
 /* MONTA UMA TABELA DE AGRUPAMENTO */
 
@@ -287,64 +394,41 @@ function renderFrequencyTable(
     emptyMessage,
     totalOccurrences,
 ) {
-
     tableBody.replaceChildren();
-
 
     if (
         frequencyData.length === 0
     ) {
-
         const row =
-            document.createElement(
-                "tr",
-            );
+            document.createElement("tr");
 
+        const cell = createCell(
+            "td",
+            emptyMessage,
+        );
 
-        const cell =
-            createCell(
-                "td",
-                emptyMessage,
-            );
-
-
-        cell.colSpan =
-            3;
-
+        cell.colSpan = 3;
 
         cell.classList.add(
             "statistics-summary-empty",
         );
 
+        row.appendChild(cell);
 
-        row.appendChild(
-            cell,
-        );
-
-
-        tableBody.appendChild(
-            row,
-        );
-
+        tableBody.appendChild(row);
 
         return;
     }
 
-
     const fragment =
         document.createDocumentFragment();
 
-
     frequencyData.forEach(
-        function (
-            group,
-        ) {
-
+        function (group) {
             const row =
                 document.createElement(
                     "tr",
                 );
-
 
             const valueCell =
                 createCell(
@@ -352,34 +436,28 @@ function renderFrequencyTable(
                     group.label,
                 );
 
-
             const quantityCell =
                 createCell(
                     "td",
                     group.count,
                 );
 
-
             const percentageCell =
                 createCell(
                     "td",
-
                     formatAnalysisPercentage(
                         group.count,
                         totalOccurrences,
                     ),
                 );
 
-
             quantityCell.classList.add(
                 "statistics-summary-number",
             );
 
-
             percentageCell.classList.add(
                 "statistics-summary-number",
             );
-
 
             row.append(
                 valueCell,
@@ -387,77 +465,137 @@ function renderFrequencyTable(
                 percentageCell,
             );
 
-
-            fragment.appendChild(
-                row,
-            );
+            fragment.appendChild(row);
         },
     );
 
-
-    tableBody.appendChild(
-        fragment,
-    );
+    tableBody.appendChild(fragment);
 }
 
 /* VERIFICA SE UMA CÉLULA ESTÁ VAZIA */
 
 function isEmptyCell(value) {
-    return formatCellValue(value).trim() === "";
+    return (
+        formatCellValue(
+            value,
+        ).trim() === ""
+    );
 }
 
 /* CONVERTE UM VALOR NUMÉRICO */
 
 function parseNumericValue(value) {
-    if (typeof value === "number" && Number.isFinite(value)) {
+    if (
+        typeof value === "number" &&
+        Number.isFinite(value)
+    ) {
         return value;
     }
 
-    if (value instanceof Date || isEmptyCell(value)) {
+    if (
+        value instanceof Date ||
+        isEmptyCell(value)
+    ) {
         return null;
     }
 
-    let normalizedValue = formatCellValue(value)
-        .trim()
-        .replace(/\s|\u00a0/g, "")
-        .replace(/^R\$/i, "")
-        .replace(/%$/, "");
+    let normalizedValue =
+        formatCellValue(value)
+            .trim()
+            .replace(
+                /\s|\u00a0/g,
+                "",
+            )
+            .replace(
+                /^R\$/i,
+                "",
+            )
+            .replace(
+                /%$/,
+                "",
+            );
 
-    if (!/^[+-]?\d[\d.,]*$/.test(normalizedValue)) {
+    if (
+        !/^[+-]?\d[\d.,]*$/.test(
+            normalizedValue,
+        )
+    ) {
         return null;
     }
 
-    const lastComma = normalizedValue.lastIndexOf(",");
+    const lastComma =
+        normalizedValue.lastIndexOf(
+            ",",
+        );
 
-    const lastDot = normalizedValue.lastIndexOf(".");
+    const lastDot =
+        normalizedValue.lastIndexOf(
+            ".",
+        );
 
-    if (lastComma >= 0 && lastDot >= 0) {
-        const decimalSeparator = lastComma > lastDot ? "," : ".";
+    if (
+        lastComma >= 0 &&
+        lastDot >= 0
+    ) {
+        const decimalSeparator =
+            lastComma > lastDot
+                ? ","
+                : ".";
 
-        const thousandsSeparator = decimalSeparator === "," ? "." : ",";
+        const thousandsSeparator =
+            decimalSeparator === ","
+                ? "."
+                : ",";
 
-        normalizedValue = normalizedValue
-            .replaceAll(thousandsSeparator, "")
-            .replace(decimalSeparator, ".");
+        normalizedValue =
+            normalizedValue
+                .replaceAll(
+                    thousandsSeparator,
+                    "",
+                )
+                .replace(
+                    decimalSeparator,
+                    ".",
+                );
     } else if (lastComma >= 0) {
-        normalizedValue = normalizedValue.replaceAll(".", "").replace(",", ".");
+        normalizedValue =
+            normalizedValue
+                .replaceAll(".", "")
+                .replace(",", ".");
     } else {
-        normalizedValue = normalizedValue.replaceAll(",", "");
+        normalizedValue =
+            normalizedValue.replaceAll(
+                ",",
+                "",
+            );
     }
 
-    const numericValue = Number(normalizedValue);
+    const numericValue =
+        Number(normalizedValue);
 
-    return Number.isFinite(numericValue) ? numericValue : null;
+    return Number.isFinite(
+        numericValue,
+    )
+        ? numericValue
+        : null;
 }
 
 /* CONVERTE UMA DATA OU DATA/HORA */
 
 function parseDateValue(value) {
-    if (value instanceof Date && !Number.isNaN(value.getTime())) {
+    if (
+        value instanceof Date &&
+        !Number.isNaN(
+            value.getTime(),
+        )
+    ) {
         return value;
     }
 
-    const displayValue = formatCellValue(value).trim();
+    const displayValue =
+        formatCellValue(
+            value,
+        ).trim();
 
     if (!displayValue) {
         return null;
@@ -475,33 +613,62 @@ function parseDateValue(value) {
         return null;
     }
 
-    const startsWithYear = dateMatch[1].length === 4;
+    const startsWithYear =
+        dateMatch[1].length === 4;
 
-    let year = Number(startsWithYear ? dateMatch[1] : dateMatch[3]);
+    let year = Number(
+        startsWithYear
+            ? dateMatch[1]
+            : dateMatch[3],
+    );
 
     if (year < 100) {
-        year += year >= 70 ? 1900 : 2000;
+        year +=
+            year >= 70
+                ? 1900
+                : 2000;
     }
 
-    const month = Number(dateMatch[2]);
+    const month =
+        Number(dateMatch[2]);
 
-    const day = Number(startsWithYear ? dateMatch[3] : dateMatch[1]);
+    const day = Number(
+        startsWithYear
+            ? dateMatch[3]
+            : dateMatch[1],
+    );
 
-    const hour = Number(dateMatch[4] ?? 0);
+    const hour =
+        Number(dateMatch[4] ?? 0);
 
-    const minute = Number(dateMatch[5] ?? 0);
+    const minute =
+        Number(dateMatch[5] ?? 0);
 
-    const second = Number(dateMatch[6] ?? 0);
+    const second =
+        Number(dateMatch[6] ?? 0);
 
-    const parsedDate = new Date(year, month - 1, day, hour, minute, second);
+    const parsedDate = new Date(
+        year,
+        month - 1,
+        day,
+        hour,
+        minute,
+        second,
+    );
 
     if (
-        parsedDate.getFullYear() !== year ||
-        parsedDate.getMonth() !== month - 1 ||
-        parsedDate.getDate() !== day ||
-        parsedDate.getHours() !== hour ||
-        parsedDate.getMinutes() !== minute ||
-        parsedDate.getSeconds() !== second
+        parsedDate.getFullYear() !==
+            year ||
+        parsedDate.getMonth() !==
+            month - 1 ||
+        parsedDate.getDate() !==
+            day ||
+        parsedDate.getHours() !==
+            hour ||
+        parsedDate.getMinutes() !==
+            minute ||
+        parsedDate.getSeconds() !==
+            second
     ) {
         return null;
     }
@@ -524,64 +691,122 @@ function getColumnTypeLabel(type) {
         empty: "Vazia",
     };
 
-    return labels[type] ?? "Texto";
+    return (
+        labels[type] ??
+        "Texto"
+    );
 }
 
 /* RETORNA OS MODOS COMPATÍVEIS COM A COLUNA */
 
-function getAvailableAnalysisModes(detectedType) {
+function getAvailableAnalysisModes(
+    detectedType,
+) {
     const modesByType = {
-        category: ["category", "identifier"],
+        category: [
+            "category",
+            "identifier",
+        ],
 
-        identifier: ["identifier", "category"],
+        identifier: [
+            "identifier",
+            "category",
+        ],
 
-        number: ["number", "category", "identifier"],
+        number: [
+            "number",
+            "category",
+            "identifier",
+        ],
 
-        datetime: ["datetime", "category"],
+        datetime: [
+            "datetime",
+            "category",
+        ],
 
         empty: ["empty"],
     };
 
-    return modesByType[detectedType] ?? ["category"];
+    return (
+        modesByType[
+            detectedType
+        ] ?? ["category"]
+    );
 }
 
 /* DETECTA O TIPO DE UMA COLUNA */
 
-function detectColumnProfile(columnIndex) {
-    const filledValues = tableState.rows
-        .map(function (row) {
-            return row[columnIndex];
-        })
-        .filter(function (value) {
-            return !isEmptyCell(value);
-        });
+function detectColumnProfile(
+    columnIndex,
+) {
+    const filledValues =
+        tableState.rows
+            .map(function (row) {
+                return row[
+                    columnIndex
+                ];
+            })
+            .filter(
+                function (value) {
+                    return !isEmptyCell(
+                        value,
+                    );
+                },
+            );
 
-    if (filledValues.length === 0) {
+    if (
+        filledValues.length === 0
+    ) {
         return {
             type: "empty",
+
             hasTime: false,
         };
     }
 
-    const dateValues = filledValues.filter(function (value) {
-        return parseDateValue(value) !== null;
-    });
+    const dateValues =
+        filledValues.filter(
+            function (value) {
+                return (
+                    parseDateValue(
+                        value,
+                    ) !== null
+                );
+            },
+        );
 
-    const numericValues = filledValues.filter(function (value) {
-        return parseNumericValue(value) !== null;
-    });
+    const numericValues =
+        filledValues.filter(
+            function (value) {
+                return (
+                    parseNumericValue(
+                        value,
+                    ) !== null
+                );
+            },
+        );
 
-    const uniqueValues = new Set(
-        filledValues.map(function (value) {
-            return normalizeSearchValue(value).trim();
-        }),
-    );
+    const uniqueValues =
+        new Set(
+            filledValues.map(
+                function (value) {
+                    return normalizeSearchValue(
+                        value,
+                    ).trim();
+                },
+            ),
+        );
 
-    const uniqueRatio = uniqueValues.size / filledValues.length;
+    const uniqueRatio =
+        uniqueValues.size /
+        filledValues.length;
 
-    const headerValue = normalizeSearchValue(
-        tableState.headers[columnIndex],
-    ).trim();
+    const headerValue =
+        normalizeSearchValue(
+            tableState.headers[
+                columnIndex
+            ],
+        ).trim();
 
     /* VERIFICA SE O NOME INDICA UM IDENTIFICADOR */
 
@@ -589,11 +814,9 @@ function detectColumnProfile(columnIndex) {
         /(^|[\s_-])(id|codigo|code|uuid|chave|key|referencia|reference|pacotes?|packages?|pedidos?|orders?)([\s_-]|$)/.test(
             headerValue,
         ) ||
-
         /(^|[\s_-])(tracking|serial)(?:[\s_-]+number)?([\s_-]|$)/.test(
             headerValue,
         ) ||
-
         headerValue === "at/to";
 
     /* VERIFICA SE OS VALORES PARECEM CÓDIGOS */
@@ -601,15 +824,14 @@ function detectColumnProfile(columnIndex) {
     const identifierLikeValues =
         filledValues.filter(
             function (value) {
-
                 const textValue =
                     formatCellValue(
                         value,
                     ).trim();
 
-
                 return (
-                    textValue.length >= 6 &&
+                    textValue.length >=
+                        6 &&
                     !/\s/.test(
                         textValue,
                     ) &&
@@ -623,28 +845,40 @@ function detectColumnProfile(columnIndex) {
             },
         );
 
-
     const identifierValueRatio =
         identifierLikeValues.length /
         filledValues.length;
-
 
     const isLikelyIdentifier =
         identifierHeader ||
         identifierValueRatio >= 0.8;
 
-
-    if (dateValues.length / filledValues.length >= 0.8) {
+    if (
+        dateValues.length /
+            filledValues.length >=
+        0.8
+    ) {
         return {
             type: "datetime",
 
-            hasTime: filledValues.some(function (value) {
-                return /\d{1,2}:\d{2}/.test(formatCellValue(value));
-            }),
+            hasTime:
+                filledValues.some(
+                    function (value) {
+                        return /\d{1,2}:\d{2}/.test(
+                            formatCellValue(
+                                value,
+                            ),
+                        );
+                    },
+                ),
         };
     }
 
-    if (numericValues.length / filledValues.length >= 0.8) {
+    if (
+        numericValues.length /
+            filledValues.length >=
+        0.8
+    ) {
         return {
             type:
                 isLikelyIdentifier &&
@@ -670,13 +904,18 @@ function detectColumnProfile(columnIndex) {
 /* FORMATA UM NÚMERO DA ANÁLISE */
 
 function formatAnalysisNumber(value) {
-    if (!Number.isFinite(value)) {
+    if (
+        !Number.isFinite(value)
+    ) {
         return "—";
     }
 
-    return new Intl.NumberFormat("pt-BR", {
-        maximumFractionDigits: 2,
-    }).format(value);
+    return new Intl.NumberFormat(
+        "pt-BR",
+        {
+            maximumFractionDigits: 2,
+        },
+    ).format(value);
 }
 
 /* FORMATA UM PERCENTUAL DA ANÁLISE */
@@ -684,23 +923,26 @@ function formatAnalysisNumber(value) {
 function formatAnalysisPercentage(
     quantity,
     total,
- ) {
-
+) {
     if (
-        !Number.isFinite(quantity) ||
-        !Number.isFinite(total) ||
+        !Number.isFinite(
+            quantity,
+        ) ||
+        !Number.isFinite(
+            total,
+        ) ||
         total <= 0
     ) {
-
         return "0,0%";
     }
-
 
     return new Intl.NumberFormat(
         "pt-BR",
         {
             style: "percent",
+
             minimumFractionDigits: 1,
+
             maximumFractionDigits: 1,
         },
     ).format(
@@ -710,8 +952,13 @@ function formatAnalysisPercentage(
 
 /* FORMATA UMA DATA DA ANÁLISE */
 
-function formatAnalysisDate(value, hasTime) {
-    if (!(value instanceof Date)) {
+function formatAnalysisDate(
+    value,
+    hasTime,
+) {
+    if (
+        !(value instanceof Date)
+    ) {
         return "—";
     }
 
@@ -721,6 +968,7 @@ function formatAnalysisDate(value, hasTime) {
         hasTime
             ? {
                   dateStyle: "short",
+
                   timeStyle: "medium",
               }
             : {
@@ -731,11 +979,22 @@ function formatAnalysisDate(value, hasTime) {
 
 /* CRIA UM CARTÃO DA ANÁLISE */
 
-function createAnalysisCard(title, columnName, value) {
-    const card = document.createElement("div");
-    const cardTitle = document.createElement("span");
-    const cardSource = document.createElement("span");
-    const cardValue = document.createElement("strong");
+function createAnalysisCard(
+    title,
+    columnName,
+    value,
+) {
+    const card =
+        document.createElement("div");
+
+    const cardTitle =
+        document.createElement("span");
+
+    const cardSource =
+        document.createElement("span");
+
+    const cardValue =
+        document.createElement("strong");
 
     card.classList.add(
         "statistics-summary-card",
@@ -749,14 +1008,12 @@ function createAnalysisCard(title, columnName, value) {
         "statistics-summary-card-source",
     );
 
-    cardTitle.textContent =
-        title;
+    cardTitle.textContent = title;
 
     cardSource.textContent =
         `De: ${columnName}`;
 
-    cardValue.textContent =
-        value;
+    cardValue.textContent = value;
 
     card.append(
         cardTitle,
@@ -770,11 +1027,15 @@ function createAnalysisCard(title, columnName, value) {
 /* CRIA UM BLOCO DA ANÁLISE */
 
 function createAnalysisBlock(title) {
-    const block = document.createElement("div");
+    const block =
+        document.createElement("div");
 
-    const heading = document.createElement("h4");
+    const heading =
+        document.createElement("h4");
 
-    block.classList.add("statistics-summary-block");
+    block.classList.add(
+        "statistics-summary-block",
+    );
 
     heading.textContent = title;
 
@@ -785,32 +1046,61 @@ function createAnalysisBlock(title) {
 
 /* ADICIONA MÉTRICAS A UM BLOCO */
 
-function appendAnalysisMetrics(block, metrics) {
-    const metricsContainer = document.createElement("div");
+function appendAnalysisMetrics(
+    block,
+    metrics,
+) {
+    const metricsContainer =
+        document.createElement("div");
 
-    metricsContainer.classList.add("statistics-analysis-metrics");
+    metricsContainer.classList.add(
+        "statistics-analysis-metrics",
+    );
 
-    metrics.forEach(function (metric) {
-        const metricElement = document.createElement("div");
+    metrics.forEach(
+        function (metric) {
+            const metricElement =
+                document.createElement(
+                    "div",
+                );
 
-        const metricLabel = document.createElement("span");
+            const metricLabel =
+                document.createElement(
+                    "span",
+                );
 
-        const metricValue = document.createElement("strong");
+            const metricValue =
+                document.createElement(
+                    "strong",
+                );
 
-        metricElement.classList.add("statistics-analysis-metric");
+            metricElement.classList.add(
+                "statistics-analysis-metric",
+            );
 
-        metricLabel.textContent = metric.label;
+            metricLabel.textContent =
+                metric.label;
 
-        metricValue.textContent = metric.value;
+            metricValue.textContent =
+                metric.value;
 
-        metricValue.title = metric.value;
+            metricValue.title =
+                metric.value;
 
-        metricElement.append(metricLabel, metricValue);
+            metricElement.append(
+                metricLabel,
+                metricValue,
+            );
 
-        metricsContainer.appendChild(metricElement);
-    });
+            metricsContainer.appendChild(
+                metricElement,
+            );
+        },
+    );
 
-    block.appendChild(metricsContainer);
+    block.appendChild(
+        metricsContainer,
+    );
 }
 
 /* ADICIONA UMA TABELA DE FREQUÊNCIA A UM BLOCO */
@@ -821,30 +1111,25 @@ function appendFrequencyAnalysis(
     emptyMessage,
     totalOccurrences,
 ) {
-
     const frequencyTable =
         document.createElement(
             "table",
         );
-
 
     const tableHead =
         document.createElement(
             "thead",
         );
 
-
     const headerRow =
         document.createElement(
             "tr",
         );
 
-
     const tableBody =
         document.createElement(
             "tbody",
         );
-
 
     const valueHeader =
         createCell(
@@ -852,13 +1137,11 @@ function appendFrequencyAnalysis(
             "Valores da Coluna",
         );
 
-
     const quantityHeader =
         createCell(
             "th",
             "Quantidade",
         );
-
 
     const percentageHeader =
         createCell(
@@ -866,21 +1149,17 @@ function appendFrequencyAnalysis(
             "Percentual",
         );
 
-
     frequencyTable.classList.add(
         "statistics-summary-table",
     );
-
 
     quantityHeader.classList.add(
         "statistics-summary-number",
     );
 
-
     percentageHeader.classList.add(
         "statistics-summary-number",
     );
-
 
     headerRow.append(
         valueHeader,
@@ -888,17 +1167,14 @@ function appendFrequencyAnalysis(
         percentageHeader,
     );
 
-
     tableHead.appendChild(
         headerRow,
     );
-
 
     frequencyTable.append(
         tableHead,
         tableBody,
     );
-
 
     const percentageBase =
         Number.isFinite(
@@ -910,69 +1186,76 @@ function appendFrequencyAnalysis(
                       total,
                       group,
                   ) {
-
-                      return total +
-                          group.count;
+                      return (
+                          total +
+                          group.count
+                      );
                   },
                   0,
               );
 
-
     renderFrequencyTable(
         tableBody,
-
         frequencyData.slice(
             0,
             MAX_FREQUENCY_ROWS,
         ),
-
         emptyMessage,
-
         percentageBase,
     );
-
 
     block.appendChild(
         frequencyTable,
     );
 
-
     if (
         frequencyData.length >
         MAX_FREQUENCY_ROWS
     ) {
-
         const note =
             document.createElement(
                 "p",
             );
 
-
         note.classList.add(
             "statistics-analysis-note",
         );
 
-
         note.textContent =
             `Exibindo ${MAX_FREQUENCY_ROWS} de ${frequencyData.length} valores.`;
 
-
-        block.appendChild(
-            note,
-        );
+        block.appendChild(note);
     }
 }
 
 /* RETORNA OS ÍNDICES DAS COLUNAS VISÍVEIS */
 
 function getVisibleColumnIndexes() {
-    return Array.from(tableState.visibleColumns)
-        .filter(function (columnIndex) {
-            return columnIndex >= 0 && columnIndex < tableState.columnCount;
-        })
-        .sort(function (firstColumn, secondColumn) {
-            return firstColumn - secondColumn;
-        });
+    return Array.from(
+        tableState.visibleColumns,
+    )
+        .filter(
+            function (
+                columnIndex,
+            ) {
+                return (
+                    columnIndex >= 0 &&
+                    columnIndex <
+                        tableState.columnCount
+                );
+            },
+        )
+        .sort(
+            function (
+                firstColumn,
+                secondColumn,
+            ) {
+                return (
+                    firstColumn -
+                    secondColumn
+                );
+            },
+        );
 }
 
 /* MONTA OS CHECKBOXES DAS COLUNAS VISÍVEIS */
@@ -980,105 +1263,183 @@ function getVisibleColumnIndexes() {
 function renderVisibleColumnSelector() {
     visibleColumns.replaceChildren();
 
-    const fragment = document.createDocumentFragment();
+    const fragment =
+        document.createDocumentFragment();
 
-    const visibleColumnIndexes = getVisibleColumnIndexes();
+    const visibleColumnIndexes =
+        getVisibleColumnIndexes();
 
     /* ATUALIZA O CONTADOR */
 
-    visibleColumnCount.textContent = `${visibleColumnIndexes.length} de ${tableState.columnCount}`;
+    visibleColumnCount.textContent =
+        `${visibleColumnIndexes.length} de ${tableState.columnCount}`;
 
     /* ATUALIZA OS BOTÕES */
 
     showAllColumnsButton.disabled =
         tableState.columnCount === 0 ||
-        visibleColumnIndexes.length === tableState.columnCount;
+        visibleColumnIndexes.length ===
+            tableState.columnCount;
 
-    hideAllColumnsButton.disabled = visibleColumnIndexes.length === 0;
+    hideAllColumnsButton.disabled =
+        visibleColumnIndexes.length ===
+        0;
 
-    hideEmptyColumnsButton.disabled = !tableState.columnProfiles.some(
-        function (profile, columnIndex) {
-            return (
-                profile.type === "empty" &&
-                tableState.visibleColumns.has(columnIndex)
+    hideEmptyColumnsButton.disabled =
+        !tableState.columnProfiles.some(
+            function (
+                profile,
+                columnIndex,
+            ) {
+                return (
+                    profile.type ===
+                        "empty" &&
+                    tableState.visibleColumns.has(
+                        columnIndex,
+                    )
+                );
+            },
+        );
+
+    /* CRIA UM CHECKBOX PARA CADA COLUNA */
+
+    tableState.headers.forEach(
+        function (
+            header,
+            columnIndex,
+        ) {
+            const option =
+                document.createElement(
+                    "div",
+                );
+
+            const label =
+                document.createElement(
+                    "label",
+                );
+
+            const checkbox =
+                document.createElement(
+                    "input",
+                );
+
+            const columnName =
+                document.createElement(
+                    "span",
+                );
+
+            const profile =
+                tableState.columnProfiles[
+                    columnIndex
+                ];
+
+            option.classList.add(
+                "statistics-visible-column-option",
+            );
+
+            option.classList.toggle(
+                "is-empty",
+                profile.type === "empty",
+            );
+
+            checkbox.type =
+                "checkbox";
+
+            checkbox.checked =
+                tableState.visibleColumns.has(
+                    columnIndex,
+                );
+
+            checkbox.setAttribute(
+                "aria-label",
+                `Exibir coluna ${header}`,
+            );
+
+            checkbox.addEventListener(
+                "change",
+                function () {
+                    if (
+                        checkbox.checked
+                    ) {
+                        tableState.visibleColumns.add(
+                            columnIndex,
+                        );
+                    } else {
+                        tableState.visibleColumns.delete(
+                            columnIndex,
+                        );
+                    }
+
+                    refreshVisibleColumns();
+                },
+            );
+
+            columnName.classList.add(
+                "statistics-visible-column-name",
+            );
+
+            columnName.textContent =
+                header;
+
+            columnName.title =
+                profile.type === "empty"
+                    ? `${header} — coluna vazia`
+                    : header;
+
+            label.append(
+                checkbox,
+                columnName,
+            );
+
+            option.appendChild(label);
+
+            fragment.appendChild(
+                option,
             );
         },
     );
 
-    /* CRIA UM CHECKBOX PARA CADA COLUNA */
-
-    tableState.headers.forEach(function (header, columnIndex) {
-        const option = document.createElement("div");
-
-        const label = document.createElement("label");
-
-        const checkbox = document.createElement("input");
-
-        const columnName = document.createElement("span");
-
-        const profile = tableState.columnProfiles[columnIndex];
-
-        option.classList.add("statistics-visible-column-option");
-
-        option.classList.toggle("is-empty", profile.type === "empty");
-
-        checkbox.type = "checkbox";
-
-        checkbox.checked = tableState.visibleColumns.has(columnIndex);
-
-        checkbox.setAttribute("aria-label", `Exibir coluna ${header}`);
-
-        checkbox.addEventListener("change", function () {
-            if (checkbox.checked) {
-                tableState.visibleColumns.add(columnIndex);
-            } else {
-                tableState.visibleColumns.delete(columnIndex);
-            }
-
-            refreshVisibleColumns();
-        });
-
-        columnName.classList.add("statistics-visible-column-name");
-
-        columnName.textContent = header;
-
-        columnName.title =
-            profile.type === "empty" ? `${header} — coluna vazia` : header;
-
-        label.append(checkbox, columnName);
-
-        option.appendChild(label);
-
-        fragment.appendChild(option);
-    });
-
-    visibleColumns.appendChild(fragment);
+    visibleColumns.appendChild(
+        fragment,
+    );
 }
 
 /* ATUALIZA A INTERFACE APÓS MUDAR A VISIBILIDADE */
 
 function refreshVisibleColumns() {
-    tableState.headers.forEach(function (unusedHeader, columnIndex) {
-        const isVisible = tableState.visibleColumns.has(columnIndex);
+    tableState.headers.forEach(
+        function (
+            unusedHeader,
+            columnIndex,
+        ) {
+            const isVisible =
+                tableState.visibleColumns.has(
+                    columnIndex,
+                );
 
-        if (isVisible) {
-            return;
-        }
+            if (isVisible) {
+                return;
+            }
 
-        /*
-         * Remove filtros de colunas ocultadas.
-         * Isso impede filtros invisíveis.
-         */
+            /*
+             * Remove filtros de colunas ocultadas.
+             * Isso impede filtros invisíveis.
+             */
 
-        tableState.filters[columnIndex] =
-            createEmptyColumnFilter();
+            tableState.filters[
+                columnIndex
+            ] =
+                createEmptyColumnFilter();
 
-        /*
-         * Remove a coluna da análise.
-         */
+            /*
+             * Remove a coluna da análise.
+             */
 
-        tableState.selectedAnalysisColumns.delete(columnIndex);
-    });
+            tableState.selectedAnalysisColumns.delete(
+                columnIndex,
+            );
+        },
+    );
 
     /*
      * Cancela a ordenação se a coluna
@@ -1086,12 +1447,17 @@ function refreshVisibleColumns() {
      */
 
     if (
-        tableState.sortColumn !== null &&
-        !tableState.visibleColumns.has(tableState.sortColumn)
+        tableState.sortColumn !==
+            null &&
+        !tableState.visibleColumns.has(
+            tableState.sortColumn,
+        )
     ) {
-        tableState.sortColumn = null;
+        tableState.sortColumn =
+            null;
 
-        tableState.sortDirection = "asc";
+        tableState.sortDirection =
+            "asc";
     }
 
     renderVisibleColumnSelector();
@@ -1108,288 +1474,569 @@ function refreshVisibleColumns() {
 function renderAnalysisColumnSelector() {
     analysisColumns.replaceChildren();
 
-    const fragment = document.createDocumentFragment();
+    const fragment =
+        document.createDocumentFragment();
 
-    tableState.headers.forEach(function (header, columnIndex) {
-        if (!tableState.visibleColumns.has(columnIndex)) {
-            return;
-        }
-
-        const option = document.createElement("div");
-
-        const label = document.createElement("label");
-
-        const checkbox = document.createElement("input");
-
-        const columnName = document.createElement("span");
-
-        const columnModes = document.createElement("div");
-
-        const profile = tableState.columnProfiles[columnIndex];
-
-        const availableModes = getAvailableAnalysisModes(profile.type);
-
-        const selectedMode =
-            tableState.analysisModes.get(columnIndex) ?? profile.type;
-
-        option.classList.add("statistics-column-option");
-
-        checkbox.type = "checkbox";
-
-        checkbox.checked = tableState.selectedAnalysisColumns.has(columnIndex);
-
-        checkbox.setAttribute("aria-label", `Analisar coluna ${header}`);
-
-        checkbox.addEventListener("change", function () {
-            if (checkbox.checked) {
-                tableState.selectedAnalysisColumns.add(columnIndex);
-            } else {
-                tableState.selectedAnalysisColumns.delete(columnIndex);
+    tableState.headers.forEach(
+        function (
+            header,
+            columnIndex,
+        ) {
+            if (
+                !tableState.visibleColumns.has(
+                    columnIndex,
+                )
+            ) {
+                return;
             }
 
-            renderQuickAnalysis(getFilteredRows());
-        });
+            const option =
+                document.createElement(
+                    "div",
+                );
 
-        columnName.classList.add("statistics-column-name");
+            const label =
+                document.createElement(
+                    "label",
+                );
 
-        columnName.textContent = header;
+            const checkbox =
+                document.createElement(
+                    "input",
+                );
 
-        columnName.title = header;
+            const columnName =
+                document.createElement(
+                    "span",
+                );
 
-        columnModes.classList.add("statistics-column-modes");
+            const columnModes =
+                document.createElement(
+                    "div",
+                );
 
-        label.append(checkbox, columnName);
+            const profile =
+                tableState.columnProfiles[
+                    columnIndex
+                ];
 
-        availableModes.forEach(function (mode) {
-            const modeButton = document.createElement("button");
+            const availableModes =
+                getAvailableAnalysisModes(
+                    profile.type,
+                );
 
-            const isActive = selectedMode === mode;
+            const selectedMode =
+                tableState.analysisModes.get(
+                    columnIndex,
+                ) ?? profile.type;
 
-            modeButton.type = "button";
-
-            modeButton.classList.add("statistics-analysis-mode-button");
-
-            modeButton.classList.toggle("is-active", isActive);
-
-            modeButton.textContent = getColumnTypeLabel(mode);
-
-            modeButton.setAttribute("aria-pressed", String(isActive));
-
-            modeButton.setAttribute(
-                "aria-label",
-                `Analisar ${header} como ${getColumnTypeLabel(mode)}`,
+            option.classList.add(
+                "statistics-column-option",
             );
 
-            modeButton.disabled = mode === "empty";
+            checkbox.type =
+                "checkbox";
 
-            modeButton.addEventListener("click", function () {
-                tableState.analysisModes.set(columnIndex, mode);
+            checkbox.checked =
+                tableState.selectedAnalysisColumns.has(
+                    columnIndex,
+                );
 
-                renderAnalysisColumnSelector();
+            checkbox.setAttribute(
+                "aria-label",
+                `Analisar coluna ${header}`,
+            );
 
-                renderQuickAnalysis(getFilteredRows());
-            });
+            checkbox.addEventListener(
+                "change",
+                function () {
+                    if (
+                        checkbox.checked
+                    ) {
+                        tableState.selectedAnalysisColumns.add(
+                            columnIndex,
+                        );
+                    } else {
+                        tableState.selectedAnalysisColumns.delete(
+                            columnIndex,
+                        );
+                    }
 
-            columnModes.appendChild(modeButton);
-        });
+                    renderQuickAnalysis(
+                        getFilteredRows(),
+                    );
+                },
+            );
 
-        option.append(label, columnModes);
+            columnName.classList.add(
+                "statistics-column-name",
+            );
 
-        fragment.appendChild(option);
-    });
+            columnName.textContent =
+                header;
 
-    analysisColumns.appendChild(fragment);
+            columnName.title =
+                header;
 
-    const hasColumns = getVisibleColumnIndexes().length > 0;
+            columnModes.classList.add(
+                "statistics-column-modes",
+            );
 
-    selectAllColumnsButton.disabled = !hasColumns;
+            label.append(
+                checkbox,
+                columnName,
+            );
 
-    clearColumnsButton.disabled = !hasColumns;
+            availableModes.forEach(
+                function (mode) {
+                    const modeButton =
+                        document.createElement(
+                            "button",
+                        );
+
+                    const isActive =
+                        selectedMode ===
+                        mode;
+
+                    modeButton.type =
+                        "button";
+
+                    modeButton.classList.add(
+                        "statistics-analysis-mode-button",
+                    );
+
+                    modeButton.classList.toggle(
+                        "is-active",
+                        isActive,
+                    );
+
+                    modeButton.textContent =
+                        getColumnTypeLabel(
+                            mode,
+                        );
+
+                    modeButton.setAttribute(
+                        "aria-pressed",
+                        String(isActive),
+                    );
+
+                    modeButton.setAttribute(
+                        "aria-label",
+                        `Analisar ${header} como ${getColumnTypeLabel(mode)}`,
+                    );
+
+                    modeButton.disabled =
+                        mode === "empty";
+
+                    modeButton.addEventListener(
+                        "click",
+                        function () {
+                            tableState.analysisModes.set(
+                                columnIndex,
+                                mode,
+                            );
+
+                            renderAnalysisColumnSelector();
+
+                            renderQuickAnalysis(
+                                getFilteredRows(),
+                            );
+                        },
+                    );
+
+                    columnModes.appendChild(
+                        modeButton,
+                    );
+                },
+            );
+
+            option.append(
+                label,
+                columnModes,
+            );
+
+            fragment.appendChild(
+                option,
+            );
+        },
+    );
+
+    analysisColumns.appendChild(
+        fragment,
+    );
+
+    const hasColumns =
+        getVisibleColumnIndexes()
+            .length > 0;
+
+    selectAllColumnsButton.disabled =
+        !hasColumns;
+
+    clearColumnsButton.disabled =
+        !hasColumns;
 }
 
 /* ANALISA UMA COLUNA SELECIONADA */
 
-function renderSelectedColumnAnalysis(rows, columnIndex) {
-    const header = tableState.headers[columnIndex];
+function renderSelectedColumnAnalysis(
+    rows,
+    columnIndex,
+) {
+    const header =
+        tableState.headers[
+            columnIndex
+        ];
 
-    const profile = tableState.columnProfiles[columnIndex];
+    const profile =
+        tableState.columnProfiles[
+            columnIndex
+        ];
 
     const analysisMode =
-        tableState.analysisModes.get(columnIndex) ?? profile.type;
+        tableState.analysisModes.get(
+            columnIndex,
+        ) ?? profile.type;
 
     const filledValues = rows
         .map(function (row) {
             return row[columnIndex];
         })
-        .filter(function (value) {
-            return !isEmptyCell(value);
-        });
+        .filter(
+            function (value) {
+                return !isEmptyCell(
+                    value,
+                );
+            },
+        );
 
-    const emptyCount = rows.length - filledValues.length;
+    const emptyCount =
+        rows.length -
+        filledValues.length;
 
-    const block = createAnalysisBlock(header);
+    const block =
+        createAnalysisBlock(
+            header,
+        );
 
     if (analysisMode === "number") {
-        const numericValues = filledValues
-            .map(parseNumericValue)
-            .filter(function (value) {
-                return value !== null;
-            });
+        const numericValues =
+            filledValues
+                .map(
+                    parseNumericValue,
+                )
+                .filter(
+                    function (value) {
+                        return (
+                            value !==
+                            null
+                        );
+                    },
+                );
 
-        const total = numericValues.reduce(function (sum, value) {
-            return sum + value;
-        }, 0);
+        const total =
+            numericValues.reduce(
+                function (
+                    sum,
+                    value,
+                ) {
+                    return (
+                        sum + value
+                    );
+                },
+                0,
+            );
 
         const average =
-            numericValues.length > 0 ? total / numericValues.length : NaN;
+            numericValues.length > 0
+                ? total /
+                  numericValues.length
+                : NaN;
 
         let minimum = NaN;
 
         let maximum = NaN;
 
-        numericValues.forEach(function (value) {
-            minimum = Number.isNaN(minimum) ? value : Math.min(minimum, value);
+        numericValues.forEach(
+            function (value) {
+                minimum =
+                    Number.isNaN(
+                        minimum,
+                    )
+                        ? value
+                        : Math.min(
+                              minimum,
+                              value,
+                          );
 
-            maximum = Number.isNaN(maximum) ? value : Math.max(maximum, value);
-        });
+                maximum =
+                    Number.isNaN(
+                        maximum,
+                    )
+                        ? value
+                        : Math.max(
+                              maximum,
+                              value,
+                          );
+            },
+        );
 
         analysisCards.appendChild(
             createAnalysisCard(
                 "Total da Coluna",
                 header,
-
-                formatAnalysisNumber(total),
+                formatAnalysisNumber(
+                    total,
+                ),
             ),
         );
 
-        appendAnalysisMetrics(block, [
-            {
-                label: "Total",
+        appendAnalysisMetrics(
+            block,
+            [
+                {
+                    label: "Total",
 
-                value: formatAnalysisNumber(total),
-            },
-            {
-                label: "Média",
+                    value:
+                        formatAnalysisNumber(
+                            total,
+                        ),
+                },
+                {
+                    label: "Média",
 
-                value: formatAnalysisNumber(average),
-            },
-            {
-                label: "Menor valor",
+                    value:
+                        formatAnalysisNumber(
+                            average,
+                        ),
+                },
+                {
+                    label:
+                        "Menor valor",
 
-                value: formatAnalysisNumber(minimum),
-            },
-            {
-                label: "Maior valor",
+                    value:
+                        formatAnalysisNumber(
+                            minimum,
+                        ),
+                },
+                {
+                    label:
+                        "Maior valor",
 
-                value: formatAnalysisNumber(maximum),
-            },
-            {
-                label: "Valores válidos",
+                    value:
+                        formatAnalysisNumber(
+                            maximum,
+                        ),
+                },
+                {
+                    label:
+                        "Valores válidos",
 
-                value: formatAnalysisNumber(numericValues.length),
-            },
-            {
-                label: "Células vazias",
+                    value:
+                        formatAnalysisNumber(
+                            numericValues.length,
+                        ),
+                },
+                {
+                    label:
+                        "Células vazias",
 
-                value: formatAnalysisNumber(emptyCount),
-            },
-        ]);
-    } else if (analysisMode === "datetime") {
-        const dateValues = filledValues
-            .map(parseDateValue)
-            .filter(function (value) {
-                return value !== null;
-            });
+                    value:
+                        formatAnalysisNumber(
+                            emptyCount,
+                        ),
+                },
+            ],
+        );
+    } else if (
+        analysisMode === "datetime"
+    ) {
+        const dateValues =
+            filledValues
+                .map(parseDateValue)
+                .filter(
+                    function (value) {
+                        return (
+                            value !==
+                            null
+                        );
+                    },
+                );
 
-        const firstDate = dateValues.reduce(function (
-            earliestDate,
-            currentDate,
-        ) {
-            return !earliestDate || currentDate < earliestDate
-                ? currentDate
-                : earliestDate;
-        }, null);
+        const firstDate =
+            dateValues.reduce(
+                function (
+                    earliestDate,
+                    currentDate,
+                ) {
+                    return (
+                        !earliestDate ||
+                        currentDate <
+                            earliestDate
+                            ? currentDate
+                            : earliestDate
+                    );
+                },
+                null,
+            );
 
-        const lastDate = dateValues.reduce(function (latestDate, currentDate) {
-            return !latestDate || currentDate > latestDate
-                ? currentDate
-                : latestDate;
-        }, null);
+        const lastDate =
+            dateValues.reduce(
+                function (
+                    latestDate,
+                    currentDate,
+                ) {
+                    return (
+                        !latestDate ||
+                        currentDate >
+                            latestDate
+                            ? currentDate
+                            : latestDate
+                    );
+                },
+                null,
+            );
 
         analysisCards.appendChild(
             createAnalysisCard(
                 "Datas Válidas",
                 header,
-
-                formatAnalysisNumber(dateValues.length),
+                formatAnalysisNumber(
+                    dateValues.length,
+                ),
             ),
         );
 
-        appendAnalysisMetrics(block, [
-            {
-                label: "Data inicial",
+        appendAnalysisMetrics(
+            block,
+            [
+                {
+                    label:
+                        "Data inicial",
 
-                value: formatAnalysisDate(firstDate, profile.hasTime),
-            },
-            {
-                label: "Data final",
+                    value:
+                        formatAnalysisDate(
+                            firstDate,
+                            profile.hasTime,
+                        ),
+                },
+                {
+                    label:
+                        "Data final",
 
-                value: formatAnalysisDate(lastDate, profile.hasTime),
-            },
-            {
-                label: "Valores válidos",
+                    value:
+                        formatAnalysisDate(
+                            lastDate,
+                            profile.hasTime,
+                        ),
+                },
+                {
+                    label:
+                        "Valores válidos",
 
-                value: formatAnalysisNumber(dateValues.length),
-            },
-            {
-                label: "Células vazias",
+                    value:
+                        formatAnalysisNumber(
+                            dateValues.length,
+                        ),
+                },
+                {
+                    label:
+                        "Células vazias",
 
-                value: formatAnalysisNumber(emptyCount),
-            },
-        ]);
-    } else if (analysisMode === "category" || analysisMode === "identifier") {
-        const frequencyData = createFrequencyData(rows, columnIndex);
+                    value:
+                        formatAnalysisNumber(
+                            emptyCount,
+                        ),
+                },
+            ],
+        );
+    } else if (
+        analysisMode ===
+            "category" ||
+        analysisMode ===
+            "identifier"
+    ) {
+        const frequencyData =
+            createFrequencyData(
+                rows,
+                columnIndex,
+            );
 
-        const duplicateCount = filledValues.length - frequencyData.length;
+        const duplicateCount =
+            filledValues.length -
+            frequencyData.length;
 
         analysisCards.appendChild(
             createAnalysisCard(
                 "Valores Únicos",
                 header,
-
-                formatAnalysisNumber(frequencyData.length),
+                formatAnalysisNumber(
+                    frequencyData.length,
+                ),
             ),
         );
 
-        if (analysisMode === "identifier") {
-            appendAnalysisMetrics(block, [
-                {
-                    label: "Valores Preenchidos",
+        if (
+            analysisMode ===
+            "identifier"
+        ) {
+            appendAnalysisMetrics(
+                block,
+                [
+                    {
+                        label:
+                            "Valores Preenchidos",
 
-                    value: formatAnalysisNumber(filledValues.length),
-                },
-                {
-                    label: "Valores únicos",
+                        value:
+                            formatAnalysisNumber(
+                                filledValues.length,
+                            ),
+                    },
+                    {
+                        label:
+                            "Valores únicos",
 
-                    value: formatAnalysisNumber(frequencyData.length),
-                },
-                {
-                    label: "Duplicidades na Coluna",
+                        value:
+                            formatAnalysisNumber(
+                                frequencyData.length,
+                            ),
+                    },
+                    {
+                        label:
+                            "Duplicidades na Coluna",
 
-                    value: formatAnalysisNumber(duplicateCount),
-                },
-                {
-                    label: "Células vazias",
+                        value:
+                            formatAnalysisNumber(
+                                duplicateCount,
+                            ),
+                    },
+                    {
+                        label:
+                            "Células vazias",
 
-                    value: formatAnalysisNumber(emptyCount),
-                },
-            ]);
+                        value:
+                            formatAnalysisNumber(
+                                emptyCount,
+                            ),
+                    },
+                ],
+            );
 
-            const duplicatedValues = frequencyData.filter(function (group) {
-                return group.count > 1;
-            });
+            const duplicatedValues =
+                frequencyData.filter(
+                    function (
+                        group,
+                    ) {
+                        return (
+                            group.count >
+                            1
+                        );
+                    },
+                );
 
-            if (duplicatedValues.length > 0) {
+            if (
+                duplicatedValues.length >
+                0
+            ) {
                 appendFrequencyAnalysis(
                     block,
                     duplicatedValues,
@@ -1404,70 +2051,130 @@ function renderSelectedColumnAnalysis(rows, columnIndex) {
             );
         }
     } else {
-        analysisCards.appendChild(createAnalysisCard("Valores Preenchidos", header, "0"));
+        analysisCards.appendChild(
+            createAnalysisCard(
+                "Valores Preenchidos",
+                header,
+                "0",
+            ),
+        );
 
-        appendAnalysisMetrics(block, [
-            {
-                label: "Valores preenchidos",
-                value: "0",
-            },
-            {
-                label: "Células vazias",
+        appendAnalysisMetrics(
+            block,
+            [
+                {
+                    label:
+                        "Valores preenchidos",
 
-                value: formatAnalysisNumber(rows.length),
-            },
-        ]);
+                    value: "0",
+                },
+                {
+                    label:
+                        "Células vazias",
+
+                    value:
+                        formatAnalysisNumber(
+                            rows.length,
+                        ),
+                },
+            ],
+        );
     }
 
-    analysisResults.appendChild(block);
+    analysisResults.appendChild(
+        block,
+    );
 }
 
 /* ATUALIZA A ANÁLISE RÁPIDA */
 
 function renderQuickAnalysis(rows) {
-    totalRecords.textContent = formatAnalysisNumber(rows.length);
+    totalRecords.textContent =
+        formatAnalysisNumber(
+            rows.length,
+        );
 
     analysisCards.replaceChildren();
 
     analysisResults.replaceChildren();
 
-    const selectedColumns = Array.from(tableState.selectedAnalysisColumns)
-        .filter(function (columnIndex) {
-            return tableState.visibleColumns.has(columnIndex);
-        })
-        .sort(function (firstColumn, secondColumn) {
-            return firstColumn - secondColumn;
-        });
+    const selectedColumns =
+        Array.from(
+            tableState.selectedAnalysisColumns,
+        )
+            .filter(
+                function (
+                    columnIndex,
+                ) {
+                    return tableState.visibleColumns.has(
+                        columnIndex,
+                    );
+                },
+            )
+            .sort(
+                function (
+                    firstColumn,
+                    secondColumn,
+                ) {
+                    return (
+                        firstColumn -
+                        secondColumn
+                    );
+                },
+            );
 
-    analysisEmpty.hidden = selectedColumns.length > 0;
+    analysisEmpty.hidden =
+        selectedColumns.length > 0;
 
-    selectedColumns.forEach(function (columnIndex) {
-        renderSelectedColumnAnalysis(rows, columnIndex);
-    });
+    selectedColumns.forEach(
+        function (columnIndex) {
+            renderSelectedColumnAnalysis(
+                rows,
+                columnIndex,
+            );
+        },
+    );
 
-    quickAnalysis.hidden = false;
+    quickAnalysis.hidden =
+        false;
 }
 
 /* RETORNA O ÍCONE DA ORDENAÇÃO */
 
-function getSortIndicator(columnIndex) {
-    if (tableState.sortColumn !== columnIndex) {
+function getSortIndicator(
+    columnIndex,
+) {
+    if (
+        tableState.sortColumn !==
+        columnIndex
+    ) {
         return "↕";
     }
 
-    return tableState.sortDirection === "asc" ? "↑" : "↓";
+    return tableState.sortDirection ===
+        "asc"
+        ? "↑"
+        : "↓";
 }
 
 /* ALTERA A ORDENAÇÃO */
 
 function changeSort(columnIndex) {
-    if (tableState.sortColumn === columnIndex) {
+    if (
+        tableState.sortColumn ===
+        columnIndex
+    ) {
         tableState.sortDirection =
-            tableState.sortDirection === "asc" ? "desc" : "asc";
+            tableState.sortDirection ===
+            "asc"
+                ? "desc"
+                : "asc";
     } else {
-        tableState.sortColumn = columnIndex;
+        tableState.sortColumn =
+            columnIndex;
 
-        tableState.sortDirection = "asc";
+        tableState.sortDirection =
+            "asc";
     }
 
     renderTableHeader();
@@ -1478,16 +2185,22 @@ function changeSort(columnIndex) {
 /* MONTA OS CABEÇALHOS E FILTROS */
 
 function renderTableHeader() {
-    const tableHead = table.querySelector("thead");
+    const tableHead =
+        table.querySelector("thead");
 
-    const headerRow = document.createElement("tr");
+    const headerRow =
+        document.createElement("tr");
 
-    const filterRow = document.createElement("tr");
+    const filterRow =
+        document.createElement("tr");
 
-    const visibleColumnIndexes = getVisibleColumnIndexes();
+    const visibleColumnIndexes =
+        getVisibleColumnIndexes();
 
-    filterRow.classList.add("statistics-filter-row");
-    
+    filterRow.classList.add(
+        "statistics-filter-row",
+    );
+
     if (
         typeof window.destroySelect2Fields ===
         "function"
@@ -1499,35 +2212,64 @@ function renderTableHeader() {
 
     tableHead.replaceChildren();
 
-    for (const columnIndex of visibleColumnIndexes) {
-        const headerCell = document.createElement("th");
+    for (
+        const columnIndex
+        of visibleColumnIndexes
+    ) {
+        const headerCell =
+            document.createElement(
+                "th",
+            );
 
-        const sortButton = document.createElement("button");
+        const sortButton =
+            document.createElement(
+                "button",
+            );
 
-        const sortIndicator = document.createElement("span");
+        const sortIndicator =
+            document.createElement(
+                "span",
+            );
 
-        const filterCell = document.createElement("th");
+        const filterCell =
+            document.createElement(
+                "th",
+            );
 
         const filterControls =
-            document.createElement("div");
+            document.createElement(
+                "div",
+            );
 
         const advancedFilters =
-            document.createElement("div");
+            document.createElement(
+                "div",
+            );
 
         const filterInput =
-            document.createElement("input");
+            document.createElement(
+                "input",
+            );
 
-        const headerValue = tableState.headers[columnIndex];
+        const headerValue =
+            tableState.headers[
+                columnIndex
+            ];
 
         const columnProfile =
-            tableState.columnProfiles[columnIndex];
+            tableState.columnProfiles[
+                columnIndex
+            ];
 
         const columnFilter =
-            tableState.filters[columnIndex];
+            tableState.filters[
+                columnIndex
+            ];
 
         /* ORDENAÇÃO */
 
-        sortButton.type = "button";
+        sortButton.type =
+            "button";
 
         sortButton.classList.add(
             "statistics-sort-button",
@@ -1539,7 +2281,9 @@ function renderTableHeader() {
         );
 
         sortButton.append(
-            document.createTextNode(headerValue),
+            document.createTextNode(
+                headerValue,
+            ),
         );
 
         sortIndicator.classList.add(
@@ -1547,20 +2291,30 @@ function renderTableHeader() {
         );
 
         sortIndicator.textContent =
-            getSortIndicator(columnIndex);
+            getSortIndicator(
+                columnIndex,
+            );
 
-        sortButton.appendChild(sortIndicator);
+        sortButton.appendChild(
+            sortIndicator,
+        );
 
         sortButton.addEventListener(
             "click",
             function () {
-                changeSort(columnIndex);
+                changeSort(
+                    columnIndex,
+                );
             },
         );
 
-        headerCell.appendChild(sortButton);
+        headerCell.appendChild(
+            sortButton,
+        );
 
-        headerRow.appendChild(headerCell);
+        headerRow.appendChild(
+            headerCell,
+        );
 
         /* CONTAINER DOS FILTROS */
 
@@ -1574,15 +2328,18 @@ function renderTableHeader() {
 
         /* FILTRO POR TEXTO */
 
-        filterInput.type = "search";
+        filterInput.type =
+            "search";
 
         filterInput.classList.add(
             "statistics-column-filter",
         );
 
-        filterInput.placeholder = "Filtrar...";
+        filterInput.placeholder =
+            "Filtrar...";
 
-        filterInput.value = columnFilter.text;
+        filterInput.value =
+            columnFilter.text;
 
         filterInput.setAttribute(
             "aria-label",
@@ -1599,25 +2356,37 @@ function renderTableHeader() {
             },
         );
 
-        filterControls.appendChild(filterInput);
+        filterControls.appendChild(
+            filterInput,
+        );
 
         /* FILTRO DE DUPLICIDADE */
 
-        if (columnProfile.type !== "empty") {
+        if (
+            columnProfile.type !==
+            "empty"
+        ) {
             const duplicateLabel =
-                document.createElement("label");
+                document.createElement(
+                    "label",
+                );
 
             const duplicateCheckbox =
-                document.createElement("input");
+                document.createElement(
+                    "input",
+                );
 
             const duplicateText =
-                document.createElement("span");
+                document.createElement(
+                    "span",
+                );
 
             duplicateLabel.classList.add(
                 "statistics-duplicate-filter",
             );
 
-            duplicateCheckbox.type = "checkbox";
+            duplicateCheckbox.type =
+                "checkbox";
 
             duplicateCheckbox.checked =
                 columnFilter.duplicatesOnly;
@@ -1652,15 +2421,24 @@ function renderTableHeader() {
 
         /* FILTRO PARA COLUNAS NUMÉRICAS */
 
-        if (columnProfile.type === "number") {
+        if (
+            columnProfile.type ===
+            "number"
+        ) {
             const numericFilter =
-                document.createElement("div");
+                document.createElement(
+                    "div",
+                );
 
             const numericOperator =
-                document.createElement("select");
+                document.createElement(
+                    "select",
+                );
 
             const numericValue =
-                document.createElement("input");
+                document.createElement(
+                    "input",
+                );
 
             numericFilter.classList.add(
                 "statistics-numeric-filter",
@@ -1671,7 +2449,8 @@ function renderTableHeader() {
                 "standard-select",
             );
 
-            numericOperator.style.width = "100%";
+            numericOperator.style.width =
+                "100%";
 
             numericOperator.append(
                 createNumericFilterOption(
@@ -1728,11 +2507,14 @@ function renderTableHeader() {
 
             if (
                 window.jQuery &&
-                typeof window.jQuery.fn.select2 ===
+                typeof window.jQuery
+                    .fn.select2 ===
                     "function"
             ) {
                 window
-                    .jQuery(numericOperator)
+                    .jQuery(
+                        numericOperator,
+                    )
                     .on(
                         "change.statisticsNumericFilter",
                         updateNumericOperator,
@@ -1744,11 +2526,14 @@ function renderTableHeader() {
                 );
             }
 
-            numericValue.type = "text";
+            numericValue.type =
+                "text";
 
-            numericValue.inputMode = "decimal";
+            numericValue.inputMode =
+                "decimal";
 
-            numericValue.placeholder = "Valor";
+            numericValue.placeholder =
+                "Valor";
 
             numericValue.value =
                 columnFilter.numericValue;
@@ -1776,23 +2561,34 @@ function renderTableHeader() {
                 numericOperator,
                 numericValue,
             );
+
             advancedFilters.appendChild(
                 numericFilter,
             );
         }
 
-        if (advancedFilters.childElementCount > 0) {
+        if (
+            advancedFilters
+                .childElementCount > 0
+        ) {
             filterControls.appendChild(
                 advancedFilters,
             );
         }
 
-        filterCell.appendChild(filterControls);
+        filterCell.appendChild(
+            filterControls,
+        );
 
-        filterRow.appendChild(filterCell);
+        filterRow.appendChild(
+            filterCell,
+        );
     }
 
-    if (visibleColumnIndexes.length > 0) {
+    if (
+        visibleColumnIndexes.length >
+        0
+    ) {
         tableHead.append(
             headerRow,
             filterRow,
@@ -1816,120 +2612,165 @@ function renderTableHeader() {
 /* APLICA OS FILTROS */
 
 function getFilteredRows() {
-    return tableState.rows.filter(function (row) {
-        return tableState.filters.every(
-            function (columnFilter, columnIndex) {
-                /*
-                 * Colunas ocultas não aplicam filtros.
-                 */
-
-                if (
-                    !tableState.visibleColumns.has(
-                        columnIndex,
-                    )
+    return tableState.rows.filter(
+        function (row) {
+            return tableState.filters.every(
+                function (
+                    columnFilter,
+                    columnIndex,
                 ) {
-                    return true;
-                }
-
-                const normalizedCellValue =
-                    normalizeSearchValue(
-                        row[columnIndex],
-                    ).trim();
-
-                const normalizedTextFilter =
-                    normalizeSearchValue(
-                        columnFilter.text,
-                    ).trim();
-
-                /* FILTRO POR TEXTO */
-
-                if (
-                    normalizedTextFilter &&
-                    !normalizedCellValue.includes(
-                        normalizedTextFilter,
-                    )
-                ) {
-                    return false;
-                }
-
-                /* FILTRO DE DUPLICIDADE */
-
-                if (columnFilter.duplicatesOnly) {
-                    const valueCounts =
-                        tableState.columnValueCounts[
-                            columnIndex
-                        ];
-
-                    const valueCount =
-                        valueCounts?.get(
-                            normalizedCellValue,
-                        ) ?? 0;
+                    /*
+                     * Colunas ocultas não aplicam filtros.
+                     */
 
                     if (
-                        !normalizedCellValue ||
-                        valueCount <= 1
+                        !tableState.visibleColumns.has(
+                            columnIndex,
+                        )
+                    ) {
+                        return true;
+                    }
+
+                    const normalizedCellValue =
+                        normalizeSearchValue(
+                            row[
+                                columnIndex
+                            ],
+                        ).trim();
+
+                    const normalizedTextFilter =
+                        normalizeSearchValue(
+                            columnFilter.text,
+                        ).trim();
+
+                    /* FILTRO POR TEXTO */
+
+                    if (
+                        normalizedTextFilter &&
+                        !normalizedCellValue.includes(
+                            normalizedTextFilter,
+                        )
                     ) {
                         return false;
                     }
-                }
 
-                /* FILTRO NUMÉRICO */
+                    /* FILTRO DE DUPLICIDADE */
 
-                const numericFilterValue =
-                    parseNumericValue(
-                        columnFilter.numericValue,
-                    );
+                    if (
+                        columnFilter.duplicatesOnly
+                    ) {
+                        const valueCounts =
+                            tableState.columnValueCounts[
+                                columnIndex
+                            ];
 
-                const hasNumericFilter =
-                    columnFilter.numericOperator !==
-                        "" &&
-                    numericFilterValue !== null;
+                        const valueCount =
+                            valueCounts?.get(
+                                normalizedCellValue,
+                            ) ?? 0;
 
-                if (
-                    hasNumericFilter &&
-                    !matchesNumericFilter(
-                        row[columnIndex],
-                        columnFilter.numericOperator,
-                        numericFilterValue,
-                    )
-                ) {
-                    return false;
-                }
+                        if (
+                            !normalizedCellValue ||
+                            valueCount <= 1
+                        ) {
+                            return false;
+                        }
+                    }
 
-                return true;
-            },
-        );
-    });
+                    /* FILTRO NUMÉRICO */
+
+                    const numericFilterValue =
+                        parseNumericValue(
+                            columnFilter.numericValue,
+                        );
+
+                    const hasNumericFilter =
+                        columnFilter.numericOperator !==
+                            "" &&
+                        numericFilterValue !==
+                            null;
+
+                    if (
+                        hasNumericFilter &&
+                        !matchesNumericFilter(
+                            row[
+                                columnIndex
+                            ],
+                            columnFilter.numericOperator,
+                            numericFilterValue,
+                        )
+                    ) {
+                        return false;
+                    }
+
+                    return true;
+                },
+            );
+        },
+    );
 }
 
 /* ORDENA OS REGISTROS */
 
 function getSortedRows(rows) {
-    if (tableState.sortColumn === null) {
+    if (
+        tableState.sortColumn ===
+        null
+    ) {
         return rows;
     }
 
-    const sortedRows = [...rows];
+    const sortedRows =
+        [...rows];
 
-    const columnIndex = tableState.sortColumn;
+    const columnIndex =
+        tableState.sortColumn;
 
-    sortedRows.sort(function (firstRow, secondRow) {
-        const firstValue = formatCellValue(firstRow[columnIndex]).trim();
+    sortedRows.sort(
+        function (
+            firstRow,
+            secondRow,
+        ) {
+            const firstValue =
+                formatCellValue(
+                    firstRow[
+                        columnIndex
+                    ],
+                ).trim();
 
-        const secondValue = formatCellValue(secondRow[columnIndex]).trim();
+            const secondValue =
+                formatCellValue(
+                    secondRow[
+                        columnIndex
+                    ],
+                ).trim();
 
-        if (!firstValue && secondValue) {
-            return 1;
-        }
+            if (
+                !firstValue &&
+                secondValue
+            ) {
+                return 1;
+            }
 
-        if (firstValue && !secondValue) {
-            return -1;
-        }
+            if (
+                firstValue &&
+                !secondValue
+            ) {
+                return -1;
+            }
 
-        const comparison = naturalCollator.compare(firstValue, secondValue);
+            const comparison =
+                naturalCollator.compare(
+                    firstValue,
+                    secondValue,
+                );
 
-        return tableState.sortDirection === "asc" ? comparison : -comparison;
-    });
+            return tableState.sortDirection ===
+                "asc"
+                ? comparison
+                : -comparison;
+        },
+    );
 
     return sortedRows;
 }
@@ -1937,130 +2778,225 @@ function getSortedRows(rows) {
 /* MONTA AS LINHAS VISÍVEIS */
 
 function renderTableBody() {
-    const tableBody = table.querySelector("tbody");
+    const tableBody =
+        table.querySelector("tbody");
 
-    const filteredRows = getFilteredRows();
+    const filteredRows =
+        getFilteredRows();
 
-    const sortedRows = getSortedRows(filteredRows);
+    const sortedRows =
+        getSortedRows(
+            filteredRows,
+        );
 
-    const visibleRows = sortedRows;
+    const visibleRows =
+        sortedRows;
 
-    const visibleColumnIndexes = getVisibleColumnIndexes();
+    const visibleColumnIndexes =
+        getVisibleColumnIndexes();
 
     tableBody.replaceChildren();
 
-    if (visibleColumnIndexes.length === 0) {
-        const emptyRow = document.createElement("tr");
+    if (
+        visibleColumnIndexes.length ===
+        0
+    ) {
+        const emptyRow =
+            document.createElement(
+                "tr",
+            );
 
-        const emptyCell = createCell(
-            "td",
-            "Selecione ao menos uma coluna para visualizar a tabela.",
+        const emptyCell =
+            createCell(
+                "td",
+                "Selecione ao menos uma coluna para visualizar a tabela.",
+            );
+
+        emptyRow.classList.add(
+            "statistics-empty-row",
         );
-
-        emptyRow.classList.add("statistics-empty-row");
 
         emptyCell.colSpan = 1;
 
-        emptyRow.appendChild(emptyCell);
-
-        tableBody.appendChild(emptyRow);
-    } else if (visibleRows.length === 0) {
-        const emptyRow = document.createElement("tr");
-
-        const emptyCell = createCell(
-            "td",
-            "Nenhum resultado encontrado para os filtros aplicados.",
+        emptyRow.appendChild(
+            emptyCell,
         );
 
-        emptyRow.classList.add("statistics-empty-row");
+        tableBody.appendChild(
+            emptyRow,
+        );
+    } else if (
+        visibleRows.length === 0
+    ) {
+        const emptyRow =
+            document.createElement(
+                "tr",
+            );
 
-        emptyCell.colSpan = visibleColumnIndexes.length;
+        const emptyCell =
+            createCell(
+                "td",
+                "Nenhum resultado encontrado para os filtros aplicados.",
+            );
 
-        emptyRow.appendChild(emptyCell);
+        emptyRow.classList.add(
+            "statistics-empty-row",
+        );
 
-        tableBody.appendChild(emptyRow);
+        emptyCell.colSpan =
+            visibleColumnIndexes.length;
+
+        emptyRow.appendChild(
+            emptyCell,
+        );
+
+        tableBody.appendChild(
+            emptyRow,
+        );
     } else {
-        const bodyFragment = document.createDocumentFragment();
+        const bodyFragment =
+            document.createDocumentFragment();
 
-        visibleRows.forEach(function (row) {
-            const tableRow = document.createElement("tr");
+        visibleRows.forEach(
+            function (row) {
+                const tableRow =
+                    document.createElement(
+                        "tr",
+                    );
 
-            for (const columnIndex of visibleColumnIndexes) {
-                tableRow.appendChild(createCell("td", row[columnIndex]));
-            }
+                for (
+                    const columnIndex
+                    of visibleColumnIndexes
+                ) {
+                    tableRow.appendChild(
+                        createCell(
+                            "td",
+                            row[
+                                columnIndex
+                            ],
+                        ),
+                    );
+                }
 
-            bodyFragment.appendChild(tableRow);
-        });
+                bodyFragment.appendChild(
+                    tableRow,
+                );
+            },
+        );
 
-        tableBody.appendChild(bodyFragment);
+        tableBody.appendChild(
+            bodyFragment,
+        );
     }
 
-    renderQuickAnalysis(filteredRows);
+    renderQuickAnalysis(
+        filteredRows,
+    );
 
-    const totalRows = tableState.rows.length;
+    const totalRows =
+        tableState.rows.length;
 
-    const filteredRowCount = filteredRows.length;
+    const filteredRowCount =
+        filteredRows.length;
 
     const isFiltered =
         tableState.filters.some(
             isColumnFilterActive,
         );
 
-    const rowCountMessage = isFiltered
-        ? `${filteredRowCount} de ${totalRows} linhas`
-        : `${totalRows} linhas`;
-
-    const columnCountMessage =
-        visibleColumnIndexes.length ===
-        tableState.columnCount
-            ? `${tableState.columnCount} colunas`
-            : `${visibleColumnIndexes.length} de ${tableState.columnCount} colunas`;
+    const rowCountMessage =
+        isFiltered
+            ? `${filteredRowCount} de ${totalRows} linhas`
+            : `${totalRows} linhas`;
 
     previewSummary.textContent =
         `Página: ${tableState.sheetName} / ${rowCountMessage} -`;
-    }
+
+    downloadButton.disabled =
+        !tableState.sourceFileName ||
+        visibleColumnIndexes.length ===
+            0 ||
+        filteredRows.length === 0;
+}
 
 /* MONTA A TABELA INTERATIVA */
 
-function renderTable(rows, sheetName) {
-    const columnCount = rows.reduce(function (largestColumnCount, row) {
-        return Math.max(largestColumnCount, row.length);
-    }, 0);
+function renderTable(
+    rows,
+    sheetName,
+) {
+    const columnCount =
+        rows.reduce(
+            function (
+                largestColumnCount,
+                row,
+            ) {
+                return Math.max(
+                    largestColumnCount,
+                    row.length,
+                );
+            },
+            0,
+        );
 
     if (columnCount === 0) {
-        throw new Error("A primeira aba do arquivo não possui dados.");
+        throw new Error(
+            "A primeira aba do arquivo não possui dados.",
+        );
     }
 
-    const headerValues = rows[0] ?? [];
+    const headerValues =
+        rows[0] ?? [];
 
-    tableState.sheetName = sheetName;
+    tableState.sheetName =
+        sheetName;
 
-    tableState.columnCount = columnCount;
+    tableState.columnCount =
+        columnCount;
 
-    tableState.headers = Array.from(
-        {
-            length: columnCount,
-        },
+    tableState.headers =
+        Array.from(
+            {
+                length:
+                    columnCount,
+            },
 
-        function (unusedValue, columnIndex) {
-            return (
-                formatCellValue(headerValues[columnIndex]).trim() ||
-                `Coluna ${columnIndex + 1}`
-            );
-        },
-    );
+            function (
+                unusedValue,
+                columnIndex,
+            ) {
+                return (
+                    formatCellValue(
+                        headerValues[
+                            columnIndex
+                        ],
+                    ).trim() ||
+                    `Coluna ${columnIndex + 1}`
+                );
+            },
+        );
 
-    tableState.rows = rows.slice(1);
+    tableState.rows =
+        rows.slice(1);
 
-    tableState.columnProfiles = tableState.headers.map(
-        function (unusedHeader, columnIndex) {
-            return detectColumnProfile(columnIndex);
-        },
-    );
+    tableState.columnProfiles =
+        tableState.headers.map(
+            function (
+                unusedHeader,
+                columnIndex,
+            ) {
+                return detectColumnProfile(
+                    columnIndex,
+                );
+            },
+        );
 
     tableState.columnValueCounts =
         tableState.headers.map(
-            function (unusedHeader, columnIndex) {
+            function (
+                unusedHeader,
+                columnIndex,
+            ) {
                 return createColumnValueCounts(
                     columnIndex,
                 );
@@ -2069,33 +3005,52 @@ function renderTable(rows, sheetName) {
 
     /* TODAS AS COLUNAS COMEÇAM VISÍVEIS */
 
-    tableState.visibleColumns = new Set(
-        tableState.headers.map(function (unusedHeader, columnIndex) {
-            return columnIndex;
-        }),
-    );
+    tableState.visibleColumns =
+        new Set(
+            tableState.headers.map(
+                function (
+                    unusedHeader,
+                    columnIndex,
+                ) {
+                    return columnIndex;
+                },
+            ),
+        );
 
-    tableState.analysisModes = new Map(
-        tableState.columnProfiles.map(function (profile, columnIndex) {
-            return [columnIndex, profile.type];
-        }),
-    );
+    tableState.analysisModes =
+        new Map(
+            tableState.columnProfiles.map(
+                function (
+                    profile,
+                    columnIndex,
+                ) {
+                    return [
+                        columnIndex,
+                        profile.type,
+                    ];
+                },
+            ),
+        );
 
     tableState.selectedAnalysisColumns.clear();
 
-    tableState.filters = Array.from(
-        {
-            length: columnCount,
-        },
+    tableState.filters =
+        Array.from(
+            {
+                length:
+                    columnCount,
+            },
 
-        function () {
-            return createEmptyColumnFilter();
-        },
-    );
+            function () {
+                return createEmptyColumnFilter();
+            },
+        );
 
-    tableState.sortColumn = null;
+    tableState.sortColumn =
+        null;
 
-    tableState.sortDirection = "asc";
+    tableState.sortDirection =
+        "asc";
 
     renderVisibleColumnSelector();
 
@@ -2111,13 +3066,20 @@ function renderTable(rows, sheetName) {
 /* LIMPA O ESTADO DA TABELA */
 
 function resetTableState() {
+    tableState.sourceFileName =
+        "";
+
+    tableState.sourceExtension =
+        "";
+
     tableState.sheetName = "";
 
     tableState.headers = [];
 
     tableState.rows = [];
 
-    tableState.columnProfiles = [];
+    tableState.columnProfiles =
+        [];
 
     tableState.visibleColumns.clear();
 
@@ -2127,13 +3089,16 @@ function resetTableState() {
 
     tableState.filters = [];
 
-    tableState.columnValueCounts = [];
+    tableState.columnValueCounts =
+        [];
 
     tableState.columnCount = 0;
 
-    tableState.sortColumn = null;
+    tableState.sortColumn =
+        null;
 
-    tableState.sortDirection = "asc";
+    tableState.sortDirection =
+        "asc";
 }
 
 /* LIMPA A ANÁLISE RÁPIDA */
@@ -2141,37 +3106,50 @@ function resetTableState() {
 function clearQuickAnalysis() {
     quickAnalysis.hidden = true;
 
-    totalRecords.textContent = "0";
+    totalRecords.textContent =
+        "0";
 
     analysisColumns.replaceChildren();
 
     visibleColumns.replaceChildren();
 
-    visibleColumnCount.textContent = "0 de 0";
+    visibleColumnCount.textContent =
+        "0 de 0";
 
     analysisCards.replaceChildren();
 
     analysisResults.replaceChildren();
 
-    analysisEmpty.hidden = false;
+    analysisEmpty.hidden =
+        false;
 
-    selectAllColumnsButton.disabled = true;
+    selectAllColumnsButton.disabled =
+        true;
 
-    clearColumnsButton.disabled = true;
+    clearColumnsButton.disabled =
+        true;
 
-    showAllColumnsButton.disabled = true;
+    showAllColumnsButton.disabled =
+        true;
 
-    hideAllColumnsButton.disabled = true;
+    hideAllColumnsButton.disabled =
+        true;
 
-    hideEmptyColumnsButton.disabled = true;
+    hideEmptyColumnsButton.disabled =
+        true;
 }
 
 /* REMOVE OS DADOS DA TELA */
 
 function clearImportedFile() {
-    const tableHead = table.querySelector("thead");
+    downloadButton.disabled =
+        true;
 
-    const tableBody = table.querySelector("tbody");
+    const tableHead =
+        table.querySelector("thead");
+
+    const tableBody =
+        table.querySelector("tbody");
 
     fileInput.value = "";
 
@@ -2183,7 +3161,8 @@ function clearImportedFile() {
 
     clearQuickAnalysis();
 
-    previewSummary.textContent = "";
+    previewSummary.textContent =
+        "";
 
     preview.hidden = true;
 
@@ -2196,7 +3175,9 @@ function clearImportedFile() {
 
 /* LÊ O ARQUIVO SELECIONADO */
 
-async function readSelectedFile(file) {
+async function readSelectedFile(
+    file,
+) {
     if (!isSupportedFile(file)) {
         throw new Error(
             "Formato não suportado. Selecione um arquivo .xlsx, .xls ou .csv.",
@@ -2209,37 +3190,378 @@ async function readSelectedFile(file) {
         );
     }
 
-    const fileData = await file.arrayBuffer();
+    const fileData =
+        await file.arrayBuffer();
 
-    const workbook = window.XLSX.read(fileData, {
-        cellDates: true,
-        cellFormula: false,
-    });
+    const workbook =
+        window.XLSX.read(
+            fileData,
+            {
+                cellDates: true,
 
-    const sheetName = workbook.SheetNames[0];
+                cellFormula:
+                    false,
+            },
+        );
+
+    const sheetName =
+        workbook.SheetNames[0];
 
     if (!sheetName) {
-        throw new Error("O arquivo não possui nenhuma aba.");
+        throw new Error(
+            "O arquivo não possui nenhuma aba.",
+        );
     }
 
-    const worksheet = workbook.Sheets[sheetName];
+    const worksheet =
+        workbook.Sheets[
+            sheetName
+        ];
 
-    const rows = window.XLSX.utils.sheet_to_json(worksheet, {
-        header: 1,
-        defval: "",
-        raw: false,
-        blankrows: false,
-    });
+    const rows =
+        window.XLSX.utils.sheet_to_json(
+            worksheet,
+            {
+                header: 1,
+
+                defval: "",
+
+                raw: false,
+
+                blankrows:
+                    false,
+            },
+        );
 
     if (rows.length === 0) {
-        throw new Error("A primeira aba do arquivo está vazia.");
+        throw new Error(
+            "A primeira aba do arquivo está vazia.",
+        );
     }
 
-    renderTable(rows, sheetName);
+    tableState.sourceFileName =
+        file.name;
 
-    clearButton.disabled = false;
+    tableState.sourceExtension =
+        file.name
+            .split(".")
+            .pop()
+            ?.toLowerCase() ??
+        "xlsx";
 
-    setStatus(`Arquivo "${file.name}" carregado localmente com sucesso.`);
+    renderTable(
+        rows,
+        sheetName,
+    );
+
+    clearButton.disabled =
+        false;
+
+    setStatus(
+        `Arquivo "${file.name}" carregado localmente com sucesso.`,
+    );
+}
+
+/* CRIA UM NOME SEGURO PARA O ARQUIVO */
+
+function createSafeFileBaseName(
+    fileName,
+) {
+    const lastDotPosition =
+        fileName.lastIndexOf(".");
+
+    const baseName =
+        lastDotPosition > 0
+            ? fileName.slice(
+                  0,
+                  lastDotPosition,
+              )
+            : fileName;
+
+    const safeName =
+        baseName
+            .replace(
+                /[<>:"/\\|?*\u0000-\u001F]/g,
+                "_",
+            )
+            .trim();
+
+    return (
+        safeName ||
+        "planilha"
+    );
+}
+
+/* CRIA UM NOME VÁLIDO PARA A PÁGINA */
+
+function createSafeSheetName(
+    sheetName,
+) {
+    const safeName =
+        formatCellValue(
+            sheetName,
+        )
+            .replace(
+                /[\\/:?*\[\]]/g,
+                " ",
+            )
+            .trim()
+            .slice(0, 31);
+
+    return (
+        safeName ||
+        "Dados"
+    );
+}
+
+/* BAIXA UM ARQUIVO CRIADO COM BLOB */
+
+function downloadBlob(
+    blob,
+    fileName,
+) {
+    const downloadUrl =
+        URL.createObjectURL(
+            blob,
+        );
+
+    const downloadLink =
+        document.createElement("a");
+
+    downloadLink.href =
+        downloadUrl;
+
+    downloadLink.download =
+        fileName;
+
+    document.body.appendChild(
+        downloadLink,
+    );
+
+    downloadLink.click();
+
+    downloadLink.remove();
+
+    window.setTimeout(
+        function () {
+            URL.revokeObjectURL(
+                downloadUrl,
+            );
+        },
+        0,
+    );
+}
+
+/* CALCULA A LARGURA DAS COLUNAS EXPORTADAS */
+
+function createExportColumnWidths(
+    headers,
+    rows,
+) {
+    return headers.map(
+        function (
+            header,
+            columnIndex,
+        ) {
+            let largestLength =
+                formatCellValue(
+                    header,
+                ).length;
+
+            rows.forEach(
+                function (row) {
+                    const cellLength =
+                        formatCellValue(
+                            row[
+                                columnIndex
+                            ],
+                        ).length;
+
+                    largestLength =
+                        Math.max(
+                            largestLength,
+                            cellLength,
+                        );
+                },
+            );
+
+            return {
+                wch: Math.min(
+                    Math.max(
+                        largestLength +
+                            2,
+                        10,
+                    ),
+                    45,
+                ),
+            };
+        },
+    );
+}
+
+/* MONTA E BAIXA A VERSÃO ATUAL DA TABELA */
+
+function downloadCurrentTable() {
+    if (!window.XLSX) {
+        throw new Error(
+            "A biblioteca de planilhas não foi carregada.",
+        );
+    }
+
+    const visibleColumnIndexes =
+        getVisibleColumnIndexes();
+
+    if (
+        visibleColumnIndexes.length ===
+        0
+    ) {
+        throw new Error(
+            "Selecione ao menos uma coluna antes de baixar.",
+        );
+    }
+
+    const filteredRows =
+        getFilteredRows();
+
+    const sortedRows =
+        getSortedRows(
+            filteredRows,
+        );
+
+    if (
+        sortedRows.length === 0
+    ) {
+        throw new Error(
+            "Nenhuma linha foi encontrada para os filtros atuais.",
+        );
+    }
+
+    const exportHeaders =
+        visibleColumnIndexes.map(
+            function (
+                columnIndex,
+            ) {
+                return tableState.headers[
+                    columnIndex
+                ];
+            },
+        );
+
+    const exportRows =
+        sortedRows.map(
+            function (row) {
+                return visibleColumnIndexes.map(
+                    function (
+                        columnIndex,
+                    ) {
+                        return (
+                            row[
+                                columnIndex
+                            ] ?? ""
+                        );
+                    },
+                );
+            },
+        );
+
+    const exportData = [
+        exportHeaders,
+
+        ...exportRows,
+    ];
+
+    const exportWorksheet =
+        window.XLSX.utils.aoa_to_sheet(
+            exportData,
+        );
+
+    exportWorksheet["!cols"] =
+        createExportColumnWidths(
+            exportHeaders,
+            exportRows,
+        );
+
+    const safeBaseName =
+        createSafeFileBaseName(
+            tableState.sourceFileName,
+        );
+
+    const exportBaseName =
+        `${safeBaseName}_nova-versao`;
+
+    /*
+     * CSV É EXPORTADO NOVAMENTE COMO CSV.
+     */
+
+    if (
+        tableState.sourceExtension ===
+        "csv"
+    ) {
+        const csvContent =
+            window.XLSX.utils.sheet_to_csv(
+                exportWorksheet,
+            );
+
+        const csvBlob =
+            new Blob(
+                [
+                    "\uFEFF",
+
+                    csvContent,
+                ],
+                {
+                    type:
+                        "text/csv;charset=utf-8",
+                },
+            );
+
+        const csvFileName =
+            `${exportBaseName}.csv`;
+
+        downloadBlob(
+            csvBlob,
+            csvFileName,
+        );
+
+        setStatus(
+            `Nova versão "${csvFileName}" gerada com ${exportRows.length} registros.`,
+        );
+
+        return;
+    }
+
+    /*
+     * ARQUIVOS XLS E XLSX SÃO EXPORTADOS COMO XLSX.
+     */
+
+    const exportWorkbook =
+        window.XLSX.utils.book_new();
+
+    const safeSheetName =
+        createSafeSheetName(
+            tableState.sheetName,
+        );
+
+    window.XLSX.utils.book_append_sheet(
+        exportWorkbook,
+        exportWorksheet,
+        safeSheetName,
+    );
+
+    const xlsxFileName =
+        `${exportBaseName}.xlsx`;
+
+    window.XLSX.writeFile(
+        exportWorkbook,
+        xlsxFileName,
+        {
+            compression: true,
+        },
+    );
+
+    setStatus(
+        `Nova versão "${xlsxFileName}" gerada com ${exportRows.length} registros.`,
+    );
 }
 
 /* INICIALIZA O IMPORTADOR */
@@ -2248,6 +3570,7 @@ function initializeStatisticsImporter() {
     if (
         !fileInput ||
         !clearButton ||
+        !downloadButton ||
         !fileStatus ||
         !preview ||
         !previewSummary ||
@@ -2274,7 +3597,8 @@ function initializeStatisticsImporter() {
     }
 
     if (!window.XLSX) {
-        fileInput.disabled = true;
+        fileInput.disabled =
+            true;
 
         setStatus(
             "Não foi possível carregar a biblioteca de leitura de planilhas.",
@@ -2284,84 +3608,165 @@ function initializeStatisticsImporter() {
         return;
     }
 
-    fileInput.addEventListener("change", async function () {
-        const file = fileInput.files?.[0];
+    downloadButton.addEventListener(
+        "click",
+        function () {
+            try {
+                downloadCurrentTable();
+            } catch (error) {
+                setStatus(
+                    error instanceof
+                        Error
+                        ? error.message
+                        : "Não foi possível gerar a nova versão.",
+                    true,
+                );
+            }
+        },
+    );
 
-        if (!file) {
-            return;
-        }
+    fileInput.addEventListener(
+        "change",
+        async function () {
+            const file =
+                fileInput.files?.[0];
 
-        setStatus(`Lendo "${file.name}"...`);
-
-        try {
-            await readSelectedFile(file);
-        } catch (error) {
-            table.querySelector("thead").replaceChildren();
-
-            table.querySelector("tbody").replaceChildren();
-
-            resetTableState();
-
-            clearQuickAnalysis();
-
-            previewSummary.textContent = "";
-
-            preview.hidden = true;
-
-            clearButton.disabled = false;
+            if (!file) {
+                return;
+            }
 
             setStatus(
-                error instanceof Error
-                    ? error.message
-                    : "Não foi possível ler o arquivo selecionado.",
-                true,
+                `Lendo "${file.name}"...`,
             );
-        }
-    });
 
-    clearButton.addEventListener("click", clearImportedFile);
+            try {
+                await readSelectedFile(
+                    file,
+                );
+            } catch (error) {
+                downloadButton.disabled =
+                    true;
 
-    selectAllColumnsButton.addEventListener("click", function () {
-        tableState.selectedAnalysisColumns = new Set(getVisibleColumnIndexes());
+                table
+                    .querySelector(
+                        "thead",
+                    )
+                    .replaceChildren();
 
-        renderAnalysisColumnSelector();
+                table
+                    .querySelector(
+                        "tbody",
+                    )
+                    .replaceChildren();
 
-        renderQuickAnalysis(getFilteredRows());
-    });
+                resetTableState();
 
-    clearColumnsButton.addEventListener("click", function () {
-        tableState.selectedAnalysisColumns.clear();
+                clearQuickAnalysis();
 
-        renderAnalysisColumnSelector();
+                previewSummary.textContent =
+                    "";
 
-        renderQuickAnalysis(getFilteredRows());
-    });
+                preview.hidden =
+                    true;
 
-    showAllColumnsButton.addEventListener("click", function () {
-        tableState.visibleColumns = new Set(
-            tableState.headers.map(function (unusedHeader, columnIndex) {
-                return columnIndex;
-            }),
-        );
+                clearButton.disabled =
+                    false;
 
-        refreshVisibleColumns();
-    });
-
-    hideAllColumnsButton.addEventListener("click", function () {
-        tableState.visibleColumns.clear();
-
-        refreshVisibleColumns();
-    });
-
-    hideEmptyColumnsButton.addEventListener("click", function () {
-        tableState.columnProfiles.forEach(function (profile, columnIndex) {
-            if (profile.type === "empty") {
-                tableState.visibleColumns.delete(columnIndex);
+                setStatus(
+                    error instanceof
+                        Error
+                        ? error.message
+                        : "Não foi possível ler o arquivo selecionado.",
+                    true,
+                );
             }
-        });
+        },
+    );
 
-        refreshVisibleColumns();
-    });
+    clearButton.addEventListener(
+        "click",
+        clearImportedFile,
+    );
+
+    selectAllColumnsButton.addEventListener(
+        "click",
+        function () {
+            tableState.selectedAnalysisColumns =
+                new Set(
+                    getVisibleColumnIndexes(),
+                );
+
+            renderAnalysisColumnSelector();
+
+            renderQuickAnalysis(
+                getFilteredRows(),
+            );
+        },
+    );
+
+    clearColumnsButton.addEventListener(
+        "click",
+        function () {
+            tableState.selectedAnalysisColumns.clear();
+
+            renderAnalysisColumnSelector();
+
+            renderQuickAnalysis(
+                getFilteredRows(),
+            );
+        },
+    );
+
+    showAllColumnsButton.addEventListener(
+        "click",
+        function () {
+            tableState.visibleColumns =
+                new Set(
+                    tableState.headers.map(
+                        function (
+                            unusedHeader,
+                            columnIndex,
+                        ) {
+                            return columnIndex;
+                        },
+                    ),
+                );
+
+            refreshVisibleColumns();
+        },
+    );
+
+    hideAllColumnsButton.addEventListener(
+        "click",
+        function () {
+            tableState.visibleColumns.clear();
+
+            refreshVisibleColumns();
+        },
+    );
+
+    hideEmptyColumnsButton.addEventListener(
+        "click",
+        function () {
+            tableState.columnProfiles.forEach(
+                function (
+                    profile,
+                    columnIndex,
+                ) {
+                    if (
+                        profile.type ===
+                        "empty"
+                    ) {
+                        tableState.visibleColumns.delete(
+                            columnIndex,
+                        );
+                    }
+                },
+            );
+
+            refreshVisibleColumns();
+        },
+    );
 }
 
 /* INICIALIZA */
