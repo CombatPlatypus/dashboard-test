@@ -3399,22 +3399,13 @@ function createExportColumnWidths(
     );
 }
 
-/* MONTA E BAIXA A VERSÃO ATUAL DA TABELA */
+/* PREPARA OS DADOS VISÍVEIS PARA EXPORTAÇÃO */
 
-function downloadCurrentTable() {
-    if (!window.XLSX) {
-        throw new Error(
-            "A biblioteca de planilhas não foi carregada.",
-        );
-    }
-
+function createCurrentExportData() {
     const visibleColumnIndexes =
         getVisibleColumnIndexes();
 
-    if (
-        visibleColumnIndexes.length ===
-        0
-    ) {
+    if (visibleColumnIndexes.length === 0) {
         throw new Error(
             "Selecione ao menos uma coluna antes de baixar.",
         );
@@ -3424,115 +3415,125 @@ function downloadCurrentTable() {
         getFilteredRows();
 
     const sortedRows =
-        getSortedRows(
-            filteredRows,
-        );
+        getSortedRows(filteredRows);
 
-    if (
-        sortedRows.length === 0
-    ) {
+    if (sortedRows.length === 0) {
         throw new Error(
             "Nenhuma linha foi encontrada para os filtros atuais.",
         );
     }
 
-    const exportHeaders =
+    const headers =
         visibleColumnIndexes.map(
-            function (
-                columnIndex,
-            ) {
+            function (columnIndex) {
                 return tableState.headers[
                     columnIndex
                 ];
             },
         );
 
-    const exportRows =
-        sortedRows.map(
-            function (row) {
-                return visibleColumnIndexes.map(
-                    function (
-                        columnIndex,
-                    ) {
-                        return (
-                            row[
-                                columnIndex
-                            ] ?? ""
-                        );
-                    },
-                );
-            },
+    const rows =
+        sortedRows.map(function (row) {
+            return visibleColumnIndexes.map(
+                function (columnIndex) {
+                    return (
+                        row[columnIndex] ?? ""
+                    );
+                },
+            );
+        });
+
+    return {
+        headers,
+
+        rows,
+
+        matrix: [
+            headers,
+
+            ...rows,
+        ],
+    };
+}
+/* BAIXA OS DADOS ATUAIS COMO CSV */
+
+function downloadCurrentTableAsCsv() {
+    if (!window.XLSX) {
+        throw new Error(
+            "A biblioteca de planilhas não foi carregada.",
         );
+    }
 
-    const exportData = [
-        exportHeaders,
-
-        ...exportRows,
-    ];
+    const exportData =
+        createCurrentExportData();
 
     const exportWorksheet =
         window.XLSX.utils.aoa_to_sheet(
-            exportData,
+            exportData.matrix,
         );
 
-    exportWorksheet["!cols"] =
-        createExportColumnWidths(
-            exportHeaders,
-            exportRows,
+    const csvContent =
+        window.XLSX.utils.sheet_to_csv(
+            exportWorksheet,
         );
+
+    /*
+     * O BOM UTF-8 ajuda o Excel e o Google Planilhas
+     * a reconhecerem corretamente acentos e caracteres especiais.
+     */
+
+    const csvBlob = new Blob(
+        [
+            "\uFEFF",
+
+            csvContent,
+        ],
+        {
+            type:
+                "text/csv;charset=utf-8",
+        },
+    );
 
     const safeBaseName =
         createSafeFileBaseName(
             tableState.sourceFileName,
         );
 
-    const exportBaseName =
-        `${safeBaseName}_nova-versao`;
+    const csvFileName =
+        `${safeBaseName}_nova-versao.csv`;
 
-    /*
-     * CSV É EXPORTADO NOVAMENTE COMO CSV.
-     */
+    downloadBlob(
+        csvBlob,
+        csvFileName,
+    );
 
-    if (
-        tableState.sourceExtension ===
-        "csv"
-    ) {
-        const csvContent =
-            window.XLSX.utils.sheet_to_csv(
-                exportWorksheet,
-            );
+    setStatus(
+        `Nova versão "${csvFileName}" gerada com ${exportData.rows.length} registros.`,
+    );
+}
 
-        const csvBlob =
-            new Blob(
-                [
-                    "\uFEFF",
+/* BAIXA OS DADOS ATUAIS COMO XLSX */
 
-                    csvContent,
-                ],
-                {
-                    type:
-                        "text/csv;charset=utf-8",
-                },
-            );
-
-        const csvFileName =
-            `${exportBaseName}.csv`;
-
-        downloadBlob(
-            csvBlob,
-            csvFileName,
+function downloadCurrentTableAsXlsx() {
+    if (!window.XLSX) {
+        throw new Error(
+            "A biblioteca de planilhas não foi carregada.",
         );
-
-        setStatus(
-            `Nova versão "${csvFileName}" gerada com ${exportRows.length} registros.`,
-        );
-
-        return;
     }
 
-    /*
-     * ARQUIVOS XLS E XLSX SÃO EXPORTADOS COMO XLSX.
-     */
+    const exportData =
+        createCurrentExportData();
+
+    const exportWorksheet =
+        window.XLSX.utils.aoa_to_sheet(
+            exportData.matrix,
+        );
+
+    exportWorksheet["!cols"] =
+        createExportColumnWidths(
+            exportData.headers,
+            exportData.rows,
+        );
 
     const exportWorkbook =
         window.XLSX.utils.book_new();
@@ -3548,8 +3549,18 @@ function downloadCurrentTable() {
         safeSheetName,
     );
 
+    /*
+     * Futuramente, a página de gráficos será
+     * adicionada ao mesmo workbook neste ponto.
+     */
+
+    const safeBaseName =
+        createSafeFileBaseName(
+            tableState.sourceFileName,
+        );
+
     const xlsxFileName =
-        `${exportBaseName}.xlsx`;
+        `${safeBaseName}_nova-versao.xlsx`;
 
     window.XLSX.writeFile(
         exportWorkbook,
@@ -3560,7 +3571,7 @@ function downloadCurrentTable() {
     );
 
     setStatus(
-        `Nova versão "${xlsxFileName}" gerada com ${exportRows.length} registros.`,
+        `Nova versão "${xlsxFileName}" gerada com ${exportData.rows.length} registros.`,
     );
 }
 
@@ -3612,7 +3623,7 @@ function initializeStatisticsImporter() {
         "click",
         function () {
             try {
-                downloadCurrentTable();
+                downloadCurrentTableAsXlsx();
             } catch (error) {
                 setStatus(
                     error instanceof
