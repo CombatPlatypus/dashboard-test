@@ -214,7 +214,7 @@
                         background-color: #2e2e2e;
                         border: 1px solid transparent;
                         border-radius: 3px;
-                        font-size: 10px;
+                        font-size: 12px;
                         letter-spacing: 0.4px;
                         line-height: 1.2;
                         cursor: pointer;
@@ -304,7 +304,7 @@
                     }
                     .statistics-summary-card span {
                         color: #b9bcc1;
-                        font-size: 12px;
+                        font-size: 13px;
                         letter-spacing: 1px;
                     }
                     .statistics-summary-card h4 {
@@ -314,6 +314,16 @@
                     .statistics-summary-card strong {
                         font-size: 28px;
                         line-height: 1;
+                    }
+                    .statistics-summary-card-title {
+                        color: #e4e6eb !important;
+                        font-size: 13px !important;
+                    }
+
+                    .statistics-summary-card-source {
+                        color: #b9bcc1 !important;
+                        font-size: 13px !important;
+                        letter-spacing: 1px !important;
                     }
                     .statistics-summary-tables {
                         margin-top: 15px;
@@ -328,12 +338,15 @@
                         border-radius: 5px;
                         overflow: hidden;
                     }
-
+                    .statistics-summary-block div {
+                        border-bottom: 1px solid #525252;
+                        align-items: center;
+                        padding-left: 15px;
+                    }
                     .statistics-summary-block h4 {
                         margin: 0;
                         padding: 12px 14px;
                         font-size: 13px;
-                        border-bottom: 1px solid #525252;
                         display: flex;
                         align-items: center;
                         gap: 10px;
@@ -579,10 +592,10 @@
                         font-size: 12px;
                         text-align: left;
                     }
-                    .statistics-summary-table thead th:last-child,
-                    .statistics-summary-table tbody td:last-child {
-                        width: 90px;
+                    .statistics-summary-table .statistics-summary-number {
+                        width: 110px;
                         text-align: right;
+                        white-space: nowrap;
                     }
                     .statistics-summary-table tbody tr {
                         border-top: 1px solid #393a3b;
@@ -970,7 +983,7 @@
                                     </div>
 
                                     <div class="statistics-summary-card statistics-total-records-card">
-                                        <span>Linhas Encontradas</span>
+                                        <span>Linhas Analisadas</span>
                                         <strong id="statisticsTotalRecords">0</strong>
                                     </div>
                                 </div>
