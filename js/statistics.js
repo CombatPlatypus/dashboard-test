@@ -1,5 +1,7 @@
 const MAX_FREQUENCY_ROWS = 25;
 
+const MAX_CHART_ITEMS = 25;
+
 const SUPPORTED_EXTENSIONS = new Set(["xlsx", "xls", "csv"]);
 
 /* LOCALIZA OS ELEMENTOS DO PAINEL */
@@ -136,6 +138,26 @@ const chartState = {
     type: "bar",
 
     color: "#1abc9c",
+};
+
+/* FUNDO DO GRÁFICO E DA IMAGEM PNG */
+
+const chartBackgroundPlugin = {
+    id: "statisticsChartBackground",
+
+    beforeDraw(chart, unusedArguments, options) {
+        const context = chart.ctx;
+
+        context.save();
+
+        context.globalCompositeOperation = "destination-over";
+
+        context.fillStyle = options.color ?? "#18191a";
+
+        context.fillRect(0, 0, chart.width, chart.height);
+
+        context.restore();
+    },
 };
 
 const naturalCollator = new Intl.Collator("pt-BR", {
@@ -2965,6 +2987,8 @@ function renderTableBody() {
     setDownloadButtonsDisabled(
         downloadsDisabled,
     );
+
+    renderChart();
 }
 
 /* ATUALIZA A APARÊNCIA DE UM SELECT2 */
@@ -3031,6 +3055,289 @@ function updateChartValueField() {
     updateChartSelect2(chartOperation);
 
     updateChartSelect2(chartValue);
+}
+
+/* AGRUPA OS DADOS SELECIONADOS PARA O GRÁFICO */
+
+function createGroupedChartData() {
+    if (chartCategory.value === "") {
+        return null;
+    }
+
+    const operation = chartOperation.value;
+
+    const valueRequired = operation !== "count";
+
+    if (valueRequired && chartValue.value === "") {
+        return null;
+    }
+
+    const categoryIndex = Number(chartCategory.value);
+
+    const valueIndex = valueRequired
+        ? Number(chartValue.value)
+        : null;
+
+    const groups = new Map();
+
+    getFilteredRows().forEach(function (row) {
+        const categoryText =
+            formatCellValue(row[categoryIndex]).trim() || "Sem valor";
+
+        const categoryKey =
+            normalizeSearchValue(categoryText).trim() || "__empty__";
+
+        const group = groups.get(categoryKey) ?? {
+            label: categoryText,
+
+            total: 0,
+
+            quantity: 0,
+        };
+
+        if (operation === "count") {
+            group.total += 1;
+
+            group.quantity += 1;
+        } else {
+            const numericValue = parseNumericValue(row[valueIndex]);
+
+            if (numericValue === null) {
+                return;
+            }
+
+            group.total += numericValue;
+
+            group.quantity += 1;
+        }
+
+        groups.set(categoryKey, group);
+    });
+
+    const groupedItems = Array.from(groups.values())
+        .map(function (group) {
+            const value =
+                operation === "average"
+                    ? group.total / group.quantity
+                    : group.total;
+
+            return {
+                label: group.label,
+
+                value,
+            };
+        })
+        .filter(function (item) {
+            return Number.isFinite(item.value);
+        })
+        .sort(function (firstItem, secondItem) {
+            return (
+                secondItem.value - firstItem.value ||
+                naturalCollator.compare(firstItem.label, secondItem.label)
+            );
+        });
+
+    const limitedItems = groupedItems.slice(0, MAX_CHART_ITEMS);
+
+    const categoryName = tableState.headers[categoryIndex];
+
+    const valueName =
+        valueIndex !== null
+            ? tableState.headers[valueIndex]
+            : "";
+
+    const operationNames = {
+        count: "Quantidade",
+
+        sum: "Soma",
+
+        average: "Média",
+    };
+
+    const title =
+        operation === "count"
+            ? `Quantidade por ${categoryName}`
+            : `${operationNames[operation]} de ${valueName} por ${categoryName}`;
+
+    return {
+        labels: limitedItems.map(function (item) {
+            return item.label;
+        }),
+
+        values: limitedItems.map(function (item) {
+            return item.value;
+        }),
+
+        title:
+            groupedItems.length > MAX_CHART_ITEMS
+                ? `${title} — 25 maiores resultados`
+                : title,
+    };
+}
+
+/* REMOVE O GRÁFICO ATUAL */
+
+function destroyChart() {
+    if (chartState.instance) {
+        chartState.instance.destroy();
+
+        chartState.instance = null;
+    }
+
+    chartDownloadButton.disabled = true;
+}
+
+/* MONTA O GRÁFICO DE COLUNAS */
+
+function renderChart() {
+    destroyChart();
+
+    if (!window.Chart) {
+        return;
+    }
+
+    const chartData = createGroupedChartData();
+
+    if (!chartData || chartData.values.length === 0) {
+        return;
+    }
+
+    chartState.instance = new window.Chart(chartCanvas, {
+        type: "bar",
+
+        data: {
+            labels: chartData.labels,
+
+            datasets: [
+                {
+                    label: chartData.title,
+
+                    data: chartData.values,
+
+                    backgroundColor: chartState.color,
+
+                    borderColor: chartState.color,
+
+                    borderWidth: 1,
+
+                    borderRadius: 3,
+                },
+            ],
+        },
+
+        options: {
+            responsive: true,
+
+            maintainAspectRatio: false,
+
+            animation: false,
+
+            locale: "pt-BR",
+
+            plugins: {
+                statisticsChartBackground: {
+                    color: "#18191a",
+                },
+
+                legend: {
+                    display: false,
+                },
+
+                title: {
+                    display: true,
+
+                    text: chartData.title,
+
+                    color: "#e4e6eb",
+
+                    font: {
+                        size: 16,
+                    },
+
+                    padding: {
+                        bottom: 25,
+                    },
+                },
+
+                tooltip: {
+                    displayColors: false,
+                },
+            },
+
+            scales: {
+                x: {
+                    ticks: {
+                        color: "#e4e6eb",
+
+                        maxRotation: 45,
+
+                        minRotation: 0,
+                    },
+
+                    grid: {
+                        color: "rgba(82, 82, 82, 0.35)",
+                    },
+
+                    border: {
+                        color: "#8b8d91",
+                    },
+                },
+
+                y: {
+                    beginAtZero: true,
+
+                    ticks: {
+                        color: "#e4e6eb",
+
+                        callback(value) {
+                            return formatAnalysisNumber(Number(value));
+                        },
+                    },
+
+                    grid: {
+                        color: "rgba(82, 82, 82, 0.35)",
+                    },
+
+                    border: {
+                        color: "#8b8d91",
+                    },
+                },
+            },
+        },
+
+        plugins: [
+            chartBackgroundPlugin,
+        ],
+    });
+
+    chartDownloadButton.disabled = false;
+}
+
+/* BAIXA O GRÁFICO COMO IMAGEM PNG */
+
+function downloadChartImage() {
+    if (!chartState.instance) {
+        return;
+    }
+
+    const fileBaseName = createSafeFileBaseName(
+        tableState.sourceFileName || "grafico",
+    );
+
+    const downloadLink = document.createElement("a");
+
+    downloadLink.download = `${fileBaseName}-grafico.png`;
+
+    downloadLink.href = chartState.instance.toBase64Image(
+        "image/png",
+        1,
+    );
+
+    document.body.appendChild(downloadLink);
+
+    downloadLink.click();
+
+    downloadLink.remove();
 }
 
 /* PREENCHE OS CAMPOS DE COLUNAS DO GRÁFICO */
@@ -3110,12 +3417,17 @@ function showChartPanel() {
 
     renderChartColumnSelectors();
 
+    renderChart();
+
     chartPanel.hidden = false;
 }
 
 /* LIMPA E OCULTA O PAINEL DE GRÁFICOS */
 
 function clearChartPanel() {
+
+    destroyChart();
+
     const categoryPlaceholder = document.createElement("option");
 
     const valuePlaceholder = document.createElement("option");
@@ -3882,7 +4194,47 @@ function initializeStatisticsImporter() {
 
     const handleChartOperationChange = function () {
         updateChartValueField();
+
+        renderChart();
     };
+
+    const handleChartDataChange = function () {
+        renderChart();
+    };
+
+    if (
+        window.jQuery &&
+        typeof window.jQuery.fn.select2 === "function"
+    ) {
+        window
+            .jQuery(chartCategory)
+            .on(
+                "change.statisticsChartData",
+                handleChartDataChange,
+            );
+
+        window
+            .jQuery(chartValue)
+            .on(
+                "change.statisticsChartData",
+                handleChartDataChange,
+            );
+    } else {
+        chartCategory.addEventListener(
+            "change",
+            handleChartDataChange,
+        );
+
+        chartValue.addEventListener(
+            "change",
+            handleChartDataChange,
+        );
+    }
+
+    chartDownloadButton.addEventListener(
+        "click",
+        downloadChartImage,
+    );
 
     if (
         window.jQuery &&
