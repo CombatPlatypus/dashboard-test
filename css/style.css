@@ -717,12 +717,23 @@ select[multiple] {
         color: #8b8d91;
     }
 
-    /* SELECT COM FOCO */
+    /* SELECT COM FOCO OU ABERTO */
 
     .select2-container--default.select2-container--focus
+    .select2-selection--single,
+    .select2-container--default.select2-container--open
     .select2-selection--single {
-        background-color: #141414;
-        border-color: #8b8d91;
+        border-color: #525252;
+        box-shadow: none;
+        outline: none;
+    }
+
+    /* SELECT ABERTO */
+
+    .select2-container--default.select2-container--open
+    .select2-selection--single {
+        color: #e4e6eb;
+        background-color: #1f1f1f;
     }
 
     /* OPÇÃO ATUALMENTE SELECIONADA */
