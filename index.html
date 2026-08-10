@@ -672,6 +672,25 @@
                         padding: 7px 8px !important;
                         background-color: #242424;
                     }
+                    /* LINHA DOS FILTROS */
+
+                    .statistics-filter-row th {
+                        padding: 8px !important;
+                        vertical-align: top;
+                        background-color: #242424;
+                    }
+
+                    /* CONJUNTO DE FILTROS DA COLUNA */
+
+                    .statistics-column-filter-controls {
+                        min-width: 210px;
+                        display: flex;
+                        flex-direction: column;
+                        gap: 8px;
+                    }
+
+                    /* FILTRO POR TEXTO */
+
                     .statistics-column-filter {
                         width: 100%;
                         height: 34px;
@@ -682,20 +701,115 @@
                         border: 1px solid #525252;
                         border-radius: 3px;
                         box-shadow: none;
+                        font-family: inherit;
                         font-size: 12px;
+                        letter-spacing: 0.5px;
                     }
+
                     .statistics-column-filter:focus {
-                        border-color: #8b8d91;
+                        color: #e4e6eb;
                         background-color: #141414;
+                        border-color: #525252;
                         box-shadow: none;
+                        outline: none;
                     }
+
                     .statistics-column-filter::placeholder {
                         color: #8b8d91;
                     }
-                    .statistics-empty-row td {
-                        padding: 18px 12px !important;
-                        color: #b9bcc1;
-                        text-align: center !important;
+
+                    /* FILTROS ABAIXO DO CAMPO DE TEXTO */
+
+                    .statistics-advanced-filters {
+                        min-height: 34px;
+                        display: flex;
+                        align-items: center;
+                        flex-wrap: wrap;
+                        gap: 8px 12px;
+                    }
+
+                    /* FILTRO DE DUPLICIDADE */
+
+                    .statistics-duplicate-filter {
+                        min-height: 34px;
+                        margin: 0;
+                        display: flex;
+                        align-items: center;
+                        gap: 7px;
+                        flex: 0 0 auto;
+                        color: #e4e6eb;
+                        font-family: inherit;
+                        font-size: 12px;
+                        font-weight: 600;
+                        letter-spacing: 0.5px;
+                        line-height: 1.2;
+                        white-space: nowrap;
+                        cursor: pointer;
+                        user-select: none;
+                    }
+
+                    .statistics-duplicate-filter:hover {
+                        color: #ffffff;
+                    }
+
+                    .statistics-duplicate-filter input[type="checkbox"] {
+                        width: 13px;
+                        height: 13px;
+                        margin: 0;
+                        flex: 0 0 auto;
+                        cursor: pointer;
+                        accent-color: #e4e6eb;
+                    }
+
+                    /* FILTRO NUMÉRICO */
+
+                    .statistics-numeric-filter {
+                        min-width: 190px;
+                        display: flex;
+                        align-items: center;
+                        flex: 1 1 210px;
+                        gap: 6px;
+                    }
+
+                    /* SELECT2 DENTRO DO FILTRO */
+
+                    .statistics-numeric-filter
+                    .select2-container {
+                        width: auto !important;
+                        min-width: 125px;
+                        flex: 1 1 140px;
+                    }
+
+                    /* CAMPO DO VALOR NUMÉRICO */
+
+                    .statistics-numeric-value {
+                        width: 65px;
+                        min-width: 65px;
+                        height: 34px;
+                        margin: 0;
+                        padding: 6px 8px;
+                        flex: 0 0 65px;
+                        color: #e4e6eb;
+                        background-color: #141414;
+                        border: 1px solid #525252;
+                        border-radius: 3px;
+                        box-shadow: none;
+                        font-family: inherit;
+                        font-size: 12px;
+                        letter-spacing: 0.5px;
+                        text-align: center;
+                    }
+
+                    .statistics-numeric-value:focus {
+                        color: #e4e6eb;
+                        background-color: #141414;
+                        border-color: #525252;
+                        box-shadow: none;
+                        outline: none;
+                    }
+
+                    .statistics-numeric-value::placeholder {
+                        color: #8b8d91;
                     }
 
                     /* ? */
@@ -864,13 +978,6 @@
                         <!-- IMPORTAÇÃO LOCAL -->
 
                         <section class="import-panel">
-
-                            <select name="category" class="standard-select" style="width: 100%">
-                                <option value="firearm">Arma de Fogo</option>
-                                <option value="melee-weapon">Corpo a Corpo</option>
-                                <option value="throwable">Arremessável</option>
-                            </select>
-
                             <div class="flex-box-start">
                                 <img src="images/geral-icons/import-icon.svg">
                                 <h3>Importe a Planilha</h3>
