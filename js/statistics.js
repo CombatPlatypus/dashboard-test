@@ -8,8 +8,15 @@ const fileInput = document.getElementById("statisticsFileInput");
 
 const clearButton = document.getElementById("statisticsClearFile");
 
-const downloadButton =
-    document.getElementById("statisticsDownloadFile");
+const downloadCsvButton =
+    document.getElementById(
+        "statisticsDownloadCsv",
+    );
+
+const downloadXlsxButton =
+    document.getElementById(
+        "statisticsDownloadXlsx",
+    );
 
 const fileStatus = document.getElementById("statisticsFileStatus");
 
@@ -79,8 +86,6 @@ const analysisEmpty = document.getElementById(
 
 const tableState = {
     sourceFileName: "",
-
-    sourceExtension: "",
 
     sheetName: "",
 
@@ -265,6 +270,18 @@ function setStatus(
         "is-error",
         isError,
     );
+}
+
+/* ATUALIZA O ESTADO DOS BOTÕES DE DOWNLOAD */
+
+function setDownloadButtonsDisabled(
+    disabled,
+) {
+    downloadCsvButton.disabled =
+        disabled;
+
+    downloadXlsxButton.disabled =
+        disabled;
 }
 
 /* VERIFICA A EXTENSÃO DO ARQUIVO */
@@ -2912,11 +2929,14 @@ function renderTableBody() {
     previewSummary.textContent =
         `Página: ${tableState.sheetName} / ${rowCountMessage} -`;
 
-    downloadButton.disabled =
+    const downloadsDisabled =
         !tableState.sourceFileName ||
-        visibleColumnIndexes.length ===
-            0 ||
+        visibleColumnIndexes.length === 0 ||
         filteredRows.length === 0;
+
+    setDownloadButtonsDisabled(
+        downloadsDisabled,
+    );
 }
 
 /* MONTA A TABELA INTERATIVA */
@@ -3142,8 +3162,9 @@ function clearQuickAnalysis() {
 /* REMOVE OS DADOS DA TELA */
 
 function clearImportedFile() {
-    downloadButton.disabled =
-        true;
+    setDownloadButtonsDisabled(
+        true,
+    );
 
     const tableHead =
         table.querySelector("thead");
@@ -3241,13 +3262,6 @@ async function readSelectedFile(
 
     tableState.sourceFileName =
         file.name;
-
-    tableState.sourceExtension =
-        file.name
-            .split(".")
-            .pop()
-            ?.toLowerCase() ??
-        "xlsx";
 
     renderTable(
         rows,
@@ -3575,13 +3589,31 @@ function downloadCurrentTableAsXlsx() {
     );
 }
 
+/* EXECUTA UM DOWNLOAD E TRATA POSSÍVEIS ERROS */
+
+function executeTableDownload(
+    downloadFunction,
+) {
+    try {
+        downloadFunction();
+    } catch (error) {
+        setStatus(
+            error instanceof Error
+                ? error.message
+                : "Não foi possível gerar a nova versão.",
+            true,
+        );
+    }
+}
+
 /* INICIALIZA O IMPORTADOR */
 
 function initializeStatisticsImporter() {
     if (
         !fileInput ||
         !clearButton ||
-        !downloadButton ||
+        !downloadCsvButton ||
+        !downloadXlsxButton ||
         !fileStatus ||
         !preview ||
         !previewSummary ||
@@ -3619,20 +3651,21 @@ function initializeStatisticsImporter() {
         return;
     }
 
-    downloadButton.addEventListener(
+    downloadCsvButton.addEventListener(
         "click",
         function () {
-            try {
-                downloadCurrentTableAsXlsx();
-            } catch (error) {
-                setStatus(
-                    error instanceof
-                        Error
-                        ? error.message
-                        : "Não foi possível gerar a nova versão.",
-                    true,
-                );
-            }
+            executeTableDownload(
+                downloadCurrentTableAsCsv,
+            );
+        },
+    );
+
+    downloadXlsxButton.addEventListener(
+        "click",
+        function () {
+            executeTableDownload(
+                downloadCurrentTableAsXlsx,
+            );
         },
     );
 
@@ -3655,8 +3688,9 @@ function initializeStatisticsImporter() {
                     file,
                 );
             } catch (error) {
-                downloadButton.disabled =
-                    true;
+                setDownloadButtonsDisabled(
+                    true,
+                );
 
                 table
                     .querySelector(
