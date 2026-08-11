@@ -2128,6 +2128,18 @@ a.thumbnail image {
             border: 1px solid #525252;
             border-radius: 5px;
         }
+        .statistics-table-container::-webkit-scrollbar-track {
+            background-color: transparent;
+        }
+        .statistics-table-container::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+            background-color: transparent;
+        }
+        .statistics-table-container::-webkit-scrollbar-thumb {
+            background-color: #525252;
+            border-radius: 5px;
+        }
         .statistics-local-table {
             min-width: 650px;
             color: #e4e6eb;
