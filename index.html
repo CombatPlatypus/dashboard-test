@@ -31,7 +31,7 @@
         <nav class="main-menu">
             <div class="flex-box-between">
                 <div class="container-1 flex-box-start">
-                    <img src="images/geral-icons/hub-logo.svg">
+                    <img src="images/geral-icons/hub-logo-menu.svg">
 
                     <div>
                         <h3>Dashboard do Inventário</h3>
@@ -192,6 +192,16 @@
                                                 <span id="statisticsVisibleColumnCount">
                                                     0 de 0
                                                 </span>
+
+                                                <label for="statisticsPreviewLimit">Exibir até</label>
+
+                                                <select id="statisticsPreviewLimit" class="standard-select">
+                                                    <option value="50">50 linhas</option>
+                                                    <option value="100">100 linhas</option>
+                                                    <option value="250">250 linhas</option>
+                                                    <option value="500">500 linhas</option>
+                                                    <option value="all" selected>Todas as linhas</option>
+                                                </select>
                                             </div>
 
                                             <div class="statistics-visible-columns-actions">
@@ -291,13 +301,13 @@
                                                 <option value="">Selecione uma coluna</option>
                                             </select>
 
-                                            <h4>Tipo de Cálculo</h4>
+                                            <h4>Calcular Usando</h4>
 
                                             <select id="statisticsChartValue" class="standard-select">
                                                 <option value="">Selecione uma coluna</option>
                                             </select>
 
-                                            <h4>Calcular Usando</h4>
+                                            <h4>Tipo de Cálculo</h4>
 
                                             <select id="statisticsChartOperation" class="standard-select">
                                                 <option value="count">Contar Registros</option>
