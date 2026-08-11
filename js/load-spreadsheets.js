@@ -943,20 +943,20 @@ function initializeStatisticsSpreadsheet(
             "switch-1"
         );
 
+    if (!statisticsIframe) {
+        return;
+    }
 
     if (
         !statisticsPanel ||
-        !statisticsIframe ||
         !mainTabs
     ) {
-
         console.error(
             "Elementos do painel Estatísticas não foram encontrados."
         );
 
         return;
     }
-
 
     statisticsIframe.dataset.src =
         configuration.url;
