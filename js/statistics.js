@@ -2,6 +2,8 @@ const MAX_FREQUENCY_ROWS = 25;
 
 const MAX_CHART_ITEMS = 25;
 
+const MAX_PIE_ITEMS = 10;
+
 const SUPPORTED_EXTENSIONS = new Set(["xlsx", "xls", "csv"]);
 
 /* LOCALIZA OS ELEMENTOS DO PAINEL */
@@ -87,18 +89,14 @@ const analysisEmpty = document.getElementById(
 /* ELEMENTOS DA MONTAGEM DE GRÁFICOS */
 
 const chartPanel = document.getElementById("statisticsChartPanel");
-
 const chartSummary = document.getElementById("statisticsChartSummary");
-
 const chartCategory = document.getElementById("statisticsChartCategory");
-
 const chartValue = document.getElementById("statisticsChartValue");
-
 const chartOperation = document.getElementById("statisticsChartOperation");
-
-const chartDownloadButton = document.getElementById("statisticsChartDownload");
-
+const chartTypes = document.getElementById("statisticsChartTypes");
+const chartColors = document.getElementById("statisticsChartColors");
 const chartCanvas = document.getElementById("statisticsChartCanvas");
+const chartDownloadButton = document.getElementById("statisticsChartDownload");
 
 /* ESTADO DA TABELA INTERATIVA */
 
@@ -3137,7 +3135,12 @@ function createGroupedChartData() {
             );
         });
 
-    const limitedItems = groupedItems.slice(0, MAX_CHART_ITEMS);
+    const itemLimit =
+        chartState.type === "pie"
+            ? MAX_PIE_ITEMS
+            : MAX_CHART_ITEMS;
+
+    const limitedItems = groupedItems.slice(0, itemLimit);
 
     const categoryName = tableState.headers[categoryIndex];
 
@@ -3169,8 +3172,8 @@ function createGroupedChartData() {
         }),
 
         title:
-            groupedItems.length > MAX_CHART_ITEMS
-                ? `${title} — 25 maiores resultados`
+            groupedItems.length > itemLimit
+                ? `${title} — ${itemLimit} maiores resultados`
                 : title,
     };
 }
@@ -3187,153 +3190,237 @@ function destroyChart() {
     chartDownloadButton.disabled = true;
 }
 
-/* MONTA O GRÁFICO DE COLUNAS */
+/* MARCA O BOTÃO ATIVO */
+
+function setActiveChartButton(container, activeButton) {
+    container.querySelectorAll("button").forEach(function (button) {
+        button.setAttribute(
+            "aria-pressed",
+            String(button === activeButton),
+        );
+    });
+}
+
+/* MONTA A PALETA DE CORES DO GRÁFICO */
+
+function createChartColorPalette(quantity) {
+    const availableColors = Array.from(
+        chartColors.querySelectorAll("[data-chart-color]"),
+    ).map(function (button) {
+        return button.dataset.chartColor;
+    });
+
+    const selectedColorIndex = availableColors.indexOf(chartState.color);
+
+    const orderedColors =
+        selectedColorIndex >= 0
+            ? [
+                ...availableColors.slice(selectedColorIndex),
+                ...availableColors.slice(0, selectedColorIndex),
+            ]
+            : [
+                chartState.color,
+                ...availableColors,
+            ];
+
+    return Array.from(
+        {
+            length: quantity,
+        },
+        function (unusedValue, colorIndex) {
+            return orderedColors[colorIndex % orderedColors.length];
+        },
+    );
+}
+
+/* MONTA A APARÊNCIA DO CONJUNTO DE DADOS */
+
+function createChartDataset(chartData) {
+    const dataset = {
+        label: chartData.title,
+
+        data: chartData.values,
+    };
+
+    if (chartState.type === "pie") {
+        return {
+            ...dataset,
+
+            backgroundColor: createChartColorPalette(
+                chartData.values.length,
+            ),
+
+            borderColor: "#18191a",
+
+            borderWidth: 2,
+
+            hoverOffset: 8,
+        };
+    }
+
+    if (chartState.type === "line") {
+        return {
+            ...dataset,
+
+            backgroundColor: chartState.color,
+
+            borderColor: chartState.color,
+
+            borderWidth: 3,
+
+            pointRadius: 4,
+
+            pointHoverRadius: 6,
+
+            pointBackgroundColor: chartState.color,
+
+            tension: 0.25,
+
+            fill: false,
+        };
+    }
+
+    return {
+        ...dataset,
+
+        backgroundColor: chartState.color,
+
+        borderColor: chartState.color,
+
+        borderWidth: 1,
+
+        borderRadius: 3,
+    };
+}
+
+/* MONTA OS EIXOS DOS GRÁFICOS */
+
+function createChartScales() {
+    return {
+        x: {
+            ticks: {
+                color: "#e4e6eb",
+
+                padding: 12,
+
+                maxRotation: 45,
+
+                minRotation: 0,
+            },
+
+            grid: {
+                color: "rgba(82, 82, 82, 0.35)",
+            },
+
+            border: {
+                color: "#8b8d91",
+            },
+        },
+
+        y: {
+            beginAtZero: true,
+
+            ticks: {
+                color: "#e4e6eb",
+
+                padding: 12,
+
+                callback(value) {
+                    return formatAnalysisNumber(Number(value));
+                },
+            },
+
+            grid: {
+                color: "rgba(82, 82, 82, 0.35)",
+            },
+
+            border: {
+                color: "#8b8d91",
+            },
+        },
+    };
+}
+
+/* MONTA O GRÁFICO */
 
 function renderChart() {
-    destroyChart();
-
-    if (!window.Chart) {
+    if (!window.Chart || !tableState.rows.length) {
+        destroyChart();
+        chartDownloadButton.disabled = true;
         return;
     }
 
     const chartData = createGroupedChartData();
 
-    if (!chartData || chartData.values.length === 0) {
+    if (!chartData || !chartData.labels.length) {
+        destroyChart();
+        chartDownloadButton.disabled = true;
         return;
     }
 
-    chartState.instance = new window.Chart(chartCanvas, {
-        type: "bar",
+    destroyChart();
 
+    const pieChart = chartState.type === "pie";
+
+    chartState.instance = new window.Chart(chartCanvas, {
+        type: chartState.type,
         data: {
             labels: chartData.labels,
-
-            datasets: [
-                {
-                    label: chartData.title,
-
-                    data: chartData.values,
-
-                    backgroundColor: chartState.color,
-
-                    borderColor: chartState.color,
-
-                    borderWidth: 1,
-
-                    borderRadius: 3,
-                },
-            ],
+            datasets: [createChartDataset(chartData)],
         },
-
         options: {
             responsive: true,
-
             maintainAspectRatio: false,
-
             animation: false,
-
             locale: "pt-BR",
-
             layout: {
                 padding: {
                     top: 10,
-
                     right: 20,
-
                     bottom: 20,
-
                     left: 20,
                 },
             },
-
             plugins: {
                 statisticsChartBackground: {
                     color: "#18191a",
                 },
-
                 legend: {
-                    display: false,
+                    display: pieChart,
+                    position: "bottom",
+                    labels: {
+                        color: "#e4e6eb",
+                        padding: 15,
+                        usePointStyle: true,
+                        font: {
+                            family: "'Open Sans', sans-serif",
+                            size: 12,
+                        },
+                    },
                 },
-
                 title: {
                     display: true,
-
                     text: chartData.title,
-
                     color: "#e4e6eb",
-
                     font: {
                         family: "'Open Sans', sans-serif",
-
                         size: 16,
-
                         style: "normal",
-
                         weight: 600,
-
                         lineHeight: 1.3,
                     },
-
                     padding: {
                         top: 20,
-
                         bottom: 30,
                     },
                 },
-
                 tooltip: {
-                    displayColors: false,
+                    displayColors: pieChart,
                 },
             },
-
-            scales: {
-                x: {
-                    ticks: {
-                        color: "#e4e6eb",
-
-                        padding: 12,
-
-                        maxRotation: 45,
-
-                        minRotation: 0,
-                    },
-
-                    grid: {
-                        color: "rgba(82, 82, 82, 0.35)",
-                    },
-
-                    border: {
-                        color: "#8b8d91",
-                    },
-                },
-
-                y: {
-                    beginAtZero: true,
-
-                    ticks: {
-                        color: "#e4e6eb",
-
-                        padding: 12,
-
-                        callback(value) {
-                            return formatAnalysisNumber(Number(value));
-                        },
-                    },
-
-                    grid: {
-                        color: "rgba(82, 82, 82, 0.35)",
-                    },
-
-                    border: {
-                        color: "#8b8d91",
-                    },
-                },
-            },
+            scales: pieChart ? undefined : createChartScales(),
         },
-
-        plugins: [
-            chartBackgroundPlugin,
-        ],
+        plugins: [chartBackgroundPlugin],
     });
 
     chartDownloadButton.disabled = false;
@@ -4187,11 +4274,13 @@ function initializeStatisticsImporter() {
         !analysisEmpty ||
         !chartPanel ||
         !chartSummary ||
-        !chartDownloadButton ||
         !chartCategory ||
         !chartValue ||
         !chartOperation ||
-        !chartCanvas
+        !chartTypes ||
+        !chartColors ||
+        !chartCanvas ||
+        !chartDownloadButton
     ) {
         console.error(
             "Elementos do importador de Estatísticas não foram encontrados.",
@@ -4269,6 +4358,44 @@ function initializeStatisticsImporter() {
             handleChartDataChange,
         );
     }
+
+    chartTypes.addEventListener("click", function (event) {
+        const eventTarget = event.target instanceof Element ? event.target : null;
+        const typeButton = eventTarget?.closest("button[data-chart-type]");
+
+        if (!typeButton || !chartTypes.contains(typeButton)) {
+            return;
+        }
+
+        const selectedType = typeButton.dataset.chartType;
+
+        if (!["bar", "line", "pie"].includes(selectedType)) {
+            return;
+        }
+
+        chartState.type = selectedType;
+        setActiveChartButton(chartTypes, typeButton);
+        renderChart();
+    });
+
+    chartColors.addEventListener("click", function (event) {
+        const eventTarget = event.target instanceof Element ? event.target : null;
+        const colorButton = eventTarget?.closest("button[data-chart-color]");
+
+        if (!colorButton || !chartColors.contains(colorButton)) {
+            return;
+        }
+
+        const selectedColor = colorButton.dataset.chartColor;
+
+        if (!selectedColor) {
+            return;
+        }
+
+        chartState.color = selectedColor;
+        setActiveChartButton(chartColors, colorButton);
+        renderChart();
+    });
 
     chartDownloadButton.addEventListener(
         "click",
