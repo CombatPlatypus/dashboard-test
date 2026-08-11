@@ -3251,12 +3251,21 @@ function renderChart() {
                     color: "#e4e6eb",
 
                     font: {
+                        family: "'Open Sans', sans-serif",
+
                         size: 16,
+
+                        style: "normal",
+
+                        weight: 600,
+
+                        lineHeight: 1.3,
                     },
 
                     padding: {
                         top: 20,
-                        bottom: 25,
+
+                        bottom: 30,
                     },
                 },
 
