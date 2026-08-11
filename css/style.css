@@ -2428,14 +2428,15 @@ a.thumbnail image {
         width: 100%;
         align-items: stretch;
     }
-
     .charts-control {
         flex: 0 0 500px;
         padding-top: 30px;
         padding-right: 30px;
         border-right: 2px solid #525252;
     }
-
+    .charts-control p {
+        margin: 0;
+    }
     .charts-control > h4 {
         margin-bottom: 15px;
     }
