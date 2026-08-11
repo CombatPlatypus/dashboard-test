@@ -136,7 +136,7 @@ const chartState = {
 
     type: "bar",
 
-    color: "#1abc9c",
+    color: "#fb5330",
 };
 
 /* FUNDO DO GRÁFICO E DA IMAGEM PNG */
