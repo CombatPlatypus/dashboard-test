@@ -97,6 +97,7 @@ const chartTypes = document.getElementById("statisticsChartTypes");
 const chartColors = document.getElementById("statisticsChartColors");
 const chartCanvas = document.getElementById("statisticsChartCanvas");
 const chartDownloadButton = document.getElementById("statisticsChartDownload");
+const statisticsPanel = document.getElementById("statistics");
 
 /* ESTADO DA TABELA INTERATIVA */
 
@@ -3830,6 +3831,8 @@ function clearImportedFile() {
 
     clearButton.disabled = true;
 
+    statisticsPanel.classList.add("no-file");
+
     setStatus(
         "Nenhum arquivo selecionado. O arquivo será lido somente neste navegador.",
     );
@@ -3908,6 +3911,8 @@ async function readSelectedFile(
         rows,
         sheetName,
     );
+
+    statisticsPanel.classList.remove("no-file");
 
     clearButton.disabled =
         false;
@@ -4251,6 +4256,7 @@ function executeTableDownload(
 
 function initializeStatisticsImporter() {
     if (
+        !statisticsPanel ||
         !fileInput ||
         !clearButton ||
         !downloadCsvButton ||
@@ -4477,6 +4483,8 @@ function initializeStatisticsImporter() {
                 clearQuickAnalysis();
 
                 clearChartPanel();
+
+                statisticsPanel.classList.add("no-file");
 
                 previewSummary.textContent =
                     "";
