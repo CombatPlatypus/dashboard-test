@@ -30,6 +30,10 @@ const previewSummary = document.getElementById(
     "statisticsPreviewSummary",
 );
 
+const previewLimit = document.getElementById(
+    "statisticsPreviewLimit",
+);
+
 const table = document.getElementById("statisticsLocalTable");
 
 /* ELEMENTOS DO CONTROLE DE COLUNAS VISÍVEIS */
@@ -2841,6 +2845,23 @@ function getSortedRows(rows) {
     return sortedRows;
 }
 
+/* RETORNA O LIMITE DE LINHAS DA PRÉVIA */
+
+function getPreviewRowLimit() {
+    if (previewLimit.value === "all") {
+        return null;
+    }
+
+    const selectedLimit = Number(
+        previewLimit.value,
+    );
+
+    return Number.isInteger(selectedLimit) &&
+        selectedLimit > 0
+        ? selectedLimit
+        : null;
+}
+
 /* MONTA AS LINHAS VISÍVEIS */
 
 function renderTableBody() {
@@ -2855,8 +2876,16 @@ function renderTableBody() {
             filteredRows,
         );
 
+    const rowLimit =
+        getPreviewRowLimit();
+
     const visibleRows =
-        sortedRows;
+        rowLimit === null
+            ? sortedRows
+            : sortedRows.slice(
+                0,
+                rowLimit,
+            );
 
     const visibleColumnIndexes =
         getVisibleColumnIndexes();
@@ -2965,6 +2994,18 @@ function renderTableBody() {
     const filteredRowCount =
         filteredRows.length;
 
+    const visibleRowCount =
+        visibleRows.length;
+
+    const hasLimitedPreview =
+        visibleRowCount <
+        filteredRowCount;
+
+    const previewLimitMessage =
+        hasLimitedPreview
+            ? ` - Exibindo ${visibleRowCount}`
+            : "";
+
     const isFiltered =
         tableState.filters.some(
             isColumnFilterActive,
@@ -2976,7 +3017,7 @@ function renderTableBody() {
             : `${totalRows} linhas`;
 
     previewSummary.textContent =
-        `Página: ${tableState.sheetName} / ${rowCountMessage} -`;
+        `Página: ${tableState.sheetName} / ${rowCountMessage}${previewLimitMessage} -`;
 
     const downloadsDisabled =
         !tableState.sourceFileName ||
@@ -4264,6 +4305,7 @@ function initializeStatisticsImporter() {
         !fileStatus ||
         !preview ||
         !previewSummary ||
+        !previewLimit ||
         !table ||
         !visibleColumns ||
         !visibleColumnCount ||
@@ -4425,6 +4467,31 @@ function initializeStatisticsImporter() {
         );
     }
 
+    const handlePreviewLimitChange = function () {
+        if (!tableState.rows.length) {
+            return;
+        }
+
+        renderTableBody();
+    };
+
+    if (
+        window.jQuery &&
+        typeof window.jQuery.fn.select2 === "function"
+    ) {
+        window
+            .jQuery(previewLimit)
+            .on(
+                "change.statisticsPreviewLimit",
+                handlePreviewLimitChange,
+            );
+    } else {
+        previewLimit.addEventListener(
+            "change",
+            handlePreviewLimitChange,
+        );
+    }
+    
     downloadCsvButton.addEventListener(
         "click",
         function () {
