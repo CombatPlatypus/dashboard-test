@@ -2254,35 +2254,13 @@ a.thumbnail image {
 
         /* FILTRO DE DUPLICIDADE */
 
-        .statistics-duplicate-filter {
-            min-height: 34px;
-            margin: 0;
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            flex: 0 0 auto;
-            color: #e4e6eb;
-            font-family: inherit;
-            font-size: 12px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            line-height: 1.2;
-            white-space: nowrap;
-            cursor: pointer;
-            user-select: none;
+        .statistics-occurrence-filter {
+            width: 100%;
         }
 
-        .statistics-duplicate-filter:hover {
-            color: #ffffff;
-        }
-
-        .statistics-duplicate-filter input[type="checkbox"] {
-            width: 13px;
-            height: 13px;
-            margin: 0;
-            flex: 0 0 auto;
-            cursor: pointer;
-            accent-color: #e4e6eb;
+        .statistics-advanced-filters > .select2-container {
+            min-width: 155px;
+            flex: 1 1 170px;
         }
 
         /* FILTRO NUMÉRICO */
