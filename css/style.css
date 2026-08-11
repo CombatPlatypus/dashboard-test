@@ -1929,6 +1929,7 @@ a.thumbnail image {
         }
         .statistics-visible-columns-title label {
             margin-left: 15px;
+            margin-right: 5px;
             font-size: 13px;
             font-weight: 600;
         }
