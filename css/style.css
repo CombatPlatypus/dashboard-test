@@ -1886,7 +1886,6 @@ a.thumbnail image {
             width: 100%;
             margin-bottom: 20px;
         }
-
         #statisticsPreviewSummary {
             flex: 0 0 auto;
             color: #b9bcc1;
@@ -1906,7 +1905,6 @@ a.thumbnail image {
             border: 1px solid #525252;
             border-radius: 5px;
         }
-
 
         /* CABEÇALHO DO SELETOR */
 
@@ -1928,6 +1926,15 @@ a.thumbnail image {
         .statistics-visible-columns-title h4 {
             margin: 0;
             font-size: 14px;
+        }
+        .statistics-visible-columns-title label {
+            margin-left: 15px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        #statisticsPreviewLimit,
+        #statisticsPreviewLimit + .select2 {
+            width: 150px !important;
         }
         #statisticsPreviewSummary {
             color: #e4e6eb;
@@ -2457,6 +2464,7 @@ a.thumbnail image {
     .operation-choice h4 {
         width: 100%;
         font-size: 13px;
+        margin: 0;
     }
 
     .operation-choice select,
