@@ -3255,6 +3255,7 @@ function renderChart() {
                     },
 
                     padding: {
+                        top: 20,
                         bottom: 25,
                     },
                 },
