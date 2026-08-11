@@ -3234,6 +3234,18 @@ function renderChart() {
 
             locale: "pt-BR",
 
+            layout: {
+                padding: {
+                    top: 10,
+
+                    right: 20,
+
+                    bottom: 20,
+
+                    left: 20,
+                },
+            },
+
             plugins: {
                 statisticsChartBackground: {
                     color: "#18191a",
@@ -3279,6 +3291,8 @@ function renderChart() {
                     ticks: {
                         color: "#e4e6eb",
 
+                        padding: 12,
+
                         maxRotation: 45,
 
                         minRotation: 0,
@@ -3298,6 +3312,8 @@ function renderChart() {
 
                     ticks: {
                         color: "#e4e6eb",
+
+                        padding: 12,
 
                         callback(value) {
                             return formatAnalysisNumber(Number(value));
@@ -4204,6 +4220,19 @@ function initializeStatisticsImporter() {
 
     const handleChartOperationChange = function () {
         updateChartValueField();
+
+        const valueRequired = chartOperation.value !== "count";
+
+        const valueSelected = chartValue.value !== "";
+
+        if (
+            valueRequired &&
+            !valueSelected
+        ) {
+            chartDownloadButton.disabled = true;
+
+            return;
+        }
 
         renderChart();
     };
