@@ -3903,28 +3903,11 @@ function createChartScales(chartData) {
                 callback(value) {
                     const fullLabel = this.getLabelForValue(value);
 
-                    const shortLabel = shortenChartLabel(
+                    return shortenChartLabel(
                         fullLabel,
                         labelLength,
                     );
-
-                    if (
-                        chartState.type !== "bar" ||
-                        !chartState.showValues
-                    ) {
-                        return shortLabel;
-                    }
-
-                    const barValue = Number(
-                        chartData.values[value],
-                    );
-
-                    return [
-                        shortLabel,
-                        formatAnalysisNumber(barValue),
-                    ];
                 },
-            },
 
             grid: {
                 color: "rgba(82, 82, 82, 0.35)",
