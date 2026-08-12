@@ -3908,6 +3908,7 @@ function createChartScales(chartData) {
                         labelLength,
                     );
                 },
+            },
 
             grid: {
                 color: "rgba(82, 82, 82, 0.35)",
