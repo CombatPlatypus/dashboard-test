@@ -93,6 +93,7 @@ const analysisEmpty = document.getElementById(
 /* ELEMENTOS DA MONTAGEM DE GRÁFICOS */
 
 const chartPanel = document.getElementById("statisticsChartPanel");
+const chartEmpty = document.getElementById("statisticsChartEmpty");
 const chartSummary = document.getElementById("statisticsChartSummary");
 const chartCategory = document.getElementById("statisticsChartCategory");
 const chartValue = document.getElementById("statisticsChartValue");
@@ -2473,7 +2474,7 @@ function renderTableHeader() {
 
             occurrenceFilter.setAttribute(
                 "aria-label",
-                `Filtrar valores duplicados ou únicos da coluna ${headerValue}`,
+                `Filtrar valores duplicados, únicos ou vazios da coluna ${headerValue}`,
             );
 
             const updateOccurrenceFilter =
@@ -3282,6 +3283,13 @@ function destroyChart() {
     chartDownloadButton.disabled = true;
 }
 
+/* MOSTRA OU OCULTA O ESTADO VAZIO */
+
+function setChartEmptyState(empty) {
+    chartEmpty.hidden =
+        !empty;
+}
+
 /* MARCA O BOTÃO ATIVO */
 
 function setActiveChartButton(container, activeButton) {
@@ -3518,7 +3526,7 @@ function createChartScales(chartData) {
 function renderChart() {
     if (!window.Chart || !tableState.rows.length) {
         destroyChart();
-        chartDownloadButton.disabled = true;
+        setChartEmptyState(true);
         return;
     }
 
@@ -3526,7 +3534,7 @@ function renderChart() {
 
     if (!chartData || !chartData.labels.length) {
         destroyChart();
-        chartDownloadButton.disabled = true;
+        setChartEmptyState(true);
         return;
     }
 
@@ -3600,6 +3608,7 @@ function renderChart() {
         plugins: [chartBackgroundPlugin],
     });
 
+    setChartEmptyState(false);
     chartDownloadButton.disabled = false;
 }
 
@@ -3717,7 +3726,9 @@ function showChartPanel() {
 function clearChartPanel() {
 
     destroyChart();
-
+    
+    setChartEmptyState(true);
+    
     const categoryPlaceholder = document.createElement("option");
 
     const valuePlaceholder = document.createElement("option");
@@ -4462,6 +4473,7 @@ function initializeStatisticsImporter() {
         !chartOperation ||
         !chartTypes ||
         !chartColors ||
+        !chartEmpty ||
         !chartCanvas ||
         !chartDownloadButton
     ) {
