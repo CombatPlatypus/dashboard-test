@@ -1549,7 +1549,11 @@ a.thumbnail image {
         display: flex;
     }
     .main-structure #statistics .tabs-panel.is-active {
+        flex: 1 1 0;
         width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        overflow: hidden;
     }
     .main-structure #statistics.no-file #statistics-margin {
         margin-bottom: 0;
@@ -2388,10 +2392,18 @@ a.thumbnail image {
 
 /* GRÁFICOS */
 
+    #statistics-3 {
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        overflow: hidden;
+    }
     .charts-panel {
         width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        overflow: hidden;
     }
-
     .charts-panel[hidden] {
         display: none;
     }
@@ -2429,6 +2441,10 @@ a.thumbnail image {
         flex-wrap: nowrap;
         align-items: stretch;
         overflow: hidden;
+    }
+
+    .charts-body > * {
+        min-width: 0;
     }
 
     .charts-control {
@@ -2554,32 +2570,27 @@ a.thumbnail image {
         overflow: hidden;
         flex-direction: column;
     }
-
     .charts-panel,
     .charts-body,
     .chart-view,
     .chart-box {
         max-width: 100%;
     }
-
     .chart-view > div:first-child {
         align-items: center;
     }
-
     .chart-view h3 {
         margin-bottom: 0;
     }
-
     .chart-view .flex-box-between div {
         max-height: 40px;
         overflow: hidden;
     }
-    .chart-view-view button {
+    .chart-view button {
         min-height: 40px;
         font-size: 14px;
         padding: 10px 15px;
     }
-
     .chart-box {
         flex: 0 0 603px;
         width: 100%;
