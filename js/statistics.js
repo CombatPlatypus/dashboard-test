@@ -3922,7 +3922,7 @@ function createChartScales(chartData) {
         y: {
             // O restante continua como já está.
         },
-    };
+    }
 }
 
 /* MONTA O GRÁFICO */
