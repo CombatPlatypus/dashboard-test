@@ -40,7 +40,7 @@
                 </div>
 
                 <ul class="flex-box-start tabs" data-tabs id="switch-1">
-                    <li class="tabs-title is-active">
+                    <li class="tabs-title">
                         <a href="#spreadsheets">
                             <div class="flex-box-center">
                                 <img src="images/geral-icons/sheets-icon.svg">
@@ -50,7 +50,7 @@
                     </li> 
 
                     <li class="tabs-title">
-                        <a href="#statistics">
+                        <a href="#statistics is-active">
                             <div class="flex-box-center">
                                 <img src="images/geral-icons/statistics-icon.svg">
                                 <h4>Análise de Dados</h4>
@@ -89,7 +89,7 @@
 
                 <!-- PAINEL PLANILHAS -->
 
-                <div class="tabs-panel is-active" id="spreadsheets">
+                <div class="tabs-panel" id="spreadsheets">
                     <div class="spreadsheets-layout">
 
                         <!-- MENU DE NAVEGAÇÃO DAS PLANILHAS -->
@@ -105,7 +105,7 @@
 
                 <!-- PAINEL ANÁLISE DE PLANILHAS -->
 
-                <div class="tabs-panel no-file" id="statistics">
+                <div class="tabs-panel is-active no-file" id="statistics">
 
                     <div class="flex-box-start" id="statistics-margin">
 
@@ -114,7 +114,7 @@
                         <section class="import-panel">
                             <div class="flex-box-start">
                                 <img src="images/geral-icons/import-icon.svg">
-                                <h3>Importe um XLSX ou CSV.</h3>
+                                <h3>Importe um Arquivo do SPX ou uma Planilha.</h3>
                             </div>
 
                             <div class="flex-box-start">
@@ -127,8 +127,8 @@
                             <p id="statisticsFileStatus">Nenhum arquivo selecionado.</p>
 
                             <div class="flex-box-start">
-                                <button class="button" id="statisticsDownloadCsv" type="button" disabled>Baixar CSV</button>
-                                <button class="button" id="statisticsDownloadXlsx" type="button" disabled>Baixar XLSX</button>
+                                <button class="button" id="statisticsDownloadCsv" type="button" disabled>Baixar Versão CSV</button>
+                                <button class="button" id="statisticsDownloadXlsx" type="button" disabled>Baixar Versão XLSX</button>
                             </div>
                         </section>
 
@@ -205,6 +205,7 @@
                                             </div>
 
                                             <div class="statistics-visible-columns-actions">
+                                                <button id="statisticsClearFilters" class="statistics-visible-columns-action" type="button" disabled>Limpar filtros</button>
                                                 <button id="statisticsShowAllColumns" class="statistics-visible-columns-action" type="button">Marcar todas</button>
                                                 <button id="statisticsHideAllColumns" class="statistics-visible-columns-action" type="button">Desmarcar todas</button>
                                                 <button id="statisticsHideEmptyColumns" class="statistics-visible-columns-action" type="button">Ocultar vazias</button>
