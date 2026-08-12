@@ -2557,7 +2557,6 @@ a.thumbnail image {
         position: relative;
         background-color: #18191a;
     }
-
     .chart-empty {
         position: absolute;
         inset: 0;
@@ -2567,27 +2566,32 @@ a.thumbnail image {
         justify-content: center;
         flex-direction: column;
         gap: 10px;
+        overflow: hidden;
         text-align: center;
         background-color: #18191a;
     }
 
+    .chart-empty::before {
+        content: "";
+        position: absolute;
+        inset: 80px 20px 60px 70px;
+        background-image:
+            linear-gradient(to right, rgba(82, 82, 82, 0.35) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(82, 82, 82, 0.35) 1px, transparent 1px);
+        background-size:
+            10% 100%,
+            100% 16.6667%;
+        border-left: 1px solid #8b8d91;
+        border-bottom: 1px solid #8b8d91;
+    }
+
+    .chart-empty > * {
+        position: relative;
+        z-index: 1;
+    }
+
     .chart-empty[hidden] {
         display: none;
-    }
-
-    .chart-empty img {
-        width: 70px;
-        opacity: 0.5;
-    }
-
-    .chart-empty h4,
-    .chart-empty p {
-        margin: 0;
-    }
-
-    .chart-empty p {
-        color: #8b8d91;
-        font-size: 13px;
     }
 
     .chart-box canvas {
