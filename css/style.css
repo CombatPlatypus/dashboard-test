@@ -2571,12 +2571,12 @@ a.thumbnail image {
     }
 
     .chart-view .flex-box-between div {
-        max-height: 42px;
+        max-height: 40px;
         overflow: hidden;
     }
-
     .chart-view-view button {
-        min-height: 42px;
+        min-height: 40px;
+        font-size: 14px;
         padding: 10px 15px;
     }
 
