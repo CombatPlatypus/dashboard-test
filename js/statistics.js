@@ -3325,6 +3325,26 @@ function createChartColorPalette(quantity) {
     );
 }
 
+/* APLICA AS CORES NOS BOTÕES */
+
+function prepareChartColorButtons() {
+    chartColors
+        .querySelectorAll(
+            "[data-chart-color]",
+        )
+        .forEach(
+            function (button) {
+                const buttonColor =
+                    button.dataset.chartColor;
+
+                if (buttonColor) {
+                    button.style.backgroundColor =
+                        buttonColor;
+                }
+            },
+        );
+}
+
 /* MONTA A APARÊNCIA DO CONJUNTO DE DADOS */
 
 function createChartDataset(chartData) {
@@ -4404,6 +4424,8 @@ function initializeStatisticsImporter() {
 
         chartDownloadButton.disabled = true;
     }
+
+    prepareChartColorButtons();
 
     const handleChartOperationChange = function () {
         updateChartValueField();
