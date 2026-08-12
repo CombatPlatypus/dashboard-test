@@ -2461,6 +2461,11 @@ function renderTableHeader() {
                     "unique",
                     "Somente únicos",
                 ),
+
+                createFilterOption(
+                    "empty",
+                    "Somente células vazias",
+                ),
             );
 
             occurrenceFilter.value =
@@ -2756,13 +2761,24 @@ function getFilteredRows() {
                                 normalizedCellValue,
                             ) ?? 0;
 
+                        const isEmpty =
+                            normalizedCellValue === "";
+
                         const isDuplicate =
-                            normalizedCellValue &&
+                            !isEmpty &&
                             valueCount > 1;
 
                         const isUnique =
-                            normalizedCellValue &&
+                            !isEmpty &&
                             valueCount === 1;
+
+                        if (
+                            columnFilter.occurrence ===
+                                "empty" &&
+                            !isEmpty
+                        ) {
+                            return false;
+                        }
 
                         if (
                             columnFilter.occurrence ===
