@@ -1045,9 +1045,9 @@ input[type='search'] {
 [type='checkbox'] + label[for], [type='radio'] + label[for] {
     cursor: pointer;
 }
-label > [type='checkbox'], label > [type='radio'] {
+/* label > [type='checkbox'], label > [type='radio'] {
     margin-right: 0.5rem;
-}
+} */
 [type='file'] {
     width: 100%;
 }
@@ -2547,13 +2547,19 @@ a.thumbnail image {
         flex: 1 1 0;
         width: 0;
         min-width: 0;
-        max-width: calc(100% - 500px);
         min-height: 525px;
         display: flex;
         padding: 20px;
         row-gap: 20px;
         overflow: hidden;
         flex-direction: column;
+    }
+
+    .charts-panel,
+    .charts-body,
+    .chart-view,
+    .chart-box {
+        max-width: 100%;
     }
 
     .chart-view > div:first-child {
@@ -2582,13 +2588,6 @@ a.thumbnail image {
         position: relative;
         overflow: hidden;
         background-color: #18191a;
-    }
-
-    .chart-box.pie {
-        flex: 0 1 600px;
-        height: 603px;
-        max-height: 603px;
-        align-self: center;
     }
 
     .chart-box canvas {
