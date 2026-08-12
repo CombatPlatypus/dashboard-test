@@ -348,6 +348,8 @@ function createPieLegendLabels(chart) {
                 strokeStyle:
                     dataset.borderColor,
 
+                fontColor: "#e4e6eb",
+
                 lineWidth:
                     dataset.borderWidth,
 
@@ -3690,7 +3692,7 @@ function createChartDataset(chartData) {
 
             hoverOffset: 8,
 
-            radius: "50%",
+            radius: "35%",
         };
     }
 
