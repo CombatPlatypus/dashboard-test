@@ -3911,7 +3911,8 @@ function createChartScales(chartData) {
             },
 
             grid: {
-                color: "rgba(82, 82, 82, 0.35)",
+                color: "#292a2b",
+                lineWidth: 1,
             },
 
             border: {
@@ -3920,9 +3921,31 @@ function createChartScales(chartData) {
         },
 
         y: {
-            // O restante continua como já está.
+            beginAtZero: true,
+            grace: "5%",
+
+            ticks: {
+                color: "#e4e6eb",
+                padding: 12,
+                stepSize,
+
+                callback(value) {
+                    return formatAnalysisNumber(
+                        Number(value),
+                    );
+                },
+            },
+
+            grid: {
+                color: "#292a2b",
+                lineWidth: 1,
+            },
+
+            border: {
+                color: "#8b8d91",
+            },
         },
-    }
+    };
 }
 
 /* MONTA O GRÁFICO */
