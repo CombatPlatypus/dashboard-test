@@ -175,7 +175,7 @@ function createEmptyColumnFilter() {
     return {
         text: "",
 
-        duplicatesOnly: false,
+        occurrence: "all",
 
         numericOperator: "",
 
@@ -199,7 +199,7 @@ function isColumnFilterActive(filter) {
 
     return (
         hasTextFilter ||
-        filter.duplicatesOnly ||
+        filter.occurrence !== "all" ||
         hasNumericFilter
     );
 }
@@ -239,7 +239,7 @@ function createColumnValueCounts(columnIndex) {
 
 /* CRIA UMA OPÇÃO DO FILTRO NUMÉRICO */
 
-function createNumericFilterOption(
+function createFilterOption(
     value,
     label,
 ) {
@@ -2430,62 +2430,78 @@ function renderTableHeader() {
             filterInput,
         );
 
-        /* FILTRO DE DUPLICIDADE */
+        /* FILTRO POR FREQUÊNCIA */
 
         if (
             columnProfile.type !==
             "empty"
         ) {
-            const duplicateLabel =
+            const occurrenceFilter =
                 document.createElement(
-                    "label",
+                    "select",
                 );
 
-            const duplicateCheckbox =
-                document.createElement(
-                    "input",
-                );
-
-            const duplicateText =
-                document.createElement(
-                    "span",
-                );
-
-            duplicateLabel.classList.add(
-                "statistics-duplicate-filter",
+            occurrenceFilter.classList.add(
+                "statistics-occurrence-filter",
+                "standard-select",
             );
 
-            duplicateCheckbox.type =
-                "checkbox";
+            occurrenceFilter.append(
+                createFilterOption(
+                    "all",
+                    "Todos os valores",
+                ),
 
-            duplicateCheckbox.checked =
-                columnFilter.duplicatesOnly;
+                createFilterOption(
+                    "duplicates",
+                    "Somente duplicados",
+                ),
 
-            duplicateCheckbox.setAttribute(
+                createFilterOption(
+                    "unique",
+                    "Somente únicos",
+                ),
+            );
+
+            occurrenceFilter.value =
+                columnFilter.occurrence;
+
+            occurrenceFilter.setAttribute(
                 "aria-label",
-                `Mostrar somente duplicados da coluna ${headerValue}`,
+                `Filtrar valores duplicados ou únicos da coluna ${headerValue}`,
             );
 
-            duplicateText.textContent =
-                "Somente duplicados";
-
-            duplicateCheckbox.addEventListener(
-                "change",
+            const updateOccurrenceFilter =
                 function () {
-                    columnFilter.duplicatesOnly =
-                        duplicateCheckbox.checked;
+                    columnFilter.occurrence =
+                        occurrenceFilter.value;
 
                     renderTableBody();
-                },
-            );
+                };
 
-            duplicateLabel.append(
-                duplicateCheckbox,
-                duplicateText,
-            );
+            if (
+                window.jQuery &&
+                typeof window.jQuery
+                    .fn.select2 ===
+                    "function"
+            ) {
+                window
+                    .jQuery(
+                        occurrenceFilter,
+                    )
+                    .on(
+                        "change.statisticsOccurrenceFilter",
+                        updateOccurrenceFilter,
+                    );
+            } else {
+                occurrenceFilter.addEventListener(
+                    "change",
+                    updateOccurrenceFilter,
+                );
+            }
 
             advancedFilters.appendChild(
-                duplicateLabel,
+                occurrenceFilter,
             );
         }
 
@@ -2523,37 +2539,37 @@ function renderTableHeader() {
                 "100%";
 
             numericOperator.append(
-                createNumericFilterOption(
+                createFilterOption(
                     "",
                     "Comparar...",
                 ),
 
-                createNumericFilterOption(
+                createFilterOption(
                     "greaterThan",
                     "Maior que",
                 ),
 
-                createNumericFilterOption(
+                createFilterOption(
                     "greaterThanOrEqual",
                     "Maior ou igual",
                 ),
 
-                createNumericFilterOption(
+                createFilterOption(
                     "lessThan",
                     "Menor que",
                 ),
 
-                createNumericFilterOption(
+                createFilterOption(
                     "lessThanOrEqual",
                     "Menor ou igual",
                 ),
 
-                createNumericFilterOption(
+                createFilterOption(
                     "equal",
                     "Igual a",
                 ),
 
-                createNumericFilterOption(
+                createFilterOption(
                     "notEqual",
                     "Diferente de",
                 ),
@@ -2724,10 +2740,11 @@ function getFilteredRows() {
                         return false;
                     }
 
-                    /* FILTRO DE DUPLICIDADE */
+                    /* FILTRO POR FREQUÊNCIA */
 
                     if (
-                        columnFilter.duplicatesOnly
+                        columnFilter.occurrence !==
+                        "all"
                     ) {
                         const valueCounts =
                             tableState.columnValueCounts[
@@ -2739,9 +2756,26 @@ function getFilteredRows() {
                                 normalizedCellValue,
                             ) ?? 0;
 
+                        const isDuplicate =
+                            normalizedCellValue &&
+                            valueCount > 1;
+
+                        const isUnique =
+                            normalizedCellValue &&
+                            valueCount === 1;
+
                         if (
-                            !normalizedCellValue ||
-                            valueCount <= 1
+                            columnFilter.occurrence ===
+                                "duplicates" &&
+                            !isDuplicate
+                        ) {
+                            return false;
+                        }
+
+                        if (
+                            columnFilter.occurrence ===
+                                "unique" &&
+                            !isUnique
                         ) {
                             return false;
                         }
