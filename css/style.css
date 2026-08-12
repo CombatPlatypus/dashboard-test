@@ -2507,31 +2507,22 @@ a.thumbnail image {
         font-size: 13px;
     }
 
-    .colors-change div {
+    .colors-change > div {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
         gap: 10px;
     }
-
     .colors-change button {
         width: 35px;
         height: 35px;
         padding: 0;
-        border: 3px solid #383838;
+        border: 2px solid #525252;
+        border-radius: 3px;
+        cursor: pointer;
     }
-
     .colors-change button[aria-pressed="true"] {
         border-color: #e4e6eb;
-    }
-
-    .colors-change .color-1 {
-        background-color: #fb5330;
-    }
-
-    .colors-change .color-2 {
-        background-color: #e4e6eb;
-    }
-
-    .colors-change .color-3 {
-        background-color: #f2a900;
     }
 
     .chart-view {
