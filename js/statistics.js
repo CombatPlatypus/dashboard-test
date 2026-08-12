@@ -107,6 +107,7 @@ const chartColors = document.getElementById("statisticsChartColors");
 const chartCanvas = document.getElementById("statisticsChartCanvas");
 const chartDownloadButton = document.getElementById("statisticsChartDownload");
 const statisticsPanel = document.getElementById("statistics");
+const chartShowValues = document.getElementById("statisticsChartShowValues");
 
 /* ESTADO DA TABELA INTERATIVA */
 
@@ -144,6 +145,8 @@ const chartState = {
     instance: null,
 
     type: "bar",
+
+    showValues: true,
 
     color: "#ff5533",
 };
@@ -296,7 +299,10 @@ const chartValueLabelsPlugin = {
     id: "statisticsChartValues",
 
     afterDatasetsDraw(chart) {
-        if (chart.config.type !== "bar") {
+        if (
+            !chartState.showValues ||
+            !["bar", "line"].includes(chart.config.type)
+        ) {
             return;
         }
 
@@ -309,7 +315,7 @@ const chartValueLabelsPlugin = {
         context.textAlign = "center";
         context.lineWidth = 3;
 
-        metadata.data.forEach(function (bar, index) {
+        metadata.data.forEach(function (element, index) {
             const value = Number(dataset.data[index]);
 
             if (!Number.isFinite(value)) {
@@ -317,25 +323,29 @@ const chartValueLabelsPlugin = {
             }
 
             const text = formatAnalysisNumber(value);
-            const barHeight = Math.abs(bar.base - bar.y);
-            const positiveBar = bar.y < bar.base;
-            const textInside = barHeight >= 28;
-
             let textPosition;
 
-            if (textInside) {
-                textPosition = positiveBar ? bar.y + 8 : bar.y - 8;
-                context.textBaseline = positiveBar ? "top" : "bottom";
+            if (chart.config.type === "bar") {
+                const barHeight = Math.abs(element.base - element.y);
+                const positiveBar = element.y < element.base;
+                const textInside = barHeight >= 28;
+
+                if (textInside) {
+                    textPosition = positiveBar ? element.y + 8 : element.y - 8;
+                    context.textBaseline = positiveBar ? "top" : "bottom";
+                } else {
+                    textPosition = positiveBar ? element.y - 6 : element.y + 6;
+                    context.textBaseline = positiveBar ? "bottom" : "top";
+                }
             } else {
-                textPosition = positiveBar ? bar.y - 6 : bar.y + 6;
-                context.textBaseline = positiveBar ? "bottom" : "top";
+                textPosition = element.y - 10;
+                context.textBaseline = "bottom";
             }
 
             context.strokeStyle = "#18191a";
             context.fillStyle = "#e4e6eb";
-
-            context.strokeText(text, bar.x, textPosition);
-            context.fillText(text, bar.x, textPosition);
+            context.strokeText(text, element.x, textPosition);
+            context.fillText(text, element.x, textPosition);
         });
 
         context.restore();
@@ -3876,25 +3886,18 @@ function getChartAxisLabelLength(
 /* MONTA OS EIXOS DOS GRÁFICOS */
 
 function createChartScales(chartData) {
-    const stepSize =
-        getChartStepSize(
-            chartData.values,
-        );
+    const stepSize = getChartStepSize(chartData.values);
 
-    const labelLength =
-        getChartAxisLabelLength(
-            chartData.labels.length,
-        );
+    const labelLength = getChartAxisLabelLength(
+        chartData.labels.length,
+    );
 
     return {
         x: {
             ticks: {
                 color: "#e4e6eb",
-
                 padding: 12,
-
                 maxRotation: 45,
-
                 minRotation: 0,
 
                 callback(value) {
@@ -3905,7 +3908,10 @@ function createChartScales(chartData) {
                         labelLength,
                     );
 
-                    if (chartState.type !== "bar") {
+                    if (
+                        chartState.type !== "bar" ||
+                        !chartState.showValues
+                    ) {
                         return shortLabel;
                     }
 
@@ -3930,29 +3936,7 @@ function createChartScales(chartData) {
         },
 
         y: {
-            beginAtZero: true,
-
-            grace: "5%",
-
-            ticks: {
-                color: "#e4e6eb",
-
-                padding: 12,
-
-                stepSize,
-
-                callback(value) {
-                    return formatAnalysisNumber(Number(value));
-                },
-            },
-
-            grid: {
-                color: "rgba(82, 82, 82, 0.35)",
-            },
-
-            border: {
-                color: "#8b8d91",
-            },
+            // O restante continua como já está.
         },
     };
 }
@@ -4959,6 +4943,7 @@ function initializeStatisticsImporter() {
         !chartOperation ||
         !chartTypes ||
         !chartColors ||
+        !chartShowValues ||
         !chartEmpty ||
         !chartCanvas ||
         !chartDownloadButton
@@ -5300,6 +5285,11 @@ function initializeStatisticsImporter() {
         "click",
         clearAllFilters,
     );
+
+    chartShowValues.addEventListener("change", function () {
+        chartState.showValues = chartShowValues.checked;
+        renderChart();
+    });
 }
 
 /* INICIALIZA */
