@@ -2554,9 +2554,40 @@ a.thumbnail image {
     }
 
     .chart-box {
-        flex: 1 1 0;
-        min-height: 450px;
         position: relative;
+        background-color: #18191a;
+    }
+
+    .chart-empty {
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+        background-color: #18191a;
+    }
+
+    .chart-empty[hidden] {
+        display: none;
+    }
+
+    .chart-empty img {
+        width: 70px;
+        opacity: 0.5;
+    }
+
+    .chart-empty h4,
+    .chart-empty p {
+        margin: 0;
+    }
+
+    .chart-empty p {
+        color: #8b8d91;
+        font-size: 13px;
     }
 
     .chart-box canvas {
