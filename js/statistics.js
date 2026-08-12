@@ -3376,7 +3376,7 @@ function createChartDataset(chartData) {
 
             hoverOffset: 8,
 
-            radius: "65%",
+            radius: "50%",
         };
     }
 
