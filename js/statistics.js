@@ -90,6 +90,10 @@ const analysisEmpty = document.getElementById(
     "statisticsAnalysisEmpty",
 );
 
+const clearFiltersButton = document.getElementById(
+    "statisticsClearFilters",
+);
+
 /* ELEMENTOS DA MONTAGEM DE GRÁFICOS */
 
 const chartPanel = document.getElementById("statisticsChartPanel");
@@ -2913,6 +2917,30 @@ function getPreviewRowLimit() {
         : null;
 }
 
+/* LIMPA TODOS OS FILTROS DA TABELA */
+
+function clearAllFilters() {
+    const hasActiveFilters =
+        tableState.filters.some(
+            isColumnFilterActive,
+        );
+
+    if (!hasActiveFilters) {
+        return;
+    }
+
+    tableState.filters =
+        tableState.filters.map(
+            function () {
+                return createEmptyColumnFilter();
+            },
+        );
+
+    renderTableHeader();
+
+    renderTableBody();
+}
+
 /* MONTA AS LINHAS VISÍVEIS */
 
 function renderTableBody() {
@@ -3061,6 +3089,9 @@ function renderTableBody() {
         tableState.filters.some(
             isColumnFilterActive,
         );
+
+    clearFiltersButton.disabled =
+        !isFiltered;
 
     const rowCountMessage =
         isFiltered
@@ -3995,6 +4026,9 @@ function clearImportedFile() {
         true,
     );
 
+    clearFiltersButton.disabled =
+        true;
+
     const tableHead =
         table.querySelector("thead");
 
@@ -4460,6 +4494,7 @@ function initializeStatisticsImporter() {
         !showAllColumnsButton ||
         !hideAllColumnsButton ||
         !hideEmptyColumnsButton ||
+        !clearFiltersButton ||
         !quickAnalysis ||
         !analysisColumns ||
         !selectAllColumnsButton ||
@@ -4702,6 +4737,9 @@ function initializeStatisticsImporter() {
 
                 clearChartPanel();
 
+                clearFiltersButton.disabled =
+                    true;
+
                 statisticsPanel.classList.add("no-file");
 
                 previewSummary.textContent =
@@ -4807,6 +4845,11 @@ function initializeStatisticsImporter() {
 
             refreshVisibleColumns();
         },
+    );
+
+    clearFiltersButton.addEventListener(
+        "click",
+        clearAllFilters,
     );
 }
 
