@@ -335,11 +335,11 @@ function createPieLegendLabels(chart) {
                     : 0;
 
             return {
-                text:
-                    `${label} — ` +
-                    formatChartPercentage(
-                        percentage,
-                    ),
+            text:
+                `${shortenChartLabel(label, 28)} — ` +
+                formatChartPercentage(
+                    percentage,
+                ),
 
                 fillStyle:
                     colors[index] ??
@@ -3503,8 +3503,6 @@ function createGroupedChartData() {
                 );
         }
 
-    const limitedItems = groupedItems.slice(0, itemLimit);
-
     const categoryName = tableState.headers[categoryIndex];
 
     const valueName =
@@ -3782,12 +3780,60 @@ function getChartStepSize(values) {
     return multiplier * magnitude;
 }
 
+/* ABREVIA NOMES LONGOS NOS GRÁFICOS */
+
+function shortenChartLabel(
+    label,
+    maximumLength,
+) {
+    const labelText =
+        String(
+            label ?? "",
+        ).trim();
+
+    if (
+        labelText.length <=
+        maximumLength
+    ) {
+        return labelText;
+    }
+
+    return (
+        labelText.slice(
+            0,
+            maximumLength - 1,
+        ) +
+        "…"
+    );
+}
+
+/* DEFINE O TAMANHO DOS NOMES NO EIXO */
+
+function getChartAxisLabelLength(
+    quantity,
+) {
+    if (quantity >= 20) {
+        return 14;
+    }
+
+    if (quantity >= 12) {
+        return 18;
+    }
+
+    return 25;
+}
+
 /* MONTA OS EIXOS DOS GRÁFICOS */
 
 function createChartScales(chartData) {
     const stepSize =
         getChartStepSize(
             chartData.values,
+        );
+
+    const labelLength =
+        getChartAxisLabelLength(
+            chartData.labels.length,
         );
 
     return {
@@ -3800,6 +3846,18 @@ function createChartScales(chartData) {
                 maxRotation: 45,
 
                 minRotation: 0,
+
+                callback(value) {
+                    const fullLabel =
+                        this.getLabelForValue(
+                            value,
+                        );
+
+                    return shortenChartLabel(
+                        fullLabel,
+                        labelLength,
+                    );
+                },
             },
 
             grid: {
