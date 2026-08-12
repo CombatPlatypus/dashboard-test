@@ -174,6 +174,194 @@ const naturalCollator = new Intl.Collator("pt-BR", {
     sensitivity: "base",
 });
 
+/* MOSTRA PERCENTUAIS NO GRÁFICO DE PIZZA */
+
+const chartPercentagePlugin = {
+    id: "statisticsChartPercentage",
+
+    afterDatasetsDraw(chart) {
+        if (
+            chart.config.type !==
+            "pie"
+        ) {
+            return;
+        }
+
+        const dataset =
+            chart.data.datasets[0];
+
+        const values =
+            dataset?.data ?? [];
+
+        const total =
+            getChartDataTotal(
+                values,
+            );
+
+        if (!total) {
+            return;
+        }
+
+        const metadata =
+            chart.getDatasetMeta(0);
+
+        const context =
+            chart.ctx;
+
+        context.save();
+
+        context.font =
+            '600 13px "Open Sans", sans-serif';
+
+        context.textAlign =
+            "center";
+
+        context.textBaseline =
+            "middle";
+
+        context.fillStyle =
+            "#ffffff";
+
+        context.strokeStyle =
+            "rgba(24, 25, 26, 0.85)";
+
+        context.lineWidth =
+            3;
+
+        metadata.data.forEach(
+            function (
+                arc,
+                index,
+            ) {
+                if (
+                    !chart.getDataVisibility(
+                        index,
+                    )
+                ) {
+                    return;
+                }
+
+                const numericValue =
+                    Math.abs(
+                        Number(
+                            values[index],
+                        ) || 0,
+                    );
+
+                const percentage =
+                    (
+                        numericValue /
+                        total
+                    ) *
+                    100;
+
+                /*
+                 * Evita textos sobrepostos
+                 * dentro de fatias pequenas.
+                 */
+
+                if (
+                    percentage < 4
+                ) {
+                    return;
+                }
+
+                const position =
+                    arc.tooltipPosition();
+
+                const percentageText =
+                    formatChartPercentage(
+                        percentage,
+                    );
+
+                context.strokeText(
+                    percentageText,
+                    position.x,
+                    position.y,
+                );
+
+                context.fillText(
+                    percentageText,
+                    position.x,
+                    position.y,
+                );
+            },
+        );
+
+        context.restore();
+    },
+};
+
+/* MONTA A LEGENDA DO GRÁFICO DE PIZZA */
+
+function createPieLegendLabels(chart) {
+    const dataset =
+        chart.data.datasets[0];
+
+    const values =
+        dataset?.data ?? [];
+
+    const total =
+        getChartDataTotal(
+            values,
+        );
+
+    const colors =
+        Array.isArray(
+            dataset.backgroundColor,
+        )
+            ? dataset.backgroundColor
+            : [];
+
+    return chart.data.labels.map(
+        function (
+            label,
+            index,
+        ) {
+            const numericValue =
+                Math.abs(
+                    Number(
+                        values[index],
+                    ) || 0,
+                );
+
+            const percentage =
+                total > 0
+                    ? (
+                          numericValue /
+                          total
+                      ) *
+                      100
+                    : 0;
+
+            return {
+                text:
+                    `${label} — ` +
+                    formatChartPercentage(
+                        percentage,
+                    ),
+
+                fillStyle:
+                    colors[index] ??
+                    dataset.backgroundColor,
+
+                strokeStyle:
+                    dataset.borderColor,
+
+                lineWidth:
+                    dataset.borderWidth,
+
+                hidden:
+                    !chart.getDataVisibility(
+                        index,
+                    ),
+
+                index,
+            };
+        },
+    );
+}
+
 /* CRIA O ESTADO INICIAL DE UM FILTRO */
 
 function createEmptyColumnFilter() {
@@ -3259,10 +3447,61 @@ function createGroupedChartData() {
             );
         });
 
-    const itemLimit =
-        chartState.type === "pie"
-            ? MAX_PIE_ITEMS
-            : MAX_CHART_ITEMS;
+        const pieChart =
+            chartState.type === "pie";
+
+        const itemLimit =
+            pieChart
+                ? MAX_PIE_ITEMS
+                : MAX_CHART_ITEMS;
+
+        const hasOtherItems =
+            pieChart &&
+            groupedItems.length > itemLimit;
+
+        let limitedItems;
+
+        if (hasOtherItems) {
+            const mainItems =
+                groupedItems.slice(
+                    0,
+                    itemLimit - 1,
+                );
+
+            const otherValue =
+                groupedItems
+                    .slice(
+                        itemLimit - 1,
+                    )
+                    .reduce(
+                        function (
+                            total,
+                            item,
+                        ) {
+                            return (
+                                total +
+                                item.value
+                            );
+                        },
+                        0,
+                    );
+
+            limitedItems = [
+                ...mainItems,
+
+                {
+                    label: "Outros",
+
+                    value: otherValue,
+                },
+            ];
+        } else {
+            limitedItems =
+                groupedItems.slice(
+                    0,
+                    itemLimit,
+                );
+        }
 
     const limitedItems = groupedItems.slice(0, itemLimit);
 
@@ -3295,8 +3534,10 @@ function createGroupedChartData() {
             return item.value;
         }),
 
-        title:
-            groupedItems.length > itemLimit
+    title:
+        hasOtherItems
+            ? `${title} — ${itemLimit - 1} maiores + Outros`
+            : groupedItems.length > itemLimit
                 ? `${title} — ${itemLimit} maiores resultados`
                 : title,
     };
@@ -3382,6 +3623,50 @@ function prepareChartColorButtons() {
                 }
             },
         );
+}
+
+/* SOMA OS VALORES DO GRÁFICO */
+
+function getChartDataTotal(values) {
+    return values.reduce(
+        function (
+            total,
+            value,
+        ) {
+            const numericValue =
+                Number(value);
+
+            return (
+                total +
+                (
+                    Number.isFinite(
+                        numericValue,
+                    )
+                        ? Math.abs(
+                              numericValue,
+                          )
+                        : 0
+                )
+            );
+        },
+        0,
+    );
+}
+
+/* FORMATA O PERCENTUAL DO GRÁFICO */
+
+function formatChartPercentage(value) {
+    return (
+        new Intl.NumberFormat(
+            "pt-BR",
+            {
+                minimumFractionDigits: 1,
+
+                maximumFractionDigits: 1,
+            },
+        ).format(value) +
+        "%"
+    );
 }
 
 /* MONTA A APARÊNCIA DO CONJUNTO DE DADOS */
@@ -3605,6 +3890,8 @@ function renderChart() {
                         color: "#e4e6eb",
                         padding: 15,
                         usePointStyle: true,
+                        generateLabels:
+                        createPieLegendLabels,
                         font: {
                             family: "'Open Sans', sans-serif",
                             size: 12,
@@ -3628,7 +3915,46 @@ function renderChart() {
                     },
                 },
                 tooltip: {
-                    displayColors: pieChart,
+                    displayColors:
+                        pieChart,
+
+                    callbacks:
+                        pieChart
+                            ? {
+                                label(context) {
+                                    const values =
+                                        context.dataset
+                                            .data;
+
+                                    const total =
+                                        getChartDataTotal(
+                                            values,
+                                        );
+
+                                    const value =
+                                        Number(
+                                            context.raw,
+                                        ) || 0;
+
+                                    const percentage =
+                                        total > 0
+                                            ? (
+                                                    Math.abs(
+                                                        value,
+                                                    ) /
+                                                    total
+                                                ) *
+                                                100
+                                            : 0;
+
+                                    return (
+                                        `${context.label}: ` +
+                                        `${formatAnalysisNumber(value)} ` +
+                                        `(${formatChartPercentage(percentage)})`
+                                    );
+                                },
+                            }
+                            : {},
                 },
             },
             scales:
@@ -3638,7 +3964,11 @@ function renderChart() {
                         chartData,
                     ),
         },
-        plugins: [chartBackgroundPlugin],
+        plugins: [
+            chartBackgroundPlugin,
+
+            chartPercentagePlugin,
+        ],
     });
 
     setChartEmptyState(false);
