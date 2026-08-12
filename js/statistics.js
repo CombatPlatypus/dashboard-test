@@ -326,17 +326,15 @@ const chartValueLabelsPlugin = {
             let textPosition;
 
             if (chart.config.type === "bar") {
-                const barHeight = Math.abs(element.base - element.y);
                 const positiveBar = element.y < element.base;
-                const textInside = barHeight >= 28;
 
-                if (textInside) {
-                    textPosition = positiveBar ? element.y + 8 : element.y - 8;
-                    context.textBaseline = positiveBar ? "top" : "bottom";
-                } else {
-                    textPosition = positiveBar ? element.y - 6 : element.y + 6;
-                    context.textBaseline = positiveBar ? "bottom" : "top";
-                }
+                textPosition = positiveBar
+                    ? element.y - 8
+                    : element.y + 8;
+
+                context.textBaseline = positiveBar
+                    ? "bottom"
+                    : "top";
             } else {
                 textPosition = element.y - 10;
                 context.textBaseline = "bottom";
@@ -2292,7 +2290,7 @@ function renderSelectedColumnAnalysis(
 
         analysisCards.appendChild(
             createAnalysisCard(
-                "Valores Únicos",
+                "Valores Diferentes",
                 header,
                 formatAnalysisNumber(
                     frequencyData.length,
@@ -3611,7 +3609,6 @@ function destroyChart() {
         chartState.instance = null;
     }
 
-    chartCanvas.parentElement.classList.remove("pie");
     chartDownloadButton.disabled = true;
 }
 
@@ -3968,7 +3965,6 @@ function renderChart() {
     destroyChart();
 
     const pieChart = chartState.type === "pie";
-    chartCanvas.parentElement.classList.toggle("pie", pieChart);
 
     chartState.instance = new window.Chart(chartCanvas, {
         type: chartState.type,
