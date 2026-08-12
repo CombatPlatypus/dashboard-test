@@ -3405,9 +3405,65 @@ function createChartDataset(chartData) {
     };
 }
 
+/* CALCULA O INTERVALO DO EIXO VERTICAL */
+
+function getChartStepSize(values) {
+    const largestValue =
+        Math.max(
+            ...values.map(
+                function (value) {
+                    return Math.abs(
+                        Number(value),
+                    );
+                },
+            ),
+            0,
+        );
+
+    if (largestValue === 0) {
+        return 1;
+    }
+
+    const approximateStep =
+        largestValue / 12;
+
+    const magnitude =
+        10 **
+        Math.floor(
+            Math.log10(
+                approximateStep,
+            ),
+        );
+
+    const normalizedStep =
+        approximateStep /
+        magnitude;
+
+    let multiplier;
+
+    if (normalizedStep <= 1) {
+        multiplier = 1;
+    } else if (normalizedStep <= 2) {
+        multiplier = 2;
+    } else if (normalizedStep <= 2.5) {
+        multiplier = 2.5;
+    } else if (normalizedStep <= 5) {
+        multiplier = 5;
+    } else {
+        multiplier = 10;
+    }
+
+    return multiplier * magnitude;
+}
+
 /* MONTA OS EIXOS DOS GRÁFICOS */
 
-function createChartScales() {
+function createChartScales(chartData) {
+    const stepSize =
+        getChartStepSize(
+            chartData.values,
+        );
+
     return {
         x: {
             ticks: {
@@ -3432,10 +3488,14 @@ function createChartScales() {
         y: {
             beginAtZero: true,
 
+            grace: "5%",
+
             ticks: {
                 color: "#e4e6eb",
 
                 padding: 12,
+
+                stepSize,
 
                 callback(value) {
                     return formatAnalysisNumber(Number(value));
@@ -3530,7 +3590,12 @@ function renderChart() {
                     displayColors: pieChart,
                 },
             },
-            scales: pieChart ? undefined : createChartScales(),
+            scales:
+                pieChart
+                    ? undefined
+                    : createChartScales(
+                        chartData,
+                    ),
         },
         plugins: [chartBackgroundPlugin],
     });
