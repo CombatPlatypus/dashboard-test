@@ -292,6 +292,56 @@ const chartPercentagePlugin = {
     },
 };
 
+const chartValueLabelsPlugin = {
+    id: "statisticsChartValues",
+
+    afterDatasetsDraw(chart) {
+        if (chart.config.type !== "bar") {
+            return;
+        }
+
+        const dataset = chart.data.datasets[0];
+        const metadata = chart.getDatasetMeta(0);
+        const context = chart.ctx;
+
+        context.save();
+        context.font = "600 12px 'Open Sans', sans-serif";
+        context.textAlign = "center";
+        context.lineWidth = 3;
+
+        metadata.data.forEach(function (bar, index) {
+            const value = Number(dataset.data[index]);
+
+            if (!Number.isFinite(value)) {
+                return;
+            }
+
+            const text = formatAnalysisNumber(value);
+            const barHeight = Math.abs(bar.base - bar.y);
+            const positiveBar = bar.y < bar.base;
+            const textInside = barHeight >= 28;
+
+            let textPosition;
+
+            if (textInside) {
+                textPosition = positiveBar ? bar.y + 8 : bar.y - 8;
+                context.textBaseline = positiveBar ? "top" : "bottom";
+            } else {
+                textPosition = positiveBar ? bar.y - 6 : bar.y + 6;
+                context.textBaseline = positiveBar ? "bottom" : "top";
+            }
+
+            context.strokeStyle = "#18191a";
+            context.fillStyle = "#e4e6eb";
+
+            context.strokeText(text, bar.x, textPosition);
+            context.fillText(text, bar.x, textPosition);
+        });
+
+        context.restore();
+    },
+};
+
 /* MONTA A LEGENDA DO GRÁFICO DE PIZZA */
 
 function createPieLegendLabels(chart) {
@@ -3548,10 +3598,10 @@ function createGroupedChartData() {
 function destroyChart() {
     if (chartState.instance) {
         chartState.instance.destroy();
-
         chartState.instance = null;
     }
 
+    chartCanvas.parentElement.classList.remove("pie");
     chartDownloadButton.disabled = true;
 }
 
@@ -3691,8 +3741,6 @@ function createChartDataset(chartData) {
             borderWidth: 2,
 
             hoverOffset: 8,
-
-            radius: "20%",
         };
     }
 
@@ -3850,15 +3898,25 @@ function createChartScales(chartData) {
                 minRotation: 0,
 
                 callback(value) {
-                    const fullLabel =
-                        this.getLabelForValue(
-                            value,
-                        );
+                    const fullLabel = this.getLabelForValue(value);
 
-                    return shortenChartLabel(
+                    const shortLabel = shortenChartLabel(
                         fullLabel,
                         labelLength,
                     );
+
+                    if (chartState.type !== "bar") {
+                        return shortLabel;
+                    }
+
+                    const barValue = Number(
+                        chartData.values[value],
+                    );
+
+                    return [
+                        shortLabel,
+                        formatAnalysisNumber(barValue),
+                    ];
                 },
             },
 
@@ -3919,6 +3977,7 @@ function renderChart() {
     destroyChart();
 
     const pieChart = chartState.type === "pie";
+    chartCanvas.parentElement.classList.toggle("pie", pieChart);
 
     chartState.instance = new window.Chart(chartCanvas, {
         type: chartState.type,
@@ -4026,8 +4085,8 @@ function renderChart() {
         },
         plugins: [
             chartBackgroundPlugin,
-
             chartPercentagePlugin,
+            chartValueLabelsPlugin,
         ],
     });
 
