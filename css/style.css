@@ -2476,12 +2476,21 @@ a.thumbnail image {
         margin-top: 20px;
         cursor: pointer;
     }
-
     .operation-choice {
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
         display: flex;
         padding: 15px 15px 0;
         row-gap: 10px;
+        overflow: hidden;
         flex-direction: column;
+    }
+
+    .operation-choice > * {
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
     }
 
     .operation-choice h4 {
@@ -2493,8 +2502,16 @@ a.thumbnail image {
     .operation-choice select,
     .operation-choice .select2-container {
         width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
     }
 
+    .operation-choice .select2-selection,
+    .operation-choice .select2-selection__rendered {
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+    }
     .types-of-charts {
         gap: 10px;
         align-items: flex-start;
