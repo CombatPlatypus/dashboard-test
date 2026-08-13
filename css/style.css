@@ -2449,9 +2449,12 @@ a.thumbnail image {
 
     .charts-control {
         flex: 0 0 500px;
+        width: 500px;
         min-width: 0;
+        max-width: 500px;
         padding-top: 30px;
         padding-right: 30px;
+        overflow: hidden;
         border-right: 2px solid #525252;
     }
 
