@@ -66,7 +66,11 @@
                 padding: 10px 15px;
             }
             .comparison .textarea-results {
-                
+                margin: 20px 0;
+                column-gap: 5px;
+            }
+            .comparison .textarea-results img {
+                width: 15px;
             }
             .comparison .textarea-results p {
                 font-size: 13px;
@@ -479,7 +483,7 @@
                                     <div class="comparison-choice">
 
                                         <h4>Dados para Comparar</h4>
-                                        <p>Coluna Escolhida:</p>
+                                        <p>Escolha uma coluna para comparar.</p>
 
                                         <select id="" class="standard-select" style="width: 100%;">
 
@@ -494,22 +498,22 @@
                                             <p>38 Linhas</p>
                                         </div>
 
-                                        <textarea rows=""></textarea>
+                                        <textarea rows="15"></textarea>
 
                                         <div class="textarea-results flex-box-between">
-                                            <div>
-                                                <img src="">
+                                            <div class="flex-box-start">
+                                                <img src="images/geral-icons/circle-green-icon.svg">
                                                 <p>35 Válidos</p>
                                             </div>
 
-                                            <div>
-                                                <img src="">
-                                                <p>35 Válidos</p>
+                                            <div class="flex-box-start">
+                                                <img src="images/geral-icons/circle-yellow-icon.svg">
+                                                <p>1 Repetidos</p>
                                             </div>
 
-                                            <div>
-                                                <img src="">
-                                                <p>35 Válidos</p>
+                                            <div class="flex-box-start">
+                                                <img src="images/geral-icons/circle-red-icon.svg">
+                                                <p>3 Inválidos</p>
                                             </div>
                                         </div>
 
