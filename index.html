@@ -23,8 +23,24 @@
 
         <style>
 
+
+            .comparison {
+                width: 100%;
+                padding-bottom: 20px;
+                border-bottom: 2px solid #525252;
+            }
+
+            .comparison > .flex-box-between {
+                width: 100%;
+                padding-bottom: 20px;
+                border-bottom: 2px solid #525252;
+            }
+
             .comparison-choice {
-                
+                flex: 0 0 500px;
+                padding-top: 30px;
+                padding-right: 30px;
+                border-right: 2px solid #525252;
             }
 
             .comparison-results {
@@ -413,7 +429,18 @@
                         <!-- COMPARAÇÕES DE DADOS -->
 
                         <div class="tabs-panel" id="statistics-4">
-                            <section class="" id="">
+                            <section class="comparison" id="">
+
+                                <!-- HEADER -->
+
+                                <div class="flex-box-between">
+
+                                    <div class="flex-box-start">
+                                        <img src="images/geral-icons/comparison-icon.svg">
+                                        <h3>Comparação de Dados</h3>
+                                    </div>
+                                </div>
+                                
                                 <div class="flex-box-start">
 
                                     <!-- ÁREA DE COMPARAÇÃO  -->
@@ -423,7 +450,7 @@
                                         <h3>Dados para Comparar</h3>
                                         <p>Coluna Escolhida:</p>
 
-                                        <select id="" class="standard-select">
+                                        <select id="" class="standard-select" style="width: 100%;">
 
                                             <!-- COLUNAS  -->
                                         
