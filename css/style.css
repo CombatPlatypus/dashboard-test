@@ -2491,7 +2491,6 @@ a.thumbnail image {
     }
 
     .operation-choice > * {
-        width: 100%;
         min-width: 0;
         max-width: 100%;
     }
@@ -2502,11 +2501,18 @@ a.thumbnail image {
         font-size: 13px;
     }
 
-    .operation-choice select,
+    .operation-choice select:not(.select2-hidden-accessible),
     .operation-choice .select2-container {
         width: 100% !important;
         min-width: 0 !important;
         max-width: 100% !important;
+    }
+
+    .operation-choice > .select2-hidden-accessible {
+        width: 1px !important;
+        min-width: 1px !important;
+        max-width: 1px !important;
+        height: 1px !important;
     }
 
     .operation-choice .select2-selection,
