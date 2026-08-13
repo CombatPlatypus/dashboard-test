@@ -47,16 +47,31 @@
                 gap: 10px;
                 align-items: center;
             }
+            .comparison > .flex-box-between h3, .comparison > .flex-box-between p {
+                margin-bottom: 0;
+            }
             .comparison-choice {
                 flex: 0 0 500px;
                 padding-top: 30px;
                 padding-right: 30px;
                 border-right: 2px solid #525252;
             }
+            .comparison-choice > h4 {
+                margin-bottom: 15px;
+            }
             .comparison-choice button {
+                width: 100%;
                 min-height: 40px;
                 font-size: 14px;
                 padding: 10px 15px;
+            }
+            .comparison .textarea-results {
+                
+            }
+            .comparison .textarea-results p {
+                font-size: 13px;
+                margin-bottom: 0;
+                width: max-content;
             }
 
             .comparison-results {
@@ -150,7 +165,6 @@
                 <!-- PAINEL ANÁLISE DE PLANILHAS -->
 
                 <div class="tabs-panel is-active no-file" id="statistics">
-
                     <div class="flex-box-start" id="statistics-margin">
 
                         <!-- IMPORTAÇÃO LOCAL -->
@@ -209,7 +223,6 @@
                                 </a>
                             </li> 
                         </ul> 
-
                     </div>
 
                     <!-- SEM TITULO POR ENQUANTO -->
@@ -455,6 +468,8 @@
                                         <img src="images/geral-icons/comparison-icon.svg">
                                         <h3>Comparação de Dados</h3>
                                     </div>
+
+                                    <p id="statisticsComparisonSummary">Nenhuma planilha carregada.</p>
                                 </div>
                                 
                                 <div class="flex-box-start">
@@ -463,7 +478,7 @@
 
                                     <div class="comparison-choice">
 
-                                        <h3>Dados para Comparar</h3>
+                                        <h4>Dados para Comparar</h4>
                                         <p>Coluna Escolhida:</p>
 
                                         <select id="" class="standard-select" style="width: 100%;">
@@ -474,14 +489,14 @@
 
                                         </select>
 
-                                        <div class="flex-box-between">
+                                        <div class="flex-box-between" style="margin-top: 20px;">
                                             <p>Cole os BRs aqui:</p>
                                             <p>38 Linhas</p>
                                         </div>
 
                                         <textarea rows=""></textarea>
 
-                                        <div class="textarea-results">
+                                        <div class="textarea-results flex-box-between">
                                             <div>
                                                 <img src="">
                                                 <p>35 Válidos</p>
@@ -498,7 +513,9 @@
                                             </div>
                                         </div>
 
-                                        <button class="button">Limpar Lista</button>
+                                        <div class="pre-button">
+                                            <button class="button">Limpar Lista</button>
+                                        </div>
                                     </div>
 
                                     <!-- RESULTADOS DA COMPARAÇÃO  -->
