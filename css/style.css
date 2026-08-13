@@ -2608,7 +2608,6 @@ a.thumbnail image {
         max-width: 100% !important;
         height: 100% !important;
     }
-
     .chart-empty {
         position: absolute;
         inset: 0;
@@ -2644,6 +2643,16 @@ a.thumbnail image {
 
     .chart-empty[hidden] {
         display: none;
+    }
+
+    .main-structure #statistics .tabs-panel.is-active,
+    #statistics-3,
+    .charts-panel,
+    .charts-body,
+    .chart-view,
+    .chart-box {
+        min-width: 0;
+        max-width: 100%;
     }
 
 /* TABELAS */
