@@ -109,6 +109,27 @@ const chartDownloadButton = document.getElementById("statisticsChartDownload");
 const statisticsPanel = document.getElementById("statistics");
 const chartShowValues = document.getElementById("statisticsChartShowValues");
 
+/* ELEMENTOS DA COMPARAÇÃO DE DADOS */
+
+const comparisonPanel = document.getElementById("statisticsComparisonPanel");
+const comparisonSummary = document.getElementById("statisticsComparisonSummary");
+const comparisonColumn = document.getElementById("statisticsComparisonColumn");
+const comparisonInput = document.getElementById("statisticsComparisonInput");
+const comparisonLineCount = document.getElementById("statisticsComparisonLineCount");
+const comparisonValidCount = document.getElementById("statisticsComparisonValidCount");
+const comparisonDuplicateCount = document.getElementById("statisticsComparisonDuplicateCount");
+const comparisonInvalidCount = document.getElementById("statisticsComparisonInvalidCount");
+const comparisonExecuteButton = document.getElementById("statisticsComparisonExecute");
+const comparisonClearButton = document.getElementById("statisticsComparisonClear");
+const comparisonFoundCount = document.getElementById("statisticsComparisonFoundCount");
+const comparisonNotFoundCount = document.getElementById("statisticsComparisonNotFoundCount");
+const comparisonRate = document.getElementById("statisticsComparisonRate");
+const comparisonEmpty = document.getElementById("statisticsComparisonEmpty");
+const comparisonPreview = document.getElementById("statisticsComparisonPreview");
+const comparisonSearch = document.getElementById("statisticsComparisonSearch");
+const comparisonExportButton = document.getElementById("statisticsComparisonExport");
+const comparisonTable = document.getElementById("statisticsComparisonTable");
+
 /* ESTADO DA TABELA INTERATIVA */
 
 const tableState = {
