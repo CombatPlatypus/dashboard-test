@@ -1811,8 +1811,6 @@ function refreshVisibleColumns() {
     renderTableBody();
 
     showChartPanel();
-
-    showComparisonPanel();
 }
 
 /* MONTA OS CHECKBOXES E MODOS DAS COLUNAS PARA ANÁLISE */
@@ -4400,6 +4398,8 @@ function renderTable(
     preview.hidden = false;
 
     showChartPanel();
+
+    showComparisonPanel();
 }
 
 /* LIMPA O ESTADO DA TABELA */
@@ -4940,50 +4940,43 @@ function executeTableDownload(
 
 function renderComparisonColumnSelector() {
     const previousColumn = comparisonColumn.value;
+    const placeholder = document.createElement("option");
 
     comparisonColumn.replaceChildren();
 
-    comparisonColumn.appendChild(
-        createOption(
-            "",
-            "Selecione uma coluna",
-        ),
-    );
+    placeholder.value = "";
+    placeholder.textContent = "Selecione uma coluna";
+
+    comparisonColumn.appendChild(placeholder);
 
     tableState.headers.forEach(function (header, columnIndex) {
         if (tableState.columnProfiles[columnIndex].type === "empty") {
             return;
         }
 
-        comparisonColumn.appendChild(
-            createOption(
-                String(columnIndex),
-                header,
-            ),
-        );
+        const option = document.createElement("option");
+
+        option.value = String(columnIndex);
+        option.textContent = header;
+
+        comparisonColumn.appendChild(option);
     });
 
-    if (
-        previousColumn !== "" &&
-        comparisonColumn.querySelector(
-            `option[value="${previousColumn}"]`,
-        )
-    ) {
-        comparisonColumn.value = previousColumn;
-    }
+    const previousColumnExists = Array.from(comparisonColumn.options).some(
+        function (option) {
+            return option.value === previousColumn;
+        },
+    );
+
+    comparisonColumn.value = previousColumnExists ? previousColumn : "";
 
     if (
         window.jQuery &&
         typeof window.jQuery.fn.select2 === "function"
     ) {
-        const comparisonSelect =
-            window.jQuery(comparisonColumn);
+        const comparisonSelect = window.jQuery(comparisonColumn);
 
-        if (
-            comparisonSelect.hasClass(
-                "select2-hidden-accessible",
-            )
-        ) {
+        if (comparisonSelect.hasClass("select2-hidden-accessible")) {
             comparisonSelect.trigger("change.select2");
         } else {
             comparisonSelect.select2({
@@ -4992,7 +4985,6 @@ function renderComparisonColumnSelector() {
         }
     }
 }
-
 /* MOSTRA O PAINEL DE COMPARAÇÃO */
 
 function showComparisonPanel() {
@@ -5011,6 +5003,7 @@ function showComparisonPanel() {
 function clearComparisonPanel() {
     comparisonInput.value = "";
     comparisonColumn.value = "";
+    updateChartSelect2(comparisonColumn);
 
     comparisonLineCount.textContent = "0 linhas";
     comparisonValidCount.textContent = "0";
@@ -5076,7 +5069,25 @@ function initializeStatisticsImporter() {
         !chartShowValues ||
         !chartEmpty ||
         !chartCanvas ||
-        !chartDownloadButton
+        !chartDownloadButton ||
+        !comparisonPanel ||
+        !comparisonSummary ||
+        !comparisonColumn ||
+        !comparisonInput ||
+        !comparisonLineCount ||
+        !comparisonValidCount ||
+        !comparisonDuplicateCount ||
+        !comparisonInvalidCount ||
+        !comparisonExecuteButton ||
+        !comparisonClearButton ||
+        !comparisonFoundCount ||
+        !comparisonNotFoundCount ||
+        !comparisonRate ||
+        !comparisonEmpty ||
+        !comparisonPreview ||
+        !comparisonSearch ||
+        !comparisonExportButton ||
+        !comparisonTable
     ) {
         console.error(
             "Elementos do importador de Estatísticas não foram encontrados.",
@@ -5300,6 +5311,8 @@ function initializeStatisticsImporter() {
                 clearQuickAnalysis();
 
                 clearChartPanel();
+
+                clearComparisonPanel();
 
                 clearFiltersButton.disabled =
                     true;
