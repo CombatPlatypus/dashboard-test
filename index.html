@@ -22,79 +22,257 @@
         <link rel="stylesheet" href="css/style.css">
 
         <style>
-
+            
+            /* COMPARAÇÃO DE DADOS */
 
             .comparison {
                 width: 100%;
-                padding-bottom: 20px;
-                border-bottom: 2px solid #525252;
+                min-width: 0;
             }
+
+            .comparison[hidden] {
+                display: none;
+            }
+
             .comparison > .flex-box-between {
                 width: 100%;
                 padding-bottom: 20px;
+                align-items: center;
                 border-bottom: 2px solid #525252;
+            }
+
+            .comparison > .flex-box-between div {
+                gap: 10px;
                 align-items: center;
             }
+
             .comparison > .flex-box-between img {
                 width: 35px;
             }
+
+            .comparison > .flex-box-between h3,
+            .comparison > .flex-box-between p {
+                margin-bottom: 0;
+            }
+
             .comparison > .flex-box-between p {
                 width: max-content;
                 height: auto;
                 font-size: 13px;
             }
-            .comparison > .flex-box-between div {
-                gap: 10px;
-                align-items: center;
+
+            .comparison-body {
+                width: 100%;
+                min-width: 0;
+                flex-wrap: nowrap;
+                align-items: stretch;
             }
-            .comparison > .flex-box-between h3, .comparison > .flex-box-between p {
-                margin-bottom: 0;
-            }
+
             .comparison-choice {
                 flex: 0 0 500px;
+                min-width: 0;
                 padding-top: 30px;
                 padding-right: 30px;
                 border-right: 2px solid #525252;
             }
+
             .comparison-choice > h4 {
                 margin-bottom: 15px;
             }
-            .comparison-choice button {
+
+            .comparison-choice > p {
+                margin-bottom: 20px;
+            }
+
+            .comparison-choice > label {
+                display: block;
+                margin-bottom: 8px;
+                font-size: 13px;
+                font-weight: 600;
+            }
+
+            .comparison-choice select:not(.select2-hidden-accessible),
+            .comparison-choice .select2-container {
+                width: 100% !important;
+                min-width: 0 !important;
+                max-width: 100% !important;
+            }
+
+            .comparison-choice > .select2-hidden-accessible {
+                width: 1px !important;
+                min-width: 1px !important;
+                max-width: 1px !important;
+                height: 1px !important;
+            }
+
+            .comparison-textarea-title {
+                margin-top: 20px;
+                margin-bottom: 8px;
+                align-items: center;
+            }
+
+            .comparison-textarea-title label {
+                margin: 0;
+                font-weight: 600;
+            }
+
+            .comparison-textarea-title span {
+                color: #b9bcc1;
+                font-size: 13px;
+            }
+
+            .comparison-choice textarea {
                 width: 100%;
-                min-height: 40px;
-                font-size: 14px;
-                padding: 10px 15px;
+                min-height: 330px;
+                padding: 15px;
+                color: #e4e6eb;
+                background-color: #141414;
+                border: 1px solid #525252;
+                border-radius: 5px;
+                resize: vertical;
             }
-            .comparison .textarea-results {
+
+            .comparison-choice textarea:focus {
+                outline: none;
+                border-color: #8b8d91;
+            }
+
+            .textarea-results {
                 margin: 20px 0;
-                column-gap: 5px;
+                gap: 10px;
+                align-items: center;
             }
-            .comparison .textarea-results img {
+
+            .textarea-results div {
+                gap: 8px;
+                align-items: center;
+            }
+
+            .textarea-results img {
                 width: 15px;
             }
-            .comparison .textarea-results p {
-                font-size: 13px;
-                margin-bottom: 0;
+
+            .textarea-results p {
                 width: max-content;
+                margin-bottom: 0;
+                font-size: 13px;
             }
-            .comparison .textarea-results div {
-                column-gap: 10px;
+
+            .textarea-results strong {
+                color: #e4e6eb;
+            }
+
+            .comparison-actions {
+                display: flex;
+                gap: 10px;
+                flex-direction: column;
+            }
+
+            .comparison-actions button {
+                width: 100%;
+                min-height: 40px;
+                padding: 10px 15px;
+                font-size: 14px;
             }
 
             .comparison-results {
                 flex: 1 1 0;
+                min-width: 0;
                 display: flex;
                 padding: 20px;
                 gap: 20px;
                 flex-direction: column;
             }
 
-            .comparison-results .card {
-                width: 150px;
+            .comparison-cards {
+                width: 100%;
+                display: grid;
+                grid-template-columns: repeat(3, minmax(150px, 1fr));
+                gap: 15px;
+            }
+
+            .comparison-cards .card {
+                min-width: 150px;
                 min-height: 100px;
+                display: flex;
+                padding: 15px;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                flex-direction: column;
                 border: 1px solid #525252;
                 border-radius: 5px;
+            }
 
+            .comparison-cards span {
+                margin-bottom: 8px;
+                font-size: 13px;
+            }
+
+            .comparison-cards strong {
+                color: #ffffff;
+                font-size: 28px;
+            }
+
+            .comparison-empty {
+                flex: 1 1 0;
+                min-height: 350px;
+                display: flex;
+                gap: 10px;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                flex-direction: column;
+                background-color: #18191a;
+            }
+
+            .comparison-empty p {
+                color: #b9bcc1;
+            }
+
+            .comparison-preview[hidden] {
+                display: none;
+            }
+
+            .comparison-preview-header {
+                margin-bottom: 15px;
+                gap: 15px;
+                align-items: center;
+            }
+
+            .comparison-preview-header input {
+                flex: 1 1 250px;
+                min-width: 0;
+            }
+
+            .comparison-preview-header button {
+                min-height: 40px;
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+
+            #statistics-4 {
+                min-width: 0;
+                overflow: hidden;
+            }
+
+            @media only screen and (max-width: 1100px) {
+                .comparison-body {
+                    flex-direction: column;
+                }
+
+                .comparison-choice {
+                    flex: 1 1 auto;
+                    width: 100%;
+                    padding-right: 0;
+                    padding-bottom: 30px;
+                    border-right: 0;
+                    border-bottom: 2px solid #525252;
+                }
+
+                .comparison-cards {
+                    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                }
             }
 
         </style>
@@ -474,15 +652,14 @@
                             </section>
                         </div>
 
-                        <!-- COMPARAÇÕES DE DADOS -->
+                        <!-- COMPARAÇÃO DE DADOS -->
 
                         <div class="tabs-panel" id="statistics-4">
-                            <section class="comparison" id="">
+                            <section class="comparison" id="statisticsComparisonPanel" hidden>
 
                                 <!-- HEADER -->
 
                                 <div class="flex-box-between">
-
                                     <div class="flex-box-start">
                                         <img src="images/geral-icons/comparison-icon.svg">
                                         <h3>Comparação de Dados</h3>
@@ -490,79 +667,106 @@
 
                                     <p id="statisticsComparisonSummary">Nenhuma planilha carregada.</p>
                                 </div>
-                                
-                                <div class="flex-box-start">
 
-                                    <!-- ÁREA DE COMPARAÇÃO  -->
+                                <!-- CONTEÚDO -->
+
+                                <div class="comparison-body flex-box-start">
+
+                                    <!-- DADOS PARA COMPARAÇÃO -->
 
                                     <div class="comparison-choice">
-
                                         <h4>Dados para Comparar</h4>
-                                        <p>Escolha uma coluna para comparar.</p>
+                                        <p>Escolha uma coluna e cole os valores que deseja localizar.</p>
 
-                                        <select id="" class="standard-select" style="width: 100%;">
+                                        <label for="statisticsComparisonColumn">Localizar na coluna</label>
 
-                                            <!-- COLUNAS  -->
-                                        
-                                            <option value="">50 linhas</option>
-
+                                        <select id="statisticsComparisonColumn" class="standard-select">
+                                            <option value="">Selecione uma coluna</option>
                                         </select>
 
-                                        <div class="flex-box-between" style="margin-top: 20px;">
-                                            <p>Cole os BRs aqui:</p>
-                                            <p>38 Linhas</p>
+                                        <div class="comparison-textarea-title flex-box-between">
+                                            <label for="statisticsComparisonInput">Valores para comparar</label>
+                                            <span id="statisticsComparisonLineCount">0 linhas</span>
                                         </div>
 
-                                        <textarea rows="15"></textarea>
+                                        <textarea id="statisticsComparisonInput" rows="15" placeholder="Cole um valor por linha"></textarea>
 
                                         <div class="textarea-results flex-box-between">
                                             <div class="flex-box-start">
                                                 <img src="images/geral-icons/circle-green-icon.svg">
-                                                <p>35 Válidos</p>
+                                                <p><strong id="statisticsComparisonValidCount">0</strong> válidos</p>
                                             </div>
 
                                             <div class="flex-box-start">
                                                 <img src="images/geral-icons/circle-yellow-icon.svg">
-                                                <p>1 Repetidos</p>
+                                                <p><strong id="statisticsComparisonDuplicateCount">0</strong> repetidos</p>
                                             </div>
 
                                             <div class="flex-box-start">
                                                 <img src="images/geral-icons/circle-red-icon.svg">
-                                                <p>3 Inválidos</p>
+                                                <p><strong id="statisticsComparisonInvalidCount">0</strong> inválidos</p>
                                             </div>
                                         </div>
 
-                                        <div class="pre-button">
-                                            <button class="button">Limpar Lista</button>
+                                        <div class="comparison-actions">
+                                            <button id="statisticsComparisonExecute" class="button" type="button" disabled>Comparar Dados</button>
+                                            <button id="statisticsComparisonClear" class="button" type="button" disabled>Limpar Lista</button>
                                         </div>
                                     </div>
 
-                                    <!-- RESULTADOS DA COMPARAÇÃO  -->
+                                    <!-- RESULTADOS -->
 
                                     <div class="comparison-results">
 
                                         <!-- CARDS -->
 
-                                        <div class="flex-box-between">
-                                            <div class="card"></div>
-                                            <div class="card"></div>
-                                            <div class="card"></div>
-                                        </div>
-
-                                        <!-- PREVIA -->
-
-                                        <div class="">
-
-                                            <!-- CONTROLES DA PREVIA -->
-
-                                            <div class="">
-
-
+                                        <div class="comparison-cards">
+                                            <div class="card">
+                                                <span>Encontrados</span>
+                                                <strong id="statisticsComparisonFoundCount">0</strong>
                                             </div>
 
-                                            <!-- TABELA COM RESULTADOS -->
+                                            <div class="card">
+                                                <span>Não Encontrados</span>
+                                                <strong id="statisticsComparisonNotFoundCount">0</strong>
+                                            </div>
 
-                                            <table></table>
+                                            <div class="card">
+                                                <span>Correspondência</span>
+                                                <strong id="statisticsComparisonRate">0%</strong>
+                                            </div>
+                                        </div>
+
+                                        <!-- ESTADO INICIAL -->
+
+                                        <div class="comparison-empty" id="statisticsComparisonEmpty">
+                                            <h4>Nenhuma comparação realizada</h4>
+                                            <p>Escolha uma coluna, cole os valores e clique em Comparar Dados.</p>
+                                        </div>
+
+                                        <!-- PRÉVIA DOS RESULTADOS -->
+
+                                        <div class="comparison-preview" id="statisticsComparisonPreview" hidden>
+                                            <div class="comparison-preview-header flex-box-between">
+                                                <input id="statisticsComparisonSearch" type="search" placeholder="Buscar nos resultados">
+
+                                                <button id="statisticsComparisonExport" class="button" type="button" disabled>Baixar Resultado</button>
+                                            </div>
+
+                                            <div class="statistics-table-container">
+                                                <table class="statistics-local-table" id="statisticsComparisonTable">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Valor Informado</th>
+                                                            <th>Status</th>
+                                                            <th>Ocorrências</th>
+                                                            <th>Linhas</th>
+                                                        </tr>
+                                                    </thead>
+
+                                                    <tbody></tbody>
+                                                </table>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
