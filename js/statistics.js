@@ -1811,6 +1811,8 @@ function refreshVisibleColumns() {
     renderTableBody();
 
     showChartPanel();
+
+    showComparisonPanel();
 }
 
 /* MONTA OS CHECKBOXES E MODOS DAS COLUNAS PARA ANÁLISE */
@@ -4504,6 +4506,8 @@ function clearImportedFile() {
 
     clearChartPanel();
 
+    clearComparisonPanel();
+
     previewSummary.textContent =
         "";
 
@@ -4930,6 +4934,108 @@ function executeTableDownload(
             true,
         );
     }
+}
+
+/* PREENCHE O SELETOR DA COMPARAÇÃO */
+
+function renderComparisonColumnSelector() {
+    const previousColumn = comparisonColumn.value;
+
+    comparisonColumn.replaceChildren();
+
+    comparisonColumn.appendChild(
+        createOption(
+            "",
+            "Selecione uma coluna",
+        ),
+    );
+
+    tableState.headers.forEach(function (header, columnIndex) {
+        if (tableState.columnProfiles[columnIndex].type === "empty") {
+            return;
+        }
+
+        comparisonColumn.appendChild(
+            createOption(
+                String(columnIndex),
+                header,
+            ),
+        );
+    });
+
+    if (
+        previousColumn !== "" &&
+        comparisonColumn.querySelector(
+            `option[value="${previousColumn}"]`,
+        )
+    ) {
+        comparisonColumn.value = previousColumn;
+    }
+
+    if (
+        window.jQuery &&
+        typeof window.jQuery.fn.select2 === "function"
+    ) {
+        const comparisonSelect =
+            window.jQuery(comparisonColumn);
+
+        if (
+            comparisonSelect.hasClass(
+                "select2-hidden-accessible",
+            )
+        ) {
+            comparisonSelect.trigger("change.select2");
+        } else {
+            comparisonSelect.select2({
+                width: "100%",
+            });
+        }
+    }
+}
+
+/* MOSTRA O PAINEL DE COMPARAÇÃO */
+
+function showComparisonPanel() {
+    renderComparisonColumnSelector();
+
+    comparisonSummary.textContent =
+        `Página: ${tableState.sheetName} / ` +
+        `${tableState.rows.length} linhas - ` +
+        `${tableState.headers.length} colunas`;
+
+    comparisonPanel.hidden = false;
+}
+
+/* LIMPA E OCULTA O PAINEL DE COMPARAÇÃO */
+
+function clearComparisonPanel() {
+    comparisonInput.value = "";
+    comparisonColumn.value = "";
+
+    comparisonLineCount.textContent = "0 linhas";
+    comparisonValidCount.textContent = "0";
+    comparisonDuplicateCount.textContent = "0";
+    comparisonInvalidCount.textContent = "0";
+
+    comparisonFoundCount.textContent = "0";
+    comparisonNotFoundCount.textContent = "0";
+    comparisonRate.textContent = "0%";
+
+    comparisonExecuteButton.disabled = true;
+    comparisonClearButton.disabled = true;
+    comparisonExportButton.disabled = true;
+
+    comparisonPreview.hidden = true;
+    comparisonEmpty.hidden = false;
+
+    comparisonTable
+        .querySelector("tbody")
+        .replaceChildren();
+
+    comparisonSummary.textContent =
+        "Nenhuma planilha carregada.";
+
+    comparisonPanel.hidden = true;
 }
 
 /* INICIALIZA O IMPORTADOR */
