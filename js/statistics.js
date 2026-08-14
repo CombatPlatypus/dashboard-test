@@ -160,6 +160,12 @@ const tableState = {
     sortDirection: "asc",
 };
 
+/* ESTADO DE COMPARAÇÃO */
+
+const comparisonState = {
+    results: [],
+};
+
 /* ESTADO DO GRÁFICO */
 
 const chartState = {
@@ -5018,24 +5024,235 @@ function updateComparisonInputSummary() {
         inputData.validCount === 0;
 }
 
-/* LIMPA SOMENTE A LISTA INFORMADA */
+/* LIMPA OS RESULTADOS DA COMPARAÇÃO */
 
-function clearComparisonInput() {
-    comparisonInput.value = "";
+function resetComparisonResults() {
+    comparisonState.results = [];
 
     comparisonFoundCount.textContent = "0";
     comparisonNotFoundCount.textContent = "0";
     comparisonRate.textContent = "0%";
 
-    comparisonExportButton.disabled = true;
-    comparisonPreview.hidden = true;
-    comparisonEmpty.hidden = false;
-
     comparisonSearch.value = "";
+    comparisonExportButton.disabled = true;
 
     comparisonTable
         .querySelector("tbody")
         .replaceChildren();
+
+    comparisonPreview.hidden = true;
+    comparisonEmpty.hidden = false;
+}
+
+/* CRIA UM ÍNDICE DA COLUNA ESCOLHIDA */
+
+function createComparisonColumnIndex(columnIndex) {
+    const columnIndexMap = new Map();
+
+    tableState.rows.forEach(function (row, rowIndex) {
+        const originalValue = formatCellValue(row[columnIndex]).trim();
+        const normalizedValue = normalizeSearchValue(originalValue).trim();
+
+        if (!normalizedValue) {
+            return;
+        }
+
+        if (!columnIndexMap.has(normalizedValue)) {
+            columnIndexMap.set(normalizedValue, {
+                occurrences: 0,
+                lines: [],
+            });
+        }
+
+        const indexedValue = columnIndexMap.get(normalizedValue);
+
+        indexedValue.occurrences += 1;
+
+        /*
+         * Soma 2 porque:
+         * linha 1 = cabeçalho;
+         * os dados começam na linha 2.
+         */
+
+        indexedValue.lines.push(rowIndex + 2);
+    });
+
+    return columnIndexMap;
+}
+
+/* MONTA UMA LINHA DO RESULTADO */
+
+function createComparisonResultRow(result) {
+    const row = document.createElement("tr");
+    const informedValueCell = createCell("td", result.value);
+    const statusCell = createCell(
+        "td",
+        result.found ? "Encontrado" : "Não encontrado",
+    );
+
+    const occurrencesCell = createCell(
+        "td",
+        result.occurrences,
+    );
+
+    const linesCell = createCell(
+        "td",
+        result.lines.length
+            ? result.lines.join(", ")
+            : "—",
+    );
+
+    row.classList.add(
+        result.found
+            ? "is-found"
+            : "is-not-found",
+    );
+
+    row.append(
+        informedValueCell,
+        statusCell,
+        occurrencesCell,
+        linesCell,
+    );
+
+    return row;
+}
+
+/* EXIBE OS RESULTADOS NA TABELA */
+
+function renderComparisonResults(results = comparisonState.results) {
+    const tableBody = comparisonTable.querySelector("tbody");
+    const fragment = document.createDocumentFragment();
+
+    tableBody.replaceChildren();
+
+    results.forEach(function (result) {
+        fragment.appendChild(
+            createComparisonResultRow(result),
+        );
+    });
+
+    tableBody.appendChild(fragment);
+}
+
+/* EXECUTA A COMPARAÇÃO */
+
+function executeComparison() {
+    const selectedColumn = comparisonColumn.value;
+    const columnIndex = Number(selectedColumn);
+    const inputData = readComparisonInput();
+
+    if (
+        selectedColumn === "" ||
+        !Number.isInteger(columnIndex) ||
+        columnIndex < 0 ||
+        columnIndex >= tableState.headers.length ||
+        inputData.validCount === 0
+    ) {
+        return;
+    }
+
+    const columnIndexMap =
+        createComparisonColumnIndex(columnIndex);
+
+    comparisonState.results =
+        inputData.values.map(function (inputValue) {
+            const indexedValue =
+                columnIndexMap.get(
+                    inputValue.normalizedValue,
+                );
+
+            return {
+                value: inputValue.value,
+                normalizedValue: inputValue.normalizedValue,
+                found: Boolean(indexedValue),
+                occurrences: indexedValue?.occurrences ?? 0,
+                lines: indexedValue?.lines ?? [],
+            };
+        });
+
+    const foundCount =
+        comparisonState.results.filter(
+            function (result) {
+                return result.found;
+            },
+        ).length;
+
+    const notFoundCount =
+        comparisonState.results.length - foundCount;
+
+    const correspondenceRate =
+        comparisonState.results.length
+            ? (
+                foundCount /
+                comparisonState.results.length *
+                100
+            )
+            : 0;
+
+    comparisonFoundCount.textContent =
+        String(foundCount);
+
+    comparisonNotFoundCount.textContent =
+        String(notFoundCount);
+
+    comparisonRate.textContent =
+        correspondenceRate.toLocaleString(
+            "pt-BR",
+            {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 1,
+            },
+        ) + "%";
+
+    comparisonEmpty.hidden = true;
+    comparisonPreview.hidden = false;
+    comparisonExportButton.disabled = false;
+
+    renderComparisonResults();
+}
+
+/* FILTRA A TABELA DE RESULTADOS */
+
+function filterComparisonResults() {
+    const searchValue =
+        normalizeSearchValue(
+            comparisonSearch.value,
+        ).trim();
+
+    if (!searchValue) {
+        renderComparisonResults();
+        return;
+    }
+
+    const filteredResults =
+        comparisonState.results.filter(
+            function (result) {
+                const searchableValue =
+                    [
+                        result.value,
+                        result.found
+                            ? "Encontrado"
+                            : "Não encontrado",
+                        result.occurrences,
+                        result.lines.join(" "),
+                    ].join(" ");
+
+                return normalizeSearchValue(
+                    searchableValue,
+                ).includes(searchValue);
+            },
+        );
+
+    renderComparisonResults(filteredResults);
+}
+
+/* LIMPA SOMENTE A LISTA INFORMADA */
+
+function clearComparisonInput() {
+    comparisonInput.value = "";
+
+    resetComparisonResults();
 
     updateComparisonInputSummary();
 
@@ -5094,6 +5311,10 @@ function renderComparisonColumnSelector() {
 /* MOSTRA O PAINEL DE COMPARAÇÃO */
 
 function showComparisonPanel() {
+    resetComparisonResults();
+
+    comparisonColumn.value = "";
+
     renderComparisonColumnSelector();
 
     comparisonSummary.textContent =
@@ -5109,6 +5330,8 @@ function showComparisonPanel() {
 /* LIMPA E OCULTA O PAINEL DE COMPARAÇÃO */
 
 function clearComparisonPanel() {
+
+    comparisonState.results = [];
     comparisonInput.value = "";
     comparisonColumn.value = "";
     updateChartSelect2(comparisonColumn);
@@ -5321,7 +5544,10 @@ function initializeStatisticsImporter() {
 
     comparisonInput.addEventListener(
         "input",
-        updateComparisonInputSummary,
+        function () {
+            resetComparisonResults();
+            updateComparisonInputSummary();
+        },
     );
 
     comparisonClearButton.addEventListener(
@@ -5330,8 +5556,19 @@ function initializeStatisticsImporter() {
     );
 
     const handleComparisonColumnChange = function () {
+        resetComparisonResults();
         updateComparisonInputSummary();
     };
+
+    comparisonExecuteButton.addEventListener(
+        "click",
+        executeComparison,
+    );
+
+    comparisonSearch.addEventListener(
+        "input",
+        filterComparisonResults,
+    );
 
     if (
         window.jQuery &&
