@@ -29,45 +29,37 @@
                 width: 100%;
                 min-width: 0;
             }
-
             .comparison[hidden] {
                 display: none;
             }
-
             .comparison > .flex-box-between {
                 width: 100%;
                 padding-bottom: 20px;
                 align-items: center;
                 border-bottom: 2px solid #525252;
             }
-
             .comparison > .flex-box-between div {
                 gap: 10px;
                 align-items: center;
             }
-
             .comparison > .flex-box-between img {
                 width: 35px;
             }
-
             .comparison > .flex-box-between h3,
             .comparison > .flex-box-between p {
                 margin-bottom: 0;
             }
-
             .comparison > .flex-box-between p {
                 width: max-content;
                 height: auto;
                 font-size: 13px;
             }
-
             .comparison-body {
                 width: 100%;
                 min-width: 0;
                 flex-wrap: nowrap;
                 align-items: stretch;
             }
-
             .comparison-choice {
                 flex: 0 0 500px;
                 min-width: 0;
@@ -75,52 +67,43 @@
                 padding-right: 30px;
                 border-right: 2px solid #525252;
             }
-
             .comparison-choice > h4 {
                 margin-bottom: 15px;
             }
-
             .comparison-choice > p {
                 margin-bottom: 20px;
             }
-
             .comparison-choice > label {
                 display: block;
                 margin-bottom: 8px;
                 font-size: 13px;
                 font-weight: 600;
             }
-
             .comparison-choice select:not(.select2-hidden-accessible),
             .comparison-choice .select2-container {
                 width: 100% !important;
                 min-width: 0 !important;
                 max-width: 100% !important;
             }
-
             .comparison-choice > .select2-hidden-accessible {
                 width: 1px !important;
                 min-width: 1px !important;
                 max-width: 1px !important;
                 height: 1px !important;
             }
-
             .comparison-textarea-title {
                 margin-top: 20px;
                 margin-bottom: 8px;
                 align-items: center;
             }
-
             .comparison-textarea-title label {
                 margin: 0;
                 font-weight: 600;
             }
-
             .comparison-textarea-title span {
                 color: #b9bcc1;
                 font-size: 13px;
             }
-
             .comparison-choice textarea {
                 width: 100%;
                 min-height: 330px;
@@ -131,50 +114,41 @@
                 border-radius: 5px;
                 resize: vertical;
             }
-
             .comparison-choice textarea:focus {
                 outline: none;
                 border-color: #8b8d91;
             }
-
             .textarea-results {
                 margin: 20px 0;
                 gap: 10px;
                 align-items: center;
             }
-
             .textarea-results div {
                 gap: 8px;
                 align-items: center;
             }
-
             .textarea-results img {
                 width: 15px;
             }
-
             .textarea-results p {
                 width: max-content;
                 margin-bottom: 0;
                 font-size: 13px;
             }
-
             .textarea-results strong {
                 color: #e4e6eb;
             }
-
             .comparison-actions {
                 display: flex;
                 gap: 10px;
                 flex-direction: column;
             }
-
             .comparison-actions button {
                 width: 100%;
                 min-height: 40px;
                 padding: 10px 15px;
                 font-size: 14px;
             }
-
             .comparison-results {
                 flex: 1 1 0;
                 min-width: 0;
@@ -183,14 +157,16 @@
                 gap: 20px;
                 flex-direction: column;
             }
-
+            .comparison-table {
+                height: auto !important;
+            }
+            
             .comparison-cards {
                 width: 100%;
                 display: grid;
                 grid-template-columns: repeat(3, minmax(150px, 1fr));
                 gap: 15px;
             }
-
             .comparison-cards .card {
                 min-width: 150px;
                 min-height: 100px;
@@ -203,17 +179,14 @@
                 border: 1px solid #525252;
                 border-radius: 5px;
             }
-
             .comparison-cards span {
                 margin-bottom: 8px;
                 font-size: 13px;
             }
-
             .comparison-cards strong {
                 color: #ffffff;
                 font-size: 28px;
             }
-
             .comparison-empty {
                 flex: 1 1 0;
                 min-height: 350px;
@@ -225,37 +198,31 @@
                 flex-direction: column;
                 background-color: #18191a;
             }
-
             .comparison-empty p {
                 color: #b9bcc1;
             }
-
             .comparison-preview[hidden] {
                 display: none;
             }
-
             .comparison-preview-header {
                 margin-bottom: 15px;
                 gap: 15px;
                 align-items: center;
             }
-
             .comparison-preview-header input {
                 flex: 1 1 250px;
                 min-width: 0;
+                height: 45px;
             }
-
             .comparison-preview-header button {
                 min-height: 40px;
                 padding: 10px 15px;
                 font-size: 14px;
             }
-
             #statistics-4 {
                 min-width: 0;
                 overflow: hidden;
             }
-
             @media only screen and (max-width: 1100px) {
                 .comparison-body {
                     flex-direction: column;
@@ -472,7 +439,7 @@
 
                                 <!-- TABELA GERADA DE ACORDO COM A PLANILHA -->
 
-                                <div class="statistics-table-container">
+                                <div class="statistics-table-container comparison-table">
                                     <table id="statisticsLocalTable" class="statistics-local-table">
                                         <thead></thead>
                                         <tbody></tbody>
@@ -746,12 +713,14 @@
 
                                         <!-- PRÉVIA DOS RESULTADOS -->
 
-                                        <div class="comparison-preview" id="statisticsComparisonPreview" hidden>
-                                            <div class="comparison-preview-header flex-box-between">
-                                                <input id="statisticsComparisonSearch" type="search" placeholder="Buscar nos resultados">
+                                        <div class="comparison-preview-header flex-box-between">
+                                            <input id="statisticsComparisonSearch" type="search" placeholder="Buscar nos resultados">
 
-                                                <button id="statisticsComparisonExport" class="button" type="button" disabled>Baixar Resultado</button>
-                                            </div>
+                                            <button id="statisticsComparisonExport" class="button" type="button" disabled>Baixar Resultado</button>
+                                        </div>
+
+
+                                        <div class="comparison-preview" id="statisticsComparisonPreview" hidden>
 
                                             <div class="statistics-table-container">
                                                 <table class="statistics-local-table" id="statisticsComparisonTable">
