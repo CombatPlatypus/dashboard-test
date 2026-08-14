@@ -4936,6 +4936,112 @@ function executeTableDownload(
     }
 }
 
+/* LÊ OS VALORES INFORMADOS PARA COMPARAÇÃO */
+
+function readComparisonInput() {
+    const inputValue = comparisonInput.value.replace(/\r/g, "");
+
+    if (!inputValue.trim()) {
+        return {
+            lineCount: 0,
+            validCount: 0,
+            duplicateCount: 0,
+            invalidCount: 0,
+            values: [],
+        };
+    }
+
+    const lines = inputValue.replace(/\n+$/, "").split("\n");
+    const valueCounts = new Map();
+    const values = [];
+    let invalidCount = 0;
+
+    lines.forEach(function (line) {
+        const displayValue = line.trim();
+        const normalizedValue = normalizeSearchValue(displayValue).trim();
+
+        if (!normalizedValue) {
+            invalidCount += 1;
+            return;
+        }
+
+        const currentCount = valueCounts.get(normalizedValue) ?? 0;
+
+        valueCounts.set(normalizedValue, currentCount + 1);
+
+        if (currentCount === 0) {
+            values.push({
+                value: displayValue,
+                normalizedValue,
+            });
+        }
+    });
+
+    let duplicateCount = 0;
+
+    valueCounts.forEach(function (count) {
+        duplicateCount += Math.max(0, count - 1);
+    });
+
+    return {
+        lineCount: lines.length,
+        validCount: values.length,
+        duplicateCount,
+        invalidCount,
+        values,
+    };
+}
+
+/* ATUALIZA AS CONTAGENS DA LISTA */
+
+function updateComparisonInputSummary() {
+    const inputData = readComparisonInput();
+    const lineLabel = inputData.lineCount === 1 ? "linha" : "linhas";
+
+    comparisonLineCount.textContent =
+        `${inputData.lineCount} ${lineLabel}`;
+
+    comparisonValidCount.textContent =
+        String(inputData.validCount);
+
+    comparisonDuplicateCount.textContent =
+        String(inputData.duplicateCount);
+
+    comparisonInvalidCount.textContent =
+        String(inputData.invalidCount);
+
+    comparisonClearButton.disabled =
+        comparisonInput.value.length === 0;
+
+    comparisonExecuteButton.disabled =
+        comparisonColumn.value === "" ||
+        inputData.validCount === 0;
+}
+
+/* LIMPA SOMENTE A LISTA INFORMADA */
+
+function clearComparisonInput() {
+    comparisonInput.value = "";
+
+    comparisonFoundCount.textContent = "0";
+    comparisonNotFoundCount.textContent = "0";
+    comparisonRate.textContent = "0%";
+
+    comparisonExportButton.disabled = true;
+    comparisonPreview.hidden = true;
+    comparisonEmpty.hidden = false;
+
+    comparisonSearch.value = "";
+
+    comparisonTable
+        .querySelector("tbody")
+        .replaceChildren();
+
+    updateComparisonInputSummary();
+
+    comparisonInput.focus();
+}
+
 /* PREENCHE O SELETOR DA COMPARAÇÃO */
 
 function renderComparisonColumnSelector() {
@@ -4994,6 +5100,8 @@ function showComparisonPanel() {
         `Página: ${tableState.sheetName} / ` +
         `${tableState.rows.length} linhas - ` +
         `${tableState.headers.length} colunas`;
+
+    updateComparisonInputSummary();
 
     comparisonPanel.hidden = false;
 }
@@ -5210,6 +5318,37 @@ function initializeStatisticsImporter() {
         "click",
         downloadChartImage,
     );
+
+    comparisonInput.addEventListener(
+        "input",
+        updateComparisonInputSummary,
+    );
+
+    comparisonClearButton.addEventListener(
+        "click",
+        clearComparisonInput,
+    );
+
+    const handleComparisonColumnChange = function () {
+        updateComparisonInputSummary();
+    };
+
+    if (
+        window.jQuery &&
+        typeof window.jQuery.fn.select2 === "function"
+    ) {
+        window
+            .jQuery(comparisonColumn)
+            .on(
+                "change.statisticsComparison",
+                handleComparisonColumnChange,
+            );
+    } else {
+        comparisonColumn.addEventListener(
+            "change",
+            handleComparisonColumnChange,
+        );
+    }
 
     if (
         window.jQuery &&
