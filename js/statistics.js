@@ -5233,39 +5233,141 @@ function executeComparison() {
     renderComparisonResults();
 }
 
-/* FILTRA A TABELA DE RESULTADOS */
+/* RETORNA OS RESULTADOS VISÍVEIS DA COMPARAÇÃO */
 
-function filterComparisonResults() {
+function getVisibleComparisonResults() {
     const searchValue =
         normalizeSearchValue(
             comparisonSearch.value,
         ).trim();
 
     if (!searchValue) {
-        renderComparisonResults();
-        return;
+        return comparisonState.results;
     }
 
-    const filteredResults =
-        comparisonState.results.filter(
-            function (result) {
-                const searchableValue =
-                    [
-                        result.value,
-                        result.found
-                            ? "Encontrado"
-                            : "Não encontrado",
-                        result.occurrences,
-                        result.lines.join(" "),
-                    ].join(" ");
+    return comparisonState.results.filter(
+        function (result) {
+            const searchableValue =
+                [
+                    result.value,
+                    result.found
+                        ? "Encontrado"
+                        : "Não encontrado",
+                    result.occurrences,
+                    result.lines.join(" "),
+                ].join(" ");
 
-                return normalizeSearchValue(
-                    searchableValue,
-                ).includes(searchValue);
+            return normalizeSearchValue(
+                searchableValue,
+            ).includes(searchValue);
+        },
+    );
+}
+
+/* FILTRA A TABELA DE RESULTADOS */
+
+function filterComparisonResults() {
+    renderComparisonResults(
+        getVisibleComparisonResults(),
+    );
+}
+
+/* PREPARA OS RESULTADOS DA COMPARAÇÃO PARA EXPORTAÇÃO */
+
+function createComparisonExportData() {
+    const visibleResults =
+        getVisibleComparisonResults();
+
+    if (visibleResults.length === 0) {
+        throw new Error(
+            "Nenhum resultado está disponível para baixar.",
+        );
+    }
+
+    const headers = [
+        "Valor informado",
+        "Status",
+        "Ocorrências",
+        "Linhas",
+    ];
+
+    const rows =
+        visibleResults.map(
+            function (result) {
+                return [
+                    result.value,
+                    result.found
+                        ? "Encontrado"
+                        : "Não encontrado",
+                    result.occurrences,
+                    result.lines.length
+                        ? result.lines.join(", ")
+                        : "—",
+                ];
             },
         );
 
-    renderComparisonResults(filteredResults);
+    return {
+        headers,
+        rows,
+        matrix: [
+            headers,
+            ...rows,
+        ],
+    };
+}
+
+/* BAIXA OS RESULTADOS DA COMPARAÇÃO */
+
+function downloadComparisonResults() {
+    if (!window.XLSX) {
+        throw new Error(
+            "A biblioteca de planilhas não foi carregada.",
+        );
+    }
+
+    const exportData =
+        createComparisonExportData();
+
+    const worksheet =
+        window.XLSX.utils.aoa_to_sheet(
+            exportData.matrix,
+        );
+
+    worksheet["!cols"] =
+        createExportColumnWidths(
+            exportData.headers,
+            exportData.rows,
+        );
+
+    const workbook =
+        window.XLSX.utils.book_new();
+
+    window.XLSX.utils.book_append_sheet(
+        workbook,
+        worksheet,
+        createSafeSheetName("Comparação"),
+    );
+
+    const safeBaseName =
+        createSafeFileBaseName(
+            tableState.sourceFileName,
+        );
+
+    const fileName =
+        `${safeBaseName}_comparacao.xlsx`;
+
+    window.XLSX.writeFile(
+        workbook,
+        fileName,
+        {
+            compression: true,
+        },
+    );
+
+    setStatus(
+        `Resultado "${fileName}" gerado com ${exportData.rows.length} registros.`,
+    );
 }
 
 /* LIMPA SOMENTE A LISTA INFORMADA */
@@ -5586,6 +5688,15 @@ function initializeStatisticsImporter() {
     comparisonSearch.addEventListener(
         "input",
         filterComparisonResults,
+    );
+
+    comparisonExportButton.addEventListener(
+        "click",
+        function () {
+            executeTableDownload(
+                downloadComparisonResults,
+            );
+        },
     );
 
     if (
