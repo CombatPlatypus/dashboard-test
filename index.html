@@ -62,10 +62,12 @@
             }
             .comparison-choice {
                 flex: 0 0 500px;
+                height: 664px;
                 min-width: 0;
                 padding-top: 30px;
                 padding-right: 30px;
                 border-right: 2px solid #525252;
+                overflow: hidden;
             }
             .comparison-choice > h4 {
                 margin-bottom: 15px;
@@ -135,9 +137,6 @@
                 margin-bottom: 0;
                 font-size: 13px;
             }
-            .textarea-results strong {
-                color: #e4e6eb;
-            }
             .comparison-actions {
                 display: flex;
                 gap: 10px;
@@ -153,12 +152,14 @@
                 flex: 1 1 0;
                 min-width: 0;
                 display: flex;
-                padding: 20px;
+                padding: 30px 0 0 30px;
                 gap: 20px;
                 flex-direction: column;
             }
             .comparison-table {
-                height: auto !important;
+                padding-right: 15px;
+                overflow: auto;
+                height: 458px;
             }
             
             .comparison-cards {
@@ -183,7 +184,7 @@
                 margin-bottom: 8px;
                 font-size: 13px;
             }
-            .comparison-cards strong {
+            .comparison-cards span {
                 color: #ffffff;
                 font-size: 28px;
             }
@@ -439,7 +440,7 @@
 
                                 <!-- TABELA GERADA DE ACORDO COM A PLANILHA -->
 
-                                <div class="statistics-table-container comparison-table">
+                                <div class="statistics-table-container">
                                     <table id="statisticsLocalTable" class="statistics-local-table">
                                         <thead></thead>
                                         <tbody></tbody>
@@ -474,7 +475,7 @@
 
                                     <div class="statistics-summary-card statistics-total-records-card">
                                         <span>Linhas Analisadas</span>
-                                        <strong id="statisticsTotalRecords">0</strong>
+                                        <span id="statisticsTotalRecords">0</span>
                                     </div>
                                 </div>
 
@@ -643,9 +644,9 @@
 
                                     <div class="comparison-choice">
                                         <h4>Dados para Comparar</h4>
-                                        <p>Escolha uma coluna e cole os valores que deseja localizar.</p>
+                                        <p>Escolha a coluna e cole os valores para localizar.</p>
 
-                                        <label for="statisticsComparisonColumn">Localizar na coluna</label>
+                                        <label for="statisticsComparisonColumn">Localizar na Coluna</label>
 
                                         <select id="statisticsComparisonColumn" class="standard-select">
                                             <option value="">Selecione uma coluna</option>
@@ -661,22 +662,21 @@
                                         <div class="textarea-results flex-box-between">
                                             <div class="flex-box-start">
                                                 <img src="images/geral-icons/circle-green-icon.svg">
-                                                <p><strong id="statisticsComparisonValidCount">0</strong> válidos</p>
+                                                <p><span id="statisticsComparisonValidCount">0</span> Válidos</p>
                                             </div>
 
                                             <div class="flex-box-start">
                                                 <img src="images/geral-icons/circle-yellow-icon.svg">
-                                                <p><strong id="statisticsComparisonDuplicateCount">0</strong> repetidos</p>
+                                                <p><span id="statisticsComparisonDuplicateCount">0</span> Repetidos</p>
                                             </div>
 
                                             <div class="flex-box-start">
                                                 <img src="images/geral-icons/circle-red-icon.svg">
-                                                <p><strong id="statisticsComparisonInvalidCount">0</strong> inválidos</p>
+                                                <p><span id="statisticsComparisonInvalidCount">0</span> Inválidos</p>
                                             </div>
                                         </div>
 
                                         <div class="comparison-actions">
-                                            <button id="statisticsComparisonExecute" class="button" type="button" disabled>Comparar Dados</button>
                                             <button id="statisticsComparisonClear" class="button" type="button" disabled>Limpar Lista</button>
                                         </div>
                                     </div>
@@ -690,17 +690,17 @@
                                         <div class="comparison-cards">
                                             <div class="card">
                                                 <span>Encontrados</span>
-                                                <strong id="statisticsComparisonFoundCount">0</strong>
+                                                <span id="statisticsComparisonFoundCount">0</span>
                                             </div>
 
                                             <div class="card">
                                                 <span>Não Encontrados</span>
-                                                <strong id="statisticsComparisonNotFoundCount">0</strong>
+                                                <span id="statisticsComparisonNotFoundCount">0</span>
                                             </div>
 
                                             <div class="card">
                                                 <span>Correspondência</span>
-                                                <strong id="statisticsComparisonRate">0%</strong>
+                                                <span id="statisticsComparisonRate">0%</span>
                                             </div>
                                         </div>
 
@@ -713,29 +713,31 @@
 
                                         <!-- PRÉVIA DOS RESULTADOS -->
 
-                                        <div class="comparison-preview-header flex-box-between">
-                                            <input id="statisticsComparisonSearch" type="search" placeholder="Buscar nos resultados">
-
-                                            <button id="statisticsComparisonExport" class="button" type="button" disabled>Baixar Resultado</button>
-                                        </div>
-
-
                                         <div class="comparison-preview" id="statisticsComparisonPreview" hidden>
 
-                                            <div class="statistics-table-container">
-                                                <table class="statistics-local-table" id="statisticsComparisonTable">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Valor Informado</th>
-                                                            <th>Status</th>
-                                                            <th>Ocorrências</th>
-                                                            <th>Linhas</th>
-                                                        </tr>
-                                                    </thead>
+                                            <div class="comparison-preview-header flex-box-between">
+                                                <input id="statisticsComparisonSearch" type="search" placeholder="Buscar nos resultados">
 
-                                                    <tbody></tbody>
-                                                </table>
+                                                <button id="statisticsComparisonExport" class="button" type="button" disabled>Baixar Resultado</button>
                                             </div>
+
+                                            <div class="comparison-table">
+                                                <div class="statistics-table-container">
+                                                    <table class="statistics-local-table" id="statisticsComparisonTable">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Valor Informado</th>
+                                                                <th>Status</th>
+                                                                <th>Ocorrências</th>
+                                                                <th>Linhas</th>
+                                                            </tr>
+                                                        </thead>
+
+                                                        <tbody></tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+
                                         </div>
                                     </div>
                                 </div>
