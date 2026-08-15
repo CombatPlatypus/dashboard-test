@@ -114,6 +114,8 @@ const chartShowValues = document.getElementById("statisticsChartShowValues");
 const comparisonPanel = document.getElementById("statisticsComparisonPanel");
 const comparisonSummary = document.getElementById("statisticsComparisonSummary");
 const comparisonColumn = document.getElementById("statisticsComparisonColumn");
+const comparisonConditionColumn = document.getElementById("statisticsComparisonConditionColumn");
+const comparisonConditionValue = document.getElementById("statisticsComparisonConditionValue");
 const comparisonInput = document.getElementById("statisticsComparisonInput");
 const comparisonLineCount = document.getElementById("statisticsComparisonLineCount");
 const comparisonValidCount = document.getElementById("statisticsComparisonValidCount");
@@ -5142,9 +5144,14 @@ function scheduleComparison() {
 
     const inputData = readComparisonInput();
 
+    const incompleteCondition =
+        comparisonConditionColumn.value !== "" &&
+        comparisonConditionValue.value === "";
+
     if (
         comparisonColumn.value === "" ||
-        inputData.validCount === 0
+        inputData.validCount === 0 ||
+        incompleteCondition
     ) {
         resetComparisonResults();
         return;
@@ -5382,6 +5389,27 @@ function clearComparisonInput() {
     comparisonInput.focus();
 }
 
+/* ATUALIZA UM SELECT DA COMPARAÇÃO */
+
+function updateComparisonSelect(select) {
+    if (
+        !window.jQuery ||
+        typeof window.jQuery.fn.select2 !== "function"
+    ) {
+        return;
+    }
+
+    const selectElement = window.jQuery(select);
+
+    if (selectElement.hasClass("select2-hidden-accessible")) {
+        selectElement.trigger("change.select2");
+    } else {
+        selectElement.select2({
+            width: "100%",
+        });
+    }
+}
+
 /* PREENCHE O SELETOR DA COMPARAÇÃO */
 
 function renderComparisonColumnSelector() {
@@ -5431,6 +5459,187 @@ function renderComparisonColumnSelector() {
         }
     }
 }
+
+/* PREENCHE AS COLUNAS DISPONÍVEIS PARA A CONDIÇÃO */
+
+function renderComparisonConditionColumnSelector() {
+    const previousColumn =
+        comparisonConditionColumn.value;
+
+    const selectedComparisonColumn =
+        comparisonColumn.value;
+
+    const placeholder =
+        document.createElement("option");
+
+    comparisonConditionColumn.replaceChildren();
+
+    placeholder.value = "";
+    placeholder.textContent = "Nenhuma condição";
+
+    comparisonConditionColumn.appendChild(
+        placeholder,
+    );
+
+    tableState.headers.forEach(
+        function (header, columnIndex) {
+            if (
+                tableState.columnProfiles[columnIndex].type === "empty" ||
+                String(columnIndex) === selectedComparisonColumn
+            ) {
+                return;
+            }
+
+            const option =
+                document.createElement("option");
+
+            option.value = String(columnIndex);
+            option.textContent = header;
+
+            comparisonConditionColumn.appendChild(
+                option,
+            );
+        },
+    );
+
+    const previousColumnExists =
+        Array.from(
+            comparisonConditionColumn.options,
+        ).some(
+            function (option) {
+                return option.value === previousColumn;
+            },
+        );
+
+    comparisonConditionColumn.value =
+        previousColumnExists
+            ? previousColumn
+            : "";
+
+    updateComparisonSelect(
+        comparisonConditionColumn,
+    );
+}
+
+/* PREENCHE OS VALORES DISPONÍVEIS PARA A CONDIÇÃO */
+
+function renderComparisonConditionValueSelector() {
+    const previousValue =
+        comparisonConditionValue.value;
+
+    const selectedColumn =
+        comparisonConditionColumn.value;
+
+    const placeholder =
+        document.createElement("option");
+
+    comparisonConditionValue.replaceChildren();
+
+    placeholder.value = "";
+    placeholder.textContent = "Selecione um valor";
+
+    comparisonConditionValue.appendChild(
+        placeholder,
+    );
+
+    if (selectedColumn === "") {
+        comparisonConditionValue.disabled = true;
+
+        updateComparisonSelect(
+            comparisonConditionValue,
+        );
+
+        return;
+    }
+
+    const columnIndex =
+        Number(selectedColumn);
+
+    const uniqueValues =
+        new Map();
+
+    tableState.rows.forEach(
+        function (row) {
+            const displayValue =
+                formatCellValue(
+                    row[columnIndex],
+                ).trim();
+
+            const normalizedValue =
+                normalizeSearchValue(
+                    displayValue,
+                ).trim();
+
+            if (
+                !normalizedValue ||
+                uniqueValues.has(normalizedValue)
+            ) {
+                return;
+            }
+
+            uniqueValues.set(
+                normalizedValue,
+                displayValue,
+            );
+        },
+    );
+
+    Array.from(
+        uniqueValues.entries(),
+    )
+        .sort(
+            function (
+                firstValue,
+                secondValue,
+            ) {
+                return firstValue[1].localeCompare(
+                    secondValue[1],
+                    "pt-BR",
+                    {
+                        numeric: true,
+                        sensitivity: "base",
+                    },
+                );
+            },
+        )
+        .forEach(
+            function (
+                [normalizedValue, displayValue],
+            ) {
+                const option =
+                    document.createElement("option");
+
+                option.value = normalizedValue;
+                option.textContent = displayValue;
+
+                comparisonConditionValue.appendChild(
+                    option,
+                );
+            },
+        );
+
+    comparisonConditionValue.disabled =
+        uniqueValues.size === 0;
+
+    const previousValueExists =
+        Array.from(
+            comparisonConditionValue.options,
+        ).some(
+            function (option) {
+                return option.value === previousValue;
+            },
+        );
+
+    comparisonConditionValue.value =
+        previousValueExists
+            ? previousValue
+            : "";
+
+    updateComparisonSelect(
+        comparisonConditionValue,
+    );
+}
+
 /* MOSTRA O PAINEL DE COMPARAÇÃO */
 
 function showComparisonPanel() {
@@ -5438,7 +5647,12 @@ function showComparisonPanel() {
 
     comparisonColumn.value = "";
 
+    comparisonConditionColumn.value = "";
+    comparisonConditionValue.value = "";
+
     renderComparisonColumnSelector();
+    renderComparisonConditionColumnSelector();
+    renderComparisonConditionValueSelector();
 
     comparisonSummary.textContent =
         `Página: ${tableState.sheetName} / ` +
@@ -5459,6 +5673,12 @@ function clearComparisonPanel() {
     comparisonState.results = [];
     comparisonInput.value = "";
     comparisonColumn.value = "";
+    comparisonConditionColumn.value = "";
+    comparisonConditionValue.value = "";
+    comparisonConditionValue.disabled = true;
+
+    updateComparisonSelect(comparisonConditionColumn);
+    updateComparisonSelect(comparisonConditionValue);
     updateChartSelect2(comparisonColumn);
 
     comparisonLineCount.textContent = "0 linhas";
@@ -5528,6 +5748,8 @@ function initializeStatisticsImporter() {
         !comparisonPanel ||
         !comparisonSummary ||
         !comparisonColumn ||
+        !comparisonConditionColumn ||
+        !comparisonConditionValue ||
         !comparisonInput ||
         !comparisonLineCount ||
         !comparisonValidCount ||
@@ -5681,9 +5903,55 @@ function initializeStatisticsImporter() {
 
     const handleComparisonColumnChange = function () {
         resetComparisonResults();
+
+        renderComparisonConditionColumnSelector();
+        renderComparisonConditionValueSelector();
+
         updateComparisonInputSummary();
         scheduleComparison();
     };
+
+    const handleComparisonConditionColumnChange = function () {
+        resetComparisonResults();
+
+        renderComparisonConditionValueSelector();
+
+        scheduleComparison();
+    };
+
+    const handleComparisonConditionValueChange = function () {
+        resetComparisonResults();
+        scheduleComparison();
+    };
+
+    if (
+        window.jQuery &&
+        typeof window.jQuery.fn.select2 === "function"
+    ) {
+        window
+            .jQuery(comparisonConditionColumn)
+            .on(
+                "change.statisticsComparisonCondition",
+                handleComparisonConditionColumnChange,
+            );
+
+        window
+            .jQuery(comparisonConditionValue)
+            .on(
+                "change.statisticsComparisonCondition",
+                handleComparisonConditionValueChange,
+            );
+    } else {
+        comparisonConditionColumn.addEventListener(
+            "change",
+            handleComparisonConditionColumnChange,
+        );
+
+        comparisonConditionValue.addEventListener(
+            "change",
+            handleComparisonConditionValueChange,
+        );
+    }
 
     comparisonSearch.addEventListener(
         "input",
