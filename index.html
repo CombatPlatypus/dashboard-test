@@ -120,6 +120,17 @@
                 outline: none;
                 border-color: #8b8d91;
             }
+            textarea::-webkit-scrollbar-track {
+                background-color: transparent;
+            }
+            textarea::-webkit-scrollbar {
+                width: 5px;
+                background: transparent;
+            }
+            textarea::-webkit-scrollbar-thumb {
+                border-radius: 5px;
+                background: #525252;
+            }
             .textarea-results {
                 margin: 20px 0;
                 gap: 10px;
@@ -159,9 +170,22 @@
             .comparison-table {
                 padding-right: 15px;
                 overflow: auto;
-                height: 458px;
+                height: 425px;
             }
-            
+            .comparison-table .statistics-table-container {
+               height: auto !important;
+            }
+            #comparison-table::-webkit-scrollbar-track {
+                background-color: transparent;
+            }
+            #comparison-table::-webkit-scrollbar {
+                width: 5px;
+                background: transparent;
+            }
+            #comparison-table::-webkit-scrollbar-thumb {
+                border-radius: 5px;
+                background: #525252;
+            }
             .comparison-cards {
                 width: 100%;
                 display: grid;
@@ -179,6 +203,12 @@
                 flex-direction: column;
                 border: 1px solid #525252;
                 border-radius: 5px;
+            }
+            .comparison-cards .card .flex-box-start {
+                column-gap: 10px;
+            }
+            .comparison-cards .card .flex-box-start img{
+                width: 30px;
             }
             .comparison-cards span {
                 margin-bottom: 8px;
@@ -689,18 +719,30 @@
 
                                         <div class="comparison-cards">
                                             <div class="card">
-                                                <span>Encontrados</span>
-                                                <span id="statisticsComparisonFoundCount">0</span>
+                                                <h3>Encontrados</h3>
+
+                                                <div class="flex-box-start">
+                                                    <img src="images/geral-icons/success-icon.svg">
+                                                    <h3 id="statisticsComparisonFoundCount">0</h3>
+                                                </div>
                                             </div>
 
                                             <div class="card">
-                                                <span>Não Encontrados</span>
-                                                <span id="statisticsComparisonNotFoundCount">0</span>
+                                                <h3>Não Encontrados</h3>
+
+                                                <div class="flex-box-start">
+                                                    <img src="images/geral-icons/error-icon.svg">
+                                                    <h3 id="statisticsComparisonNotFoundCount">0</h3>
+                                                </div>
                                             </div>
 
                                             <div class="card">
-                                                <span>Correspondência</span>
-                                                <span id="statisticsComparisonRate">0%</span>
+                                                <h3>Correspondência</h3>
+
+                                                <div class="flex-box-start">
+                                                    <img src="images/geral-icons/chart-pizza-icon.svg">
+                                                    <h3 id="statisticsComparisonRate">0%</h3>
+                                                </div>
                                             </div>
                                         </div>
 
@@ -714,7 +756,6 @@
                                         <!-- PRÉVIA DOS RESULTADOS -->
 
                                         <div class="comparison-preview" id="statisticsComparisonPreview" hidden>
-
                                             <div class="comparison-preview-header flex-box-between">
                                                 <input id="statisticsComparisonSearch" type="search" placeholder="Buscar nos resultados">
 
