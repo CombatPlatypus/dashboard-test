@@ -175,14 +175,14 @@
             .comparison-table .statistics-table-container {
                height: auto !important;
             }
-            #comparison-table::-webkit-scrollbar-track {
+            .comparison-table::-webkit-scrollbar-track {
                 background-color: transparent;
             }
-            #comparison-table::-webkit-scrollbar {
+            .comparison-table::-webkit-scrollbar {
                 width: 5px;
                 background: transparent;
             }
-            #comparison-table::-webkit-scrollbar-thumb {
+            .comparison-table::-webkit-scrollbar-thumb {
                 border-radius: 5px;
                 background: #525252;
             }
@@ -201,22 +201,22 @@
                 justify-content: center;
                 text-align: center;
                 flex-direction: column;
-                border: 1px solid #525252;
+                border: 2px solid #525252;
                 border-radius: 5px;
             }
             .comparison-cards .card .flex-box-start {
                 column-gap: 10px;
+                align-items: center;
             }
-            .comparison-cards .card .flex-box-start img{
+            .comparison-cards .card .flex-box-start h3 {
+                margin: 0;
+            }
+            .comparison-cards .card .flex-box-start img {
                 width: 30px;
             }
             .comparison-cards span {
                 margin-bottom: 8px;
                 font-size: 13px;
-            }
-            .comparison-cards span {
-                color: #ffffff;
-                font-size: 28px;
             }
             .comparison-empty {
                 flex: 1 1 0;
