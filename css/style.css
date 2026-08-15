@@ -2412,6 +2412,7 @@ a.thumbnail image {
         width: 100%;
         padding-bottom: 20px;
         border-bottom: 2px solid #525252;
+        align-items: center;
     }
 
     .charts-panel > .flex-box-between div {
@@ -2591,7 +2592,7 @@ a.thumbnail image {
         min-width: 0;
         min-height: 525px;
         display: flex;
-        padding: 20px;
+        padding: 30px 0 0 30px;
         row-gap: 20px;
         overflow: hidden;
         flex-direction: column;
@@ -2618,11 +2619,10 @@ a.thumbnail image {
         padding: 10px 15px;
     }
     .chart-box {
-        flex: 0 0 603px;
+        flex: 0 0 658px;
         width: 100%;
         min-width: 0;
-        height: 603px;
-        max-height: 603px;
+        height: 658px;
         position: relative;
         overflow: hidden;
         background-color: #18191a;
@@ -2948,7 +2948,7 @@ table.unstriped tbody tr {
         overflow: auto;
         padding-right: 15px;
     }
-    #driveFiles:-webkit-scrollbar-track {
+    #driveFiles::-webkit-scrollbar-track {
         background-color: transparent;
     }
     #driveFiles::-webkit-scrollbar {
