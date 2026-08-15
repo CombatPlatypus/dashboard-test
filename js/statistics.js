@@ -119,7 +119,6 @@ const comparisonLineCount = document.getElementById("statisticsComparisonLineCou
 const comparisonValidCount = document.getElementById("statisticsComparisonValidCount");
 const comparisonDuplicateCount = document.getElementById("statisticsComparisonDuplicateCount");
 const comparisonInvalidCount = document.getElementById("statisticsComparisonInvalidCount");
-const comparisonExecuteButton = document.getElementById("statisticsComparisonExecute");
 const comparisonClearButton = document.getElementById("statisticsComparisonClear");
 const comparisonFoundCount = document.getElementById("statisticsComparisonFoundCount");
 const comparisonNotFoundCount = document.getElementById("statisticsComparisonNotFoundCount");
@@ -164,6 +163,7 @@ const tableState = {
 
 const comparisonState = {
     results: [],
+    timer: null,
 };
 
 /* ESTADO DO GRÁFICO */
@@ -5018,15 +5018,14 @@ function updateComparisonInputSummary() {
 
     comparisonClearButton.disabled =
         comparisonInput.value.length === 0;
-
-    comparisonExecuteButton.disabled =
-        comparisonColumn.value === "" ||
-        inputData.validCount === 0;
 }
 
 /* LIMPA OS RESULTADOS DA COMPARAÇÃO */
 
 function resetComparisonResults() {
+    
+    window.clearTimeout(comparisonState.timer);
+    comparisonState.timer = null;
     comparisonState.results = [];
 
     comparisonFoundCount.textContent = "0";
@@ -5133,6 +5132,28 @@ function renderComparisonResults(results = comparisonState.results) {
     });
 
     tableBody.appendChild(fragment);
+}
+
+
+/* PROGRAMA A COMPARAÇÃO AUTOMÁTICA */
+
+function scheduleComparison() {
+    window.clearTimeout(comparisonState.timer);
+
+    const inputData = readComparisonInput();
+
+    if (
+        comparisonColumn.value === "" ||
+        inputData.validCount === 0
+    ) {
+        resetComparisonResults();
+        return;
+    }
+
+    comparisonState.timer = window.setTimeout(
+        executeComparison,
+        250,
+    );
 }
 
 /* EXECUTA A COMPARAÇÃO */
@@ -5330,7 +5351,9 @@ function showComparisonPanel() {
 /* LIMPA E OCULTA O PAINEL DE COMPARAÇÃO */
 
 function clearComparisonPanel() {
+    window.clearTimeout(comparisonState.timer);
 
+    comparisonState.timer = null;
     comparisonState.results = [];
     comparisonInput.value = "";
     comparisonColumn.value = "";
@@ -5345,7 +5368,6 @@ function clearComparisonPanel() {
     comparisonNotFoundCount.textContent = "0";
     comparisonRate.textContent = "0%";
 
-    comparisonExecuteButton.disabled = true;
     comparisonClearButton.disabled = true;
     comparisonExportButton.disabled = true;
 
@@ -5409,7 +5431,6 @@ function initializeStatisticsImporter() {
         !comparisonValidCount ||
         !comparisonDuplicateCount ||
         !comparisonInvalidCount ||
-        !comparisonExecuteButton ||
         !comparisonClearButton ||
         !comparisonFoundCount ||
         !comparisonNotFoundCount ||
@@ -5547,6 +5568,7 @@ function initializeStatisticsImporter() {
         function () {
             resetComparisonResults();
             updateComparisonInputSummary();
+            scheduleComparison();
         },
     );
 
@@ -5558,12 +5580,8 @@ function initializeStatisticsImporter() {
     const handleComparisonColumnChange = function () {
         resetComparisonResults();
         updateComparisonInputSummary();
+        scheduleComparison();
     };
-
-    comparisonExecuteButton.addEventListener(
-        "click",
-        executeComparison,
-    );
 
     comparisonSearch.addEventListener(
         "input",
