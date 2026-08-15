@@ -81,6 +81,11 @@
                 font-size: 13px;
                 font-weight: 600;
             }
+            .conditional-comparison {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(146px, 1fr));
+                gap: 15px;
+            }
             .comparison-choice select:not(.select2-hidden-accessible),
             .comparison-choice .select2-container {
                 width: 100% !important;
@@ -677,26 +682,24 @@
                                         <h4>Dados para Comparar</h4>
                                         <p>Escolha a coluna e cole os valores para localizar.</p>
 
-                                        <div class="flex-box-start">
+                                        <h4>Localize Em:</h4>
+
+                                        <select id="statisticsComparisonColumn" class="standard-select">
+                                            <option value="">Selecione uma coluna</option>
+                                        </select>
+
+                                        <div class="conditional-comparison">
                                             <div>
-                                                <h4>Aplicar condição pela coluna</h4>
+                                                <h4>Se a Coluna:</h4>
                                                 <select id="statisticsComparisonConditionColumn" class="standard-select" style="width: 100%;">
                                                     <option value="">Nenhuma condição</option>
                                                 </select>
                                             </div>
 
                                             <div>
-                                                <h4>Quando o valor for</h4>
+                                                <h4>Tiver o Valor:</h4>
                                                 <select id="statisticsComparisonConditionValue" class="standard-select" style="width: 100%;" disabled>
                                                     <option value="">Selecione um valor</option>
-                                                </select>
-                                            </div>
-
-                                            <div>
-                                                <h4>Localizar na Coluna</h4>
-
-                                                <select id="statisticsComparisonColumn" class="standard-select">
-                                                    <option value="">Selecione uma coluna</option>
                                                 </select>
                                             </div>
                                         </div>
