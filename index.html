@@ -228,6 +228,7 @@
                 text-align: center;
                 flex-direction: column;
                 background-color: #18191a;
+                border-radius: 5px;
             }
             .comparison-empty p {
                 color: #b9bcc1;
@@ -676,11 +677,30 @@
                                         <h4>Dados para Comparar</h4>
                                         <p>Escolha a coluna e cole os valores para localizar.</p>
 
-                                        <label for="statisticsComparisonColumn">Localizar na Coluna</label>
+                                        <div class="flex-box-start">
+                                            <div>
+                                                <h4>Aplicar condição pela coluna</h4>
+                                                <select id="statisticsComparisonConditionColumn" class="standard-select" style="width: 100%;">
+                                                    <option value="">Nenhuma condição</option>
+                                                </select>
+                                            </div>
 
-                                        <select id="statisticsComparisonColumn" class="standard-select">
-                                            <option value="">Selecione uma coluna</option>
-                                        </select>
+                                            <div>
+                                                <h4>Quando o valor for</h4>
+                                                <select id="statisticsComparisonConditionValue" class="standard-select" style="width: 100%;" disabled>
+                                                    <option value="">Selecione um valor</option>
+                                                </select>
+                                            </div>
+
+                                            <div>
+                                                <h4>Localizar na Coluna</h4>
+
+                                                <select id="statisticsComparisonColumn" class="standard-select">
+                                                    <option value="">Selecione uma coluna</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
 
                                         <div class="comparison-textarea-title flex-box-between">
                                             <label for="statisticsComparisonInput">Valores para comparar</label>
@@ -749,8 +769,7 @@
                                         <!-- ESTADO INICIAL -->
 
                                         <div class="comparison-empty" id="statisticsComparisonEmpty">
-                                            <h4>Nenhuma comparação realizada</h4>
-                                            <p>Escolha uma coluna, cole os valores e clique em Comparar Dados.</p>
+                                            <h4>Esperando por uma comparação...</h4>
                                         </div>
 
                                         <!-- PRÉVIA DOS RESULTADOS -->
