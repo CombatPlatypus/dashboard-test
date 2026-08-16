@@ -59,7 +59,9 @@
     /* MÓDULO DE IMPORTAÇÃO */
 
         .import-panel {
-            flex: 1 1 0;
+            display: none;
+        }
+        #statistics.no-file .import-panel {
             display: flex;
             align-items: center;
             text-align: center;
