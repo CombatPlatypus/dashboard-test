@@ -41,7 +41,7 @@
                 padding: 50px;
                 display: flex;
                 align-items: center;
-                flex-direction: column;
+                flex-direction: row;
                 justify-content: center;
                 row-gap: 18px;
                 text-align: center;
@@ -50,7 +50,9 @@
                 border-radius: 8px;
                 transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
             }
-
+             .statistics-drop-zone img {
+                width: 80px;
+            }
             .statistics-drop-zone.is-drag-over {
                 background-color: #242323;
                 border-color: #e4e6eb;
@@ -155,6 +157,7 @@
 
                         <div class="statistics-drop-zone" id="statisticsDropZone">
                             <img src="images/geral-icons/file-xlsx-icon.svg">
+                            <h4>OU</h4>
                             <img src="images/geral-icons/file-csv-icon.svg">
                         </div>
 
