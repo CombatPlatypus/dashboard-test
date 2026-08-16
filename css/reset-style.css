@@ -22,6 +22,10 @@
             padding: 0;
         }
 
+        [hidden] {
+            display: none !important;
+        }
+
         article,
         aside,
         footer,
@@ -119,8 +123,18 @@
             border-style: none;
         }
 
+        iframe {
+            border: none;
+        }
+
         svg:not(:root) {
             overflow: hidden;
+        }
+
+    /* TABELAS */
+
+        table {
+            border-collapse: collapse;
         }
 
     /* FORMULÁRIOS */
