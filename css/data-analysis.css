@@ -36,6 +36,10 @@
         .main-structure #statistics.no-file .import-panel {
             height: calc(100dvh - 162px - 30px);
             max-height: calc(100dvh - 162px - 30px);
+            background-color: transparent;
+            border: none;
+            padding: 0;
+            border-radius: 0;
         }
         .main-structure #statistics section {
             padding: 25px;
