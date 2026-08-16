@@ -119,20 +119,15 @@
                     <section class="import-panel">
                         <div class="flex-box-start">
                             <img src="images/geral-icons/import-icon.svg">
-                            <h3>Arquivo Exportado do SPX ou uma Planilha.</h3>
+                            <h3>Exporte do SPX ou uma Planilha.</h3>
                         </div>
 
                         <div>
-                            <label class="button statistics-file-button" for="statisticsFileInput">Selecionar arquivo</label>
+                            <label class="button statistics-file-button" for="statisticsFileInput">Procurar Arquivo</label>
                             <input id="statisticsFileInput" type="file" accept=".xlsx,.xls,.csv" style="display: none;">
                         </div>
 
                         <p id="statisticsFileStatus">Nenhum arquivo selecionado.</p>
-
-                        <div class="flex-box-start">
-                            <button class="button" id="statisticsDownloadCsv" type="button" disabled>Baixar Texto</button>
-                            <button class="button" id="statisticsDownloadXlsx" type="button" disabled>Baixar Planilha</button>
-                        </div>
                     </section>
 
                     <div class="flex-box-start" id="statistics-margin">
@@ -171,11 +166,21 @@
                             </li> 
                         </ul> 
 
-                        <!-- BOTÃO DE APAGAR RESULTADOS -->
+                        <!-- BOTÕES DE AÇÃO -->
 
-                        <button id="statisticsClearFile" disabled>
-                            <img src="images/geral-icons/trash-basket-icon.svg">
-                        </button>
+                        <div class="action-buttons flex-box-start">
+                            <button id="statisticsClearFile" disabled>
+                                <img src="images/geral-icons/trash-basket-icon.svg">
+                            </button>
+                            
+                            <button id="statisticsDownloadCsv" type="button" disabled>
+                                <img src="images/geral-icons/file-csv-icon.svg">
+                            </button>
+
+                            <button id="statisticsDownloadXlsx" type="button" disabled>
+                                <img src="images/geral-icons/file-xlsx-icon.svg">
+                            </button>
+                        </div>
                     </div>
 
                     <!-- SEM TITULO POR ENQUANTO -->
