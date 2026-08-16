@@ -3,7 +3,7 @@
     /* ESTRUTURA DO PAINEL */
 
         .main-structure #statistics .tabs {
-            width: 100%;
+            flex: 1 1 0;
             margin: 0;
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -40,6 +40,17 @@
             background-color: #1f1f1f;
             border: 2px solid #525252;
             border-radius: 5px;
+        }
+        .main-structure #statistics .action-buttons {
+            column-gap: 15px;
+        }
+        .main-structure #statistics .action-buttons button {
+            background-color: transparent;
+            border-bottom: none;
+            cursor: pointer;
+        }
+        .main-structure #statistics .action-buttons button img {
+            width: 40px;
         }
 
     /* MÓDULO DE IMPORTAÇÃO */
