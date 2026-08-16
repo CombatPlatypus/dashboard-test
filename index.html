@@ -62,7 +62,7 @@
             }
             .comparison-choice {
                 flex: 0 0 500px;
-                height: 756px;
+                height: 763px;
                 min-width: 0;
                 padding-top: 30px;
                 padding-right: 30px;
@@ -176,7 +176,7 @@
             .comparison-table {
                 padding-right: 15px;
                 overflow: auto;
-                height: 463px;
+                height: 553px;
             }
             .comparison-table .statistics-table-container {
                height: auto !important;
@@ -195,7 +195,7 @@
             .comparison-cards {
                 width: 100%;
                 display: grid;
-                grid-template-columns: repeat(3, minmax(150px, 1fr));
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
                 gap: 15px;
             }
             .comparison-cards .card {
@@ -743,11 +743,20 @@
 
                                         <div class="comparison-cards">
                                             <div class="card">
-                                                <h3>Encontrados</h3>
+                                                <h3 id="statisticsComparisonFoundTitle">Encontrados</h3>
 
                                                 <div class="flex-box-start">
                                                     <img src="images/geral-icons/success-icon.svg">
                                                     <h3 id="statisticsComparisonFoundCount">0</h3>
+                                                </div>
+                                            </div>
+
+                                            <div class="card" id="statisticsComparisonOutsideCard" hidden>
+                                                <h3>Fora da Condição</h3>
+
+                                                <div class="flex-box-start">
+                                                    <img src="images/geral-icons/alert-icon.svg">
+                                                    <h3 id="statisticsComparisonOutsideCount">0</h3>
                                                 </div>
                                             </div>
 
@@ -792,6 +801,7 @@
                                                             <tr>
                                                                 <th>Valor Informado</th>
                                                                 <th>Status</th>
+                                                                <th>Valor da Condição</th>
                                                                 <th>Ocorrências</th>
                                                                 <th>Linhas</th>
                                                             </tr>
