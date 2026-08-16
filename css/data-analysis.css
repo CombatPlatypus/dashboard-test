@@ -30,6 +30,7 @@
         }
         .main-structure #statistics.no-file #statistics-margin {
             margin-bottom: 0;
+            display: none;
         }
         .main-structure #statistics.no-file .import-panel {
             height: calc(100dvh - 162px - 30px);
@@ -69,6 +70,7 @@
             min-height: 40px;
             font-size: 14px;
             padding: 10px 15px;
+            width: 260px;
         }
         .import-panel div {
             gap: 10px;
