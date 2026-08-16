@@ -280,6 +280,10 @@
             color: #e4e6eb;
             background-color: #141414;
         }
+
+        .statistics-local-table:has(.statistics-filter-row th:only-child) {
+            table-layout: fixed;
+        }
         .statistics-local-table thead {
             position: sticky;
             top: 0;
