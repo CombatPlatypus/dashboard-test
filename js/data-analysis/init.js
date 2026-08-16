@@ -4,6 +4,7 @@ function initializeStatisticsImporter() {
     if (
         !statisticsPanel ||
         !fileInput ||
+        !dropZone ||
         !clearButton ||
         !downloadCsvButton ||
         !downloadXlsxButton ||
@@ -358,66 +359,30 @@ function initializeStatisticsImporter() {
             const file =
                 fileInput.files?.[0];
 
-            if (!file) {
-                return;
-            }
-
-            setStatus(
-                `Lendo "${file.name}"...`,
+            await importStatisticsFile(
+                file,
             );
-
-            try {
-                await readSelectedFile(
-                    file,
-                );
-            } catch (error) {
-                setDownloadButtonsDisabled(
-                    true,
-                );
-
-                table
-                    .querySelector(
-                        "thead",
-                    )
-                    .replaceChildren();
-
-                table
-                    .querySelector(
-                        "tbody",
-                    )
-                    .replaceChildren();
-
-                resetTableState();
-
-                clearQuickAnalysis();
-
-                clearChartPanel();
-
-                clearComparisonPanel();
-
-                clearFiltersButton.disabled =
-                    true;
-
-                statisticsPanel.classList.add("no-file");
-
-                previewSummary.textContent =
-                    "";
-
-                preview.hidden =
-                    true;
-
-                clearButton.disabled =
-                    false;
-
-                setStatus(
-                    error instanceof
-                        Error
-                        ? error.message
-                        : "Não foi possível ler o arquivo selecionado.",
-                    true,
-                );
-            }
         },
+    );
+
+    dropZone.addEventListener(
+        "dragenter",
+        handleDropZoneDragEnter,
+    );
+
+    dropZone.addEventListener(
+        "dragover",
+        handleDropZoneDragOver,
+    );
+
+    dropZone.addEventListener(
+        "dragleave",
+        handleDropZoneDragLeave,
+    );
+
+    dropZone.addEventListener(
+        "drop",
+        handleDropZoneDrop,
     );
 
     clearButton.addEventListener(
