@@ -42,6 +42,7 @@
             border-radius: 5px;
         }
         .main-structure #statistics .action-buttons {
+            flex: 0 0 165px;
             column-gap: 15px;
         }
         .main-structure #statistics .action-buttons button {
