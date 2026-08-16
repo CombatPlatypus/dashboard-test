@@ -14,6 +14,11 @@ const fileInput =
         "statisticsFileInput",
     );
 
+const dropZone =
+    document.getElementById(
+        "statisticsDropZone",
+    );
+
 const clearButton =
     document.getElementById(
         "statisticsClearFile",
@@ -23,6 +28,10 @@ const statisticsPanel =
     document.getElementById(
         "statistics",
     );
+
+/* ESTADO DA ÁREA DE IMPORTAÇÃO */
+
+let dropZoneDragDepth = 0;
 
 /* VERIFICA A EXTENSÃO DO ARQUIVO */
 
@@ -77,8 +86,14 @@ function clearImportedFile() {
 
     statisticsPanel.classList.add("no-file");
 
+    dropZoneDragDepth = 0;
+
+    dropZone.classList.remove(
+        "is-drag-over",
+    );
+
     setStatus(
-        "Nenhum arquivo selecionado. O arquivo será lido somente neste navegador.",
+        "Nenhum arquivo selecionado, escolha um arquivo para começar.",
     );
 }
 
@@ -162,5 +177,129 @@ async function readSelectedFile(
 
     setStatus(
         `Arquivo "${file.name}" carregado localmente com sucesso.`,
+    );
+}
+
+/* PROCESSA UM ARQUIVO IMPORTADO */
+
+async function importStatisticsFile(
+    file,) {
+    if (!file) {
+        return;
+    }
+
+    setStatus(
+        `Lendo "${file.name}"...`,
+    );
+
+    try {
+        await readSelectedFile(
+            file,
+        );
+    } catch (error) {
+        clearImportedFile();
+
+        setStatus(
+            error instanceof Error
+                ? error.message
+                : "Não foi possível ler o arquivo selecionado.",
+            true,
+        );
+    }
+}
+
+/* IMPEDE O COMPORTAMENTO PADRÃO DO NAVEGADOR */
+
+function preventDropZoneDefault(
+    event,) {
+    event.preventDefault();
+
+    event.stopPropagation();
+}
+
+/* DESTACA A ÁREA DE IMPORTAÇÃO */
+
+function handleDropZoneDragEnter(
+    event,) {
+    preventDropZoneDefault(
+        event,
+    );
+
+    dropZoneDragDepth += 1;
+
+    dropZone.classList.add(
+        "is-drag-over",
+    );
+}
+
+/* MANTÉM O ARQUIVO COMO UMA OPERAÇÃO DE CÓPIA */
+
+function handleDropZoneDragOver(
+    event,) {
+    preventDropZoneDefault(
+        event,
+    );
+
+    if (event.dataTransfer) {
+        event.dataTransfer.dropEffect =
+            "copy";
+    }
+}
+
+/* REMOVE O DESTAQUE DA ÁREA DE IMPORTAÇÃO */
+
+function handleDropZoneDragLeave(
+    event,) {
+    preventDropZoneDefault(
+        event,
+    );
+
+    dropZoneDragDepth =
+        Math.max(
+            0,
+            dropZoneDragDepth - 1,
+        );
+
+    if (dropZoneDragDepth > 0) {
+        return;
+    }
+
+    dropZone.classList.remove(
+        "is-drag-over",
+    );
+}
+
+/* RECEBE O ARQUIVO SOLTO NA ÁREA */
+
+async function handleDropZoneDrop(
+    event,) {
+    preventDropZoneDefault(
+        event,
+    );
+
+    dropZoneDragDepth = 0;
+
+    dropZone.classList.remove(
+        "is-drag-over",
+    );
+
+    const files =
+        event.dataTransfer?.files;
+
+    if (!files || files.length === 0) {
+        return;
+    }
+
+    if (files.length > 1) {
+        setStatus(
+            "Solte apenas um arquivo por vez.",
+            true,
+        );
+
+        return;
+    }
+
+    await importStatisticsFile(
+        files[0],
     );
 }
