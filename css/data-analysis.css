@@ -12,6 +12,7 @@
         .main-structure #statistics #statistics-margin {
             margin-bottom: 30px;
             column-gap: 15px;
+            align-items: center;
         }
         .main-structure #statistics .tabs .tabs-title {
             width: 100%;
