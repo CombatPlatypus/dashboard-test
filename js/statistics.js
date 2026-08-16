@@ -123,6 +123,9 @@ const comparisonDuplicateCount = document.getElementById("statisticsComparisonDu
 const comparisonInvalidCount = document.getElementById("statisticsComparisonInvalidCount");
 const comparisonClearButton = document.getElementById("statisticsComparisonClear");
 const comparisonFoundCount = document.getElementById("statisticsComparisonFoundCount");
+const comparisonFoundTitle = document.getElementById("statisticsComparisonFoundTitle");
+const comparisonOutsideCard = document.getElementById("statisticsComparisonOutsideCard");
+const comparisonOutsideCount = document.getElementById("statisticsComparisonOutsideCount");
 const comparisonNotFoundCount = document.getElementById("statisticsComparisonNotFoundCount");
 const comparisonRate = document.getElementById("statisticsComparisonRate");
 const comparisonEmpty = document.getElementById("statisticsComparisonEmpty");
@@ -5030,6 +5033,10 @@ function resetComparisonResults() {
     comparisonState.timer = null;
     comparisonState.results = [];
 
+    comparisonFoundTitle.textContent = "Encontrados";
+    comparisonOutsideCount.textContent = "0";
+    comparisonOutsideCard.hidden = true;
+
     comparisonFoundCount.textContent = "0";
     comparisonNotFoundCount.textContent = "0";
     comparisonRate.textContent = "0%";
@@ -5045,14 +5052,54 @@ function resetComparisonResults() {
     comparisonEmpty.hidden = false;
 }
 
+/* VERIFICA SE EXISTE UMA CONDIÇÃO COMPLETA */
+
+function isComparisonConditionActive() {
+    return (
+        comparisonConditionColumn.value !== "" &&
+        comparisonConditionValue.value !== ""
+    );
+}
+
+/* RETORNA O TEXTO DO STATUS DA COMPARAÇÃO */
+
+function getComparisonStatusLabel(result) {
+    if (result.status === "outside") {
+        return "Fora da condição";
+    }
+
+    if (result.status === "notFound") {
+        return "Não encontrado";
+    }
+
+    return result.conditionActive
+        ? "Corresponde à condição"
+        : "Encontrado";
+}
+
 /* CRIA UM ÍNDICE DA COLUNA ESCOLHIDA */
 
-function createComparisonColumnIndex(columnIndex) {
+function createComparisonColumnIndex(
+    columnIndex,
+    conditionColumnIndex = null,
+    conditionValue = "",
+) {
     const columnIndexMap = new Map();
 
+    const conditionActive =
+        Number.isInteger(conditionColumnIndex) &&
+        conditionValue !== "";
+
     tableState.rows.forEach(function (row, rowIndex) {
-        const originalValue = formatCellValue(row[columnIndex]).trim();
-        const normalizedValue = normalizeSearchValue(originalValue).trim();
+        const originalValue =
+            formatCellValue(
+                row[columnIndex],
+            ).trim();
+
+        const normalizedValue =
+            normalizeSearchValue(
+                originalValue,
+            ).trim();
 
         if (!normalizedValue) {
             return;
@@ -5060,22 +5107,56 @@ function createComparisonColumnIndex(columnIndex) {
 
         if (!columnIndexMap.has(normalizedValue)) {
             columnIndexMap.set(normalizedValue, {
-                occurrences: 0,
-                lines: [],
+                totalOccurrences: 0,
+                matchedOccurrences: 0,
+                allLines: [],
+                matchedLines: [],
+                conditionValues: new Set(),
+                matchedConditionValues: new Set(),
             });
         }
 
-        const indexedValue = columnIndexMap.get(normalizedValue);
+        const indexedValue =
+            columnIndexMap.get(normalizedValue);
 
-        indexedValue.occurrences += 1;
+        const spreadsheetLine =
+            rowIndex + 2;
 
-        /*
-         * Soma 2 porque:
-         * linha 1 = cabeçalho;
-         * os dados começam na linha 2.
-         */
+        indexedValue.totalOccurrences += 1;
+        indexedValue.allLines.push(spreadsheetLine);
 
-        indexedValue.lines.push(rowIndex + 2);
+        if (!conditionActive) {
+            indexedValue.matchedOccurrences += 1;
+            indexedValue.matchedLines.push(spreadsheetLine);
+            return;
+        }
+
+        const displayConditionValue =
+            formatCellValue(
+                row[conditionColumnIndex],
+            ).trim();
+
+        const normalizedConditionValue =
+            normalizeSearchValue(
+                displayConditionValue,
+            ).trim();
+
+        indexedValue.conditionValues.add(
+            displayConditionValue ||
+            "Célula vazia",
+        );
+
+        if (
+            normalizedConditionValue ===
+            conditionValue
+        ) {
+            indexedValue.matchedOccurrences += 1;
+            indexedValue.matchedLines.push(spreadsheetLine);
+
+            indexedValue.matchedConditionValues.add(
+                displayConditionValue,
+            );
+        }
     });
 
     return columnIndexMap;
@@ -5085,33 +5166,50 @@ function createComparisonColumnIndex(columnIndex) {
 
 function createComparisonResultRow(result) {
     const row = document.createElement("tr");
-    const informedValueCell = createCell("td", result.value);
-    const statusCell = createCell(
-        "td",
-        result.found ? "Encontrado" : "Não encontrado",
-    );
 
-    const occurrencesCell = createCell(
-        "td",
-        result.occurrences,
-    );
+    const informedValueCell =
+        createCell("td", result.value);
 
-    const linesCell = createCell(
-        "td",
-        result.lines.length
-            ? result.lines.join(", ")
-            : "—",
-    );
+    const statusCell =
+        createCell(
+            "td",
+            getComparisonStatusLabel(result),
+        );
+
+    const conditionCell =
+        createCell(
+            "td",
+            result.conditionValues.length
+                ? result.conditionValues.join(", ")
+                : "—",
+        );
+
+    const occurrencesCell =
+        createCell(
+            "td",
+            result.occurrences,
+        );
+
+    const linesCell =
+        createCell(
+            "td",
+            result.lines.length
+                ? result.lines.join(", ")
+                : "—",
+        );
 
     row.classList.add(
-        result.found
+        result.status === "found"
             ? "is-found"
-            : "is-not-found",
+            : result.status === "outside"
+                ? "is-outside"
+                : "is-not-found",
     );
 
     row.append(
         informedValueCell,
         statusCell,
+        conditionCell,
         occurrencesCell,
         linesCell,
     );
@@ -5166,22 +5264,56 @@ function scheduleComparison() {
 /* EXECUTA A COMPARAÇÃO */
 
 function executeComparison() {
-    const selectedColumn = comparisonColumn.value;
-    const columnIndex = Number(selectedColumn);
-    const inputData = readComparisonInput();
+    const selectedColumn =
+        comparisonColumn.value;
+
+    const columnIndex =
+        Number(selectedColumn);
+
+    const inputData =
+        readComparisonInput();
+
+    const conditionActive =
+        isComparisonConditionActive();
+
+    const conditionColumnIndex =
+        conditionActive
+            ? Number(
+                comparisonConditionColumn.value,
+            )
+            : null;
+
+    const conditionValue =
+        conditionActive
+            ? comparisonConditionValue.value
+            : "";
 
     if (
         selectedColumn === "" ||
         !Number.isInteger(columnIndex) ||
         columnIndex < 0 ||
         columnIndex >= tableState.headers.length ||
-        inputData.validCount === 0
+        inputData.validCount === 0 ||
+        (
+            conditionActive &&
+            (
+                !Number.isInteger(conditionColumnIndex) ||
+                conditionColumnIndex < 0 ||
+                conditionColumnIndex >= tableState.headers.length
+            )
+        )
     ) {
         return;
     }
 
+    comparisonState.timer = null;
+
     const columnIndexMap =
-        createComparisonColumnIndex(columnIndex);
+        createComparisonColumnIndex(
+            columnIndex,
+            conditionColumnIndex,
+            conditionValue,
+        );
 
     comparisonState.results =
         inputData.values.map(function (inputValue) {
@@ -5190,24 +5322,74 @@ function executeComparison() {
                     inputValue.normalizedValue,
                 );
 
+            const exists =
+                Boolean(indexedValue);
+
+            const matchesCondition =
+                exists &&
+                indexedValue.matchedOccurrences > 0;
+
+            const status =
+                !exists
+                    ? "notFound"
+                    : matchesCondition
+                        ? "found"
+                        : "outside";
+
+            const occurrences =
+                status === "found"
+                    ? indexedValue.matchedOccurrences
+                    : indexedValue?.totalOccurrences ?? 0;
+
+            const lines =
+                status === "found"
+                    ? indexedValue.matchedLines
+                    : indexedValue?.allLines ?? [];
+
+            const conditionValues =
+                !conditionActive ||
+                !indexedValue
+                    ? []
+                    : status === "found"
+                        ? Array.from(
+                            indexedValue.matchedConditionValues,
+                        )
+                        : Array.from(
+                            indexedValue.conditionValues,
+                        );
+
             return {
                 value: inputValue.value,
                 normalizedValue: inputValue.normalizedValue,
-                found: Boolean(indexedValue),
-                occurrences: indexedValue?.occurrences ?? 0,
-                lines: indexedValue?.lines ?? [],
+                conditionActive,
+                status,
+                found: status === "found",
+                occurrences,
+                lines,
+                conditionValues,
             };
         });
 
     const foundCount =
         comparisonState.results.filter(
             function (result) {
-                return result.found;
+                return result.status === "found";
+            },
+        ).length;
+
+    const outsideCount =
+        comparisonState.results.filter(
+            function (result) {
+                return result.status === "outside";
             },
         ).length;
 
     const notFoundCount =
-        comparisonState.results.length - foundCount;
+        comparisonState.results.filter(
+            function (result) {
+                return result.status === "notFound";
+            },
+        ).length;
 
     const correspondenceRate =
         comparisonState.results.length
@@ -5218,8 +5400,16 @@ function executeComparison() {
             )
             : 0;
 
+    comparisonFoundTitle.textContent =
+        conditionActive
+            ? "Correspondem"
+            : "Encontrados";
+
     comparisonFoundCount.textContent =
         String(foundCount);
+
+    comparisonOutsideCount.textContent =
+        String(outsideCount);
 
     comparisonNotFoundCount.textContent =
         String(notFoundCount);
@@ -5232,6 +5422,9 @@ function executeComparison() {
                 maximumFractionDigits: 1,
             },
         ) + "%";
+
+    comparisonOutsideCard.hidden =
+        !conditionActive;
 
     comparisonEmpty.hidden = true;
     comparisonPreview.hidden = false;
@@ -5257,9 +5450,8 @@ function getVisibleComparisonResults() {
             const searchableValue =
                 [
                     result.value,
-                    result.found
-                        ? "Encontrado"
-                        : "Não encontrado",
+                    getComparisonStatusLabel(result),
+                    result.conditionValues.join(" "),
                     result.occurrences,
                     result.lines.join(" "),
                 ].join(" ");
@@ -5291,37 +5483,50 @@ function createComparisonExportData() {
         );
     }
 
-    const headers = [
-        "Valor informado",
-        "Status",
-        "Ocorrências",
-        "Linhas",
-    ];
+    const conditionActive =
+        isComparisonConditionActive();
+
+    const headers = conditionActive
+        ? [
+            "Valor informado",
+            "Status",
+            "Valor da condição",
+            "Ocorrências",
+            "Linhas",
+        ]
+        : [
+            "Valor informado",
+            "Status",
+            "Ocorrências",
+            "Linhas",
+        ];
 
     const rows =
         visibleResults.map(
             function (result) {
-                return [
+                const basicResult = [
                     result.value,
-                    result.found
-                        ? "Encontrado"
-                        : "Não encontrado",
+                    getComparisonStatusLabel(result),
+                ];
+
+                if (conditionActive) {
+                    basicResult.push(
+                        result.conditionValues.length
+                            ? result.conditionValues.join(", ")
+                            : "—",
+                    );
+                }
+
+                basicResult.push(
                     result.occurrences,
                     result.lines.length
                         ? result.lines.join(", ")
                         : "—",
-                ];
+                );
+
+                return basicResult;
             },
         );
-
-    return {
-        headers,
-        rows,
-        matrix: [
-            headers,
-            ...rows,
-        ],
-    };
 }
 
 /* BAIXA OS RESULTADOS DA COMPARAÇÃO */
@@ -5671,6 +5876,11 @@ function clearComparisonPanel() {
 
     comparisonState.timer = null;
     comparisonState.results = [];
+
+    comparisonFoundTitle.textContent = "Encontrados";
+    comparisonOutsideCount.textContent = "0";
+    comparisonOutsideCard.hidden = true;
+
     comparisonInput.value = "";
     comparisonColumn.value = "";
     comparisonConditionColumn.value = "";
@@ -5757,6 +5967,9 @@ function initializeStatisticsImporter() {
         !comparisonInvalidCount ||
         !comparisonClearButton ||
         !comparisonFoundCount ||
+        !comparisonFoundTitle ||
+        !comparisonOutsideCard ||
+        !comparisonOutsideCount ||
         !comparisonNotFoundCount ||
         !comparisonRate ||
         !comparisonEmpty ||
