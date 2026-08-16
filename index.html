@@ -33,17 +33,14 @@
             /* ÁREA DE IMPORTAÇÃO */
 
             .statistics-drop-zone {
-                flex: 1 1 auto;
-                width: 800px;
+                width: max-content;
                 min-width: 0;
                 min-height: 0;
                 max-height: none !important;
-                padding: 50px;
+                padding: 50px 80px;
                 display: flex;
-                align-items: center;
-                flex-direction: row;
+                flex-direction: column;
                 justify-content: center;
-                row-gap: 18px;
                 text-align: center;
                 background-color: #1f1f1f;
                 border: 2px solid #525252;
@@ -55,6 +52,12 @@
             }
              .statistics-drop-zone h4 {
                 margin-bottom: 0;
+            }
+             .statistics-drop-zone h5 {
+                margin: 0;
+                border: 2px solid #525252;
+                padding: 5px 10px;
+                border-radius: 5px;
             }
             .statistics-drop-zone.is-drag-over {
                 background-color: #242323;
@@ -154,14 +157,20 @@
 
                     <section class="import-panel">
                         <div class="flex-box-start">
-                            <img src="images/geral-icons/import-icon.svg">
+                            <img src="images/geral-icons/sheets-icon.svg">
                             <h3>Exporte do SPX ou uma Planilha.</h3>
                         </div>
 
                         <div class="statistics-drop-zone" id="statisticsDropZone">
-                            <img src="images/geral-icons/file-xlsx-icon.svg">
-                            <h4>OU</h4>
-                            <img src="images/geral-icons/file-csv-icon.svg">
+                            <img src="images/geral-icons/import-icon.svg">
+                            <h3>Importe os dados para começar.</h3>
+                            <p>Arraste uma planilha ou escolha um arquivo do computador.</p>
+
+                            <div class="flex-box-center">
+                                <h5>.xlsx</h5>
+                                <h5>.xls</h5>
+                                <h5>.csv</h5>
+                            </div>
                         </div>
 
                         <p id="statisticsFileStatus">Nenhum arquivo selecionado, escolha um arquivo para começar.</p>
