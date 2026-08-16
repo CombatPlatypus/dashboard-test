@@ -3,15 +3,11 @@
     /* ESTRUTURA DO PAINEL */
 
         .main-structure #statistics .tabs {
-            flex: 0 0 300px;
-            overflow: auto;
+            width: 100%;
             margin: 0;
-            display: -webkit-flex;
-            display: flex;
-            -webkit-flex-direction: column;
-            flex-direction: column;
-            -webkit-align-items: stretch;
-            align-items: stretch;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
         }
         .main-structure #statistics #statistics-margin {
             margin-bottom: 30px;
