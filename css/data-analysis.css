@@ -29,7 +29,7 @@
             max-width: 100%;
             overflow: hidden;
         }
-        .main-structure #statistics.no-file #statistics-margin {
+        .main-structure #statistics.no-file #statistics-margin, .main-structure #statistics.no-file .tabs, .main-structure #statistics.no-file .action-buttons {
             margin-bottom: 0;
             display: none;
         }
