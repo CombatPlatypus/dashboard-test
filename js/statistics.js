@@ -169,6 +169,9 @@ const tableState = {
 const comparisonState = {
     results: [],
     timer: null,
+
+    sortColumn: "status",
+    sortDirection: "asc",
 };
 
 /* ESTADO DO GRÁFICO */
@@ -5052,6 +5055,32 @@ function resetComparisonResults() {
     comparisonEmpty.hidden = false;
 }
 
+/* ATUALIZA OS CONTROLES DISPONÍVEIS DA COMPARAÇÃO */
+
+function updateComparisonControlsState() {
+    const hasComparisonColumn =
+        comparisonColumn.value !== "";
+
+    comparisonConditionColumn.disabled =
+        !hasComparisonColumn;
+
+    comparisonInput.disabled =
+        !hasComparisonColumn;
+
+    comparisonConditionValue.disabled =
+        !hasComparisonColumn ||
+        comparisonConditionColumn.value === "" ||
+        comparisonConditionValue.options.length <= 1;
+
+    updateComparisonSelect(
+        comparisonConditionColumn,
+    );
+
+    updateComparisonSelect(
+        comparisonConditionValue,
+    );
+}
+
 /* VERIFICA SE EXISTE UMA CONDIÇÃO COMPLETA */
 
 function isComparisonConditionActive() {
@@ -5217,23 +5246,262 @@ function createComparisonResultRow(result) {
     return row;
 }
 
+/* RETORNA O INDICADOR DA ORDENAÇÃO DA COMPARAÇÃO */
+
+function getComparisonSortIndicator(column) {
+    if (
+        comparisonState.sortColumn !==
+        column
+    ) {
+        return "↕";
+    }
+
+    return comparisonState.sortDirection ===
+        "asc"
+        ? "↑"
+        : "↓";
+}
+
+/* ALTERA A ORDENAÇÃO DA COMPARAÇÃO */
+
+function changeComparisonSort(column) {
+    if (
+        comparisonState.sortColumn ===
+        column
+    ) {
+        comparisonState.sortDirection =
+            comparisonState.sortDirection ===
+            "asc"
+                ? "desc"
+                : "asc";
+    } else {
+        comparisonState.sortColumn =
+            column;
+
+        comparisonState.sortDirection =
+            "asc";
+    }
+
+    renderComparisonTableHeader();
+    filterComparisonResults();
+}
+
+/* MONTA O CABEÇALHO ORDENÁVEL DA COMPARAÇÃO */
+
+function renderComparisonTableHeader() {
+    const tableHead =
+        comparisonTable.querySelector(
+            "thead",
+        );
+
+    const headerRow =
+        document.createElement("tr");
+
+    const columns = [
+        [
+            "value",
+            "Valor Informado",
+        ],
+        [
+            "status",
+            "Status",
+        ],
+        [
+            "condition",
+            "Valor da Condição",
+        ],
+        [
+            "occurrences",
+            "Ocorrências",
+        ],
+        [
+            "lines",
+            "Linhas",
+        ],
+    ];
+
+    columns.forEach(
+        function ([column, label]) {
+            const headerCell =
+                document.createElement(
+                    "th",
+                );
+
+            const sortButton =
+                document.createElement(
+                    "button",
+                );
+
+            const indicator =
+                document.createElement(
+                    "span",
+                );
+
+            sortButton.type = "button";
+
+            sortButton.classList.add(
+                "statistics-sort-button",
+            );
+
+            sortButton.setAttribute(
+                "aria-label",
+                `Ordenar por ${label}`,
+            );
+
+            indicator.classList.add(
+                "statistics-sort-indicator",
+            );
+
+            indicator.textContent =
+                getComparisonSortIndicator(
+                    column,
+                );
+
+            sortButton.append(
+                document.createTextNode(
+                    label,
+                ),
+                indicator,
+            );
+
+            sortButton.addEventListener(
+                "click",
+                function () {
+                    changeComparisonSort(
+                        column,
+                    );
+                },
+            );
+
+            headerCell.appendChild(
+                sortButton,
+            );
+
+            headerRow.appendChild(
+                headerCell,
+            );
+        },
+    );
+
+    tableHead.replaceChildren(
+        headerRow,
+    );
+}
+
+/* ORDENA OS RESULTADOS DA COMPARAÇÃO */
+
+function sortComparisonResults(results) {
+    const statusOrder = {
+        found: 0,
+        outside: 1,
+        notFound: 2,
+    };
+
+    const getSortValue =
+        function (result) {
+            switch (
+                comparisonState.sortColumn
+            ) {
+                case "value":
+                    return result.value;
+
+                case "condition":
+                    return result
+                        .conditionValues
+                        .join(", ");
+
+                case "occurrences":
+                    return result.occurrences;
+
+                case "lines":
+                    return (
+                        result.lines[0] ??
+                        Number.MAX_SAFE_INTEGER
+                    );
+
+                default:
+                    return statusOrder[
+                        result.status
+                    ];
+            }
+        };
+
+    return [...results].sort(
+        function (
+            firstResult,
+            secondResult,
+        ) {
+            const firstValue =
+                getSortValue(
+                    firstResult,
+                );
+
+            const secondValue =
+                getSortValue(
+                    secondResult,
+                );
+
+            const comparison =
+                typeof firstValue ===
+                    "number" &&
+                typeof secondValue ===
+                    "number"
+                    ? firstValue -
+                        secondValue
+                    : String(
+                        firstValue,
+                    ).localeCompare(
+                        String(
+                            secondValue,
+                        ),
+                        "pt-BR",
+                        {
+                            numeric: true,
+                            sensitivity:
+                                "base",
+                        },
+                    );
+
+            return comparisonState
+                .sortDirection ===
+                "asc"
+                ? comparison
+                : -comparison;
+        },
+    );
+}
+
 /* EXIBE OS RESULTADOS NA TABELA */
 
-function renderComparisonResults(results = comparisonState.results) {
-    const tableBody = comparisonTable.querySelector("tbody");
-    const fragment = document.createDocumentFragment();
+function renderComparisonResults(
+    results = comparisonState.results,
+) {
+    const tableBody =
+        comparisonTable.querySelector(
+            "tbody",
+        );
+
+    const fragment =
+        document.createDocumentFragment();
 
     tableBody.replaceChildren();
 
-    results.forEach(function (result) {
-        fragment.appendChild(
-            createComparisonResultRow(result),
-        );
-    });
+    sortComparisonResults(
+        results,
+    ).forEach(
+        function (result) {
+            fragment.appendChild(
+                createComparisonResultRow(
+                    result,
+                ),
+            );
+        },
+    );
 
-    tableBody.appendChild(fragment);
+    tableBody.appendChild(
+        fragment,
+    );
 }
-
 
 /* PROGRAMA A COMPARAÇÃO AUTOMÁTICA */
 
@@ -5442,24 +5710,40 @@ function getVisibleComparisonResults() {
         ).trim();
 
     if (!searchValue) {
-        return comparisonState.results;
+        return sortComparisonResults(
+            comparisonState.results,
+        );
     }
 
-    return comparisonState.results.filter(
-        function (result) {
-            const searchableValue =
-                [
-                    result.value,
-                    getComparisonStatusLabel(result),
-                    result.conditionValues.join(" "),
-                    result.occurrences,
-                    result.lines.join(" "),
-                ].join(" ");
+    return sortComparisonResults(
+        comparisonState.results.filter(
+            function (result) {
+                const searchableValue =
+                    [
+                        result.value,
 
-            return normalizeSearchValue(
-                searchableValue,
-            ).includes(searchValue);
-        },
+                        getComparisonStatusLabel(
+                            result,
+                        ),
+
+                        result
+                            .conditionValues
+                            .join(" "),
+
+                        result.occurrences,
+
+                        result.lines.join(
+                            " ",
+                        ),
+                    ].join(" ");
+
+                return normalizeSearchValue(
+                    searchableValue,
+                ).includes(
+                    searchValue,
+                );
+            },
+        ),
     );
 }
 
@@ -5724,6 +6008,8 @@ function renderComparisonConditionColumnSelector() {
     updateComparisonSelect(
         comparisonConditionColumn,
     );
+
+    updateComparisonControlsState();
 }
 
 /* PREENCHE OS VALORES DISPONÍVEIS PARA A CONDIÇÃO */
@@ -5748,11 +6034,14 @@ function renderComparisonConditionValueSelector() {
     );
 
     if (selectedColumn === "") {
-        comparisonConditionValue.disabled = true;
+        comparisonConditionValue.disabled =
+            true;
 
         updateComparisonSelect(
             comparisonConditionValue,
         );
+
+        updateComparisonControlsState();
 
         return;
     }
@@ -5843,6 +6132,8 @@ function renderComparisonConditionValueSelector() {
     updateComparisonSelect(
         comparisonConditionValue,
     );
+
+    updateComparisonControlsState();
 }
 
 /* MOSTRA O PAINEL DE COMPARAÇÃO */
@@ -5858,6 +6149,9 @@ function showComparisonPanel() {
     renderComparisonColumnSelector();
     renderComparisonConditionColumnSelector();
     renderComparisonConditionValueSelector();
+
+    renderComparisonTableHeader();
+    updateComparisonControlsState();
 
     comparisonSummary.textContent =
         `Página: ${tableState.sheetName} / ` +
@@ -5885,7 +6179,13 @@ function clearComparisonPanel() {
     comparisonColumn.value = "";
     comparisonConditionColumn.value = "";
     comparisonConditionValue.value = "";
+
     comparisonConditionValue.disabled = true;
+    comparisonConditionColumn.disabled = true;
+    comparisonInput.disabled = true;
+
+    comparisonState.sortColumn = "status";
+    comparisonState.sortDirection = "asc";
 
     updateComparisonSelect(comparisonConditionColumn);
     updateComparisonSelect(comparisonConditionValue);
@@ -6114,15 +6414,28 @@ function initializeStatisticsImporter() {
         clearComparisonInput,
     );
 
-    const handleComparisonColumnChange = function () {
-        resetComparisonResults();
+    const handleComparisonColumnChange =
+        function () {
+            resetComparisonResults();
 
-        renderComparisonConditionColumnSelector();
-        renderComparisonConditionValueSelector();
+            if (
+                comparisonColumn.value ===
+                ""
+            ) {
+                comparisonConditionColumn
+                    .value = "";
 
-        updateComparisonInputSummary();
-        scheduleComparison();
-    };
+                comparisonConditionValue
+                    .value = "";
+            }
+
+            renderComparisonConditionColumnSelector();
+            renderComparisonConditionValueSelector();
+
+            updateComparisonControlsState();
+            updateComparisonInputSummary();
+            scheduleComparison();
+        };
 
     const handleComparisonConditionColumnChange = function () {
         resetComparisonResults();
