@@ -27,6 +27,165 @@
         <link rel="stylesheet" href="css/dashboard-style.css">
         <link rel="stylesheet" href="css/hub-spreadsheets.css">
         <link rel="stylesheet" href="css/data-analysis.css">
+
+
+        <!-- ESTILOS TEMPORARIOS NÃO FINALIZADOS -->
+
+        <style>
+
+            /* ESTRUTURA GERAL DO REPORTS */
+
+            #report-choice {
+                width: 100%;
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 15px;
+                margin-bottom: 30px;
+            }
+            #report-choice .tabs-title {
+                width: 100%;
+            }
+            #report-choice .tabs-title h4 {
+                margin: 10px 0;
+            }
+            #report-choice .tabs-title p {
+                margin-bottom: 0;
+                text-align: center;
+            }
+            #reports > .tabs-content {
+                padding: 25px;
+                background-color: #1f1f1f;
+                border: 2px solid #525252;
+                border-radius: 5px;
+            }
+
+            /* HEADER DOS REPORTS */
+
+            #reports > .tabs-content > .tabs-panel > .flex-box-between {
+                width: 100%;
+                padding-bottom: 20px;
+                align-items: center;
+                border-bottom: 2px solid #525252;
+            }
+            #reports > .tabs-content > .tabs-panel > .flex-box-between div {
+                gap: 10px;
+                align-items: center;
+            }
+            #reports > .tabs-content > .tabs-panel > .flex-box-between img {
+                width: 35px;
+            }
+            #reports > .tabs-content > .tabs-panel > .flex-box-between h3,
+            #reports > .tabs-content > .tabs-panel > .flex-box-between p {
+                margin-bottom: 0;
+            }
+            #reports > .tabs-content > .tabs-panel > .flex-box-between p {
+                width: max-content;
+                height: auto;
+                font-size: 13px;
+            }
+
+            /* CONTROLE DOS REPORTS */
+
+            #reports > .tabs-content > .tabs-panel > .flex-box-start > .report-controls {
+                flex: 0 0 350px;
+                row-gap: 15px;
+                padding-right: 25px;
+                margin-right: 25px;
+            }
+            #reports > .tabs-content > .tabs-panel > .flex-box-start > .report-controls .input-group {
+                padding: 0 0 15px 0;
+                border-bottom: 2px solid #525252;
+            }
+            #reports > .tabs-content > .tabs-panel > .flex-box-start > .report-controls .input-group:last-of-type {
+                padding: 0 0 0 0;
+                border-bottom: none;
+            }
+
+            /* CONTROLE DOS REPORTS - DOIS INPUTS DENTRO DE UMA FLEX-BOX-START */
+
+            #reports > .tabs-content > .tabs-panel > .flex-box-start > .report-controls .flex-box-start {
+                column-gap: 10px;
+            }
+            #reports > .tabs-content > .tabs-panel > .flex-box-start > .report-controls .input-group .flex-box-start input:first-of-type {
+                flex: 1 1 0;
+            }
+            #reports > .tabs-content > .tabs-panel > .flex-box-start > .report-controls .input-group .flex-box-start input:last-of-type {
+                flex: 0 0 86px;
+                text-align: center;
+            }
+
+            /* CONTROLE DOS REPORTS - COMPORTAMENTO GERAL DOS INPUTS NO INPUT GROUP */
+
+            #reports > .tabs-content > .tabs-panel > .flex-box-start > .report-controls > .input-group > input {
+                margin: 15px 0;
+            }
+            #reports > .tabs-content > .tabs-panel > .flex-box-start > .report-controls > .input-group > input:last-of-type {
+                margin: 15px 0 0 0;
+            }
+
+            /* CONTROLE DO PLANEJAMENTO - LISTA DINÂMICA DE LHS */
+
+                #planning .planning-lh-toolbar {
+                    align-items: center;
+                    flex-wrap: nowrap;
+                    padding-bottom: 15px;
+                    border-bottom: 2px solid #525252;
+                }
+                #planning .planning-lh-toolbar h3,
+                #planning .planning-lh-item-header h4 {
+                    margin-bottom: 0;
+                }
+                #planning .planning-lh-toolbar .button,
+                #planning .planning-lh-remove {
+                    min-height: 38px;
+                    padding: 8px 12px;
+                    font-size: 12px;
+                }
+                #planning .planning-lh-list {
+                    row-gap: 15px;
+                }
+                #planning .planning-lh-item-header {
+                    align-items: center;
+                    flex-wrap: nowrap;
+                    margin-bottom: 15px;
+                }
+                #planning .planning-lh-item > input {
+                    margin: 15px 0 0 0;
+                }
+                #planning .planning-lh-remove {
+                    color: #e4e6eb;
+                    background-color: #141414;
+                    border: 1px solid #525252;
+                    border-bottom: 4px solid #525252;
+                }
+
+            /* CONTROLE DOS REPORTS - AJUSTES ESPECIFICOS DEPENDENDO DO RELATÓRIO EM QUESTÃO */
+
+            #reports > .tabs-content > #planning > .flex-box-start > .report-controls {
+                max-height: 737px;
+                overflow: auto;
+            }
+            #reports > .tabs-content > #planning > .flex-box-start > .report-controls::-webkit-scrollbar-track {
+                background-color: transparent;
+            }
+            #reports > .tabs-content > #planning > .flex-box-start > .report-controls::-webkit-scrollbar {
+                width: 5px;
+                height: 5px;
+                background-color: transparent;
+            }
+            #reports > .tabs-content > #planning > .flex-box-start > .report-controls::-webkit-scrollbar-thumb {
+                border-radius: 5px;
+                background-color: #525252;
+            }
+
+            /* PREVIA DOS REPORTS */
+            
+            #reports > .tabs-content > .tabs-panel > .flex-box-start > .report-preview {
+                flex: 1 1 0;
+                border-left: 2px solid #525252;
+            }
+
+        </style>
     </head>	
 
     <!-- CONTEÚDO DA PÁGINA -->
@@ -57,6 +216,15 @@
                     </li> 
 
                     <li class="tabs-title is-active">
+                        <a href="#reports">
+                            <div class="flex-box-center">
+                                <img src="images/geral-icons/statistics-icon.svg">
+                                <h4>Relatórios</h4>
+                            </div>
+                        </a>
+                    </li> 
+
+                    <li class="tabs-title">
                         <a href="#statistics">
                             <div class="flex-box-center">
                                 <img src="images/geral-icons/statistics-icon.svg">
@@ -94,7 +262,7 @@
         <div class="main-structure">
             <div class="tabs-content" data-tabs-content="switch-1">
 
-                <!-- PAINEL PLANILHAS -->
+                <!-- PLANILHAS -->
 
                 <div class="tabs-panel" id="spreadsheets">
                     <div class="spreadsheets-layout">
@@ -110,9 +278,84 @@
                     </div>
                 </div>
 
-                <!-- PAINEL ANÁLISE DE PLANILHAS -->
+                <!-- REPORTS -->
 
-                <div class="tabs-panel is-active no-file" id="statistics">
+                <div class="tabs-panel is-active" id="reports">
+                    <ul class="tabs" data-tabs id="report-choice">
+                        <li class="tabs-title is-active">
+                            <a href="#planning">
+                                <div class="flex-box-full-center">
+                                    <img src="images/geral-icons/sheets-icon.svg">
+                                    <h4>Planejamento</h4>
+                                    <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum</p>
+                                </div>
+                            </a>
+                        </li> 
+
+                        <li class="tabs-title">
+                            <a href="#receipt">
+                                <div class="flex-box-full-center">
+                                    <img src="images/geral-icons/statistics-icon.svg">
+                                    <h4>Recebimento</h4>
+                                    <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum</p>
+                                </div>
+                            </a>
+                        </li> 
+
+                        <li class="tabs-title">
+                            <a href="#rlosses-rate">
+                                <div class="flex-box-full-center">
+                                    <img src="images/geral-icons/statistics-icon.svg">
+                                    <h4>Taxa de Perdas</h4>
+                                    <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum</p>
+                                </div>
+                            </a>
+                        </li> 
+
+                        <li class="tabs-title">
+                            <a href="#rlosses-rate">
+                                <div class="flex-box-full-center">
+                                    <img src="images/geral-icons/statistics-icon.svg">
+                                    <h4>Mapa de Calor</h4>
+                                    <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum</p>
+                                </div>
+                            </a>
+                        </li> 
+                    </ul> 
+
+                    <div class="tabs-content" data-tabs-content="report-choice">
+                        <div class="tabs-panel is-active" id="planning">
+
+                            <!-- CONTEÚDO DO RELATÓRIO -->
+
+                            <div class="flex-box-start">
+
+                                <!-- CONTROLES DO RELATÓRIO -->
+
+                                <div class="report-controls flex-box-column">
+
+                                    <!-- LISTA DE LHS -->
+
+                                    <div class="planning-lh-toolbar flex-box-between">
+                                        <h3>Lista de LHs</h3>
+
+                                        <button type="button" class="button" id="planningAddLh">Adicionar LH</button>
+                                    </div>
+
+                                    <div class="planning-lh-list flex-box-column" id="planningLhList"></div>
+                                </div>
+
+                                <!-- PPÉVIA DO RELATÓRIO -->
+
+                                <div class="report-preview"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ANÁLISE -->
+
+                <div class="tabs-panel no-file" id="statistics">
 
                     <!-- IMPORTAÇÃO LOCAL -->
 
@@ -636,6 +879,10 @@
 
             <script type="module" src="js/load-spreadsheets.js"></script>
 
+            <!-- JS - PAINEL DE RELATÓRIOS -->
+
+            <script type="module" src="js/reports/init.js"></script>
+
             <!-- JS - PAINEL DE ANÁLISE -->  
 
             <script src="js/data-analysis/core.js" defer></script>
@@ -649,5 +896,23 @@
             <!-- PONTO DE ENTRADA DA APLICAÇÃO -->
 
             <script src="js/app.js" defer></script>
+
+            <!-- TEMPORARIO -->  
+
+            <script>
+
+                // FORÇAR MAXLENGTH
+
+                $('input[maxlength], textarea[maxlength]').on('input', function() {
+                    this.value = this.value.slice(0, this.maxLength);
+                });
+
+                // DESABILITAR SCROLL EM INPUTS TIPO NÚMERO
+
+                $('input[type=number]').on('wheel', function(e) {
+                    e.preventDefault();
+                });
+
+            </script>
     </body>
 </html>
