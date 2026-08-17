@@ -56,6 +56,74 @@
             }
 
 
+            /* CONTROLES DA PRÉVIA */
+
+            .statistics-preview-controls {
+                justify-content: flex-end;
+            }
+
+            /* BOTÃO DO DROPDOWN */
+
+            .statistics-visible-columns-toggle {
+                min-height: 40px;
+                margin: 0;
+                padding: 10px 15px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 7px;
+                color: #e4e6eb;
+                background-color: #141414;
+                border: 2px solid #525252;
+                border-radius: 3px;
+                font-family: "Open Sans", sans-serif;
+                font-size: 13px;
+                font-weight: 600;
+                letter-spacing: 1px;
+                cursor: pointer;
+            }
+
+            .statistics-visible-columns-toggle:hover,
+            .statistics-visible-columns-toggle:focus-visible,
+            .statistics-visible-columns-toggle[aria-expanded="true"] {
+                background-color: #2e2e2e;
+                border-color: #73767a;
+            }
+
+            /* PAINEL DROPDOWN */
+
+            #statisticsVisibleColumnSelector.dropdown-pane {
+                width: 430px;
+                max-width: calc(100vw - 40px);
+                padding: 18px;
+                color: #e4e6eb;
+                background-color: #1f1f1f;
+                border: 2px solid #525252;
+                border-radius: 5px;
+                z-index: 1000;
+            }
+
+            #statisticsVisibleColumnSelector .statistics-visible-columns-header {
+                display: block;
+            }
+
+            #statisticsVisibleColumnSelector .statistics-visible-columns-header > h4 {
+                margin-bottom: 15px;
+            }
+
+            #statisticsVisibleColumnSelector .statistics-visible-columns-actions {
+                margin-bottom: 15px;
+            }
+
+            #statisticsVisibleColumnSelector #statisticsVisibleColumns {
+                max-height: 260px;
+                grid-template-columns: repeat(
+                    2,
+                    minmax(0, 1fr)
+                );
+            }
+
+
         </style>
     </head>	
 
@@ -236,25 +304,12 @@
                                         <h3>Prévia da Planilha</h3>
                                     </div>
 
-                                    <div class="statistics-visible-columns-title">
-
-                                    <!-- Bottom Center -->
-                                    <button class="button" type="button" data-toggle="example-dropdown-bottom-center">Toggle Dropdown</button>
-                                    <div class="dropdown-pane" data-position="bottom" data-alignment="center" id="example-dropdown-bottom-center" data-dropdown data-auto-focus="true">
-                                        <h3>Prévia da Planilha</h3>
-                                    </div>
-
-
-
-
+                                    <div class="statistics-visible-columns-title statistics-preview-controls">
                                         <h4 id="statisticsPreviewSummary"></h4>
-                                        <h4>Colunas visíveis</h4>
 
-                                        <span id="statisticsVisibleColumnCount">
-                                            0 de 0
-                                        </span>
-
-                                        <label for="statisticsPreviewLimit">Exibir até</label>
+                                        <label for="statisticsPreviewLimit">
+                                            Exibir até
+                                        </label>
 
                                         <select id="statisticsPreviewLimit" class="standard-select">
                                             <option value="50">50 linhas</option>
@@ -263,27 +318,39 @@
                                             <option value="500">500 linhas</option>
                                             <option value="all" selected>Todas as linhas</option>
                                         </select>
+
+                                        <button class="statistics-visible-columns-toggle" type="button" data-toggle="statisticsVisibleColumnSelector">
+                                            <span>Colunas</span>
+
+                                            <span id="statisticsVisibleColumnCount">
+                                                0 de 0
+                                            </span>
+
+                                            <span aria-hidden="true">▾</span>
+                                        </button>
                                     </div>
                                 </div>
 
-                                <!-- CONTEÚDO DO MODULO -->
+                                <!-- PAINEL DROPDOWN DAS COLUNAS -->
+
+                                <div class="dropdown-pane statistics-visible-columns-dropdown" id="statisticsVisibleColumnSelector" data-dropdown data-position="bottom" data-alignment="center" data-auto-focus="true" data-close-on-click="true">
+                                    <div class="statistics-visible-columns-header">
+                                        <h4>Colunas Visíveis</h4>
+
+                                        <div class="statistics-visible-columns-actions">
+                                            <button id="statisticsShowAllColumns" class="statistics-visible-columns-action" type="button">Marcar todas</button>
+                                            <button id="statisticsHideAllColumns" class="statistics-visible-columns-action" type="button">Desmarcar todas</button>
+                                            <button id="statisticsHideEmptyColumns" class="statistics-visible-columns-action" type="button">Ocultar vazias</button>
+                                        </div>
+                                    </div>
+
+                                    <div id="statisticsVisibleColumns"></div>
+                                </div>
+
+                                <!-- AÇÕES DA TABELA -->
 
                                 <div class="preview-header">
-
-                                    <!-- BOTÕES DE OCULTAR E REVELAR COLUNAS -->
-
-                                    <div id="statisticsVisibleColumnSelector">
-                                        <div class="statistics-visible-columns-header">
-                                            <div class="statistics-visible-columns-actions">
-                                                <button id="statisticsClearFilters" class="statistics-visible-columns-action" type="button" disabled>Limpar filtros</button>
-                                                <button id="statisticsShowAllColumns" class="statistics-visible-columns-action" type="button">Marcar todas</button>
-                                                <button id="statisticsHideAllColumns" class="statistics-visible-columns-action" type="button">Desmarcar todas</button>
-                                                <button id="statisticsHideEmptyColumns" class="statistics-visible-columns-action" type="button">Ocultar vazias</button>
-                                            </div>
-                                        </div>
-
-                                        <div id="statisticsVisibleColumns"></div>
-                                    </div>
+                                    <button id="statisticsClearFilters" class="statistics-visible-columns-action" type="button" disabled>Limpar filtros</button>
                                 </div>
 
                                 <!-- TABELA GERADA DE ACORDO COM A PLANILHA -->
