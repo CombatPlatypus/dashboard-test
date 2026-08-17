@@ -213,6 +213,7 @@
                         margin-bottom: 0;
                         font-size: 20px;
                         text-transform: uppercase;
+                        letter-spacing: 1.5px;
                     }
                     #planning .planning-sheet-layout {
                         display: grid;
@@ -232,26 +233,6 @@
                         margin-bottom: 0;
                     }
 
-                /* VOLUME ESTIMADO */
-
-                    #planning .planning-sheet-volume {
-                        width: 280px;
-                        margin-bottom: 20px;
-                        text-align: center;
-                        border: 1px solid #525252;
-                    }
-                    #planning .planning-sheet-volume h4 {
-                        padding: 8px 10px;
-                        margin-bottom: 0;
-                        font-size: 13px;
-                        background-color: #2e2e2e;
-                        border-bottom: 1px solid #525252;
-                    }
-                    #planning .planning-sheet-volume strong {
-                        display: block;
-                        padding: 10px;
-                        font-size: 16px;
-                    }
 
                 /* TABELAS */
 
@@ -314,30 +295,31 @@
                         text-align: center;
                     }
 
-                /* INDICADORES */
+                    /* INDICADORES */
 
-                    #planning .planning-sheet-metrics {
-                        display: grid;
-                        grid-template-columns: repeat(2, minmax(0, 1fr));
-                        gap: 10px;
-                        margin-bottom: 20px;
-                    }
-                    #planning .planning-sheet-metrics > div {
-                        text-align: center;
-                        border: 1px solid #525252;
-                    }
-                    #planning .planning-sheet-metrics h4 {
-                        padding: 8px;
-                        margin-bottom: 0;
-                        font-size: 12px;
-                        background-color: #2e2e2e;
-                        border-bottom: 1px solid #525252;
-                    }
-                    #planning .planning-sheet-metrics strong {
-                        display: block;
-                        padding: 10px;
-                        font-size: 15px;
-                    }
+                        #planning .planning-sheet-metrics {
+                            display: grid;
+                            grid-template-columns: repeat(3, minmax(0, 1fr));
+                            gap: 10px;
+                            margin-bottom: 20px;
+                        }
+                        #planning .planning-sheet-metrics > div {
+                            min-width: 0;
+                            text-align: center;
+                            border: 1px solid #525252;
+                        }
+                        #planning .planning-sheet-metrics h4 {
+                            padding: 8px;
+                            margin-bottom: 0;
+                            font-size: 12px;
+                            background-color: #2e2e2e;
+                            border-bottom: 1px solid #525252;
+                        }
+                        #planning .planning-sheet-metrics strong {
+                            display: block;
+                            padding: 10px;
+                            font-size: 15px;
+                        }
 
                 /* RESPONSIVIDADE */
 
@@ -345,9 +327,11 @@
                         #planning .planning-sheet-layout {
                             grid-template-columns: minmax(0, 1fr);
                         }
+                    }
 
-                        #planning .planning-sheet-volume {
-                            width: 100%;
+                    @media screen and (max-width: 800px) {
+                        #planning .planning-sheet-metrics {
+                            grid-template-columns: minmax(0, 1fr);
                         }
                     }
 
@@ -532,11 +516,23 @@
 
                                             <div class="planning-sheet-main">
 
-                                                <!-- VOLUME ESTIMADO -->
+                                                <!-- INDICADORES -->
 
-                                                <div class="planning-sheet-volume">
-                                                    <h4>Volume estimado ciclo</h4>
-                                                    <strong id="planningEstimatedVolume">0</strong>
+                                                <div class="planning-sheet-metrics">
+                                                    <div>
+                                                        <h4>Volume estimado ciclo</h4>
+                                                        <strong id="planningEstimatedVolume">0</strong>
+                                                    </div>
+
+                                                    <div>
+                                                        <h4>SPR Médio Final</h4>
+                                                        <strong id="planningPreviewAverageSpr">0</strong>
+                                                    </div>
+
+                                                    <div>
+                                                        <h4>CAP do Dia</h4>
+                                                        <strong id="planningPreviewDailyCapacity">0</strong>
+                                                    </div>
                                                 </div>
 
                                                 <!-- LISTA DE LHS -->
@@ -575,6 +571,26 @@
                                                         <tbody id="planningPreviewSegregatedBody">
                                                             <tr class="planning-empty-row">
                                                                 <td colspan="4">Nenhum LH para segregar.</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+
+                                                <!-- TOS PARA ROTEIRIZAR -->
+
+                                                <div class="planning-sheet-section">
+                                                    <table class="planning-sheet-table planning-routing-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>TOs para Roteirizar</th>
+                                                                <th>LH</th>
+                                                                <th>QTD</th>
+                                                            </tr>
+                                                        </thead>
+
+                                                        <tbody id="planningPreviewRoutingBody">
+                                                            <tr class="planning-empty-row">
+                                                                <td colspan="3">Nenhuma TO para roteirizar.</td>
                                                             </tr>
                                                         </tbody>
                                                     </table>
@@ -625,40 +641,6 @@
                                                                 <td>Fora de Rota</td>
                                                                 <td>—</td>
                                                                 <td>0</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-
-                                                <!-- INDICADORES -->
-
-                                                <div class="planning-sheet-metrics">
-                                                    <div>
-                                                        <h4>SPR Médio Final</h4>
-                                                        <strong id="planningPreviewAverageSpr">0</strong>
-                                                    </div>
-
-                                                    <div>
-                                                        <h4>CAP do Dia</h4>
-                                                        <strong id="planningPreviewDailyCapacity">0</strong>
-                                                    </div>
-                                                </div>
-
-                                                <!-- TOS PARA ROTEIRIZAR -->
-
-                                                <div class="planning-sheet-section">
-                                                    <table class="planning-sheet-table planning-routing-table">
-                                                        <thead>
-                                                            <tr>
-                                                                <th>TOs para Roteirizar</th>
-                                                                <th>LH</th>
-                                                                <th>QTD</th>
-                                                            </tr>
-                                                        </thead>
-
-                                                        <tbody id="planningPreviewRoutingBody">
-                                                            <tr class="planning-empty-row">
-                                                                <td colspan="3">Nenhuma TO para roteirizar.</td>
                                                             </tr>
                                                         </tbody>
                                                     </table>
