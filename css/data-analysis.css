@@ -66,6 +66,30 @@
             width: 30px;
         }
 
+        .module-header.flex-box-between {
+            width: 100%;
+            padding-bottom: 20px;
+            align-items: center;
+            border-bottom: 2px solid #525252;
+            margin-bottom: 30px;
+        }
+        .module-header.flex-box-between div {
+            gap: 10px;
+            align-items: center;
+        }
+        .module-header.flex-box-between img {
+            width: 35px;
+        }
+        .module-header.flex-box-between h3,
+        .module-header.flex-box-between p {
+            margin-bottom: 0;
+        }
+        .module-header.flex-box-between p {
+            width: max-content;
+            height: auto;
+            font-size: 13px;
+        }
+
     /* MÓDULO DE IMPORTAÇÃO */
 
         .import-panel {
@@ -156,7 +180,7 @@
             flex: 0 0 auto;
             margin: 0;
             color: #e4e6eb;
-            font-size: 14px;
+            font-size: 13px;
             letter-spacing: 1px;
         }
         #statisticsVisibleColumnSelector {
@@ -185,13 +209,12 @@
         }
         .statistics-visible-columns-title h4 {
             margin: 0;
-            font-size: 14px;
+            font-size: 13px;
+            font-weight: 400;
         }
         .statistics-visible-columns-title label {
-            margin-left: 5px;
-            margin-right: 5px;
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 400;
         }
         #statisticsPreviewLimit,
         #statisticsPreviewLimit + .select2 {
@@ -207,6 +230,8 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 6px;
+            padding: 15px 0 0 0;
+            border-top: 1px solid #525252;
         }
         .statistics-visible-columns-action {
             min-height: 40px;
@@ -214,7 +239,7 @@
             padding: 10px 15px;
             color: #e4e6eb;
             background-color: #242424;
-            border: 2px solid #525252;
+            border: 1px solid #525252;
             border-radius: 3px;
             font-size: 13px;
             cursor: pointer;
@@ -226,6 +251,7 @@
             font-family: 'Open Sans', sans-serif;
             font-weight: 600;
             user-select: none;
+            border-radius: 5px;
         }
         .statistics-visible-columns-action:hover,
         .statistics-visible-columns-action:focus-visible {
@@ -234,19 +260,16 @@
             border-color: #73767a;
         }
         .statistics-visible-columns-action:disabled {
-            cursor: default;
+            cursor: not-allowed;
             opacity: 0.5;
         }
         #statisticsVisibleColumns {
-            max-height: 124px;
-            padding-right: 6px;
+            border-top: 1px solid #525252;
+            max-height: 260px;
+            padding: 15px 6px 0 6px;
             display: grid;
-            grid-template-columns: repeat(
-                auto-fit,
-                minmax(180px, 1fr)
-            );
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 7px;
-
             overflow-x: hidden;
             overflow-y: auto;
         }
@@ -282,6 +305,60 @@
         .statistics-visible-column-name {
             color: #8b8d91;
         }
+
+        /* CONTROLES DA PRÉVIA */
+
+        .statistics-preview-controls {
+            justify-content: flex-end;
+        }
+
+        /* BOTÃO DO DROPDOWN */
+
+        .statistics-visible-columns-toggle {
+            min-height: 40px;
+            margin: 0;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            color: #e4e6eb;
+            background-color: #141414;
+            border: 1px solid #525252;
+            border-radius: 5px;
+            font-family: "Open Sans", sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            cursor: pointer;
+        }
+        .statistics-visible-columns-toggle span:last-of-type {
+            font-size: 15px;
+            color: #8b8d91;
+        }
+        .statistics-visible-columns-toggle:hover,
+        .statistics-visible-columns-toggle:focus-visible,
+        .statistics-visible-columns-toggle[aria-expanded="true"] {
+            background-color: #2e2e2e;
+            border-color: #73767a;
+        }
+        #statisticsVisibleColumnSelector.dropdown-pane {
+            width: max-content;
+            max-width: calc(100vw - 40px);
+            padding: 25px;
+            background-color: #1f1f1f;
+            border: 2px solid #525252;
+            border-radius: 5px;
+            z-index: 1000;
+        }
+        #statisticsVisibleColumnSelector .statistics-visible-columns-header {
+            display: block;
+        }
+        #statisticsVisibleColumnSelector .statistics-visible-columns-header > h4 {
+            margin-bottom: 15px;
+        }
+
+
         @media (max-width: 900px) {
 
             .preview-header {
