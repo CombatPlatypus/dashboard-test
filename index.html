@@ -30,40 +30,30 @@
 
         <style>
 
-            /* ÁREA DE IMPORTAÇÃO */
 
-            .statistics-drop-zone {
-                width: max-content;
-                min-width: 0;
-                min-height: 0;
-                max-height: none !important;
-                padding: 50px 80px;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                text-align: center;
-                background-color: #1f1f1f;
-                border: 2px solid #525252;
-                border-radius: 8px;
-                transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+            .module-header > .flex-box-between {
+                width: 100%;
+                padding-bottom: 20px;
+                align-items: center;
+                border-bottom: 2px solid #525252;
             }
-             .statistics-drop-zone img {
-                width: 80px;
+            .module-header > .flex-box-between div {
+                gap: 10px;
+                align-items: center;
             }
-             .statistics-drop-zone h4 {
+            .module-header > .flex-box-between img {
+                width: 35px;
+            }
+            .module-header > .flex-box-between h3,
+            .module-header > .flex-box-between p {
                 margin-bottom: 0;
             }
-             .statistics-drop-zone h5 {
-                margin: 0;
-                border: 2px solid #525252;
-                padding: 5px 10px;
-                border-radius: 5px;
+            .module-header > .flex-box-between p {
+                width: max-content;
+                height: auto;
+                font-size: 13px;
             }
-            .statistics-drop-zone.is-drag-over {
-                background-color: #242323;
-                border-color: #e4e6eb;
-                box-shadow: 0 0 0 3px rgba(228, 230, 235, 0.08);
-            }
+
 
         </style>
     </head>	
@@ -181,7 +171,6 @@
                         </div>
                     </section>
 
-                    
                     <div class="flex-box-start" id="statistics-margin">
 
                         <!-- MENU DE NAVEGAÇÃO DO PAINEL -->
@@ -237,6 +226,17 @@
 
                         <div class="tabs-panel" id="statistics-1">
                             <section id="statisticsLocalPreview" hidden>
+
+                                <!-- HEADER -->
+
+                                <div class="module-header flex-box-between">
+                                    <div class="flex-box-start">
+                                        <img src="images/geral-icons/magnifier-icon.svg">
+                                        <h3>Comparação de Dados</h3>
+                                    </div>
+
+                                    <p>Nenhuma planilha carregada.</p>
+                                </div>
 
                                 <div class="preview-header">
 
@@ -453,6 +453,19 @@
 
                         <div class="tabs-panel" id="statistics-3">
                             <section id="statisticsQuickAnalysis" hidden>
+
+                                <!-- HEADER -->
+
+                                <div class="module-header flex-box-between">
+                                    <div class="flex-box-start">
+                                        <img src="images/geral-icons/magnifier-icon.svg">
+                                        <h3>Comparação de Dados</h3>
+                                    </div>
+
+                                    <p>Nenhuma planilha carregada.</p>
+                                </div>
+
+                                <!-- CONTEÚDO DO MODULO -->
 
                                 <div class="statistics-analysis-top">
                                     <div id="statisticsAnalysisColumnSelector">
