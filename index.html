@@ -36,6 +36,7 @@
                 padding-bottom: 20px;
                 align-items: center;
                 border-bottom: 2px solid #525252;
+                margin-bottom: 30px;
             }
             .module-header.flex-box-between div {
                 gap: 10px;
@@ -231,12 +232,14 @@
 
                                 <div class="module-header flex-box-between">
                                     <div class="flex-box-start">
-                                        <img src="images/geral-icons/magnifier-icon.svg">
-                                        <h3>Comparação de Dados</h3>
+                                        <img src="images/geral-icons/table-icon.svg">
+                                        <h3>Prévia da Planilha</h3>
                                     </div>
 
                                     <p>Nenhuma planilha carregada.</p>
                                 </div>
+
+                                <!-- CONTEÚDO DO MODULO -->
 
                                 <div class="preview-header">
 
@@ -459,10 +462,10 @@
                                 <div class="module-header flex-box-between">
                                     <div class="flex-box-start">
                                         <img src="images/geral-icons/magnifier-icon.svg">
-                                        <h3>Comparação de Dados</h3>
+                                        <h3>Análise da Planilha</h3>
                                     </div>
 
-                                    <p>Nenhuma planilha carregada.</p>
+                                    <p>Linhas Analisadas <span id="statisticsTotalRecords">0</span></p>
                                 </div>
 
                                 <!-- CONTEÚDO DO MODULO -->
@@ -484,11 +487,6 @@
                                         </div>
 
                                         <div id="statisticsAnalysisColumns" class="statistics-column-options"></div>
-                                    </div>
-
-                                    <div class="statistics-summary-card statistics-total-records-card">
-                                        <span>Linhas Analisadas</span>
-                                        <span id="statisticsTotalRecords">0</span>
                                     </div>
                                 </div>
 
