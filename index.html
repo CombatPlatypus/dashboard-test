@@ -27,124 +27,6 @@
         <link rel="stylesheet" href="css/dashboard-style.css">
         <link rel="stylesheet" href="css/hub-spreadsheets.css">
         <link rel="stylesheet" href="css/data-analysis.css">
-
-        <style>
-
-
-            .module-header.flex-box-between {
-                width: 100%;
-                padding-bottom: 20px;
-                align-items: center;
-                border-bottom: 2px solid #525252;
-                margin-bottom: 30px;
-            }
-            .module-header.flex-box-between div {
-                gap: 10px;
-                align-items: center;
-            }
-            .module-header.flex-box-between img {
-                width: 35px;
-            }
-            .module-header.flex-box-between h3,
-            .module-header.flex-box-between p {
-                margin-bottom: 0;
-            }
-            .module-header.flex-box-between p {
-                width: max-content;
-                height: auto;
-                font-size: 13px;
-            }
-
-
-            /* CONTROLES DA PRÉVIA */
-
-            .statistics-preview-controls {
-                justify-content: flex-end;
-            }
-
-            /* BOTÃO DO DROPDOWN */
-
-            .statistics-visible-columns-toggle {
-                min-height: 40px;
-                margin: 0;
-                padding: 10px 15px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 7px;
-                color: #e4e6eb;
-                background-color: #141414;
-                border: 2px solid #525252;
-                border-radius: 3px;
-                font-family: "Open Sans", sans-serif;
-                font-size: 13px;
-                font-weight: 600;
-                letter-spacing: 1px;
-                cursor: pointer;
-            }
-
-            .statistics-visible-columns-toggle:hover,
-            .statistics-visible-columns-toggle:focus-visible,
-            .statistics-visible-columns-toggle[aria-expanded="true"] {
-                background-color: #2e2e2e;
-                border-color: #73767a;
-            }
-
-            /* PAINEL DROPDOWN */
-
-
-            .dropdown-pane {
-                position: absolute;
-                z-index: 10;
-                display: none;
-                width: 300px;
-                padding: 1rem;
-                visibility: hidden;
-                border-radius: 0;
-                font-size: 1rem;
-                }
-                .dropdown-pane.is-opening {
-                display: block;
-                }
-                .dropdown-pane.is-open {
-                display: block;
-                visibility: visible;
-                }
-
-
-            #statisticsVisibleColumnSelector.dropdown-pane {
-                width: 430px;
-                max-width: calc(100vw - 40px);
-                padding: 18px;
-                color: #e4e6eb;
-                background-color: #1f1f1f;
-                border: 2px solid #525252;
-                border-radius: 5px;
-                z-index: 1000;
-            }
-
-            #statisticsVisibleColumnSelector .statistics-visible-columns-header {
-                display: block;
-            }
-
-            #statisticsVisibleColumnSelector .statistics-visible-columns-header > h4 {
-                margin-bottom: 15px;
-            }
-
-            #statisticsVisibleColumnSelector .statistics-visible-columns-actions {
-                margin-bottom: 15px;
-            }
-
-            #statisticsVisibleColumnSelector #statisticsVisibleColumns {
-                max-height: 260px;
-                grid-template-columns: repeat(
-                    2,
-                    minmax(0, 1fr)
-                );
-            }
-
-
-        </style>
     </head>	
 
     <!-- CONTEÚDO DA PÁGINA -->
@@ -355,7 +237,7 @@
 
                                 <div class="dropdown-pane statistics-visible-columns-dropdown" id="statisticsVisibleColumnSelector" data-dropdown data-position="bottom" data-alignment="center" data-auto-focus="true" data-close-on-click="true">
                                     <div class="statistics-visible-columns-header">
-                                        <h4>Colunas Visíveis</h4>
+                                        <h4>Controle de Colunas</h4>
 
                                         <div class="statistics-visible-columns-actions">
                                             <button id="statisticsShowAllColumns" class="statistics-visible-columns-action" type="button">Marcar todas</button>
