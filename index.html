@@ -236,27 +236,34 @@
                                         <h3>Prévia da Planilha</h3>
                                     </div>
 
-                                    
-                                            <div class="statistics-visible-columns-title">
+                                    <div class="statistics-visible-columns-title">
 
-                                                <h4 id="statisticsPreviewSummary"></h4>
-                                                <h4>Colunas visíveis</h4>
+                                    <!-- Bottom Center -->
+                                    <button class="button" type="button" data-toggle="example-dropdown-bottom-center">Toggle Dropdown</button>
+                                    <div class="dropdown-pane" data-position="bottom" data-alignment="center" id="example-dropdown-bottom-center" data-dropdown data-auto-focus="true">
+                                        <h3>Prévia da Planilha</h3>
+                                    </div>
 
-                                                <span id="statisticsVisibleColumnCount">
-                                                    0 de 0
-                                                </span>
 
-                                                <label for="statisticsPreviewLimit">Exibir até</label>
 
-                                                <select id="statisticsPreviewLimit" class="standard-select">
-                                                    <option value="50">50 linhas</option>
-                                                    <option value="100">100 linhas</option>
-                                                    <option value="250">250 linhas</option>
-                                                    <option value="500">500 linhas</option>
-                                                    <option value="all" selected>Todas as linhas</option>
-                                                </select>
-                                            </div>
 
+                                        <h4 id="statisticsPreviewSummary"></h4>
+                                        <h4>Colunas visíveis</h4>
+
+                                        <span id="statisticsVisibleColumnCount">
+                                            0 de 0
+                                        </span>
+
+                                        <label for="statisticsPreviewLimit">Exibir até</label>
+
+                                        <select id="statisticsPreviewLimit" class="standard-select">
+                                            <option value="50">50 linhas</option>
+                                            <option value="100">100 linhas</option>
+                                            <option value="250">250 linhas</option>
+                                            <option value="500">500 linhas</option>
+                                            <option value="all" selected>Todas as linhas</option>
+                                        </select>
+                                    </div>
                                 </div>
 
                                 <!-- CONTEÚDO DO MODULO -->
@@ -267,7 +274,6 @@
 
                                     <div id="statisticsVisibleColumnSelector">
                                         <div class="statistics-visible-columns-header">
-
                                             <div class="statistics-visible-columns-actions">
                                                 <button id="statisticsClearFilters" class="statistics-visible-columns-action" type="button" disabled>Limpar filtros</button>
                                                 <button id="statisticsShowAllColumns" class="statistics-visible-columns-action" type="button">Marcar todas</button>
