@@ -92,6 +92,26 @@
 
             /* PAINEL DROPDOWN */
 
+
+            .dropdown-pane {
+                position: absolute;
+                z-index: 10;
+                display: none;
+                width: 300px;
+                padding: 1rem;
+                visibility: hidden;
+                border-radius: 0;
+                font-size: 1rem;
+                }
+                .dropdown-pane.is-opening {
+                display: block;
+                }
+                .dropdown-pane.is-open {
+                display: block;
+                visibility: visible;
+                }
+
+
             #statisticsVisibleColumnSelector.dropdown-pane {
                 width: 430px;
                 max-width: calc(100vw - 40px);
