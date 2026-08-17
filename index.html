@@ -221,7 +221,7 @@
                                             <option value="all" selected>Todas as linhas</option>
                                         </select>
 
-                                        <button class="statistics-visible-columns-toggle" type="button" data-toggle="statisticsVisibleColumnSelector">
+                                        <button class="statistics-visible-columns-toggle" data-toggle="statisticsVisibleColumnSelector">
                                             <span>Colunas</span>
 
                                             <span id="statisticsVisibleColumnCount">
@@ -229,6 +229,10 @@
                                             </span>
 
                                             <span aria-hidden="true">▾</span>
+                                        </button>
+
+                                        <button id="statisticsClearFilters" class="statistics-visible-columns-action" disabled>
+                                            <img src="images/geral-icons/clean-filter-icon.svg">
                                         </button>
                                     </div>
                                 </div>
@@ -240,19 +244,13 @@
                                         <h4>Controle de Colunas</h4>
 
                                         <div class="statistics-visible-columns-actions">
-                                            <button id="statisticsShowAllColumns" class="statistics-visible-columns-action" type="button">Marcar todas</button>
-                                            <button id="statisticsHideAllColumns" class="statistics-visible-columns-action" type="button">Desmarcar todas</button>
-                                            <button id="statisticsHideEmptyColumns" class="statistics-visible-columns-action" type="button">Ocultar vazias</button>
+                                            <button id="statisticsShowAllColumns" class="statistics-visible-columns-action">Marcar todas</button>
+                                            <button id="statisticsHideAllColumns" class="statistics-visible-columns-action">Desmarcar todas</button>
+                                            <button id="statisticsHideEmptyColumns" class="statistics-visible-columns-action">Ocultar vazias</button>
                                         </div>
                                     </div>
 
                                     <div id="statisticsVisibleColumns"></div>
-                                </div>
-
-                                <!-- AÇÕES DA TABELA -->
-
-                                <div class="preview-header">
-                                    <button id="statisticsClearFilters" class="statistics-visible-columns-action" type="button" disabled>Limpar filtros</button>
                                 </div>
 
                                 <!-- TABELA GERADA DE ACORDO COM A PLANILHA -->
