@@ -3,6 +3,8 @@ import {
     getPlanningState,
     removePlanningLh,
     subscribePlanningState,
+    updatePlanningCollectionPoolField,
+    updatePlanningGeneralField,
     updatePlanningLh,
 } from "./state.js";
 
@@ -13,6 +15,21 @@ let planningAddLhButton = null;
 let planningEstimatedVolume = null;
 let planningPreviewLhBody = null;
 let planningPreviewSegregatedBody = null;
+let planningGeneralControls = null;
+let planningPoolControls = null;
+let planningPreviewAverageSpr = null;
+let planningPreviewDailyCapacity = null;
+
+let planningPoolPreviewCells =
+    new Map();
+
+const planningCollectionPoolFields = [
+    "bulky",
+    "office",
+    "backlog",
+    "home",
+    "outOfRoute",
+];
 
 /* FORMATAÇÃO NUMÉRICA */
 
@@ -463,6 +480,28 @@ function renderPlanningPreview(state) {
             estimatedVolume,
         );
 
+    planningPreviewAverageSpr.textContent =
+        planningNumberFormatter.format(
+            state.averageSpr ?? 0,
+        );
+
+    planningPreviewDailyCapacity.textContent =
+        planningNumberFormatter.format(
+            state.dailyCapacity ?? 0,
+        );
+
+    planningPoolPreviewCells.forEach(
+        function (
+            cell,
+            field,
+        ) {
+            cell.textContent =
+                state.collectionPool[field]
+                    ? "SIM"
+                    : "NÃO";
+        },
+    );
+
     renderPlanningLhPreview(
         state.lhs,
     );
@@ -488,6 +527,101 @@ function renderPlanningLhList(lhs) {
     planningLhList.replaceChildren(
         ...lhElements,
     );
+}
+
+/* ATUALIZA UM CAMPO GERAL */
+
+function handlePlanningGeneralInput(event) {
+    const input =
+        event.target instanceof HTMLInputElement
+            ? event.target
+            : null;
+
+    const field =
+        input?.dataset.planningField;
+
+    if (
+        !input ||
+        !field
+    ) {
+        return;
+    }
+
+    input.value =
+        input.value
+            .replace(
+                /\D/g,
+                "",
+            )
+            .slice(
+                0,
+                input.maxLength,
+            );
+
+    updatePlanningGeneralField(
+        field,
+        input.value,
+    );
+}
+
+/* ATUALIZA A COLLECTION POOL */
+
+function handlePlanningPoolChange(event) {
+    const input =
+        event.target instanceof HTMLInputElement
+            ? event.target
+            : null;
+
+    const field =
+        input?.dataset.planningPoolField;
+
+    if (
+        !input ||
+        !field
+    ) {
+        return;
+    }
+
+    updatePlanningCollectionPoolField(
+        field,
+        input.checked,
+    );
+}
+
+/* SINCRONIZA OS CONTROLES */
+
+function synchronizePlanningControls(
+    state,
+) {
+    planningGeneralControls
+        .querySelectorAll(
+            "[data-planning-field]",
+        )
+        .forEach(
+            function (input) {
+                const field =
+                    input.dataset.planningField;
+
+                input.value =
+                    state[field] ?? "";
+            },
+        );
+
+    planningPoolControls
+        .querySelectorAll(
+            "[data-planning-pool-field]",
+        )
+        .forEach(
+            function (input) {
+                const field =
+                    input.dataset.planningPoolField;
+
+                input.checked =
+                    Boolean(
+                        state.collectionPool[field],
+                    );
+            },
+        );
 }
 
 /* ADICIONA UM NOVO LH */
@@ -691,6 +825,42 @@ function handlePlanningLhClick(event) {
 /* INICIALIZA A LISTA DE LHS */
 
 function initializePlanningLhList() {
+    planningGeneralControls =
+        document.getElementById(
+            "planningGeneralControls",
+        );
+
+    planningPoolControls =
+        document.getElementById(
+            "planningPoolControls",
+        );
+
+    planningPreviewAverageSpr =
+        document.getElementById(
+            "planningPreviewAverageSpr",
+        );
+
+    planningPreviewDailyCapacity =
+        document.getElementById(
+            "planningPreviewDailyCapacity",
+        );
+
+    planningPoolPreviewCells =
+        new Map(
+            Array.from(
+                document.querySelectorAll(
+                    "[data-planning-pool-preview]",
+                ),
+            ).map(
+                function (cell) {
+                    return [
+                        cell.dataset.planningPoolPreview,
+                        cell,
+                    ];
+                },
+            ),
+        );
+    
     planningLhList =
         document.getElementById(
             "planningLhList",
@@ -721,7 +891,13 @@ function initializePlanningLhList() {
         !planningAddLhButton ||
         !planningEstimatedVolume ||
         !planningPreviewLhBody ||
-        !planningPreviewSegregatedBody
+        !planningPreviewSegregatedBody ||
+        !planningGeneralControls ||
+        !planningPoolControls ||
+        !planningPreviewAverageSpr ||
+        !planningPreviewDailyCapacity ||
+        planningPoolPreviewCells.size !==
+            planningCollectionPoolFields.length
     ) {
         console.error(
             "Elementos do Planejamento não foram encontrados.",
@@ -736,8 +912,9 @@ function initializePlanningLhList() {
             change,
         ) {
             if (
-                change.type !==
-                "lh-updated"
+                change.type === "lh-added" ||
+                change.type === "lh-removed" ||
+                change.type === "lhs-replaced"
             ) {
                 renderPlanningLhList(
                     state.lhs,
@@ -765,8 +942,22 @@ function initializePlanningLhList() {
         handlePlanningLhClick,
     );
 
+    planningGeneralControls.addEventListener(
+        "input",
+        handlePlanningGeneralInput,
+    );
+
+    planningPoolControls.addEventListener(
+        "change",
+        handlePlanningPoolChange,
+    );
+
     const state =
         getPlanningState();
+
+    synchronizePlanningControls(
+        state,
+    );
 
     if (
         state.lhs.length === 0
