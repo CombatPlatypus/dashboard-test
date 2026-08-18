@@ -89,7 +89,6 @@
             #reports > .tabs-content > .tabs-panel > .flex-box-start > .report-controls {
                 flex: 0 0 350px;
                 row-gap: 15px;
-                padding-right: 25px;
                 margin-right: 25px;
             }
             #reports > .tabs-content > .tabs-panel > .flex-box-start > .report-controls .input-group {
@@ -99,6 +98,9 @@
             #reports > .tabs-content > .tabs-panel > .flex-box-start > .report-controls .input-group:last-of-type {
                 padding: 0 0 0 0;
                 border-bottom: none;
+            }
+            #reports > .tabs-content > .tabs-panel > .flex-box-start > .report-controls .tabs {
+                margin: 0 auto;
             }
 
             /* CONTROLE DOS REPORTS - DOIS INPUTS DENTRO DE UMA FLEX-BOX-START */
@@ -569,19 +571,6 @@
                                 <!-- CONTROLES DO RELATÓRIO -->
 
                                 <div class="report-controls flex-box-column">
-                                    <ul class="flex-box-start tabs" data-tabs id="planning-choice">
-                                        <li class="tabs-title is-active">
-                                            <a href="#lhs-list">
-                                                <h4>Lista de LHs</h4>
-                                            </a>
-                                        </li> 
-
-                                        <li class="tabs-title">
-                                            <a href="#collection-pool">
-                                                <h4>Collection Pool</h4>
-                                            </a>
-                                        </li> 
-                                    </ul> 
 
                                     <!-- DADOS GERAIS -->
 
@@ -614,6 +603,24 @@
                                             </label>
                                         </div>
                                     </div>
+
+                                    <!-- MENU OPÇÕES DO RELATÓRIO EM QUESTÃO -->
+
+                                    <ul class="flex-box-start tabs" data-tabs id="planning-choice">
+                                        <li class="tabs-title is-active">
+                                            <a href="#lhs-list">
+                                                <h4>Lista de LHs</h4>
+                                            </a>
+                                        </li> 
+
+                                        <li class="tabs-title">
+                                            <a href="#collection-pool">
+                                                <h4>Collection Pool</h4>
+                                            </a>
+                                        </li> 
+                                    </ul> 
+
+                                    <!-- CONTROLES SEPERADOS POR TIPO -->
 
                                     <div class="tabs-content" data-tabs-content="planning-choice">
                                         <div class="tabs-panel is-active" id="lhs-list">
