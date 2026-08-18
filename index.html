@@ -116,10 +116,10 @@
 
             /* CONTROLE DOS REPORTS - COMPORTAMENTO GERAL DOS INPUTS NO INPUT GROUP */
 
-            #reports > .tabs-content > .tabs-panel > .flex-box-start > .report-controls > .input-group > input {
+            #reports > .tabs-content > .tabs-panel > .flex-box-start > .report-controls .input-group > input {
                 margin: 15px 0;
             }
-            #reports > .tabs-content > .tabs-panel > .flex-box-start > .report-controls > .input-group > input:last-of-type {
+            #reports > .tabs-content > .tabs-panel > .flex-box-start > .report-controls .input-group > input:last-of-type {
                 margin: 15px 0 0 0;
             }
 
@@ -569,6 +569,19 @@
                                 <!-- CONTROLES DO RELATÓRIO -->
 
                                 <div class="report-controls flex-box-column">
+                                    <ul class="flex-box-start tabs" data-tabs id="planning-choice">
+                                        <li class="tabs-title is-active">
+                                            <a href="#lhs-list">
+                                                <h4>Lista de LHs</h4>
+                                            </a>
+                                        </li> 
+
+                                        <li class="tabs-title">
+                                            <a href="#collection-pool">
+                                                <h4>Collection Pool</h4>
+                                            </a>
+                                        </li> 
+                                    </ul> 
 
                                     <!-- DADOS GERAIS -->
 
@@ -602,73 +615,81 @@
                                         </div>
                                     </div>
 
-                                    <!-- CONTROLES DA COLLECTION POOL -->
+                                    <div class="tabs-content" data-tabs-content="planning-choice">
+                                        <div class="tabs-panel is-active" id="lhs-list">
 
-                                    <div class="input-group planning-pool-controls" id="planningPoolControls">
-                                        <h4>Collection Pool</h4>
+                                            <!-- LISTA DE LHS -->
 
-                                        <div class="planning-pool-control-list">
-                                            <label class="planning-pool-control">
-                                                <input
-                                                    type="checkbox"
-                                                    data-planning-pool-field="bulky"
-                                                    checked
-                                                >
+                                            <div class="planning-lh-toolbar flex-box-between">
+                                                <h3>Lista de LHs</h3>
 
-                                                <span>Volumosos</span>
-                                            </label>
+                                                <button type="button" class="button" id="planningAddLh">Adicionar LH</button>
+                                            </div>
 
-                                            <label class="planning-pool-control">
-                                                <input
-                                                    type="checkbox"
-                                                    data-planning-pool-field="office"
-                                                    checked
-                                                >
+                                            <div class="planning-lh-list flex-box-column" id="planningLhList"></div>
+                                        </div>
 
-                                                <span>Roteirizar Office?</span>
-                                            </label>
+                                        <div class="tabs-panel" id="collection-pool">
 
-                                            <label class="planning-pool-control">
-                                                <input
-                                                    type="checkbox"
-                                                    data-planning-pool-field="backlog"
-                                                    checked
-                                                >
+                                            <!-- CONTROLES DA COLLECTION POOL -->
 
-                                                <span>Roteirizar Backlog?</span>
-                                            </label>
+                                            <div class="input-group planning-pool-controls" id="planningPoolControls">
+                                                <h4>Collection Pool</h4>
 
-                                            <label class="planning-pool-control">
-                                                <input
-                                                    type="checkbox"
-                                                    data-planning-pool-field="home"
-                                                    checked
-                                                >
+                                                <div class="planning-pool-control-list">
+                                                    <label class="planning-pool-control">
+                                                        <input
+                                                            type="checkbox"
+                                                            data-planning-pool-field="bulky"
+                                                            checked
+                                                        >
 
-                                                <span>Roteirizar Home?</span>
-                                            </label>
+                                                        <span>Volumosos</span>
+                                                    </label>
 
-                                            <label class="planning-pool-control">
-                                                <input
-                                                    type="checkbox"
-                                                    data-planning-pool-field="outOfRoute"
-                                                    checked
-                                                >
+                                                    <label class="planning-pool-control">
+                                                        <input
+                                                            type="checkbox"
+                                                            data-planning-pool-field="office"
+                                                            checked
+                                                        >
 
-                                                <span>Fora de Rota</span>
-                                            </label>
+                                                        <span>Roteirizar Office?</span>
+                                                    </label>
+
+                                                    <label class="planning-pool-control">
+                                                        <input
+                                                            type="checkbox"
+                                                            data-planning-pool-field="backlog"
+                                                            checked
+                                                        >
+
+                                                        <span>Roteirizar Backlog?</span>
+                                                    </label>
+
+                                                    <label class="planning-pool-control">
+                                                        <input
+                                                            type="checkbox"
+                                                            data-planning-pool-field="home"
+                                                            checked
+                                                        >
+
+                                                        <span>Roteirizar Home?</span>
+                                                    </label>
+
+                                                    <label class="planning-pool-control">
+                                                        <input
+                                                            type="checkbox"
+                                                            data-planning-pool-field="outOfRoute"
+                                                            checked
+                                                        >
+
+                                                        <span>Fora de Rota</span>
+                                                    </label>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-
-                                    <!-- LISTA DE LHS -->
-
-                                    <div class="planning-lh-toolbar flex-box-between">
-                                        <h3>Lista de LHs</h3>
-
-                                        <button type="button" class="button" id="planningAddLh">Adicionar LH</button>
-                                    </div>
-
-                                    <div class="planning-lh-list flex-box-column" id="planningLhList"></div>
                                 </div>
 
                                 <!-- PPÉVIA DO RELATÓRIO -->
