@@ -100,7 +100,14 @@
                 border-bottom: none;
             }
             #reports > .tabs-content > .tabs-panel > .flex-box-start > .report-controls .tabs {
-                margin: 0 auto;
+                width: 100%;
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                padding-bottom: 15px;
+                border-bottom: 2px solid #525252;
+            }
+            #reports > .tabs-content > .tabs-panel > .flex-box-start > .report-controls .tabs .tabs-title{
+                width: 100%;
             }
 
             /* CONTROLE DOS REPORTS - DOIS INPUTS DENTRO DE UMA FLEX-BOX-START */
@@ -128,14 +135,12 @@
             /* CONTROLE DO PLANEJAMENTO - LISTA DINÂMICA DE LHS */
 
                 #planning .planning-lh-toolbar {
-                    align-items: center;
-                    flex-wrap: nowrap;
-                    padding-bottom: 15px;
-                    border-bottom: 2px solid #525252;
+                    margin-bottom: 20px;
+                    max-height: 40px;
+                    overflow: hidden;
                 }
-                #planning .planning-lh-toolbar h3,
-                #planning .planning-lh-item-header h4 {
-                    margin-bottom: 0;
+                #planning .planning-lh-toolbar button {
+                   width: 100%;
                 }
                 #planning .planning-lh-toolbar .button,
                 #planning .planning-lh-remove {
@@ -572,38 +577,6 @@
 
                                 <div class="report-controls flex-box-column">
 
-                                    <!-- DADOS GERAIS -->
-
-                                    <div class="input-group planning-general-controls" id="planningGeneralControls">
-                                        <h4>Dados Gerais</h4>
-
-                                        <div class="planning-general-fields">
-                                            <label class="planning-control-field">
-                                                <span>SPR Médio Final</span>
-
-                                                <input
-                                                    type="text"
-                                                    inputmode="numeric"
-                                                    maxlength="5"
-                                                    placeholder="SPR"
-                                                    data-planning-field="averageSpr"
-                                                >
-                                            </label>
-
-                                            <label class="planning-control-field">
-                                                <span>CAP do Dia</span>
-
-                                                <input
-                                                    type="text"
-                                                    inputmode="numeric"
-                                                    maxlength="6"
-                                                    placeholder="CAP"
-                                                    data-planning-field="dailyCapacity"
-                                                >
-                                            </label>
-                                        </div>
-                                    </div>
-
                                     <!-- MENU OPÇÕES DO RELATÓRIO EM QUESTÃO -->
 
                                     <ul class="flex-box-start tabs" data-tabs id="planning-choice">
@@ -618,6 +591,12 @@
                                                 <h4>Collection Pool</h4>
                                             </a>
                                         </li> 
+
+                                        <li class="tabs-title">
+                                            <a href="#geral-data">
+                                                <h4>Dados Gerais</h4>
+                                            </a>
+                                        </li> 
                                     </ul> 
 
                                     <!-- CONTROLES SEPERADOS POR TIPO -->
@@ -627,10 +606,8 @@
 
                                             <!-- LISTA DE LHS -->
 
-                                            <div class="planning-lh-toolbar flex-box-between">
-                                                <h3>Lista de LHs</h3>
-
-                                                <button type="button" class="button" id="planningAddLh">Adicionar LH</button>
+                                            <div class="planning-lh-toolbar">
+                                                <button class="button" id="planningAddLh">Adicionar LH</button>
                                             </div>
 
                                             <div class="planning-lh-list flex-box-column" id="planningLhList"></div>
@@ -692,6 +669,41 @@
                                                         >
 
                                                         <span>Fora de Rota</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="tabs-panel" id="geral-data">
+                                            
+                                            <!-- DADOS GERAIS -->
+
+                                            <div class="input-group planning-general-controls" id="planningGeneralControls">
+                                                <h4>Dados Gerais</h4>
+
+                                                <div class="planning-general-fields">
+                                                    <label class="planning-control-field">
+                                                        <span>SPR Médio Final</span>
+
+                                                        <input
+                                                            type="text"
+                                                            inputmode="numeric"
+                                                            maxlength="5"
+                                                            placeholder="SPR"
+                                                            data-planning-field="averageSpr"
+                                                        >
+                                                    </label>
+
+                                                    <label class="planning-control-field">
+                                                        <span>CAP do Dia</span>
+
+                                                        <input
+                                                            type="text"
+                                                            inputmode="numeric"
+                                                            maxlength="6"
+                                                            placeholder="CAP"
+                                                            data-planning-field="dailyCapacity"
+                                                        >
                                                     </label>
                                                 </div>
                                             </div>
