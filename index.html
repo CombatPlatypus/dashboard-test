@@ -185,6 +185,53 @@
                     cursor: not-allowed;
                 }
 
+            /* CONTROLE DO PLANEJAMENTO - DADOS GERAIS */
+
+                #planning .planning-general-controls h4,
+                #planning .planning-pool-controls h4 {
+                    margin-bottom: 15px;
+                }
+                #planning .planning-general-fields {
+                    display: grid;
+                    grid-template-columns: repeat(2, minmax(0, 1fr));
+                    gap: 10px;
+                }
+                #planning .planning-control-field {
+                    display: block;
+                    margin: 0;
+                }
+                #planning .planning-control-field span {
+                    display: block;
+                    margin-bottom: 5px;
+                    font-size: 12px;
+                    color: #e4e6eb;
+                }
+                #planning .planning-control-field input {
+                    text-align: center;
+                }
+
+            /* CONTROLE DO PLANEJAMENTO - COLLECTION POOL */
+
+                #planning .planning-pool-control-list {
+                    display: grid;
+                    grid-template-columns: minmax(0, 1fr);
+                    gap: 10px;
+                }
+                #planning .planning-pool-control {
+                    display: flex;
+                    align-items: center;
+                    column-gap: 8px;
+                    margin: 0;
+                    font-size: 12px;
+                    color: #e4e6eb;
+                    cursor: pointer;
+                    user-select: none;
+                }
+                #planning .planning-pool-control input {
+                    margin: 0;
+                    cursor: pointer;
+                }
+
             /* CONTROLE DOS REPORTS - AJUSTES ESPECIFICOS DEPENDENDO DO RELATÓRIO EM QUESTÃO */
 
             #reports > .tabs-content > #planning > .flex-box-start > .report-controls {
@@ -523,6 +570,96 @@
 
                                 <div class="report-controls flex-box-column">
 
+                                    <!-- DADOS GERAIS -->
+
+                                    <div class="input-group planning-general-controls" id="planningGeneralControls">
+                                        <h4>Dados Gerais</h4>
+
+                                        <div class="planning-general-fields">
+                                            <label class="planning-control-field">
+                                                <span>SPR Médio Final</span>
+
+                                                <input
+                                                    type="text"
+                                                    inputmode="numeric"
+                                                    maxlength="5"
+                                                    placeholder="SPR"
+                                                    data-planning-field="averageSpr"
+                                                >
+                                            </label>
+
+                                            <label class="planning-control-field">
+                                                <span>CAP do Dia</span>
+
+                                                <input
+                                                    type="text"
+                                                    inputmode="numeric"
+                                                    maxlength="6"
+                                                    placeholder="CAP"
+                                                    data-planning-field="dailyCapacity"
+                                                >
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <!-- CONTROLES DA COLLECTION POOL -->
+
+                                    <div class="input-group planning-pool-controls" id="planningPoolControls">
+                                        <h4>Collection Pool</h4>
+
+                                        <div class="planning-pool-control-list">
+                                            <label class="planning-pool-control">
+                                                <input
+                                                    type="checkbox"
+                                                    data-planning-pool-field="bulky"
+                                                    checked
+                                                >
+
+                                                <span>Volumosos</span>
+                                            </label>
+
+                                            <label class="planning-pool-control">
+                                                <input
+                                                    type="checkbox"
+                                                    data-planning-pool-field="office"
+                                                    checked
+                                                >
+
+                                                <span>Roteirizar Office?</span>
+                                            </label>
+
+                                            <label class="planning-pool-control">
+                                                <input
+                                                    type="checkbox"
+                                                    data-planning-pool-field="backlog"
+                                                    checked
+                                                >
+
+                                                <span>Roteirizar Backlog?</span>
+                                            </label>
+
+                                            <label class="planning-pool-control">
+                                                <input
+                                                    type="checkbox"
+                                                    data-planning-pool-field="home"
+                                                    checked
+                                                >
+
+                                                <span>Roteirizar Home?</span>
+                                            </label>
+
+                                            <label class="planning-pool-control">
+                                                <input
+                                                    type="checkbox"
+                                                    data-planning-pool-field="outOfRoute"
+                                                    checked
+                                                >
+
+                                                <span>Fora de Rota</span>
+                                            </label>
+                                        </div>
+                                    </div>
+
                                     <!-- LISTA DE LHS -->
 
                                     <div class="planning-lh-toolbar flex-box-between">
@@ -652,27 +789,27 @@
                                                         <tbody>
                                                             <tr>
                                                                 <td>Volumosos</td>
-                                                                <td>SIM</td>
+                                                                <td data-planning-pool-preview="bulky">SIM</td>
                                                             </tr>
 
                                                             <tr>
                                                                 <td>Roteirizar Office?</td>
-                                                                <td>SIM</td>
+                                                                <td data-planning-pool-preview="office">SIM</td>
                                                             </tr>
 
                                                             <tr>
                                                                 <td>Roteirizar Backlog?</td>
-                                                                <td>SIM</td>
+                                                                <td data-planning-pool-preview="backlog">SIM</td>
                                                             </tr>
 
                                                             <tr>
                                                                 <td>Roteirizar Home?</td>
-                                                                <td>SIM</td>
+                                                                <td data-planning-pool-preview="home">SIM</td>
                                                             </tr>
 
                                                             <tr>
                                                                 <td>Fora de Rota</td>
-                                                                <td>SIM</td>
+                                                                <td data-planning-pool-preview="outOfRoute">SIM</td>
                                                             </tr>
                                                         </tbody>
                                                     </table>
@@ -754,7 +891,6 @@
                                         </div>
                                     </section>
                                 </div>
-
                             </div>
                         </div>
                     </div>
