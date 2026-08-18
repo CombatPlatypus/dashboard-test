@@ -1,6 +1,18 @@
 /* ESTADO DO PLANEJAMENTO */
 
 const planningState = {
+    averageSpr: null,
+
+    dailyCapacity: null,
+
+    collectionPool: {
+        bulky: true,
+        office: true,
+        backlog: true,
+        home: true,
+        outOfRoute: true,
+    },
+
     lhs: [],
 };
 
@@ -16,6 +28,21 @@ const planningLhFields =
         "origin",
         "segregate",
         "segregateQuantity",
+    ]);
+
+const planningGeneralFields =
+    new Set([
+        "averageSpr",
+        "dailyCapacity",
+    ]);
+
+const planningCollectionPoolFields =
+    new Set([
+        "bulky",
+        "office",
+        "backlog",
+        "home",
+        "outOfRoute",
     ]);
 
 let nextPlanningLhId = 1;
@@ -114,6 +141,16 @@ function createPlanningLhRecord(
 
 function getPlanningState() {
     return {
+        averageSpr:
+            planningState.averageSpr,
+
+        dailyCapacity:
+            planningState.dailyCapacity,
+
+        collectionPool: {
+            ...planningState.collectionPool,
+        },
+
         lhs:
             planningState.lhs.map(
                 function (lh) {
@@ -261,6 +298,78 @@ function updatePlanningLh(
     return true;
 }
 
+/* ATUALIZA UM CAMPO GERAL */
+
+function updatePlanningGeneralField(
+    field,
+    value,
+) {
+    if (
+        !planningGeneralFields.has(
+            field,
+        )
+    ) {
+        return false;
+    }
+
+    const normalizedValue =
+        normalizeQuantity(
+            value,
+        );
+
+    if (
+        planningState[field] ===
+        normalizedValue
+    ) {
+        return true;
+    }
+
+    planningState[field] =
+        normalizedValue;
+
+    notifyPlanningState({
+        type: "general-field-updated",
+        field,
+    });
+
+    return true;
+}
+
+/* ATUALIZA A COLLECTION POOL */
+
+function updatePlanningCollectionPoolField(
+    field,
+    value,
+) {
+    if (
+        !planningCollectionPoolFields.has(
+            field,
+        )
+    ) {
+        return false;
+    }
+
+    const normalizedValue =
+        Boolean(value);
+
+    if (
+        planningState.collectionPool[field] ===
+        normalizedValue
+    ) {
+        return true;
+    }
+
+    planningState.collectionPool[field] =
+        normalizedValue;
+
+    notifyPlanningState({
+        type: "collection-pool-updated",
+        field,
+    });
+
+    return true;
+}
+
 /* REMOVE UM LH */
 
 function removePlanningLh(id) {
@@ -322,5 +431,7 @@ export {
     removePlanningLh,
     replacePlanningLhs,
     subscribePlanningState,
+    updatePlanningCollectionPoolField,
+    updatePlanningGeneralField,
     updatePlanningLh,
 };
