@@ -153,6 +153,20 @@
                 }
                 #planning .planning-lh-list {
                     row-gap: 15px;
+                    max-height: 664px;
+                    overflow: auto;
+                }
+                #planning .planning-lh-list::-webkit-scrollbar-track {
+                    background-color: transparent;
+                }
+                #planning .planning-lh-list::-webkit-scrollbar {
+                    width: 5px;
+                    height: 5px;
+                    background-color: transparent;
+                }
+                #planning .planning-lh-list::-webkit-scrollbar-thumb {
+                    border-radius: 5px;
+                    background-color: #525252;
                 }
                 #planning .planning-lh-item-header {
                     align-items: center;
@@ -244,22 +258,7 @@
 
             /* CONTROLE DOS REPORTS - AJUSTES ESPECIFICOS DEPENDENDO DO RELATÓRIO EM QUESTÃO */
 
-            #reports > .tabs-content > #planning > .flex-box-start > .report-controls {
-                max-height: 737px;
-                overflow: auto;
-            }
-            #reports > .tabs-content > #planning > .flex-box-start > .report-controls::-webkit-scrollbar-track {
-                background-color: transparent;
-            }
-            #reports > .tabs-content > #planning > .flex-box-start > .report-controls::-webkit-scrollbar {
-                width: 5px;
-                height: 5px;
-                background-color: transparent;
-            }
-            #reports > .tabs-content > #planning > .flex-box-start > .report-controls::-webkit-scrollbar-thumb {
-                border-radius: 5px;
-                background-color: #525252;
-            }
+
 
             /* PREVIA DOS REPORTS */
             
