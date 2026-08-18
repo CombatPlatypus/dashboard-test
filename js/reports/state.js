@@ -14,6 +14,8 @@ const planningLhFields =
         "code",
         "quantity",
         "origin",
+        "segregate",
+        "segregateQuantity",
     ]);
 
 let nextPlanningLhId = 1;
@@ -64,6 +66,11 @@ function createPlanningLhRecord(
     values = {},
     source = "manual",
 ) {
+    const segregate =
+        Boolean(
+            values.segregate,
+        );
+
     return {
         id: nextPlanningLhId++,
 
@@ -81,6 +88,15 @@ function createPlanningLhRecord(
             normalizeTextValue(
                 values.origin,
             ),
+
+        segregate,
+
+        segregateQuantity:
+            segregate
+                ? normalizeQuantity(
+                    values.segregateQuantity,
+                )
+                : null,
 
         source:
             normalizeTextValue(
@@ -191,10 +207,27 @@ function updatePlanningLh(
         return false;
     }
 
-    const normalizedValue =
-        field === "quantity"
-            ? normalizeQuantity(value)
-            : normalizeTextValue(value);
+    let normalizedValue;
+
+    if (
+        field === "segregate"
+    ) {
+        normalizedValue =
+            Boolean(value);
+    } else if (
+        field === "quantity" ||
+        field === "segregateQuantity"
+    ) {
+        normalizedValue =
+            normalizeQuantity(
+                value,
+            );
+    } else {
+        normalizedValue =
+            normalizeTextValue(
+                value,
+            );
+    }
 
     if (
         lh[field] === normalizedValue
@@ -204,6 +237,14 @@ function updatePlanningLh(
 
     lh[field] =
         normalizedValue;
+
+    if (
+        field === "segregate" &&
+        !normalizedValue
+    ) {
+        lh.segregateQuantity =
+            null;
+    }
 
     if (
         lh.source !== "manual"
