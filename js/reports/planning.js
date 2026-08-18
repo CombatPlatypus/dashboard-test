@@ -6,10 +6,20 @@ import {
     updatePlanningLh,
 } from "./state.js";
 
-/* ELEMENTOS DA LISTA DE LHS */
+/* ELEMENTOS DO PLANEJAMENTO */
 
 let planningLhList = null;
 let planningAddLhButton = null;
+let planningEstimatedVolume = null;
+let planningPreviewLhBody = null;
+let planningPreviewSegregatedBody = null;
+
+/* FORMATAÇÃO NUMÉRICA */
+
+const planningNumberFormatter =
+    new Intl.NumberFormat(
+        "pt-BR",
+    );
 
 /* CRIA UM INPUT DE LH */
 
@@ -81,6 +91,54 @@ function createPlanningLhElement(
     title.textContent =
         `LH ${position}`;
 
+    const headerActions =
+        document.createElement(
+            "div",
+        );
+
+    headerActions.className =
+        "planning-lh-item-actions flex-box-end";
+
+    const segregateLabel =
+        document.createElement(
+            "label",
+        );
+
+    segregateLabel.className =
+        "planning-lh-segregate-toggle";
+
+    const segregateCheckbox =
+        document.createElement(
+            "input",
+        );
+
+    segregateCheckbox.type =
+        "checkbox";
+
+    segregateCheckbox.dataset.field =
+        "segregate";
+
+    segregateCheckbox.checked =
+        lh.segregate;
+
+    segregateCheckbox.setAttribute(
+        "aria-label",
+        `Segregar LH ${position}`,
+    );
+
+    const segregateText =
+        document.createElement(
+            "span",
+        );
+
+    segregateText.textContent =
+        "Segregar";
+
+    segregateLabel.append(
+        segregateCheckbox,
+        segregateText,
+    );
+
     const removeButton =
         document.createElement(
             "button",
@@ -103,9 +161,14 @@ function createPlanningLhElement(
         `Remover LH ${position}`,
     );
 
+    headerActions.append(
+        segregateLabel,
+        removeButton,
+    );
+
     header.append(
         title,
-        removeButton,
+        headerActions,
     );
 
     const mainFields =
@@ -131,7 +194,7 @@ function createPlanningLhElement(
             value: lh.quantity,
             placeholder: "Qtd",
             ariaLabel:
-                `Quantidade do LH ${position}`,
+                `Quantidade total do LH ${position}`,
             maxLength: 5,
         });
 
@@ -150,18 +213,263 @@ function createPlanningLhElement(
                 `Origem do LH ${position}`,
         });
 
-    mainFields.append(
-        codeInput,
-        quantityInput,
-    );
+    const segregateQuantityInput =
+        createPlanningLhInput({
+            field: "segregateQuantity",
+            value: lh.segregateQuantity,
+            placeholder: "Qtd a segregar",
+            ariaLabel:
+                `Quantidade a segregar do LH ${position}`,
+            maxLength: 5,
+        });
+
+    segregateQuantityInput.className =
+        "planning-lh-segregate-quantity";
+
+    segregateQuantityInput.inputMode =
+        "numeric";
+
+    segregateQuantityInput.pattern =
+        "[0-9]*";
+
+    segregateQuantityInput.disabled =
+        !lh.segregate;
 
     item.append(
         header,
         mainFields,
         originInput,
+        segregateQuantityInput,
+    );
+
+    mainFields.append(
+        codeInput,
+        quantityInput,
     );
 
     return item;
+}
+
+/* VERIFICA SE O LH POSSUI INFORMAÇÕES */
+
+function hasPlanningLhInformation(lh) {
+    return (
+        String(
+            lh.code,
+        ).trim() !== "" ||
+        String(
+            lh.origin,
+        ).trim() !== "" ||
+        lh.quantity !== null
+    );
+}
+
+/* FORMATA UM VALOR DA PRÉVIA */
+
+function formatPlanningPreviewValue(
+    value,
+) {
+    if (
+        value === null ||
+        value === undefined ||
+        value === ""
+    ) {
+        return "—";
+    }
+
+    if (
+        typeof value === "number"
+    ) {
+        return planningNumberFormatter.format(
+            value,
+        );
+    }
+
+    return String(value);
+}
+
+/* CRIA UMA LINHA DA PRÉVIA */
+
+function createPlanningPreviewRow(
+    values,
+) {
+    const row =
+        document.createElement(
+            "tr",
+        );
+
+    values.forEach(
+        function (value) {
+            const cell =
+                document.createElement(
+                    "td",
+                );
+
+            cell.textContent =
+                formatPlanningPreviewValue(
+                    value,
+                );
+
+            row.append(
+                cell,
+            );
+        },
+    );
+
+    return row;
+}
+
+/* CRIA UMA LINHA VAZIA */
+
+function createPlanningEmptyRow(
+    columnCount,
+    message,
+) {
+    const row =
+        document.createElement(
+            "tr",
+        );
+
+    row.className =
+        "planning-empty-row";
+
+    const cell =
+        document.createElement(
+            "td",
+        );
+
+    cell.colSpan =
+        columnCount;
+
+    cell.textContent =
+        message;
+
+    row.append(
+        cell,
+    );
+
+    return row;
+}
+
+/* RENDERIZA A TABELA PRINCIPAL DE LHS */
+
+function renderPlanningLhPreview(lhs) {
+    const filledLhs =
+        lhs.filter(
+            hasPlanningLhInformation,
+        );
+
+    if (
+        filledLhs.length === 0
+    ) {
+        planningPreviewLhBody.replaceChildren(
+            createPlanningEmptyRow(
+                3,
+                "Nenhum LH informado.",
+            ),
+        );
+
+        return;
+    }
+
+    const rows =
+        filledLhs.map(
+            function (lh) {
+                return createPlanningPreviewRow([
+                    lh.code,
+                    lh.origin,
+                    lh.quantity,
+                ]);
+            },
+        );
+
+    planningPreviewLhBody.replaceChildren(
+        ...rows,
+    );
+}
+
+/* RENDERIZA OS LHS PARA SEGREGAR */
+
+function renderPlanningSegregatedPreview(
+    lhs,
+) {
+    const segregatedLhs =
+        lhs.filter(
+            function (lh) {
+                return (
+                    lh.segregate &&
+                    hasPlanningLhInformation(
+                        lh,
+                    )
+                );
+            },
+        );
+
+    if (
+        segregatedLhs.length === 0
+    ) {
+        planningPreviewSegregatedBody.replaceChildren(
+            createPlanningEmptyRow(
+                4,
+                "Nenhum LH para segregar.",
+            ),
+        );
+
+        return;
+    }
+
+    const rows =
+        segregatedLhs.map(
+            function (lh) {
+                return createPlanningPreviewRow([
+                    lh.code,
+                    lh.origin,
+                    lh.quantity,
+                    lh.segregateQuantity,
+                ]);
+            },
+        );
+
+    planningPreviewSegregatedBody.replaceChildren(
+        ...rows,
+    );
+}
+
+/* ATUALIZA A PRÉVIA DO PLANEJAMENTO */
+
+function renderPlanningPreview(state) {
+    const estimatedVolume =
+        state.lhs.reduce(
+            function (
+                total,
+                lh,
+            ) {
+                return (
+                    total +
+                    (
+                        Number.isFinite(
+                            lh.quantity,
+                        )
+                            ? lh.quantity
+                            : 0
+                    )
+                );
+            },
+            0,
+        );
+
+    planningEstimatedVolume.textContent =
+        planningNumberFormatter.format(
+            estimatedVolume,
+        );
+
+    renderPlanningLhPreview(
+        state.lhs,
+    );
+
+    renderPlanningSegregatedPreview(
+        state.lhs,
+    );
 }
 
 /* RENDERIZA A LISTA DE LHS */
@@ -234,7 +542,41 @@ function handlePlanningLhInput(event) {
     }
 
     if (
-        field === "quantity"
+        field === "segregate"
+    ) {
+        const segregateQuantityInput =
+            item.querySelector(
+                '[data-field="segregateQuantity"]',
+            );
+
+        updatePlanningLh(
+            lhId,
+            field,
+            input.checked,
+        );
+
+        if (
+            segregateQuantityInput
+        ) {
+            segregateQuantityInput.disabled =
+                !input.checked;
+
+            if (
+                !input.checked
+            ) {
+                segregateQuantityInput.value =
+                    "";
+            } else {
+                segregateQuantityInput.focus();
+            }
+        }
+
+        return;
+    }
+
+    if (
+        field === "quantity" ||
+        field === "segregateQuantity"
     ) {
         input.value =
             input.value
@@ -248,13 +590,64 @@ function handlePlanningLhInput(event) {
                 );
     }
 
+    if (
+        field === "segregateQuantity"
+    ) {
+        const totalQuantityInput =
+            item.querySelector(
+                '[data-field="quantity"]',
+            );
+
+        if (
+            input.value !== "" &&
+            totalQuantityInput?.value !== "" &&
+            Number(input.value) >
+                Number(
+                    totalQuantityInput.value,
+                )
+        ) {
+            input.value =
+                totalQuantityInput.value;
+        }
+    }
+
     updatePlanningLh(
         lhId,
         field,
         input.value,
     );
-}
 
+    if (
+        field === "quantity"
+    ) {
+        const segregateQuantityInput =
+            item.querySelector(
+                '[data-field="segregateQuantity"]',
+            );
+
+        if (
+            segregateQuantityInput?.value !== "" &&
+            (
+                input.value === "" ||
+                Number(
+                    segregateQuantityInput.value,
+                ) >
+                    Number(
+                        input.value,
+                    )
+            )
+        ) {
+            segregateQuantityInput.value =
+                input.value;
+
+            updatePlanningLh(
+                lhId,
+                "segregateQuantity",
+                segregateQuantityInput.value,
+            );
+        }
+    }
+}
 /* REMOVE UM LH */
 
 function handlePlanningLhClick(event) {
@@ -308,12 +701,30 @@ function initializePlanningLhList() {
             "planningAddLh",
         );
 
+    planningEstimatedVolume =
+        document.getElementById(
+            "planningEstimatedVolume",
+        );
+
+    planningPreviewLhBody =
+        document.getElementById(
+            "planningPreviewLhBody",
+        );
+
+    planningPreviewSegregatedBody =
+        document.getElementById(
+            "planningPreviewSegregatedBody",
+        );
+
     if (
         !planningLhList ||
-        !planningAddLhButton
+        !planningAddLhButton ||
+        !planningEstimatedVolume ||
+        !planningPreviewLhBody ||
+        !planningPreviewSegregatedBody
     ) {
         console.error(
-            "Elementos da lista de LHs não foram encontrados.",
+            "Elementos do Planejamento não foram encontrados.",
         );
 
         return;
@@ -332,6 +743,10 @@ function initializePlanningLhList() {
                     state.lhs,
                 );
             }
+
+            renderPlanningPreview(
+                state,
+            );
         },
     );
 
@@ -363,6 +778,10 @@ function initializePlanningLhList() {
 
     renderPlanningLhList(
         state.lhs,
+    );
+
+    renderPlanningPreview(
+        state,
     );
 }
 
