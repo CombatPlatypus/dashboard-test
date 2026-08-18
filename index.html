@@ -159,6 +159,32 @@
                     border-bottom: 4px solid #525252;
                 }
 
+            /* CONTROLE DO PLANEJAMENTO - SEGREGAÇÃO */
+
+                #planning .planning-lh-item-actions {
+                    align-items: center;
+                    flex-wrap: nowrap;
+                    column-gap: 10px;
+                }
+                #planning .planning-lh-segregate-toggle {
+                    display: flex;
+                    align-items: center;
+                    column-gap: 6px;
+                    margin: 0;
+                    font-size: 12px;
+                    color: #e4e6eb;
+                    cursor: pointer;
+                    user-select: none;
+                }
+                #planning .planning-lh-segregate-toggle input {
+                    margin: 0;
+                    cursor: pointer;
+                }
+                #planning .planning-lh-segregate-quantity:disabled {
+                    opacity: 0.5;
+                    cursor: not-allowed;
+                }
+
             /* CONTROLE DOS REPORTS - AJUSTES ESPECIFICOS DEPENDENDO DO RELATÓRIO EM QUESTÃO */
 
             #reports > .tabs-content > #planning > .flex-box-start > .report-controls {
@@ -268,32 +294,45 @@
                         text-align: center;
                     }
 
-                /* COLUNAS DAS TABELAS */
+                    /* COLUNAS DAS TABELAS */
 
-                    #planning .planning-main-table th:nth-child(2),
-                    #planning .planning-main-table td:nth-child(2) {
-                        width: 90px;
-                        text-align: center;
-                    }
-                    #planning .planning-segregated-table th:nth-child(2),
-                    #planning .planning-segregated-table td:nth-child(2),
-                    #planning .planning-segregated-table th:nth-child(4),
-                    #planning .planning-segregated-table td:nth-child(4) {
-                        width: 90px;
-                        text-align: center;
-                    }
-                    #planning .planning-pool-table th:nth-child(2),
-                    #planning .planning-pool-table td:nth-child(2),
-                    #planning .planning-pool-table th:nth-child(3),
-                    #planning .planning-pool-table td:nth-child(3) {
-                        width: 75px;
-                        text-align: center;
-                    }
-                    #planning .planning-routing-table th:nth-child(3),
-                    #planning .planning-routing-table td:nth-child(3) {
-                        width: 75px;
-                        text-align: center;
-                    }
+                        #planning .planning-main-table th:nth-child(3),
+                        #planning .planning-main-table td:nth-child(3) {
+                            width: 90px;
+                            text-align: center;
+                        }
+                        #planning .planning-segregated-table th:nth-child(3),
+                        #planning .planning-segregated-table td:nth-child(3),
+                        #planning .planning-segregated-table th:nth-child(4),
+                        #planning .planning-segregated-table td:nth-child(4) {
+                            width: 90px;
+                            text-align: center;
+                        }
+                        #planning .planning-pool-table td:nth-child(2) {
+                            width: 75px;
+                            text-align: center;
+                        }
+                        #planning .planning-routing-table th:nth-child(3),
+                        #planning .planning-routing-table td:nth-child(3) {
+                            width: 75px;
+                            text-align: center;
+                        }
+                        #planning .planning-cp-summary-table td:nth-child(2),
+                        #planning .planning-pool-lh-table th:nth-child(2),
+                        #planning .planning-pool-lh-table td:nth-child(2) {
+                            width: 85px;
+                            text-align: center;
+                        }
+
+                    /* TABELAS DO RESUMO DO CP */
+
+                        #planning .planning-cp-tables {
+                            display: grid;
+                            grid-template-columns: repeat(2, minmax(0, 1fr));
+                            gap: 10px;
+                            align-items: start;
+                        }
+
 
                     /* INDICADORES */
 
@@ -333,8 +372,10 @@
                         #planning .planning-sheet-metrics {
                             grid-template-columns: minmax(0, 1fr);
                         }
+                        #planning .planning-cp-tables {
+                            grid-template-columns: minmax(0, 1fr);
+                        }
                     }
-
 
         </style>
     </head>	
@@ -520,7 +561,7 @@
 
                                                 <div class="planning-sheet-metrics">
                                                     <div>
-                                                        <h4>Volume estimado ciclo</h4>
+                                                        <h4>Volume Estimado</h4>
                                                         <strong id="planningEstimatedVolume">0</strong>
                                                     </div>
 
@@ -541,7 +582,7 @@
                                                     <table class="planning-sheet-table planning-main-table">
                                                         <thead>
                                                             <tr>
-                                                                <th>LH a Roteirizar</th>
+                                                                <th>LHs a Roteirizar</th>
                                                                 <th>Origem</th>
                                                                 <th>QTD</th>
                                                             </tr>
@@ -561,7 +602,7 @@
                                                     <table class="planning-sheet-table planning-segregated-table">
                                                         <thead>
                                                             <tr>
-                                                                <th>LH a Segregar</th>
+                                                                <th>LHs a Segregar</th>
                                                                 <th>Origem</th>
                                                                 <th>QTD</th>
                                                                 <th>Segregar</th>
@@ -608,39 +649,106 @@
                                                         <thead>
                                                             <tr>
                                                                 <th colspan="2">Collection Pool</th>
-                                                                <th>QTD</th>
                                                             </tr>
                                                         </thead>
 
                                                         <tbody>
                                                             <tr>
                                                                 <td>Volumosos</td>
-                                                                <td>—</td>
-                                                                <td>0</td>
+                                                                <td>SIM</td>
                                                             </tr>
 
                                                             <tr>
                                                                 <td>Roteirizar Office?</td>
-                                                                <td>—</td>
-                                                                <td>0</td>
+                                                                <td>SIM</td>
                                                             </tr>
 
                                                             <tr>
                                                                 <td>Roteirizar Backlog?</td>
-                                                                <td>—</td>
-                                                                <td>0</td>
+                                                                <td>SIM</td>
                                                             </tr>
 
                                                             <tr>
                                                                 <td>Roteirizar Home?</td>
-                                                                <td>—</td>
-                                                                <td>0</td>
+                                                                <td>SIM</td>
                                                             </tr>
 
                                                             <tr>
                                                                 <td>Fora de Rota</td>
-                                                                <td>—</td>
-                                                                <td>0</td>
+                                                                <td>SIM</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+
+                                                <!-- INFORMAÇÕES DO CP -->
+
+                                                <div class="planning-cp-tables">
+
+                                                    <!-- RESUMO DO CP -->
+
+                                                    <table class="planning-sheet-table planning-cp-summary-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th colspan="2">Resumo do CP</th>
+                                                            </tr>
+                                                        </thead>
+
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>Total</td>
+                                                                <td id="planningPreviewCpTotal">0</td>
+                                                            </tr>
+
+                                                            <tr>
+                                                                <td>Backlog</td>
+                                                                <td id="planningPreviewCpBacklog">0</td>
+                                                            </tr>
+
+                                                            <tr>
+                                                                <td>LH Pool</td>
+                                                                <td id="planningPreviewCpLhPool">0</td>
+                                                            </tr>
+
+                                                            <tr>
+                                                                <td>Volumosos</td>
+                                                                <td id="planningPreviewCpBulky">0</td>
+                                                            </tr>
+
+                                                            <tr>
+                                                                <td>Erros</td>
+                                                                <td id="planningPreviewCpErrors">0</td>
+                                                            </tr>
+
+                                                            <tr>
+                                                                <td>Pacotes adicionados</td>
+                                                                <td id="planningPreviewCpAdded">0</td>
+                                                            </tr>
+
+                                                            <tr>
+                                                                <td>Pacotes retirados</td>
+                                                                <td id="planningPreviewCpRemoved">0</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+
+                                                    <!-- LHS NA POOL -->
+
+                                                    <table class="planning-sheet-table planning-pool-lh-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th colspan="2">LHs na Pool</th>
+                                                            </tr>
+
+                                                            <tr>
+                                                                <th>LH</th>
+                                                                <th>QTD</th>
+                                                            </tr>
+                                                        </thead>
+
+                                                        <tbody id="planningPreviewPoolLhBody">
+                                                            <tr class="planning-empty-row">
+                                                                <td colspan="2">Nenhum LH na Pool.</td>
                                                             </tr>
                                                         </tbody>
                                                     </table>
