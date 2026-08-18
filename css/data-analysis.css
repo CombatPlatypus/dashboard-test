@@ -263,6 +263,15 @@
             cursor: not-allowed;
             opacity: 0.5;
         }
+        #statisticsClearFilters {
+            padding: 0 !important;
+            border: none !important;
+            background: none !important;
+            min-height: auto !important;
+        }
+        #statisticsClearFilters img {
+            width: 30px !important;
+        }
         #statisticsVisibleColumns {
             border-top: 1px solid #525252;
             max-height: 260px;
@@ -1136,7 +1145,7 @@
             }
             .comparison-choice {
                 flex: 0 0 500px;
-                height: 763px;
+                height: 775px;
                 min-width: 0;
                 padding-top: 30px;
                 padding-right: 30px;
