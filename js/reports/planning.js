@@ -1,4 +1,6 @@
 import {
+    MINIMUM_PLANNING_LHS,
+    ensureMinimumPlanningLhs,
     addPlanningLh,
     getPlanningState,
     removePlanningLh,
@@ -22,6 +24,8 @@ let planningPreviewDailyCapacity = null;
 
 let planningPoolPreviewCells =
     new Map();
+
+let planningSegregatedSection = null;    
 
 const planningCollectionPoolFields = [
     "bulky",
@@ -407,51 +411,46 @@ function renderPlanningLhPreview(lhs) {
 
 /* RENDERIZA OS LHS PARA SEGREGAR */
 
-function renderPlanningSegregatedPreview(
-    lhs,
-) {
-    const segregatedLhs =
-        lhs.filter(
-            function (lh) {
-                return (
-                    lh.segregate &&
-                    hasPlanningLhInformation(
-                        lh,
-                    )
-                );
-            },
-        );
+function renderPlanningSegregatedPreview(lhs) {
+    const segregatedLhs = lhs.filter(function(lh) {
+        return lh.segregate;
+    });
 
-    if (
-        segregatedLhs.length === 0
-    ) {
-        planningPreviewSegregatedBody.replaceChildren(
-            createPlanningEmptyRow(
-                4,
-                "Nenhum LH para segregar.",
-            ),
-        );
+    const hasSegregatedLhs = segregatedLhs.length > 0;
 
+    planningSegregatedSection.hidden = !hasSegregatedLhs;
+
+    if (!hasSegregatedLhs) {
+        planningPreviewSegregatedBody.replaceChildren();
         return;
     }
 
-    const rows =
-        segregatedLhs.map(
-            function (lh) {
-                return createPlanningPreviewRow([
-                    lh.code,
-                    lh.origin,
-                    lh.quantity,
-                    lh.segregateQuantity,
-                ]);
-            },
+    const rows = segregatedLhs.map(function(lh) {
+        const row = document.createElement("tr");
+
+        const codeCell = document.createElement("td");
+        const originCell = document.createElement("td");
+        const quantityCell = document.createElement("td");
+        const segregateQuantityCell = document.createElement("td");
+
+        codeCell.textContent = lh.code || "—";
+        originCell.textContent = lh.origin || "—";
+        quantityCell.textContent = lh.quantity || "0";
+        segregateQuantityCell.textContent =
+            lh.segregateQuantity || "0";
+
+        row.append(
+            codeCell,
+            originCell,
+            quantityCell,
+            segregateQuantityCell
         );
 
-    planningPreviewSegregatedBody.replaceChildren(
-        ...rows,
-    );
-}
+        return row;
+    });
 
+    planningPreviewSegregatedBody.replaceChildren(...rows);
+}
 /* ATUALIZA A PRÉVIA DO PLANEJAMENTO */
 
 function renderPlanningPreview(state) {
@@ -527,6 +526,19 @@ function renderPlanningLhList(lhs) {
     planningLhList.replaceChildren(
         ...lhElements,
     );
+
+    const removeDisabled =
+    lhs.length <= MINIMUM_PLANNING_LHS;
+
+    planningLhList
+        .querySelectorAll('[data-action="remove-lh"]')
+        .forEach(function(button) {
+            button.disabled = removeDisabled;
+
+            button.title = removeDisabled
+                ? "O planejamento deve possuir pelo menos três LHs."
+                : "Remover LH";
+        });
 }
 
 /* ATUALIZA UM CAMPO GERAL */
@@ -886,12 +898,18 @@ function initializePlanningLhList() {
             "planningPreviewSegregatedBody",
         );
 
+    planningSegregatedSection =
+        document.getElementById(
+            "planningSegregatedSection",
+        );
+
     if (
         !planningLhList ||
         !planningAddLhButton ||
         !planningEstimatedVolume ||
         !planningPreviewLhBody ||
         !planningPreviewSegregatedBody ||
+        !planningSegregatedSection ||
         !planningGeneralControls ||
         !planningPoolControls ||
         !planningPreviewAverageSpr ||
@@ -906,6 +924,8 @@ function initializePlanningLhList() {
         return;
     }
 
+    ensureMinimumPlanningLhs();
+
     subscribePlanningState(
         function (
             state,
@@ -914,7 +934,9 @@ function initializePlanningLhList() {
             if (
                 change.type === "lh-added" ||
                 change.type === "lh-removed" ||
-                change.type === "lhs-replaced"
+                change.type === "lhs-replaced" ||
+                change.type === "lhs-minimum-restored"
+
             ) {
                 renderPlanningLhList(
                     state.lhs,
@@ -958,14 +980,6 @@ function initializePlanningLhList() {
     synchronizePlanningControls(
         state,
     );
-
-    if (
-        state.lhs.length === 0
-    ) {
-        addPlanningLh();
-
-        return;
-    }
 
     renderPlanningLhList(
         state.lhs,
