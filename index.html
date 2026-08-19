@@ -301,11 +301,30 @@
                         display: grid;
                         grid-template-columns: minmax(0, 3fr) minmax(300px, 2fr);
                         gap: 20px;
-                        align-items: start;
+                        align-items: stretch;
                     }
                     #planning .planning-sheet-main,
                     #planning .planning-sheet-sidebar {
                         min-width: 0;
+                    }
+
+                    /* PRÉVIA DO PLANEJAMENTO - DISTRIBUIÇÃO VERTICAL */
+
+                    #planning .planning-sheet-main {
+                        display: flex;
+                        flex-direction: column;
+                        height: 100%;
+                    }
+                    #planning .planning-main-table-section {
+                        display: flex;
+                        flex: 1 1 auto;
+                        min-height: 250px;
+                    }
+                    #planning .planning-main-table {
+                        height: 100%;
+                    }
+                    #planning #planningSegregatedSection[hidden] {
+                        display: none;
                     }
                     #planning .planning-sheet-section {
                         width: 100%;
@@ -463,7 +482,7 @@
                     <li class="tabs-title is-active">
                         <a href="#reports">
                             <div class="flex-box-center">
-                                <img src="images/geral-icons/statistics-icon.svg">
+                                <img src="images/geral-icons/reports-icon.svg">
                                 <h4>Relatórios</h4>
                             </div>
                         </a>
@@ -532,7 +551,7 @@
                                 <div class="flex-box-full-center">
                                     <img src="images/geral-icons/planning.svg">
                                     <h4>Planejamento</h4>
-                                    <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum</p>
+                                    <p>Crie um relatório do planejamento de LHs e Resumo do CP para a próxima janela.</p>
                                 </div>
                             </a>
                         </li> 
@@ -542,7 +561,7 @@
                                 <div class="flex-box-full-center">
                                     <img src="images/geral-icons/barcode-scanner-icon.svg">
                                     <h4>Recebimento</h4>
-                                    <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum</p>
+                                    <p>Crie um relatório com as informações obtidas das mesas recebimento da sua janela.</p>
                                 </div>
                             </a>
                         </li> 
@@ -552,7 +571,7 @@
                                 <div class="flex-box-full-center">
                                     <img src="images/geral-icons/percentage-icon.svg">
                                     <h4>Taxa de Perdas</h4>
-                                    <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum</p>
+                                    <p>Crie um relatório de acompanhamento sobre a situação de avarias e perdas do hub.</p>
                                 </div>
                             </a>
                         </li> 
@@ -562,7 +581,7 @@
                                 <div class="flex-box-full-center">
                                     <img src="images/geral-icons/fire-icon.svg">
                                     <h4>Mapa de Calor</h4>
-                                    <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum</p>
+                                    <p>Crie um relatório que abrange todos os aspectos do inventário nas últimas semanas.</p>
                                 </div>
                             </a>
                         </li> 
@@ -733,7 +752,7 @@
 
                                                 <!-- LISTA DE LHS -->
 
-                                                <div class="planning-sheet-section">
+                                                <div class="planning-sheet-section planning-main-table-section">
                                                     <table class="planning-sheet-table planning-main-table">
                                                         <thead>
                                                             <tr>
@@ -753,7 +772,7 @@
 
                                                 <!-- LHS PARA SEGREGAR -->
 
-                                                <div class="planning-sheet-section">
+                                                <div id="planningSegregatedSection" class="planning-sheet-section" hidden>
                                                     <table class="planning-sheet-table planning-segregated-table">
                                                         <thead>
                                                             <tr>
