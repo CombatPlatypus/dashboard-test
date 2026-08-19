@@ -46,6 +46,7 @@ const planningCollectionPoolFields =
     ]);
 
 let nextPlanningLhId = 1;
+const MINIMUM_PLANNING_LHS = 3;
 
 /* NORMALIZA UM TEXTO */
 
@@ -91,8 +92,7 @@ function normalizeQuantity(value) {
 
 function createPlanningLhRecord(
     values = {},
-    source = "manual",
-) {
+    source = "manual",) {
     const segregate =
         Boolean(
             values.segregate,
@@ -135,6 +135,17 @@ function createPlanningLhRecord(
                 values.edited,
             ),
     };
+}
+
+function fillMinimumPlanningLhs() {
+    let added = false;
+
+    while (planningState.lhs.length < MINIMUM_PLANNING_LHS) {
+        planningState.lhs.push(createPlanningLhRecord());
+        added = true;
+    }
+
+    return added;
 }
 
 /* CRIA UMA CÓPIA DO ESTADO */
@@ -196,8 +207,7 @@ function subscribePlanningState(listener) {
 
 function addPlanningLh(
     values = {},
-    source = "manual",
-) {
+    source = "manual",) {
     const lh =
         createPlanningLhRecord(
             values,
@@ -216,6 +226,18 @@ function addPlanningLh(
     return {
         ...lh,
     };
+}
+
+function ensureMinimumPlanningLhs() {
+    const changed = fillMinimumPlanningLhs();
+
+    if (changed) {
+        notifyPlanningState({
+            type: "lhs-minimum-restored"
+        });
+    }
+
+    return changed;
 }
 
 /* ATUALIZA UM LH */
@@ -373,27 +395,23 @@ function updatePlanningCollectionPoolField(
 /* REMOVE UM LH */
 
 function removePlanningLh(id) {
-    const lhIndex =
-        planningState.lhs.findIndex(
-            function (lh) {
-                return lh.id === id;
-            },
-        );
-
-    if (
-        lhIndex === -1
-    ) {
+    if (planningState.lhs.length <= MINIMUM_PLANNING_LHS) {
         return false;
     }
 
-    planningState.lhs.splice(
-        lhIndex,
-        1,
-    );
+    const index = planningState.lhs.findIndex(function(lh) {
+        return lh.id === id;
+    });
+
+    if (index === -1) {
+        return false;
+    }
+
+    planningState.lhs.splice(index, 1);
 
     notifyPlanningState({
         type: "lh-removed",
-        id,
+        id: id
     });
 
     return true;
@@ -420,12 +438,16 @@ function replacePlanningLhs(
             },
         );
 
+    fillMinimumPlanningLhs();
+
     notifyPlanningState({
         type: "lhs-replaced",
     });
 }
 
 export {
+    MINIMUM_PLANNING_LHS,
+    ensureMinimumPlanningLhs,
     addPlanningLh,
     getPlanningState,
     removePlanningLh,
