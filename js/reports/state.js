@@ -5,6 +5,8 @@ const planningState = {
 
     dailyCapacity: null,
 
+    includeCpClosing: false,
+
     collectionPool: {
         bulky: true,
         office: true,
@@ -231,6 +233,9 @@ function getPlanningState() {
 
         dailyCapacity:
             planningState.dailyCapacity,
+
+        includeCpClosing:
+            planningState.includeCpClosing,
 
         collectionPool: {
             ...planningState.collectionPool,
@@ -621,6 +626,29 @@ function updatePlanningGeneralField(
     return true;
 }
 
+/* ATUALIZA A EXIBIÇÃO DO FECHAMENTO DO CP */
+
+function updatePlanningCpClosingVisibility(value) {
+    const normalizedValue =
+        Boolean(value);
+
+    if (
+        planningState.includeCpClosing ===
+        normalizedValue
+    ) {
+        return true;
+    }
+
+    planningState.includeCpClosing =
+        normalizedValue;
+
+    notifyPlanningState({
+        type: "cp-closing-visibility-updated",
+    });
+
+    return true;
+}
+
 /* ATUALIZA A COLLECTION POOL */
 
 function updatePlanningCollectionPoolField(
@@ -724,4 +752,5 @@ export {
     updatePlanningGeneralField,
     updatePlanningLh,
     updatePlanningTo,
+    updatePlanningCpClosingVisibility,
 };
