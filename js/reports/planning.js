@@ -1,5 +1,6 @@
 import {
     MINIMUM_PLANNING_LHS,
+    MINIMUM_PLANNING_TOS_PER_LH,
     ensureMinimumPlanningLhs,
     addPlanningLh,
     addPlanningTo,
@@ -27,6 +28,8 @@ let planningPreviewAverageSpr = null;
 let planningPreviewDailyCapacity = null;
 let planningToGroups = null;
 let planningToEmpty = null;
+let planningSegregatedTosTab = null;
+let planningLhTabLink = null;
 
 let planningPoolPreviewCells =
     new Map();
@@ -304,6 +307,7 @@ function createPlanningLhElement(
 function createPlanningToElement(
     to,
     position,
+    canRemove,
 ) {
     const item =
         document.createElement(
@@ -353,6 +357,14 @@ function createPlanningToElement(
         "aria-label",
         `Remover TO ${position}`,
     );
+
+    removeButton.disabled =
+        !canRemove;
+
+    removeButton.title =
+        canRemove
+            ? "Remover TO"
+            : "É necessário manter pelo menos uma TO para este LH.";
 
     header.append(
         title,
@@ -477,12 +489,17 @@ function createPlanningToGroup(
     list.className =
         "planning-to-list flex-box-column";
 
+    const canRemoveTos =
+        lh.tos.length >
+            MINIMUM_PLANNING_TOS_PER_LH;
+
     const toElements =
         lh.tos.map(
             function (to, index) {
                 return createPlanningToElement(
                     to,
                     index + 1,
+                    canRemoveTos,
                 );
             },
         );
@@ -514,6 +531,18 @@ function renderPlanningToGroups(lhs) {
 
     const hasLhsWithTos =
         lhsWithTos.length > 0;
+
+    if (
+        !hasLhsWithTos &&
+        planningSegregatedTosTab.classList.contains(
+            "is-active",
+        )
+    ) {
+        planningLhTabLink.click();
+    }
+
+    planningSegregatedTosTab.hidden =
+        !hasLhsWithTos;
 
     planningToEmpty.hidden =
         hasLhsWithTos;
@@ -583,6 +612,21 @@ function getPlanningLhSegregatedQuantity(lh) {
         return lh.quantity;
     }
 
+    const hasDefinedToQuantity =
+        lh.tos.some(
+            function (to) {
+                return Number.isFinite(
+                    to.quantity,
+                );
+            },
+        );
+
+    if (
+        !hasDefinedToQuantity
+    ) {
+        return "?";
+    }
+
     return lh.tos.reduce(
         function (
             total,
@@ -602,7 +646,6 @@ function getPlanningLhSegregatedQuantity(lh) {
         0,
     );
 }
-
 /* FORMATA UM VALOR DA PRÉVIA */
 
 function formatPlanningPreviewValue(
@@ -1404,6 +1447,16 @@ function initializePlanningLhList() {
             "planningToEmpty",
         );    
 
+    planningSegregatedTosTab =
+        document.getElementById(
+            "planningSegregatedTosTab",
+        );
+
+    planningLhTabLink =
+        document.querySelector(
+            '#planning-choice a[href="#lhs-list"]',
+        );
+
     planningSegregatedSection =
         document.getElementById(
             "planningSegregatedSection",
@@ -1425,6 +1478,8 @@ function initializePlanningLhList() {
         !planningSegregatedTosSection ||
         !planningToGroups ||
         !planningToEmpty ||
+        !planningSegregatedTosTab ||
+        !planningLhTabLink ||
         !planningGeneralControls ||
         !planningPoolControls ||
         !planningPreviewAverageSpr ||
