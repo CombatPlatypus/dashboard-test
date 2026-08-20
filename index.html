@@ -316,6 +316,8 @@
                     color: #e4e6eb;
                     cursor: pointer;
                     user-select: none;
+                    border-top: 2px solid #525252;
+                    padding-top: 15px;
                 }
                 #planning .planning-general-option input {
                     margin: 0;
@@ -790,12 +792,6 @@
                                             <div class="input-group planning-pool-controls" id="planningPoolControls">
                                                 <h4>Collection Pool</h4>
 
-                                                <label class="planning-general-option">
-                                                    <input type="checkbox" id="planningIncludeCpClosing" aria-controls="planningCpClosingTables">
-
-                                                    <span>Incluir fechamento do CP</span>
-                                                </label>
-
                                                 <div class="planning-pool-control-list">
                                                     <label class="planning-pool-control">
                                                         <input
@@ -847,6 +843,12 @@
                                                         <span>Fora de Rota</span>
                                                     </label>
                                                 </div>
+
+                                                <label class="planning-general-option">
+                                                    <input type="checkbox" id="planningIncludeCpClosing" aria-controls="planningCpClosingTables">
+
+                                                    <span>Incluir Resumo do CP</span>
+                                                </label>
                                             </div>
                                         </div>
 
