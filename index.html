@@ -183,31 +183,110 @@
                     border-bottom: 4px solid #525252;
                 }
 
-            /* CONTROLE DO PLANEJAMENTO - SEGREGAÇÃO */
+                /* CONTROLE DO PLANEJAMENTO - SEGREGAÇÃO */
 
-                #planning .planning-lh-item-actions {
-                    align-items: center;
-                    flex-wrap: nowrap;
-                    column-gap: 10px;
-                }
-                #planning .planning-lh-segregate-toggle {
-                    display: flex;
-                    align-items: center;
-                    column-gap: 6px;
-                    margin: 0;
-                    font-size: 12px;
-                    color: #e4e6eb;
-                    cursor: pointer;
-                    user-select: none;
-                }
-                #planning .planning-lh-segregate-toggle input {
-                    margin: 0;
-                    cursor: pointer;
-                }
-                #planning .planning-lh-segregate-quantity:disabled {
-                    opacity: 0.5;
-                    cursor: not-allowed;
-                }
+                    #planning .planning-lh-item-actions {
+                        align-items: center;
+                        flex-wrap: nowrap;
+                        column-gap: 10px;
+                    }
+                    #planning .planning-lh-segregate-toggle,
+                    #planning .planning-lh-segregate-to-toggle {
+                        display: flex;
+                        align-items: center;
+                        column-gap: 6px;
+                        margin: 0;
+                        font-size: 12px;
+                        color: #e4e6eb;
+                        cursor: pointer;
+                        user-select: none;
+                    }
+                    #planning .planning-lh-segregate-toggle input,
+                    #planning .planning-lh-segregate-to-toggle input {
+                        margin: 0;
+                        cursor: pointer;
+                    }
+                    #planning .planning-lh-segregate-to-toggle {
+                        min-height: 40px;
+                        padding: 8px 12px;
+                        margin-top: 15px;
+                        border: 1px solid #525252;
+                        border-radius: 5px;
+                    }
+                    #planning .planning-lh-segregate-to-toggle:has(input:disabled) {
+                        opacity: 0.5;
+                        cursor: not-allowed;
+                    }
+                    #planning .planning-lh-segregate-to-toggle input:disabled {
+                        cursor: not-allowed;
+                    }
+
+                /* CONTROLE DO PLANEJAMENTO - LISTA DINÂMICA DE TOS */
+
+                    #planning .planning-to-empty {
+                        padding: 20px;
+                        color: #8b8d91;
+                        text-align: center;
+                        border: 1px solid #525252;
+                        border-radius: 5px;
+                    }
+                    #planning .planning-to-empty p {
+                        margin-bottom: 0;
+                    }
+                    #planning .planning-to-groups {
+                        row-gap: 20px;
+                        max-height: 664px;
+                        padding-right: 15px;
+                        overflow: auto;
+                    }
+                    #planning .planning-to-groups[hidden],
+                    #planning .planning-to-empty[hidden] {
+                        display: none;
+                    }
+                    #planning .planning-to-group {
+                        padding-bottom: 20px;
+                        border-bottom: 2px solid #525252;
+                    }
+                    #planning .planning-to-group:last-child {
+                        padding-bottom: 0;
+                        border-bottom: none;
+                    }
+                    #planning .planning-to-group-header,
+                    #planning .planning-to-item-header {
+                        align-items: center;
+                        flex-wrap: nowrap;
+                        margin-bottom: 15px;
+                    }
+                    #planning .planning-to-group-header .button,
+                    #planning .planning-to-remove {
+                        min-height: 38px;
+                        padding: 8px 12px;
+                        font-size: 12px;
+                    }
+                    #planning .planning-to-list {
+                        row-gap: 15px;
+                    }
+                    #planning .planning-to-item {
+                        padding: 12px;
+                        border: 1px solid #525252;
+                        border-radius: 5px;
+                    }
+                    #planning .planning-to-item .flex-box-start {
+                        column-gap: 10px;
+                    }
+                    #planning .planning-to-item .flex-box-start input:first-child {
+                        flex: 1 1 0;
+                    }
+                    #planning .planning-to-item .flex-box-start input:last-child {
+                        flex: 0 0 86px;
+                        text-align: center;
+                    }
+                    #planning .planning-to-remove {
+                        color: #e4e6eb;
+                        background-color: #141414;
+                        border: 1px solid #525252;
+                        border-bottom: 4px solid #525252;
+                    }
 
             /* CONTROLE DO PLANEJAMENTO - DADOS GERAIS */
 
@@ -324,7 +403,8 @@
                     #planning .planning-main-table {
                         height: 100%;
                     }
-                    #planning #planningSegregatedSection[hidden] {
+                    #planning #planningSegregatedSection[hidden],
+                    #planning #planningSegregatedTosSection[hidden] {
                         display: none;
                     }
                     #planning .planning-sheet-section {
@@ -388,8 +468,8 @@
                             width: 75px;
                             text-align: center;
                         }
-                        #planning .planning-routing-table th:nth-child(3),
-                        #planning .planning-routing-table td:nth-child(3) {
+                        #planning .planning-segregated-tos-table th:nth-child(3),
+                        #planning .planning-segregated-tos-table td:nth-child(3) {
                             width: 75px;
                             text-align: center;
                         }
@@ -609,6 +689,12 @@
                                         </li> 
 
                                         <li class="tabs-title">
+                                            <a href="#segregated-tos">
+                                                <h4>TOs a Segregar</h4>
+                                            </a>
+                                        </li>
+
+                                        <li class="tabs-title">
                                             <a href="#collection-pool">
                                                 <h4>Collection Pool</h4>
                                             </a>
@@ -633,6 +719,17 @@
                                             </div>
 
                                             <div class="planning-lh-list flex-box-column" id="planningLhList"></div>
+                                        </div>
+
+                                        <div class="tabs-panel" id="segregated-tos">
+
+                                            <!-- LISTAS DE TOS SEPARADAS POR LH -->
+
+                                            <div class="planning-to-empty" id="planningToEmpty">
+                                                <p>Marque “Segregar” e “Segregar TO” em um LH para adicionar suas TOs.</p>
+                                            </div>
+
+                                            <div class="planning-to-groups flex-box-column" id="planningToGroups" hidden></div>
                                         </div>
 
                                         <div class="tabs-panel" id="collection-pool">
@@ -792,21 +889,21 @@
                                                     </table>
                                                 </div>
 
-                                                <!-- TOS PARA ROTEIRIZAR -->
+                                                <!-- TOS PARA SEGREGAR -->
 
-                                                <div class="planning-sheet-section">
-                                                    <table class="planning-sheet-table planning-routing-table">
+                                                <div id="planningSegregatedTosSection" class="planning-sheet-section" hidden>
+                                                    <table class="planning-sheet-table planning-segregated-tos-table">
                                                         <thead>
                                                             <tr>
-                                                                <th>TOs para Roteirizar</th>
+                                                                <th>TOs para Segregar</th>
                                                                 <th>LH</th>
                                                                 <th>QTD</th>
                                                             </tr>
                                                         </thead>
 
-                                                        <tbody id="planningPreviewRoutingBody">
+                                                        <tbody id="planningPreviewSegregatedTosBody">
                                                             <tr class="planning-empty-row">
-                                                                <td colspan="3">Nenhuma TO para roteirizar.</td>
+                                                                <td colspan="3">Nenhuma TO para segregar.</td>
                                                             </tr>
                                                         </tbody>
                                                     </table>
