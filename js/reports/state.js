@@ -16,7 +16,7 @@ const planningState = {
     lhs: [],
 };
 
-/* CONTROLE INTERNO DOS LHS */
+/* CONTROLE INTERNO DOS LHS E DAS TOS */
 
 const planningStateListeners =
     new Set();
@@ -27,7 +27,13 @@ const planningLhFields =
         "quantity",
         "origin",
         "segregate",
-        "segregateQuantity",
+        "segregateTos",
+    ]);
+
+const planningToFields =
+    new Set([
+        "code",
+        "quantity",
     ]);
 
 const planningGeneralFields =
@@ -46,6 +52,8 @@ const planningCollectionPoolFields =
     ]);
 
 let nextPlanningLhId = 1;
+let nextPlanningToId = 1;
+
 const MINIMUM_PLANNING_LHS = 3;
 
 /* NORMALIZA UM TEXTO */
@@ -88,15 +96,82 @@ function normalizeQuantity(value) {
     );
 }
 
+/* CRIA O REGISTRO DE UMA TO */
+
+function createPlanningToRecord(
+    values = {},
+    source = "manual",
+) {
+    return {
+        id: nextPlanningToId++,
+
+        code:
+            normalizeTextValue(
+                values.code,
+            ),
+
+        quantity:
+            normalizeQuantity(
+                values.quantity,
+            ),
+
+        source:
+            normalizeTextValue(
+                values.source || source,
+            ),
+
+        edited:
+            Boolean(
+                values.edited,
+            ),
+    };
+}
+
 /* CRIA O REGISTRO DE UM LH */
 
 function createPlanningLhRecord(
     values = {},
-    source = "manual",) {
+    source = "manual",
+) {
     const segregate =
         Boolean(
             values.segregate,
         );
+
+    const segregateTos =
+        segregate &&
+        Boolean(
+            values.segregateTos,
+        );
+
+    const receivedTos =
+        Array.isArray(
+            values.tos,
+        )
+            ? values.tos
+            : [];
+
+    const tos =
+        receivedTos.map(
+            function (to) {
+                return createPlanningToRecord(
+                    to,
+                    source,
+                );
+            },
+        );
+
+    if (
+        segregateTos &&
+        tos.length === 0
+    ) {
+        tos.push(
+            createPlanningToRecord(
+                {},
+                source,
+            ),
+        );
+    }
 
     return {
         id: nextPlanningLhId++,
@@ -118,12 +193,9 @@ function createPlanningLhRecord(
 
         segregate,
 
-        segregateQuantity:
-            segregate
-                ? normalizeQuantity(
-                    values.segregateQuantity,
-                )
-                : null,
+        segregateTos,
+
+        tos,
 
         source:
             normalizeTextValue(
@@ -167,6 +239,15 @@ function getPlanningState() {
                 function (lh) {
                     return {
                         ...lh,
+
+                        tos:
+                            lh.tos.map(
+                                function (to) {
+                                    return {
+                                        ...to,
+                                    };
+                                },
+                            ),
                     };
                 },
             ),
@@ -269,13 +350,20 @@ function updatePlanningLh(
     let normalizedValue;
 
     if (
-        field === "segregate"
+        field === "segregate" ||
+        field === "segregateTos"
     ) {
         normalizedValue =
             Boolean(value);
+
+        if (
+            field === "segregateTos" &&
+            !lh.segregate
+        ) {
+            normalizedValue = false;
+        }
     } else if (
-        field === "quantity" ||
-        field === "segregateQuantity"
+        field === "quantity"
     ) {
         normalizedValue =
             normalizeQuantity(
@@ -301,8 +389,17 @@ function updatePlanningLh(
         field === "segregate" &&
         !normalizedValue
     ) {
-        lh.segregateQuantity =
-            null;
+        lh.segregateTos = false;
+    }
+
+    if (
+        field === "segregateTos" &&
+        normalizedValue &&
+        lh.tos.length === 0
+    ) {
+        lh.tos.push(
+            createPlanningToRecord(),
+        );
     }
 
     if (
@@ -315,6 +412,159 @@ function updatePlanningLh(
         type: "lh-updated",
         id,
         field,
+    });
+
+    return true;
+}
+
+/* ADICIONA UMA TO A UM LH */
+
+function addPlanningTo(
+    lhId,
+    values = {},
+    source = "manual",
+) {
+    const lh =
+        planningState.lhs.find(
+            function (currentLh) {
+                return currentLh.id === lhId;
+            },
+        );
+
+    if (
+        !lh ||
+        !lh.segregate ||
+        !lh.segregateTos
+    ) {
+        return null;
+    }
+
+    const to =
+        createPlanningToRecord(
+            values,
+            source,
+        );
+
+    lh.tos.push(
+        to,
+    );
+
+    notifyPlanningState({
+        type: "to-added",
+        lhId,
+        toId: to.id,
+    });
+
+    return {
+        ...to,
+    };
+}
+
+/* ATUALIZA UMA TO */
+
+function updatePlanningTo(
+    lhId,
+    toId,
+    field,
+    value,
+) {
+    if (
+        !planningToFields.has(
+            field,
+        )
+    ) {
+        return false;
+    }
+
+    const lh =
+        planningState.lhs.find(
+            function (currentLh) {
+                return currentLh.id === lhId;
+            },
+        );
+
+    const to =
+        lh?.tos.find(
+            function (currentTo) {
+                return currentTo.id === toId;
+            },
+        );
+
+    if (!to) {
+        return false;
+    }
+
+    const normalizedValue =
+        field === "quantity"
+            ? normalizeQuantity(
+                value,
+            )
+            : normalizeTextValue(
+                value,
+            );
+
+    if (
+        to[field] === normalizedValue
+    ) {
+        return true;
+    }
+
+    to[field] =
+        normalizedValue;
+
+    if (
+        to.source !== "manual"
+    ) {
+        to.edited = true;
+    }
+
+    notifyPlanningState({
+        type: "to-updated",
+        lhId,
+        toId,
+        field,
+    });
+
+    return true;
+}
+
+/* REMOVE UMA TO */
+
+function removePlanningTo(
+    lhId,
+    toId,
+) {
+    const lh =
+        planningState.lhs.find(
+            function (currentLh) {
+                return currentLh.id === lhId;
+            },
+        );
+
+    if (!lh) {
+        return false;
+    }
+
+    const index =
+        lh.tos.findIndex(
+            function (to) {
+                return to.id === toId;
+            },
+        );
+
+    if (index === -1) {
+        return false;
+    }
+
+    lh.tos.splice(
+        index,
+        1,
+    );
+
+    notifyPlanningState({
+        type: "to-removed",
+        lhId,
+        toId,
     });
 
     return true;
@@ -449,11 +699,14 @@ export {
     MINIMUM_PLANNING_LHS,
     ensureMinimumPlanningLhs,
     addPlanningLh,
+    addPlanningTo,
     getPlanningState,
     removePlanningLh,
+    removePlanningTo,
     replacePlanningLhs,
     subscribePlanningState,
     updatePlanningCollectionPoolField,
     updatePlanningGeneralField,
     updatePlanningLh,
+    updatePlanningTo,
 };
