@@ -404,12 +404,24 @@
                         height: 100%;
                     }
                     #planning .planning-main-table-section {
-                        display: flex;
+                        display: block;
                         flex: 1 1 auto;
                         min-height: 250px;
+                        background-color: #1f1f1f;
+                        border: 1px solid #525252;
+                        overflow: hidden;
                     }
                     #planning .planning-main-table {
-                        height: 100%;
+                        height: auto;
+                    }
+                    #planning .planning-main-table thead tr:first-child th {
+                        border-top: none;
+                    }
+                    #planning .planning-main-table tr > :first-child {
+                        border-left: none;
+                    }
+                    #planning .planning-main-table tr > :last-child {
+                        border-right: none;
                     }
                     #planning #planningSegregatedSection[hidden],
                     #planning #planningSegregatedTosSection[hidden] {
