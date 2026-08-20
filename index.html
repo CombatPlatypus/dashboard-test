@@ -307,6 +307,20 @@
                     grid-template-columns: repeat(2, minmax(0, 1fr));
                     gap: 10px;
                 }
+                #planning .planning-general-option {
+                    display: flex;
+                    align-items: center;
+                    column-gap: 8px;
+                    margin: 15px 0 0;
+                    font-size: 12px;
+                    color: #e4e6eb;
+                    cursor: pointer;
+                    user-select: none;
+                }
+                #planning .planning-general-option input {
+                    margin: 0;
+                    cursor: pointer;
+                }
                 #planning .planning-control-field {
                     display: block;
                     margin: 0;
@@ -506,7 +520,9 @@
                         gap: 20px;
                         min-height: 0;
                     }
-
+                    #planning .planning-cp-tables[hidden] {
+                        display: none;
+                    }
                     #planning .planning-cp-summary-table {
                         flex: 0 0 auto;
                     }
@@ -839,6 +855,12 @@
                                                     <input type="text" inputmode="numeric" maxlength="5" placeholder="SPR" data-planning-field="averageSpr">
                                                     <input type="text" inputmode="numeric" maxlength="6" placeholder="CAP" data-planning-field="dailyCapacity">
                                                 </div>
+
+                                                <label class="planning-general-option">
+                                                    <input type="checkbox" id="planningIncludeCpClosing" aria-controls="planningCpClosingTables">
+
+                                                    <span>Incluir fechamento do CP</span>
+                                                </label>
                                             </div>
                                         </div>
                                     </div>
@@ -990,7 +1012,7 @@
 
                                                 <!-- INFORMAÇÕES DO CP -->
 
-                                                <div class="planning-cp-tables">
+                                                <div class="planning-cp-tables" id="planningCpClosingTables" hidden>
 
                                                     <!-- RESUMO DO CP -->
 
