@@ -2,12 +2,15 @@ import {
     MINIMUM_PLANNING_LHS,
     ensureMinimumPlanningLhs,
     addPlanningLh,
+    addPlanningTo,
     getPlanningState,
     removePlanningLh,
+    removePlanningTo,
     subscribePlanningState,
     updatePlanningCollectionPoolField,
     updatePlanningGeneralField,
     updatePlanningLh,
+    updatePlanningTo,
 } from "./state.js";
 
 /* ELEMENTOS DO PLANEJAMENTO */
@@ -17,15 +20,19 @@ let planningAddLhButton = null;
 let planningEstimatedVolume = null;
 let planningPreviewLhBody = null;
 let planningPreviewSegregatedBody = null;
+let planningPreviewSegregatedTosBody = null;
 let planningGeneralControls = null;
 let planningPoolControls = null;
 let planningPreviewAverageSpr = null;
 let planningPreviewDailyCapacity = null;
+let planningToGroups = null;
+let planningToEmpty = null;
 
 let planningPoolPreviewCells =
     new Map();
 
 let planningSegregatedSection = null;    
+let planningSegregatedTosSection = null;
 
 const planningCollectionPoolFields = [
     "bulky",
@@ -234,33 +241,54 @@ function createPlanningLhElement(
                 `Origem do LH ${position}`,
         });
 
-    const segregateQuantityInput =
-        createPlanningLhInput({
-            field: "segregateQuantity",
-            value: lh.segregateQuantity,
-            placeholder: "Qtd a segregar",
-            ariaLabel:
-                `Quantidade a segregar do LH ${position}`,
-            maxLength: 5,
-        });
+    const segregateTosLabel =
+        document.createElement(
+            "label",
+        );
 
-    segregateQuantityInput.className =
-        "planning-lh-segregate-quantity";
+    segregateTosLabel.className =
+        "planning-lh-segregate-to-toggle";
 
-    segregateQuantityInput.inputMode =
-        "numeric";
+    const segregateTosCheckbox =
+        document.createElement(
+            "input",
+        );
 
-    segregateQuantityInput.pattern =
-        "[0-9]*";
+    segregateTosCheckbox.type =
+        "checkbox";
 
-    segregateQuantityInput.disabled =
+    segregateTosCheckbox.dataset.field =
+        "segregateTos";
+
+    segregateTosCheckbox.checked =
+        lh.segregateTos;
+
+    segregateTosCheckbox.disabled =
         !lh.segregate;
+
+    segregateTosCheckbox.setAttribute(
+        "aria-label",
+        `Segregar TOs do LH ${position}`,
+    );
+
+    const segregateTosText =
+        document.createElement(
+            "span",
+        );
+
+    segregateTosText.textContent =
+        "Segregar TO";
+
+    segregateTosLabel.append(
+        segregateTosCheckbox,
+        segregateTosText,
+    );
 
     item.append(
         header,
         mainFields,
         originInput,
-        segregateQuantityInput,
+        segregateTosLabel,
     );
 
     mainFields.append(
@@ -269,6 +297,256 @@ function createPlanningLhElement(
     );
 
     return item;
+}
+
+/* CRIA O ELEMENTO VISUAL DE UMA TO */
+
+function createPlanningToElement(
+    to,
+    position,
+) {
+    const item =
+        document.createElement(
+            "div",
+        );
+
+    item.className =
+        "planning-to-item";
+
+    item.dataset.toId =
+        String(to.id);
+
+    const header =
+        document.createElement(
+            "div",
+        );
+
+    header.className =
+        "planning-to-item-header flex-box-between";
+
+    const title =
+        document.createElement(
+            "h4",
+        );
+
+    title.textContent =
+        `TO ${position}`;
+
+    const removeButton =
+        document.createElement(
+            "button",
+        );
+
+    removeButton.type =
+        "button";
+
+    removeButton.className =
+        "button planning-to-remove";
+
+    removeButton.dataset.action =
+        "remove-to";
+
+    removeButton.textContent =
+        "Remover";
+
+    removeButton.setAttribute(
+        "aria-label",
+        `Remover TO ${position}`,
+    );
+
+    header.append(
+        title,
+        removeButton,
+    );
+
+    const fields =
+        document.createElement(
+            "div",
+        );
+
+    fields.className =
+        "flex-box-start";
+
+    const codeInput =
+        createPlanningLhInput({
+            field: "code",
+            value: to.code,
+            placeholder: "Código da TO",
+            ariaLabel:
+                `Código da TO ${position}`,
+        });
+
+    const quantityInput =
+        createPlanningLhInput({
+            field: "quantity",
+            value: to.quantity,
+            placeholder: "Qtd",
+            ariaLabel:
+                `Quantidade da TO ${position}`,
+            maxLength: 5,
+        });
+
+    quantityInput.inputMode =
+        "numeric";
+
+    quantityInput.pattern =
+        "[0-9]*";
+
+    fields.append(
+        codeInput,
+        quantityInput,
+    );
+
+    item.append(
+        header,
+        fields,
+    );
+
+    return item;
+}
+
+/* CRIA O GRUPO DE TOS DE UM LH */
+
+function createPlanningToGroup(
+    lh,
+    position,
+) {
+    const group =
+        document.createElement(
+            "div",
+        );
+
+    group.className =
+        "planning-to-group";
+
+    group.dataset.lhId =
+        String(lh.id);
+
+    const header =
+        document.createElement(
+            "div",
+        );
+
+    header.className =
+        "planning-to-group-header flex-box-between";
+
+    const title =
+        document.createElement(
+            "h4",
+        );
+
+    const lhName =
+        String(lh.code).trim() ||
+        `LH ${position}`;
+
+    title.textContent =
+        `TOs do ${lhName}`;
+
+    const addButton =
+        document.createElement(
+            "button",
+        );
+
+    addButton.type =
+        "button";
+
+    addButton.className =
+        "button";
+
+    addButton.dataset.action =
+        "add-to";
+
+    addButton.textContent =
+        "Adicionar TO";
+
+    addButton.setAttribute(
+        "aria-label",
+        `Adicionar TO ao ${lhName}`,
+    );
+
+    header.append(
+        title,
+        addButton,
+    );
+
+    const list =
+        document.createElement(
+            "div",
+        );
+
+    list.className =
+        "planning-to-list flex-box-column";
+
+    const toElements =
+        lh.tos.map(
+            function (to, index) {
+                return createPlanningToElement(
+                    to,
+                    index + 1,
+                );
+            },
+        );
+
+    list.replaceChildren(
+        ...toElements,
+    );
+
+    group.append(
+        header,
+        list,
+    );
+
+    return group;
+}
+
+/* RENDERIZA OS GRUPOS DE TOS */
+
+function renderPlanningToGroups(lhs) {
+    const lhsWithTos =
+        lhs.filter(
+            function (lh) {
+                return (
+                    lh.segregate &&
+                    lh.segregateTos
+                );
+            },
+        );
+
+    const hasLhsWithTos =
+        lhsWithTos.length > 0;
+
+    planningToEmpty.hidden =
+        hasLhsWithTos;
+
+    planningToGroups.hidden =
+        !hasLhsWithTos;
+
+    if (!hasLhsWithTos) {
+        planningToGroups.replaceChildren();
+
+        return;
+    }
+
+    const groups =
+        lhsWithTos.map(
+            function (lh) {
+                const position =
+                    lhs.findIndex(
+                        function (currentLh) {
+                            return currentLh.id === lh.id;
+                        },
+                    ) + 1;
+
+                return createPlanningToGroup(
+                    lh,
+                    position,
+                );
+            },
+        );
+
+    planningToGroups.replaceChildren(
+        ...groups,
+    );
 }
 
 /* VERIFICA SE O LH POSSUI INFORMAÇÕES */
@@ -282,6 +560,46 @@ function hasPlanningLhInformation(lh) {
             lh.origin,
         ).trim() !== "" ||
         lh.quantity !== null
+    );
+}
+
+/* VERIFICA SE A TO POSSUI INFORMAÇÕES */
+
+function hasPlanningToInformation(to) {
+    return (
+        String(
+            to.code,
+        ).trim() !== "" ||
+        to.quantity !== null
+    );
+}
+
+/* CALCULA A QUANTIDADE SEGREGADA DE UM LH */
+
+function getPlanningLhSegregatedQuantity(lh) {
+    if (
+        !lh.segregateTos
+    ) {
+        return lh.quantity;
+    }
+
+    return lh.tos.reduce(
+        function (
+            total,
+            to,
+        ) {
+            return (
+                total +
+                (
+                    Number.isFinite(
+                        to.quantity,
+                    )
+                        ? to.quantity
+                        : 0
+                )
+            );
+        },
+        0,
     );
 }
 
@@ -412,45 +730,106 @@ function renderPlanningLhPreview(lhs) {
 /* RENDERIZA OS LHS PARA SEGREGAR */
 
 function renderPlanningSegregatedPreview(lhs) {
-    const segregatedLhs = lhs.filter(function(lh) {
-        return lh.segregate;
-    });
+    const segregatedLhs =
+        lhs.filter(
+            function (lh) {
+                return lh.segregate;
+            },
+        );
 
-    const hasSegregatedLhs = segregatedLhs.length > 0;
+    const hasSegregatedLhs =
+        segregatedLhs.length > 0;
 
-    planningSegregatedSection.hidden = !hasSegregatedLhs;
+    planningSegregatedSection.hidden =
+        !hasSegregatedLhs;
 
     if (!hasSegregatedLhs) {
         planningPreviewSegregatedBody.replaceChildren();
+
         return;
     }
 
-    const rows = segregatedLhs.map(function(lh) {
-        const row = document.createElement("tr");
-
-        const codeCell = document.createElement("td");
-        const originCell = document.createElement("td");
-        const quantityCell = document.createElement("td");
-        const segregateQuantityCell = document.createElement("td");
-
-        codeCell.textContent = lh.code || "—";
-        originCell.textContent = lh.origin || "—";
-        quantityCell.textContent = lh.quantity || "0";
-        segregateQuantityCell.textContent =
-            lh.segregateQuantity || "0";
-
-        row.append(
-            codeCell,
-            originCell,
-            quantityCell,
-            segregateQuantityCell
+    const rows =
+        segregatedLhs.map(
+            function (lh) {
+                return createPlanningPreviewRow([
+                    lh.code,
+                    lh.origin,
+                    lh.quantity,
+                    getPlanningLhSegregatedQuantity(
+                        lh,
+                    ),
+                ]);
+            },
         );
 
-        return row;
-    });
-
-    planningPreviewSegregatedBody.replaceChildren(...rows);
+    planningPreviewSegregatedBody.replaceChildren(
+        ...rows,
+    );
 }
+
+/* RENDERIZA AS TOS PARA SEGREGAR */
+
+function renderPlanningSegregatedTosPreview(lhs) {
+    const lhsWithSegregatedTos =
+        lhs.filter(
+            function (lh) {
+                return (
+                    lh.segregate &&
+                    lh.segregateTos
+                );
+            },
+        );
+
+    const hasSegregatedTos =
+        lhsWithSegregatedTos.length > 0;
+
+    planningSegregatedTosSection.hidden =
+        !hasSegregatedTos;
+
+    if (!hasSegregatedTos) {
+        planningPreviewSegregatedTosBody.replaceChildren();
+
+        return;
+    }
+
+    const rows =
+        lhsWithSegregatedTos.flatMap(
+            function (lh) {
+                return lh.tos
+                    .filter(
+                        hasPlanningToInformation,
+                    )
+                    .map(
+                        function (to) {
+                            return createPlanningPreviewRow([
+                                to.code,
+                                lh.code,
+                                to.quantity,
+                            ]);
+                        },
+                    );
+            },
+        );
+
+    if (
+        rows.length === 0
+    ) {
+        planningPreviewSegregatedTosBody.replaceChildren(
+            createPlanningEmptyRow(
+                3,
+                "Nenhuma TO para segregar.",
+            ),
+        );
+
+        return;
+    }
+
+    planningPreviewSegregatedTosBody.replaceChildren(
+        ...rows,
+    );
+}
+
 /* ATUALIZA A PRÉVIA DO PLANEJAMENTO */
 
 function renderPlanningPreview(state) {
@@ -506,6 +885,10 @@ function renderPlanningPreview(state) {
     );
 
     renderPlanningSegregatedPreview(
+        state.lhs,
+    );
+
+    renderPlanningSegregatedTosPreview(
         state.lhs,
     );
 }
@@ -690,9 +1073,9 @@ function handlePlanningLhInput(event) {
     if (
         field === "segregate"
     ) {
-        const segregateQuantityInput =
+        const segregateTosCheckbox =
             item.querySelector(
-                '[data-field="segregateQuantity"]',
+                '[data-field="segregateTos"]',
             );
 
         updatePlanningLh(
@@ -702,18 +1085,16 @@ function handlePlanningLhInput(event) {
         );
 
         if (
-            segregateQuantityInput
+            segregateTosCheckbox
         ) {
-            segregateQuantityInput.disabled =
+            segregateTosCheckbox.disabled =
                 !input.checked;
 
             if (
                 !input.checked
             ) {
-                segregateQuantityInput.value =
-                    "";
-            } else {
-                segregateQuantityInput.focus();
+                segregateTosCheckbox.checked =
+                    false;
             }
         }
 
@@ -721,8 +1102,19 @@ function handlePlanningLhInput(event) {
     }
 
     if (
-        field === "quantity" ||
-        field === "segregateQuantity"
+        field === "segregateTos"
+    ) {
+        updatePlanningLh(
+            lhId,
+            field,
+            input.checked,
+        );
+
+        return;
+    }
+
+    if (
+        field === "quantity"
     ) {
         input.value =
             input.value
@@ -736,64 +1128,163 @@ function handlePlanningLhInput(event) {
                 );
     }
 
-    if (
-        field === "segregateQuantity"
-    ) {
-        const totalQuantityInput =
-            item.querySelector(
-                '[data-field="quantity"]',
-            );
-
-        if (
-            input.value !== "" &&
-            totalQuantityInput?.value !== "" &&
-            Number(input.value) >
-                Number(
-                    totalQuantityInput.value,
-                )
-        ) {
-            input.value =
-                totalQuantityInput.value;
-        }
-    }
-
     updatePlanningLh(
         lhId,
         field,
         input.value,
     );
+}
+
+/* ATUALIZA UM CAMPO DE TO */
+
+function handlePlanningToInput(event) {
+    const input =
+        event.target instanceof HTMLInputElement
+            ? event.target
+            : null;
+
+    if (!input) {
+        return;
+    }
+
+    const group =
+        input.closest(
+            ".planning-to-group",
+        );
+
+    const item =
+        input.closest(
+            ".planning-to-item",
+        );
+
+    const field =
+        input.dataset.field;
+
+    const lhId =
+        Number(
+            group?.dataset.lhId,
+        );
+
+    const toId =
+        Number(
+            item?.dataset.toId,
+        );
+
+    if (
+        !group ||
+        !item ||
+        !field ||
+        !Number.isInteger(lhId) ||
+        !Number.isInteger(toId)
+    ) {
+        return;
+    }
 
     if (
         field === "quantity"
     ) {
-        const segregateQuantityInput =
-            item.querySelector(
-                '[data-field="segregateQuantity"]',
+        input.value =
+            input.value
+                .replace(
+                    /\D/g,
+                    "",
+                )
+                .slice(
+                    0,
+                    5,
+                );
+    }
+
+    updatePlanningTo(
+        lhId,
+        toId,
+        field,
+        input.value,
+    );
+}
+
+/* ADICIONA OU REMOVE UMA TO */
+
+function handlePlanningToClick(event) {
+    const eventTarget =
+        event.target instanceof Element
+            ? event.target
+            : null;
+
+    const actionButton =
+        eventTarget?.closest(
+            "[data-action]",
+        );
+
+    const group =
+        actionButton?.closest(
+            ".planning-to-group",
+        );
+
+    const lhId =
+        Number(
+            group?.dataset.lhId,
+        );
+
+    if (
+        !actionButton ||
+        !group ||
+        !Number.isInteger(lhId)
+    ) {
+        return;
+    }
+
+    if (
+        actionButton.dataset.action ===
+            "add-to"
+    ) {
+        const newTo =
+            addPlanningTo(
+                lhId,
+            );
+
+        if (!newTo) {
+            return;
+        }
+
+        planningToGroups
+            .querySelector(
+                `[data-lh-id="${lhId}"] ` +
+                `[data-to-id="${newTo.id}"] ` +
+                '[data-field="code"]',
+            )
+            ?.focus();
+
+        return;
+    }
+
+    if (
+        actionButton.dataset.action ===
+            "remove-to"
+    ) {
+        const item =
+            actionButton.closest(
+                ".planning-to-item",
+            );
+
+        const toId =
+            Number(
+                item?.dataset.toId,
             );
 
         if (
-            segregateQuantityInput?.value !== "" &&
-            (
-                input.value === "" ||
-                Number(
-                    segregateQuantityInput.value,
-                ) >
-                    Number(
-                        input.value,
-                    )
-            )
+            !Number.isInteger(toId)
         ) {
-            segregateQuantityInput.value =
-                input.value;
-
-            updatePlanningLh(
-                lhId,
-                "segregateQuantity",
-                segregateQuantityInput.value,
-            );
+            return;
         }
+
+        removePlanningTo(
+            lhId,
+            toId,
+        );
     }
 }
+
 /* REMOVE UM LH */
 
 function handlePlanningLhClick(event) {
@@ -898,10 +1389,30 @@ function initializePlanningLhList() {
             "planningPreviewSegregatedBody",
         );
 
+    planningPreviewSegregatedTosBody =
+        document.getElementById(
+            "planningPreviewSegregatedTosBody",
+        );
+
+    planningToGroups =
+        document.getElementById(
+            "planningToGroups",
+        );
+
+    planningToEmpty =
+        document.getElementById(
+            "planningToEmpty",
+        );    
+
     planningSegregatedSection =
         document.getElementById(
             "planningSegregatedSection",
         );
+
+    planningSegregatedTosSection =
+        document.getElementById(
+            "planningSegregatedTosSection",
+        );   
 
     if (
         !planningLhList ||
@@ -909,7 +1420,11 @@ function initializePlanningLhList() {
         !planningEstimatedVolume ||
         !planningPreviewLhBody ||
         !planningPreviewSegregatedBody ||
+        !planningPreviewSegregatedTosBody ||
         !planningSegregatedSection ||
+        !planningSegregatedTosSection ||
+        !planningToGroups ||
+        !planningToEmpty ||
         !planningGeneralControls ||
         !planningPoolControls ||
         !planningPreviewAverageSpr ||
@@ -936,9 +1451,29 @@ function initializePlanningLhList() {
                 change.type === "lh-removed" ||
                 change.type === "lhs-replaced" ||
                 change.type === "lhs-minimum-restored"
-
             ) {
                 renderPlanningLhList(
+                    state.lhs,
+                );
+            }
+
+            if (
+                change.type === "lh-added" ||
+                change.type === "lh-removed" ||
+                change.type === "lhs-replaced" ||
+                change.type === "lhs-minimum-restored" ||
+                change.type === "to-added" ||
+                change.type === "to-removed" ||
+                (
+                    change.type === "lh-updated" &&
+                    (
+                        change.field === "code" ||
+                        change.field === "segregate" ||
+                        change.field === "segregateTos"
+                    )
+                )
+            ) {
+                renderPlanningToGroups(
                     state.lhs,
                 );
             }
@@ -964,6 +1499,16 @@ function initializePlanningLhList() {
         handlePlanningLhClick,
     );
 
+    planningToGroups.addEventListener(
+        "input",
+        handlePlanningToInput,
+    );
+
+    planningToGroups.addEventListener(
+        "click",
+        handlePlanningToClick,
+    );
+
     planningGeneralControls.addEventListener(
         "input",
         handlePlanningGeneralInput,
@@ -982,6 +1527,10 @@ function initializePlanningLhList() {
     );
 
     renderPlanningLhList(
+        state.lhs,
+    );
+
+    renderPlanningToGroups(
         state.lhs,
     );
 
