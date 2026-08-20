@@ -55,6 +55,7 @@ let nextPlanningLhId = 1;
 let nextPlanningToId = 1;
 
 const MINIMUM_PLANNING_LHS = 3;
+const MINIMUM_PLANNING_TOS_PER_LH = 1;
 
 /* NORMALIZA UM TEXTO */
 
@@ -161,9 +162,10 @@ function createPlanningLhRecord(
             },
         );
 
-    if (
+    while (
         segregateTos &&
-        tos.length === 0
+        tos.length <
+            MINIMUM_PLANNING_TOS_PER_LH
     ) {
         tos.push(
             createPlanningToRecord(
@@ -394,12 +396,16 @@ function updatePlanningLh(
 
     if (
         field === "segregateTos" &&
-        normalizedValue &&
-        lh.tos.length === 0
+        normalizedValue
     ) {
-        lh.tos.push(
-            createPlanningToRecord(),
-        );
+        while (
+            lh.tos.length <
+                MINIMUM_PLANNING_TOS_PER_LH
+        ) {
+            lh.tos.push(
+                createPlanningToRecord(),
+            );
+        }
     }
 
     if (
@@ -556,6 +562,14 @@ function removePlanningTo(
         return false;
     }
 
+    if (
+        lh.segregateTos &&
+        lh.tos.length <=
+            MINIMUM_PLANNING_TOS_PER_LH
+    ) {
+        return false;
+    }
+
     lh.tos.splice(
         index,
         1,
@@ -697,6 +711,7 @@ function replacePlanningLhs(
 
 export {
     MINIMUM_PLANNING_LHS,
+    MINIMUM_PLANNING_TOS_PER_LH,
     ensureMinimumPlanningLhs,
     addPlanningLh,
     addPlanningTo,
