@@ -365,7 +365,9 @@
 
                     #planning .planning-sheet-preview {
                         width: 100%;
-                        min-height: 862px;
+                        min-height: 865px;
+                        display: flex;
+                        flex-direction: column;
                         padding: 20px;
                         color: #e4e6eb;
                         background-color: #141414;
@@ -386,6 +388,8 @@
                         letter-spacing: 1.5px;
                     }
                     #planning .planning-sheet-layout {
+                        flex: 1 1 auto;
+                        min-height: 0;
                         display: grid;
                         grid-template-columns: minmax(0, 3fr) minmax(300px, 2fr);
                         gap: 20px;
@@ -398,11 +402,15 @@
 
                     /* PRÉVIA DO PLANEJAMENTO - DISTRIBUIÇÃO VERTICAL */
 
-                    #planning .planning-sheet-main {
+                    #planning .planning-sheet-main,
+                    #planning .planning-sheet-sidebar {
                         display: flex;
                         flex-direction: column;
-                        height: 100%;
+                        gap: 20px;
+                        min-width: 0;
+                        min-height: 0;
                     }
+
                     #planning .planning-main-table-section {
                         display: block;
                         flex: 1 1 auto;
@@ -411,31 +419,20 @@
                         border: 1px solid #525252;
                         overflow: hidden;
                     }
+
                     #planning .planning-main-table {
                         height: auto;
                     }
-                    #planning .planning-main-table thead tr:first-child th {
-                        border-top: none;
-                    }
-                    #planning .planning-main-table tr > :first-child {
-                        border-left: none;
-                    }
-                    #planning .planning-main-table tr > :last-child {
-                        border-right: none;
-                    }
+
                     #planning #planningSegregatedSection[hidden],
                     #planning #planningSegregatedTosSection[hidden] {
                         display: none;
                     }
+
                     #planning .planning-sheet-section {
                         width: 100%;
-                        margin-bottom: 20px;
+                        margin: 0;
                     }
-                    #planning .planning-sheet-section:last-child {
-                        margin-bottom: 0;
-                    }
-
-
                 /* TABELAS */
 
                     #planning .planning-sheet-table {
@@ -502,12 +499,30 @@
 
                     /* TABELAS DO RESUMO DO CP */
 
-                        #planning .planning-cp-tables {
-                            display: grid;
-                            grid-template-columns: minmax(0, 1fr);
-                            gap: 20px;
-                            align-items: start;
-                        }
+                    #planning .planning-cp-tables {
+                        display: flex;
+                        flex: 1 1 auto;
+                        flex-direction: column;
+                        gap: 20px;
+                        min-height: 0;
+                    }
+
+                    #planning .planning-cp-summary-table {
+                        flex: 0 0 auto;
+                    }
+
+                    #planning .planning-pool-lh-section {
+                        width: 100%;
+                        flex: 1 1 auto;
+                        min-height: 114px;
+                        background-color: #1f1f1f;
+                        border: 1px solid #525252;
+                        overflow: hidden;
+                    }
+
+                    #planning .planning-pool-lh-table {
+                        height: auto;
+                    }
 
 
                     /* INDICADORES */
@@ -516,7 +531,7 @@
                             display: grid;
                             grid-template-columns: repeat(3, minmax(0, 1fr));
                             gap: 10px;
-                            margin-bottom: 20px;
+                            margin-bottom: 0px;
                         }
                         #planning .planning-sheet-metrics > div {
                             min-width: 0;
@@ -1026,24 +1041,26 @@
 
                                                     <!-- LHS NA POOL -->
 
-                                                    <table class="planning-sheet-table planning-pool-lh-table">
-                                                        <thead>
-                                                            <tr>
-                                                                <th colspan="2">LHs na Pool</th>
-                                                            </tr>
+                                                    <div class="planning-pool-lh-section">
+                                                        <table class="planning-sheet-table planning-pool-lh-table">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th colspan="2">LHs na Pool</th>
+                                                                </tr>
 
-                                                            <tr>
-                                                                <th>LH</th>
-                                                                <th>QTD</th>
-                                                            </tr>
-                                                        </thead>
+                                                                <tr>
+                                                                    <th>LH</th>
+                                                                    <th>QTD</th>
+                                                                </tr>
+                                                            </thead>
 
-                                                        <tbody id="planningPreviewPoolLhBody">
-                                                            <tr class="planning-empty-row">
-                                                                <td colspan="2">Nenhum LH na Pool.</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
+                                                            <tbody id="planningPreviewPoolLhBody">
+                                                                <tr class="planning-empty-row">
+                                                                    <td colspan="2">Nenhum LH na Pool.</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
