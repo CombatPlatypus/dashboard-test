@@ -12,6 +12,7 @@ import {
     updatePlanningGeneralField,
     updatePlanningLh,
     updatePlanningTo,
+    updatePlanningCpClosingVisibility,
 } from "./state.js";
 
 /* ELEMENTOS DO PLANEJAMENTO */
@@ -23,6 +24,8 @@ let planningPreviewLhBody = null;
 let planningPreviewSegregatedBody = null;
 let planningPreviewSegregatedTosBody = null;
 let planningGeneralControls = null;
+let planningIncludeCpClosing = null;
+let planningCpClosingTables = null;
 let planningPoolControls = null;
 let planningPreviewAverageSpr = null;
 let planningPreviewDailyCapacity = null;
@@ -896,6 +899,9 @@ function renderPlanningPreview(state) {
             0,
         );
 
+    planningCpClosingTables.hidden =
+        !state.includeCpClosing;
+
     planningEstimatedVolume.textContent =
         planningNumberFormatter.format(
             estimatedVolume,
@@ -1002,6 +1008,14 @@ function handlePlanningGeneralInput(event) {
     );
 }
 
+/* ALTERA A EXIBIÇÃO DO FECHAMENTO DO CP */
+
+function handlePlanningCpClosingChange() {
+    updatePlanningCpClosingVisibility(
+        planningIncludeCpClosing.checked,
+    );
+}
+
 /* ATUALIZA A COLLECTION POOL */
 
 function handlePlanningPoolChange(event) {
@@ -1043,6 +1057,11 @@ function synchronizePlanningControls(
                 input.value =
                     state[field] ?? "";
             },
+        );
+
+    planningIncludeCpClosing.checked =
+        Boolean(
+            state.includeCpClosing,
         );
 
     planningPoolControls
@@ -1376,6 +1395,16 @@ function initializePlanningLhList() {
             "planningGeneralControls",
         );
 
+    planningIncludeCpClosing =
+        document.getElementById(
+            "planningIncludeCpClosing",
+        );
+
+    planningCpClosingTables =
+        document.getElementById(
+            "planningCpClosingTables",
+        );
+
     planningPoolControls =
         document.getElementById(
             "planningPoolControls",
@@ -1481,6 +1510,8 @@ function initializePlanningLhList() {
         !planningSegregatedTosTab ||
         !planningLhTabLink ||
         !planningGeneralControls ||
+        !planningIncludeCpClosing ||
+        !planningCpClosingTables ||
         !planningPoolControls ||
         !planningPreviewAverageSpr ||
         !planningPreviewDailyCapacity ||
@@ -1567,6 +1598,11 @@ function initializePlanningLhList() {
     planningGeneralControls.addEventListener(
         "input",
         handlePlanningGeneralInput,
+    );
+
+    planningIncludeCpClosing.addEventListener(
+        "change",
+        handlePlanningCpClosingChange,
     );
 
     planningPoolControls.addEventListener(
