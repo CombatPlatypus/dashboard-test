@@ -429,10 +429,10 @@
 
                     #planning .planning-main-table-section {
                         display: block;
-                        flex: 1 1 auto;
+                        /* flex: 1 1 auto;
                         min-height: 250px;
                         background-color: #1f1f1f;
-                        border: 1px solid #525252;
+                        border: 1px solid #525252; */
                         overflow: hidden;
                     }
 
@@ -531,10 +531,10 @@
 
                     #planning .planning-pool-lh-section {
                         width: 100%;
-                        flex: 1 1 auto;
+                        /* flex: 1 1 auto;
                         min-height: 114px;
                         background-color: #1f1f1f;
-                        border: 1px solid #525252;
+                        border: 1px solid #525252; */
                         overflow: hidden;
                     }
 
@@ -876,7 +876,7 @@
 
                                     <section class="planning-sheet-preview" id="planningSheetPreview">
 
-                                        <!-- TÍTULO -->
+                                        <!-- TÍTULO DO PLANEJAMENTO -->
 
                                         <div class="planning-sheet-title">
                                             <h2>Planejamento de Roteirização</h2>
@@ -1011,81 +1011,94 @@
                                                         </tbody>
                                                     </table>
                                                 </div>
+                                            </div>
+                                        </div>
 
-                                                <!-- INFORMAÇÕES DO CP -->
+                                        <!-- TÍTULO DO RESUMO DO CP -->
 
-                                                <div class="planning-cp-tables" id="planningCpClosingTables" hidden>
+                                        <div class="planning-sheet-title">
+                                            <h2>Detalhamento da Collection Pool</h2>
+                                        </div>
 
-                                                    <!-- RESUMO DO CP -->
+                                        <!-- INFORMAÇÕES DO CP -->
 
-                                                    <table class="planning-sheet-table planning-cp-summary-table">
+                                        <div class="planning-sheet-layout">
+                                            <div class="planning-sheet-main">
+
+                                                <!-- RESUMO -->
+
+                                                <table class="planning-sheet-table planning-cp-summary-table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th colspan="2">Resumo do CP</th>
+                                                        </tr>
+                                                    </thead>
+
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>Total</td>
+                                                            <td id="planningPreviewCpTotal">0</td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>Backlog</td>
+                                                            <td id="planningPreviewCpBacklog">0</td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>LH Pool</td>
+                                                            <td id="planningPreviewCpLhPool">0</td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>Volumosos</td>
+                                                            <td id="planningPreviewCpBulky">0</td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>Erros</td>
+                                                            <td id="planningPreviewCpErrors">0</td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>Pacotes adicionados</td>
+                                                            <td id="planningPreviewCpAdded">0</td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>Pacotes retirados</td>
+                                                            <td id="planningPreviewCpRemoved">0</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+
+                                                <div class="planning-cp-tables" id="planningCpClosingTables" hidden></div>
+                                            </div>
+
+                                            <!-- LHS NA POOL -->
+
+                                            <div class="planning-sheet-sidebar">
+                                                <div class="planning-pool-lh-section">
+                                                    <table class="planning-sheet-table planning-pool-lh-table">
                                                         <thead>
                                                             <tr>
-                                                                <th colspan="2">Resumo do CP</th>
+                                                                <th colspan="2">LHs na Pool</th>
+                                                            </tr>
+
+                                                            <tr>
+                                                                <th>LH</th>
+                                                                <th>QTD</th>
                                                             </tr>
                                                         </thead>
 
-                                                        <tbody>
-                                                            <tr>
-                                                                <td>Total</td>
-                                                                <td id="planningPreviewCpTotal">0</td>
-                                                            </tr>
-
-                                                            <tr>
-                                                                <td>Backlog</td>
-                                                                <td id="planningPreviewCpBacklog">0</td>
-                                                            </tr>
-
-                                                            <tr>
-                                                                <td>LH Pool</td>
-                                                                <td id="planningPreviewCpLhPool">0</td>
-                                                            </tr>
-
-                                                            <tr>
-                                                                <td>Volumosos</td>
-                                                                <td id="planningPreviewCpBulky">0</td>
-                                                            </tr>
-
-                                                            <tr>
-                                                                <td>Erros</td>
-                                                                <td id="planningPreviewCpErrors">0</td>
-                                                            </tr>
-
-                                                            <tr>
-                                                                <td>Pacotes adicionados</td>
-                                                                <td id="planningPreviewCpAdded">0</td>
-                                                            </tr>
-
-                                                            <tr>
-                                                                <td>Pacotes retirados</td>
-                                                                <td id="planningPreviewCpRemoved">0</td>
+                                                        <tbody id="planningPreviewPoolLhBody">
+                                                            <tr class="planning-empty-row">
+                                                                <td colspan="2">Nenhum LH na Pool.</td>
                                                             </tr>
                                                         </tbody>
                                                     </table>
-
-                                                    <!-- LHS NA POOL -->
-
-                                                    <div class="planning-pool-lh-section">
-                                                        <table class="planning-sheet-table planning-pool-lh-table">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th colspan="2">LHs na Pool</th>
-                                                                </tr>
-
-                                                                <tr>
-                                                                    <th>LH</th>
-                                                                    <th>QTD</th>
-                                                                </tr>
-                                                            </thead>
-
-                                                            <tbody id="planningPreviewPoolLhBody">
-                                                                <tr class="planning-empty-row">
-                                                                    <td colspan="2">Nenhum LH na Pool.</td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
                                                 </div>
+
                                             </div>
                                         </div>
                                     </section>
