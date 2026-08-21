@@ -30,8 +30,16 @@ let planningToGroups = null;
 let planningToEmpty = null;
 let planningSegregatedTosTab = null;
 let planningLhTabLink = null;
+let planningPreviewPoolLhBody = null;
+let planningPreviewCpTotal = null;
+let planningPreviewCpBacklog = null;
+let planningPreviewCpBulky = null;
+let planningPreviewCpLhPool = null;
 
 let planningPoolPreviewCells =
+    new Map();
+
+let planningPoolQuantityPreviewCells =
     new Map();
 
 let planningSegregatedSection = null;    
@@ -586,6 +594,14 @@ function hasPlanningLhInformation(lh) {
     );
 }
 
+/* RETORNA OS LHS EXIBIDOS NO PLANEJAMENTO */
+
+function getPlanningRoutableLhs(lhs) {
+    return lhs.filter(
+        hasPlanningLhInformation,
+    );
+}
+
 /* VERIFICA SE A TO POSSUI INFORMAÇÕES */
 
 function hasPlanningToInformation(to) {
@@ -729,14 +745,11 @@ function createPlanningEmptyRow(
 
 /* RENDERIZA A TABELA PRINCIPAL DE LHS */
 
-function renderPlanningLhPreview(lhs) {
-    const filledLhs =
-        lhs.filter(
-            hasPlanningLhInformation,
-        );
-
+function renderPlanningLhPreview(
+    routableLhs,
+) {
     if (
-        filledLhs.length === 0
+        routableLhs.length === 0
     ) {
         planningPreviewLhBody.replaceChildren(
             createPlanningEmptyRow(
@@ -749,7 +762,7 @@ function renderPlanningLhPreview(lhs) {
     }
 
     const rows =
-        filledLhs.map(
+        routableLhs.map(
             function (lh) {
                 return createPlanningPreviewRow([
                     lh.code,
@@ -760,6 +773,39 @@ function renderPlanningLhPreview(lhs) {
         );
 
     planningPreviewLhBody.replaceChildren(
+        ...rows,
+    );
+}
+
+/* RENDERIZA OS MESMOS LHS NA TABELA DA POOL */
+
+function renderPlanningPoolLhPreview(
+    routableLhs,
+) {
+    if (
+        routableLhs.length === 0
+    ) {
+        planningPreviewPoolLhBody.replaceChildren(
+            createPlanningEmptyRow(
+                2,
+                "Nenhum LH na Pool.",
+            ),
+        );
+
+        return;
+    }
+
+    const rows =
+        routableLhs.map(
+            function (lh) {
+                return createPlanningPreviewRow([
+                    lh.code,
+                    lh.quantity,
+                ]);
+            },
+        );
+
+    planningPreviewPoolLhBody.replaceChildren(
         ...rows,
     );
 }
@@ -867,11 +913,37 @@ function renderPlanningSegregatedTosPreview(lhs) {
     );
 }
 
+/* RETORNA UMA QUANTIDADE ATIVA DA COLLECTION POOL */
+
+function getPlanningPoolQuantity(
+    state,
+    field,
+) {
+    const poolItem =
+        state.collectionPool[field];
+
+    if (
+        !poolItem?.enabled ||
+        !Number.isFinite(
+            poolItem.quantity,
+        )
+    ) {
+        return 0;
+    }
+
+    return poolItem.quantity;
+}
+
 /* ATUALIZA A PRÉVIA DO PLANEJAMENTO */
 
 function renderPlanningPreview(state) {
+    const routableLhs =
+        getPlanningRoutableLhs(
+            state.lhs,
+        );
+
     const estimatedVolume =
-        state.lhs.reduce(
+        routableLhs.reduce(
             function (
                 total,
                 lh,
@@ -889,6 +961,19 @@ function renderPlanningPreview(state) {
             },
             0,
         );
+
+    const backlogQuantity =
+        getPlanningPoolQuantity(
+            state,
+            "backlog",
+        );
+
+    const bulkyQuantity =
+        getPlanningPoolQuantity(
+            state,
+            "bulky",
+        );
+
     planningEstimatedVolume.textContent =
         planningNumberFormatter.format(
             estimatedVolume,
@@ -909,15 +994,58 @@ function renderPlanningPreview(state) {
             cell,
             field,
         ) {
+            const poolItem =
+                state.collectionPool[field];
+
             cell.textContent =
-                state.collectionPool[field]
+                poolItem?.enabled
                     ? "SIM"
                     : "NÃO";
         },
     );
 
+    planningPoolQuantityPreviewCells.forEach(
+        function (
+            cell,
+            field,
+        ) {
+            cell.textContent =
+                planningNumberFormatter.format(
+                    getPlanningPoolQuantity(
+                        state,
+                        field,
+                    ),
+                );
+        },
+    );
+
+    planningPreviewCpBacklog.textContent =
+        planningNumberFormatter.format(
+            backlogQuantity,
+        );
+
+    planningPreviewCpBulky.textContent =
+        planningNumberFormatter.format(
+            bulkyQuantity,
+        );
+
+    planningPreviewCpLhPool.textContent =
+        planningNumberFormatter.format(
+            estimatedVolume,
+        );
+
+    planningPreviewCpTotal.textContent =
+        planningNumberFormatter.format(
+            estimatedVolume +
+            backlogQuantity,
+        );
+
     renderPlanningLhPreview(
-        state.lhs,
+        routableLhs,
+    );
+
+    renderPlanningPoolLhPreview(
+        routableLhs,
     );
 
     renderPlanningSegregatedPreview(
@@ -995,7 +1123,7 @@ function handlePlanningGeneralInput(event) {
     );
 }
 
-/* ATUALIZA A COLLECTION POOL */
+/* ATUALIZA O STATUS DA COLLECTION POOL */
 
 function handlePlanningPoolChange(event) {
     const input =
@@ -1015,7 +1143,57 @@ function handlePlanningPoolChange(event) {
 
     updatePlanningCollectionPoolField(
         field,
+        "enabled",
         input.checked,
+    );
+
+    const quantityInput =
+        planningPoolControls.querySelector(
+            `[data-planning-pool-quantity="${field}"]`,
+        );
+
+    if (
+        quantityInput instanceof
+        HTMLInputElement
+    ) {
+        quantityInput.disabled =
+            !input.checked;
+    }
+}
+
+/* ATUALIZA UMA QUANTIDADE DA COLLECTION POOL */
+
+function handlePlanningPoolInput(event) {
+    const input =
+        event.target instanceof HTMLInputElement
+            ? event.target
+            : null;
+
+    const field =
+        input?.dataset.planningPoolQuantity;
+
+    if (
+        !input ||
+        !field
+    ) {
+        return;
+    }
+
+    input.value =
+        input.value
+            .replace(
+                /\D/g,
+                "",
+            )
+            .slice(
+                0,
+                input.maxLength,
+            );
+
+    updatePlanningCollectionPoolField(
+        field,
+        "quantity",
+        input.value,
     );
 }
 
@@ -1049,8 +1227,29 @@ function synchronizePlanningControls(
 
                 input.checked =
                     Boolean(
-                        state.collectionPool[field],
+                        state.collectionPool[field]
+                            ?.enabled,
                     );
+            },
+        );
+
+    planningPoolControls
+        .querySelectorAll(
+            "[data-planning-pool-quantity]",
+        )
+        .forEach(
+            function (input) {
+                const field =
+                    input.dataset.planningPoolQuantity;
+
+                const poolItem =
+                    state.collectionPool[field];
+
+                input.value =
+                    poolItem?.quantity ?? "";
+
+                input.disabled =
+                    !poolItem?.enabled;
             },
         );
 }
@@ -1399,6 +1598,22 @@ function initializePlanningLhList() {
                 },
             ),
         );
+
+    planningPoolQuantityPreviewCells =
+        new Map(
+            Array.from(
+                document.querySelectorAll(
+                    "[data-planning-pool-quantity-preview]",
+                ),
+            ).map(
+                function (cell) {
+                    return [
+                        cell.dataset.planningPoolQuantityPreview,
+                        cell,
+                    ];
+                },
+            ),
+        );    
     
     planningLhList =
         document.getElementById(
@@ -1419,6 +1634,31 @@ function initializePlanningLhList() {
         document.getElementById(
             "planningPreviewLhBody",
         );
+
+    planningPreviewPoolLhBody =
+        document.getElementById(
+            "planningPreviewPoolLhBody",
+        );
+
+    planningPreviewCpTotal =
+        document.getElementById(
+            "planningPreviewCpTotal",
+        );
+
+    planningPreviewCpBacklog =
+        document.getElementById(
+            "planningPreviewCpBacklog",
+        );
+
+    planningPreviewCpBulky =
+        document.getElementById(
+            "planningPreviewCpBulky",
+        );
+
+    planningPreviewCpLhPool =
+        document.getElementById(
+            "planningPreviewCpLhPool",
+        );   
 
     planningPreviewSegregatedBody =
         document.getElementById(
@@ -1465,6 +1705,11 @@ function initializePlanningLhList() {
         !planningAddLhButton ||
         !planningEstimatedVolume ||
         !planningPreviewLhBody ||
+        !planningPreviewPoolLhBody ||
+        !planningPreviewCpTotal ||
+        !planningPreviewCpBacklog ||
+        !planningPreviewCpBulky ||
+        !planningPreviewCpLhPool ||
         !planningPreviewSegregatedBody ||
         !planningPreviewSegregatedTosBody ||
         !planningSegregatedSection ||
@@ -1563,6 +1808,11 @@ function initializePlanningLhList() {
     planningPoolControls.addEventListener(
         "change",
         handlePlanningPoolChange,
+    );
+
+    planningPoolControls.addEventListener(
+        "input",
+        handlePlanningPoolInput,
     );
 
     const state =
