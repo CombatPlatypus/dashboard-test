@@ -144,15 +144,12 @@
                 #planning #planningSegregatedTosTab[hidden] {
                     display: none;
                 }
-
-                #planning .planning-lh-toolbar {
-                    padding-right: 15px;
-                    margin-bottom: 20px;
-                    max-height: 40px;
-                    overflow: hidden;
-                }
                 #planning .planning-lh-toolbar button {
                    width: 100%;
+                   cursor: pointer;
+                }
+                #planning .planning-lh-toolbar button img {
+                    width: 45px;
                 }
                 #planning .planning-lh-toolbar .button,
                 #planning .planning-lh-remove {
@@ -704,6 +701,10 @@
                             <!-- HEADER DO RELATÓRIO -->
 
                             <ul class="tabs flex-box-start" data-tabs id="planning-choice">
+                                <button id="planningAddLh">
+                                    <img src="images/geral-icons/add-lh-icon.svg">
+                                </button>
+
                                 <li class="tabs-title is-active">
                                     <a href="#lhs-list">
                                         <h4>Lista de LHs</h4>
@@ -733,12 +734,6 @@
                                         <h4>Importar Dados</h4>
                                     </a>
                                 </li> 
-
-                                <div class="planning-lh-toolbar">
-                                    <button id="planningAddLh">
-                                        <img src="images/geral-icons/add-lh-icon.svg">
-                                    </button>
-                                </div>
                             </ul> 
 
                             <!-- CONTEÚDO DO RELATÓRIO -->
