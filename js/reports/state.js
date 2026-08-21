@@ -6,11 +6,20 @@ const planningState = {
     dailyCapacity: null,
 
     collectionPool: {
-        bulky: true,
-        office: true,
-        backlog: true,
-        home: true,
-        outOfRoute: true,
+        bulky: {
+            enabled: true,
+            quantity: null,
+        },
+
+        backlog: {
+            enabled: true,
+            quantity: null,
+        },
+
+        outOfRoute: {
+            enabled: true,
+            quantity: null,
+        },
     },
 
     lhs: [],
@@ -45,9 +54,7 @@ const planningGeneralFields =
 const planningCollectionPoolFields =
     new Set([
         "bulky",
-        "office",
         "backlog",
-        "home",
         "outOfRoute",
     ]);
 
@@ -232,9 +239,23 @@ function getPlanningState() {
         dailyCapacity:
             planningState.dailyCapacity,
 
-        collectionPool: {
-            ...planningState.collectionPool,
-        },
+        collectionPool:
+            Object.fromEntries(
+                Object.entries(
+                    planningState.collectionPool,
+                ).map(
+                    function (
+                        [field, values],
+                    ) {
+                        return [
+                            field,
+                            {
+                                ...values,
+                            },
+                        ];
+                    },
+                ),
+            ),
 
         lhs:
             planningState.lhs.map(
@@ -625,32 +646,42 @@ function updatePlanningGeneralField(
 
 function updatePlanningCollectionPoolField(
     field,
+    property,
     value,
 ) {
     if (
         !planningCollectionPoolFields.has(
             field,
+        ) ||
+        (
+            property !== "enabled" &&
+            property !== "quantity"
         )
     ) {
         return false;
     }
 
     const normalizedValue =
-        Boolean(value);
+        property === "enabled"
+            ? Boolean(value)
+            : normalizeQuantity(
+                value,
+            );
 
     if (
-        planningState.collectionPool[field] ===
+        planningState.collectionPool[field][property] ===
         normalizedValue
     ) {
         return true;
     }
 
-    planningState.collectionPool[field] =
+    planningState.collectionPool[field][property] =
         normalizedValue;
 
     notifyPlanningState({
         type: "collection-pool-updated",
         field,
+        property,
     });
 
     return true;
