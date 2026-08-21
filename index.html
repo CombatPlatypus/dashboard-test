@@ -695,7 +695,7 @@
                                     <p>Crie um relatório que abrange todos os aspectos do inventário nas últimas semanas.</p>
                                 </div>
                             </a>
-                        </li> 
+                        </li>
                     </ul> 
 
                     <div class="tabs-content" data-tabs-content="report-choice">
@@ -733,6 +733,12 @@
                                         <h4>Importar Dados</h4>
                                     </a>
                                 </li> 
+
+                                <div class="planning-lh-toolbar">
+                                    <button id="planningAddLh">
+                                        <img src="images/geral-icons/add-lh-icon.svg">
+                                    </button>
+                                </div>
                             </ul> 
 
                             <!-- CONTEÚDO DO RELATÓRIO -->
@@ -746,10 +752,6 @@
                                         <div class="tabs-panel is-active" id="lhs-list">
 
                                             <!-- LISTA DE LHS -->
-
-                                            <div class="planning-lh-toolbar">
-                                                <button class="button" id="planningAddLh">Adicionar LH</button>
-                                            </div>
 
                                             <div class="planning-lh-list flex-box-column" id="planningLhList"></div>
                                         </div>
@@ -1002,6 +1004,11 @@
                                                             </tr>
 
                                                             <tr>
+                                                                <td>Quantidade de Erros</td>
+                                                                <td id="planningPreviewCpErrors">0</td>
+                                                            </tr>
+
+                                                            <tr>
                                                                 <td>Pacotes Adicionados</td>
                                                                 <td id="planningPreviewCpAdded">0</td>
                                                             </tr>
@@ -1009,11 +1016,6 @@
                                                             <tr>
                                                                 <td>Pacotes Retirados</td>
                                                                 <td id="planningPreviewCpRemoved">0</td>
-                                                            </tr>
-
-                                                            <tr>
-                                                                <td>Quantidade de Erros</td>
-                                                                <td id="planningPreviewCpErrors">0</td>
                                                             </tr>
                                                         </tbody>
                                                     </table>
