@@ -333,6 +333,13 @@
                     gap: 10px;
                 }
                 #planning .planning-pool-control {
+                    display: grid;
+                    grid-template-columns: minmax(0, 1fr) 86px;
+                    align-items: center;
+                    column-gap: 10px;
+                    margin: 0;
+                }
+                #planning .planning-pool-control label {
                     display: flex;
                     align-items: center;
                     column-gap: 8px;
@@ -342,9 +349,19 @@
                     cursor: pointer;
                     user-select: none;
                 }
-                #planning .planning-pool-control input {
+                #planning .planning-pool-control label input,
+                #planning .planning-pool-control > input {
                     margin: 0;
+                }
+                #planning .planning-pool-control label input {
                     cursor: pointer;
+                }
+                #planning .planning-pool-control > input {
+                    text-align: center;
+                }
+                #planning .planning-pool-control > input:disabled {
+                    cursor: not-allowed;
+                    opacity: 0.5;
                 }
 
             /* CONTROLE DOS REPORTS - AJUSTES ESPECIFICOS DEPENDENDO DO RELATÓRIO EM QUESTÃO */
@@ -478,7 +495,9 @@
                             width: 90px;
                             text-align: center;
                         }
-                        #planning .planning-pool-table td:nth-child(2) {
+                        #planning .planning-pool-table th:last-child,
+                        #planning .planning-pool-table td:nth-child(2),
+                        #planning .planning-pool-table td:nth-child(3) {
                             width: 75px;
                             text-align: center;
                         }
@@ -754,22 +773,32 @@
                                                 <h4>Collection Pool</h4>
 
                                                 <div class="planning-pool-control-list">
-                                                    <label class="planning-pool-control">
-                                                        <input type="checkbox" data-planning-pool-field="bulky" checked>
-                                                        <span>Volumosos</span>
-                                                    </label>
+                                                    <div class="planning-pool-control">
+                                                        <label>
+                                                            <input type="checkbox" data-planning-pool-field="bulky" checked>
+                                                            <span>Volumosos</span>
+                                                        </label>
 
-                                                    <input type="text">
+                                                        <input type="text" inputmode="numeric" maxlength="6" placeholder="QTD" aria-label="Quantidade de volumosos" data-planning-pool-quantity="bulky">
+                                                    </div>
 
-                                                    <label class="planning-pool-control">
-                                                        <input type="checkbox" data-planning-pool-field="backlog" checked>
-                                                        <span>Roteirizar Backlog?</span>
-                                                    </label>
+                                                    <div class="planning-pool-control">
+                                                        <label>
+                                                            <input type="checkbox" data-planning-pool-field="backlog" checked>
+                                                            <span>Roteirizar Backlog?</span>
+                                                        </label>
 
-                                                    <label class="planning-pool-control">
-                                                        <input type="checkbox" data-planning-pool-field="outOfRoute" checked>
-                                                        <span>Fora de Rota</span>
-                                                    </label>
+                                                        <input type="text" inputmode="numeric" maxlength="6" placeholder="QTD" aria-label="Quantidade de backlog" data-planning-pool-quantity="backlog">
+                                                    </div>
+
+                                                    <div class="planning-pool-control">
+                                                        <label>
+                                                            <input type="checkbox" data-planning-pool-field="outOfRoute" checked>
+                                                            <span>Fora de Rota</span>
+                                                        </label>
+
+                                                        <input type="text" inputmode="numeric" maxlength="6" placeholder="QTD" aria-label="Quantidade fora de rota" data-planning-pool-quantity="outOfRoute">
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -782,8 +811,8 @@
                                                 <h4>Dados Gerais</h4>
 
                                                 <div class="planning-general-fields">
-                                                    <input type="text" inputmode="numeric" maxlength="5" placeholder="SPR" value="90" data-planning-field="averageSpr">
-                                                    <input type="text" inputmode="numeric" maxlength="6" placeholder="CAP" value="20000" data-planning-field="dailyCapacity">
+                                                    <input type="text" inputmode="numeric" maxlength="5" placeholder="SPR" data-planning-field="averageSpr">
+                                                    <input type="text" inputmode="numeric" maxlength="6" placeholder="CAP" data-planning-field="dailyCapacity">
                                                 </div>
                                             </div>
                                         </div>
@@ -903,6 +932,7 @@
                                                             <thead>
                                                                 <tr>
                                                                     <th colspan="2">Collection Pool</th>
+                                                                    <th>QTD</th>
                                                                 </tr>
                                                             </thead>
 
@@ -910,16 +940,19 @@
                                                                 <tr>
                                                                     <td>Volumosos</td>
                                                                     <td data-planning-pool-preview="bulky">SIM</td>
+                                                                    <td data-planning-pool-quantity-preview="bulky">0</td>
                                                                 </tr>
 
                                                                 <tr>
                                                                     <td>Roteirizar Backlog?</td>
                                                                     <td data-planning-pool-preview="backlog">SIM</td>
+                                                                    <td data-planning-pool-quantity-preview="backlog">0</td>
                                                                 </tr>
 
                                                                 <tr>
                                                                     <td>Fora de Rota</td>
                                                                     <td data-planning-pool-preview="outOfRoute">SIM</td>
+                                                                    <td data-planning-pool-quantity-preview="outOfRoute">0</td>
                                                                 </tr>
                                                             </tbody>
                                                         </table>
