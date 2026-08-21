@@ -381,18 +381,17 @@
 
                     #planning .planning-sheet-preview {
                         width: 100%;
-                        min-height: 865px;
                         display: flex;
                         flex-direction: column;
+                        row-gap: 20px;
                         padding: 20px;
-                        color: #e4e6eb;
                         background-color: #141414;
                         border: 1px solid #525252;
                         border-radius: 5px;
                     }
                     #planning .planning-sheet-title {
+                        width: 100%;
                         padding: 12px 20px;
-                        margin-bottom: 20px;
                         text-align: center;
                         background-color: #2e2e2e;
                         border: 1px solid #525252;
@@ -724,6 +723,34 @@
                     <div class="tabs-content" data-tabs-content="report-choice">
                         <div class="tabs-panel is-active" id="planning">
 
+                            <!-- HEADER DO RELATÓRIO -->
+
+                            <ul class="flex-box-start tabs" data-tabs id="planning-choice">
+                                <li class="tabs-title is-active">
+                                    <a href="#lhs-list">
+                                        <h4>Lista de LHs</h4>
+                                    </a>
+                                </li> 
+
+                                <li class="tabs-title" id="planningSegregatedTosTab" hidden>
+                                    <a href="#segregated-tos">
+                                        <h4>TOs a Segregar</h4>
+                                    </a>
+                                </li>
+
+                                <li class="tabs-title">
+                                    <a href="#collection-pool">
+                                        <h4>Collection Pool</h4>
+                                    </a>
+                                </li> 
+
+                                <li class="tabs-title">
+                                    <a href="#geral-data">
+                                        <h4>Dados Gerais</h4>
+                                    </a>
+                                </li> 
+                            </ul> 
+
                             <!-- CONTEÚDO DO RELATÓRIO -->
 
                             <div class="flex-box-start">
@@ -731,37 +758,6 @@
                                 <!-- CONTROLES DO RELATÓRIO -->
 
                                 <div class="report-controls flex-box-column">
-
-                                    <!-- MENU OPÇÕES DO RELATÓRIO EM QUESTÃO -->
-
-                                    <ul class="flex-box-start tabs" data-tabs id="planning-choice">
-                                        <li class="tabs-title is-active">
-                                            <a href="#lhs-list">
-                                                <h4>Lista de LHs</h4>
-                                            </a>
-                                        </li> 
-
-                                        <li class="tabs-title" id="planningSegregatedTosTab" hidden>
-                                            <a href="#segregated-tos">
-                                                <h4>TOs a Segregar</h4>
-                                            </a>
-                                        </li>
-
-                                        <li class="tabs-title">
-                                            <a href="#collection-pool">
-                                                <h4>Collection Pool</h4>
-                                            </a>
-                                        </li> 
-
-                                        <li class="tabs-title">
-                                            <a href="#geral-data">
-                                                <h4>Dados Gerais</h4>
-                                            </a>
-                                        </li> 
-                                    </ul> 
-
-                                    <!-- CONTROLES SEPERADOS POR TIPO -->
-
                                     <div class="tabs-content" data-tabs-content="planning-choice">
                                         <div class="tabs-panel is-active" id="lhs-list">
 
@@ -876,10 +872,10 @@
 
                                     <section class="planning-sheet-preview" id="planningSheetPreview">
 
-                                        <!-- TÍTULO DO PLANEJAMENTO -->
+                                        <!-- RELATÓRIO DE PLANEJAMENTO -->
 
                                         <div class="planning-sheet-title">
-                                            <h2>Planejamento de Roteirização</h2>
+                                            <h2>Planejamento de Veículos</h2>
                                         </div>
 
                                         <div class="planning-sheet-layout">
@@ -990,18 +986,8 @@
                                                             </tr>
 
                                                             <tr>
-                                                                <td>Roteirizar Office?</td>
-                                                                <td data-planning-pool-preview="office">SIM</td>
-                                                            </tr>
-
-                                                            <tr>
                                                                 <td>Roteirizar Backlog?</td>
                                                                 <td data-planning-pool-preview="backlog">SIM</td>
-                                                            </tr>
-
-                                                            <tr>
-                                                                <td>Roteirizar Home?</td>
-                                                                <td data-planning-pool-preview="home">SIM</td>
                                                             </tr>
 
                                                             <tr>
@@ -1014,13 +1000,11 @@
                                             </div>
                                         </div>
 
-                                        <!-- TÍTULO DO RESUMO DO CP -->
+                                        <!-- RELATÓRIO DA COLLECTION POOL -->
 
                                         <div class="planning-sheet-title">
-                                            <h2>Detalhamento da Collection Pool</h2>
+                                            <h2>Resumo da Collection Pool</h2>
                                         </div>
-
-                                        <!-- INFORMAÇÕES DO CP -->
 
                                         <div class="planning-sheet-layout">
                                             <div class="planning-sheet-main">
@@ -1030,43 +1014,43 @@
                                                 <table class="planning-sheet-table planning-cp-summary-table">
                                                     <thead>
                                                         <tr>
-                                                            <th colspan="2">Resumo do CP</th>
+                                                            <th colspan="2">Principais Informações</th>
                                                         </tr>
                                                     </thead>
 
                                                     <tbody>
                                                         <tr>
-                                                            <td>Total</td>
+                                                            <td>Total de Pacotes</td>
                                                             <td id="planningPreviewCpTotal">0</td>
                                                         </tr>
 
                                                         <tr>
-                                                            <td>Backlog</td>
+                                                            <td>Quantidade de Backlog</td>
                                                             <td id="planningPreviewCpBacklog">0</td>
                                                         </tr>
 
                                                         <tr>
-                                                            <td>LH Pool</td>
+                                                            <td>Quantidade dos LHs (Pacotes)</td>
                                                             <td id="planningPreviewCpLhPool">0</td>
                                                         </tr>
 
                                                         <tr>
-                                                            <td>Volumosos</td>
+                                                            <td>Quantidade de Volumosos</td>
                                                             <td id="planningPreviewCpBulky">0</td>
                                                         </tr>
 
                                                         <tr>
-                                                            <td>Erros</td>
+                                                            <td>Quantidade de Erros</td>
                                                             <td id="planningPreviewCpErrors">0</td>
                                                         </tr>
 
                                                         <tr>
-                                                            <td>Pacotes adicionados</td>
+                                                            <td>Pacotes Adicionados</td>
                                                             <td id="planningPreviewCpAdded">0</td>
                                                         </tr>
 
                                                         <tr>
-                                                            <td>Pacotes retirados</td>
+                                                            <td>Pacotes Retirados</td>
                                                             <td id="planningPreviewCpRemoved">0</td>
                                                         </tr>
                                                     </tbody>
