@@ -13,7 +13,7 @@
 
         <!-- Sinal de mais -->
         <path
-            d="M150 138v134M83 205h134"
+            d="M180 108v134M113 175h134"
             fill="none"
             stroke="#1f1f1f"
             stroke-width="24"
