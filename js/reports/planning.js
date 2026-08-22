@@ -580,26 +580,24 @@ function renderPlanningToGroups(lhs) {
     );
 }
 
-/* VERIFICA SE O LH POSSUI INFORMAÇÕES */
+/* RETORNA OS LHS EXIBIDOS NA PRÉVIA */
 
-function hasPlanningLhInformation(lh) {
-    return (
-        String(
-            lh.code,
-        ).trim() !== "" ||
-        String(
-            lh.origin,
-        ).trim() !== "" ||
-        lh.quantity !== null
-    );
-}
+function getPlanningPreviewLhs(lhs) {
+    const previewLhs =
+        [...lhs];
 
-/* RETORNA OS LHS EXIBIDOS NO PLANEJAMENTO */
+    while (
+        previewLhs.length <
+        MINIMUM_PLANNING_LHS
+    ) {
+        previewLhs.push({
+            code: "",
+            origin: "",
+            quantity: null,
+        });
+    }
 
-function getPlanningRoutableLhs(lhs) {
-    return lhs.filter(
-        hasPlanningLhInformation,
-    );
+    return previewLhs;
 }
 
 /* VERIFICA SE A TO POSSUI INFORMAÇÕES */
@@ -746,23 +744,10 @@ function createPlanningEmptyRow(
 /* RENDERIZA A TABELA PRINCIPAL DE LHS */
 
 function renderPlanningLhPreview(
-    routableLhs,
+    previewLhs,
 ) {
-    if (
-        routableLhs.length === 0
-    ) {
-        planningPreviewLhBody.replaceChildren(
-            createPlanningEmptyRow(
-                3,
-                "Nenhum LH informado.",
-            ),
-        );
-
-        return;
-    }
-
     const rows =
-        routableLhs.map(
+        previewLhs.map(
             function (lh) {
                 return createPlanningPreviewRow([
                     lh.code,
@@ -780,23 +765,10 @@ function renderPlanningLhPreview(
 /* RENDERIZA OS MESMOS LHS NA TABELA DA POOL */
 
 function renderPlanningPoolLhPreview(
-    routableLhs,
+    previewLhs,
 ) {
-    if (
-        routableLhs.length === 0
-    ) {
-        planningPreviewPoolLhBody.replaceChildren(
-            createPlanningEmptyRow(
-                2,
-                "Nenhum LH na Pool.",
-            ),
-        );
-
-        return;
-    }
-
     const rows =
-        routableLhs.map(
+        previewLhs.map(
             function (lh) {
                 return createPlanningPreviewRow([
                     lh.code,
@@ -937,13 +909,13 @@ function getPlanningPoolQuantity(
 /* ATUALIZA A PRÉVIA DO PLANEJAMENTO */
 
 function renderPlanningPreview(state) {
-    const routableLhs =
-        getPlanningRoutableLhs(
+    const previewLhs =
+        getPlanningPreviewLhs(
             state.lhs,
         );
 
     const estimatedVolume =
-        routableLhs.reduce(
+        previewLhs.reduce(
             function (
                 total,
                 lh,
@@ -1041,11 +1013,11 @@ function renderPlanningPreview(state) {
         );
 
     renderPlanningLhPreview(
-        routableLhs,
+        previewLhs,
     );
 
     renderPlanningPoolLhPreview(
-        routableLhs,
+        previewLhs,
     );
 
     renderPlanningSegregatedPreview(
