@@ -141,14 +141,32 @@
 
             /* CONTROLE DO PLANEJAMENTO - LISTA DINÂMICA DE LHS */
 
+                .lhs-buttons {
+                    padding: 0 0 15px 0;
+                    margin-right: 15px;
+                    margin-bottom: 20px;
+                    border-bottom: 2px solid #525252;
+                }
+                .lhs-buttons > div {
+                    display: flex;
+                    column-gap: 10px;
+                    justify-content: center;
+                    overflow: hidden;
+                    height: 40px;
+                }
+                .lhs-buttons > div > #planningAddLh {
+                    width: 50%;
+                    cursor: pointer;
+                    min-height: 40px;
+                    font-size: 14px;
+                    padding: 10px 15px;
+                    color: #e4e6eb;
+                    background-color: #141414;
+                    border: 1px solid #525252;
+                    border-bottom: 4px solid #525252;
+                }
                 #planning #planningSegregatedTosTab[hidden] {
                     display: none;
-                }
-                #planning #planningAddLh {
-                   cursor: pointer;
-                }
-                #planning #planningAddLh img {
-                    width: 45px;
                 }
                 #planning .planning-lh-remove {
                     min-height: 38px;
@@ -380,7 +398,6 @@
                 border-bottom: 2px solid #525252;
             }
 
-
                 /* ESTRUTURA DA PLANILHA */
 
                     #planning .planning-sheet-preview {
@@ -431,9 +448,6 @@
                         min-width: 0;
                         min-height: 0;
                     }
-
-                    
-
                     #planning #planningSegregatedSection[hidden],
                     #planning #planningSegregatedTosSection[hidden] {
                         display: none;
@@ -743,9 +757,11 @@
 
                                             <!-- BOTÃO DE ADICIONAR -->
 
-                                            <div class="">
-                                                <button class="button" id="planningAddLh">Adicionar LH</button>
-                                                <button class="button">Limpar Lista</button>
+                                            <div class="lhs-buttons">
+                                                <div>
+                                                    <button class="button" id="planningAddLh">Adicionar LH</button>
+                                                    <button class="button">Limpar Lista</button>
+                                                </div>
                                             </div>
                                             
                                             <!-- LISTA DE LHS -->
