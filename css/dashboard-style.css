@@ -956,55 +956,41 @@
         background-color: #1f1f1f;
         border-bottom: 2px solid #525252;
     }
-    .main-menu .flex-box-between {
+    .main-menu > .flex-box-between {
         max-width: 1356px;
         margin: 0 auto;
         align-items: center;
     }
-    .main-menu .container-1 {
+    .main-menu > .flex-box-between > div {
         width: max-content;
         justify-content: left;
         align-items: center;
     }
-    .main-menu .container-1 img {
+    .main-menu > .flex-box-between > div > img {
         width: 80px;
         height: 80px;
         margin-right: 15px;
     }
-    .main-menu h3, .main-menu p {
+    .main-menu > .flex-box-between > div h3,
+    .main-menu > .flex-box-between > div p {
         margin: 0;
     }
-    .main-menu p {
+    .main-menu > .flex-box-between > div p {
         font-size: 14px;
     }
-    .main-menu .link-button {
-        border: 2px solid #525252;
-    }
-    .main-menu .link-button img {
-        width: 35px;
-    }
-    .main-menu .link-button:hover {
-        background: #2e2e2e;
-    }
-    .main-menu .link-button h4 {
-        cursor: pointer;
-        margin-bottom: 0;
-        font-size: 15px;
-        line-height: 1;
-    }
-    .main-menu .link-button .flex-box-center {
+    .main-menu > div > ul {
         align-items: center;
     }
     .main-menu > div > ul > .external-links {
         display: flex;
         gap: 15px;
     }
-    .main-menu > div > ul > .external-links > a > img {
-        width: 35px;
-    }
     .main-menu > div > ul > .external-links > a:hover {
         opacity: 0.61;
         transition: all 0.5s ease;
+    }
+    .main-menu > div > ul > .external-links > a > img {
+        width: 35px;
     }
 
 /* BASE ESTRUTURAL */
