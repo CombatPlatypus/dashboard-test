@@ -32,13 +32,10 @@ let planningToGroups = null;
 let planningToEmpty = null;
 let planningSegregatedTosTab = null;
 let planningLhTabLink = null;
-let planningPreviewPoolLhBody = null;
 let planningPreviewCpTotal = null;
 let planningPreviewCpBacklog = null;
 let planningPreviewCpBulky = null;
 let planningPreviewCpLhPool = null;
-let planningPoolPreviewCells = new Map();
-let planningPoolQuantityPreviewCells = new Map();
 let planningSegregatedSection = null;    
 let planningSegregatedTosSection = null;
 let planningClearLhsButton = null;
@@ -762,25 +759,6 @@ function renderPlanningLhPreview(
     );
 }
 
-/* RENDERIZA OS MESMOS LHS NA TABELA DA POOL */
-
-function renderPlanningPoolLhPreview(
-    previewLhs,
-) {
-    const rows =
-        previewLhs.map(
-            function (lh) {
-                return createPlanningPreviewRow([
-                    lh.code,
-                    lh.quantity,
-                ]);
-            },
-        );
-
-    planningPreviewPoolLhBody.replaceChildren(
-        ...rows,
-    );
-}
 
 /* RENDERIZA OS LHS PARA SEGREGAR */
 
@@ -961,36 +939,6 @@ function renderPlanningPreview(state) {
             state.dailyCapacity ?? 0,
         );
 
-    planningPoolPreviewCells.forEach(
-        function (
-            cell,
-            field,
-        ) {
-            const poolItem =
-                state.collectionPool[field];
-
-            cell.textContent =
-                poolItem?.enabled
-                    ? "SIM"
-                    : "NÃO";
-        },
-    );
-
-    planningPoolQuantityPreviewCells.forEach(
-        function (
-            cell,
-            field,
-        ) {
-            cell.textContent =
-                planningNumberFormatter.format(
-                    getPlanningPoolQuantity(
-                        state,
-                        field,
-                    ),
-                );
-        },
-    );
-
     planningPreviewCpBacklog.textContent =
         planningNumberFormatter.format(
             backlogQuantity,
@@ -1029,10 +977,6 @@ function renderPlanningPreview(state) {
 
 
     renderPlanningLhPreview(
-        previewLhs,
-    );
-
-    renderPlanningPoolLhPreview(
         previewLhs,
     );
 
@@ -1640,39 +1584,7 @@ function initializePlanningLhList() {
     planningPreviewDailyCapacity =
         document.getElementById(
             "planningPreviewDailyCapacity",
-        );
-
-    planningPoolPreviewCells =
-        new Map(
-            Array.from(
-                document.querySelectorAll(
-                    "[data-planning-pool-preview]",
-                ),
-            ).map(
-                function (cell) {
-                    return [
-                        cell.dataset.planningPoolPreview,
-                        cell,
-                    ];
-                },
-            ),
-        );
-
-    planningPoolQuantityPreviewCells =
-        new Map(
-            Array.from(
-                document.querySelectorAll(
-                    "[data-planning-pool-quantity-preview]",
-                ),
-            ).map(
-                function (cell) {
-                    return [
-                        cell.dataset.planningPoolQuantityPreview,
-                        cell,
-                    ];
-                },
-            ),
-        );    
+        );  
     
     planningLhList =
         document.getElementById(
@@ -1697,11 +1609,6 @@ function initializePlanningLhList() {
     planningPreviewLhBody =
         document.getElementById(
             "planningPreviewLhBody",
-        );
-
-    planningPreviewPoolLhBody =
-        document.getElementById(
-            "planningPreviewPoolLhBody",
         );
 
     planningPreviewCpTotal =
@@ -1784,7 +1691,6 @@ function initializePlanningLhList() {
         !planningAddLhButton ||
         !planningEstimatedVolume ||
         !planningPreviewLhBody ||
-        !planningPreviewPoolLhBody ||
         !planningPreviewCpTotal ||
         !planningPreviewCpBacklog ||
         !planningPreviewCpBulky ||
