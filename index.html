@@ -86,18 +86,9 @@
             /* CONTROLE DOS REPORTS */
 
             #reports > .tabs-content > .tabs-panel > .flex-box-start > .report-controls {
-                flex: 0 0 350px;
-                row-gap: 15px;
+                flex: 1 1 0;
                 margin-right: 15px;
                 margin-top: 30px;
-            }
-            #reports > .tabs-content > .tabs-panel > .flex-box-start > .report-controls .input-group {
-                padding: 0 0 15px 0;
-                border-bottom: 2px solid #525252;
-            }
-            #reports > .tabs-content > .tabs-panel > .flex-box-start > .report-controls .input-group:last-of-type {
-                padding: 0 0 0 0;
-                border-bottom: none;
             }
             #reports > .tabs-content > .tabs-panel > .flex-box-start > .report-controls .tabs {
                 width: 100%;
@@ -178,10 +169,12 @@
                     font-size: 12px;
                 }
                 #planning .planning-lh-list {
-                    row-gap: 15px;
-                    max-height: 900px;
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(298px, 1fr));
+                    max-height: 419px;
                     overflow: auto;
                     padding-right: 15px;
+                    gap: 15px;
                 }
                 #planning .planning-lh-list::-webkit-scrollbar-track {
                     background-color: transparent;
@@ -401,9 +394,10 @@
             /* PREVIA DOS REPORTS */
             
             #reports > .tabs-content > .tabs-panel > .flex-box-start > .report-preview {
-                flex: 1 1 0;
+                flex: 0 0 1100px;
                 border-left: 2px solid #525252;
-                padding: 30px 0 0 30px;
+                padding: 0px 0 0px 25px;
+                margin-top: 30px;
             }
 
             /* PREVIA DOS REPORTS */
@@ -419,6 +413,7 @@
 
                     #planning .planning-sheet-preview {
                         width: 100%;
+                        min-height: 496px;
                         display: flex;
                         flex-direction: column;
                         row-gap: 20px;
@@ -426,10 +421,6 @@
                         background-color: #141414;
                         border: 1px solid #525252;
                         border-radius: 5px;
-                    }
-                    #planning .planning-sheet-preview:first-of-type {
-                        margin-bottom: 20px;
-                        min-height: 461px;
                     }
                     #planning .planning-sheet-title {
                         width: 100%;
@@ -768,7 +759,7 @@
 
                                 <!-- CONTROLES DO RELATÓRIO -->
 
-                                <div class="report-controls flex-box-column">
+                                <div class="report-controls">
                                     <div class="tabs-content" data-tabs-content="planning-choice">
                                         <div class="tabs-panel is-active" id="lhs-list">
 
@@ -910,7 +901,7 @@
 
                                         <div class="planning-sheet-preview">
                                             <div class="planning-sheet-title">
-                                                <h2>Planejamento de Veículos</h2>
+                                                <h2>Planejamento de Roteirização</h2>
                                             </div>
 
                                             <div class="planning-sheet-layout">
@@ -944,7 +935,7 @@
                                                         <table class="planning-sheet-table planning-main-table">
                                                             <thead>
                                                                 <tr>
-                                                                    <th>LHs a Roteirizar</th>
+                                                                    <th>LHs da Collection Pool</th>
                                                                     <th>Origem</th>
                                                                     <th>QTD</th>
                                                                 </tr>
@@ -1026,14 +1017,10 @@
 
                                                     <!-- COLLECTION POOL -->
 
-
-
-                                                    <!-- RESUMO -->
-
                                                     <table class="planning-sheet-table planning-cp-summary-table">
                                                         <thead>
                                                             <tr>
-                                                                <th colspan="2">Principais Informações</th>
+                                                                <th colspan="2">Collection Pool</th>
                                                             </tr>
                                                         </thead>
 
@@ -1074,94 +1061,6 @@
                                                             </tr>
                                                         </tbody>
                                                     </table>
-
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- RELATÓRIO DA COLLECTION POOL -->
-
-                                        <div class="planning-sheet-preview">
-                                            <div class="planning-sheet-title">
-                                                <h2>Resumo da Collection Pool</h2>
-                                            </div>
-
-                                            <div class="planning-sheet-layout">
-                                                <div class="planning-sheet-main">
-
-
-
-                                                    <div class="planning-sheet-section">
-                                                        <table class="planning-sheet-table planning-pool-table">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th colspan="2">Collection Pool</th>
-                                                                    <th>QTD</th>
-                                                                </tr>
-                                                            </thead>
-
-                                                            <tbody>
-                                                                <tr>
-                                                                    <td>Volumosos</td>
-                                                                    <td data-planning-pool-preview="bulky">SIM</td>
-                                                                    <td data-planning-pool-quantity-preview="bulky">0</td>
-                                                                </tr>
-
-                                                                <tr>
-                                                                    <td>Roteirizar Backlog?</td>
-                                                                    <td data-planning-pool-preview="backlog">SIM</td>
-                                                                    <td data-planning-pool-quantity-preview="backlog">0</td>
-                                                                </tr>
-
-                                                                <tr>
-                                                                    <td>Fora de Rota</td>
-                                                                    <td data-planning-pool-preview="outOfRoute">SIM</td>
-                                                                    <td data-planning-pool-quantity-preview="outOfRoute">0</td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-
-                                                </div>
-
-                                                <!-- LHS NA POOL -->
-
-                                                <div class="planning-sheet-sidebar">
-                                                    <div class="planning-pool-lh-section">
-                                                        <table class="planning-sheet-table planning-pool-lh-table">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th colspan="2">LHs na Pool</th>
-                                                                </tr>
-
-                                                                <tr>
-                                                                    <th>LH</th>
-                                                                    <th>QTD</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody id="planningPreviewPoolLhBody">
-                                                                <tr>
-                                                                    <td>—</td>
-                                                                    <td>—</td>
-                                                                </tr>
-
-                                                                <tr>
-                                                                    <td>—</td>
-                                                                    <td>—</td>
-                                                                </tr>
-
-                                                                <tr>
-                                                                    <td>—</td>
-                                                                    <td>—</td>
-                                                                </tr>
-
-                                                                <tr>
-                                                                    <td>—</td>
-                                                                    <td>—</td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
 
                                                 </div>
                                             </div>
