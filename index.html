@@ -129,12 +129,12 @@
             #reports > .tabs-content > .tabs-panel > .flex-box-start > .report-controls .input-group > input:last-of-type {
                 margin: 15px 0 0 0;
             }
-            #reports > .tabs-content > .tabs-panel > .flex-box-start > #collection-pool .input-group {
+            #reports > .tabs-content > .tabs-panel > #planning > .report-controls #collection-pool > .input-group {
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
                 gap: 15px;
             }
-            #reports > .tabs-content > .tabs-panel > .flex-box-start > #collection-pool .input-group h4 {
+            #reports > .tabs-content > .tabs-panel > #planning > .report-controls #collection-pool > .input-group h4 {
                 font-size: 14px;
             }
 
@@ -1574,23 +1574,5 @@
             <!-- PONTO DE ENTRADA DA APLICAÇÃO -->
 
             <script src="js/app.js" defer></script>
-
-            <!-- TEMPORARIO -->  
-
-            <script>
-
-                // FORÇAR MAXLENGTH
-
-                $('input[maxlength], textarea[maxlength]').on('input', function() {
-                    this.value = this.value.slice(0, this.maxLength);
-                });
-
-                // DESABILITAR SCROLL EM INPUTS TIPO NÚMERO
-
-                $('input[type=number]').on('wheel', function(e) {
-                    e.preventDefault();
-                });
-
-            </script>
     </body>
 </html>
