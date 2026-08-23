@@ -12,6 +12,8 @@ import {
     updatePlanningGeneralField,
     updatePlanningLh,
     updatePlanningTo,
+    resetPlanningLhs,
+    updatePlanningCollectionPoolSummaryField,
 } from "./state.js";
 
 /* ELEMENTOS DO PLANEJAMENTO */
@@ -35,17 +37,15 @@ let planningPreviewCpTotal = null;
 let planningPreviewCpBacklog = null;
 let planningPreviewCpBulky = null;
 let planningPreviewCpLhPool = null;
-
-let planningPoolPreviewCells =
-    new Map();
-
-let planningPoolQuantityPreviewCells =
-    new Map();
-
+let planningPoolPreviewCells = new Map();
+let planningPoolQuantityPreviewCells = new Map();
 let planningSegregatedSection = null;    
 let planningSegregatedTosSection = null;
-
-
+let planningClearLhsButton = null;
+let planningCpSummaryControls = null;
+let planningPreviewCpErrors = null;
+let planningPreviewCpAdded = null;
+let planningPreviewCpRemoved = null;
 
 /* FORMATAÇÃO NUMÉRICA */
 
@@ -1012,6 +1012,22 @@ function renderPlanningPreview(state) {
             backlogQuantity,
         );
 
+    planningPreviewCpErrors.textContent =
+        planningNumberFormatter.format(
+            state.collectionPoolSummary.errors ?? 0,
+        );
+
+    planningPreviewCpAdded.textContent =
+        planningNumberFormatter.format(
+            state.collectionPoolSummary.added ?? 0,
+        );
+
+    planningPreviewCpRemoved.textContent =
+        planningNumberFormatter.format(
+            state.collectionPoolSummary.removed ?? 0,
+        );
+
+
     renderPlanningLhPreview(
         previewLhs,
     );
@@ -1169,6 +1185,41 @@ function handlePlanningPoolInput(event) {
     );
 }
 
+/* ATUALIZA O RESUMO DA COLLECTION POOL */
+
+function handlePlanningCpSummaryInput(event) {
+    const input =
+        event.target instanceof HTMLInputElement
+            ? event.target
+            : null;
+
+    const field =
+        input?.dataset.planningCpSummaryField;
+
+    if (
+        !input ||
+        !field
+    ) {
+        return;
+    }
+
+    input.value =
+        input.value
+            .replace(
+                /\D/g,
+                "",
+            )
+            .slice(
+                0,
+                input.maxLength,
+            );
+
+    updatePlanningCollectionPoolSummaryField(
+        field,
+        input.value,
+    );
+}
+
 /* SINCRONIZA OS CONTROLES */
 
 function synchronizePlanningControls(
@@ -1224,6 +1275,20 @@ function synchronizePlanningControls(
                     !poolItem?.enabled;
             },
         );
+
+    planningCpSummaryControls
+        .querySelectorAll(
+            "[data-planning-cp-summary-field]",
+        )
+        .forEach(
+            function (input) {
+                const field =
+                    input.dataset.planningCpSummaryField;
+
+                input.value =
+                    state.collectionPoolSummary[field] ?? "";
+            },
+        );    
 }
 
 /* ADICIONA UM NOVO LH */
@@ -1242,6 +1307,23 @@ function handleAddPlanningLh() {
             '[data-field="code"]',
         )
         ?.focus();
+}
+
+/* REINICIA A LISTA DE LHS */
+
+function handleResetPlanningLhs() {
+    const shouldReset =
+        window.confirm(
+            "Limpar todos os LHs e TOs informados?",
+        );
+
+    if (!shouldReset) {
+        return;
+    }
+
+    resetPlanningLhs();
+
+    planningAddLhButton.focus();
 }
 
 /* ATUALIZA UM CAMPO DE LH */
@@ -1545,6 +1627,11 @@ function initializePlanningLhList() {
             "planningPoolControls",
         );
 
+    planningCpSummaryControls =
+        document.getElementById(
+            "planningCpSummaryControls",
+        );
+
     planningPreviewAverageSpr =
         document.getElementById(
             "planningPreviewAverageSpr",
@@ -1597,6 +1684,11 @@ function initializePlanningLhList() {
             "planningAddLh",
         );
 
+    planningClearLhsButton =
+        document.getElementById(
+            "planningClearLhs",
+        );    
+
     planningEstimatedVolume =
         document.getElementById(
             "planningEstimatedVolume",
@@ -1631,6 +1723,21 @@ function initializePlanningLhList() {
         document.getElementById(
             "planningPreviewCpLhPool",
         );   
+
+    planningPreviewCpErrors =
+        document.getElementById(
+            "planningPreviewCpErrors",
+        );
+
+    planningPreviewCpAdded =
+        document.getElementById(
+            "planningPreviewCpAdded",
+        );
+
+    planningPreviewCpRemoved =
+        document.getElementById(
+            "planningPreviewCpRemoved",
+        );
 
     planningPreviewSegregatedBody =
         document.getElementById(
@@ -1682,6 +1789,11 @@ function initializePlanningLhList() {
         !planningPreviewCpBacklog ||
         !planningPreviewCpBulky ||
         !planningPreviewCpLhPool ||
+        !planningClearLhsButton ||
+        !planningCpSummaryControls ||
+        !planningPreviewCpErrors ||
+        !planningPreviewCpAdded ||
+        !planningPreviewCpRemoved ||
         !planningPreviewSegregatedBody ||
         !planningPreviewSegregatedTosBody ||
         !planningSegregatedSection ||
@@ -1713,7 +1825,8 @@ function initializePlanningLhList() {
                 change.type === "lh-added" ||
                 change.type === "lh-removed" ||
                 change.type === "lhs-replaced" ||
-                change.type === "lhs-minimum-restored"
+                change.type === "lhs-minimum-restored" ||
+                change.type === "lhs-reset"
             ) {
                 renderPlanningLhList(
                     state.lhs,
@@ -1725,6 +1838,7 @@ function initializePlanningLhList() {
                 change.type === "lh-removed" ||
                 change.type === "lhs-replaced" ||
                 change.type === "lhs-minimum-restored" ||
+                change.type === "lhs-reset" ||
                 change.type === "to-added" ||
                 change.type === "to-removed" ||
                 (
@@ -1750,6 +1864,11 @@ function initializePlanningLhList() {
     planningAddLhButton.addEventListener(
         "click",
         handleAddPlanningLh,
+    );
+
+    planningClearLhsButton.addEventListener(
+        "click",
+        handleResetPlanningLhs,
     );
 
     planningLhList.addEventListener(
@@ -1785,6 +1904,11 @@ function initializePlanningLhList() {
     planningPoolControls.addEventListener(
         "input",
         handlePlanningPoolInput,
+    );
+
+    planningCpSummaryControls.addEventListener(
+        "input",
+        handlePlanningCpSummaryInput,
     );
 
     const state =
