@@ -154,7 +154,7 @@
                     overflow: hidden;
                     height: 40px;
                 }
-                .lhs-buttons > div > button {
+                .lhs-buttons > div > .button {
                     width: 50%;
                     cursor: pointer;
                     min-height: 40px;
@@ -165,7 +165,7 @@
                     border: 1px solid #525252;
                     border-bottom: 4px solid #525252;
                 }
-                .lhs-buttons > div > button:hover {
+                .lhs-buttons > div > .button:hover {
                     color: #e4e6eb;
                     background-color: #141414;
                 }
@@ -1026,49 +1026,7 @@
 
                                                     <!-- COLLECTION POOL -->
 
-                                                    <div class="planning-sheet-section">
-                                                        <table class="planning-sheet-table planning-pool-table">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th colspan="2">Collection Pool</th>
-                                                                    <th>QTD</th>
-                                                                </tr>
-                                                            </thead>
 
-                                                            <tbody>
-                                                                <tr>
-                                                                    <td>Volumosos</td>
-                                                                    <td data-planning-pool-preview="bulky">SIM</td>
-                                                                    <td data-planning-pool-quantity-preview="bulky">0</td>
-                                                                </tr>
-
-                                                                <tr>
-                                                                    <td>Roteirizar Backlog?</td>
-                                                                    <td data-planning-pool-preview="backlog">SIM</td>
-                                                                    <td data-planning-pool-quantity-preview="backlog">0</td>
-                                                                </tr>
-
-                                                                <tr>
-                                                                    <td>Fora de Rota</td>
-                                                                    <td data-planning-pool-preview="outOfRoute">SIM</td>
-                                                                    <td data-planning-pool-quantity-preview="outOfRoute">0</td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- RELATÓRIO DA COLLECTION POOL -->
-
-                                        <div class="planning-sheet-preview">
-                                            <div class="planning-sheet-title">
-                                                <h2>Resumo da Collection Pool</h2>
-                                            </div>
-
-                                            <div class="planning-sheet-layout">
-                                                <div class="planning-sheet-main">
 
                                                     <!-- RESUMO -->
 
@@ -1116,6 +1074,54 @@
                                                             </tr>
                                                         </tbody>
                                                     </table>
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- RELATÓRIO DA COLLECTION POOL -->
+
+                                        <div class="planning-sheet-preview">
+                                            <div class="planning-sheet-title">
+                                                <h2>Resumo da Collection Pool</h2>
+                                            </div>
+
+                                            <div class="planning-sheet-layout">
+                                                <div class="planning-sheet-main">
+
+
+
+                                                    <div class="planning-sheet-section">
+                                                        <table class="planning-sheet-table planning-pool-table">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th colspan="2">Collection Pool</th>
+                                                                    <th>QTD</th>
+                                                                </tr>
+                                                            </thead>
+
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td>Volumosos</td>
+                                                                    <td data-planning-pool-preview="bulky">SIM</td>
+                                                                    <td data-planning-pool-quantity-preview="bulky">0</td>
+                                                                </tr>
+
+                                                                <tr>
+                                                                    <td>Roteirizar Backlog?</td>
+                                                                    <td data-planning-pool-preview="backlog">SIM</td>
+                                                                    <td data-planning-pool-quantity-preview="backlog">0</td>
+                                                                </tr>
+
+                                                                <tr>
+                                                                    <td>Fora de Rota</td>
+                                                                    <td data-planning-pool-preview="outOfRoute">SIM</td>
+                                                                    <td data-planning-pool-quantity-preview="outOfRoute">0</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+
                                                 </div>
 
                                                 <!-- LHS NA POOL -->
