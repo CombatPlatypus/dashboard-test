@@ -137,6 +137,10 @@
             #reports #collection-pool > .input-group h4 {
                 font-size: 14px;
             }
+            #reports #collection-pool > .input-group:first-of-type {
+                padding-bottom: 20px;
+                border-bottom: 2px solid #525252;
+            }
 
         
             /* CONTROLE DO PLANEJAMENTO - LISTA DINÂMICA DE LHS */
@@ -700,7 +704,7 @@
 
                                 <li class="tabs-title">
                                     <a href="#planning-import">
-                                        <h4>Importar Dados</h4>
+                                        <h4>Importar Planilhas</h4>
                                     </a>
                                 </li> 
                             </ul> 
@@ -742,13 +746,16 @@
 
                                         <div class="tabs-panel" id="collection-pool">
 
-                                            <!-- DADOS GERAIS -->
+                                            <!-- INDICADORES -->
 
-                                            <div class="input-group planning-general-controls" id="planningGeneralControls">
-                                                <h4>Dados Gerais</h4>
-
-                                                <div class="planning-general-fields">
+                                            <div class="input-group" id="planningGeneralControls">
+                                                <div>
+                                                    <h4>SPR Médio</h4>
                                                     <input type="text" inputmode="numeric" maxlength="5" placeholder="SPR" data-planning-field="averageSpr">
+                                                </div>
+
+                                                <div>
+                                                    <h4>Cap do dia</h4>
                                                     <input type="text" inputmode="numeric" maxlength="6" placeholder="CAP" data-planning-field="dailyCapacity">
                                                 </div>
                                             </div>
