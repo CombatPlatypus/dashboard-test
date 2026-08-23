@@ -48,10 +48,8 @@
             #report-choice .tabs-title {
                 width: 100%;
             }
+            #report-choice .tabs-title p,
             #report-choice .tabs-title h4 {
-                margin: 10px 0;
-            }
-            #report-choice .tabs-title p {
                 margin-bottom: 0;
                 text-align: center;
             }
@@ -59,7 +57,7 @@
             
 
             #reports > .tabs-content > .tabs-panel > .flex-box-start {
-                column-gap: 10px;
+                column-gap: 20px;
             }
 
             /* HEADER DOS REPORTS */
@@ -106,23 +104,18 @@
             #reports .report-controls .tabs .tabs-title {
                 width: 100%;
             }
-            #reports .report-controls .tabs .tabs-title:last-child:nth-child(odd) {
-                grid-column: 1 / -1;
-            }
 
-            #planning-choice:has(#planningSegregatedTosTab[hidden]) > .tabs-title:last-child {
-                grid-column: 1 / -1;
-            }
+            
 
             /* CONTROLE DOS REPORTS - DOIS INPUTS DENTRO DE UMA FLEX-BOX-START */
 
-            #reports > .report-controls .flex-box-start {
+            #reports .report-controls .flex-box-start {
                 column-gap: 10px;
             }
-            #reports > .report-controls .input-group .flex-box-start input:first-of-type {
+            #reports .report-controls .input-group .flex-box-start input:first-of-type {
                 flex: 1 1 0;
             }
-            #reports > .report-controls .input-group .flex-box-start input:last-of-type {
+            #reports .report-controls .input-group .flex-box-start input:last-of-type {
                 flex: 0 0 86px;
                 text-align: center;
             }
@@ -373,13 +366,15 @@
                 margin-top: 30px;
             }
 
-            /* PREVIA DOS REPORTS */
+            /* TABS DO PLANEJAMANETO */
             
             #reports > .tabs-content > .tabs-panel > .tabs {
-                width: 100%;
-                padding-bottom: 20px;
+                width: 100%;    
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
                 align-items: center;
-                border-bottom: 2px solid #525252;
+                column-gap: 10px;
+                margin-bottom: 20px;
             }
 
                 /* ESTRUTURA DA PLANILHA */
@@ -529,6 +524,7 @@
                             display: block;
                             padding: 10px;
                             font-size: 15px;
+                            background-color: #141414;
                         }
 
                 /* RESPONSIVIDADE */
