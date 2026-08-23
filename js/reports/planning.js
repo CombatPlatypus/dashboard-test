@@ -13,7 +13,6 @@ import {
     updatePlanningLh,
     updatePlanningTo,
     resetPlanningLhs,
-    updatePlanningCollectionPoolSummaryField,
 } from "./state.js";
 
 /* ELEMENTOS DO PLANEJAMENTO */
@@ -39,7 +38,6 @@ let planningPreviewCpLhPool = null;
 let planningSegregatedSection = null;    
 let planningSegregatedTosSection = null;
 let planningClearLhsButton = null;
-let planningCpSummaryControls = null;
 let planningPreviewCpErrors = null;
 let planningPreviewCpAdded = null;
 let planningPreviewCpRemoved = null;
@@ -863,25 +861,24 @@ function renderPlanningSegregatedTosPreview(lhs) {
     );
 }
 
-/* RETORNA UMA QUANTIDADE ATIVA DA COLLECTION POOL */
+/* RETORNA UMA QUANTIDADE DA COLLECTION POOL */
 
 function getPlanningPoolQuantity(
     state,
     field,
 ) {
-    const poolItem =
+    const quantity =
         state.collectionPool[field];
 
     if (
-        !poolItem?.enabled ||
         !Number.isFinite(
-            poolItem.quantity,
+            quantity,
         )
     ) {
         return 0;
     }
 
-    return poolItem.quantity;
+    return quantity;
 }
 
 /* ATUALIZA A PRÉVIA DO PLANEJAMENTO */
@@ -892,89 +889,92 @@ function renderPlanningPreview(state) {
             state.lhs,
         );
 
-    const estimatedVolume =
-        previewLhs.reduce(
-            function (
-                total,
-                lh,
-            ) {
-                return (
-                    total +
-                    (
-                        Number.isFinite(
-                            lh.quantity,
+        const lhQuantity =
+            previewLhs.reduce(
+                function (
+                    total,
+                    lh,
+                ) {
+                    return (
+                        total +
+                        (
+                            Number.isFinite(
+                                lh.quantity,
+                            )
+                                ? lh.quantity
+                                : 0
                         )
-                            ? lh.quantity
-                            : 0
-                    )
-                );
-            },
-            0,
-        );
+                    );
+                },
+                0,
+            );
 
-    const backlogQuantity =
-        getPlanningPoolQuantity(
-            state,
-            "backlog",
-        );
+        const backlogPackages =
+            getPlanningPoolQuantity(
+                state,
+                "backlogPackages",
+            );
 
-    const bulkyQuantity =
-        getPlanningPoolQuantity(
-            state,
-            "bulky",
-        );
+        const backlogBulky =
+            getPlanningPoolQuantity(
+                state,
+                "backlogBulky",
+            );
 
-    planningEstimatedVolume.textContent =
-        planningNumberFormatter.format(
-            estimatedVolume,
-        );
+        const estimatedVolume =
+            lhQuantity +
+            backlogPackages +
+            backlogBulky;
+            
+        planningEstimatedVolume.textContent =
+            planningNumberFormatter.format(
+                estimatedVolume,
+            );
 
-    planningPreviewAverageSpr.textContent =
-        planningNumberFormatter.format(
-            state.averageSpr ?? 0,
-        );
+        planningPreviewAverageSpr.textContent =
+            planningNumberFormatter.format(
+                state.averageSpr ?? 0,
+            );
 
-    planningPreviewDailyCapacity.textContent =
-        planningNumberFormatter.format(
-            state.dailyCapacity ?? 0,
-        );
+        planningPreviewDailyCapacity.textContent =
+            planningNumberFormatter.format(
+                state.dailyCapacity ?? 0,
+            );
 
-    planningPreviewCpBacklog.textContent =
-        planningNumberFormatter.format(
-            backlogQuantity,
-        );
+        planningPreviewCpBacklog.textContent =
+            planningNumberFormatter.format(
+                backlogPackages,
+            );
 
-    planningPreviewCpBulky.textContent =
-        planningNumberFormatter.format(
-            bulkyQuantity,
-        );
+        planningPreviewCpBulky.textContent =
+            planningNumberFormatter.format(
+                backlogBulky,
+            );
 
-    planningPreviewCpLhPool.textContent =
-        planningNumberFormatter.format(
-            estimatedVolume,
-        );
+        planningPreviewCpLhPool.textContent =
+            planningNumberFormatter.format(
+                lhQuantity,
+            );
 
-    planningPreviewCpTotal.textContent =
-        planningNumberFormatter.format(
-            estimatedVolume +
-            backlogQuantity,
-        );
+        planningPreviewCpTotal.textContent =
+            planningNumberFormatter.format(
+                estimatedVolume,
+            );
 
-    planningPreviewCpErrors.textContent =
-        planningNumberFormatter.format(
-            state.collectionPoolSummary.errors ?? 0,
-        );
+        planningPreviewCpAdded.textContent =
+            planningNumberFormatter.format(
+                state.collectionPool.added ?? 0,
+            );
 
-    planningPreviewCpAdded.textContent =
-        planningNumberFormatter.format(
-            state.collectionPoolSummary.added ?? 0,
-        );
+        planningPreviewCpRemoved.textContent =
+            planningNumberFormatter.format(
+                state.collectionPool.removed ?? 0,
+            );
 
-    planningPreviewCpRemoved.textContent =
-        planningNumberFormatter.format(
-            state.collectionPoolSummary.removed ?? 0,
-        );
-
+        planningPreviewCpErrors.textContent =
+            planningNumberFormatter.format(
+                state.collectionPool.errors ?? 0,
+            );
 
     renderPlanningLhPreview(
         previewLhs,
@@ -1055,9 +1055,9 @@ function handlePlanningGeneralInput(event) {
     );
 }
 
-/* ATUALIZA O STATUS DA COLLECTION POOL */
+/* ATUALIZA UMA QUANTIDADE DA COLLECTION POOL */
 
-function handlePlanningPoolChange(event) {
+function handlePlanningPoolInput(event) {
     const input =
         event.target instanceof HTMLInputElement
             ? event.target
@@ -1073,44 +1073,6 @@ function handlePlanningPoolChange(event) {
         return;
     }
 
-    updatePlanningCollectionPoolField(
-        field,
-        "enabled",
-        input.checked,
-    );
-
-    const quantityInput =
-        planningPoolControls.querySelector(
-            `[data-planning-pool-quantity="${field}"]`,
-        );
-
-    if (
-        quantityInput instanceof
-        HTMLInputElement
-    ) {
-        quantityInput.disabled =
-            !input.checked;
-    }
-}
-
-/* ATUALIZA UMA QUANTIDADE DA COLLECTION POOL */
-
-function handlePlanningPoolInput(event) {
-    const input =
-        event.target instanceof HTMLInputElement
-            ? event.target
-            : null;
-
-    const field =
-        input?.dataset.planningPoolQuantity;
-
-    if (
-        !input ||
-        !field
-    ) {
-        return;
-    }
-
     input.value =
         input.value
             .replace(
@@ -1123,42 +1085,6 @@ function handlePlanningPoolInput(event) {
             );
 
     updatePlanningCollectionPoolField(
-        field,
-        "quantity",
-        input.value,
-    );
-}
-
-/* ATUALIZA O RESUMO DA COLLECTION POOL */
-
-function handlePlanningCpSummaryInput(event) {
-    const input =
-        event.target instanceof HTMLInputElement
-            ? event.target
-            : null;
-
-    const field =
-        input?.dataset.planningCpSummaryField;
-
-    if (
-        !input ||
-        !field
-    ) {
-        return;
-    }
-
-    input.value =
-        input.value
-            .replace(
-                /\D/g,
-                "",
-            )
-            .slice(
-                0,
-                input.maxLength,
-            );
-
-    updatePlanningCollectionPoolSummaryField(
         field,
         input.value,
     );
@@ -1192,47 +1118,10 @@ function synchronizePlanningControls(
                 const field =
                     input.dataset.planningPoolField;
 
-                input.checked =
-                    Boolean(
-                        state.collectionPool[field]
-                            ?.enabled,
-                    );
+                input.value =
+                    state.collectionPool[field] ?? "";
             },
         );
-
-    planningPoolControls
-        .querySelectorAll(
-            "[data-planning-pool-quantity]",
-        )
-        .forEach(
-            function (input) {
-                const field =
-                    input.dataset.planningPoolQuantity;
-
-                const poolItem =
-                    state.collectionPool[field];
-
-                input.value =
-                    poolItem?.quantity ?? "";
-
-                input.disabled =
-                    !poolItem?.enabled;
-            },
-        );
-
-    planningCpSummaryControls
-        .querySelectorAll(
-            "[data-planning-cp-summary-field]",
-        )
-        .forEach(
-            function (input) {
-                const field =
-                    input.dataset.planningCpSummaryField;
-
-                input.value =
-                    state.collectionPoolSummary[field] ?? "";
-            },
-        );    
 }
 
 /* ADICIONA UM NOVO LH */
@@ -1571,11 +1460,6 @@ function initializePlanningLhList() {
             "planningPoolControls",
         );
 
-    planningCpSummaryControls =
-        document.getElementById(
-            "planningCpSummaryControls",
-        );
-
     planningPreviewAverageSpr =
         document.getElementById(
             "planningPreviewAverageSpr",
@@ -1696,7 +1580,6 @@ function initializePlanningLhList() {
         !planningPreviewCpBulky ||
         !planningPreviewCpLhPool ||
         !planningClearLhsButton ||
-        !planningCpSummaryControls ||
         !planningPreviewCpErrors ||
         !planningPreviewCpAdded ||
         !planningPreviewCpRemoved ||
@@ -1803,18 +1686,8 @@ function initializePlanningLhList() {
     );
 
     planningPoolControls.addEventListener(
-        "change",
-        handlePlanningPoolChange,
-    );
-
-    planningPoolControls.addEventListener(
         "input",
         handlePlanningPoolInput,
-    );
-
-    planningCpSummaryControls.addEventListener(
-        "input",
-        handlePlanningCpSummaryInput,
     );
 
     const state =
