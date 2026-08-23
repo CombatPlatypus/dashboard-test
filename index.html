@@ -789,80 +789,31 @@
                                             <div class="input-group planning-pool-controls" id="planningPoolControls">
                                                 <h4>Collection Pool</h4>
 
-                                                <div class="planning-pool-control-list">
-                                                    <div class="planning-pool-control">
-                                                        <label>
-                                                            <input type="checkbox" data-planning-pool-field="bulky" checked>
-                                                            <span>Roteirizar Volumosos</span>
-                                                        </label>
-
-                                                        <input type="text" inputmode="numeric" maxlength="6" placeholder="QTD" aria-label="Quantidade de volumosos" data-planning-pool-quantity="bulky">
-                                                    </div>
-
-                                                    <div class="planning-pool-control">
-                                                        <label>
-                                                            <input type="checkbox" data-planning-pool-field="backlog" checked>
-                                                            <span>Roteirizar Backlog?</span>
-                                                        </label>
-
+                                                <div class="input-group">
+                                                    <div>
+                                                        <label>Qtd Backlog Pacotes</label>
                                                         <input type="text" inputmode="numeric" maxlength="6" placeholder="QTD" aria-label="Quantidade de backlog" data-planning-pool-quantity="backlog">
                                                     </div>
 
-                                                    <div class="planning-pool-control">
-                                                        <label>
-                                                            <input type="checkbox" data-planning-pool-field="outOfRoute" checked>
-                                                            <span>Fora de Rota</span>
-                                                        </label>
-
-                                                        <input type="text" inputmode="numeric" maxlength="6" placeholder="QTD" aria-label="Quantidade fora de rota" data-planning-pool-quantity="outOfRoute">
+                                                    <div>
+                                                        <label>Qtd Backlog Volumosos</label>
+                                                        <input type="text" inputmode="numeric" maxlength="6" placeholder="QTD" aria-label="Quantidade de volumosos" data-planning-pool-quantity="bulky">
                                                     </div>
-                                                </div>
-                                            </div>
 
-                                            <!-- INFORMAÇÕES DO RESUMO DA COLLECTION POOL -->
+                                                    <div>
+                                                        <label>Qtd de Adicionados</label>
+                                                        <input type="text" inputmode="numeric" maxlength="6" placeholder="QTD" aria-label="Pacotes adicionados" data-planning-cp-summary-field="added">
+                                                    </div>
 
-                                            <div class="input-group planning-cp-summary-controls" id="planningCpSummaryControls">
-                                                <h4>Principais Informações</h4>
+                                                    <div>
+                                                        <label>Qtd de Retirados</label>
+                                                        <input type="text" inputmode="numeric" maxlength="6" placeholder="QTD" aria-label="Pacotes retirados" data-planning-cp-summary-field="removed">
+                                                    </div>
 
-                                                <div class="planning-cp-summary-fields">
-                                                    <label class="planning-control-field">
-                                                        <span>Quantidade de Erros</span>
-
-                                                        <input
-                                                            type="text"
-                                                            inputmode="numeric"
-                                                            maxlength="6"
-                                                            placeholder="QTD"
-                                                            aria-label="Quantidade de erros"
-                                                            data-planning-cp-summary-field="errors"
-                                                        >
-                                                    </label>
-
-                                                    <label class="planning-control-field">
-                                                        <span>Pacotes Adicionados</span>
-
-                                                        <input
-                                                            type="text"
-                                                            inputmode="numeric"
-                                                            maxlength="6"
-                                                            placeholder="QTD"
-                                                            aria-label="Pacotes adicionados"
-                                                            data-planning-cp-summary-field="added"
-                                                        >
-                                                    </label>
-
-                                                    <label class="planning-control-field">
-                                                        <span>Pacotes Retirados</span>
-
-                                                        <input
-                                                            type="text"
-                                                            inputmode="numeric"
-                                                            maxlength="6"
-                                                            placeholder="QTD"
-                                                            aria-label="Pacotes retirados"
-                                                            data-planning-cp-summary-field="removed"
-                                                        >
-                                                    </label>
+                                                    <div>
+                                                        <label>Qtd de Erros</label>
+                                                        <input type="text" inputmode="numeric" maxlength="6" placeholder="QTD" aria-label="Quantidade de erros" data-planning-cp-summary-field="errors">
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -1025,38 +976,38 @@
 
                                                         <tbody>
                                                             <tr>
-                                                                <td>Total de Pacotes</td>
+                                                                <td>Total da Pool</td>
                                                                 <td id="planningPreviewCpTotal">0</td>
                                                             </tr>
 
                                                             <tr>
-                                                                <td>Quantidade de Backlog</td>
+                                                                <td>Qtd Backlog Pacotes</td>
                                                                 <td id="planningPreviewCpBacklog">0</td>
                                                             </tr>
 
                                                             <tr>
-                                                                <td>Quantidade de Volumosos</td>
+                                                                <td>Qtd Backlog Volumosos</td>
                                                                 <td id="planningPreviewCpBulky">0</td>
                                                             </tr>
 
                                                             <tr>
-                                                                <td>Quantidade dos LHs (Pacotes)</td>
+                                                                <td>Qtd dentro dos LHs</td>
                                                                 <td id="planningPreviewCpLhPool">0</td>
                                                             </tr>
 
                                                             <tr>
-                                                                <td>Quantidade de Erros</td>
-                                                                <td id="planningPreviewCpErrors">0</td>
-                                                            </tr>
-
-                                                            <tr>
-                                                                <td>Pacotes Adicionados</td>
+                                                                <td>Qtd Adicionada</td>
                                                                 <td id="planningPreviewCpAdded">0</td>
                                                             </tr>
 
                                                             <tr>
-                                                                <td>Pacotes Retirados</td>
+                                                                <td>Qtd Retirada</td>
                                                                 <td id="planningPreviewCpRemoved">0</td>
+                                                            </tr>
+
+                                                            <tr>
+                                                                <td>Qtd de Erros</td>
+                                                                <td id="planningPreviewCpErrors">0</td>
                                                             </tr>
                                                         </tbody>
                                                     </table>
