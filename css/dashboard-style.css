@@ -995,6 +995,17 @@
     .main-menu .link-button .flex-box-center {
         align-items: center;
     }
+    .main-menu > div > ul > .external-links {
+        display: flex;
+        gap: 15px;
+    }
+    .main-menu > div > ul > .external-links > a > img {
+        width: 35px;
+    }
+    .main-menu > div > ul > .external-links > a:hover {
+        opacity: 0.61;
+        transition: all 0.5s ease;
+    }
 
 /* BASE ESTRUTURAL */
 
@@ -1165,3 +1176,5 @@
             margin: 0 auto;
         }
     }
+
+/*  */
