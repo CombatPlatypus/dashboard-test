@@ -6,23 +6,8 @@ const planningState = {
     dailyCapacity: null,
 
     collectionPool: {
-        bulky: {
-            enabled: true,
-            quantity: null,
-        },
-
-        backlog: {
-            enabled: true,
-            quantity: null,
-        },
-
-        outOfRoute: {
-            enabled: true,
-            quantity: null,
-        },
-    },
-
-    collectionPoolSummary: {
+        backlogPackages: null,
+        backlogBulky: null,
         errors: null,
         added: null,
         removed: null,
@@ -59,18 +44,13 @@ const planningGeneralFields =
 
 const planningCollectionPoolFields =
     new Set([
-        "bulky",
-        "backlog",
-        "outOfRoute",
-    ]);
-
-const planningCollectionPoolSummaryFields =
-    new Set([
+        "backlogPackages",
+        "backlogBulky",
         "errors",
         "added",
         "removed",
     ]);
-
+    
 let nextPlanningLhId = 1;
 let nextPlanningToId = 1;
 
@@ -252,28 +232,10 @@ function getPlanningState() {
         dailyCapacity:
             planningState.dailyCapacity,
 
-        collectionPool:
-            Object.fromEntries(
-                Object.entries(
-                    planningState.collectionPool,
-                ).map(
-                    function (
-                        [field, values],
-                    ) {
-                        return [
-                            field,
-                            {
-                                ...values,
-                            },
-                        ];
-                    },
-                ),
-            ),
-
-        collectionPoolSummary: {
-            ...planningState.collectionPoolSummary,
+        collectionPool: {
+            ...planningState.collectionPool,
         },
-            
+                    
         lhs:
             planningState.lhs.map(
                 function (lh) {
@@ -659,59 +621,14 @@ function updatePlanningGeneralField(
     return true;
 }
 
-/* ATUALIZA A COLLECTION POOL */
+/* ATUALIZA UMA INFORMAÇÃO DA COLLECTION POOL */
 
 function updatePlanningCollectionPoolField(
     field,
-    property,
     value,
 ) {
     if (
         !planningCollectionPoolFields.has(
-            field,
-        ) ||
-        (
-            property !== "enabled" &&
-            property !== "quantity"
-        )
-    ) {
-        return false;
-    }
-
-    const normalizedValue =
-        property === "enabled"
-            ? Boolean(value)
-            : normalizeQuantity(
-                value,
-            );
-
-    if (
-        planningState.collectionPool[field][property] ===
-        normalizedValue
-    ) {
-        return true;
-    }
-
-    planningState.collectionPool[field][property] =
-        normalizedValue;
-
-    notifyPlanningState({
-        type: "collection-pool-updated",
-        field,
-        property,
-    });
-
-    return true;
-}
-
-/* ATUALIZA UMA INFORMAÇÃO DO RESUMO DA COLLECTION POOL */
-
-function updatePlanningCollectionPoolSummaryField(
-    field,
-    value,
-) {
-    if (
-        !planningCollectionPoolSummaryFields.has(
             field,
         )
     ) {
@@ -724,17 +641,17 @@ function updatePlanningCollectionPoolSummaryField(
         );
 
     if (
-        planningState.collectionPoolSummary[field] ===
+        planningState.collectionPool[field] ===
         normalizedValue
     ) {
         return true;
     }
 
-    planningState.collectionPoolSummary[field] =
+    planningState.collectionPool[field] =
         normalizedValue;
 
     notifyPlanningState({
-        type: "collection-pool-summary-updated",
+        type: "collection-pool-updated",
         field,
     });
 
@@ -827,5 +744,4 @@ export {
     updatePlanningLh,
     updatePlanningTo,
     resetPlanningLhs,
-    updatePlanningCollectionPoolSummaryField,
 };
