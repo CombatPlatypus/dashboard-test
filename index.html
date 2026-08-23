@@ -129,7 +129,16 @@
             #reports > .tabs-content > .tabs-panel > .flex-box-start > .report-controls .input-group > input:last-of-type {
                 margin: 15px 0 0 0;
             }
+            #reports > .tabs-content > .tabs-panel > .flex-box-start > #collection-pool .input-group {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 15px;
+            }
+            #reports > .tabs-content > .tabs-panel > .flex-box-start > #collection-pool .input-group h4 {
+                font-size: 14px;
+            }
 
+        
             /* CONTROLE DO PLANEJAMENTO - LISTA DINÂMICA DE LHS */
 
                 .lhs-buttons {
@@ -192,6 +201,9 @@
                     align-items: center;
                     flex-wrap: nowrap;
                     margin-bottom: 15px;
+                }
+                #planning .planning-lh-item-header > h4 {
+                    margin-bottom: 0;
                 }
                 #planning .planning-lh-item > input {
                     margin: 15px 0 0 0;
@@ -792,27 +804,27 @@
                                                 <div class="input-group">
                                                     <div>
                                                         <label>Qtd Backlog Pacotes</label>
-                                                        <input type="text" inputmode="numeric" maxlength="6" placeholder="QTD" aria-label="Quantidade de backlog" data-planning-pool-quantity="backlog">
+                                                        <input type="text" inputmode="numeric" maxlength="6" placeholder="QTD" data-planning-pool-quantity="backlog">
                                                     </div>
 
                                                     <div>
                                                         <label>Qtd Backlog Volumosos</label>
-                                                        <input type="text" inputmode="numeric" maxlength="6" placeholder="QTD" aria-label="Quantidade de volumosos" data-planning-pool-quantity="bulky">
+                                                        <input type="text" inputmode="numeric" maxlength="6" placeholder="QTD" data-planning-pool-quantity="bulky">
                                                     </div>
 
                                                     <div>
                                                         <label>Qtd de Adicionados</label>
-                                                        <input type="text" inputmode="numeric" maxlength="6" placeholder="QTD" aria-label="Pacotes adicionados" data-planning-cp-summary-field="added">
+                                                        <input type="text" inputmode="numeric" maxlength="6" placeholder="QTD" data-planning-cp-summary-field="added">
                                                     </div>
 
                                                     <div>
                                                         <label>Qtd de Retirados</label>
-                                                        <input type="text" inputmode="numeric" maxlength="6" placeholder="QTD" aria-label="Pacotes retirados" data-planning-cp-summary-field="removed">
+                                                        <input type="text" inputmode="numeric" maxlength="6" placeholder="QTD" data-planning-cp-summary-field="removed">
                                                     </div>
 
                                                     <div>
                                                         <label>Qtd de Erros</label>
-                                                        <input type="text" inputmode="numeric" maxlength="6" placeholder="QTD" aria-label="Quantidade de erros" data-planning-cp-summary-field="errors">
+                                                        <input type="text" inputmode="numeric" maxlength="6" placeholder="QTD" data-planning-cp-summary-field="errors">
                                                     </div>
                                                 </div>
                                             </div>
