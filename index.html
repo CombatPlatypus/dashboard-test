@@ -524,19 +524,13 @@
                             width: 75px;
                             text-align: center;
                         }
-                        #planning .planning-cp-summary-table td:nth-child(2),
-                        #planning .planning-pool-lh-table th:nth-child(2),
-                        #planning .planning-pool-lh-table td:nth-child(2) {
-                            width: 85px;
+                        #planning .planning-cp-summary-table .planning-quantity-column {
+                            width: 90px;
+                        }
+
+                        #planning .planning-cp-summary-table td:last-child {
                             text-align: center;
                         }
-
-                        /* TABELAS DO RESUMO DO CP */
-
-                        #planning .planning-pool-lh-section {
-                            width: 100%;
-                        }
-
 
                     /* INDICADORES */
 
@@ -1018,6 +1012,11 @@
                                                     <!-- COLLECTION POOL -->
 
                                                     <table class="planning-sheet-table planning-cp-summary-table">
+                                                        <colgroup>
+                                                            <col>
+                                                            <col class="planning-quantity-column">
+                                                        </colgroup>
+
                                                         <thead>
                                                             <tr>
                                                                 <th colspan="2">Collection Pool</th>
@@ -1061,7 +1060,6 @@
                                                             </tr>
                                                         </tbody>
                                                     </table>
-
                                                 </div>
                                             </div>
                                         </div>
