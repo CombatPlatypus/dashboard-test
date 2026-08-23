@@ -22,6 +22,12 @@ const planningState = {
         },
     },
 
+    collectionPoolSummary: {
+        errors: null,
+        added: null,
+        removed: null,
+    },
+
     lhs: [],
 };
 
@@ -56,6 +62,13 @@ const planningCollectionPoolFields =
         "bulky",
         "backlog",
         "outOfRoute",
+    ]);
+
+const planningCollectionPoolSummaryFields =
+    new Set([
+        "errors",
+        "added",
+        "removed",
     ]);
 
 let nextPlanningLhId = 1;
@@ -257,6 +270,10 @@ function getPlanningState() {
                 ),
             ),
 
+        collectionPoolSummary: {
+            ...planningState.collectionPoolSummary,
+        },
+            
         lhs:
             planningState.lhs.map(
                 function (lh) {
@@ -687,6 +704,60 @@ function updatePlanningCollectionPoolField(
     return true;
 }
 
+/* ATUALIZA UMA INFORMAÇÃO DO RESUMO DA COLLECTION POOL */
+
+function updatePlanningCollectionPoolSummaryField(
+    field,
+    value,
+) {
+    if (
+        !planningCollectionPoolSummaryFields.has(
+            field,
+        )
+    ) {
+        return false;
+    }
+
+    const normalizedValue =
+        normalizeQuantity(
+            value,
+        );
+
+    if (
+        planningState.collectionPoolSummary[field] ===
+        normalizedValue
+    ) {
+        return true;
+    }
+
+    planningState.collectionPoolSummary[field] =
+        normalizedValue;
+
+    notifyPlanningState({
+        type: "collection-pool-summary-updated",
+        field,
+    });
+
+    return true;
+}
+
+/* REINICIA A LISTA DE LHS */
+
+function resetPlanningLhs() {
+    planningState.lhs = [];
+
+    nextPlanningLhId = 1;
+    nextPlanningToId = 1;
+
+    fillMinimumPlanningLhs();
+
+    notifyPlanningState({
+        type: "lhs-reset",
+    });
+
+    return true;
+}
+
 /* REMOVE UM LH */
 
 function removePlanningLh(id) {
@@ -755,4 +826,6 @@ export {
     updatePlanningGeneralField,
     updatePlanningLh,
     updatePlanningTo,
+    resetPlanningLhs,
+    updatePlanningCollectionPoolSummaryField,
 };
