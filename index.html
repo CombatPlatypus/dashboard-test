@@ -165,7 +165,7 @@
                     border: 1px solid #525252;
                     border-bottom: 4px solid #525252;
                 }
-                .lhs-buttons > div > .button:hover {
+                .lhs-buttons > div > .button:hover, .lhs-buttons > div > .button:focus  {
                     color: #e4e6eb;
                     background-color: #141414;
                 }
@@ -694,13 +694,7 @@
 
                                 <li class="tabs-title">
                                     <a href="#collection-pool">
-                                        <h4>Collection Pool</h4>
-                                    </a>
-                                </li> 
-
-                                <li class="tabs-title">
-                                    <a href="#geral-data">
-                                        <h4>Dados Gerais</h4>
+                                        <h4>Indicadores e Collection Pool</h4>
                                     </a>
                                 </li> 
 
@@ -748,6 +742,17 @@
 
                                         <div class="tabs-panel" id="collection-pool">
 
+                                            <!-- DADOS GERAIS -->
+
+                                            <div class="input-group planning-general-controls" id="planningGeneralControls">
+                                                <h4>Dados Gerais</h4>
+
+                                                <div class="planning-general-fields">
+                                                    <input type="text" inputmode="numeric" maxlength="5" placeholder="SPR" data-planning-field="averageSpr">
+                                                    <input type="text" inputmode="numeric" maxlength="6" placeholder="CAP" data-planning-field="dailyCapacity">
+                                                </div>
+                                            </div>
+
                                             <!-- CONTROLES DA COLLECTION POOL -->
 
                                             <div class="input-group" id="planningPoolControls">
@@ -778,19 +783,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="tabs-panel" id="geral-data">
-
-                                            <!-- DADOS GERAIS -->
-
-                                            <div class="input-group planning-general-controls" id="planningGeneralControls">
-                                                <h4>Dados Gerais</h4>
-
-                                                <div class="planning-general-fields">
-                                                    <input type="text" inputmode="numeric" maxlength="5" placeholder="SPR" data-planning-field="averageSpr">
-                                                    <input type="text" inputmode="numeric" maxlength="6" placeholder="CAP" data-planning-field="dailyCapacity">
-                                                </div>
-                                            </div>
-                                        </div>
+                                        <div class="tabs-panel" id="import"></div>
                                     </div>
                                 </div>
 
