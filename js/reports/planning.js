@@ -31,7 +31,6 @@ let planningToGroups = null;
 let planningToEmpty = null;
 let planningSegregatedTosTab = null;
 let planningLhTabLink = null;
-let planningPreviewCpTotal = null;
 let planningPreviewCpBacklog = null;
 let planningPreviewCpBulky = null;
 let planningPreviewCpLhPool = null;
@@ -956,11 +955,6 @@ function renderPlanningPreview(state) {
                 lhQuantity,
             );
 
-        planningPreviewCpTotal.textContent =
-            planningNumberFormatter.format(
-                estimatedVolume,
-            );
-
         planningPreviewCpAdded.textContent =
             planningNumberFormatter.format(
                 state.collectionPool.added ?? 0,
@@ -1495,11 +1489,6 @@ function initializePlanningLhList() {
             "planningPreviewLhBody",
         );
 
-    planningPreviewCpTotal =
-        document.getElementById(
-            "planningPreviewCpTotal",
-        );
-
     planningPreviewCpBacklog =
         document.getElementById(
             "planningPreviewCpBacklog",
@@ -1575,7 +1564,6 @@ function initializePlanningLhList() {
         !planningAddLhButton ||
         !planningEstimatedVolume ||
         !planningPreviewLhBody ||
-        !planningPreviewCpTotal ||
         !planningPreviewCpBacklog ||
         !planningPreviewCpBulky ||
         !planningPreviewCpLhPool ||
