@@ -34,12 +34,16 @@
 
             /* ESTRUTURA GERAL DO REPORTS */
 
+            #reports {
+                width: 1600px;
+                margin: 0 auto;
+            }
             #report-choice {
-                width: 100%;
+                width: 1300px;
+                margin: 0 auto 30px auto;
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
                 gap: 15px;
-                margin-bottom: 30px;
             }
             #report-choice .tabs-title {
                 width: 100%;
@@ -56,6 +60,10 @@
                 background-color: #1f1f1f;
                 border: 2px solid #525252;
                 border-radius: 5px;
+            }
+
+            #reports > .tabs-content > .tabs-panel > .flex-box-start {
+                column-gap: 10px;
             }
 
             /* HEADER DOS REPORTS */
@@ -85,22 +93,24 @@
 
             /* CONTROLE DOS REPORTS */
 
-            #reports > .tabs-content > .tabs-panel > .flex-box-start > .report-controls {
+            #reports > .report-controls {
                 flex: 1 1 0;
-                margin-right: 15px;
-                margin-top: 30px;
+                background-color: #1f1f1f;
+                border: 2px solid #525252;
+                border-radius: 5px;
+                padding: 30px;
             }
-            #reports > .tabs-content > .tabs-panel > .flex-box-start > .report-controls .tabs {
+            #reports > .report-controls .tabs {
                 width: 100%;
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
                 padding-bottom: 15px;
                 border-bottom: 2px solid #525252;
             }
-            #reports > .tabs-content > .tabs-panel > .flex-box-start > .report-controls .tabs .tabs-title {
+            #reports > .report-controls .tabs .tabs-title {
                 width: 100%;
             }
-            #reports > .tabs-content > .tabs-panel > .flex-box-start > .report-controls .tabs .tabs-title:last-child:nth-child(odd) {
+            #reports > .report-controls .tabs .tabs-title:last-child:nth-child(odd) {
                 grid-column: 1 / -1;
             }
 
@@ -592,32 +602,10 @@
                             <img src="images/menu-icons/link-icon.svg">
                         </a>
 
-                        <a href="#">
+                        <a href="https://docs.google.com/spreadsheets/d/1IS4QDnMenXTi07FhiL-nFINrEjLppAfZhSlogZq22hY/edit?gid=0#gid=0">
                             <img src="images/menu-icons/settings-icon.svg">
                         </a>
                     </div>
-
-
-                    <!-- <a href="https://www.appsheet.com/start/9898e1c7-28cc-4bcc-9e15-b13a73533544?platform=desktop#appName=AVARIASLSP-63-957299733-25-10-22&vss=H4sIAAAAAAAAA6WRzU7CQBDHX4XMuREoWGBPihhjjB8BwoUSM7ZT2dh2m90tSJo-jM_iiznLR_TgBbjtzsxv5v-fqWAlaT2xGH2AmFe_vwfagIAqhOmmoBBECDcqt1qlIXghPGG2C758f73LHNsh1OCBIdTRcko6Y3Y49oPu4LLd6wwGfvuZ0xbfUnLoVE22lVx1vUIt0UDtnT78dUQWZeo01Avv0MaSAVEdZ0GcuwEZU25lIkm7Xo7kHnuO047iwIFh15CV27VsBTNTc-gU42co_9PlWAN79B8fMFbrnQ6M-v2g0_NFo9VttoKm3_ID0VhJq_SFkRmqK7NUBdFFpDKecKdVWQwZnPMpJ0rbw3tECZapnWFausvOF7XbVaKi0lA8Y--nezb3-e1ngXn8qGIWn2BqqP4BMXkggBsDAAA=&row=ac886372:%2004/06/2026:%20vitor.simao@shopee.com&view=P%C3%A1gina1_Detail" target="_blank" class="link-button">
-                        <div class="flex-box-center">
-                            <img src="images/links-icons/pack-recover-icon.svg" style="margin-right: 10px;">
-                            <h4>Pack Recover</h4>
-                        </div>
-                    </a> -->
-
-                    <!-- <a href="https://www.appsheet.com/start/9898e1c7-28cc-4bcc-9e15-b13a73533544?platform=desktop#appName=AVARIASLSP-63-957299733-25-10-22&vss=H4sIAAAAAAAAA6WRzU7CQBDHX4XMuREoWGBPihhjjB8BwoUSM7ZT2dh2m90tSJo-jM_iiznLR_TgBbjtzsxv5v-fqWAlaT2xGH2AmFe_vwfagIAqhOmmoBBECDcqt1qlIXghPGG2C758f73LHNsh1OCBIdTRcko6Y3Y49oPu4LLd6wwGfvuZ0xbfUnLoVE22lVx1vUIt0UDtnT78dUQWZeo01Avv0MaSAVEdZ0GcuwEZU25lIkm7Xo7kHnuO047iwIFh15CV27VsBTNTc-gU42co_9PlWAN79B8fMFbrnQ6M-v2g0_NFo9VttoKm3_ID0VhJq_SFkRmqK7NUBdFFpDKecKdVWQwZnPMpJ0rbw3tECZapnWFausvOF7XbVaKi0lA8Y--nezb3-e1ngXn8qGIWn2BqqP4BMXkggBsDAAA=&row=ac886372:%2004/06/2026:%20vitor.simao@shopee.com&view=P%C3%A1gina1_Detail" target="_blank" class="link-button">
-                        <div class="flex-box-center">
-                            <img src="images/links-icons/avarias-icon.svg" style="margin-right: 10px;">
-                            <h4>Avárias</h4>
-                        </div>
-                    </a>
-                    
-                    <a href="https://www.appsheet.com/start/e90438ea-37a9-47f7-a28f-1499b53fbd35#appName=ColetasLMHub-510641030&page=gallery&sort=%5B%5D&table=MenuInicial&view=Menu" target="_blank" class="link-button">
-                        <div class="flex-box-center">
-                            <img src="images/links-icons/coleta-icon.svg" style="margin-right: 10px;">
-                            <h4>Coletas</h4>
-                        </div>
-                    </a> -->
                 </ul> 
             </div>        
         </nav>
@@ -652,7 +640,6 @@
                                 <div class="flex-box-full-center">
                                     <img src="images/geral-icons/planning.svg">
                                     <h4>Planejamento</h4>
-                                    <p>Crie um relatório do planejamento de LHs e Resumo do CP para a próxima janela.</p>
                                 </div>
                             </a>
                         </li> 
@@ -662,7 +649,6 @@
                                 <div class="flex-box-full-center">
                                     <img src="images/geral-icons/barcode-scanner-icon.svg">
                                     <h4>Recebimento</h4>
-                                    <p>Crie um relatório com as informações obtidas das mesas recebimento da sua janela.</p>
                                 </div>
                             </a>
                         </li> 
@@ -672,7 +658,6 @@
                                 <div class="flex-box-full-center">
                                     <img src="images/geral-icons/percentage-icon.svg">
                                     <h4>Taxa de Perdas</h4>
-                                    <p>Crie um relatório de acompanhamento sobre a situação de avarias e perdas do hub.</p>
                                 </div>
                             </a>
                         </li> 
@@ -682,7 +667,6 @@
                                 <div class="flex-box-full-center">
                                     <img src="images/geral-icons/fire-icon.svg">
                                     <h4>Mapa de Calor</h4>
-                                    <p>Crie um relatório que abrange todos os aspectos do inventário nas últimas semanas.</p>
                                 </div>
                             </a>
                         </li>
@@ -711,12 +695,6 @@
                                         <h4>Indicadores e Collection Pool</h4>
                                     </a>
                                 </li> 
-
-                                <li class="tabs-title">
-                                    <a href="#planning-import">
-                                        <h4>Importar Planilhas</h4>
-                                    </a>
-                                </li> 
                             </ul> 
 
                             <!-- CONTEÚDO DO RELATÓRIO -->
@@ -725,276 +703,269 @@
 
                                 <!-- CONTROLES DO RELATÓRIO -->
 
-                                <div class="report-controls">
-                                    <div class="tabs-content" data-tabs-content="planning-choice">
-                                        <div class="tabs-panel is-active" id="lhs-list">
+                                <div class="tabs-content report-controls" data-tabs-content="planning-choice">
+                                    <div class="tabs-panel is-active" id="lhs-list">
 
-                                            <!-- BOTÃO DE ADICIONAR -->
+                                        <!-- BOTÃO DE ADICIONAR -->
 
-                                            <div class="lhs-buttons">
-                                                <div>
-                                                    <button class="button" id="planningAddLh" type="button">Adicionar LH</button>
-                                                    <button class="button" id="planningClearLhs" type="button">Limpar Lista</button>
-                                                </div>
-                                            </div>
-                                            
-                                            <!-- LISTA DE LHS -->
-
-                                            <div class="planning-lh-list flex-box-column" id="planningLhList"></div>
-                                        </div>
-
-                                        <div class="tabs-panel" id="segregated-tos">
-
-                                            <!-- LISTAS DE TOS SEPARADAS POR LH -->
-
-                                            <div class="planning-to-empty" id="planningToEmpty">
-                                                <p>Marque “Segregar” e “Segregar TO” em um LH para adicionar suas TOs.</p>
-                                            </div>
-
-                                            <div class="planning-to-groups flex-box-column" id="planningToGroups" hidden></div>
-                                        </div>
-
-                                        <div class="tabs-panel" id="collection-pool">
-
-                                            <!-- INDICADORES -->
-
-                                            <div class="input-group" id="planningGeneralControls">
-                                                <div>
-                                                    <h4>SPR Médio</h4>
-                                                    <input type="text" inputmode="numeric" maxlength="5" data-planning-field="averageSpr">
-                                                </div>
-
-                                                <div>
-                                                    <h4>Cap do dia</h4>
-                                                    <input type="text" inputmode="numeric" maxlength="6" data-planning-field="dailyCapacity">
-                                                </div>
-                                            </div>
-
-                                            <!-- CONTROLES DA COLLECTION POOL -->
-
-                                            <div class="input-group" id="planningPoolControls">
-                                                <div>
-                                                    <h4>Qtd Backlog Pacotes</h4>
-                                                    <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="backlogPackages">
-                                                </div>
-
-                                                <div>
-                                                    <h4>Qtd Backlog Volumosos</h4>
-                                                    <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="backlogBulky">
-                                                </div>
-
-                                                <div>
-                                                    <h4>Qtd de Adicionados</h4>
-                                                    <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="added">
-                                                </div>
-
-                                                <div>
-                                                    <h4>Qtd de Retirados</h4>
-                                                    <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="removed">
-                                                </div>
-
-                                                <div>
-                                                    <h4>Qtd de Erros</h4>
-                                                    <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="errors">
-                                                </div>
+                                        <div class="lhs-buttons">
+                                            <div>
+                                                <button class="button" id="planningAddLh" type="button">Adicionar LH</button>
+                                                <button class="button" id="planningClearLhs" type="button">Limpar Lista</button>
                                             </div>
                                         </div>
+                                        
+                                        <!-- LISTA DE LHS -->
 
-                                        <div class="tabs-panel" id="planning-import"></div>
+                                        <div class="planning-lh-list flex-box-column" id="planningLhList"></div>
                                     </div>
+
+                                    <div class="tabs-panel" id="segregated-tos">
+
+                                        <!-- LISTAS DE TOS SEPARADAS POR LH -->
+
+                                        <div class="planning-to-empty" id="planningToEmpty">
+                                            <p>Marque “Segregar” e “Segregar TO” em um LH para adicionar suas TOs.</p>
+                                        </div>
+
+                                        <div class="planning-to-groups flex-box-column" id="planningToGroups" hidden></div>
+                                    </div>
+
+                                    <div class="tabs-panel" id="collection-pool">
+
+                                        <!-- INDICADORES -->
+
+                                        <div class="input-group" id="planningGeneralControls">
+                                            <div>
+                                                <h4>SPR Médio</h4>
+                                                <input type="text" inputmode="numeric" maxlength="5" data-planning-field="averageSpr">
+                                            </div>
+
+                                            <div>
+                                                <h4>Cap do dia</h4>
+                                                <input type="text" inputmode="numeric" maxlength="6" data-planning-field="dailyCapacity">
+                                            </div>
+                                        </div>
+
+                                        <!-- CONTROLES DA COLLECTION POOL -->
+
+                                        <div class="input-group" id="planningPoolControls">
+                                            <div>
+                                                <h4>Qtd Backlog Pacotes</h4>
+                                                <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="backlogPackages">
+                                            </div>
+
+                                            <div>
+                                                <h4>Qtd Backlog Volumosos</h4>
+                                                <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="backlogBulky">
+                                            </div>
+
+                                            <div>
+                                                <h4>Qtd de Adicionados</h4>
+                                                <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="added">
+                                            </div>
+
+                                            <div>
+                                                <h4>Qtd de Retirados</h4>
+                                                <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="removed">
+                                            </div>
+
+                                            <div>
+                                                <h4>Qtd de Erros</h4>
+                                                <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="errors">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="tabs-panel" id="planning-import"></div>
                                 </div>
 
                                 <!-- PPÉVIA DO RELATÓRIO -->
 
-                                <div class="report-preview">
+                                <div class="report-preview" id="planningSheetPreview">
 
-                                    <!-- PRÉVIA DO PLANEJAMENTO -->
+                                    <!-- RELATÓRIO DE PLANEJAMENTO -->
 
-                                    <section id="planningSheetPreview">
+                                    <div class="planning-sheet-preview">
+                                        <div class="planning-sheet-title">
+                                            <h2>Planejamento de Roteirização</h2>
+                                        </div>
 
-                                        <!-- RELATÓRIO DE PLANEJAMENTO -->
+                                        <div class="planning-sheet-layout">
 
-                                        <div class="planning-sheet-preview">
-                                            <div class="planning-sheet-title">
-                                                <h2>Planejamento de Roteirização</h2>
+                                            <!-- COLUNA PRINCIPAL -->
+
+                                            <div class="planning-sheet-main">
+
+                                                <!-- INDICADORES -->
+
+                                                <div class="planning-sheet-metrics">
+                                                    <div>
+                                                        <h4>Volume Estimado</h4>
+                                                        <strong id="planningEstimatedVolume">0</strong>
+                                                    </div>
+
+                                                    <div>
+                                                        <h4>SPR Médio</h4>
+                                                        <strong id="planningPreviewAverageSpr">0</strong>
+                                                    </div>
+
+                                                    <div>
+                                                        <h4>Cap do Dia</h4>
+                                                        <strong id="planningPreviewDailyCapacity">0</strong>
+                                                    </div>
+                                                </div>
+
+                                                <!-- LISTA DE LHS -->
+
+                                                <div class="planning-sheet-section planning-main-table-section">
+                                                    <table class="planning-sheet-table planning-main-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>LHs da Collection Pool</th>
+                                                                <th>Origem</th>
+                                                                <th>QTD</th>
+                                                            </tr>
+                                                        </thead>
+
+                                                        <tbody id="planningPreviewLhBody">
+                                                            <tr>
+                                                                <td>—</td>
+                                                                <td>—</td>
+                                                                <td>—</td>
+                                                            </tr>
+
+                                                            <tr>
+                                                                <td>—</td>
+                                                                <td>—</td>
+                                                                <td>—</td>
+                                                            </tr>
+
+                                                            <tr>
+                                                                <td>—</td>
+                                                                <td>—</td>
+                                                                <td>—</td>
+                                                            </tr>
+
+                                                            <tr>
+                                                                <td>—</td>
+                                                                <td>—</td>
+                                                                <td>—</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+
+                                                <!-- LHS PARA SEGREGAR -->
+
+                                                <div id="planningSegregatedSection" class="planning-sheet-section" hidden>
+                                                    <table class="planning-sheet-table planning-segregated-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>LHs a Segregar</th>
+                                                                <th>Origem</th>
+                                                                <th>QTD</th>
+                                                                <th>Segregar</th>
+                                                            </tr>
+                                                        </thead>
+
+                                                        <tbody id="planningPreviewSegregatedBody">
+                                                            <tr class="planning-empty-row">
+                                                                <td colspan="4">Nenhum LH para segregar.</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+
+                                                <!-- TOS PARA SEGREGAR -->
+
+                                                <div id="planningSegregatedTosSection" class="planning-sheet-section" hidden>
+                                                    <table class="planning-sheet-table planning-segregated-tos-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>TOs para Segregar</th>
+                                                                <th>LH</th>
+                                                                <th>QTD</th>
+                                                            </tr>
+                                                        </thead>
+
+                                                        <tbody id="planningPreviewSegregatedTosBody">
+                                                            <tr class="planning-empty-row">
+                                                                <td colspan="3">Nenhuma TO para segregar.</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
                                             </div>
 
-                                            <div class="planning-sheet-layout">
+                                            <!-- COLUNA LATERAL -->
 
-                                                <!-- COLUNA PRINCIPAL -->
+                                            <div class="planning-sheet-sidebar">
 
-                                                <div class="planning-sheet-main">
+                                                <!-- COLLECTION POOL -->
 
-                                                    <!-- INDICADORES -->
+                                                <table class="planning-sheet-table planning-cp-summary-table">
+                                                    <colgroup>
+                                                        <col>
+                                                        <col class="planning-quantity-column">
+                                                    </colgroup>
 
-                                                    <div class="planning-sheet-metrics">
-                                                        <div>
-                                                            <h4>Volume Estimado</h4>
-                                                            <strong id="planningEstimatedVolume">0</strong>
-                                                        </div>
+                                                    <thead>
+                                                        <tr>
+                                                            <th colspan="2">Valores da Collection Pool</th>
+                                                        </tr>
+                                                    </thead>
 
-                                                        <div>
-                                                            <h4>SPR Médio</h4>
-                                                            <strong id="planningPreviewAverageSpr">0</strong>
-                                                        </div>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>Qtd Backlog Pacotes</td>
+                                                            <td id="planningPreviewCpBacklog">0</td>
+                                                        </tr>
 
-                                                        <div>
-                                                            <h4>Cap do Dia</h4>
-                                                            <strong id="planningPreviewDailyCapacity">0</strong>
-                                                        </div>
-                                                    </div>
+                                                        <tr>
+                                                            <td>Qtd Backlog Volumosos</td>
+                                                            <td id="planningPreviewCpBulky">0</td>
+                                                        </tr>
 
-                                                    <!-- LISTA DE LHS -->
+                                                        <tr>
+                                                            <td>Qtd dentro dos LHs</td>
+                                                            <td id="planningPreviewCpLhPool">0</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
 
-                                                    <div class="planning-sheet-section planning-main-table-section">
-                                                        <table class="planning-sheet-table planning-main-table">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>LHs da Collection Pool</th>
-                                                                    <th>Origem</th>
-                                                                    <th>QTD</th>
-                                                                </tr>
-                                                            </thead>
+                                                <table class="planning-sheet-table planning-cp-summary-table">
+                                                    <colgroup>
+                                                        <col>
+                                                        <col class="planning-quantity-column">
+                                                    </colgroup>
 
-                                                            <tbody id="planningPreviewLhBody">
-                                                                <tr>
-                                                                    <td>—</td>
-                                                                    <td>—</td>
-                                                                    <td>—</td>
-                                                                </tr>
+                                                    <thead>
+                                                        <tr>
+                                                            <th colspan="2">Operações na Collection Pool</th>
+                                                        </tr>
+                                                    </thead>
 
-                                                                <tr>
-                                                                    <td>—</td>
-                                                                    <td>—</td>
-                                                                    <td>—</td>
-                                                                </tr>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>Qtd Pacotes Inseridos</td>
+                                                            <td id="planningPreviewCpAdded">0</td>
+                                                        </tr>
 
-                                                                <tr>
-                                                                    <td>—</td>
-                                                                    <td>—</td>
-                                                                    <td>—</td>
-                                                                </tr>
+                                                        <tr>
+                                                            <td>Qtd Pacotes Retirados</td>
+                                                            <td id="planningPreviewCpRemoved">0</td>
+                                                        </tr>
 
-                                                                <tr>
-                                                                    <td>—</td>
-                                                                    <td>—</td>
-                                                                    <td>—</td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-
-                                                    <!-- LHS PARA SEGREGAR -->
-
-                                                    <div id="planningSegregatedSection" class="planning-sheet-section" hidden>
-                                                        <table class="planning-sheet-table planning-segregated-table">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>LHs a Segregar</th>
-                                                                    <th>Origem</th>
-                                                                    <th>QTD</th>
-                                                                    <th>Segregar</th>
-                                                                </tr>
-                                                            </thead>
-
-                                                            <tbody id="planningPreviewSegregatedBody">
-                                                                <tr class="planning-empty-row">
-                                                                    <td colspan="4">Nenhum LH para segregar.</td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-
-                                                    <!-- TOS PARA SEGREGAR -->
-
-                                                    <div id="planningSegregatedTosSection" class="planning-sheet-section" hidden>
-                                                        <table class="planning-sheet-table planning-segregated-tos-table">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>TOs para Segregar</th>
-                                                                    <th>LH</th>
-                                                                    <th>QTD</th>
-                                                                </tr>
-                                                            </thead>
-
-                                                            <tbody id="planningPreviewSegregatedTosBody">
-                                                                <tr class="planning-empty-row">
-                                                                    <td colspan="3">Nenhuma TO para segregar.</td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-
-                                                <!-- COLUNA LATERAL -->
-
-                                                <div class="planning-sheet-sidebar">
-
-                                                    <!-- COLLECTION POOL -->
-
-                                                    <table class="planning-sheet-table planning-cp-summary-table">
-                                                        <colgroup>
-                                                            <col>
-                                                            <col class="planning-quantity-column">
-                                                        </colgroup>
-
-                                                        <thead>
-                                                            <tr>
-                                                                <th colspan="2">Valores da Collection Pool</th>
-                                                            </tr>
-                                                        </thead>
-
-                                                        <tbody>
-                                                            <tr>
-                                                                <td>Qtd Backlog Pacotes</td>
-                                                                <td id="planningPreviewCpBacklog">0</td>
-                                                            </tr>
-
-                                                            <tr>
-                                                                <td>Qtd Backlog Volumosos</td>
-                                                                <td id="planningPreviewCpBulky">0</td>
-                                                            </tr>
-
-                                                            <tr>
-                                                                <td>Qtd dentro dos LHs</td>
-                                                                <td id="planningPreviewCpLhPool">0</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-
-                                                    <table class="planning-sheet-table planning-cp-summary-table">
-                                                        <colgroup>
-                                                            <col>
-                                                            <col class="planning-quantity-column">
-                                                        </colgroup>
-
-                                                        <thead>
-                                                            <tr>
-                                                                <th colspan="2">Operações na Collection Pool</th>
-                                                            </tr>
-                                                        </thead>
-
-                                                        <tbody>
-                                                            <tr>
-                                                                <td>Qtd Pacotes Inseridos</td>
-                                                                <td id="planningPreviewCpAdded">0</td>
-                                                            </tr>
-
-                                                            <tr>
-                                                                <td>Qtd Pacotes Retirados</td>
-                                                                <td id="planningPreviewCpRemoved">0</td>
-                                                            </tr>
-
-                                                            <tr>
-                                                                <td>Qtd Pacotes com Erros</td>
-                                                                <td id="planningPreviewCpErrors">0</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
+                                                        <tr>
+                                                            <td>Qtd Pacotes com Erros</td>
+                                                            <td id="planningPreviewCpErrors">0</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
                                             </div>
                                         </div>
-                                    </section>
+                                    </div>
                                 </div>
                             </div>
                         </div>
