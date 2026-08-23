@@ -55,12 +55,8 @@
                 margin-bottom: 0;
                 text-align: center;
             }
-            #reports > .tabs-content {
-                padding: 25px;
-                background-color: #1f1f1f;
-                border: 2px solid #525252;
-                border-radius: 5px;
-            }
+
+            
 
             #reports > .tabs-content > .tabs-panel > .flex-box-start {
                 column-gap: 10px;
@@ -93,24 +89,24 @@
 
             /* CONTROLE DOS REPORTS */
 
-            #reports > .report-controls {
+            #reports .report-controls {
                 flex: 1 1 0;
                 background-color: #1f1f1f;
                 border: 2px solid #525252;
                 border-radius: 5px;
                 padding: 30px;
             }
-            #reports > .report-controls .tabs {
+            #reports .report-controls .tabs {
                 width: 100%;
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
                 padding-bottom: 15px;
                 border-bottom: 2px solid #525252;
             }
-            #reports > .report-controls .tabs .tabs-title {
+            #reports .report-controls .tabs .tabs-title {
                 width: 100%;
             }
-            #reports > .report-controls .tabs .tabs-title:last-child:nth-child(odd) {
+            #reports .report-controls .tabs .tabs-title:last-child:nth-child(odd) {
                 grid-column: 1 / -1;
             }
 
@@ -638,7 +634,6 @@
                         <li class="tabs-title is-active">
                             <a href="#planning">
                                 <div class="flex-box-full-center">
-                                    <img src="images/geral-icons/planning.svg">
                                     <h4>Planejamento</h4>
                                 </div>
                             </a>
@@ -647,7 +642,6 @@
                         <li class="tabs-title">
                             <a href="#receipt">
                                 <div class="flex-box-full-center">
-                                    <img src="images/geral-icons/barcode-scanner-icon.svg">
                                     <h4>Recebimento</h4>
                                 </div>
                             </a>
@@ -656,7 +650,6 @@
                         <li class="tabs-title">
                             <a href="#rlosses-rate">
                                 <div class="flex-box-full-center">
-                                    <img src="images/geral-icons/percentage-icon.svg">
                                     <h4>Taxa de Perdas</h4>
                                 </div>
                             </a>
@@ -665,7 +658,6 @@
                         <li class="tabs-title">
                             <a href="#rlosses-rate">
                                 <div class="flex-box-full-center">
-                                    <img src="images/geral-icons/fire-icon.svg">
                                     <h4>Mapa de Calor</h4>
                                 </div>
                             </a>
