@@ -674,7 +674,13 @@
 
                                 <li class="tabs-title">
                                     <a href="#collection-pool">
-                                        <h4>Indicadores e Collection Pool</h4>
+                                        <h4>Collection Pool</h4>
+                                    </a>
+                                </li> 
+
+                                <li class="tabs-title">
+                                    <a href="#spr">
+                                        <h4>Valores do SPR</h4>
                                     </a>
                                 </li> 
                             </ul> 
@@ -715,14 +721,9 @@
 
                                     <div class="tabs-panel" id="collection-pool">
 
-                                        <!-- INDICADORES -->
+                                        <!-- CAP DO DIA -->
 
                                         <div class="input-group" id="planningGeneralControls">
-                                            <div>
-                                                <h4>SPR Médio</h4>
-                                                <input type="text" inputmode="numeric" maxlength="5" data-planning-field="averageSpr">
-                                            </div>
-
                                             <div>
                                                 <h4>Cap do dia</h4>
                                                 <input type="text" inputmode="numeric" maxlength="6" data-planning-field="dailyCapacity">
@@ -757,10 +758,18 @@
                                                 <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="errors">
                                             </div>
                                         </div>
+                                    </div>
+
+                                    <div class="tabs-panel" id="spr">
 
                                         <!-- CALCULO DO SPR -->
 
                                         <div class="input-group" id="planningGeneralControls">
+                                            <div>
+                                                <h4>SPR Médio</h4>
+                                                <input type="text" inputmode="numeric" maxlength="5" data-planning-field="averageSpr">
+                                            </div>
+
                                             <div>
                                                 <h4>Fiorinos</h4>
                                                 <input type="text" inputmode="numeric" maxlength="4">
