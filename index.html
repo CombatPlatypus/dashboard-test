@@ -35,12 +35,14 @@
             /* ESTRUTURA GERAL DO REPORTS */
 
             #reports {
-                width: 1600px;
+                max-width: 1600px;
                 margin: 0 auto;
             }
-            #report-choice {
-                width: 1300px;
+            #reports > .flex-box-start {
+                max-width: 1300px;
                 margin: 0 auto 30px auto;
+            }
+            #report-choice {
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
                 gap: 15px;
@@ -565,39 +567,42 @@
                 <!-- REPORTS -->
 
                 <div class="tabs-panel is-active" id="reports">
-                    <ul class="tabs" data-tabs id="report-choice">
-                        <li class="tabs-title is-active">
-                            <a href="#planning">
-                                <div class="flex-box-full-center">
-                                    <h4>Planejamento</h4>
-                                </div>
-                            </a>
-                        </li> 
 
-                        <li class="tabs-title">
-                            <a href="#receipt">
-                                <div class="flex-box-full-center">
-                                    <h4>Recebimento</h4>
-                                </div>
-                            </a>
-                        </li> 
+                    <div class="flex-box-start">
+                        <ul class="tabs" data-tabs id="report-choice">
+                            <li class="tabs-title is-active">
+                                <a href="#planning">
+                                    <div class="flex-box-full-center">
+                                        <h4>Planejamento</h4>
+                                    </div>
+                                </a>
+                            </li> 
 
-                        <li class="tabs-title">
-                            <a href="#rlosses-rate">
-                                <div class="flex-box-full-center">
-                                    <h4>Taxa de Perdas</h4>
-                                </div>
-                            </a>
-                        </li> 
+                            <li class="tabs-title">
+                                <a href="#receipt">
+                                    <div class="flex-box-full-center">
+                                        <h4>Recebimento</h4>
+                                    </div>
+                                </a>
+                            </li> 
 
-                        <li class="tabs-title">
-                            <a href="#rlosses-rate">
-                                <div class="flex-box-full-center">
-                                    <h4>Mapa de Calor</h4>
-                                </div>
-                            </a>
-                        </li>
+                            <li class="tabs-title">
+                                <a href="#rlosses-rate">
+                                    <div class="flex-box-full-center">
+                                        <h4>Taxa de Perdas</h4>
+                                    </div>
+                                </a>
+                            </li> 
 
+                            <li class="tabs-title">
+                                <a href="#rlosses-rate">
+                                    <div class="flex-box-full-center">
+                                        <h4>Mapa de Calor</h4>
+                                    </div>
+                                </a>
+                            </li>
+                        </ul>
+                    
                         <div class="action-buttons flex-box-start">
                             <button class="button" id="reportDownloadButton" type="button">
                                 Baixar
@@ -607,7 +612,7 @@
                                 <img src="images/geral-icons/import-icon.svg">
                             </button>
                         </div>
-                    </ul> 
+                    </div>
 
                     <div class="tabs-content" data-tabs-content="report-choice">
                         <div class="tabs-panel is-active" id="planning">
