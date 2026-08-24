@@ -675,6 +675,38 @@ function resetPlanningLhs() {
     return true;
 }
 
+/* REINICIA TODO O RELATÓRIO DE PLANEJAMENTO */
+
+function resetPlanningReport() {
+    planningGeneralFields.forEach(
+        function (field) {
+            planningState[field] =
+                null;
+        },
+    );
+
+    planningCollectionPoolFields.forEach(
+        function (field) {
+            planningState
+                .collectionPool[field] =
+                    null;
+        },
+    );
+
+    planningState.lhs = [];
+
+    nextPlanningLhId = 1;
+    nextPlanningToId = 1;
+
+    fillMinimumPlanningLhs();
+
+    notifyPlanningState({
+        type: "planning-reset",
+    });
+
+    return true;
+}
+
 /* REMOVE UM LH */
 
 function removePlanningLh(id) {
@@ -744,4 +776,5 @@ export {
     updatePlanningLh,
     updatePlanningTo,
     resetPlanningLhs,
+    resetPlanningReport,
 };
