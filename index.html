@@ -53,10 +53,27 @@
                 margin-bottom: 0;
                 text-align: center;
             }
-
             #reports > .tabs-content > .tabs-panel > .flex-box-start {
                 column-gap: 20px;
                 align-items: stretch;
+            }
+            #reports .action-buttons {
+                flex: 0 0 135px;
+                column-gap: 15px;
+                overflow: hidden;
+            }
+            #reports .action-buttons #reportDownloadButton {
+                min-height: 45px;
+                font-size: 14px;
+                padding: 10px 15px;
+            }
+            #reports .action-buttons #reportImportButton {
+                background-color: transparent;
+                border-bottom: none;
+                cursor: pointer;
+            }
+            #reports .action-buttons #reportImportButton img {
+                width: 30px;
             }
 
             /* TABS DO PLANEJAMANETO */
@@ -580,6 +597,16 @@
                                 </div>
                             </a>
                         </li>
+
+                        <div class="action-buttons flex-box-start">
+                            <button class="button" id="reportDownloadButton" type="button">
+                                Baixar
+                            </button>
+
+                            <button id="reportImportButton">
+                                <img src="images/geral-icons/import-icon.svg">
+                            </button>
+                        </div>
                     </ul> 
 
                     <div class="tabs-content" data-tabs-content="report-choice">
