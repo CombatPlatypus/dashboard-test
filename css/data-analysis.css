@@ -10,7 +10,8 @@
             gap: 15px;
         }
         .main-structure #statistics #statistics-margin {
-            margin-bottom: 30px;
+            width: 1300px;
+            margin: 0 auto 30px auto;
             column-gap: 15px;
             align-items: center;
         }
