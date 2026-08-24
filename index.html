@@ -74,8 +74,12 @@
                 border-bottom: none;
                 cursor: pointer;
             }
+            #reports .action-buttons #reportImportButton:hover {
+                opacity: 0.61;
+                transition: all 0.5s ease;
+            }
             #reports .action-buttons #reportImportButton img {
-                width: 30px;
+                width: 35px;
             }
 
             /* TABS DO PLANEJAMANETO */
@@ -567,7 +571,6 @@
                 <!-- REPORTS -->
 
                 <div class="tabs-panel is-active" id="reports">
-
                     <div class="flex-box-start">
                         <ul class="tabs" data-tabs id="report-choice">
                             <li class="tabs-title is-active">
@@ -909,6 +912,13 @@
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+
+                            <!-- FOOTER DO RELATÓRIO -->
+
+                            <div class="">
+                                <button class="button">Copiar Relatório</button>
+                                <button class="button">Baixar Relatório</button>
                             </div>
                         </div>
                     </div>
