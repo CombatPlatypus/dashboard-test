@@ -53,39 +53,26 @@
                 margin-bottom: 0;
                 text-align: center;
             }
-
             
-
             #reports > .tabs-content > .tabs-panel > .flex-box-start {
                 column-gap: 20px;
             }
 
-            /* HEADER DOS REPORTS */
-
-            #reports > .tabs-content > .tabs-panel > .flex-box-between {
+            /* TABS DO PLANEJAMANETO */
+            
+            #reports > .tabs-content > .tabs-panel > .tabs {
+                width: 100%;    
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                align-items: center;
+                column-gap: 10px;
+                margin-bottom: 20px;
+            }
+            #reports > .tabs-content > .tabs-panel > .tabs .tabs-title {
                 width: 100%;
-                padding-bottom: 20px;
-                align-items: center;
-                border-bottom: 2px solid #525252;
-            }
-            #reports > .tabs-content > .tabs-panel > .flex-box-between div {
-                gap: 10px;
-                align-items: center;
-            }
-            #reports > .tabs-content > .tabs-panel > .flex-box-between img {
-                width: 35px;
-            }
-            #reports > .tabs-content > .tabs-panel > .flex-box-between h3,
-            #reports > .tabs-content > .tabs-panel > .flex-box-between p {
-                margin-bottom: 0;
-            }
-            #reports > .tabs-content > .tabs-panel > .flex-box-between p {
-                width: max-content;
-                height: auto;
-                font-size: 13px;
             }
 
-            /* CONTROLE DOS REPORTS */
+            /* CONTROLE DO PLANEJAMENTO */
 
             #reports .report-controls {
                 flex: 1 1 0;
@@ -94,20 +81,24 @@
                 border-radius: 5px;
                 padding: 30px;
             }
-            #reports .report-controls .tabs {
-                width: 100%;
+
+            /* CONTROLE DO PLANEJAMENTO - INPUT GROUP */
+
+            #reports #collection-pool > .input-group {
                 display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-                padding-bottom: 15px;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 15px;
+            }
+            #reports #collection-pool > .input-group h4 {
+                font-size: 14px;
+            }
+            #reports #collection-pool > .input-group:first-of-type {
+                padding-bottom: 20px;
                 border-bottom: 2px solid #525252;
-            }
-            #reports .report-controls .tabs .tabs-title {
-                width: 100%;
+                margin-bottom: 20px;
             }
 
-            
-
-            /* CONTROLE DOS REPORTS - DOIS INPUTS DENTRO DE UMA FLEX-BOX-START */
+            /* CONTROLE DO PLANEJAMENTO - DOIS INPUTS DENTRO DE UMA FLEX-BOX-START */
 
             #reports .report-controls .flex-box-start {
                 column-gap: 10px;
@@ -120,416 +111,355 @@
                 text-align: center;
             }
 
-            /* CONTROLE DOS REPORTS - COMPORTAMENTO GERAL DOS INPUTS NO INPUT GROUP */
-
-            #reports > .report-controls .input-group > input {
-                margin: 15px 0;
-            }
-            #reports > .report-controls .input-group > input:last-of-type {
-                margin: 15px 0 0 0;
-            }
-            #reports #collection-pool > .input-group {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-                gap: 15px;
-            }
-            #reports #collection-pool > .input-group h4 {
-                font-size: 14px;
-            }
-            #reports #collection-pool > .input-group:first-of-type {
-                padding-bottom: 20px;
-                border-bottom: 2px solid #525252;
-                    margin-bottom: 20px;
-            }
-
-        
             /* CONTROLE DO PLANEJAMENTO - LISTA DINÂMICA DE LHS */
 
-                .lhs-buttons {
-                    padding: 0 0 15px 0;
-                    margin-right: 15px;
-                    margin-bottom: 20px;
-                    border-bottom: 2px solid #525252;
-                }
-                .lhs-buttons > div {
-                    display: flex;
-                    column-gap: 10px;
-                    justify-content: center;
-                    overflow: hidden;
-                    height: 40px;
-                }
-                .lhs-buttons > div > .button {
-                    width: 50%;
-                    cursor: pointer;
-                    min-height: 40px;
-                    font-size: 14px;
-                    padding: 10px 15px;
-                    color: #e4e6eb;
-                    background-color: #141414;
-                    border-bottom: 5px solid #525252;
-                }
-                .lhs-buttons > div > .button:hover, .lhs-buttons > div > .button:focus  {
-                    color: #e4e6eb;
-                    background-color: #141414;
-                }
-                #planning #planningSegregatedTosTab[hidden] {
-                    display: none;
-                }
-                #planning .planning-lh-remove {
-                    min-height: 38px;
-                    padding: 8px 12px;
-                    font-size: 12px;
-                }
-                #planning .planning-lh-list {
-                    display: grid;
-                    grid-template-columns: repeat(auto-fit, minmax(298px, 1fr));
-                    max-height: 419px;
-                    overflow: auto;
-                    padding-right: 15px;
-                    gap: 15px;
-                }
-                #planning .planning-lh-list::-webkit-scrollbar-track {
-                    background-color: transparent;
-                }
-                #planning .planning-lh-list::-webkit-scrollbar {
-                    width: 5px;
-                    height: 5px;
-                    background-color: transparent;
-                }
-                #planning .planning-lh-list::-webkit-scrollbar-thumb {
-                    border-radius: 5px;
-                    background-color: #525252;
-                }
-                #planning .planning-lh-item-header {
-                    align-items: center;
-                    flex-wrap: nowrap;
-                    margin-bottom: 15px;
-                }
-                #planning .planning-lh-item-header > h4 {
-                    margin-bottom: 0;
-                }
-                #planning .planning-lh-item > input {
-                    margin: 15px 0 0 0;
-                }
-                #planning .planning-lh-remove {
-                    color: #e4e6eb;
-                    background-color: #141414;
-                    border-bottom: 5px solid #525252;
-                }
-
-                /* CONTROLE DO PLANEJAMENTO - SEGREGAÇÃO */
-
-                    #planning .planning-lh-item-actions {
-                        align-items: center;
-                        flex-wrap: nowrap;
-                        column-gap: 10px;
-                        max-height: 38px;
-                        overflow: hidden;
-                    }
-                    #planning .planning-lh-segregate-toggle,
-                    #planning .planning-lh-segregate-to-toggle {
-                        display: flex;
-                        align-items: center;
-                        column-gap: 6px;
-                        margin: 0;
-                        font-size: 12px;
-                        color: #e4e6eb;
-                        cursor: pointer;
-                        user-select: none;
-                    }
-                    #planning .planning-lh-segregate-toggle input,
-                    #planning .planning-lh-segregate-to-toggle input {
-                        margin: 0;
-                        cursor: pointer;
-                    }
-                    #planning .planning-lh-segregate-to-toggle {
-                        min-height: 40px;
-                        padding: 8px 12px;
-                        margin-top: 15px;
-                        border: 1px solid #525252;
-                        border-radius: 5px;
-                    }
-                    #planning .planning-lh-segregate-to-toggle:has(input:disabled) {
-                        opacity: 0.5;
-                        cursor: not-allowed;
-                    }
-                    #planning .planning-lh-segregate-to-toggle input:disabled {
-                        cursor: not-allowed;
-                    }
-
-                /* CONTROLE DO PLANEJAMENTO - LISTA DINÂMICA DE TOS */
-
-                    #planning .planning-to-empty {
-                        padding: 20px;
-                        color: #8b8d91;
-                        text-align: center;
-                        border: 1px solid #525252;
-                        border-radius: 5px;
-                    }
-                    #planning .planning-to-empty p {
-                        margin-bottom: 0;
-                    }
-                    #planning .planning-to-groups {
-                        row-gap: 20px;
-                        max-height: 664px;
-                        padding-right: 15px;
-                        overflow: auto;
-                    }
-                    #planning .planning-to-groups[hidden],
-                    #planning .planning-to-empty[hidden] {
-                        display: none;
-                    }
-                    #planning .planning-to-group {
-                        padding-bottom: 20px;
-                        border-bottom: 2px solid #525252;
-                    }
-                    #planning .planning-to-group:last-child {
-                        padding-bottom: 0;
-                        border-bottom: none;
-                    }
-                    #planning .planning-to-group-header,
-                    #planning .planning-to-item-header {
-                        align-items: center;
-                        flex-wrap: nowrap;
-                        margin-bottom: 15px;
-                    }
-                    #planning .planning-to-group-header .button,
-                    #planning .planning-to-remove {
-                        min-height: 38px;
-                        padding: 8px 12px;
-                        font-size: 12px;
-                    }
-                    #planning .planning-to-list {
-                        row-gap: 15px;
-                    }
-                    #planning .planning-to-item {
-                        padding: 12px;
-                        border: 1px solid #525252;
-                        border-radius: 5px;
-                    }
-                    #planning .planning-to-item .flex-box-start {
-                        column-gap: 10px;
-                    }
-                    #planning .planning-to-item .flex-box-start input:first-child {
-                        flex: 1 1 0;
-                    }
-                    #planning .planning-to-item .flex-box-start input:last-child {
-                        flex: 0 0 86px;
-                        text-align: center;
-                    }
-                    #planning .planning-to-remove {
-                        color: #e4e6eb;
-                        background-color: #141414;
-                        border: 1px solid #525252;
-                        border-bottom: 4px solid #525252;
-                    }
-
-            /* CONTROLE DO PLANEJAMENTO - DADOS GERAIS */
-
-                #planning .planning-general-controls h4,
-                #planning .planning-pool-controls h4,
-                #planning .planning-cp-summary-controls h4 {
-                    margin-bottom: 15px;
-                }
-                #planning .planning-general-fields {
-                    display: grid;
-                    grid-template-columns: repeat(2, minmax(0, 1fr));
-                    gap: 10px;
-                }
-                #planning .planning-control-field {
-                    display: block;
-                    margin: 0;
-                }
-                #planning .planning-control-field span {
-                    display: block;
-                    margin-bottom: 5px;
-                    font-size: 12px;
-                    color: #e4e6eb;
-                }
-                #planning .planning-control-field input {
-                    text-align: center;
-                }
-
-
-            /* TABS DO PLANEJAMANETO */
-            
-            #reports > .tabs-content > .tabs-panel > .tabs {
-                width: 100%;    
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-                align-items: center;
-                column-gap: 10px;
+            .lhs-buttons {
+                padding: 0 0 15px 0;
+                margin-right: 15px;
                 margin-bottom: 20px;
+                border-bottom: 2px solid #525252;
+            }
+            .lhs-buttons > div {
+                display: flex;
+                column-gap: 10px;
+                justify-content: center;
+                overflow: hidden;
+                height: 40px;
+            }
+            .lhs-buttons > div > .button {
+                width: 50%;
+                cursor: pointer;
+                min-height: 40px;
+                font-size: 14px;
+                padding: 10px 15px;
+                color: #e4e6eb;
+                background-color: #141414;
+                border-bottom: 5px solid #525252;
+            }
+            .lhs-buttons > div > .button:hover, .lhs-buttons > div > .button:focus  {
+                color: #e4e6eb;
+                background-color: #141414;
+            }
+            #planning #planningSegregatedTosTab[hidden] {
+                display: none;
+            }
+            #planning .planning-lh-remove {
+                min-height: 38px;
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+            #planning .planning-lh-list {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(298px, 1fr));
+                max-height: 419px;
+                overflow: auto;
+                padding-right: 15px;
+                gap: 15px;
+            }
+            #planning .planning-lh-list::-webkit-scrollbar-track {
+                background-color: transparent;
+            }
+            #planning .planning-lh-list::-webkit-scrollbar {
+                width: 5px;
+                height: 5px;
+                background-color: transparent;
+            }
+            #planning .planning-lh-list::-webkit-scrollbar-thumb {
+                border-radius: 5px;
+                background-color: #525252;
+            }
+            #planning .planning-lh-item-header {
+                align-items: center;
+                flex-wrap: nowrap;
+                margin-bottom: 15px;
+            }
+            #planning .planning-lh-item-header > h4 {
+                margin-bottom: 0;
+            }
+            #planning .planning-lh-item > input {
+                margin: 15px 0 0 0;
+            }
+            #planning .planning-lh-remove {
+                color: #e4e6eb;
+                background-color: #141414;
+                border-bottom: 5px solid #525252;
             }
 
-            /* PREVIA DOS REPORTS */
+            /* CONTROLE DO PLANEJAMENTO - LISTA DINÂMICA DE TOS */
+
+            #planning .planning-to-empty {
+                padding: 20px;
+                color: #8b8d91;
+                text-align: center;
+                border: 1px solid #525252;
+                border-radius: 5px;
+            }
+            #planning .planning-to-empty p {
+                margin-bottom: 0;
+            }
+            #planning .planning-to-groups {
+                row-gap: 20px;
+                max-height: 664px;
+                padding-right: 15px;
+                overflow: auto;
+            }
+            #planning .planning-to-groups[hidden],
+            #planning .planning-to-empty[hidden] {
+                display: none;
+            }
+            #planning .planning-to-group {
+                padding-bottom: 20px;
+                border-bottom: 2px solid #525252;
+            }
+            #planning .planning-to-group:last-child {
+                padding-bottom: 0;
+                border-bottom: none;
+            }
+            #planning .planning-to-group-header,
+            #planning .planning-to-item-header {
+                align-items: center;
+                flex-wrap: nowrap;
+                margin-bottom: 15px;
+            }
+            #planning .planning-to-group-header .button,
+            #planning .planning-to-remove {
+                min-height: 38px;
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+            #planning .planning-to-list {
+                row-gap: 15px;
+            }
+            #planning .planning-to-item {
+                padding: 12px;
+                border: 1px solid #525252;
+                border-radius: 5px;
+            }
+            #planning .planning-to-item .flex-box-start {
+                column-gap: 10px;
+            }
+            #planning .planning-to-item .flex-box-start input:first-child {
+                flex: 1 1 0;
+            }
+            #planning .planning-to-item .flex-box-start input:last-child {
+                flex: 0 0 86px;
+                text-align: center;
+            }
+            #planning .planning-to-remove {
+                color: #e4e6eb;
+                background-color: #141414;
+                border: 1px solid #525252;
+                border-bottom: 4px solid #525252;
+            }
+
+            /* CONTROLE DO PLANEJAMENTO - SEGREGAÇÃO */
+
+            #planning .planning-lh-item-actions {
+                align-items: center;
+                flex-wrap: nowrap;
+                column-gap: 10px;
+                max-height: 38px;
+                overflow: hidden;
+            }
+            #planning .planning-lh-segregate-toggle,
+            #planning .planning-lh-segregate-to-toggle {
+                display: flex;
+                align-items: center;
+                column-gap: 6px;
+                margin: 0;
+                font-size: 12px;
+                color: #e4e6eb;
+                cursor: pointer;
+                user-select: none;
+            }
+            #planning .planning-lh-segregate-toggle input,
+            #planning .planning-lh-segregate-to-toggle input {
+                margin: 0;
+                cursor: pointer;
+            }
+            #planning .planning-lh-segregate-to-toggle {
+                min-height: 40px;
+                padding: 8px 12px;
+                margin-top: 15px;
+                border: 1px solid #525252;
+                border-radius: 5px;
+            }
+            #planning .planning-lh-segregate-to-toggle:has(input:disabled) {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+            #planning .planning-lh-segregate-to-toggle input:disabled {
+                cursor: not-allowed;
+            }
+
+            /* PREVIA DO PLANEJAMENTO */
             
             #reports .report-preview {
                 flex: 0 0 1100px;
             }   
 
-            /* ESTRUTURA DA PLANILHA */
+            /* PREVIA DO PLANEJAMENTO - ESTRUTURA DA PLANILHA */
 
-                #planning .planning-sheet-preview {
-                    width: 100%;
-                    display: flex;
-                    flex-direction: column;
-                    row-gap: 20px;
-                    padding: 20px;
-                    background-color: #1f1f1f;
-                    border: 2px solid #525252;
-                    border-radius: 5px;
-                }
-                #planning .planning-sheet-title {
-                    width: 100%;
-                    padding: 12px 20px;
-                    text-align: center;
-                    background-color: #2e2e2e;
-                    border: 1px solid #525252;
-                }
-                #planning .planning-sheet-title h2 {
-                    margin-bottom: 0;
-                    font-size: 20px;
-                    text-transform: uppercase;
-                    letter-spacing: 1.5px;
-                }
+            #planning .planning-sheet-preview {
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                row-gap: 20px;
+                padding: 20px;
+                background-color: #1f1f1f;
+                border: 2px solid #525252;
+                border-radius: 5px;
+            }
+            #planning .planning-sheet-title {
+                width: 100%;
+                padding: 12px 20px;
+                text-align: center;
+                background-color: #2e2e2e;
+                border: 1px solid #525252;
+            }
+            #planning .planning-sheet-title h2 {
+                margin-bottom: 0;
+                font-size: 20px;
+                text-transform: uppercase;
+                letter-spacing: 1.5px;
+            }
+            #planning .planning-sheet-layout {
+                display: grid;
+                grid-template-columns: minmax(0, 3fr) minmax(300px, 2fr);
+                gap: 20px;
+                align-items: stretch;
+            }
+            #planning .planning-sheet-main,
+            #planning .planning-sheet-sidebar {
+                min-width: 0;
+            }
+
+            /* PRÉVIA DO PLANEJAMENTO - DISTRIBUIÇÃO VERTICAL */
+
+            #planning .planning-sheet-main,
+            #planning .planning-sheet-sidebar {
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+                min-width: 0;
+                min-height: 0;
+            }
+            #planning #planningSegregatedSection[hidden],
+            #planning #planningSegregatedTosSection[hidden] {
+                display: none;
+            }
+
+            #planning .planning-sheet-section {
+                width: 100%;
+                margin: 0;
+            }
+
+            /* PREVIA DO PLANEJAMENTO - TABELAS */
+
+            #planning .planning-sheet-table {
+                width: 100%;
+                margin: 0;
+                table-layout: fixed;
+                border-collapse: collapse;
+                background-color: #1f1f1f;
+            }
+            #planning .planning-sheet-table th,
+            #planning .planning-sheet-table td {
+                height: 38px;
+                padding: 8px 10px;
+                font-size: 12px;
+                color: #e4e6eb;
+                border: 1px solid #525252;
+                overflow-wrap: anywhere;
+            }
+            #planning .planning-sheet-table th {
+                font-weight: 600;
+                text-align: center;
+                background-color: #2e2e2e;
+            }
+            #planning .planning-sheet-table tbody tr:nth-child(even) {
+                background-color: #1b1b1b;
+            }
+            #planning .planning-sheet-table td {
+                text-align: left;
+            }
+            #planning .planning-sheet-table .planning-empty-row td {
+                color: #8b8d91;
+                text-align: center;
+            }
+
+            /* PREVIA DO PLANEJAMENTO - COLUNAS DAS TABELAS */
+
+            #planning .planning-main-table th:nth-child(3),
+            #planning .planning-main-table td:nth-child(3) {
+                width: 90px;
+                text-align: center;
+            }
+            #planning .planning-segregated-table th:nth-child(3),
+            #planning .planning-segregated-table td:nth-child(3),
+            #planning .planning-segregated-table th:nth-child(4),
+            #planning .planning-segregated-table td:nth-child(4) {
+                width: 90px;
+                text-align: center;
+            }
+            #planning .planning-pool-table th:last-child,
+            #planning .planning-pool-table td:nth-child(2),
+            #planning .planning-pool-table td:nth-child(3) {
+                width: 75px;
+                text-align: center;
+            }
+            #planning .planning-segregated-tos-table th:nth-child(3),
+            #planning .planning-segregated-tos-table td:nth-child(3) {
+                width: 75px;
+                text-align: center;
+            }
+            #planning .planning-cp-summary-table .planning-quantity-column {
+                width: 90px;
+            }
+            #planning .planning-cp-summary-table td:last-child {
+                text-align: center;
+            }
+
+            /* PREVIA DO PLANEJAMENTO - INDICADORES */
+
+            #planning .planning-sheet-metrics {
+                display: grid;
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 10px;
+                margin-bottom: 0px;
+            }
+            #planning .planning-sheet-metrics > div {
+                min-width: 0;
+                text-align: center;
+                border: 1px solid #525252;
+            }
+            #planning .planning-sheet-metrics h4 {
+                padding: 8px;
+                margin-bottom: 0;
+                font-size: 12px;
+                background-color: #2e2e2e;
+                border-bottom: 1px solid #525252;
+            }
+            #planning .planning-sheet-metrics strong {
+                display: block;
+                padding: 10px;
+                font-size: 15px;
+                background-color: #141414;
+            }
+
+            /* PREVIA DO PLANEJAMENTO - RESPONSIVIDADE */
+
+            @media screen and (max-width: 1500px) {
                 #planning .planning-sheet-layout {
-                    display: grid;
-                    grid-template-columns: minmax(0, 3fr) minmax(300px, 2fr);
-                    gap: 20px;
-                    align-items: stretch;
+                    grid-template-columns: minmax(0, 1fr);
                 }
-                #planning .planning-sheet-main,
-                #planning .planning-sheet-sidebar {
-                    min-width: 0;
+            }
+
+            @media screen and (max-width: 800px) {
+                #planning .planning-sheet-metrics {
+                    grid-template-columns: minmax(0, 1fr);
                 }
-
-                /* PRÉVIA DO PLANEJAMENTO - DISTRIBUIÇÃO VERTICAL */
-
-                #planning .planning-sheet-main,
-                #planning .planning-sheet-sidebar {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 20px;
-                    min-width: 0;
-                    min-height: 0;
-                }
-                #planning #planningSegregatedSection[hidden],
-                #planning #planningSegregatedTosSection[hidden] {
-                    display: none;
-                }
-
-                #planning .planning-sheet-section {
-                    width: 100%;
-                    margin: 0;
-                }
-            /* TABELAS */
-
-                #planning .planning-sheet-table {
-                    width: 100%;
-                    margin: 0;
-                    table-layout: fixed;
-                    border-collapse: collapse;
-                    background-color: #1f1f1f;
-                }
-                #planning .planning-sheet-table th,
-                #planning .planning-sheet-table td {
-                    height: 38px;
-                    padding: 8px 10px;
-                    font-size: 12px;
-                    color: #e4e6eb;
-                    border: 1px solid #525252;
-                    overflow-wrap: anywhere;
-                }
-                #planning .planning-sheet-table th {
-                    font-weight: 600;
-                    text-align: center;
-                    background-color: #2e2e2e;
-                }
-                #planning .planning-sheet-table tbody tr:nth-child(even) {
-                    background-color: #1b1b1b;
-                }
-                #planning .planning-sheet-table td {
-                    text-align: left;
-                }
-                #planning .planning-sheet-table .planning-empty-row td {
-                    color: #8b8d91;
-                    text-align: center;
-                }
-
-                /* COLUNAS DAS TABELAS */
-
-                    #planning .planning-main-table th:nth-child(3),
-                    #planning .planning-main-table td:nth-child(3) {
-                        width: 90px;
-                        text-align: center;
-                    }
-                    #planning .planning-segregated-table th:nth-child(3),
-                    #planning .planning-segregated-table td:nth-child(3),
-                    #planning .planning-segregated-table th:nth-child(4),
-                    #planning .planning-segregated-table td:nth-child(4) {
-                        width: 90px;
-                        text-align: center;
-                    }
-                    #planning .planning-pool-table th:last-child,
-                    #planning .planning-pool-table td:nth-child(2),
-                    #planning .planning-pool-table td:nth-child(3) {
-                        width: 75px;
-                        text-align: center;
-                    }
-                    #planning .planning-segregated-tos-table th:nth-child(3),
-                    #planning .planning-segregated-tos-table td:nth-child(3) {
-                        width: 75px;
-                        text-align: center;
-                    }
-                    #planning .planning-cp-summary-table .planning-quantity-column {
-                        width: 90px;
-                    }
-
-                    #planning .planning-cp-summary-table td:last-child {
-                        text-align: center;
-                    }
-
-                /* INDICADORES */
-
-                    #planning .planning-sheet-metrics {
-                        display: grid;
-                        grid-template-columns: repeat(3, minmax(0, 1fr));
-                        gap: 10px;
-                        margin-bottom: 0px;
-                    }
-                    #planning .planning-sheet-metrics > div {
-                        min-width: 0;
-                        text-align: center;
-                        border: 1px solid #525252;
-                    }
-                    #planning .planning-sheet-metrics h4 {
-                        padding: 8px;
-                        margin-bottom: 0;
-                        font-size: 12px;
-                        background-color: #2e2e2e;
-                        border-bottom: 1px solid #525252;
-                    }
-                    #planning .planning-sheet-metrics strong {
-                        display: block;
-                        padding: 10px;
-                        font-size: 15px;
-                        background-color: #141414;
-                    }
-
-                /* RESPONSIVIDADE */
-
-                    @media screen and (max-width: 1500px) {
-                        #planning .planning-sheet-layout {
-                            grid-template-columns: minmax(0, 1fr);
-                        }
-                    }
-
-                    @media screen and (max-width: 800px) {
-                        #planning .planning-sheet-metrics {
-                            grid-template-columns: minmax(0, 1fr);
-                        }
-                    }
+            }
 
         </style>
     </head>	
