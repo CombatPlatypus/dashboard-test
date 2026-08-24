@@ -13,6 +13,7 @@ import {
     updatePlanningLh,
     updatePlanningTo,
     resetPlanningLhs,
+    resetPlanningReport,
 } from "./state.js";
 
 /* ELEMENTOS DO PLANEJAMENTO */
@@ -37,10 +38,15 @@ let planningPreviewCpLhPool = null;
 let planningSegregatedSection = null;    
 let planningSegregatedTosSection = null;
 let planningClearLhsButton = null;
+let planningClearReportButton = null;
 let planningPreviewCpErrors = null;
 let planningPreviewCpAdded = null;
 let planningPreviewCpRemoved = null;
 let planningHeightResizeObserver = null;
+let planningReportStatusIcon = null;
+let planningReportStatusText = null;
+let planningCopyReportButton = null;
+let planningDownloadReportButton = null;
 
 /* FORMATAÇÃO NUMÉRICA */
 
@@ -984,6 +990,100 @@ function renderPlanningPreview(state) {
     );
 }
 
+/* VERIFICA SE UM VALOR NUMÉRICO É VÁLIDO */
+
+function isPlanningPositiveNumber(
+    value,
+) {
+    return (
+        Number.isFinite(
+            value,
+        ) &&
+        value > 0
+    );
+}
+
+/* VERIFICA SE UM LH ESTÁ COMPLETO */
+
+function isPlanningLhComplete(
+    lh,
+) {
+    const hasCode =
+        String(
+            lh.code ?? "",
+        ).trim() !== "";
+
+    const hasQuantity =
+        isPlanningPositiveNumber(
+            lh.quantity,
+        );
+
+    const hasOrigin =
+        String(
+            lh.origin ?? "",
+        ).trim() !== "";
+
+    return (
+        hasCode &&
+        hasQuantity &&
+        hasOrigin
+    );
+}
+
+/* VERIFICA SE O RELATÓRIO PODE SER EXPORTADO */
+
+function canExportPlanningReport(
+    state,
+) {
+    const hasCompleteLh =
+        state.lhs.some(
+            isPlanningLhComplete,
+        );
+
+    const hasAverageSpr =
+        isPlanningPositiveNumber(
+            state.averageSpr,
+        );
+
+    const hasDailyCapacity =
+        isPlanningPositiveNumber(
+            state.dailyCapacity,
+        );
+
+    return (
+        hasCompleteLh &&
+        hasAverageSpr &&
+        hasDailyCapacity
+    );
+}
+
+/* ATUALIZA O ESTADO DE EXPORTAÇÃO DO RELATÓRIO */
+
+function renderPlanningReportStatus(
+    state,
+) {
+    const canExport =
+        canExportPlanningReport(
+            state,
+        );
+
+    planningCopyReportButton.disabled =
+        !canExport;
+
+    planningDownloadReportButton.disabled =
+        !canExport;
+
+    planningReportStatusIcon.src =
+        canExport
+            ? "images/geral-icons/success-icon.svg"
+            : "images/geral-icons/alert-icon.svg";
+
+    planningReportStatusText.textContent =
+        canExport
+            ? "O relatório está pronto para exportação."
+            : "O relatório ainda aguarda informações.";
+}
+
 /* RENDERIZA A LISTA DE LHS */
 
 function renderPlanningLhList(lhs) {
@@ -1152,6 +1252,21 @@ function handleResetPlanningLhs() {
     resetPlanningLhs();
 
     planningAddLhButton.focus();
+}
+
+/* REINICIA TODO O RELATÓRIO */
+
+function handleResetPlanningReport() {
+    const shouldReset =
+        window.confirm(
+            "Limpar todas as informações do relatório de planejamento?",
+        );
+
+    if (!shouldReset) {
+        return;
+    }
+
+    resetPlanningReport();
 }
 
 /* ATUALIZA UM CAMPO DE LH */
@@ -1553,7 +1668,27 @@ function initializePlanningLhList() {
         document.getElementById(
             "planningPreviewDailyCapacity",
         );  
-    
+        
+    planningReportStatusIcon =
+        document.getElementById(
+            "planningReportStatusIcon",
+        );
+
+    planningReportStatusText =
+        document.getElementById(
+            "planningReportStatusText",
+        );
+
+    planningCopyReportButton =
+        document.getElementById(
+            "planningCopyReportButton",
+        );
+
+    planningDownloadReportButton =
+        document.getElementById(
+            "planningDownloadReportButton",
+        );
+
     planningLhList =
         document.getElementById(
             "planningLhList",
@@ -1567,7 +1702,12 @@ function initializePlanningLhList() {
     planningClearLhsButton =
         document.getElementById(
             "planningClearLhs",
-        );    
+        );   
+        
+    planningClearReportButton =
+        document.getElementById(
+            "planningClearReportButton",
+        );   
 
     planningEstimatedVolume =
         document.getElementById(
@@ -1658,6 +1798,7 @@ function initializePlanningLhList() {
         !planningPreviewCpBulky ||
         !planningPreviewCpLhPool ||
         !planningClearLhsButton ||
+        !planningClearReportButton ||
         !planningPreviewCpErrors ||
         !planningPreviewCpAdded ||
         !planningPreviewCpRemoved ||
@@ -1672,7 +1813,12 @@ function initializePlanningLhList() {
         !planningGeneralControls ||
         !planningPoolControls ||
         !planningPreviewAverageSpr ||
-        !planningPreviewDailyCapacity
+        !planningPreviewDailyCapacity ||
+        !planningReportStatusIcon ||
+        !planningReportStatusText ||
+        !planningCopyReportButton ||
+        !planningDownloadReportButton
+        
     ) {
         console.error(
             "Elementos do Planejamento não foram encontrados.",
@@ -1693,7 +1839,8 @@ function initializePlanningLhList() {
                 change.type === "lh-removed" ||
                 change.type === "lhs-replaced" ||
                 change.type === "lhs-minimum-restored" ||
-                change.type === "lhs-reset"
+                change.type === "lhs-reset" ||
+                change.type === "planning-reset"
             ) {
                 renderPlanningLhList(
                     state.lhs,
@@ -1706,6 +1853,7 @@ function initializePlanningLhList() {
                 change.type === "lhs-replaced" ||
                 change.type === "lhs-minimum-restored" ||
                 change.type === "lhs-reset" ||
+                change.type === "planning-reset" ||
                 change.type === "to-added" ||
                 change.type === "to-removed" ||
                 (
@@ -1722,7 +1870,20 @@ function initializePlanningLhList() {
                 );
             }
 
+            if (
+                change.type ===
+                    "planning-reset"
+            ) {
+                synchronizePlanningControls(
+                    state,
+                );
+            }
+
             renderPlanningPreview(
+                state,
+            );
+
+            renderPlanningReportStatus(
                 state,
             );
         },
@@ -1736,6 +1897,11 @@ function initializePlanningLhList() {
     planningClearLhsButton.addEventListener(
         "click",
         handleResetPlanningLhs,
+    );
+
+    planningClearReportButton.addEventListener(
+        "click",
+        handleResetPlanningReport,
     );
 
     planningLhList.addEventListener(
@@ -1787,6 +1953,10 @@ function initializePlanningLhList() {
         state,
     );
 
+    renderPlanningReportStatus(
+        state,
+    );
+    
     initializePlanningHeightSynchronization();
 }
 
