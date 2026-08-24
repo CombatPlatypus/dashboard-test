@@ -53,9 +53,10 @@
                 margin-bottom: 0;
                 text-align: center;
             }
-            
+
             #reports > .tabs-content > .tabs-panel > .flex-box-start {
                 column-gap: 20px;
+                align-items: stretch;
             }
 
             /* TABS DO PLANEJAMANETO */
@@ -65,7 +66,7 @@
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
                 align-items: center;
-                column-gap: 10px;
+                column-gap: 15px;
                 margin-bottom: 20px;
             }
             #reports > .tabs-content > .tabs-panel > .tabs .tabs-title {
@@ -151,7 +152,7 @@
             #planning .planning-lh-list {
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(298px, 1fr));
-                max-height: 419px;
+                max-height: var(--planning-lh-list-max-height, 419px);
                 overflow: auto;
                 padding-right: 15px;
                 gap: 15px;
@@ -514,7 +515,7 @@
                             <img src="images/menu-icons/link-icon.svg">
                         </a>
 
-                        <a href="https://docs.google.com/spreadsheets/d/1IS4QDnMenXTi07FhiL-nFINrEjLppAfZhSlogZq22hY/edit?gid=0#gid=0">
+                        <a href="https://docs.google.com/spreadsheets/d/1IS4QDnMenXTi07FhiL-nFINrEjLppAfZhSlogZq22hY/edit?gid=0#gid=0" target="_blank">
                             <img src="images/menu-icons/settings-icon.svg">
                         </a>
                     </div>
