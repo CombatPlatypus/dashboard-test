@@ -18,6 +18,7 @@ import {
 
 import {
     createReportImageBlob,
+    copyReportBlob,
     downloadReportBlob,
 } from "./export.js";
 
@@ -1300,6 +1301,92 @@ function createPlanningReportFileName() {
     );
 }
 
+/* COPIA O RELATÓRIO DE PLANEJAMENTO */
+
+async function handleCopyPlanningReport() {
+    const state =
+        getPlanningState();
+
+    if (
+        !canExportPlanningReport(
+            state,
+        )
+    ) {
+        return;
+    }
+
+    const originalText =
+        planningCopyReportButton
+            .textContent;
+
+    let copySucceeded =
+        false;
+
+    planningCopyReportButton.disabled =
+        true;
+
+    planningCopyReportButton.textContent =
+        "Copiando...";
+
+    planningCopyReportButton.setAttribute(
+        "aria-busy",
+        "true",
+    );
+
+    try {
+        const reportBlob =
+            await createReportImageBlob(
+                planningReportExportArea,
+            );
+
+        await copyReportBlob(
+            reportBlob,
+        );
+
+        copySucceeded =
+            true;
+
+        planningCopyReportButton.textContent =
+            "Copiado!";
+    } catch (error) {
+        console.error(
+            "Não foi possível copiar o relatório:",
+            error,
+        );
+
+        window.alert(
+            error instanceof Error
+                ? error.message
+                : "Não foi possível copiar a imagem do relatório.",
+        );
+    } finally {
+        planningCopyReportButton.removeAttribute(
+            "aria-busy",
+        );
+
+        if (copySucceeded) {
+            window.setTimeout(
+                function () {
+                    planningCopyReportButton.textContent =
+                        originalText;
+
+                    renderPlanningReportStatus(
+                        getPlanningState(),
+                    );
+                },
+                1200,
+            );
+        } else {
+            planningCopyReportButton.textContent =
+                originalText;
+
+            renderPlanningReportStatus(
+                getPlanningState(),
+            );
+        }
+    }
+}
+
 /* BAIXA O RELATÓRIO DE PLANEJAMENTO */
 
 async function handleDownloadPlanningReport() {
@@ -2001,6 +2088,11 @@ function initializePlanningLhList() {
     planningClearReportButton.addEventListener(
         "click",
         handleResetPlanningReport,
+    );
+
+    planningCopyReportButton.addEventListener(
+        "click",
+        handleCopyPlanningReport,
     );
 
     planningDownloadReportButton.addEventListener(
