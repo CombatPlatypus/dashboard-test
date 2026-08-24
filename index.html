@@ -145,15 +145,18 @@
 
             /* CONTROLE DO PLANEJAMENTO - INPUT GROUP */
 
-            #reports #collection-pool > .input-group {
+            #reports #collection-pool > .input-group, 
+            #reports #spr > .input-group {
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
                 gap: 15px;
             }
-            #reports #collection-pool > .input-group h4 {
+            #reports #collection-pool > .input-group h4, 
+            #reports #spr > .input-group h4 {
                 font-size: 14px;
             }
-            #reports #collection-pool > .input-group:first-of-type {
+            #reports #collection-pool > .input-group:first-of-type, 
+            #reports #spr > .input-group:first-of-type {
                 padding-bottom: 20px;
                 border-bottom: 2px solid #525252;
                 margin-bottom: 20px;
