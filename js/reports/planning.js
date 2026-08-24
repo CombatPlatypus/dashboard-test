@@ -1725,8 +1725,6 @@ function initializePlanningLhList() {
             renderPlanningPreview(
                 state,
             );
-
-            initializePlanningHeightSynchronization();
         },
     );
 
@@ -1788,6 +1786,8 @@ function initializePlanningLhList() {
     renderPlanningPreview(
         state,
     );
+
+    initializePlanningHeightSynchronization();
 }
 
 export {
