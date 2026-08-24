@@ -40,6 +40,7 @@ let planningClearLhsButton = null;
 let planningPreviewCpErrors = null;
 let planningPreviewCpAdded = null;
 let planningPreviewCpRemoved = null;
+let planningHeightResizeObserver = null;
 
 /* FORMATAÇÃO NUMÉRICA */
 
@@ -1441,6 +1442,95 @@ function handlePlanningLhClick(event) {
     planningAddLhButton.focus();
 }
 
+/* SINCRONIZA A ALTURA DOS CONTROLES COM A PRÉVIA */
+
+function initializePlanningHeightSynchronization() {
+    const planningControls =
+        document.querySelector(
+            "#planning .report-controls",
+        );
+
+    const planningSheet =
+        document.querySelector(
+            "#planning .planning-sheet-preview",
+        );
+
+    if (
+        !planningControls ||
+        !planningSheet ||
+        !planningLhList
+    ) {
+        return;
+    }
+
+    requestAnimationFrame(
+        function () {
+            const basePreviewHeight =
+                planningSheet
+                    .getBoundingClientRect()
+                    .height;
+
+            const baseControlsHeight =
+                planningControls
+                    .getBoundingClientRect()
+                    .height;
+
+            const currentListHeight =
+                planningLhList
+                    .getBoundingClientRect()
+                    .height;
+
+            const fixedControlsHeight =
+                baseControlsHeight -
+                currentListHeight;
+
+            const baseListMaxHeight =
+                Math.max(
+                    0,
+                    basePreviewHeight -
+                    fixedControlsHeight,
+                );
+
+            function synchronizePlanningHeight() {
+                const currentPreviewHeight =
+                    planningSheet
+                        .getBoundingClientRect()
+                        .height;
+
+                const previewHeightDifference =
+                    currentPreviewHeight -
+                    basePreviewHeight;
+
+                const newListMaxHeight =
+                    Math.max(
+                        0,
+                        baseListMaxHeight +
+                        previewHeightDifference,
+                    );
+
+                planningLhList.style.setProperty(
+                    "--planning-lh-list-max-height",
+                    `${Math.round(newListMaxHeight)}px`,
+                );
+            }
+
+            planningHeightResizeObserver
+                ?.disconnect();
+
+            planningHeightResizeObserver =
+                new ResizeObserver(
+                    synchronizePlanningHeight,
+                );
+
+            planningHeightResizeObserver.observe(
+                planningSheet,
+            );
+
+            synchronizePlanningHeight();
+        },
+    );
+}
+
 /* INICIALIZA A LISTA DE LHS */
 
 function initializePlanningLhList() {
@@ -1635,6 +1725,8 @@ function initializePlanningLhList() {
             renderPlanningPreview(
                 state,
             );
+
+            initializePlanningHeightSynchronization();
         },
     );
 
