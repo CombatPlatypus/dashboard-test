@@ -92,8 +92,16 @@
             }
             #reports .footer > p {
                 margin-bottom: 0;
+                font-size: 14px;
             }
             #reports .footer > div {
+                gap: 10px;
+                align-items: center;
+            }
+            #reports .footer > div > img {
+                width: 35px;
+            }
+            #reports .footer > div:last-of-type {
                 max-width: max-content;
                 height: 45px;
                 overflow: hidden;
@@ -102,6 +110,12 @@
                 min-height: 45px;
                 font-size: 14px;
                 padding: 10px 15px;
+            }
+            #reports .footer .flex-box-start:last-of-type {
+                width: 700px;
+                border-left: 2px solid #525252;
+                border-right: 2px solid #525252;
+                padding: 0 100px;
             }
 
             /* TABS DO PLANEJAMANETO */
@@ -939,7 +953,15 @@
                             <!-- FOOTER DO RELATÓRIO -->
 
                             <div class="footer flex-box-between">
-                                <p>O relatório não será armazenado após sair desta página</p>
+                                <div class="flex-box-start">
+                                    <img src="images/geral-icons/hourglass-icon.svg">
+                                    <p>O relatório não será armazenado após sair desta página</p>
+                                </div>
+
+                                <div class="flex-box-start">
+                                    <img src="images/geral-icons/alert-icon.svg">
+                                    <p>O relatório ainda aguarda informações.</p>
+                                </div>
                                 
                                 <div>
                                     <button class="button">Limpar Relatório</button>
