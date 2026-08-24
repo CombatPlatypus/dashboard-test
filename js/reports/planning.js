@@ -16,6 +16,11 @@ import {
     resetPlanningReport,
 } from "./state.js";
 
+import {
+    createReportImageBlob,
+    downloadReportBlob,
+} from "./export.js";
+
 /* ELEMENTOS DO PLANEJAMENTO */
 
 let planningLhList = null;
@@ -47,6 +52,7 @@ let planningReportStatusIcon = null;
 let planningReportStatusText = null;
 let planningCopyReportButton = null;
 let planningDownloadReportButton = null;
+let planningReportExportArea = null;
 
 /* FORMATAÇÃO NUMÉRICA */
 
@@ -1269,6 +1275,93 @@ function handleResetPlanningReport() {
     resetPlanningReport();
 }
 
+/* CRIA O NOME DO ARQUIVO DO RELATÓRIO */
+
+function createPlanningReportFileName() {
+    const date =
+        new Intl.DateTimeFormat(
+            "pt-BR",
+            {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+            },
+        )
+            .format(
+                new Date(),
+            )
+            .replace(
+                /\//g,
+                "-",
+            );
+
+    return (
+        `planejamento-de-roteirizacao-${date}.png`
+    );
+}
+
+/* BAIXA O RELATÓRIO DE PLANEJAMENTO */
+
+async function handleDownloadPlanningReport() {
+    const state =
+        getPlanningState();
+
+    if (
+        !canExportPlanningReport(
+            state,
+        )
+    ) {
+        return;
+    }
+
+    const originalText =
+        planningDownloadReportButton
+            .textContent;
+
+    planningDownloadReportButton.disabled =
+        true;
+
+    planningDownloadReportButton.textContent =
+        "Gerando...";
+
+    planningDownloadReportButton.setAttribute(
+        "aria-busy",
+        "true",
+    );
+
+    try {
+        const reportBlob =
+            await createReportImageBlob(
+                planningReportExportArea,
+            );
+
+        downloadReportBlob(
+            reportBlob,
+            createPlanningReportFileName(),
+        );
+    } catch (error) {
+        console.error(
+            "Não foi possível gerar o relatório:",
+            error,
+        );
+
+        window.alert(
+            "Não foi possível gerar a imagem do relatório.",
+        );
+    } finally {
+        planningDownloadReportButton.textContent =
+            originalText;
+
+        planningDownloadReportButton.removeAttribute(
+            "aria-busy",
+        );
+
+        renderPlanningReportStatus(
+            getPlanningState(),
+        );
+    }
+}
+
 /* ATUALIZA UM CAMPO DE LH */
 
 function handlePlanningLhInput(event) {
@@ -1689,6 +1782,11 @@ function initializePlanningLhList() {
             "planningDownloadReportButton",
         );
 
+    planningReportExportArea =
+        document.getElementById(
+            "planningReportExportArea",
+        );
+
     planningLhList =
         document.getElementById(
             "planningLhList",
@@ -1814,6 +1912,7 @@ function initializePlanningLhList() {
         !planningPoolControls ||
         !planningPreviewAverageSpr ||
         !planningPreviewDailyCapacity ||
+        !planningReportExportArea ||
         !planningReportStatusIcon ||
         !planningReportStatusText ||
         !planningCopyReportButton ||
@@ -1902,6 +2001,11 @@ function initializePlanningLhList() {
     planningClearReportButton.addEventListener(
         "click",
         handleResetPlanningReport,
+    );
+
+    planningDownloadReportButton.addEventListener(
+        "click",
+        handleDownloadPlanningReport,
     );
 
     planningLhList.addEventListener(
