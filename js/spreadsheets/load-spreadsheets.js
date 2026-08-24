@@ -2,13 +2,6 @@ import {
     CONFIG
 } from "./config.js";
 
-
-/* DEFINE A PLANILHA UTILIZADA NO PAINEL ESTATÍSTICAS */
-
-const STATISTICS_SPREADSHEET_KEY =
-    "resumo-operacao";
-
-
 /* PADRÕES DE VALIDAÇÃO */
 
 const KEY_PATTERN =
@@ -921,125 +914,6 @@ function showSpreadsheetConfigurationError(
     );
 }
 
-
-/* CONFIGURA A PLANILHA DO PAINEL ESTATÍSTICAS */
-
-function initializeStatisticsSpreadsheet(
-    configuration
-) {
-
-    const statisticsPanel =
-        document.getElementById(
-            "statistics"
-        );
-
-    const statisticsIframe =
-        document.getElementById(
-            "statisticsSpreadsheet"
-        );
-
-    const mainTabs =
-        document.getElementById(
-            "switch-1"
-        );
-
-    if (!statisticsIframe) {
-        return;
-    }
-
-    if (
-        !statisticsPanel ||
-        !mainTabs
-    ) {
-        console.error(
-            "Elementos do painel Estatísticas não foram encontrados."
-        );
-
-        return;
-    }
-
-    statisticsIframe.dataset.src =
-        configuration.url;
-
-    statisticsIframe.title =
-        configuration.spreadsheetName;
-
-
-    /* CARREGA A PLANILHA */
-
-    function loadStatisticsSpreadsheet() {
-
-        if (
-            statisticsIframe.hasAttribute(
-                "src"
-            )
-        ) {
-
-            return;
-        }
-
-
-        statisticsIframe.src =
-            statisticsIframe.dataset.src;
-    }
-
-
-    /* DESCARREGA A PLANILHA */
-
-    function unloadStatisticsSpreadsheet() {
-
-        if (
-            statisticsIframe.hasAttribute(
-                "src"
-            )
-        ) {
-
-            statisticsIframe.removeAttribute(
-                "src"
-            );
-        }
-    }
-
-
-    /* ATUALIZA O ESTADO DO IFRAME */
-
-    function updateStatisticsSpreadsheet() {
-
-        if (
-            statisticsPanel.classList.contains(
-                "is-active"
-            )
-        ) {
-
-            loadStatisticsSpreadsheet();
-
-            return;
-        }
-
-
-        unloadStatisticsSpreadsheet();
-    }
-
-
-    /* OBSERVA A TROCA DO PAINEL PRINCIPAL */
-
-    $(
-        mainTabs
-    ).on(
-        "change.zf.tabs",
-        function () {
-
-            requestAnimationFrame(
-                updateStatisticsSpreadsheet
-            );
-        }
-    );
-
-
-    updateStatisticsSpreadsheet();
-}
-
-
 /* INICIALIZA AS PLANILHAS */
 
 async function initializeSpreadsheets() {
@@ -1082,60 +956,13 @@ async function initializeSpreadsheets() {
         const configurations =
             await getSpreadsheetConfigurations();
 
-
-        /* SEPARA A PLANILHA DE ESTATÍSTICAS */
-
-        const statisticsConfiguration =
-            configurations.find(
-                function (configuration) {
-
-                    return (
-                        configuration.key ===
-                        STATISTICS_SPREADSHEET_KEY
-                    );
-                }
-            );
-
-
-        /* REMOVE A PLANILHA DE ESTATÍSTICAS DO MENU PLANILHAS */
-
-        const spreadsheetConfigurations =
-            configurations.filter(
-                function (configuration) {
-
-                    return (
-                        configuration.key !==
-                        STATISTICS_SPREADSHEET_KEY
-                    );
-                }
-            );
-
-
         /* MONTA O PAINEL PLANILHAS */
 
         renderSpreadsheetInterface(
-            spreadsheetConfigurations,
+            configurations,
             tabsElement,
             panelsElement
         );
-
-
-        /* CONFIGURA O PAINEL ESTATÍSTICAS */
-
-        if (statisticsConfiguration) {
-
-            initializeStatisticsSpreadsheet(
-                statisticsConfiguration
-            );
-
-        }
-        else {
-
-            console.warn(
-                'A planilha "resumo-operacao" não foi encontrada na configuração.'
-            );
-        }
-
 
         /* INICIALIZA AS ABAS DAS PLANILHAS */
 
