@@ -64,6 +64,40 @@ async function createReportImageBlob(
     );
 }
 
+/* COPIA UM BLOB DE IMAGEM PARA A ÁREA DE TRANSFERÊNCIA */
+
+async function copyReportBlob(
+    blob,
+) {
+    if (!(blob instanceof Blob)) {
+        throw new Error(
+            "A imagem do relatório não foi gerada corretamente.",
+        );
+    }
+
+    if (
+        !window.isSecureContext ||
+        !navigator.clipboard ||
+        typeof navigator.clipboard.write !==
+            "function" ||
+        typeof window.ClipboardItem !==
+            "function"
+    ) {
+        throw new Error(
+            "A cópia da imagem exige uma página HTTPS e um navegador compatível.",
+        );
+    }
+
+    const clipboardItem =
+        new window.ClipboardItem({
+            "image/png": blob,
+        });
+
+    await navigator.clipboard.write([
+        clipboardItem,
+    ]);
+}
+
 /* BAIXA UM BLOB COMO ARQUIVO */
 
 function downloadReportBlob(
@@ -105,5 +139,6 @@ function downloadReportBlob(
 
 export {
     createReportImageBlob,
+    copyReportBlob,
     downloadReportBlob,
 };
