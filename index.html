@@ -112,7 +112,7 @@
                 padding: 10px 15px;
             }
             #reports .footer .report-warning {
-                width: 700px;
+                width: max-content;
                 border-left: 2px solid #525252;
                 border-right: 2px solid #525252;
                 padding: 0 100px;
@@ -954,19 +954,30 @@
 
                             <div class="footer flex-box-between">
                                 <div class="flex-box-start">
-                                    <img src="images/geral-icons/hourglass-icon.svg">
+                                    <img src="images/geral-icons/hourglass-icon.svg" alt="">
                                     <p>O relatório não será armazenado após sair desta página</p>
                                 </div>
 
-                                <div class="flex-box-start report-warning">
-                                    <img src="images/geral-icons/alert-icon.svg">
-                                    <p>O relatório ainda aguarda informações.</p>
+                                <div class="flex-box-start report-warning" id="planningReportStatus" role="status" aria-live="polite" aria-atomic="true">
+                                    <img id="planningReportStatusIcon" src="images/geral-icons/alert-icon.svg" alt="">
+
+                                    <p id="planningReportStatusText">
+                                        O relatório ainda aguarda informações.
+                                    </p>
                                 </div>
                                 
                                 <div>
-                                    <button class="button">Limpar Relatório</button>
-                                    <button class="button">Copiar Relatório</button>
-                                    <button class="button">Baixar Relatório</button>
+                                    <button class="button" id="planningClearReportButton" type="button">
+                                        Limpar Relatório
+                                    </button>
+
+                                    <button class="button" id="planningCopyReportButton" type="button" disabled>
+                                        Copiar Relatório
+                                    </button>
+
+                                    <button class="button" id="planningDownloadReportButton" type="button" disabled>
+                                        Baixar Relatório
+                                    </button>
                                 </div>
                             </div>
                         </div>
