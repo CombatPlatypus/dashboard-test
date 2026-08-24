@@ -41,10 +41,12 @@
             #reports > .flex-box-start {
                 max-width: 1300px;
                 margin: 0 auto 30px auto;
+                column-gap: 15px;
             }
             #report-choice {
+                flex: 1 1 0;
                 display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
                 gap: 15px;
             }
             #report-choice .tabs-title {
@@ -80,6 +82,26 @@
             }
             #reports .action-buttons #reportImportButton img {
                 width: 35px;
+            }
+            #reports .footer {
+                background-color: #1f1f1f;
+                border: 2px solid #525252;
+                border-radius: 5px;
+                padding: 30px;
+                margin: 20px 0 0px auto;
+            }
+            #reports .footer > p {
+                margin-bottom: 0;
+            }
+            #reports .footer > div {
+                max-width: max-content;
+                height: 45px;
+                overflow: hidden;
+            }
+            #reports .footer button {
+                min-height: 45px;
+                font-size: 14px;
+                padding: 10px 15px;
             }
 
             /* TABS DO PLANEJAMANETO */
@@ -916,9 +938,14 @@
 
                             <!-- FOOTER DO RELATÓRIO -->
 
-                            <div class="">
-                                <button class="button">Copiar Relatório</button>
-                                <button class="button">Baixar Relatório</button>
+                            <div class="footer flex-box-between">
+                                <p>O relatório não será armazenado após sair desta página</p>
+                                
+                                <div>
+                                    <button class="button">Limpar Relatório</button>
+                                    <button class="button">Copiar Relatório</button>
+                                    <button class="button">Baixar Relatório</button>
+                                </div>
                             </div>
                         </div>
                     </div>
