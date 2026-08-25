@@ -19,8 +19,6 @@
             width: 100%;
         }
         .main-structure #statistics .tabs-content {
-            flex: 1 1 0;
-            min-width: 0;
             display: flex;
         }
         .main-structure #statistics .tabs-panel.is-active {
@@ -42,12 +40,6 @@
             padding: 0;
             border-radius: 0;
         }
-        .main-structure #statistics section {
-            padding: 25px;
-            background-color: #1f1f1f;
-            border: 2px solid #525252;
-            border-radius: 5px;
-        }
         .main-structure #statistics .action-buttons {
             flex: 0 0 135px;
             column-gap: 15px;
@@ -66,13 +58,14 @@
         .main-structure #statistics .action-buttons #statisticsClearFile img {
             width: 30px;
         }
-
         .module-header.flex-box-between {
             width: 100%;
-            padding-bottom: 20px;
+            padding: 25px;
+            background-color: #1f1f1f;
+            border: 2px solid #525252;
+            border-radius: 5px;
             align-items: center;
-            border-bottom: 2px solid #525252;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
         .module-header.flex-box-between div {
             gap: 10px;
@@ -168,7 +161,6 @@
         #statisticsLocalPreview {
             width: 100%;
             margin: 0 auto;
-            min-height: 0;
         }
         #statisticsLocalPreview[hidden] {
             display: none;
@@ -622,16 +614,17 @@
     
     /* MÓDULO DE ANÁLISE RÁPIDA */
 
+        #statisticsQuickAnalysis #standard-container {
+            padding: 25px;
+            border-radius: 5px;
+            background-color: #1f1f1f;
+            border: 2px solid #525252;
+        }
         #statisticsQuickAnalysis[hidden] {
             display: none;
         }
         #statisticsAnalysisColumnSelector {
             flex: 1 1 0;
-            padding: 15px;
-            background-color: #141414;
-            border: 1px solid #525252;
-            border-radius: 5px;
-            margin-bottom: 0;
         }
         #statisticsAnalysisColumnSelector .flex-box-between {
             margin-bottom: 14px;
@@ -682,7 +675,7 @@
             gap: 8px;
             overflow: auto;
             max-height: 124px;
-            padding: 0 10px;
+            padding: 0 15px 0 0;
         }
         #statisticsAnalysisColumnSelector #statisticsAnalysisColumns .statistics-column-option {
             min-width: 0;
@@ -863,10 +856,13 @@
             display: none;
         }
         .charts-panel > .flex-box-between {
-            width: 100%;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #525252;
+            max-width: 100%;
+            padding: 25px;
+            background-color: #1f1f1f;
+            border: 2px solid #525252;
+            border-radius: 5px;
             align-items: center;
+            margin-bottom: 20px;
         }
         .charts-panel > .flex-box-between div {
             gap: 10px;
@@ -885,25 +881,18 @@
             font-size: 13px;
         }
         .charts-body {
-            width: 100%;
             max-width: 100%;
-            min-width: 0;
-            flex-wrap: nowrap;
-            align-items: stretch;
-            overflow: hidden;
+            gap: 20px;
         }
         .charts-body > * {
             min-width: 0;
         }
         .charts-control {
-            flex: 0 0 500px;
-            width: 500px;
-            min-width: 0;
-            max-width: 500px;
-            padding-top: 30px;
-            padding-right: 30px;
-            overflow: hidden;
-            border-right: 2px solid #525252;
+            flex: 0 0 480px;
+            padding: 25px;
+            background-color: #1f1f1f;
+            border: 2px solid #525252;
+            border-radius: 5px;
         }
         .charts-control p {
             margin: 0;
@@ -1006,8 +995,8 @@
             flex-wrap: wrap;
         }
         .colors-change button {
-            width: 35px;
-            height: 35px;
+            width: 30px;
+            height: 30px;
             padding: 0;
             cursor: pointer;
             border: 2px solid #525252;
@@ -1018,11 +1007,11 @@
         }
         .chart-view {
             flex: 1 1 0;
-            width: 0;
-            min-width: 0;
-            min-height: 525px;
+            padding: 25px;
+            background-color: #1f1f1f;
+            border: 2px solid #525252;
+            border-radius: 5px;
             display: flex;
-            padding: 30px 0 0 30px;
             row-gap: 20px;
             overflow: hidden;
             flex-direction: column;
@@ -1118,9 +1107,12 @@
             }
             .comparison > .flex-box-between {
                 width: 100%;
-                padding-bottom: 20px;
                 align-items: center;
-                border-bottom: 2px solid #525252;
+                padding: 25px;
+                background-color: #1f1f1f;
+                border: 2px solid #525252;
+                border-radius: 5px;
+                margin-bottom: 20px;
             }
             .comparison > .flex-box-between div {
                 gap: 10px;
@@ -1140,17 +1132,15 @@
             }
             .comparison-body {
                 width: 100%;
-                min-width: 0;
-                flex-wrap: nowrap;
-                align-items: stretch;
+                gap: 20px;
             }
             .comparison-choice {
-                flex: 0 0 500px;
-                height: 775px;
-                min-width: 0;
-                padding-top: 30px;
-                padding-right: 30px;
-                border-right: 2px solid #525252;
+                flex: 0 0 480px;
+                height: auto;
+                padding: 25px;
+                background-color: #1f1f1f;
+                border: 2px solid #525252;
+                border-radius: 5px;
                 overflow: hidden;
             }
             .comparison-choice > h4 {
@@ -1228,9 +1218,8 @@
                 font-size: 13px;
             }
             .comparison-actions {
-                display: flex;
-                gap: 10px;
-                flex-direction: column;
+                height: 49px;
+                overflow: hidden;
             }
             .comparison-actions button {
                 width: 100%;
@@ -1240,9 +1229,11 @@
             }
             .comparison-results {
                 flex: 1 1 0;
-                min-width: 0;
                 display: flex;
-                padding: 30px 0 0 30px;
+                padding: 25px;
+                background-color: #1f1f1f;
+                border: 2px solid #525252;
+                border-radius: 5px;
                 gap: 20px;
                 flex-direction: column;
             }
