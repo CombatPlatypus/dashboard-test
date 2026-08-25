@@ -1,4 +1,5 @@
 import {
+    DEFAULT_PLANNING_AVERAGE_SPR,
     MINIMUM_PLANNING_LHS,
     MINIMUM_PLANNING_TOS_PER_LH,
     ensureMinimumPlanningLhs,
@@ -12,6 +13,7 @@ import {
     updatePlanningGeneralField,
     updatePlanningLh,
     updatePlanningTo,
+    updatePlanningVehicleCount,
     resetPlanningLhs,
     resetPlanningReport,
 } from "./state.js";
@@ -894,6 +896,123 @@ function getPlanningPoolQuantity(
     return quantity;
 }
 
+/* CALCULA A QUANTIDADE PRESENTE NOS LHS */
+
+function getPlanningLhQuantity(
+    lhs,
+) {
+    return lhs.reduce(
+        function (
+            total,
+            lh,
+        ) {
+            return (
+                total +
+                (
+                    Number.isFinite(
+                        lh.quantity,
+                    )
+                        ? lh.quantity
+                        : 0
+                )
+            );
+        },
+        0,
+    );
+}
+
+/* CALCULA O VOLUME ESTIMADO */
+
+function calculatePlanningEstimatedVolume(
+    state,
+) {
+    const lhQuantity =
+        getPlanningLhQuantity(
+            state.lhs,
+        );
+
+    const backlogPackages =
+        getPlanningPoolQuantity(
+            state,
+            "backlogPackages",
+        );
+
+    const backlogBulky =
+        getPlanningPoolQuantity(
+            state,
+            "backlogBulky",
+        );
+
+    return (
+        lhQuantity +
+        backlogPackages +
+        backlogBulky
+    );
+}
+
+/* CALCULA O TOTAL DE VEÍCULOS */
+
+function getPlanningVehicleTotal(
+    state,
+) {
+    return Object.values(
+        state.vehicleCounts,
+    ).reduce(
+        function (
+            total,
+            quantity,
+        ) {
+            return (
+                total +
+                (
+                    Number.isFinite(
+                        quantity,
+                    )
+                        ? quantity
+                        : 0
+                )
+            );
+        },
+        0,
+    );
+}
+
+/* CALCULA O SPR MÉDIO UTILIZADO NO RELATÓRIO */
+
+function calculatePlanningAverageSpr(
+    state,
+) {
+    const vehicleTotal =
+        getPlanningVehicleTotal(
+            state,
+        );
+
+    if (
+        vehicleTotal <= 0
+    ) {
+        return (
+            state.averageSpr ??
+            DEFAULT_PLANNING_AVERAGE_SPR
+        );
+    }
+
+    const estimatedVolume =
+        calculatePlanningEstimatedVolume(
+            state,
+        );
+
+    if (
+        estimatedVolume <= 0
+    ) {
+        return 0;
+    }
+
+    return Math.round(
+        estimatedVolume /
+        vehicleTotal,
+    );
+}
+
 /* ATUALIZA A PRÉVIA DO PLANEJAMENTO */
 
 function renderPlanningPreview(state) {
@@ -902,87 +1021,77 @@ function renderPlanningPreview(state) {
             state.lhs,
         );
 
-        const lhQuantity =
-            previewLhs.reduce(
-                function (
-                    total,
-                    lh,
-                ) {
-                    return (
-                        total +
-                        (
-                            Number.isFinite(
-                                lh.quantity,
-                            )
-                                ? lh.quantity
-                                : 0
-                        )
-                    );
-                },
-                0,
-            );
+    const lhQuantity =
+        getPlanningLhQuantity(
+            previewLhs,
+        );
 
-        const backlogPackages =
-            getPlanningPoolQuantity(
-                state,
-                "backlogPackages",
-            );
+    const backlogPackages =
+        getPlanningPoolQuantity(
+            state,
+            "backlogPackages",
+        );
 
-        const backlogBulky =
-            getPlanningPoolQuantity(
-                state,
-                "backlogBulky",
-            );
+    const backlogBulky =
+        getPlanningPoolQuantity(
+            state,
+            "backlogBulky",
+        );
 
-        const estimatedVolume =
-            lhQuantity +
-            backlogPackages +
-            backlogBulky;
-            
-        planningEstimatedVolume.textContent =
-            planningNumberFormatter.format(
-                estimatedVolume,
-            );
+    const estimatedVolume =
+        calculatePlanningEstimatedVolume(
+            state,
+        );
 
-        planningPreviewAverageSpr.textContent =
-            planningNumberFormatter.format(
-                state.averageSpr ?? 0,
-            );
+    const averageSpr =
+        calculatePlanningAverageSpr(
+            state,
+        );
 
-        planningPreviewDailyCapacity.textContent =
-            planningNumberFormatter.format(
-                state.dailyCapacity ?? 0,
-            );
+    planningEstimatedVolume.textContent =
+        planningNumberFormatter.format(
+            estimatedVolume,
+        );
 
-        planningPreviewCpBacklog.textContent =
-            planningNumberFormatter.format(
-                backlogPackages,
-            );
+    planningPreviewAverageSpr.textContent =
+        planningNumberFormatter.format(
+            averageSpr,
+        );
 
-        planningPreviewCpBulky.textContent =
-            planningNumberFormatter.format(
-                backlogBulky,
-            );
+    planningPreviewDailyCapacity.textContent =
+        planningNumberFormatter.format(
+            state.dailyCapacity ?? 0,
+        );
 
-        planningPreviewCpLhPool.textContent =
-            planningNumberFormatter.format(
-                lhQuantity,
-            );
+    planningPreviewCpBacklog.textContent =
+        planningNumberFormatter.format(
+            backlogPackages,
+        );
 
-        planningPreviewCpAdded.textContent =
-            planningNumberFormatter.format(
-                state.collectionPool.added ?? 0,
-            );
+    planningPreviewCpBulky.textContent =
+        planningNumberFormatter.format(
+            backlogBulky,
+        );
 
-        planningPreviewCpRemoved.textContent =
-            planningNumberFormatter.format(
-                state.collectionPool.removed ?? 0,
-            );
+    planningPreviewCpLhPool.textContent =
+        planningNumberFormatter.format(
+            lhQuantity,
+        );
 
-        planningPreviewCpErrors.textContent =
-            planningNumberFormatter.format(
-                state.collectionPool.errors ?? 0,
-            );
+    planningPreviewCpAdded.textContent =
+        planningNumberFormatter.format(
+            state.collectionPool.added ?? 0,
+        );
+
+    planningPreviewCpRemoved.textContent =
+        planningNumberFormatter.format(
+            state.collectionPool.removed ?? 0,
+        );
+
+    planningPreviewCpErrors.textContent =
+        planningNumberFormatter.format(
+            state.collectionPool.errors ?? 0,
+        );
 
     renderPlanningLhPreview(
         previewLhs,
@@ -1049,7 +1158,9 @@ function canExportPlanningReport(
 
     const hasAverageSpr =
         isPlanningPositiveNumber(
-            state.averageSpr,
+            calculatePlanningAverageSpr(
+                state,
+            ),
         );
 
     const hasDailyCapacity =
@@ -1117,7 +1228,7 @@ function renderPlanningLhList(lhs) {
             button.disabled = removeDisabled;
 
             button.title = removeDisabled
-                ? "O planejamento deve possuir pelo menos três LHs."
+                ? `O planejamento deve possuir pelo menos ${MINIMUM_PLANNING_LHS} LHs.`
                 : "Remover LH";
         });
 }
@@ -1152,6 +1263,45 @@ function handlePlanningGeneralInput(event) {
             );
 
     updatePlanningGeneralField(
+        field,
+        input.value,
+    );
+}
+
+/* ATUALIZA UMA QUANTIDADE DE VEÍCULOS */
+
+function handlePlanningVehicleInput(
+    event,
+) {
+    const input =
+        event.target instanceof
+        HTMLInputElement
+            ? event.target
+            : null;
+
+    const field =
+        input?.dataset
+            .planningVehicleField;
+
+    if (
+        !input ||
+        !field
+    ) {
+        return;
+    }
+
+    input.value =
+        input.value
+            .replace(
+                /\D/g,
+                "",
+            )
+            .slice(
+                0,
+                input.maxLength,
+            );
+
+    updatePlanningVehicleCount(
         field,
         input.value,
     );
@@ -1192,11 +1342,16 @@ function handlePlanningPoolInput(event) {
     );
 }
 
-/* SINCRONIZA OS CONTROLES */
+/* SINCRONIZA OS CONTROLES DOS INDICADORES */
 
-function synchronizePlanningControls(
+function synchronizePlanningIndicatorControls(
     state,
 ) {
+    const averageSpr =
+        calculatePlanningAverageSpr(
+            state,
+        );
+
     planningGeneralControls
         .querySelectorAll(
             "[data-planning-field]",
@@ -1204,13 +1359,39 @@ function synchronizePlanningControls(
         .forEach(
             function (input) {
                 const field =
-                    input.dataset.planningField;
+                    input.dataset
+                        .planningField;
 
                 input.value =
-                    state[field] ?? "";
+                    field === "averageSpr"
+                        ? averageSpr
+                        : state[field] ?? "";
             },
         );
 
+    planningGeneralControls
+        .querySelectorAll(
+            "[data-planning-vehicle-field]",
+        )
+        .forEach(
+            function (input) {
+                const field =
+                    input.dataset
+                        .planningVehicleField;
+
+                input.value =
+                    state
+                        .vehicleCounts[field] ??
+                    "";
+            },
+        );
+}
+
+/* SINCRONIZA OS CONTROLES DA COLLECTION POOL */
+
+function synchronizePlanningPoolControls(
+    state,
+) {
     planningPoolControls
         .querySelectorAll(
             "[data-planning-pool-field]",
@@ -1218,12 +1399,29 @@ function synchronizePlanningControls(
         .forEach(
             function (input) {
                 const field =
-                    input.dataset.planningPoolField;
+                    input.dataset
+                        .planningPoolField;
 
                 input.value =
-                    state.collectionPool[field] ?? "";
+                    state
+                        .collectionPool[field] ??
+                    "";
             },
         );
+}
+
+/* SINCRONIZA TODOS OS CONTROLES */
+
+function synchronizePlanningControls(
+    state,
+) {
+    synchronizePlanningIndicatorControls(
+        state,
+    );
+
+    synchronizePlanningPoolControls(
+        state,
+    );
 }
 
 /* ADICIONA UM NOVO LH */
@@ -2056,11 +2254,17 @@ function initializePlanningLhList() {
                 );
             }
 
+            synchronizePlanningIndicatorControls(
+                state,
+            );
+
             if (
                 change.type ===
-                    "planning-reset"
+                    "planning-reset" ||
+                change.type ===
+                    "collection-pool-updated"
             ) {
-                synchronizePlanningControls(
+                synchronizePlanningPoolControls(
                     state,
                 );
             }
@@ -2123,6 +2327,11 @@ function initializePlanningLhList() {
     planningGeneralControls.addEventListener(
         "input",
         handlePlanningGeneralInput,
+    );
+
+    planningGeneralControls.addEventListener(
+        "input",
+        handlePlanningVehicleInput,
     );
 
     planningPoolControls.addEventListener(
