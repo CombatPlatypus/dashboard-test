@@ -211,7 +211,7 @@
             border: none;
         }
         tr {
-            border-top: 2px solid #393a3b;
+            border-top: 1px solid #393a3b;
         }
         table thead th, table thead td, table tfoot th, table tfoot td {
             padding: 15px 20px;
