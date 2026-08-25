@@ -145,18 +145,17 @@
 
             /* CONTROLE DO PLANEJAMENTO - INPUT GROUP */
 
-            #reports #collection-pool > .input-group, 
-            #reports #spr > .input-group {
+            #reports #collection-pool > .input-group,
+            #reports #planningGeneralControls > .input-group {
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
                 gap: 15px;
             }
-            #reports #collection-pool > .input-group h4, 
-            #reports #spr > .input-group h4 {
+            #reports #collection-pool > .input-group h4,
+            #reports #planningGeneralControls > .input-group h4 {
                 font-size: 14px;
             }
-            #reports #collection-pool > .input-group:first-of-type, 
-            #reports #spr > .input-group:first-of-type {
+            #reports #planningGeneralControls > .input-group:first-of-type {
                 padding-bottom: 20px;
                 border-bottom: 2px solid #525252;
                 margin-bottom: 20px;
@@ -683,7 +682,7 @@
 
                                 <li class="tabs-title">
                                     <a href="#spr">
-                                        <h4>Valores do SPR</h4>
+                                        <h4>CAP do Dia e SPR Médio</h4>
                                     </a>
                                 </li> 
                             </ul> 
@@ -756,36 +755,46 @@
 
                                     <div class="tabs-panel" id="spr">
 
-                                        <!-- CAP DO DIA -->
+                                        <!-- CONTROLES DOS INDICADORES -->
 
-                                        <div class="input-group" id="planningGeneralControls">
-                                            <div>
-                                                <h4>Cap do dia</h4>
-                                                <input type="text" inputmode="numeric" maxlength="6" data-planning-field="dailyCapacity">
-                                            </div>
-                                        </div>
+                                        <div id="planningGeneralControls">
 
-                                        <!-- CALCULO DO SPR -->
+                                            <!-- CAP DO DIA -->
 
-                                        <div class="input-group" id="planningGeneralControls">
-                                            <div>
-                                                <h4>SPR Médio</h4>
-                                                <input type="text" inputmode="numeric" maxlength="5" data-planning-field="averageSpr">
+                                            <div class="input-group">
+                                                <div>
+                                                    <h4>Cap do Dia</h4>
+
+                                                    <input type="text" inputmode="numeric" maxlength="6" data-planning-field="dailyCapacity">
+                                                </div>
                                             </div>
 
-                                            <div>
-                                                <h4>Fiorinos</h4>
-                                                <input type="text" inputmode="numeric" maxlength="4">
-                                            </div>
+                                            <!-- CÁLCULO DO SPR -->
 
-                                            <div>
-                                                <h4>Carros</h4>
-                                                <input type="text" inputmode="numeric" maxlength="4">
-                                            </div>
+                                            <div class="input-group">
+                                                <div>
+                                                    <h4>SPR Médio</h4>
 
-                                            <div>
-                                                <h4>Motos</h4>
-                                                <input type="text" inputmode="numeric" maxlength="4">
+                                                    <input type="text" inputmode="numeric" maxlength="5" data-planning-field="averageSpr">
+                                                </div>
+
+                                                <div>
+                                                    <h4>Carros</h4>
+
+                                                    <input type="text" inputmode="numeric" maxlength="4" data-planning-vehicle-field="cars">
+                                                </div>
+
+                                                <div>
+                                                    <h4>Motos</h4>
+
+                                                    <input type="text" inputmode="numeric" maxlength="4" data-planning-vehicle-field="motorcycles">
+                                                </div>
+
+                                                <div>
+                                                    <h4>Fiorinos</h4>
+
+                                                    <input type="text" inputmode="numeric" maxlength="4" data-planning-vehicle-field="fiorinos">
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
