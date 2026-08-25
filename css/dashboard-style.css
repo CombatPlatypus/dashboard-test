@@ -1019,7 +1019,7 @@
         font-size: 15px;
         line-height: 1;
     }
-    .main-menu > div > ul > .dropdown-pane > .link-button > .flex-box-start {
+    .main-menu > div > ul > .dropdown-pane > .link-button > .flex-box-center{
         align-items: center;
     }
 
