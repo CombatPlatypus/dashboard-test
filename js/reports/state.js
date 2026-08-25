@@ -1,9 +1,19 @@
 /* ESTADO DO PLANEJAMENTO */
 
+const DEFAULT_PLANNING_AVERAGE_SPR =
+    90;
+
 const planningState = {
-    averageSpr: null,
+    averageSpr:
+        DEFAULT_PLANNING_AVERAGE_SPR,
 
     dailyCapacity: null,
+
+    vehicleCounts: {
+        cars: null,
+        motorcycles: null,
+        fiorinos: null,
+    },
 
     collectionPool: {
         backlogPackages: null,
@@ -40,6 +50,13 @@ const planningGeneralFields =
     new Set([
         "averageSpr",
         "dailyCapacity",
+    ]);
+
+const planningVehicleFields =
+    new Set([
+        "cars",
+        "motorcycles",
+        "fiorinos",
     ]);
 
 const planningCollectionPoolFields =
@@ -231,6 +248,10 @@ function getPlanningState() {
 
         dailyCapacity:
             planningState.dailyCapacity,
+
+        vehicleCounts: {
+            ...planningState.vehicleCounts,
+        },
 
         collectionPool: {
             ...planningState.collectionPool,
@@ -584,6 +605,30 @@ function removePlanningTo(
     return true;
 }
 
+/* LIMPA AS QUANTIDADES DOS VEÍCULOS */
+
+function clearPlanningVehicleCounts() {
+    let changed = false;
+
+    planningVehicleFields.forEach(
+        function (field) {
+            if (
+                planningState
+                    .vehicleCounts[field] !==
+                null
+            ) {
+                planningState
+                    .vehicleCounts[field] =
+                        null;
+
+                changed = true;
+            }
+        },
+    );
+
+    return changed;
+}
+
 /* ATUALIZA UM CAMPO GERAL */
 
 function updatePlanningGeneralField(
@@ -598,14 +643,29 @@ function updatePlanningGeneralField(
         return false;
     }
 
-    const normalizedValue =
+    const receivedValue =
         normalizeQuantity(
             value,
         );
 
+    const normalizedValue =
+        field === "averageSpr" &&
+        receivedValue === null
+            ? DEFAULT_PLANNING_AVERAGE_SPR
+            : receivedValue;
+
+    const fieldChanged =
+        planningState[field] !==
+        normalizedValue;
+
+    const vehicleCountsCleared =
+        field === "averageSpr"
+            ? clearPlanningVehicleCounts()
+            : false;
+
     if (
-        planningState[field] ===
-        normalizedValue
+        !fieldChanged &&
+        !vehicleCountsCleared
     ) {
         return true;
     }
@@ -615,6 +675,46 @@ function updatePlanningGeneralField(
 
     notifyPlanningState({
         type: "general-field-updated",
+        field,
+        vehicleCountsCleared,
+    });
+
+    return true;
+}
+
+/* ATUALIZA A QUANTIDADE DE UM TIPO DE VEÍCULO */
+
+function updatePlanningVehicleCount(
+    field,
+    value,
+) {
+    if (
+        !planningVehicleFields.has(
+            field,
+        )
+    ) {
+        return false;
+    }
+
+    const normalizedValue =
+        normalizeQuantity(
+            value,
+        );
+
+    if (
+        planningState
+            .vehicleCounts[field] ===
+        normalizedValue
+    ) {
+        return true;
+    }
+
+    planningState
+        .vehicleCounts[field] =
+            normalizedValue;
+
+    notifyPlanningState({
+        type: "vehicle-count-updated",
         field,
     });
 
@@ -678,10 +778,17 @@ function resetPlanningLhs() {
 /* REINICIA TODO O RELATÓRIO DE PLANEJAMENTO */
 
 function resetPlanningReport() {
-    planningGeneralFields.forEach(
+    planningState.averageSpr =
+        DEFAULT_PLANNING_AVERAGE_SPR;
+
+    planningState.dailyCapacity =
+        null;
+
+    planningVehicleFields.forEach(
         function (field) {
-            planningState[field] =
-                null;
+            planningState
+                .vehicleCounts[field] =
+                    null;
         },
     );
 
@@ -761,6 +868,7 @@ function replacePlanningLhs(
 }
 
 export {
+    DEFAULT_PLANNING_AVERAGE_SPR,
     MINIMUM_PLANNING_LHS,
     MINIMUM_PLANNING_TOS_PER_LH,
     ensureMinimumPlanningLhs,
@@ -775,6 +883,7 @@ export {
     updatePlanningGeneralField,
     updatePlanningLh,
     updatePlanningTo,
+    updatePlanningVehicleCount,
     resetPlanningLhs,
     resetPlanningReport,
 };
