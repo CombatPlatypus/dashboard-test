@@ -982,6 +982,10 @@ function getPlanningVehicleTotal(
 function calculatePlanningAverageSpr(
     state,
 ) {
+    const fallbackAverageSpr =
+        state.averageSpr ??
+        DEFAULT_PLANNING_AVERAGE_SPR;
+
     const vehicleTotal =
         getPlanningVehicleTotal(
             state,
@@ -990,10 +994,7 @@ function calculatePlanningAverageSpr(
     if (
         vehicleTotal <= 0
     ) {
-        return (
-            state.averageSpr ??
-            DEFAULT_PLANNING_AVERAGE_SPR
-        );
+        return fallbackAverageSpr;
     }
 
     const estimatedVolume =
@@ -1004,7 +1005,7 @@ function calculatePlanningAverageSpr(
     if (
         estimatedVolume <= 0
     ) {
-        return 0;
+        return fallbackAverageSpr;
     }
 
     return Math.round(
@@ -1119,7 +1120,7 @@ function isPlanningPositiveNumber(
     );
 }
 
-/* VERIFICA SE UM LH ESTÁ COMPLETO */
+/* VERIFICA SE UM LH POSSUI OS DADOS OBRIGATÓRIOS */
 
 function isPlanningLhComplete(
     lh,
@@ -1129,11 +1130,6 @@ function isPlanningLhComplete(
             lh.code ?? "",
         ).trim() !== "";
 
-    const hasQuantity =
-        isPlanningPositiveNumber(
-            lh.quantity,
-        );
-
     const hasOrigin =
         String(
             lh.origin ?? "",
@@ -1141,7 +1137,6 @@ function isPlanningLhComplete(
 
     return (
         hasCode &&
-        hasQuantity &&
         hasOrigin
     );
 }
