@@ -31,6 +31,43 @@
 
         <!-- ESTILOS TEMPORARIOS NÃO FINALIZADOS -->
          
+        <style>
+
+            /* ESTILO GERAL PARA TODAS TABELAS DE REPORT */
+
+            #reports table {
+                width: 100%;
+                margin: 0;
+                table-layout: fixed;
+                border-collapse: collapse;
+                background-color: #1f1f1f;
+            }
+            #reports th,
+            #reports td {
+                height: 38px;
+                padding: 8px 10px;
+                font-size: 13px;
+                color: #e4e6eb;
+                border: 1px solid #525252;
+                overflow-wrap: anywhere;
+            }
+            #reports th {
+                font-weight: 600;
+                text-align: center;
+                background-color: #2e2e2e;
+            }
+            #reports tbody tr:nth-child(even) {
+                background-color: #1b1b1b;
+            }
+            #reports td {
+                text-align: left;
+            }
+            #reports .empty-row td {
+                color: #8b8d91;
+                text-align: center;
+            }
+
+        </style>
     </head>	
 
     <!-- CONTEÚDO DA PÁGINA -->
@@ -546,44 +583,46 @@
 
                         <div class="tabs-panel" id="losses-rate">
 
-                            <div class="report-controls">
+                            <div class="flex-box-start">
+                                <div class="report-controls">
 
 
-                            </div>
+                                </div>
 
-                            <div class="report-preview">
+                                <div class="report-preview">
 
-                                <!-- LOSSES RATE -->
+                                    <!-- LOSSES RATE -->
 
-                                <table class="planning-sheet-table planning-cp-summary-table">
-                                    <colgroup>
-                                        <col>
-                                        <col class="planning-quantity-column">
-                                    </colgroup>
+                                    <table class="planning-sheet-table planning-cp-summary-table">
+                                        <colgroup>
+                                            <col>
+                                            <col class="planning-quantity-column">
+                                        </colgroup>
 
-                                    <thead>
-                                        <tr>
-                                            <th colspan="2">Valores da Collection Pool</th>
-                                        </tr>
-                                    </thead>
+                                        <thead>
+                                            <tr>
+                                                <th colspan="2">Valores da Collection Pool</th>
+                                            </tr>
+                                        </thead>
 
-                                    <tbody>
-                                        <tr>
-                                            <td>Qtd Backlog Pacotes</td>
-                                            <td id="planningPreviewCpBacklog">0</td>
-                                        </tr>
+                                        <tbody>
+                                            <tr>
+                                                <td>Qtd Backlog Pacotes</td>
+                                                <td id="planningPreviewCpBacklog">0</td>
+                                            </tr>
 
-                                        <tr>
-                                            <td>Qtd Backlog Volumosos</td>
-                                            <td id="planningPreviewCpBulky">0</td>
-                                        </tr>
+                                            <tr>
+                                                <td>Qtd Backlog Volumosos</td>
+                                                <td id="planningPreviewCpBulky">0</td>
+                                            </tr>
 
-                                        <tr>
-                                            <td>Qtd dentro dos LHs</td>
-                                            <td id="planningPreviewCpLhPool">0</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                                            <tr>
+                                                <td>Qtd dentro dos LHs</td>
+                                                <td id="planningPreviewCpLhPool">0</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
