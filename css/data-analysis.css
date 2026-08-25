@@ -10,7 +10,7 @@
             gap: 15px;
         }
         .main-structure #statistics #statistics-margin {
-            width: 1300px;
+            max-width: 1300px;
             margin: 0 auto 30px auto;
             column-gap: 15px;
             align-items: center;
@@ -20,6 +20,7 @@
         }
         .main-structure #statistics .tabs-content {
             display: flex;
+            max-width: 1600px;
         }
         .main-structure #statistics .tabs-panel.is-active {
             flex: 1 1 0;
