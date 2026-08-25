@@ -3,11 +3,15 @@
 const DEFAULT_PLANNING_AVERAGE_SPR =
     90;
 
+const DEFAULT_PLANNING_DAILY_CAPACITY =
+    20000;
+
 const planningState = {
     averageSpr:
         DEFAULT_PLANNING_AVERAGE_SPR,
 
-    dailyCapacity: null,
+    dailyCapacity:
+    DEFAULT_PLANNING_DAILY_CAPACITY,
 
     vehicleCounts: {
         cars: null,
@@ -782,7 +786,7 @@ function resetPlanningReport() {
         DEFAULT_PLANNING_AVERAGE_SPR;
 
     planningState.dailyCapacity =
-        null;
+        DEFAULT_PLANNING_DAILY_CAPACITY;
 
     planningVehicleFields.forEach(
         function (field) {
