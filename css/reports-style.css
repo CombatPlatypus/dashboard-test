@@ -397,7 +397,7 @@
 #planning .planning-sheet-table td {
     height: 38px;
     padding: 8px 10px;
-    font-size: 12px;
+    font-size: 13px;
     color: #e4e6eb;
     border: 1px solid #525252;
     overflow-wrap: anywhere;
@@ -466,7 +466,7 @@
 #planning .planning-sheet-metrics h4 {
     padding: 8px;
     margin-bottom: 0;
-    font-size: 12px;
+    font-size: 13px;
     background-color: #2e2e2e;
     border-bottom: 1px solid #525252;
 }
