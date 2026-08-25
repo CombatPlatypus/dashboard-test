@@ -150,7 +150,7 @@
                             </li> 
 
                             <li class="tabs-title">
-                                <a href="#rlosses-rate">
+                                <a href="#losses-rate">
                                     <div class="flex-box-full-center">
                                         <h4>Taxa de Perdas</h4>
                                     </div>
@@ -541,6 +541,49 @@
                                         Baixar Relatório
                                     </button>
                                 </div>
+                            </div>
+                        </div>
+
+                        <div class="tabs-panel" id="losses-rate">
+
+                            <div class="report-controls">
+
+
+                            </div>
+
+                            <div class="report-preview">
+
+                                <!-- LOSSES RATE -->
+
+                                <table class="planning-sheet-table planning-cp-summary-table">
+                                    <colgroup>
+                                        <col>
+                                        <col class="planning-quantity-column">
+                                    </colgroup>
+
+                                    <thead>
+                                        <tr>
+                                            <th colspan="2">Valores da Collection Pool</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <tr>
+                                            <td>Qtd Backlog Pacotes</td>
+                                            <td id="planningPreviewCpBacklog">0</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>Qtd Backlog Volumosos</td>
+                                            <td id="planningPreviewCpBulky">0</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>Qtd dentro dos LHs</td>
+                                            <td id="planningPreviewCpLhPool">0</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
