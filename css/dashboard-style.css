@@ -981,16 +981,16 @@
     .main-menu > div > ul {
         align-items: center;
     }
-    .main-menu > div > ul > .external-links {
+    .main-menu > div > ul > .dropdown-pane > .external-links {
         display: flex;
         padding: 20px;
         gap: 15px;
     }
-    .main-menu > div > ul > .external-links > a:hover {
+    .main-menu > div > ul > .dropdown-pane > .external-links > a:hover {
         opacity: 0.61;
         transition: all 0.5s ease;
     }
-    .main-menu > div > ul > .external-links > a > img {
+    .main-menu > div > ul > .dropdown-pane > .external-links > a > img {
         width: 35px;
     }
 
