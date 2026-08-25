@@ -421,6 +421,7 @@
                 border-radius: 5px;
                 top: 6px;
             }
+            button:disabled,
             .button:disabled {
                 opacity: 0.5;
                 cursor: not-allowed;
@@ -1019,7 +1020,7 @@
         font-size: 15px;
         line-height: 1;
     }
-    .main-menu > div > ul > .dropdown-pane > .link-button > .flex-box-center{
+    .main-menu > div > ul > .dropdown-pane > .link-button > .flex-box-center {
         align-items: center;
     }
 
