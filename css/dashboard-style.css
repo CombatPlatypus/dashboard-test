@@ -993,6 +993,17 @@
     .main-menu > div > ul > .external-links > a > img {
         width: 35px;
     }
+    .main-menu > div > ul > .dropdown-pane{
+        width: max-content;
+        padding: 20px;
+        background-color: #1f1f1f;
+        border: 2px solid #525252;
+        border-radius: 5px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
     .main-menu > div > ul > .dropdown-pane > .link-button {
         border: 2px solid #525252;
     }
@@ -1007,6 +1018,9 @@
         margin-bottom: 0;
         font-size: 15px;
         line-height: 1;
+    }
+    .main-menu > div > ul > .dropdown-pane > .link-button > .flex-box-start {
+        align-items: center;
     }
 
 /* BASE ESTRUTURAL */
