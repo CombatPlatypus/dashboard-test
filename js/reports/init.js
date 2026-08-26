@@ -14,6 +14,10 @@ import {
     initializeLossesRateImport,
 } from "./losses-rate-import.js";
 
+import {
+    initializeLossesRateExport,
+} from "./losses-rate-export.js";
+
 /* INICIALIZA O PAINEL DE RELATÓRIOS */
 
 function initializeReportsPanel() {
@@ -21,6 +25,7 @@ function initializeReportsPanel() {
     initializeLossesRateReport();
     initializeLossesRateCharts();
     initializeLossesRateImport();
+    initializeLossesRateExport();
 }
 
 if (
