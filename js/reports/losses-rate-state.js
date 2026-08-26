@@ -387,10 +387,43 @@ function getLossesRateMonthSummary(
     };
 }
 
+/* SUBSTITUI TODO O HISTÓRICO */
+
+function replaceLossesRateHistory(
+    months,
+) {
+    if (
+        !Array.isArray(
+            months,
+        )
+    ) {
+        return false;
+    }
+
+    lossesRateState.months =
+        LOSSES_RATE_MONTHS.map(
+            function (
+                monthName,
+                monthIndex,
+            ) {
+                return createLossesRateMonthRecord(
+                    months[monthIndex] || {},
+                );
+            },
+        );
+
+    notifyLossesRateState({
+        type: "history-replaced",
+    });
+
+    return true;
+}
+
 export {
     LOSSES_RATE_MONTHS,
     getLossesRateMonthSummary,
     getLossesRateState,
+    replaceLossesRateHistory,
     setActiveLossesRateMonth,
     subscribeLossesRateState,
     updateLossesRateIdentification,
