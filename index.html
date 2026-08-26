@@ -67,6 +67,60 @@
                 text-align: center;
             }
 
+            /* ESTILO GERAL DO PREVIEW */
+
+            #reports .preview {
+                flex: 0 0 1100px;
+                display: flex;
+                flex-direction: column;
+                row-gap: 20px;
+                padding: 20px;
+                background-color: #1f1f1f;
+                border: 2px solid #525252;
+                border-radius: 5px;
+            }
+
+            #reports .preview .title {
+                width: 100%;
+                padding: 12px 20px;
+                text-align: center;
+                background-color: #2e2e2e;
+                border: 1px solid #525252;
+            }
+
+            #reports .preview .title > h2 {
+                margin-bottom: 0;
+                font-size: 20px;
+                text-transform: uppercase;
+                letter-spacing: 1.5px;
+            }
+
+            /* INPUT GROUP */
+
+            #reports .input-group {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 15px;
+            }
+            #reports .input-group h4 {
+                font-size: 14px;
+            }
+            #reports .input-group:first-of-type {
+                padding-bottom: 20px;
+                border-bottom: 2px solid #525252;
+                margin-bottom: 20px;
+            }
+            
+            /* ESTILOS DO REPORT TAXA DE PERDAS */
+
+            #losses-rate .tabs {
+                grid-template-columns: repeat(auto-fit, minmax(254px, 1fr)) !important;
+            }
+
+            #losses-rate .input-group:first-of-type {
+                grid-template-columns: repeat(auto-fit, minmax(100%, 1fr)) !important;
+            }
+
         </style>
     </head>	
 
@@ -583,45 +637,107 @@
 
                         <div class="tabs-panel" id="losses-rate">
 
+                            <!-- HISTÓRICO POR MÊS -->
+
+                            <ul class="tabs flex-box-start" id="lossesRateMonthTabs" role="tablist" aria-label="Mês do relatório"></ul>
+
+                            <!-- CONTEÚDO DO RELATÓRIO -->
+
                             <div class="flex-box-start">
                                 <div class="report-controls">
+                                    <div class="input-group">
+                                        <div>
+                                            <h4>Descrição</h4>
+                                            <input id="lossesRateDescriptionInput" type="text" value="LM HUB SP Santos Praia Grande 02" readonly>                                        
+                                        </div>
 
+                                        <div>
+                                            <h4>Código do Hub</h4>
+                                            <input id="lossesRateHubCodeInput" type="text" value="LSP-63" readonly>
+                                        </div>
 
+                                        <div>
+                                            <h4>Sub Regional</h4>
+                                            <input id="lossesRateSubRegionalInput" type="text" value="SPM07" readonly>                                        
+                                        </div>
+                                    </div>
+
+                                    <div class="input-group">
+                                        <div>
+                                            <h4>Volume Movimentado</h4>
+                                            <input id="lossesRateMovedInput" type="text" inputmode="numeric" maxlength="9">
+                                        </div>
+
+                                        <div>
+                                            <h4>Possíveis Perdas</h4>
+                                            <input id="lossesRatePossibleLossesInput" type="text" inputmode="numeric" maxlength="6">                                        
+                                        </div>
+
+                                        <div>
+                                            <h4>Quantidade de LOST</h4>
+                                            <input id="lossesRateLostInput" type="text" inputmode="numeric" maxlength="6">                                        
+                                        </div>
+
+                                        <div>
+                                            <h4>Quantidade de AVARIA</h4>
+                                            <input id="lossesRateDamageInput" type="text" inputmode="numeric" maxlength="6">
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <div class="report-preview">
+                                <div class="preview" id="lossesRatePreview">
 
-                                    <!-- LOSSES RATE -->
 
-                                    <table class="planning-sheet-table planning-cp-summary-table">
-                                        <colgroup>
-                                            <col>
-                                            <col class="planning-quantity-column">
-                                        </colgroup>
 
-                                        <thead>
-                                            <tr>
-                                                <th colspan="2">Valores da Collection Pool</th>
-                                            </tr>
-                                        </thead>
+                                        <!-- LOSSES RATE -->
 
-                                        <tbody>
-                                            <tr>
-                                                <td>Qtd Backlog Pacotes</td>
-                                                <td id="planningPreviewCpBacklog">0</td>
-                                            </tr>
+                                        <div class="title">
+                                            <h2>Relatório de Taxas de Perdas</h2>
+                                        </div>
 
-                                            <tr>
-                                                <td>Qtd Backlog Volumosos</td>
-                                                <td id="planningPreviewCpBulky">0</td>
-                                            </tr>
+                                        <table>
+                                            <thead>
+                                                <tr>
+                                                    <th>Descrição</th>
+                                                    <th>Código do Hub</th>
+                                                    <th>Sub Regional</th>
+                                                    <th>Volume Movimentado</th>
+                                                </tr>
+                                            </thead>
 
-                                            <tr>
-                                                <td>Qtd dentro dos LHs</td>
-                                                <td id="planningPreviewCpLhPool">0</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                                            <tbody>
+                                                <tr>
+                                                    <td id="lossesRatePreviewDescription">—</td>
+                                                    <td id="lossesRatePreviewHubCode">—</td>
+                                                    <td id="lossesRatePreviewSubRegional">—</td>
+                                                    <td id="lossesRatePreviewMoved">—</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+
+                                        <table>
+                                            <thead>
+                                                <tr>
+                                                    <th>Possíveis Perdas</th>
+                                                    <th>Quantidade de LOST</th>
+                                                    <th>Quantidade de AVARIA</th>
+                                                    <th>Total de Perdas</th>
+                                                    <th>Taxa de Perda</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                <tr>
+                                                    <td id="lossesRatePreviewPossibleLosses">—</td>
+                                                    <td id="lossesRatePreviewLost">—</td>
+                                                    <td id="lossesRatePreviewDamage">—</td>
+                                                    <td id="lossesRatePreviewTotal">—</td>
+                                                    <td id="lossesRatePreviewRate">—</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+
+
                                 </div>
                             </div>
                         </div>
