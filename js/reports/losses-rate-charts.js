@@ -139,7 +139,7 @@ const lossesRateCompositionLabelsPlugin = {
         context.save();
 
         context.font =
-            '700 12px "Open Sans", sans-serif';
+            '400 12px "Open Sans", sans-serif';
 
         context.textBaseline =
             "middle";
