@@ -368,8 +368,13 @@ function createLossesRateHistoryChart(
 function updateLossesRateCompositionChart(
     state,
 ) {
+    const summary =
+        getLossesRateMonthSummary(
+            state.activeMonth,
+        );
+
     const possibleLosses =
-    summary.possibleLosses || 0;
+        summary.possibleLosses || 0;
 
     const lost =
         summary.lost || 0;
@@ -408,7 +413,6 @@ function updateLossesRateCompositionChart(
                 : lossesRateChartIntegerFormatter.format(
                     compositionTotal,
                 );
-
     lossesRateCompositionChart.update();
 
     document.getElementById(
