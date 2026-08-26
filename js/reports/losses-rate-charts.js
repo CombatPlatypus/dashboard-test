@@ -424,6 +424,13 @@ function createLossesRateCompositionChart(
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+
+                devicePixelRatio:
+                    Math.max(
+                        window.devicePixelRatio || 1,
+                        2,
+                    ),
+
                 cutout: "62%",
 
                 layout: {
@@ -571,6 +578,12 @@ function createLossesRateHistoryChart(
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+
+                devicePixelRatio:
+                    Math.max(
+                        window.devicePixelRatio || 1,
+                        2,
+                    ),
 
                 interaction: {
                     intersect: false,
