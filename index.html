@@ -117,8 +117,36 @@
                 grid-template-columns: repeat(auto-fit, minmax(254px, 1fr)) !important;
             }
 
-            #losses-rate .input-group:first-of-type {
+            #losses-rate .losses-rate-identification {
                 grid-template-columns: repeat(auto-fit, minmax(100%, 1fr)) !important;
+                padding-bottom: 20px;
+                margin-bottom: 20px;
+                border-bottom: 2px solid #525252;
+            }
+
+            #losses-rate .losses-rate-history-import {
+                align-items: center;
+                column-gap: 15px;
+                padding-bottom: 20px;
+                margin-bottom: 20px;
+                border-bottom: 2px solid #525252;
+            }
+
+            #losses-rate .losses-rate-history-import .button,
+            #losses-rate .losses-rate-history-import p {
+                margin: 0;
+            }
+
+            #losses-rate #lossesRateHistoryStatus {
+                color: #8b8d91;
+            }
+
+            #losses-rate #lossesRateHistoryStatus[data-status="success"] {
+                color: #4dc38a;
+            }
+
+            #losses-rate #lossesRateHistoryStatus[data-status="error"] {
+                color: #d9534f;
             }
 
             #losses-rate .losses-rate-charts {
@@ -676,7 +704,36 @@
 
                             <div class="flex-box-start">
                                 <div class="report-controls">
-                                    <div class="input-group">
+
+                                    <!-- IMPORTAÇÃO DO HISTÓRICO -->
+
+                                    <div class="losses-rate-history-import flex-box-start">
+                                        <button
+                                            class="button"
+                                            id="lossesRateImportHistoryButton"
+                                            type="button"
+                                        >
+                                            Importar Histórico
+                                        </button>
+
+                                        <input
+                                            id="lossesRateHistoryFileInput"
+                                            type="file"
+                                            accept=".csv,.xlsx,.xls"
+                                            hidden
+                                        >
+
+                                        <p
+                                            id="lossesRateHistoryStatus"
+                                            role="status"
+                                            aria-live="polite"
+                                            aria-atomic="true"
+                                        >
+                                            Nenhum histórico importado.
+                                        </p>
+                                    </div>
+
+                                    <div class="input-group losses-rate-identification">
                                         <div>
                                             <h4>Descrição</h4>
                                             <input id="lossesRateDescriptionInput" type="text" value="LM HUB SP Santos Praia Grande 02" readonly>                                        
@@ -693,7 +750,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="input-group">
+                                    <div class="input-group losses-rate-values">
                                         <div>
                                             <h4>Volume Movimentado</h4>
                                             <input id="lossesRateMovedInput" type="text" inputmode="numeric" maxlength="9">
@@ -771,7 +828,7 @@
                                     <div class="losses-rate-charts">
                                         <div class="losses-rate-chart-panel">
                                             <h3>
-                                                Composição das Perdas —
+                                                Composição das Ocorrências —
                                                 <span id="lossesRateCompositionMonth"></span>
                                             </h3>
 
