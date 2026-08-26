@@ -424,14 +424,14 @@ function createLossesRateCompositionChart(
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                cutout: "68%",
+                cutout: "62%",
 
                 layout: {
                     padding: {
-                        top: 20,
-                        right: 28,
-                        bottom: 10,
-                        left: 28,
+                        top: 10,
+                        right: 20,
+                        bottom: 5,
+                        left: 20,
                     },
                 },
 
