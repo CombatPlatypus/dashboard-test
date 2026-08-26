@@ -6,6 +6,10 @@ import {
     initializeLossesRateReport,
 } from "./losses-rate.js";
 
+import {
+    initializeLossesRateCharts,
+} from "./losses-rate-charts.js";
+
 /* INICIALIZA O PAINEL DE RELATÓRIOS */
 
 function initializeReportsPanel() {
