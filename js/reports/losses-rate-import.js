@@ -183,6 +183,7 @@ LOSSES_RATE_MONTHS.forEach(
 );
 
 /* CONVERTE O MÊS */
+/* CONVERTE O MÊS */
 
 function parseLossesRateMonth(
     value,
@@ -221,8 +222,24 @@ function parseLossesRateMonth(
         );
     }
 
+    const abbreviatedValue =
+        normalizedValue.slice(
+            0,
+            3,
+        );
+
+    if (
+        lossesRateMonthIndexes.has(
+            abbreviatedValue,
+        )
+    ) {
+        return lossesRateMonthIndexes.get(
+            abbreviatedValue,
+        );
+    }
+
     throw new Error(
-        `Mês inválido na linha ${rowNumber}.`,
+        `Mês inválido na linha ${rowNumber}: ${String(value)}.`,
     );
 }
 
