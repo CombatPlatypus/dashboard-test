@@ -180,10 +180,28 @@
                 height: 260px;
             }
 
+            
             @media screen and (max-width: 1000px) {
                 #losses-rate .losses-rate-charts {
                     grid-template-columns: 1fr;
                 }
+            }
+
+            /* TABELA DE IDENTIFICAÇÃO */
+
+            #losses-rate .losses-rate-identification-table {
+                table-layout: fixed;
+            }
+
+            #losses-rate .losses-rate-identification-table th:first-child,
+            #losses-rate .losses-rate-identification-table td:first-child {
+                width: 40%;
+                white-space: nowrap;
+            }
+
+            #losses-rate .losses-rate-identification-table th:nth-child(n + 2),
+            #losses-rate .losses-rate-identification-table td:nth-child(n + 2) {
+                width: 20%;
             }
 
         </style>
@@ -773,7 +791,7 @@
                                         <h2>Relatório de Taxas de Perdas</h2>
                                     </div>
 
-                                    <table>
+                                    <table class="losses-rate-identification-table">
                                         <thead>
                                             <tr>
                                                 <th>Descrição</th>
@@ -850,20 +868,20 @@
                             <!-- FOOTER DO RELATÓRIO -->
 
                             <div class="footer flex-box-between">
-                                <div class="flex-box-start report-warning" id="" role="status" aria-live="polite" aria-atomic="true">
-                                    <img id="" src="images/geral-icons/alert-icon.svg" alt="">
+                                <div class="flex-box-start report-warning" id="lossesRateReportStatus" role="status" aria-live="polite" aria-atomic="true">
+                                    <img id="lossesRateReportStatusIcon" src="images/geral-icons/alert-icon.svg" alt="">
 
-                                    <p id="">
+                                    <p id="lossesRateReportStatusText">
                                         O relatório ainda aguarda informações.
                                     </p>
                                 </div>
                                 
                                 <div>
-                                    <button class="button" id="" type="button" disabled>
+                                    <button class="button" id="lossesRateCopyReportButton" type="button" disabled>
                                         Copiar Relatório
                                     </button>
 
-                                    <button class="button" id="" type="button" disabled>
+                                    <button class="button" id="lossesRateDownloadReportButton" type="button" disabled>
                                         Baixar Relatório
                                     </button>
                                 </div>
