@@ -121,6 +121,37 @@
                 grid-template-columns: repeat(auto-fit, minmax(100%, 1fr)) !important;
             }
 
+            #losses-rate .losses-rate-charts {
+                display: grid;
+                grid-template-columns: minmax(280px, 2fr) minmax(420px, 3fr);
+                gap: 20px;
+            }
+
+            #losses-rate .losses-rate-chart-panel {
+                min-width: 0;
+                padding: 15px;
+                background-color: #1f1f1f;
+                border: 1px solid #525252;
+            }
+
+            #losses-rate .losses-rate-chart-panel > h3 {
+                margin-bottom: 15px;
+                font-size: 14px;
+                text-align: center;
+            }
+
+            #losses-rate .losses-rate-chart-container {
+                position: relative;
+                width: 100%;
+                height: 260px;
+            }
+
+            @media screen and (max-width: 1000px) {
+                #losses-rate .losses-rate-charts {
+                    grid-template-columns: 1fr;
+                }
+            }
+
         </style>
     </head>	
 
@@ -687,57 +718,83 @@
 
                                 <div class="preview" id="lossesRatePreview">
 
+                                    <!-- TABELAS DE LOSSES RATE -->
 
+                                    <div class="title">
+                                        <h2>Relatório de Taxas de Perdas</h2>
+                                    </div>
 
-                                        <!-- LOSSES RATE -->
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Descrição</th>
+                                                <th>Código do Hub</th>
+                                                <th>Sub Regional</th>
+                                                <th>Volume Movimentado</th>
+                                            </tr>
+                                        </thead>
 
-                                        <div class="title">
-                                            <h2>Relatório de Taxas de Perdas</h2>
+                                        <tbody>
+                                            <tr>
+                                                <td id="lossesRatePreviewDescription">—</td>
+                                                <td id="lossesRatePreviewHubCode">—</td>
+                                                <td id="lossesRatePreviewSubRegional">—</td>
+                                                <td id="lossesRatePreviewMoved">—</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Possíveis Perdas</th>
+                                                <th>Quantidade de LOST</th>
+                                                <th>Quantidade de AVARIA</th>
+                                                <th>Total de Perdas</th>
+                                                <th>Taxa de Perda</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            <tr>
+                                                <td id="lossesRatePreviewPossibleLosses">—</td>
+                                                <td id="lossesRatePreviewLost">—</td>
+                                                <td id="lossesRatePreviewDamage">—</td>
+                                                <td id="lossesRatePreviewTotal">—</td>
+                                                <td id="lossesRatePreviewRate">—</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <!-- GRÁFICOS DO RELATÓRIO -->
+
+                                    <div class="losses-rate-charts">
+                                        <div class="losses-rate-chart-panel">
+                                            <h3>
+                                                Composição das Perdas —
+                                                <span id="lossesRateCompositionMonth"></span>
+                                            </h3>
+
+                                            <div class="losses-rate-chart-container">
+                                                <canvas id="lossesRateCompositionChart">
+                                                    Seu navegador não suporta gráficos em canvas.
+                                                </canvas>
+                                            </div>
                                         </div>
 
-                                        <table>
-                                            <thead>
-                                                <tr>
-                                                    <th>Descrição</th>
-                                                    <th>Código do Hub</th>
-                                                    <th>Sub Regional</th>
-                                                    <th>Volume Movimentado</th>
-                                                </tr>
-                                            </thead>
+                                        <div class="losses-rate-chart-panel">
+                                            <h3>
+                                                Histórico da Taxa de Perda —
+                                                <span id="lossesRateHistoryYear"></span>
+                                            </h3>
 
-                                            <tbody>
-                                                <tr>
-                                                    <td id="lossesRatePreviewDescription">—</td>
-                                                    <td id="lossesRatePreviewHubCode">—</td>
-                                                    <td id="lossesRatePreviewSubRegional">—</td>
-                                                    <td id="lossesRatePreviewMoved">—</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-
-                                        <table>
-                                            <thead>
-                                                <tr>
-                                                    <th>Possíveis Perdas</th>
-                                                    <th>Quantidade de LOST</th>
-                                                    <th>Quantidade de AVARIA</th>
-                                                    <th>Total de Perdas</th>
-                                                    <th>Taxa de Perda</th>
-                                                </tr>
-                                            </thead>
-
-                                            <tbody>
-                                                <tr>
-                                                    <td id="lossesRatePreviewPossibleLosses">—</td>
-                                                    <td id="lossesRatePreviewLost">—</td>
-                                                    <td id="lossesRatePreviewDamage">—</td>
-                                                    <td id="lossesRatePreviewTotal">—</td>
-                                                    <td id="lossesRatePreviewRate">—</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-
-
+                                            <div class="losses-rate-chart-container">
+                                                <canvas id="lossesRateHistoryChart">
+                                                    Seu navegador não suporta gráficos em canvas.
+                                                </canvas>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
