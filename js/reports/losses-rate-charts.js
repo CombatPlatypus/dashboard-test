@@ -334,30 +334,31 @@ function createLossesRateHistoryChart(
                         },
                     },
 
-                y: {
-                    beginAtZero: true,
-                    suggestedMax: 0.05,
+                    y: {
+                        beginAtZero: true,
+                        suggestedMax: 0.05,
 
-                    ticks: {
-                        color: "#e4e6eb",
-                        stepSize: 0.01,
-                        precision: 3,
+                        ticks: {
+                            color: "#e4e6eb",
+                            stepSize: 0.01,
+                            precision: 3,
 
-                        callback(
-                            value,
-                        ) {
-                            return (
-                                lossesRateChartPercentageFormatter.format(
-                                    value,
-                                ) +
-                                "%"
-                            );
+                            callback(
+                                value,
+                            ) {
+                                return (
+                                    lossesRateChartPercentageFormatter.format(
+                                        value,
+                                    ) +
+                                    "%"
+                                );
+                            },
                         },
-                    },
 
-                    grid: {
-                        color:
-                            "rgba(82, 82, 82, 0.45)",
+                        grid: {
+                            color:
+                                "rgba(82, 82, 82, 0.45)",
+                        },
                     },
                 },
             },
