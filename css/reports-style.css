@@ -80,9 +80,6 @@
 }
 #reports .footer .report-warning {
     width: max-content;
-    border-left: 2px solid #525252;
-    border-right: 2px solid #525252;
-    padding: 0 100px;
 }
 
 /* TABS DO PLANEJAMANETO */
