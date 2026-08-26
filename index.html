@@ -131,10 +131,16 @@
                 margin-bottom: 20px;
                 border-bottom: 2px solid #525252;
             }
-
-            #losses-rate .losses-rate-history-import .button,
             #losses-rate .losses-rate-history-import p {
                 margin: 0;
+            }
+
+            #losses-rate .losses-rate-history-import .button {
+                min-height: 40px;
+                font-size: 14px;
+                padding: 10px 15px;
+                color: #e4e6eb;
+                border-bottom: 5px solid #525252;
             }
 
             #losses-rate #lossesRateHistoryStatus {
@@ -708,20 +714,11 @@
                                     <!-- IMPORTAÇÃO DO HISTÓRICO -->
 
                                     <div class="losses-rate-history-import flex-box-start">
-                                        <button
-                                            class="button"
-                                            id="lossesRateImportHistoryButton"
-                                            type="button"
-                                        >
+                                        <button class="button" id="lossesRateImportHistoryButton" type="button">
                                             Importar Histórico
                                         </button>
 
-                                        <input
-                                            id="lossesRateHistoryFileInput"
-                                            type="file"
-                                            accept=".csv,.xlsx,.xls"
-                                            hidden
-                                        >
+                                        <input id="lossesRateHistoryFileInput" type="file" accept=".csv,.xlsx,.xls" hidden>
 
                                         <p
                                             id="lossesRateHistoryStatus"
@@ -852,6 +849,28 @@
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+
+                            <!-- FOOTER DO RELATÓRIO -->
+
+                            <div class="footer flex-box-between">
+                                <div class="flex-box-start report-warning" id="" role="status" aria-live="polite" aria-atomic="true">
+                                    <img id="" src="images/geral-icons/alert-icon.svg" alt="">
+
+                                    <p id="">
+                                        O relatório ainda aguarda informações.
+                                    </p>
+                                </div>
+                                
+                                <div>
+                                    <button class="button" id="" type="button" disabled>
+                                        Copiar Relatório
+                                    </button>
+
+                                    <button class="button" id="" type="button" disabled>
+                                        Baixar Relatório
+                                    </button>
                                 </div>
                             </div>
                         </div>
