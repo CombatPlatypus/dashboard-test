@@ -1,5 +1,6 @@
 import {
     LOSSES_RATE_MONTHS,
+    getLossesRateState,
     replaceLossesRateHistory,
 } from "./losses-rate-state.js";
 
@@ -532,6 +533,191 @@ function setLossesRateImportStatus(
     }
 }
 
+/* FORMATA UMA CÉLULA DA BASE */
+
+function formatLossesRateBaseCell(
+    value,
+) {
+    if (
+        value === null ||
+        value === undefined
+    ) {
+        return "";
+    }
+
+    return String(
+        value,
+    );
+}
+
+/* MONTA A BASE ATUALIZADA EM FORMATO TSV */
+
+function createLossesRateUpdatedBaseText() {
+    const state =
+        getLossesRateState();
+
+    const rows = [
+        [
+            "Possíveis Perdas",
+            "Qtd LOST",
+            "Qtd AVARIA",
+            "Volume Movimentado",
+            "Mês",
+        ],
+    ];
+
+    state.months.forEach(
+        function (
+            month,
+            monthIndex,
+        ) {
+            rows.push([
+                formatLossesRateBaseCell(
+                    month.possibleLosses,
+                ),
+
+                formatLossesRateBaseCell(
+                    month.lost,
+                ),
+
+                formatLossesRateBaseCell(
+                    month.damage,
+                ),
+
+                formatLossesRateBaseCell(
+                    month.moved,
+                ),
+
+                LOSSES_RATE_MONTHS[
+                    monthIndex
+                ],
+            ]);
+        },
+    );
+
+    return rows
+        .map(
+            function (row) {
+                return row.join(
+                    "\t",
+                );
+            },
+        )
+        .join(
+            "\n",
+        );
+}
+
+/* COPIA UM TEXTO PARA A ÁREA DE TRANSFERÊNCIA */
+
+async function copyLossesRateText(
+    text,
+) {
+    if (
+        navigator.clipboard &&
+        window.isSecureContext
+    ) {
+        await navigator.clipboard.writeText(
+            text,
+        );
+
+        return;
+    }
+
+    const temporaryTextarea =
+        document.createElement(
+            "textarea",
+        );
+
+    temporaryTextarea.value =
+        text;
+
+    temporaryTextarea.setAttribute(
+        "readonly",
+        "",
+    );
+
+    temporaryTextarea.style.position =
+        "fixed";
+
+    temporaryTextarea.style.opacity =
+        "0";
+
+    temporaryTextarea.style.pointerEvents =
+        "none";
+
+    document.body.appendChild(
+        temporaryTextarea,
+    );
+
+    let copied = false;
+
+    try {
+        temporaryTextarea.select();
+
+        temporaryTextarea.setSelectionRange(
+            0,
+            temporaryTextarea.value.length,
+        );
+
+        copied =
+            document.execCommand(
+                "copy",
+            );
+    } finally {
+        temporaryTextarea.remove();
+    }
+
+    if (!copied) {
+        throw new Error(
+            "O navegador não permitiu copiar a base.",
+        );
+    }
+}
+
+/* COPIA A BASE ATUALIZADA */
+
+async function copyLossesRateUpdatedBase(
+    button,
+) {
+    const originalLabel =
+        button.textContent.trim();
+
+    button.disabled =
+        true;
+
+    try {
+        const baseText =
+            createLossesRateUpdatedBaseText();
+
+        await copyLossesRateText(
+            baseText,
+        );
+
+        button.textContent =
+            "Base Copiada";
+    } catch (error) {
+        console.error(
+            "Não foi possível copiar a base:",
+            error,
+        );
+
+        button.textContent =
+            "Erro ao Copiar";
+    } finally {
+        window.setTimeout(
+            function () {
+                button.textContent =
+                    originalLabel;
+
+                button.disabled =
+                    false;
+            },
+            1600,
+        );
+    }
+}
+
 /* INICIALIZA A IMPORTAÇÃO */
 
 function initializeLossesRateImport() {
@@ -549,6 +735,11 @@ function initializeLossesRateImport() {
         document.getElementById(
             "lossesRateHistoryStatus",
         );
+
+    const copyBaseButton =
+        document.getElementById(
+            "lossesRateCopyBaseButton",
+        );  
 
     if (
         !(importButton instanceof HTMLButtonElement) ||
@@ -621,6 +812,20 @@ function initializeLossesRateImport() {
             }
         },
     );
+
+    if (
+    copyBaseButton instanceof
+        HTMLButtonElement
+    ) {
+        copyBaseButton.addEventListener(
+            "click",
+            function () {
+                copyLossesRateUpdatedBase(
+                    copyBaseButton,
+                );
+            },
+        );
+    }
 
     return true;
 }
