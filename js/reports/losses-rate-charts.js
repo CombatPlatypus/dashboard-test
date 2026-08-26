@@ -506,7 +506,7 @@ function createLossesRateCompositionChart(
 
             plugins: [
                 lossesRateCenterTextPlugin,
-                lossesRateCompositionLabelsPlugin,,
+                lossesRateCompositionLabelsPlugin,
             ],
         },
     );
