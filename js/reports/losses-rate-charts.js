@@ -29,6 +29,14 @@ const lossesRateChartPercentageFormatter =
         },
     );
 
+const lossesRateChartQuantityFormatter =
+    new Intl.NumberFormat(
+        "pt-BR",
+        {
+            maximumFractionDigits: 0,
+        },
+    );
+
 /* TEXTO CENTRAL DO GRÁFICO DE ROSCA */
 
 const lossesRateCenterTextPlugin = {
@@ -106,6 +114,274 @@ const lossesRateCenterTextPlugin = {
     },
 };
 
+/* MOSTRA OS VALORES NAS FATIAS DO GRÁFICO DE ROSCA */
+
+const lossesRateCompositionLabelsPlugin = {
+    id: "lossesRateCompositionLabels",
+
+    afterDatasetsDraw(chart) {
+        if (
+            chart.config.type !==
+            "doughnut"
+        ) {
+            return;
+        }
+
+        const dataset =
+            chart.data.datasets[0];
+
+        const metadata =
+            chart.getDatasetMeta(0);
+
+        const context =
+            chart.ctx;
+
+        context.save();
+
+        context.font =
+            '700 12px "Open Sans", sans-serif';
+
+        context.textBaseline =
+            "middle";
+
+        context.lineWidth =
+            3;
+
+        metadata.data.forEach(
+            function (
+                arc,
+                index,
+            ) {
+                if (
+                    !chart.getDataVisibility(index)
+                ) {
+                    return;
+                }
+
+                const value =
+                    Number(
+                        dataset.data[index],
+                    );
+
+                if (
+                    !Number.isFinite(value) ||
+                    value <= 0
+                ) {
+                    return;
+                }
+
+                const angle =
+                    (
+                        arc.startAngle +
+                        arc.endAngle
+                    ) /
+                    2;
+
+                const smallSlice =
+                    arc.circumference <
+                    0.4;
+
+                const radius =
+                    smallSlice
+                        ? arc.outerRadius + 16
+                        : arc.innerRadius +
+                          (
+                              arc.outerRadius -
+                              arc.innerRadius
+                          ) *
+                              0.55;
+
+                const positionX =
+                    arc.x +
+                    Math.cos(angle) *
+                        radius;
+
+                const positionY =
+                    arc.y +
+                    Math.sin(angle) *
+                        radius;
+
+                const text =
+                    lossesRateChartQuantityFormatter.format(
+                        value,
+                    );
+
+                if (smallSlice) {
+                    const edgeX =
+                        arc.x +
+                        Math.cos(angle) *
+                            arc.outerRadius;
+
+                    const edgeY =
+                        arc.y +
+                        Math.sin(angle) *
+                            arc.outerRadius;
+
+                    context.beginPath();
+
+                    context.moveTo(
+                        edgeX,
+                        edgeY,
+                    );
+
+                    context.lineTo(
+                        positionX,
+                        positionY,
+                    );
+
+                    context.strokeStyle =
+                        "#8a8d91";
+
+                    context.lineWidth =
+                        1;
+
+                    context.stroke();
+
+                    context.textAlign =
+                        Math.cos(angle) >= 0
+                            ? "left"
+                            : "right";
+                } else {
+                    context.textAlign =
+                        "center";
+                }
+
+                context.lineWidth =
+                    3;
+
+                context.strokeStyle =
+                    "#18191a";
+
+                context.fillStyle =
+                    "#e4e6eb";
+
+                context.strokeText(
+                    text,
+                    positionX,
+                    positionY,
+                );
+
+                context.fillText(
+                    text,
+                    positionX,
+                    positionY,
+                );
+            },
+        );
+
+        context.restore();
+    },
+};
+
+
+/* MOSTRA AS TAXAS ACIMA DOS PONTOS DO GRÁFICO */
+
+const lossesRateHistoryLabelsPlugin = {
+    id: "lossesRateHistoryLabels",
+
+    afterDatasetsDraw(chart) {
+        if (
+            chart.config.type !==
+            "line"
+        ) {
+            return;
+        }
+
+        const context =
+            chart.ctx;
+
+        context.save();
+
+        context.font =
+            '600 11px "Open Sans", sans-serif';
+
+        context.textAlign =
+            "center";
+
+        context.textBaseline =
+            "bottom";
+
+        context.lineWidth =
+            3;
+
+        chart.data.datasets.forEach(
+            function (
+                dataset,
+                datasetIndex,
+            ) {
+                const metadata =
+                    chart.getDatasetMeta(
+                        datasetIndex,
+                    );
+
+                if (metadata.hidden) {
+                    return;
+                }
+
+                metadata.data.forEach(
+                    function (
+                        point,
+                        index,
+                    ) {
+                        const originalValue =
+                            dataset.data[index];
+
+                        if (
+                            originalValue ===
+                                null ||
+                            originalValue ===
+                                undefined ||
+                            originalValue ===
+                                ""
+                        ) {
+                            return;
+                        }
+
+                        const value =
+                            Number(
+                                originalValue,
+                            );
+
+                        if (
+                            !Number.isFinite(
+                                value,
+                            )
+                        ) {
+                            return;
+                        }
+
+                        const text =
+                            lossesRateChartPercentageFormatter.format(
+                                value,
+                            ) +
+                            "%";
+
+                        context.strokeStyle =
+                            "#18191a";
+
+                        context.fillStyle =
+                            "#e4e6eb";
+
+                        context.strokeText(
+                            text,
+                            point.x,
+                            point.y - 10,
+                        );
+
+                        context.fillText(
+                            text,
+                            point.x,
+                            point.y - 10,
+                        );
+                    },
+                );
+            },
+        );
+
+        context.restore();
+    },
+};
+
 /* CRIA O GRÁFICO DE COMPOSIÇÃO */
 
 function createLossesRateCompositionChart(
@@ -149,6 +425,15 @@ function createLossesRateCompositionChart(
                 responsive: true,
                 maintainAspectRatio: false,
                 cutout: "68%",
+
+                layout: {
+                    padding: {
+                        top: 20,
+                        right: 28,
+                        bottom: 10,
+                        left: 28,
+                    },
+                },
 
                 animation: {
                     duration: 250,
@@ -221,6 +506,7 @@ function createLossesRateCompositionChart(
 
             plugins: [
                 lossesRateCenterTextPlugin,
+                lossesRateCompositionLabelsPlugin,,
             ],
         },
     );
@@ -278,6 +564,10 @@ function createLossesRateHistoryChart(
                 ],
             },
 
+            plugins: [
+                lossesRateHistoryLabelsPlugin,
+            ],
+
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
@@ -285,6 +575,12 @@ function createLossesRateHistoryChart(
                 interaction: {
                     intersect: false,
                     mode: "index",
+                },
+
+                layout: {
+                    padding: {
+                        top: 24,
+                    },
                 },
 
                 animation: {
