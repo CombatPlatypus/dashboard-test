@@ -11,6 +11,7 @@ import {
 function initializeReportsPanel() {
     initializePlanningLhList();
     initializeLossesRateReport();
+    initializeLossesRateCharts();
 }
 
 if (
