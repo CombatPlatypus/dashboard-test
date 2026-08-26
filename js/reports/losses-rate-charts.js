@@ -13,6 +13,14 @@ let lossesRateCompositionChart =
 let lossesRateHistoryChart =
     null;
 
+/* LIMITES DO HISTÓRICO */
+
+const LOSSES_RATE_HISTORY_INITIAL_MAXIMUM =
+    0.04;
+
+const LOSSES_RATE_MAXIMUM_REFERENCE =
+    0.03;
+
 /* FORMATADORES */
 
 const lossesRateChartIntegerFormatter =
@@ -273,6 +281,111 @@ const lossesRateCompositionLabelsPlugin = {
     },
 };
 
+/* MOSTRA O LIMITE MÁXIMO NO HISTÓRICO */
+
+const lossesRateMaximumReferencePlugin = {
+    id: "lossesRateMaximumReference",
+
+    afterDatasetsDraw(
+        chart,
+    ) {
+        if (
+            chart.config.type !==
+            "line"
+        ) {
+            return;
+        }
+
+        const chartArea =
+            chart.chartArea;
+
+        const yScale =
+            chart.scales.y;
+
+        if (
+            !chartArea ||
+            !yScale
+        ) {
+            return;
+        }
+
+        const positionY =
+            yScale.getPixelForValue(
+                LOSSES_RATE_MAXIMUM_REFERENCE,
+            );
+
+        const context =
+            chart.ctx;
+
+        const label =
+            "Máximo " +
+            lossesRateChartPercentageFormatter.format(
+                LOSSES_RATE_MAXIMUM_REFERENCE,
+            ) +
+            "%";
+
+        context.save();
+
+        context.strokeStyle =
+            "#d9534f";
+
+        context.lineWidth =
+            1.5;
+
+        context.setLineDash([
+            6,
+            5,
+        ]);
+
+        context.beginPath();
+
+        context.moveTo(
+            chartArea.left,
+            positionY,
+        );
+
+        context.lineTo(
+            chartArea.right,
+            positionY,
+        );
+
+        context.stroke();
+
+        context.setLineDash([]);
+
+        context.font =
+            '600 11px "Open Sans", sans-serif';
+
+        context.textAlign =
+            "right";
+
+        context.textBaseline =
+            "bottom";
+
+        context.lineWidth =
+            3;
+
+        context.strokeStyle =
+            "#18191a";
+
+        context.fillStyle =
+            "#d9534f";
+
+        context.strokeText(
+            label,
+            chartArea.right - 6,
+            positionY - 6,
+        );
+
+        context.fillText(
+            label,
+            chartArea.right - 6,
+            positionY - 6,
+        );
+
+        context.restore();
+    },
+};
 
 /* MOSTRA AS TAXAS ACIMA DOS PONTOS DO GRÁFICO */
 
@@ -572,6 +685,7 @@ function createLossesRateHistoryChart(
             },
 
             plugins: [
+                lossesRateMaximumReferencePlugin,
                 lossesRateHistoryLabelsPlugin,
             ],
 
@@ -645,8 +759,7 @@ function createLossesRateHistoryChart(
 
                     y: {
                         beginAtZero: true,
-                        suggestedMax: 0.05,
-
+                            LOSSES_RATE_HISTORY_INITIAL_MAXIMUM,
                         ticks: {
                             color: "#e4e6eb",
                             stepSize: 0.01,
