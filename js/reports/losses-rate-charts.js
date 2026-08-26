@@ -96,7 +96,8 @@ const lossesRateCenterTextPlugin = {
             `12px ${fontFamily}`;
 
         context.fillText(
-            "Total",
+            options.label ||
+                "Ocorrências",
             centerX,
             centerY + 16,
         );
@@ -117,6 +118,7 @@ function createLossesRateCompositionChart(
 
             data: {
                 labels: [
+                    "POSSÍVEIS PERDAS",
                     "LOST",
                     "AVARIA",
                 ],
@@ -126,9 +128,11 @@ function createLossesRateCompositionChart(
                         data: [
                             0,
                             0,
+                            0,
                         ],
 
                         backgroundColor: [
+                            "#8b8d91",
                             "#d9534f",
                             "#f0ad4e",
                         ],
@@ -209,6 +213,8 @@ function createLossesRateCompositionChart(
 
                     lossesRateCenterText: {
                         text: "—",
+                        label: "Ocorrências",
+
                     },
                 },
             },
@@ -362,10 +368,8 @@ function createLossesRateHistoryChart(
 function updateLossesRateCompositionChart(
     state,
 ) {
-    const summary =
-        getLossesRateMonthSummary(
-            state.activeMonth,
-        );
+    const possibleLosses =
+    summary.possibleLosses || 0;
 
     const lost =
         summary.lost || 0;
@@ -373,10 +377,23 @@ function updateLossesRateCompositionChart(
     const damage =
         summary.damage || 0;
 
+    const hasCompositionData =
+        summary.possibleLosses !== null ||
+        summary.lost !== null ||
+        summary.damage !== null;
+
+    const compositionTotal =
+        hasCompositionData
+            ? possibleLosses +
+            lost +
+            damage
+            : null;
+
     lossesRateCompositionChart
         .data
         .datasets[0]
         .data = [
+            possibleLosses,
             lost,
             damage,
         ];
@@ -386,11 +403,10 @@ function updateLossesRateCompositionChart(
         .plugins
         .lossesRateCenterText
         .text =
-            summary.totalLosses ===
-            null
+            compositionTotal === null
                 ? "—"
                 : lossesRateChartIntegerFormatter.format(
-                    summary.totalLosses,
+                    compositionTotal,
                 );
 
     lossesRateCompositionChart.update();
