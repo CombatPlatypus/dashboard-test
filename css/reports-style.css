@@ -202,9 +202,6 @@
 #planning .planning-lh-item-header > h4 {
     margin-bottom: 0;
 }
-#planning .planning-lh-item > input {
-    margin: 15px 0 0 0;
-}
 #planning .planning-lh-remove {
     color: #e4e6eb;
     background-color: #141414;
@@ -306,7 +303,6 @@
 #planning .planning-lh-segregate-to-toggle {
     min-height: 40px;
     padding: 8px 12px;
-    margin-top: 15px;
     border: 1px solid #525252;
     border-radius: 5px;
 }
