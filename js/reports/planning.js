@@ -1940,7 +1940,7 @@ function initializePlanningHeightSynchronization() {
 
     const planningSheet =
         document.querySelector(
-            "#planning .planning-sheet-preview",
+            "planningSheetPreview",
         );
 
     if (
