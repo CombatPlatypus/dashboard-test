@@ -527,12 +527,15 @@ grid-template-columns: repeat(auto-fit, minmax(115px, 1fr));
 
 #losses-rate #lossesRateHistoryStatus {
     color: #8b8d91;
+    display: none;
 }
 #losses-rate #lossesRateHistoryStatus[data-status="success"] {
     color: #4dc38a;
+    display: block;
 }
 #losses-rate #lossesRateHistoryStatus[data-status="error"] {
     color: #d9534f;
+    display: block;
 }
 #losses-rate .losses-rate-charts {
     display: grid;
