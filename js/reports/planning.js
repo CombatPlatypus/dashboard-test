@@ -1939,64 +1939,62 @@ function initializePlanningHeightSynchronization() {
         );
 
     const planningSheet =
-        document.querySelector(
+        document.getElementById(
             "planningSheetPreview",
+        );
+
+    const planningLhListElement =
+        document.getElementById(
+            "planningLhList",
         );
 
     if (
         !planningControls ||
         !planningSheet ||
-        !planningLhList
+        !planningLhListElement
     ) {
+        console.error(
+            "Não foi possível sincronizar as alturas.",
+            {
+                planningControls,
+                planningSheet,
+                planningLhListElement,
+            },
+        );
+
         return;
     }
 
     requestAnimationFrame(
         function () {
-            const basePreviewHeight =
-                planningSheet
-                    .getBoundingClientRect()
-                    .height;
-
-            const baseControlsHeight =
+            const controlsHeight =
                 planningControls
                     .getBoundingClientRect()
                     .height;
 
-            const currentListHeight =
-                planningLhList
+            const listHeight =
+                planningLhListElement
                     .getBoundingClientRect()
                     .height;
 
             const fixedControlsHeight =
-                baseControlsHeight -
-                currentListHeight;
-
-            const baseListMaxHeight =
-                Math.max(
-                    0,
-                    basePreviewHeight -
-                    fixedControlsHeight,
-                );
+                controlsHeight -
+                listHeight;
 
             function synchronizePlanningHeight() {
-                const currentPreviewHeight =
+                const previewHeight =
                     planningSheet
                         .getBoundingClientRect()
                         .height;
 
-                const previewHeightDifference =
-                    currentPreviewHeight -
-                    basePreviewHeight;
-
                 const newListMaxHeight =
                     Math.max(
                         0,
-                        baseListMaxHeight +
-                        previewHeightDifference,
+                        previewHeight -
+                        fixedControlsHeight,
                     );
 
-                planningLhList.style.setProperty(
+                planningLhListElement.style.setProperty(
                     "--planning-lh-list-max-height",
                     `${Math.round(newListMaxHeight)}px`,
                 );
