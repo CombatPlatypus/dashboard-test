@@ -202,6 +202,9 @@
 
                 #reports .report-controls {
                     flex: 1 1 0;
+                }
+
+                #reports .report-controls .style {
                     background-color: #1f1f1f;
                     border: 2px solid #525252;
                     border-radius: 5px;
@@ -1017,13 +1020,16 @@
                                                 <button class="button" id="planningClearLhs" type="button">Limpar Lista</button>
                                             </div>
                                         </div>
-                                        
-                                        <!-- LISTA DE LHS -->
 
-                                        <div class="planning-lh-list flex-box-column" id="planningLhList"></div>
+                                        <div class="style">
+
+                                            <!-- LISTA DE LHS -->
+
+                                            <div class="planning-lh-list flex-box-column" id="planningLhList"></div>
+                                        </div>
                                     </div>
 
-                                    <div class="tabs-panel" id="segregated-tos">
+                                    <div class="tabs-panel style" id="segregated-tos">
 
                                         <!-- LISTAS DE TOS SEPARADAS POR LH -->
 
@@ -1034,7 +1040,7 @@
                                         <div class="planning-to-groups flex-box-column" id="planningToGroups" hidden></div>
                                     </div>
 
-                                    <div class="tabs-panel" id="collection-pool">
+                                    <div class="tabs-panel style" id="collection-pool">
 
                                         <!-- COLLECTION POOL -->
 
