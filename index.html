@@ -62,6 +62,52 @@
                 width: 50px;
             }
 
+
+            #losses-rate .report-controls {
+                display: flex;
+                flex-direction: column;
+            }
+
+            #losses-rate .losses-rate-controls-summary {
+                margin-top: 20px;
+                padding-top: 20px;
+                border-top: 2px solid #525252;
+            }
+
+            #losses-rate .losses-rate-controls-summary > h4 {
+                margin-bottom: 15px;
+            }
+
+            #losses-rate .losses-rate-controls-summary > div > span {
+                line-height: 1.6;
+                color: #e4e6eb;
+                text-align: left;
+                font-size: 14px;
+                letter-spacing: 1px;
+                font-family: 'Open Sans', sans-serif;
+                font-weight: 400;
+                text-rendering: optimizeLegibility;
+            }
+
+            #losses-rate .losses-rate-controls-summary > div {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                min-height: 40px;
+                padding: 8px 12px;
+                border: 1px solid #525252;
+                border-bottom: none;
+            }
+
+            #losses-rate .losses-rate-controls-summary > div:last-of-type {
+                border-bottom: 1px solid #525252;
+                min-height: 73px;
+            }
+
+            #losses-rate .losses-rate-controls-summary > p {
+                margin: 15px 0 0;
+                color: #8b8d91;
+            }
         </style>
     </head>	
 
@@ -711,10 +757,6 @@
                                         </div>
 
                                         <input id="lossesRateHistoryFileInput" type="file" accept=".csv,.xlsx,.xls" hidden>
-
-                                        <p id="lossesRateHistoryStatus" role="status" aria-live="polite" aria-atomic="true">
-                                            Nenhum histórico importado.
-                                        </p>
                                     </div>
 
                                     <div class="input-group losses-rate-identification">
@@ -753,6 +795,27 @@
                                         <div>
                                             <h4>Quantidade de AVARIA</h4>
                                             <input id="lossesRateDamageInput" type="text" inputmode="numeric" maxlength="6">
+                                        </div>
+                                    </div>
+
+                                    <!-- RESUMO DOS DADOS INFORMADOS -->
+
+                                    <div class="losses-rate-controls-summary">
+                                        <h4>Resumo do Mês</h4>
+
+                                        <div class="losses-rate-goal-status">
+                                            <span>Referência máxima</span>
+                                            <span>0,030%</span>
+                                        </div>
+
+                                        <div>
+                                            <span>Total de Perdas</span>
+                                            <span id="lossesRateControlsTotal">—</span>
+                                        </div>
+
+                                        <div>
+                                            <span>Taxa de Perda</span>
+                                            <span id="lossesRateControlsRate">—</span>
                                         </div>
                                     </div>
                                 </div>
