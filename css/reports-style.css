@@ -257,7 +257,7 @@
     /* PLANEJAMENTO - LAYOUT ENTRE PRÉVIA E CONTROLES */
 
     #planning .planning-report-layout {
-        align-items: flex-start;
+        align-items: flex-start !important;
     }
 
     /* PLANEJAMENTO - INDICADORES */
