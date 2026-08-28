@@ -63,6 +63,31 @@
             }
 
 
+
+
+            #planningPoolControls {
+                padding-bottom: 20px;
+                border-bottom: 2px solid #525252;
+                margin-bottom: 30px;
+            }
+
+            #planningPoolControls > h4,
+            #planningGeneralControls > h4 {
+                margin-bottom: 20px;
+            }
+
+            #planningPoolControls > h4:last-of-type {
+                margin-top: 20px;
+            }
+
+
+            .input-group.operation, .input-group.fleet {
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)) !important;
+            }
+
+
+
+
             #losses-rate .report-controls {
                 display: flex;
                 flex-direction: column;
@@ -521,30 +546,37 @@
 
                                         <!-- COLLECTION POOL -->
 
-                                        <div id="collection-pool">
-                                            <div class="input-group" id="planningPoolControls">
+                                        <div id="planningPoolControls">
+
+                                            <h4>Quantidade de Backlog</h4>
+
+                                            <div class="input-group">
                                                 <div>
-                                                    <h4>Qtd Backlog Pacotes</h4>
+                                                    <h4>Pacotes</h4>
                                                     <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="backlogPackages">
                                                 </div>
 
                                                 <div>
-                                                    <h4>Qtd Backlog Volumosos</h4>
+                                                    <h4>Volumosos</h4>
                                                     <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="backlogBulky">
                                                 </div>
+                                            </div>
 
+                                            <h4>Operações na Pool</h4>
+
+                                            <div class="input-group operation">
                                                 <div>
-                                                    <h4>Qtd de Adicionados</h4>
+                                                    <h4>Adicionados</h4>
                                                     <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="added">
                                                 </div>
 
                                                 <div>
-                                                    <h4>Qtd de Retirados</h4>
+                                                    <h4>Retirados</h4>
                                                     <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="removed">
                                                 </div>
 
                                                 <div>
-                                                    <h4>Qtd de Erros</h4>
+                                                    <h4>Erros</h4>
                                                     <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="errors">
                                                 </div>
                                             </div>
@@ -554,7 +586,7 @@
 
                                         <div id="planningGeneralControls">
 
-                                            <!-- CAP DO DIA -->
+                                            <h4>Indicadores Operacionais</h4>
 
                                             <div class="input-group">
                                                 <div>
@@ -562,17 +594,17 @@
 
                                                     <input type="text" inputmode="numeric" maxlength="6" data-planning-field="dailyCapacity">
                                                 </div>
-                                            </div>
 
-                                            <!-- CÁLCULO DO SPR -->
-
-                                            <div class="input-group">
                                                 <div>
                                                     <h4>SPR Médio</h4>
 
                                                     <input type="text" inputmode="numeric" maxlength="5" data-planning-field="averageSpr">
                                                 </div>
+                                            </div>
 
+                                            <h4>Composição da Frota</h4>
+
+                                            <div class="input-group fleet">
                                                 <div>
                                                     <h4>Carros</h4>
 
