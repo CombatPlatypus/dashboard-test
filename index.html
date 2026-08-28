@@ -67,17 +67,14 @@
                 display: flex;
                 flex-direction: column;
             }
-
             #losses-rate .losses-rate-controls-summary {
                 margin-top: 20px;
                 padding-top: 20px;
                 border-top: 2px solid #525252;
             }
-
             #losses-rate .losses-rate-controls-summary > h4 {
                 margin-bottom: 15px;
             }
-
             #losses-rate .losses-rate-controls-summary > div > span {
                 line-height: 1.6;
                 color: #e4e6eb;
@@ -88,7 +85,6 @@
                 font-weight: 400;
                 text-rendering: optimizeLegibility;
             }
-
             #losses-rate .losses-rate-controls-summary > div {
                 display: flex;
                 justify-content: space-between;
@@ -98,16 +94,15 @@
                 border: 1px solid #525252;
                 border-bottom: none;
             }
-
             #losses-rate .losses-rate-controls-summary > div:last-of-type {
                 border-bottom: 1px solid #525252;
                 min-height: 73px;
             }
-
             #losses-rate .losses-rate-controls-summary > p {
                 margin: 15px 0 0;
                 color: #8b8d91;
             }
+
         </style>
     </head>	
 
@@ -274,14 +269,8 @@
                                 </li>
 
                                 <li class="tabs-title">
-                                    <a href="#collection-pool">
-                                        <h4>Collection Pool</h4>
-                                    </a>
-                                </li> 
-
-                                <li class="tabs-title">
-                                    <a href="#spr">
-                                        <h4>CAP do Dia e SPR Médio</h4>
+                                    <a href="#collection-indicators">
+                                        <h4>Collection Pool e Indicadores</h4>
                                     </a>
                                 </li> 
                             </ul> 
@@ -528,39 +517,38 @@
                                         <div class="planning-to-groups flex-box-column" id="planningToGroups" hidden></div>
                                     </div>
 
-                                    <div class="tabs-panel" id="collection-pool">
+                                    <div class="tabs-panel" id="collection-indicators">
 
                                         <!-- COLLECTION POOL -->
 
-                                        <div class="input-group" id="planningPoolControls">
-                                            <div>
-                                                <h4>Qtd Backlog Pacotes</h4>
-                                                <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="backlogPackages">
-                                            </div>
+                                        <div id="collection-pool">
+                                            <div class="input-group" id="planningPoolControls">
+                                                <div>
+                                                    <h4>Qtd Backlog Pacotes</h4>
+                                                    <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="backlogPackages">
+                                                </div>
 
-                                            <div>
-                                                <h4>Qtd Backlog Volumosos</h4>
-                                                <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="backlogBulky">
-                                            </div>
+                                                <div>
+                                                    <h4>Qtd Backlog Volumosos</h4>
+                                                    <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="backlogBulky">
+                                                </div>
 
-                                            <div>
-                                                <h4>Qtd de Adicionados</h4>
-                                                <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="added">
-                                            </div>
+                                                <div>
+                                                    <h4>Qtd de Adicionados</h4>
+                                                    <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="added">
+                                                </div>
 
-                                            <div>
-                                                <h4>Qtd de Retirados</h4>
-                                                <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="removed">
-                                            </div>
+                                                <div>
+                                                    <h4>Qtd de Retirados</h4>
+                                                    <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="removed">
+                                                </div>
 
-                                            <div>
-                                                <h4>Qtd de Erros</h4>
-                                                <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="errors">
+                                                <div>
+                                                    <h4>Qtd de Erros</h4>
+                                                    <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="errors">
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-
-                                    <div class="tabs-panel" id="spr">
 
                                         <!-- CONTROLES DOS INDICADORES -->
 
@@ -797,8 +785,6 @@
                                             <input id="lossesRateDamageInput" type="text" inputmode="numeric" maxlength="6">
                                         </div>
                                     </div>
-
-                                    <!-- RESUMO DOS DADOS INFORMADOS -->
 
                                     <div class="losses-rate-controls-summary">
                                         <h4>Resumo do Mês</h4>
