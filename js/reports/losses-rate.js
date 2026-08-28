@@ -190,6 +190,16 @@ function getLossesRateElements() {
             document.getElementById(
                 "lossesRatePreviewRate",
             ),
+
+        controlsTotal:
+            document.getElementById(
+                "lossesRateControlsTotal",
+            ),
+
+        controlsRate:
+            document.getElementById(
+                "lossesRateControlsRate",
+            ),  
     };
 }
 
@@ -368,6 +378,23 @@ function renderLossesRateInputs(
     );
 }
 
+/* ATUALIZA O RESUMO DOS CONTROLES */
+
+function renderLossesRateControlsSummary(
+    elements,
+    summary,
+) {
+    elements.controlsTotal.textContent =
+        formatLossesRateQuantity(
+            summary.totalLosses,
+        );
+
+    elements.controlsRate.textContent =
+        formatLossesRatePercentage(
+            summary.lossRate,
+        );
+}
+
 /* ATUALIZA A PRÉVIA */
 
 function renderLossesRatePreview(
@@ -442,6 +469,11 @@ function renderLossesRateReport(
     );
 
     renderLossesRateInputs(
+        elements,
+        summary,
+    );
+
+    renderLossesRateControlsSummary(
         elements,
         summary,
     );
