@@ -254,6 +254,12 @@
         min-width: 0;
     }
 
+    /* PLANEJAMENTO - LAYOUT ENTRE PRÉVIA E CONTROLES */
+
+    #planning .planning-report-layout {
+        align-items: flex-start;
+    }
+
     /* PLANEJAMENTO - INDICADORES */
 
     #planning .planning-sheet-metrics {
