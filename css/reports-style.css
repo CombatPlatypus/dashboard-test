@@ -494,10 +494,12 @@ grid-template-columns: repeat(auto-fit, minmax(115px, 1fr));
 /* TAXAS DE PERDAS BOTÃO DE IMPORTAÇÃO */
 
 #losses-rate .losses-rate-identification {
-    grid-template-columns: repeat(auto-fit, minmax(100%, 1fr)) !important;
     padding-bottom: 20px;
     margin-bottom: 20px;
     border-bottom: 2px solid #525252;
+}
+#losses-rate .losses-rate-identification div:first-of-type {
+    grid-column: 1 / -1;
 }
 #losses-rate .losses-rate-history-import {
     align-items: center;
