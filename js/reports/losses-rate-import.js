@@ -514,25 +514,6 @@ async function readLossesRateHistoryFile(
     );
 }
 
-/* ALTERA A MENSAGEM DA IMPORTAÇÃO */
-
-function setLossesRateImportStatus(
-    statusElement,
-    message,
-    status,
-) {
-    statusElement.textContent =
-        message;
-
-    if (status) {
-        statusElement.dataset.status =
-            status;
-    } else {
-        delete statusElement.dataset
-            .status;
-    }
-}
-
 /* FORMATA UMA CÉLULA DA BASE */
 
 function formatLossesRateBaseCell(
@@ -731,11 +712,6 @@ function initializeLossesRateImport() {
             "lossesRateHistoryFileInput",
         );
 
-    const statusElement =
-        document.getElementById(
-            "lossesRateHistoryStatus",
-        );
-
     const copyBaseButton =
         document.getElementById(
             "lossesRateCopyBaseButton",
@@ -743,8 +719,7 @@ function initializeLossesRateImport() {
 
     if (
         !(importButton instanceof HTMLButtonElement) ||
-        !(fileInput instanceof HTMLInputElement) ||
-        !(statusElement instanceof HTMLElement)
+        !(fileInput instanceof HTMLInputElement)
     ) {
         return false;
     }
@@ -778,12 +753,6 @@ function initializeLossesRateImport() {
                 return;
             }
 
-            setLossesRateImportStatus(
-                statusElement,
-                "Lendo o histórico...",
-                "loading",
-            );
-
             try {
                 const result =
                     await readLossesRateHistoryFile(
@@ -793,18 +762,10 @@ function initializeLossesRateImport() {
                 replaceLossesRateHistory(
                     result.history,
                 );
-
-                setLossesRateImportStatus(
-                    statusElement,
-                    `${result.importedRows} meses importados de ${file.name}.`,
-                    "success",
-                );
             } catch (error) {
-                setLossesRateImportStatus(
-                    statusElement,
-                    error.message ||
-                        "Não foi possível importar o histórico.",
-                    "error",
+                console.error(
+                    "Não foi possível importar o histórico:",
+                    error,
                 );
             } finally {
                 fileInput.value =
