@@ -141,7 +141,7 @@ function createReceiptOperatorRecord(
 /* ESTADO DO RECEBIMENTO */
 
 const receiptState = {
-    window: "",
+    window: "AM",
     expectedVolume: null,
 
     useTotalErrorParticipation:
@@ -518,7 +518,7 @@ function replaceReceiptOperators(
 /* LIMPA O RELATÓRIO */
 
 function resetReceiptReport() {
-    receiptState.window = "";
+    receiptState.window = "AM";
     receiptState.expectedVolume = null;
 
     receiptState
