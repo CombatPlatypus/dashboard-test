@@ -73,7 +73,7 @@
     #reports .preview {
         flex: 0 0 1100px;
     }
-    #reports .preview > div:first-of-type {
+    #reports .preview .preview-style {
         display: flex;
         flex-direction: column;
         row-gap: 20px;
@@ -200,6 +200,27 @@
     }
     #reports .report-controls .history-link a {
         width: 50px;
+    }
+    #reports .report-controls .history-import {
+        align-items: center;
+        column-gap: 15px;
+        padding-bottom: 20px;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #525252;
+    }
+    #reports .report-controls .history-import div {
+        width: 100%; 
+        height: 40px;
+        overflow: hidden;
+    }
+    #reports .report-controls .history-import .button {
+        width: 100%;
+        min-height: 40px;
+        font-size: 14px;
+        padding: 10px 15px;
+        color: #e4e6eb;
+        background-color: #141414;
+        border-bottom: 5px solid #525252;
     }
 
     /* INPUT GROUP */
@@ -552,28 +573,6 @@
     #losses-rate .losses-rate-identification div:first-of-type {
         grid-column: 1 / -1;
     }
-    #losses-rate .losses-rate-history-import {
-        align-items: center;
-        column-gap: 15px;
-        padding-bottom: 20px;
-        margin-bottom: 20px;
-        border-bottom: 2px solid #525252;
-    }
-    #losses-rate .losses-rate-history-import div {
-        width: 100%; 
-        height: 40px;
-        overflow: hidden;
-    }
-    #losses-rate .losses-rate-history-import .button {
-        width: 100%;
-        min-height: 40px;
-        font-size: 14px;
-        padding: 10px 15px;
-        color: #e4e6eb;
-        background-color: #141414;
-        border-bottom: 5px solid #525252;
-    }
-
     #losses-rate .report-controls {
         display: flex;
         flex-direction: column;
