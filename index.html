@@ -82,7 +82,7 @@
                     436px
                 );
                 overflow-y: auto;
-                padding-right: 10px;
+                padding-right: 15px;
             }
 
             #receipt .receipt-operator-controls::-webkit-scrollbar-track {
@@ -99,9 +99,10 @@
             }
             #receipt .receipt-error-calculation-option {
                 display: flex;
-                align-items: flex-start;
+                align-items: center;
                 gap: 10px;
                 width: 100%;
+                margin-top: 20px;
                 padding-top: 20px;
                 border-top: 2px solid #525252;
                 cursor: pointer;
@@ -109,7 +110,6 @@
 
             #receipt .receipt-error-calculation-option input {
                 flex: 0 0 auto;
-                margin-top: 4px;
             }
 
             #receipt .receipt-error-calculation-option span {
@@ -118,8 +118,9 @@
                 gap: 4px;
             }
 
-            #receipt .receipt-error-calculation-option strong {
+            #receipt .receipt-error-calculation-option p {
                 color: #e4e6eb;
+                margin: 0;
                 font-size: 14px;
             }
 
@@ -1203,25 +1204,10 @@
                                         </div>
                                     </div>
 
-                                    <label
-                                        class="receipt-error-calculation-option"
-                                        for="receiptErrorCalculationToggle"
-                                    >
-                                        <input
-                                            id="receiptErrorCalculationToggle"
-                                            type="checkbox"
-                                            disabled
-                                        >
+                                    <label class="receipt-error-calculation-option" for="receiptErrorCalculationToggle">
+                                        <input id="receiptErrorCalculationToggle" type="checkbox" disabled>
 
-                                        <span>
-                                            <strong>
-                                                Mudar cálculo de erro
-                                            </strong>
-
-                                            <small>
-                                                Calcular a participação de cada recebedor no total de erros.
-                                            </small>
-                                        </span>
+                                        <p>Calcular taxa de erro por total de erros.</p>
                                     </label>
 
                                 </div>
