@@ -43,6 +43,13 @@ const receiptComparisonPercentageFormatter =
         },
     );
 
+const RECEIPT_CHART_PIXEL_RATIO =
+    Math.max(
+        window.devicePixelRatio ||
+            1,
+        3,
+    );
+
 /* FORMATA UMA QUANTIDADE */
 
 function formatReceiptProgressQuantity(
@@ -484,182 +491,6 @@ const receiptComparisonBarValuesPlugin = {
 };
 
 
-/* LINHA DA TAXA MÉDIA */
-
-const receiptComparisonAverageLinePlugin = {
-    id: "receiptComparisonAverageLine",
-
-    beforeDatasetsDraw(
-        chart,
-        args,
-        options,
-    ) {
-        if (
-            options.display !== true ||
-            !Number.isFinite(
-                options.value,
-            )
-        ) {
-            return;
-        }
-
-        const chartArea =
-            chart.chartArea;
-
-        const horizontalScale =
-            chart.scales.x;
-
-        if (
-            !chartArea ||
-            !horizontalScale
-        ) {
-            return;
-        }
-
-        const positionX =
-            horizontalScale
-                .getPixelForValue(
-                    options.value,
-                );
-
-        if (
-            positionX <
-                chartArea.left ||
-            positionX >
-                chartArea.right
-        ) {
-            return;
-        }
-
-        const context =
-            chart.ctx;
-
-        context.save();
-
-        context.strokeStyle =
-            "#FFC107";
-
-        context.lineWidth =
-            1.5;
-
-        context.setLineDash([
-            6,
-            5,
-        ]);
-
-        context.beginPath();
-
-        context.moveTo(
-            positionX,
-            chartArea.top,
-        );
-
-        context.lineTo(
-            positionX,
-            chartArea.bottom,
-        );
-
-        context.stroke();
-
-        context.restore();
-    },
-
-    afterDatasetsDraw(
-        chart,
-        args,
-        options,
-    ) {
-        if (
-            options.display !== true ||
-            !Number.isFinite(
-                options.value,
-            )
-        ) {
-            return;
-        }
-
-        const chartArea =
-            chart.chartArea;
-
-        const horizontalScale =
-            chart.scales.x;
-
-        if (
-            !chartArea ||
-            !horizontalScale
-        ) {
-            return;
-        }
-
-        const positionX =
-            horizontalScale
-                .getPixelForValue(
-                    options.value,
-                );
-
-        const context =
-            chart.ctx;
-
-        const label =
-            options.label ||
-            "Média";
-
-        context.save();
-
-        context.font =
-            '600 11px "Open Sans", sans-serif';
-
-        context.textBaseline =
-            "bottom";
-
-        context.lineWidth =
-            3;
-
-        context.strokeStyle =
-            "#1c1c1c";
-
-        context.fillStyle =
-            "#FFC107";
-
-        const labelWidth =
-            context
-                .measureText(
-                    label,
-                )
-                .width;
-
-        const showOnLeft =
-            positionX +
-                labelWidth +
-                6 >
-            chartArea.right;
-
-        context.textAlign =
-            showOnLeft
-                ? "right"
-                : "left";
-
-        const labelPositionX =
-            showOnLeft
-                ? positionX - 5
-                : positionX + 5;
-
-        context.strokeText(
-            label,
-            labelPositionX,
-            chartArea.top - 6,
-        );
-
-        context.fillText(
-            label,
-            labelPositionX,
-            chartArea.top - 6,
-        );
-
-        context.restore();
-    },
-};
-
 function createReceiptComparisonChart(
     canvas,
     metric,
@@ -701,7 +532,6 @@ function createReceiptComparisonChart(
             },
 
             plugins: [
-                receiptComparisonAverageLinePlugin,
                 receiptComparisonBarValuesPlugin,
             ],
 
@@ -712,19 +542,11 @@ function createReceiptComparisonChart(
                 maintainAspectRatio: false,
 
                 devicePixelRatio:
-                    Math.max(
-                        window.devicePixelRatio ||
-                            1,
-                        2,
-                    ),
+                    RECEIPT_CHART_PIXEL_RATIO,
 
                 layout: {
                     padding: {
-                        top:
-                            percentageMetric
-                                ? 24
-                                : 5,
-
+                        top: 5,
                         right: 12,
                     },
                 },
@@ -741,12 +563,6 @@ function createReceiptComparisonChart(
                 plugins: {
                     receiptComparisonBarValues: {
                         display: true,
-                    },
-
-                    receiptComparisonAverageLine: {
-                        display: false,
-                        value: null,
-                        label: "Média",
                     },
 
                     legend: {
@@ -957,82 +773,6 @@ function createReceiptComparisonData(
             },
         );
 
-    const completedErrors =
-        operators.filter(
-            function (
-                operator,
-            ) {
-                return (
-                    operator.errorQuantity !==
-                    null
-                );
-            },
-        ).length;
-
-    const operatorsWithErrorData =
-        operators.filter(
-            function (
-                operator,
-            ) {
-                return (
-                    operator.errorQuantity !==
-                        null &&
-
-                    operator.packagesReceived !==
-                        null &&
-
-                    operator.packagesReceived >
-                        0
-                );
-            },
-        );
-
-    const comparedErrors =
-        operatorsWithErrorData.reduce(
-            function (
-                total,
-                operator,
-            ) {
-                return (
-                    total +
-                    operator.errorQuantity
-                );
-            },
-            0,
-        );
-
-    const comparedVolume =
-        operatorsWithErrorData.reduce(
-            function (
-                total,
-                operator,
-            ) {
-                return (
-                    total +
-                    operator.packagesReceived
-                );
-            },
-            0,
-        );
-
-    const averageErrorRate =
-        comparedVolume > 0
-            ? (
-                comparedErrors /
-                comparedVolume
-            )
-            : null;
-
-
-    const completeErrorData =
-        operators.length > 0 &&
-        completedErrors ===
-            operators.length;
-
-    const generalErrorRate =
-        summary.totalErrors !==
-            null &&
-
         summary.receivedVolume !==
             null &&
 
@@ -1047,10 +787,6 @@ function createReceiptComparisonData(
         operators,
         summary,
         useParticipation,
-        completedErrors,
-        completeErrorData,
-        generalErrorRate,
-        averageErrorRate,
     };
 }
 
@@ -1201,26 +937,17 @@ function renderReceiptComparison(
                 ? "Participação nos Erros por Recebedor"
                 : "Taxa de Erros por Recebedor";
 
-    const coverageText =
-        data.operators.length > 0
-            ? (
-                `${data.completedErrors} de ` +
-                `${data.operators.length} preenchidos`
-            )
-            : "Aguardando importação";
-
     elements
         .errorChartSubtitle
         .textContent =
             data.useParticipation
                 ? (
-                    "Erros do recebedor ÷ total de erros • " +
-                    coverageText
+                    "Erros do Recebedor ÷ Total de Erros"
                 )
                 : (
-                    "Erros de etiqueta ÷ pacotes recebidos • " +
-                    coverageText
+                    "Erros de Etiqueta ÷ Pacotes Recebidos"
                 );
+
 
     const volumeDataset =
         receiptVolumeComparisonChart
@@ -1304,33 +1031,6 @@ function renderReceiptComparison(
     errorDataset.backgroundColor =
         "#F44336";
 
-    const averageLineOptions =
-        receiptErrorComparisonChart
-            .options
-            .plugins
-            .receiptComparisonAverageLine;
-
-    averageLineOptions.display =
-        !data.useParticipation &&
-        data.averageErrorRate !==
-            null;
-
-    averageLineOptions.value =
-        data.averageErrorRate;
-
-    const averageLabel =
-        data.completeErrorData
-            ? "Média geral"
-            : "Média dos preenchidos";
-
-    averageLineOptions.label =
-        (
-            `${averageLabel}: ` +
-            `${formatReceiptComparisonPercentage(
-                data.averageErrorRate,
-            )}`
-        );
-
     receiptErrorComparisonChart
         .update();
 }
@@ -1359,11 +1059,24 @@ function observeReceiptComparisonVisibility(
 
                 window.requestAnimationFrame(
                     function () {
-                        receiptVolumeComparisonChart
-                            ?.resize();
+                        [
+                            receiptVolumeComparisonChart,
+                            receiptErrorComparisonChart,
+                        ].forEach(
+                            function (
+                                chart,
+                            ) {
+                                if (!chart) {
+                                    return;
+                                }
 
-                        receiptErrorComparisonChart
-                            ?.resize();
+                                chart.resize();
+
+                                chart.update(
+                                    "none",
+                                );
+                            },
+                        );
                     },
                 );
             },
@@ -1482,11 +1195,24 @@ function initializeReceiptComparisonHeight(
 
                     window.requestAnimationFrame(
                         function () {
-                            receiptVolumeComparisonChart
-                                ?.resize();
+                            [
+                                receiptVolumeComparisonChart,
+                                receiptErrorComparisonChart,
+                            ].forEach(
+                                function (
+                                    chart,
+                                ) {
+                                    if (!chart) {
+                                        return;
+                                    }
 
-                            receiptErrorComparisonChart
-                                ?.resize();
+                                    chart.resize();
+
+                                    chart.update(
+                                        "none",
+                                    );
+                                },
+                            );
                         },
                     );
                 },
