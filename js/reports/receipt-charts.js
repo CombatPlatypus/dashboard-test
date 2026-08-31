@@ -355,6 +355,311 @@ function hasReceiptComparisonElements(
     );
 }
 
+/* VALORES AO FINAL DAS BARRAS */
+
+const receiptComparisonBarValuesPlugin = {
+    id: "receiptComparisonBarValues",
+
+    afterDatasetsDraw(
+        chart,
+        args,
+        options,
+    ) {
+        if (
+            options.display === false ||
+            !chart.chartArea
+        ) {
+            return;
+        }
+
+        const dataset =
+            chart.data.datasets[0];
+
+        const metadata =
+            chart.getDatasetMeta(
+                0,
+            );
+
+        const context =
+            chart.ctx;
+
+        const chartArea =
+            chart.chartArea;
+
+        context.save();
+
+        context.font =
+            '600 11px "Open Sans", sans-serif';
+
+        context.textBaseline =
+            "middle";
+
+        context.lineWidth =
+            3;
+
+        context.strokeStyle =
+            "#1c1c1c";
+
+        context.fillStyle =
+            "#e4e6eb";
+
+        metadata.data.forEach(
+            function (
+                bar,
+                index,
+            ) {
+                const value =
+                    dataset.data[index];
+
+                if (
+                    value === null ||
+                    value === undefined ||
+                    !Number.isFinite(
+                        Number(value),
+                    )
+                ) {
+                    return;
+                }
+
+                const formattedValue =
+                    dataset.receiptMetric ===
+                    "error"
+                        ? formatReceiptComparisonPercentage(
+                            value,
+                        )
+                        : formatReceiptProgressQuantity(
+                            value,
+                        );
+
+                const textWidth =
+                    context
+                        .measureText(
+                            formattedValue,
+                        )
+                        .width;
+
+                let positionX =
+                    bar.x + 8;
+
+                let textAlign =
+                    "left";
+
+                /*
+                 * Se o texto ultrapassar o gráfico,
+                 * ele será mostrado antes do fim
+                 * da barra.
+                 */
+
+                if (
+                    positionX +
+                        textWidth >
+                    chartArea.right
+                ) {
+                    positionX =
+                        bar.x - 8;
+
+                    textAlign =
+                        "right";
+                }
+
+                context.textAlign =
+                    textAlign;
+
+                context.strokeText(
+                    formattedValue,
+                    positionX,
+                    bar.y,
+                );
+
+                context.fillText(
+                    formattedValue,
+                    positionX,
+                    bar.y,
+                );
+            },
+        );
+
+        context.restore();
+    },
+};
+
+
+/* LINHA DA TAXA MÉDIA */
+
+const receiptComparisonAverageLinePlugin = {
+    id: "receiptComparisonAverageLine",
+
+    beforeDatasetsDraw(
+        chart,
+        args,
+        options,
+    ) {
+        if (
+            options.display !== true ||
+            !Number.isFinite(
+                options.value,
+            )
+        ) {
+            return;
+        }
+
+        const chartArea =
+            chart.chartArea;
+
+        const horizontalScale =
+            chart.scales.x;
+
+        if (
+            !chartArea ||
+            !horizontalScale
+        ) {
+            return;
+        }
+
+        const positionX =
+            horizontalScale
+                .getPixelForValue(
+                    options.value,
+                );
+
+        if (
+            positionX <
+                chartArea.left ||
+            positionX >
+                chartArea.right
+        ) {
+            return;
+        }
+
+        const context =
+            chart.ctx;
+
+        context.save();
+
+        context.strokeStyle =
+            "#FFC107";
+
+        context.lineWidth =
+            1.5;
+
+        context.setLineDash([
+            6,
+            5,
+        ]);
+
+        context.beginPath();
+
+        context.moveTo(
+            positionX,
+            chartArea.top,
+        );
+
+        context.lineTo(
+            positionX,
+            chartArea.bottom,
+        );
+
+        context.stroke();
+
+        context.restore();
+    },
+
+    afterDatasetsDraw(
+        chart,
+        args,
+        options,
+    ) {
+        if (
+            options.display !== true ||
+            !Number.isFinite(
+                options.value,
+            )
+        ) {
+            return;
+        }
+
+        const chartArea =
+            chart.chartArea;
+
+        const horizontalScale =
+            chart.scales.x;
+
+        if (
+            !chartArea ||
+            !horizontalScale
+        ) {
+            return;
+        }
+
+        const positionX =
+            horizontalScale
+                .getPixelForValue(
+                    options.value,
+                );
+
+        const context =
+            chart.ctx;
+
+        const label =
+            options.label ||
+            "Média";
+
+        context.save();
+
+        context.font =
+            '600 11px "Open Sans", sans-serif';
+
+        context.textBaseline =
+            "bottom";
+
+        context.lineWidth =
+            3;
+
+        context.strokeStyle =
+            "#1c1c1c";
+
+        context.fillStyle =
+            "#FFC107";
+
+        const labelWidth =
+            context
+                .measureText(
+                    label,
+                )
+                .width;
+
+        const showOnLeft =
+            positionX +
+                labelWidth +
+                6 >
+            chartArea.right;
+
+        context.textAlign =
+            showOnLeft
+                ? "right"
+                : "left";
+
+        const labelPositionX =
+            showOnLeft
+                ? positionX - 5
+                : positionX + 5;
+
+        context.strokeText(
+            label,
+            labelPositionX,
+            chartArea.top - 6,
+        );
+
+        context.fillText(
+            label,
+            labelPositionX,
+            chartArea.top - 6,
+        );
+
+        context.restore();
+    },
+};
+
 function createReceiptComparisonChart(
     canvas,
     metric,
@@ -374,6 +679,9 @@ function createReceiptComparisonChart(
                     {
                         data: [],
 
+                        receiptMetric:
+                            metric,
+
                         backgroundColor:
                             metric === "volume"
                             ? "#4CAF50"
@@ -392,6 +700,11 @@ function createReceiptComparisonChart(
                 ],
             },
 
+            plugins: [
+                receiptComparisonAverageLinePlugin,
+                receiptComparisonBarValuesPlugin,
+            ],
+
             options: {
                 indexAxis: "y",
 
@@ -405,6 +718,17 @@ function createReceiptComparisonChart(
                         2,
                     ),
 
+                layout: {
+                    padding: {
+                        top:
+                            percentageMetric
+                                ? 24
+                                : 5,
+
+                        right: 12,
+                    },
+                },
+
                 animation: {
                     duration: 250,
                 },
@@ -415,6 +739,16 @@ function createReceiptComparisonChart(
                 },
 
                 plugins: {
+                    receiptComparisonBarValues: {
+                        display: true,
+                    },
+
+                    receiptComparisonAverageLine: {
+                        display: false,
+                        value: null,
+                        label: "Média",
+                    },
+
                     legend: {
                         display: false,
                     },
@@ -635,6 +969,61 @@ function createReceiptComparisonData(
             },
         ).length;
 
+    const operatorsWithErrorData =
+        operators.filter(
+            function (
+                operator,
+            ) {
+                return (
+                    operator.errorQuantity !==
+                        null &&
+
+                    operator.packagesReceived !==
+                        null &&
+
+                    operator.packagesReceived >
+                        0
+                );
+            },
+        );
+
+    const comparedErrors =
+        operatorsWithErrorData.reduce(
+            function (
+                total,
+                operator,
+            ) {
+                return (
+                    total +
+                    operator.errorQuantity
+                );
+            },
+            0,
+        );
+
+    const comparedVolume =
+        operatorsWithErrorData.reduce(
+            function (
+                total,
+                operator,
+            ) {
+                return (
+                    total +
+                    operator.packagesReceived
+                );
+            },
+            0,
+        );
+
+    const averageErrorRate =
+        comparedVolume > 0
+            ? (
+                comparedErrors /
+                comparedVolume
+            )
+            : null;
+
+
     const completeErrorData =
         operators.length > 0 &&
         completedErrors ===
@@ -661,6 +1050,7 @@ function createReceiptComparisonData(
         completedErrors,
         completeErrorData,
         generalErrorRate,
+        averageErrorRate,
     };
 }
 
@@ -913,6 +1303,33 @@ function renderReceiptComparison(
 
     errorDataset.backgroundColor =
         "#F44336";
+
+    const averageLineOptions =
+        receiptErrorComparisonChart
+            .options
+            .plugins
+            .receiptComparisonAverageLine;
+
+    averageLineOptions.display =
+        !data.useParticipation &&
+        data.averageErrorRate !==
+            null;
+
+    averageLineOptions.value =
+        data.averageErrorRate;
+
+    const averageLabel =
+        data.completeErrorData
+            ? "Média geral"
+            : "Média dos preenchidos";
+
+    averageLineOptions.label =
+        (
+            `${averageLabel}: ` +
+            `${formatReceiptComparisonPercentage(
+                data.averageErrorRate,
+            )}`
+        );
 
     receiptErrorComparisonChart
         .update();
