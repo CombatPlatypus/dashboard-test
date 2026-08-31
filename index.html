@@ -33,29 +33,45 @@
 
         <style>
 
-
             #receipt .tabs {
                 grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             }
+
+
 
             #receipt .preview .table-and-chart {
                 display: grid;
                 grid-template-columns: minmax(691px, 4fr) minmax(280px, 2fr);
                 gap: 20px;
             }
-
-
             #receipt .report-controls .input-group {
                 padding-bottom: 20px;
                 margin-bottom: 20px;
                 border-bottom: 2px solid #525252;
             }
-
             #receipt .report-controls .input-group:last-of-type {
                 padding-bottom: 0;
                 margin-bottom: 0;
                 border-bottom: none;
             }
+
+
+            #receipt #receiptWindowInput {
+                width: 100%;
+            }
+
+            #receipt #receiptWindowInput + .select2-container {
+                width: 100% !important;
+            }
+
+            #receipt .receipt-operator-row {
+                grid-template-columns: minmax(0, 1fr);
+            }
+
+            #receipt .receipt-operator-row > div {
+                width: 100%;
+            }
+
 
             #receipt .receipt-operator-controls {
                 display: flex;
@@ -65,6 +81,12 @@
                 overflow-y: auto;
                 padding-right: 10px;
             }
+
+
+#reports #receipt td {
+    text-align: center;
+}
+
 
 #receipt .receipt-progress {
 
@@ -1051,22 +1073,31 @@
                                     <div class="input-group">
                                         <div>
                                             <h4>Volume Esperado</h4>
-                                            <input id="receiptExpectedInput" type="text" inputmode="numeric" maxlength="8">
+
+                                            <input id="receiptExpectedInput" type="text" inputmode="numeric" maxlength="8" disabled>
                                         </div>
 
                                         <div>
                                             <h4>Volume Recebido</h4>
-                                            <input id="receiptReceivedInput" type="text" readonly>
+
+                                            <input id="receiptReceivedInput" type="text" readonly disabled>
                                         </div>
 
                                         <div>
                                             <h4>Total de Erros</h4>
-                                            <input id="receiptErrorsInput" type="text" readonly>
+
+                                            <input id="receiptErrorsInput" type="text" readonly disabled>
                                         </div>
 
                                         <div>
                                             <h4>Janela</h4>
-                                            <input id="receiptWindowInput" type="text" maxlength="20">
+
+                                            <select class="standard-select" id="receiptWindowInput" disabled>
+                                                <option value="">Selecione a Janela</option>
+                                                <option value="AM">AM</option>
+                                                <option value="PM1">PM1</option>
+                                                <option value="PM2">PM2</option>
+                                            </select>
                                         </div>
                                     </div>
 
@@ -1075,17 +1106,14 @@
                                     <div class="receipt-operator-controls" id="receiptOperatorControls">
                                         <div class="input-group receipt-operator-row">
                                             <div>
-                                                <h4>Recebedor</h4>
-
-                                                <input type="text" data-receipt-operator-field="receiver" readonly>
-                                            </div>
-
-                                            <div>
-                                                <h4>Etiquetador</h4>
+                                                <h4 data-receipt-operator-label>
+                                                    Etiquetador
+                                                </h4>
 
                                                 <div class="flex-box-start">
-                                                    <input type="text" data-receipt-operator-field="labeler">
-                                                    <input type="text" data-receipt-operator-field="errorQuantity" placeholder="Erros" maxlength="5" autocomplete="off" inputmode="numeric" pattern="[0-9]*">
+                                                    <input type="text" data-receipt-operator-field="labeler" placeholder="Nome do etiquetador" autocomplete="off" disabled>
+
+                                                    <input type="text" data-receipt-operator-field="errorQuantity" placeholder="Erros" maxlength="5" autocomplete="off" inputmode="numeric" pattern="[0-9]*" disabled>
                                                 </div>
                                             </div>
                                         </div>
