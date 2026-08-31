@@ -97,13 +97,50 @@
                 border-radius: 5px;
                 background-color: #525252;
             }
+            #receipt .receipt-error-calculation-option {
+                display: flex;
+                align-items: flex-start;
+                gap: 10px;
+                width: 100%;
+                padding-top: 20px;
+                border-top: 2px solid #525252;
+                cursor: pointer;
+            }
+
+            #receipt .receipt-error-calculation-option input {
+                flex: 0 0 auto;
+                margin-top: 4px;
+            }
+
+            #receipt .receipt-error-calculation-option span {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            #receipt .receipt-error-calculation-option strong {
+                color: #e4e6eb;
+                font-size: 14px;
+            }
+
+            #receipt .receipt-error-calculation-option small {
+                color: #a8a9ad;
+                font-size: 12px;
+                line-height: 1.4;
+            }
+
+            #receipt .receipt-error-calculation-option:has(input:disabled) {
+                opacity: 0.55;
+                cursor: not-allowed;
+            }
+
+
 
 
 
 #reports #receipt td {
     text-align: center;
 }
-
 
 #receipt .receipt-progress {
 
@@ -985,7 +1022,7 @@
                                                             <th>Etiquetador</th>
                                                             <th>Pacotes Recebidos</th>
                                                             <th>Erros de Etiqueta</th>
-                                                            <th>Taxa de Erros</th>
+                                                            <th id="receiptPreviewOperatorRateHeading">Taxa de Erros</th>
                                                         </tr>
                                                     </thead>
 
@@ -996,17 +1033,9 @@
                                                             <td>—</td>
                                                             <td>—</td>
                                                             <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
                                                         </tr>
-
+                                                        
                                                         <tr>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
                                                             <td>—</td>
                                                             <td>—</td>
                                                             <td>—</td>
@@ -1020,17 +1049,9 @@
                                                             <td>—</td>
                                                             <td>—</td>
                                                             <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
                                                         </tr>
 
                                                         <tr>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
                                                             <td>—</td>
                                                             <td>—</td>
                                                             <td>—</td>
@@ -1044,12 +1065,39 @@
                                                             <td>—</td>
                                                             <td>—</td>
                                                             <td>—</td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>—</td>
                                                             <td>—</td>
                                                             <td>—</td>
                                                             <td>—</td>
                                                             <td>—</td>
                                                         </tr>
 
+                                                        <tr>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                        </tr>
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -1141,37 +1189,41 @@
 
                                     <!-- RECEBEDORES E ETIQUETADORES -->
 
-                                    <div
-                                        class="input-group receipt-operator-controls"
-                                        id="receiptOperatorControls"
-                                    >
+                                    <div class="input-group receipt-operator-controls" id="receiptOperatorControls">
                                         <div>
                                             <h4 data-receipt-operator-label>
                                                 Etiquetador
                                             </h4>
 
                                             <div class="flex-box-start">
-                                                <input
-                                                    type="text"
-                                                    data-receipt-operator-field="labeler"
-                                                    placeholder="Nome do etiquetador"
-                                                    autocomplete="off"
-                                                    disabled
-                                                >
+                                                <input type="text" data-receipt-operator-field="labeler" placeholder="Nome do etiquetador" autocomplete="off" disabled>
 
-                                                <input
-                                                    type="text"
-                                                    data-receipt-operator-field="errorQuantity"
-                                                    placeholder="Erros"
-                                                    maxlength="5"
-                                                    autocomplete="off"
-                                                    inputmode="numeric"
-                                                    pattern="[0-9]*"
-                                                    disabled
-                                                >
+                                                <input type="text" data-receipt-operator-field="errorQuantity" placeholder="Erros" maxlength="5" autocomplete="off" inputmode="numeric" pattern="[0-9]*" disabled>
                                             </div>
                                         </div>
                                     </div>
+
+                                    <label
+                                        class="receipt-error-calculation-option"
+                                        for="receiptErrorCalculationToggle"
+                                    >
+                                        <input
+                                            id="receiptErrorCalculationToggle"
+                                            type="checkbox"
+                                            disabled
+                                        >
+
+                                        <span>
+                                            <strong>
+                                                Mudar cálculo de erro
+                                            </strong>
+
+                                            <small>
+                                                Calcular a participação de cada recebedor no total de erros.
+                                            </small>
+                                        </span>
+                                    </label>
+
                                 </div>
                             </div>
                         </div>
