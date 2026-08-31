@@ -847,7 +847,7 @@
 
         height: var(
             --receipt-comparison-height,
-            732.78px
+            auto
         );
     }
     #receipt #receipt-charts > .preview-style > .title,
