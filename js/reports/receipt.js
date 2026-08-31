@@ -55,6 +55,39 @@ function formatReceiptQuantity(
     );
 }
 
+/* RETORNA O PRIMEIRO NOME DO RECEBEDOR */
+
+function getReceiptReceiverFirstName(
+    value,
+) {
+    const receivedValue =
+        String(value ?? "")
+            .trim();
+
+    if (receivedValue === "") {
+        return "";
+    }
+
+    const closingBracketIndex =
+        receivedValue.lastIndexOf(
+            "]",
+        );
+
+    const name =
+        closingBracketIndex !== -1
+            ? receivedValue.slice(
+                closingBracketIndex + 1,
+            )
+            : receivedValue;
+
+    return (
+        name
+            .trim()
+            .split(/\s+/)[0] ||
+        ""
+    );
+}
+
 function setReceiptInputValue(
     input,
     value,
@@ -392,7 +425,9 @@ function createReceiptPreviewRow(
         );
 
     const receiver =
-        operator?.receiver?.trim() ||
+        getReceiptReceiverFirstName(
+            operator?.receiver,
+        ) ||
         "—";
 
     const labeler =
