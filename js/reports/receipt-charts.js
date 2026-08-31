@@ -21,15 +21,7 @@ const receiptProgressPercentageFormatter =
         },
     );
 
-const receiptErrorRateFormatter =
-    new Intl.NumberFormat(
-        "pt-BR",
-        {
-            style: "percent",
-            minimumFractionDigits: 3,
-            maximumFractionDigits: 3,
-        },
-    );
+/* FORMATA UMA QUANTIDADE */
 
 function formatReceiptProgressQuantity(
     value,
@@ -47,7 +39,7 @@ function formatReceiptProgressQuantity(
         );
 }
 
-/* ELEMENTOS */
+/* LOCALIZA OS ELEMENTOS */
 
 function getReceiptProgressElements() {
     return {
@@ -75,23 +67,10 @@ function getReceiptProgressElements() {
             document.getElementById(
                 "receiptProgressFill",
             ),
-
-        barLabel:
-            document.getElementById(
-                "receiptProgressBarLabel",
-            ),
-
-        difference:
-            document.getElementById(
-                "receiptProgressDifference",
-            ),
-
-        errorRate:
-            document.getElementById(
-                "receiptProgressErrorRate",
-            ),
     };
 }
+
+/* VERIFICA OS ELEMENTOS */
 
 function hasReceiptProgressElements(
     elements,
@@ -104,58 +83,6 @@ function hasReceiptProgressElements(
                 HTMLElement;
         },
     );
-}
-
-/* DIFERENÇA ENTRE ESPERADO E RECEBIDO */
-
-function getReceiptDifferenceText(
-    expectedVolume,
-    receivedVolume,
-) {
-    const difference =
-        expectedVolume -
-        receivedVolume;
-
-    if (difference > 0) {
-        return (
-            `Faltam ` +
-            `${formatReceiptProgressQuantity(difference)} pacotes`
-        );
-    }
-
-    if (difference < 0) {
-        return (
-            `Excedente de ` +
-            `${formatReceiptProgressQuantity(
-                Math.abs(difference),
-            )} pacotes`
-        );
-    }
-
-    return "Volume esperado atingido";
-}
-
-/* TAXA DE ERROS */
-
-function formatReceiptErrorRate(
-    totalErrors,
-    receivedVolume,
-) {
-    if (
-        totalErrors === null ||
-        totalErrors === undefined ||
-        receivedVolume === null ||
-        receivedVolume === undefined ||
-        receivedVolume <= 0
-    ) {
-        return "—";
-    }
-
-    return receiptErrorRateFormatter
-        .format(
-            totalErrors /
-                receivedVolume,
-        );
 }
 
 /* RENDERIZA O INDICADOR */
@@ -185,38 +112,19 @@ function renderReceiptProgress(
             expectedVolume,
         );
 
-    elements.errorRate.textContent =
-        formatReceiptErrorRate(
-            summary.totalErrors,
-            receivedVolume,
-        );
-
-    const hasExpectedVolume =
+    const canCalculate =
         expectedVolume !== null &&
         expectedVolume !== undefined &&
-        expectedVolume > 0;
-
-    const hasReceivedVolume =
+        expectedVolume > 0 &&
         receivedVolume !== null &&
         receivedVolume !== undefined;
 
-    if (
-        !hasExpectedVolume ||
-        !hasReceivedVolume
-    ) {
+    if (!canCalculate) {
         elements.percentage.textContent =
             "—";
 
         elements.fill.style.width =
             "0%";
-
-        elements.barLabel.textContent =
-            "Aguardando informações";
-
-        elements.difference.textContent =
-            hasExpectedVolume
-                ? "Importe o recebimento para comparar."
-                : "Informe o volume esperado para comparar.";
 
         elements.bar.setAttribute(
             "aria-valuenow",
@@ -238,6 +146,11 @@ function renderReceiptProgress(
     const progressPercentage =
         progressRatio * 100;
 
+    /*
+     * A barra visual para em 100%,
+     * mas o texto pode mostrar valores superiores.
+     */
+
     const visiblePercentage =
         Math.min(
             Math.max(
@@ -258,15 +171,6 @@ function renderReceiptProgress(
 
     elements.fill.style.width =
         `${visiblePercentage}%`;
-
-    elements.barLabel.textContent =
-        `${formattedPercentage} recebido`;
-
-    elements.difference.textContent =
-        getReceiptDifferenceText(
-            expectedVolume,
-            receivedVolume,
-        );
 
     elements.bar.setAttribute(
         "aria-valuenow",
