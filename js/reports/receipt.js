@@ -237,9 +237,9 @@ function getReceiptOperatorInputs(
     row,
 ) {
     return {
-        receiver:
+        title:
             row.querySelector(
-                '[data-receipt-operator-field="receiver"]',
+                "[data-receipt-operator-label]",
             ),
 
         labeler:
@@ -268,19 +268,20 @@ function createReceiptOperatorControl(
             row,
         );
 
+    const receiverName =
+        getReceiptReceiverFirstName(
+            operator.receiver,
+        );
+
     row.dataset.receiptOperatorId =
         String(
             operator.id,
         );
 
-    inputs.receiver.value =
-        operator.receiver;
-
-    inputs.receiver.readOnly =
-        true;
-
-    inputs.receiver.disabled =
-        false;
+    inputs.title.textContent =
+        receiverName
+            ? `Etiquetador da ${receiverName}`
+            : "Etiquetador";
 
     inputs.labeler.value =
         operator.labeler;
@@ -290,6 +291,13 @@ function createReceiptOperatorControl(
 
     inputs.labeler.autocomplete =
         "off";
+
+    inputs.labeler.setAttribute(
+        "aria-label",
+        receiverName
+            ? `Etiquetador da ${receiverName}`
+            : "Etiquetador",
+    );
 
     setReceiptInputValue(
         inputs.errorQuantity,
@@ -304,6 +312,13 @@ function createReceiptOperatorControl(
 
     inputs.errorQuantity.pattern =
         "[0-9]*";
+
+    inputs.errorQuantity.setAttribute(
+        "aria-label",
+        receiverName
+            ? `Erros do etiquetador da ${receiverName}`
+            : "Erros do etiquetador",
+    );
 
     return row;
 }
@@ -324,17 +339,8 @@ function createEmptyReceiptOperatorControl(
     delete row.dataset
         .receiptOperatorId;
 
-    inputs.receiver.value =
-        "";
-
-    inputs.receiver.placeholder =
-        "Importe o arquivo";
-
-    inputs.receiver.readOnly =
-        true;
-
-    inputs.receiver.disabled =
-        true;
+    inputs.title.textContent =
+        "Etiquetador";
 
     inputs.labeler.value =
         "";
@@ -572,6 +578,28 @@ function renderReceiptOperatorPreview(
         );
 }
 
+/* ATIVA OU DESATIVA OS CONTROLES GERAIS */
+
+function setReceiptGeneralControlsAvailability(
+    elements,
+    hasImportedFile,
+) {
+    const disabled =
+        !hasImportedFile;
+
+    elements.expectedInput.disabled =
+        disabled;
+
+    elements.receivedInput.disabled =
+        disabled;
+
+    elements.errorsInput.disabled =
+        disabled;
+
+    elements.windowInput.disabled =
+        disabled;
+}
+
 /* RESUMO */
 
 function renderReceiptSummary(
@@ -581,6 +609,11 @@ function renderReceiptSummary(
 ) {
     const hasOperators =
         state.operators.length > 0;
+
+    setReceiptGeneralControlsAvailability(
+        elements,
+        hasOperators,
+    );
 
     const receivedVolume =
         hasOperators
@@ -671,21 +704,16 @@ function renderReceiptReport(
 function bindReceiptGeneralInputs(
     elements,
 ) {
-    elements.expectedInput
-        .addEventListener(
-            "input",
-            function () {
-                const value =
-                    sanitizeReceiptIntegerInput(
-                        elements.expectedInput,
-                    );
-
-                updateReceiptGeneralField(
-                    "expectedVolume",
-                    value,
-                );
-            },
-        );
+    
+    elements.windowInput.addEventListener(
+        "change",
+        function () {
+            updateReceiptGeneralField(
+                "window",
+                elements.windowInput.value,
+            );
+        },
+    );
 
     elements.windowInput
         .addEventListener(
@@ -822,13 +850,17 @@ function initializeReceiptReport() {
         );
 
     if (
-        !Object.values(
-            templateInputs,
-        ).every(
-            function (input) {
-                return input instanceof
-                    HTMLInputElement;
-            },
+        !(
+            templateInputs.title instanceof
+            HTMLElement
+        ) ||
+        !(
+            templateInputs.labeler instanceof
+            HTMLInputElement
+        ) ||
+        !(
+            templateInputs.errorQuantity instanceof
+            HTMLInputElement
         )
     ) {
         return false;
