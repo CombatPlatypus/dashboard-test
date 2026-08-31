@@ -841,14 +841,9 @@
         width: 100%;
         margin-top: 15px;
     }
-
     #receipt #receipt-charts > .preview-style {
         box-sizing: border-box;
-
-        height: var(
-            --receipt-comparison-height,
-            auto
-        );
+        height: calc(var(--receipt-comparison-height, auto) - 129px);
     }
     #receipt #receipt-charts > .preview-style > .title,
     #receipt #receipt-charts > .preview-style > .cards {
