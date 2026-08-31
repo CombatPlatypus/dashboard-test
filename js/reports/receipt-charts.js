@@ -1182,7 +1182,7 @@ function initializeReceiptComparisonHeight(
 ) {
     const reportControls =
         document.querySelector(
-            "#receipt .report-controls",
+            "#receipt > div.flex-box-start > .report-controls",
         );
 
     const comparisonPreview =
