@@ -199,28 +199,99 @@
     }
 }
 
-            #receipt #receipt-charts .charts, 
             #receipt #receipt-charts .cards {
-                width: 100%;
                 display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                grid-template-columns:
+                    repeat(
+                        auto-fit,
+                        minmax(300px, 1fr)
+                    );
                 gap: 15px;
+                width: 100%;
             }
 
             #receipt #receipt-charts .cards > div {
-                padding: 30px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 5px;
+
+                min-width: 0;
+                padding: 25px;
+
                 background-color: #141414;
                 border: 1px solid #525252;
                 border-radius: 5px;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                gap: 5px;
-                align-items: center;
             }
 
+            #receipt .receipt-comparison-card-label {
+                margin: 0 0 5px;
+                color: #a8a9ad;
+                font-size: 13px;
+            }
 
+            #receipt #receipt-charts .cards h4 {
+                margin: 0;
+                font-size: 18px;
+            }
 
+            #receipt #receipt-charts .cards p:last-child {
+                margin: 0;
+            }
+
+            #receipt #receipt-charts .charts {
+                display: grid;
+                grid-template-columns:
+                    repeat(
+                        auto-fit,
+                        minmax(420px, 1fr)
+                    );
+                gap: 15px;
+
+                width: 100%;
+                margin-top: 15px;
+            }
+
+            #receipt .receipt-comparison-chart-panel {
+                min-width: 0;
+                padding: 20px;
+
+                background-color: #1c1c1c;
+                border: 1px solid #525252;
+                border-radius: 5px;
+            }
+
+            #receipt .receipt-comparison-chart-panel h3 {
+                margin: 0 0 5px;
+                text-align: center;
+            }
+
+            #receipt .receipt-comparison-chart-panel > p {
+                margin: 0;
+                color: #a8a9ad;
+                font-size: 13px;
+                text-align: center;
+            }
+
+            #receipt .receipt-comparison-chart-container {
+                position: relative;
+                width: 100%;
+                height: 400px;
+                margin-top: 15px;
+            }
+
+            #receipt .receipt-comparison-chart-container canvas {
+                display: block;
+                width: 100% !important;
+                height: 100% !important;
+            }
+
+            @media screen and (max-width: 900px) {
+                #receipt #receipt-charts .charts {
+                    grid-template-columns: 1fr;
+                }
+            }
 
         </style>
     </head>	
@@ -1152,30 +1223,49 @@
                                         </div>
 
                                         <div class="tabs-panel" id="receipt-charts">
-
                                             <div class="preview-style">
-
                                                 <div class="title">
-                                                    <h2>Comparação de Recebedores <span>AM</span></h2>
+                                                    <h2>
+                                                        Comparação de Recebedores — <span id="receiptComparisonWindow">AM</span>
+                                                    </h2>
                                                 </div>
 
                                                 <div class="cards">
                                                     <div>
-                                                        <h4>Recebedor</h4>
-                                                        <p>0 Pacotes</p>
+                                                        <p class="receipt-comparison-card-label">Maior Volume Recebido</p>
+                                                        <h4 id="receiptComparisonTopReceiver">—</h4>
+                                                        <p id="receiptComparisonTopVolume">— Pacotes</p>
                                                     </div>
 
                                                     <div>
-                                                        <h4>0,00%</h4>
-                                                        <p>0 de 0 Pacotes</p>
+                                                        <p class="receipt-comparison-card-label" id="receiptComparisonTopRateLabel">Maior Taxa de Erros</p>
+                                                        <h4 id="receiptComparisonTopRate">—</h4>
+                                                        <p id="receiptComparisonTopRateDetails">—</p>
                                                     </div>
                                                 </div>
 
                                                 <div class="charts">
+                                                    <div class="receipt-comparison-chart-panel">
+                                                        <h3>Volume Recebido por Recebedor</h3>
+                                                        <p>Distribuição dos pacotes processados.</p>
 
-                                                    
+                                                        <div class="receipt-comparison-chart-container">
+                                                            <canvas id="receiptVolumeComparisonChart" role="img" aria-label="Comparação do volume recebido por recebedor">
+                                                                Seu navegador não suporta gráficos em canvas.
+                                                            </canvas>
+                                                        </div>
+                                                    </div>
 
+                                                    <div class="receipt-comparison-chart-panel">
+                                                        <h3 id="receiptComparisonErrorChartTitle">Taxa de Erros por Recebedor</h3>
+                                                        <p id="receiptComparisonErrorChartSubtitle">Aguardando importação.</p>
 
+                                                        <div class="receipt-comparison-chart-container">
+                                                            <canvas id="receiptErrorComparisonChart" role="img" aria-label="Comparação da taxa de erros por recebedor">
+                                                                Seu navegador não suporta gráficos em canvas.
+                                                            </canvas>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
