@@ -18,10 +18,22 @@ import {
     initializeLossesRateExport,
 } from "./losses-rate-export.js";
 
+import {
+    initializeReceiptReport,
+} from "./receipt.js";
+
+import {
+    initializeReceiptImport,
+} from "./receipt-import.js";
+
 /* INICIALIZA O PAINEL DE RELATÓRIOS */
 
 function initializeReportsPanel() {
     initializePlanningLhList();
+
+    initializeReceiptReport();
+    initializeReceiptImport();
+
     initializeLossesRateReport();
     initializeLossesRateCharts();
     initializeLossesRateImport();
