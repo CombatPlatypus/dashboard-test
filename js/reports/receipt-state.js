@@ -9,6 +9,8 @@ const receiptGeneralFields =
     new Set([
         "window",
         "expectedVolume",
+        "useTotalErrorParticipation",
+
     ]);
 
 const receiptOperatorFields =
@@ -141,6 +143,10 @@ function createReceiptOperatorRecord(
 const receiptState = {
     window: "",
     expectedVolume: null,
+
+    useTotalErrorParticipation:
+        false,
+
     operators: [],
 };
 
@@ -153,6 +159,10 @@ function getReceiptState() {
 
         expectedVolume:
             receiptState.expectedVolume,
+
+        useTotalErrorParticipation:
+            receiptState
+                .useTotalErrorParticipation,
 
         operators:
             receiptState.operators.map(
@@ -307,14 +317,25 @@ function updateReceiptGeneralField(
         return false;
     }
 
-    const normalizedValue =
-        field === "window"
-            ? normalizeReceiptText(
-                value,
-            )
-            : normalizeReceiptQuantity(
+    let normalizedValue;
+
+    if (field === "window") {
+        normalizedValue =
+            normalizeReceiptText(
                 value,
             );
+    } else if (
+        field ===
+        "useTotalErrorParticipation"
+    ) {
+        normalizedValue =
+            value === true;
+    } else {
+        normalizedValue =
+            normalizeReceiptQuantity(
+                value,
+            );
+    }
 
     if (
         receiptState[field] ===
@@ -499,6 +520,11 @@ function replaceReceiptOperators(
 function resetReceiptReport() {
     receiptState.window = "";
     receiptState.expectedVolume = null;
+
+    receiptState
+        .useTotalErrorParticipation =
+            false;
+
     receiptState.operators = [];
 
     nextReceiptOperatorId = 1;
