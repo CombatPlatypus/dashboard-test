@@ -395,6 +395,14 @@ const receiptComparisonBarValuesPlugin = {
 
         context.save();
 
+        if (
+            "letterSpacing" in
+            context
+        ) {
+            context.letterSpacing =
+                "1px";
+        }
+
         context.font =
             '600 11px "Open Sans", sans-serif';
 
@@ -490,6 +498,55 @@ const receiptComparisonBarValuesPlugin = {
     },
 };
 
+/* ESPAÇAMENTO DOS TEXTOS DO CANVAS */
+
+function applyReceiptCanvasTextSpacing(
+    chart,
+) {
+    const context =
+        chart.ctx;
+
+    /*
+     * Suportado pelos navegadores
+     * modernos baseados em Chromium.
+     */
+
+    if (
+        "letterSpacing" in
+        context
+    ) {
+        context.letterSpacing =
+            "1px";
+    }
+}
+
+const receiptComparisonTextSpacingPlugin = {
+    id: "receiptComparisonTextSpacing",
+
+    beforeDraw(
+        chart,
+    ) {
+        applyReceiptCanvasTextSpacing(
+            chart,
+        );
+    },
+
+    beforeDatasetsDraw(
+        chart,
+    ) {
+        applyReceiptCanvasTextSpacing(
+            chart,
+        );
+    },
+
+    beforeTooltipDraw(
+        chart,
+    ) {
+        applyReceiptCanvasTextSpacing(
+            chart,
+        );
+    },
+};
 
 function createReceiptComparisonChart(
     canvas,
@@ -532,6 +589,7 @@ function createReceiptComparisonChart(
             },
 
             plugins: [
+                receiptComparisonTextSpacingPlugin,
                 receiptComparisonBarValuesPlugin,
             ],
 
@@ -878,6 +936,16 @@ function renderReceiptComparison(
         errorRanking[0] ||
         null;
 
+    const topErrorOperatorName =
+        topErrorOperator
+            ?.labeler
+            ?.trim() ||
+
+        topErrorOperator
+            ?.receiver ||
+
+        "—";
+
     elements.topRateLabel.textContent =
         data.useParticipation
             ? "Maior Participação nos Erros"
@@ -891,44 +959,44 @@ function renderReceiptComparison(
             )
             : "—";
 
-    if (!topErrorOperator) {
-        elements
-            .topRateDetails
-            .textContent =
-                "—";
-    } else if (
-        data.useParticipation
-    ) {
-        elements
-            .topRateDetails
-            .textContent =
-                (
-                    `${topErrorOperator.receiver}: ` +
-                    `${formatReceiptProgressQuantity(
-                        topErrorOperator
-                            .errorQuantity,
-                    )} de ` +
-                    `${formatReceiptProgressQuantity(
-                        data.summary
-                            .totalErrors,
-                    )} erros`
-                );
-    } else {
-        elements
-            .topRateDetails
-            .textContent =
-                (
-                    `${topErrorOperator.receiver}: ` +
-                    `${formatReceiptProgressQuantity(
-                        topErrorOperator
-                            .errorQuantity,
-                    )} de ` +
-                    `${formatReceiptProgressQuantity(
-                        topErrorOperator
-                            .packagesReceived,
-                    )} pacotes`
-                );
-    }
+        if (!topErrorOperator) {
+            elements
+                .topRateDetails
+                .textContent =
+                    "—";
+        } else if (
+            data.useParticipation
+        ) {
+            elements
+                .topRateDetails
+                .textContent =
+                    (
+                        `${topErrorOperatorName}: ` +
+                        `${formatReceiptProgressQuantity(
+                            topErrorOperator
+                                .errorQuantity,
+                        )} de ` +
+                        `${formatReceiptProgressQuantity(
+                            data.summary
+                                .totalErrors,
+                        )} erros`
+                    );
+        } else {
+            elements
+                .topRateDetails
+                .textContent =
+                    (
+                        `${topErrorOperatorName}: ` +
+                        `${formatReceiptProgressQuantity(
+                            topErrorOperator
+                                .errorQuantity,
+                        )} de ` +
+                        `${formatReceiptProgressQuantity(
+                            topErrorOperator
+                                .packagesReceived,
+                        )} pacotes`
+                    );
+        }
 
     elements
         .errorChartTitle
