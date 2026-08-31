@@ -15,6 +15,16 @@ const receiptNumberFormatter =
         "pt-BR",
     );
 
+const receiptErrorRateFormatter =
+    new Intl.NumberFormat(
+        "pt-BR",
+        {
+            style: "percent",
+            minimumFractionDigits: 3,
+            maximumFractionDigits: 3,
+        },
+    );
+
 let receiptOperatorStructureSignature =
     null;
 
@@ -53,6 +63,46 @@ function formatReceiptQuantity(
     return receiptNumberFormatter.format(
         value,
     );
+}
+
+/* CALCULA UMA TAXA DE ERROS */
+
+function calculateReceiptErrorRate(
+    errorQuantity,
+    receivedQuantity,
+) {
+    if (
+        errorQuantity === null ||
+        errorQuantity === undefined ||
+        receivedQuantity === null ||
+        receivedQuantity === undefined ||
+        receivedQuantity <= 0
+    ) {
+        return null;
+    }
+
+    return (
+        errorQuantity /
+        receivedQuantity
+    );
+}
+
+/* FORMATA UMA TAXA DE ERROS */
+
+function formatReceiptErrorRate(
+    value,
+) {
+    if (
+        value === null ||
+        value === undefined
+    ) {
+        return "—";
+    }
+
+    return receiptErrorRateFormatter
+        .format(
+            value,
+        );
 }
 
 /* RETORNA O PRIMEIRO NOME DO RECEBEDOR */
@@ -154,6 +204,11 @@ function getReceiptElements() {
         previewErrors:
             document.getElementById(
                 "receiptPreviewErrors",
+            ),
+
+        previewErrorRate:
+            document.getElementById(
+                "receiptPreviewErrorRate",
             ),
 
         previewOperatorBody:
@@ -444,6 +499,12 @@ function createReceiptPreviewRow(
             operator?.errorQuantity,
         );
 
+    const errorRate =
+        calculateReceiptErrorRate(
+            operator?.errorQuantity,
+            operator?.packagesReceived,
+        );
+
     row.append(
         createReceiptPreviewCell(
             receiver,
@@ -459,6 +520,12 @@ function createReceiptPreviewRow(
 
         createReceiptPreviewCell(
             errorQuantity,
+        ),
+
+        createReceiptPreviewCell(
+            formatReceiptErrorRate(
+                errorRate,
+            ),
         ),
     );
 
@@ -525,6 +592,12 @@ function renderReceiptSummary(
             ? summary.totalErrors
             : null;
 
+    const totalErrorRate =
+        calculateReceiptErrorRate(
+            totalErrors,
+            receivedVolume,
+        );
+
     setReceiptInputValue(
         elements.windowInput,
         state.window,
@@ -562,6 +635,11 @@ function renderReceiptSummary(
     elements.previewErrors.textContent =
         formatReceiptQuantity(
             totalErrors,
+        );
+
+    elements.previewErrorRate.textContent =
+        formatReceiptErrorRate(
+            totalErrorRate,
         );
 }
 
