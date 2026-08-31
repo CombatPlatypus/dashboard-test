@@ -10,6 +10,12 @@ let receiptVolumeComparisonChart =
 let receiptErrorComparisonChart =
     null;
 
+let receiptComparisonHeightObserver =
+    null;
+
+let receiptComparisonHeightFrame =
+    null;
+
 /* FORMATADORES */
 
 const receiptProgressQuantityFormatter =
@@ -370,8 +376,8 @@ function createReceiptComparisonChart(
 
                         backgroundColor:
                             metric === "volume"
-                                ? "#f0ad4e"
-                                : [],
+                            ? "#4CAF50"
+                            : "#F44336",
 
                         borderWidth: 0,
                         barThickness: 22,
@@ -906,28 +912,7 @@ function renderReceiptComparison(
         );
 
     errorDataset.backgroundColor =
-        errorRanking.map(
-            function (
-                operator,
-            ) {
-                if (
-                    data.useParticipation ||
-                    !data.completeErrorData
-                ) {
-                    return "#f0ad4e";
-                }
-
-                return (
-                    data.generalErrorRate !==
-                        null &&
-
-                    operator.errorMetric >
-                        data.generalErrorRate
-                )
-                    ? "#d9534f"
-                    : "#8b8d91";
-            },
-        );
+        "#F44336";
 
     receiptErrorComparisonChart
         .update();
@@ -992,6 +977,125 @@ function observeReceiptComparisonVisibility(
     );
 }
 
+function initializeReceiptComparisonHeight(
+    elements,
+) {
+    const reportControls =
+        document.querySelector(
+            "#receipt .report-controls",
+        );
+
+    const comparisonPreview =
+        elements.panel.querySelector(
+            ".preview-style",
+        );
+
+    if (
+        !(
+            reportControls instanceof
+            HTMLElement
+        ) ||
+        !(
+            comparisonPreview instanceof
+            HTMLElement
+        )
+    ) {
+        console.error(
+            "Não foi possível sincronizar a altura da comparação.",
+        );
+
+        return;
+    }
+
+    function synchronizeComparisonHeight() {
+        if (
+            receiptComparisonHeightFrame !==
+            null
+        ) {
+            window.cancelAnimationFrame(
+                receiptComparisonHeightFrame,
+            );
+        }
+
+        receiptComparisonHeightFrame =
+            window.requestAnimationFrame(
+                function () {
+                    receiptComparisonHeightFrame =
+                        null;
+
+                    const controlsHeight =
+                        Math.ceil(
+                            reportControls
+                                .getBoundingClientRect()
+                                .height,
+                        );
+
+                    /*
+                     * O painel pode estar oculto durante
+                     * a inicialização.
+                     */
+
+                    if (controlsHeight <= 0) {
+                        return;
+                    }
+
+                    const cssHeight =
+                        `${controlsHeight}px`;
+
+                    const currentHeight =
+                        comparisonPreview
+                            .style
+                            .getPropertyValue(
+                                "--receipt-comparison-height",
+                            );
+
+                    if (
+                        currentHeight ===
+                        cssHeight
+                    ) {
+                        return;
+                    }
+
+                    comparisonPreview
+                        .style
+                        .setProperty(
+                            "--receipt-comparison-height",
+                            cssHeight,
+                        );
+
+                    window.requestAnimationFrame(
+                        function () {
+                            receiptVolumeComparisonChart
+                                ?.resize();
+
+                            receiptErrorComparisonChart
+                                ?.resize();
+                        },
+                    );
+                },
+            );
+    }
+
+    receiptComparisonHeightObserver
+        ?.disconnect();
+
+    receiptComparisonHeightObserver =
+        new ResizeObserver(
+            synchronizeComparisonHeight,
+        );
+
+    receiptComparisonHeightObserver.observe(
+        reportControls,
+    );
+
+    window.addEventListener(
+        "resize",
+        synchronizeComparisonHeight,
+    );
+
+    synchronizeComparisonHeight();
+}
+
 function initializeReceiptComparisonCharts() {
     const elements =
         getReceiptComparisonElements();
@@ -1052,6 +1156,10 @@ function initializeReceiptComparisonCharts() {
     );
 
     observeReceiptComparisonVisibility(
+        elements,
+    );
+
+    initializeReceiptComparisonHeight(
         elements,
     );
 
