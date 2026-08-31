@@ -873,7 +873,7 @@
         flex-direction: column;
         min-width: 0;
         min-height: 0;
-        height: 100%;
+        height: auto;
         padding: 20px;
         background-color: #1c1c1c;
         border: 1px solid #525252;
