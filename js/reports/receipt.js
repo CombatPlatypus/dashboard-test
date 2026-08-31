@@ -9,7 +9,7 @@ import {
 /* CONFIGURAÇÕES */
 
 const MINIMUM_RECEIPT_PREVIEW_ROWS = 9;
-const MINIMUM_RECEIPT_OPERATOR_CONTROLS_HEIGHT = 377;
+const MINIMUM_RECEIPT_OPERATOR_CONTROLS_HEIGHT = 451;
 
 const receiptNumberFormatter =
     new Intl.NumberFormat(
@@ -218,16 +218,6 @@ function getReceiptElements() {
         expectedInput:
             document.getElementById(
                 "receiptExpectedInput",
-            ),
-
-        receivedInput:
-            document.getElementById(
-                "receiptReceivedInput",
-            ),
-
-        errorsInput:
-            document.getElementById(
-                "receiptErrorsInput",
             ),
 
         windowInput:
@@ -700,12 +690,6 @@ function setReceiptGeneralControlsAvailability(
     elements.expectedInput.disabled =
         disabled;
 
-    elements.receivedInput.disabled =
-        disabled;
-
-    elements.errorsInput.disabled =
-        disabled;
-
     elements.windowInput.disabled =
         disabled;
 
@@ -756,16 +740,6 @@ function renderReceiptSummary(
     setReceiptInputValue(
         elements.expectedInput,
         state.expectedVolume,
-    );
-
-    setReceiptInputValue(
-        elements.receivedInput,
-        receivedVolume,
-    );
-
-    setReceiptInputValue(
-        elements.errorsInput,
-        totalErrors,
     );
 
     elements.previewWindow.textContent =
