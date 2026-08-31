@@ -31,7 +31,42 @@
 
         <!-- ESTILOS TEMPORARIOS NÃO FINALIZADOS -->
 
-        <style></style>
+        <style>
+
+
+            #receipt .tabs {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            }
+
+            #receipt .preview .table-and-chart {
+                display: grid;
+                grid-template-columns: minmax(691px, 4fr) minmax(280px, 2fr);
+                gap: 20px;
+            }
+
+
+            #receipt .report-controls .input-group {
+                padding-bottom: 20px;
+                margin-bottom: 20px;
+                border-bottom: 2px solid #525252;
+            }
+
+            #receipt .report-controls .input-group:last-of-type {
+                padding-bottom: 0;
+                margin-bottom: 0;
+                border-bottom: none;
+            }
+
+            #receipt .receipt-operator-controls {
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+                max-height: 350px;
+                overflow-y: auto;
+                padding-right: 10px;
+            }
+
+        </style>
     </head>	
 
     <!-- CONTEÚDO DA PÁGINA -->
@@ -151,6 +186,14 @@
                             </li> 
 
                             <li class="tabs-title">
+                                <a href="#l">
+                                    <div class="flex-box-full-center">
+                                        <h4>Expedição</h4>
+                                    </div>
+                                </a>
+                            </li> 
+
+                            <li class="tabs-title">
                                 <a href="#losses-rate">
                                     <div class="flex-box-full-center">
                                         <h4>Taxa de Perdas</h4>
@@ -213,7 +256,7 @@
 
                                     <!-- RELATÓRIO DE PLANEJAMENTO -->
 
-                                    <div id="planningReportExportArea">
+                                    <div class="preview-style" id="planningReportExportArea">
                                         <div class="title">
                                             <h2>Planejamento de Roteirização</h2>
                                         </div>
@@ -547,7 +590,7 @@
                                 <!-- PPÉVIA DO RELATÓRIO -->
 
                                 <div class="preview">
-                                    <div id="lossesRatePreview">
+                                    <div class="preview-style" id="lossesRatePreview">
 
                                         <!-- TABELAS -->
 
@@ -660,7 +703,7 @@
 
                                 <div class="report-controls">
                                     <div class="history-link flex-box-start">
-                                        <a href="#" target="_blank">
+                                        <a href="https://docs.google.com/spreadsheets/d/12hwMXkw5vMvpvEWcXaXyJqNFv8nF8ugZSPHlKIJq5ko/edit?gid=0#gid=0" target="_blank">
                                             <svg class="spreadsheets-link-icon" viewBox="0 0 24 24" aria-hidden="true">
                                                 <path d="M7 17L17 7M9 7H17V15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
                                             </svg>
@@ -672,7 +715,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="losses-rate-history-import flex-box-start">
+                                    <div class="history-import flex-box-start">
                                         <div>
                                             <button class="button" id="lossesRateImportHistoryButton" type="button">
                                                 Importar Histórico
@@ -737,6 +780,222 @@
                                         <div>
                                             <span>Taxa de Perda</span>
                                             <span id="lossesRateControlsRate">—</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tabs-panel" id="receipt">
+
+                            <!-- HEADER -->
+
+                            <ul class="tabs flex-box-start" data-tabs id="receipt-view-tabs">
+                                <li class="tabs-title is-active">
+                                    <a href="#receipt-tables">
+                                        <h4>Planilha Principal</h4>
+                                    </a>
+                                </li> 
+
+                                <li class="tabs-title">
+                                    <a href="#receipt-charts">
+                                        <h4>Comparação de Recebedores</h4>
+                                    </a>
+                                </li>
+                            </ul> 
+                            
+                            <!-- CONTEÚDO -->
+
+                            <div class="flex-box-start">
+
+                                <!-- PPÉVIA -->
+
+                                <div class="preview">
+                                    <div class="tabs-content" data-tabs-content="receipt-view-tabs">
+                                        <div class="tabs-panel is-active" id="receipt-tables">
+
+                                            <div class="preview-style" id="receiptReportExportArea">
+                                                <div class="title">
+                                                    <h2>Relatório de Recebimento</h2>
+                                                </div>
+
+                                                <!-- TABELA DE RESUMO -->
+
+                                                <table>
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Janela</th>
+                                                            <th>Volume Esperado</th>
+                                                            <th>Volume Recebido</th>
+                                                            <th>Total de Erros</th>
+                                                        </tr>
+                                                    </thead>
+
+                                                    <tbody>
+                                                        <tr>
+                                                            <td id="receiptPreviewWindow">—</td>
+                                                            <td id="receiptPreviewExpected">—</td>
+                                                            <td id="receiptPreviewReceived">—</td>
+                                                            <td id="receiptPreviewErrors">—</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+
+                                                <!-- RECEBIMENTO POR OPERADOR E GRÁFICO -->
+
+                                                <div class="table-and-chart">
+                                                    <table>
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Recebedor</th>
+                                                                <th>Etiquetador</th>
+                                                                <th>Pacotes Recebidos</th>
+                                                                <th>Erros de Etiqueta</th>
+                                                            </tr>
+                                                        </thead>
+
+                                                        <tbody id="receiptPreviewOperatorBody">
+                                                            <tr>
+                                                                <td>—</td>
+                                                                <td>—</td>
+                                                                <td>—</td>
+                                                                <td>—</td>
+                                                            </tr>
+
+                                                            <tr>
+                                                                <td>—</td>
+                                                                <td>—</td>
+                                                                <td>—</td>
+                                                                <td>—</td>
+                                                            </tr>
+
+                                                            <tr>
+                                                                <td>—</td>
+                                                                <td>—</td>
+                                                                <td>—</td>
+                                                                <td>—</td>
+                                                            </tr>
+
+                                                            <tr>
+                                                                <td>—</td>
+                                                                <td>—</td>
+                                                                <td>—</td>
+                                                                <td>—</td>
+                                                            </tr>
+
+                                                            <tr>
+                                                                <td>—</td>
+                                                                <td>—</td>
+                                                                <td>—</td>
+                                                                <td>—</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+
+                                                    <div class="receipt-chart">
+
+                                                        <canvas id="receiptSummaryChart">
+                                                            Seu navegador não suporta gráficos em canvas.
+                                                        </canvas>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- FOOTER -->
+
+                                            <div class="footer flex-box-between">
+                                                <div class="flex-box-start report-warning" id="receiptReportStatus" role="status" aria-live="polite" aria-atomic="true">
+                                                    <img id="receiptReportStatusIcon" src="images/geral-icons/alert-icon.svg" alt="">
+
+                                                    <p id="receiptReportStatusText">
+                                                        O relatório ainda aguarda informações.
+                                                    </p>
+                                                </div>
+
+                                                <div>
+                                                    <button class="button" id="receiptCopyReportButton" type="button" disabled>
+                                                        Copiar Relatório
+                                                    </button>
+
+                                                    <button class="button" id="receiptDownloadReportButton" type="button" disabled>
+                                                        Baixar Relatório
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                        <div class="tabs-panel" id="receipt-charts"></div>
+                                    </div>
+                                </div>
+
+                                <!-- CONTROLES DO RELATÓRIO -->
+
+                                <div class="report-controls">
+                                    <div class="history-link flex-box-start">
+                                        <a href="https://spx.shopee.com.br/#/generalReceiveTaskMgt" target="_blank">
+                                            <svg class="spreadsheets-link-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                                <path d="M7 17L17 7M9 7H17V15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                            </svg>
+                                        </a>
+
+                                        <div>
+                                            <h4>Gestão de Recebimento</h4>
+                                            <p>Exporte do SPX e importe aqui.</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="history-import flex-box-start">
+                                        <div>
+                                            <button class="button" id="receiptImportButton" type="button">
+                                                Importar Recebimento
+                                            </button>
+                                        </div>
+
+                                        <input id="receiptFileInput" type="file" accept=".csv,.xlsx,.xls" hidden>
+                                    </div>
+
+                                    <div class="input-group">
+                                        <div>
+                                            <h4>Volume Esperado</h4>
+                                            <input id="receiptExpectedInput" type="text" inputmode="numeric" maxlength="8">
+                                        </div>
+
+                                        <div>
+                                            <h4>Volume Recebido</h4>
+                                            <input id="receiptReceivedInput" type="text" readonly>
+                                        </div>
+
+                                        <div>
+                                            <h4>Total de Erros</h4>
+                                            <input id="receiptErrorsInput" type="text" readonly>
+                                        </div>
+
+                                        <div>
+                                            <h4>Janela</h4>
+                                            <input id="receiptWindowInput" type="text" maxlength="20">
+                                        </div>
+                                    </div>
+
+                                    <!-- RECEBEDORES E ETIQUETADORES -->
+
+                                    <div class="receipt-operator-controls" id="receiptOperatorControls">
+                                        <div class="input-group receipt-operator-row">
+                                            <div>
+                                                <h4>Recebedor</h4>
+
+                                                <input type="text" data-receipt-operator-field="receiver" readonly>
+                                            </div>
+
+                                            <div>
+                                                <h4>Etiquetador</h4>
+
+                                                <div class="flex-box-start">
+                                                    <input type="text" data-receipt-operator-field="labeler">
+                                                    <input type="text" data-receipt-operator-field="errorQuantity" placeholder="Erros" maxlength="5" autocomplete="off" inputmode="numeric" pattern="[0-9]*">
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
