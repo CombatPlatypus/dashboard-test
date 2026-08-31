@@ -157,6 +157,36 @@ function setReceiptInputValue(
     }
 }
 
+/* SINCRONIZA O SELECT DA JANELA COM O SELECT2 */
+
+function refreshReceiptWindowSelect(
+    select,
+) {
+    if (
+        typeof window.jQuery !==
+        "function"
+    ) {
+        return;
+    }
+
+    const selectElement =
+        window.jQuery(
+            select,
+        );
+
+    if (
+        !selectElement.hasClass(
+            "select2-hidden-accessible",
+        )
+    ) {
+        return;
+    }
+
+    selectElement.trigger(
+        "change.select2",
+    );
+}
+
 /* ELEMENTOS */
 
 function getReceiptElements() {
@@ -280,7 +310,7 @@ function createReceiptOperatorControl(
 
     inputs.title.textContent =
         receiverName
-            ? `Etiquetador da ${receiverName}`
+            ? `Etiquetador de ${receiverName}`
             : "Etiquetador";
 
     inputs.labeler.value =
@@ -295,7 +325,7 @@ function createReceiptOperatorControl(
     inputs.labeler.setAttribute(
         "aria-label",
         receiverName
-            ? `Etiquetador da ${receiverName}`
+            ? `Etiquetador de ${receiverName}`
             : "Etiquetador",
     );
 
@@ -316,7 +346,7 @@ function createReceiptOperatorControl(
     inputs.errorQuantity.setAttribute(
         "aria-label",
         receiverName
-            ? `Erros do etiquetador da ${receiverName}`
+            ? `Erros do etiquetador de ${receiverName}`
             : "Erros do etiquetador",
     );
 
@@ -636,6 +666,10 @@ function renderReceiptSummary(
         state.window,
     );
 
+    refreshReceiptWindowSelect(
+        elements.windowInput,
+    );
+
     setReceiptInputValue(
         elements.expectedInput,
         state.expectedVolume,
@@ -704,28 +738,55 @@ function renderReceiptReport(
 function bindReceiptGeneralInputs(
     elements,
 ) {
-    
-    elements.windowInput.addEventListener(
-        "change",
+    elements.expectedInput.addEventListener(
+        "input",
+        function () {
+            const sanitizedValue =
+                sanitizeReceiptIntegerInput(
+                    elements.expectedInput,
+                );
+
+            updateReceiptGeneralField(
+                "expectedVolume",
+                sanitizedValue,
+            );
+        },
+    );
+
+    const handleWindowChange =
         function () {
             updateReceiptGeneralField(
                 "window",
                 elements.windowInput.value,
             );
-        },
-    );
+        };
 
-    elements.windowInput
-        .addEventListener(
-            "input",
-            function () {
-                updateReceiptGeneralField(
-                    "window",
-                    elements.windowInput
-                        .value,
-                );
-            },
-        );
+    /*
+     * O Select2 dispara o evento change
+     * por meio do jQuery.
+     */
+
+    if (
+        typeof window.jQuery ===
+        "function"
+    ) {
+        window.jQuery(
+            elements.windowInput,
+        )
+            .off(
+                "change.receiptReport",
+            )
+            .on(
+                "change.receiptReport",
+                handleWindowChange,
+            );
+    } else {
+        elements.windowInput
+            .addEventListener(
+                "change",
+                handleWindowChange,
+            );
+    }
 }
 
 function bindReceiptOperatorControls(
@@ -831,9 +892,7 @@ function initializeReceiptReport() {
 
     const template =
         elements.operatorControls
-            .querySelector(
-                ".receipt-operator-row",
-            );
+            .firstElementChild;
 
     if (
         !(
