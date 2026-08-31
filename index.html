@@ -198,6 +198,30 @@
         align-items: flex-start;
     }
 }
+
+            #receipt #receipt-charts .charts, 
+            #receipt #receipt-charts .cards {
+                width: 100%;
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 15px;
+            }
+
+            #receipt #receipt-charts .cards > div {
+                padding: 30px;
+                background-color: #141414;
+                border: 1px solid #525252;
+                border-radius: 5px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                gap: 5px;
+                align-items: center;
+            }
+
+
+
+
         </style>
     </head>	
 
@@ -1127,7 +1151,34 @@
 
                                         </div>
 
-                                        <div class="tabs-panel" id="receipt-charts"></div>
+                                        <div class="tabs-panel" id="receipt-charts">
+
+                                            <div class="preview-style">
+
+                                                <div class="title">
+                                                    <h2>Comparação de Recebedores <span>AM</span></h2>
+                                                </div>
+
+                                                <div class="cards">
+                                                    <div>
+                                                        <h4>Recebedor</h4>
+                                                        <p>0 Pacotes</p>
+                                                    </div>
+
+                                                    <div>
+                                                        <h4>0,00%</h4>
+                                                        <p>0 de 0 Pacotes</p>
+                                                    </div>
+                                                </div>
+
+                                                <div class="charts">
+
+                                                    
+
+
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
