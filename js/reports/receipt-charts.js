@@ -605,7 +605,9 @@ function createReceiptComparisonChart(
                 layout: {
                     padding: {
                         top: 5,
-                        right: 12,
+                        right: 20,
+                        bottom: 5,
+                        left: 20,
                     },
                 },
 
