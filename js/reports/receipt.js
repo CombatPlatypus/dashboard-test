@@ -9,6 +9,7 @@ import {
 /* CONFIGURAÇÕES */
 
 const MINIMUM_RECEIPT_PREVIEW_ROWS = 9;
+const MINIMUM_RECEIPT_OPERATOR_CONTROLS_HEIGHT = 436;
 
 const receiptNumberFormatter =
     new Intl.NumberFormat(
@@ -87,6 +88,26 @@ function calculateReceiptErrorRate(
     return (
         errorQuantity /
         receivedQuantity
+    );
+}
+
+function calculateReceiptOperatorErrorMetric(
+    operator,
+    totalErrors,
+    useTotalErrorParticipation,
+) {
+    if (!operator) {
+        return null;
+    }
+
+    const denominator =
+        useTotalErrorParticipation
+            ? totalErrors
+            : operator.packagesReceived;
+
+    return calculateReceiptErrorRate(
+        operator.errorQuantity,
+        denominator,
     );
 }
 
@@ -248,6 +269,17 @@ function getReceiptElements() {
             document.getElementById(
                 "receiptPreviewOperatorBody",
             ),
+
+        errorCalculationToggle:
+            document.getElementById(
+                "receiptErrorCalculationToggle",
+            ),
+
+        previewOperatorRateHeading:
+            document.getElementById(
+                "receiptPreviewOperatorRateHeading",
+            ),
+
     };
 }
 
@@ -477,7 +509,7 @@ function renderReceiptOperatorControls(
 
     const fragment =
         document.createDocumentFragment();
-        
+
     operators.forEach(
         function (operator) {
             fragment.appendChild(
@@ -538,6 +570,8 @@ function createReceiptPreviewCell(
 
 function createReceiptPreviewRow(
     operator = null,
+    totalErrors = null,
+    useTotalErrorParticipation = false,
 ) {
     const row =
         document.createElement(
@@ -565,9 +599,10 @@ function createReceiptPreviewRow(
         );
 
     const errorRate =
-        calculateReceiptErrorRate(
-            operator?.errorQuantity,
-            operator?.packagesReceived,
+        calculateReceiptOperatorErrorMetric(
+            operator,
+            totalErrors,
+            useTotalErrorParticipation,
         );
 
     row.append(
@@ -600,7 +635,17 @@ function createReceiptPreviewRow(
 function renderReceiptOperatorPreview(
     elements,
     operators,
+    totalErrors,
+    useTotalErrorParticipation,
 ) {
+
+    elements
+        .previewOperatorRateHeading
+        .textContent =
+            useTotalErrorParticipation
+                ? "Participação nos Erros"
+                : "Taxa de Erros";
+
     const fragment =
         document.createDocumentFragment();
 
@@ -609,6 +654,8 @@ function renderReceiptOperatorPreview(
             fragment.appendChild(
                 createReceiptPreviewRow(
                     operator,
+                    totalErrors,
+                    useTotalErrorParticipation,
                 ),
             );
         },
@@ -627,7 +674,11 @@ function renderReceiptOperatorPreview(
         index += 1
     ) {
         fragment.appendChild(
-            createReceiptPreviewRow(),
+            createReceiptPreviewRow(
+                null,
+                totalErrors,
+                useTotalErrorParticipation,
+            ),
         );
     }
 
@@ -656,6 +707,9 @@ function setReceiptGeneralControlsAvailability(
         disabled;
 
     elements.windowInput.disabled =
+        disabled;
+
+    elements.errorCalculationToggle.disabled =
         disabled;
 }
 
@@ -744,10 +798,21 @@ function renderReceiptReport(
     template,
     state,
 ) {
+    const summary =
+        getReceiptSummary(
+            state,
+        );
+
+    elements
+        .errorCalculationToggle
+        .checked =
+            state
+                .useTotalErrorParticipation;
+
     renderReceiptSummary(
         elements,
         state,
-        getReceiptSummary(),
+        summary,
     );
 
     renderReceiptOperatorControls(
@@ -759,6 +824,9 @@ function renderReceiptReport(
     renderReceiptOperatorPreview(
         elements,
         state.operators,
+        summary.totalErrors,
+        state
+            .useTotalErrorParticipation,
     );
 }
 
@@ -816,6 +884,19 @@ function bindReceiptGeneralInputs(
                 handleWindowChange,
             );
     }
+
+    elements.errorCalculationToggle
+        .addEventListener(
+            "change",
+            function () {
+                updateReceiptGeneralField(
+                    "useTotalErrorParticipation",
+                    elements
+                        .errorCalculationToggle
+                        .checked,
+                );
+            },
+        );
 }
 
 function bindReceiptOperatorControls(
