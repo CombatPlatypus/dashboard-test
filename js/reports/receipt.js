@@ -21,8 +21,8 @@ const receiptErrorRateFormatter =
         "pt-BR",
         {
             style: "percent",
-            minimumFractionDigits: 3,
-            maximumFractionDigits: 3,
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
         },
     );
 
