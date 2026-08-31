@@ -861,12 +861,9 @@
                 auto-fit,
                 minmax(420px, 1fr)
             );
-
-        flex: 1 1 auto;
-        min-height: 0;
-
-        gap: 15px;
         width: 100%;
+        height: auto;
+        gap: 15px;
     }
     #receipt .receipt-comparison-chart-panel {
         display: flex;
