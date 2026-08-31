@@ -79,7 +79,7 @@
                 gap: 15px;
                 max-height: var(
                     --receipt-operator-controls-max-height,
-                    436px
+                    451px
                 );
                 overflow-y: auto;
                 padding-right: 15px;
@@ -1165,22 +1165,9 @@
                                         </div>
 
                                         <div>
-                                            <h4>Volume Recebido</h4>
-
-                                            <input id="receiptReceivedInput" type="text" readonly disabled>
-                                        </div>
-
-                                        <div>
-                                            <h4>Total de Erros</h4>
-
-                                            <input id="receiptErrorsInput" type="text" readonly disabled>
-                                        </div>
-
-                                        <div>
                                             <h4>Janela</h4>
 
                                             <select class="standard-select" id="receiptWindowInput" disabled>
-                                                <option value="">Selecione a Janela</option>
                                                 <option value="AM">AM</option>
                                                 <option value="PM1">PM1</option>
                                                 <option value="PM2">PM2</option>
@@ -1207,7 +1194,7 @@
                                     <label class="receipt-error-calculation-option" for="receiptErrorCalculationToggle">
                                         <input id="receiptErrorCalculationToggle" type="checkbox" disabled>
 
-                                        <p>Calcular taxa de erro por total de erros.</p>
+                                        <p>Calcular participação no total de erros.</p>
                                     </label>
 
                                 </div>
