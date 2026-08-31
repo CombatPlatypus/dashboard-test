@@ -8,7 +8,7 @@ import {
 
 /* CONFIGURAÇÕES */
 
-const MINIMUM_RECEIPT_PREVIEW_ROWS = 5;
+const MINIMUM_RECEIPT_PREVIEW_ROWS = 9;
 
 const receiptNumberFormatter =
     new Intl.NumberFormat(
@@ -26,6 +26,9 @@ const receiptErrorRateFormatter =
     );
 
 let receiptOperatorStructureSignature =
+    null;
+
+let receiptHeightResizeObserver =
     null;
 
 /* FORMATAÇÃO */
@@ -867,6 +870,131 @@ function bindReceiptOperatorControls(
         );
 }
 
+/* SINCRONIZA A ALTURA DOS CONTROLES COM A PRÉVIA */
+
+function initializeReceiptHeightSynchronization(
+    elements,
+) {
+    const receiptPreview =
+        document.getElementById(
+            "receiptSheetPreview",
+        );
+
+    const receiptControls =
+        elements.operatorControls.closest(
+            ".report-controls",
+        );
+
+    if (
+        !(
+            receiptPreview instanceof
+            HTMLElement
+        ) ||
+        !(
+            receiptControls instanceof
+            HTMLElement
+        )
+    ) {
+        console.error(
+            "Não foi possível sincronizar a altura do recebimento.",
+            {
+                receiptPreview,
+                receiptControls,
+            },
+        );
+
+        return;
+    }
+
+    function synchronizeReceiptHeight() {
+        const previewRect =
+            receiptPreview
+                .getBoundingClientRect();
+
+        /*
+         * O painel ainda pode estar oculto
+         * porque pertence a uma aba.
+         */
+        if (previewRect.height <= 0) {
+            return;
+        }
+
+        const operatorRect =
+            elements.operatorControls
+                .getBoundingClientRect();
+
+        const controlsStyle =
+            window.getComputedStyle(
+                receiptControls,
+            );
+
+        const bottomInset =
+            (
+                Number.parseFloat(
+                    controlsStyle.paddingBottom,
+                ) || 0
+            ) +
+            (
+                Number.parseFloat(
+                    controlsStyle.borderBottomWidth,
+                ) || 0
+            );
+
+        const availableHeight =
+            previewRect.bottom -
+            operatorRect.top -
+            bottomInset;
+
+        const newMaxHeight =
+            Math.max(
+                MINIMUM_RECEIPT_OPERATOR_CONTROLS_HEIGHT,
+                Math.round(
+                    availableHeight,
+                ),
+            );
+
+        const cssValue =
+            `${newMaxHeight}px`;
+
+        if (
+            elements.operatorControls
+                .style
+                .getPropertyValue(
+                    "--receipt-operator-controls-max-height",
+                ) === cssValue
+        ) {
+            return;
+        }
+
+        elements.operatorControls
+            .style
+            .setProperty(
+                "--receipt-operator-controls-max-height",
+                cssValue,
+            );
+    }
+
+    receiptHeightResizeObserver
+        ?.disconnect();
+
+    receiptHeightResizeObserver =
+        new ResizeObserver(
+            function () {
+                requestAnimationFrame(
+                    synchronizeReceiptHeight,
+                );
+            },
+        );
+
+    receiptHeightResizeObserver.observe(
+        receiptPreview,
+    );
+
+    requestAnimationFrame(
+        synchronizeReceiptHeight,
+    );
+}
+
 /* INICIALIZAÇÃO */
 
 function initializeReceiptReport() {
@@ -957,6 +1085,10 @@ function initializeReceiptReport() {
         elements,
         operatorTemplate,
         getReceiptState(),
+    );
+
+    initializeReceiptHeightSynchronization(
+        elements,
     );
 
     return true;
