@@ -9,7 +9,7 @@ import {
 /* CONFIGURAÇÕES */
 
 const MINIMUM_RECEIPT_PREVIEW_ROWS = 9;
-const MINIMUM_RECEIPT_OPERATOR_CONTROLS_HEIGHT = 350;
+const MINIMUM_RECEIPT_OPERATOR_CONTROLS_HEIGHT = 436;
 
 const receiptNumberFormatter =
     new Intl.NumberFormat(
@@ -977,87 +977,62 @@ function bindReceiptOperatorControls(
         );
 }
 
+
 /* SINCRONIZA A ALTURA DOS CONTROLES COM A PRÉVIA */
 
 function initializeReceiptHeightSynchronization(
     elements,
 ) {
-    const receiptPreview =
-        document.getElementById(
-            "receiptSheetPreview",
-        );
-
-    const receiptControls =
-        elements.operatorControls.closest(
-            ".report-controls",
-        );
-
     if (
         !(
-            receiptPreview instanceof
-            HTMLElement
-        ) ||
-        !(
-            receiptControls instanceof
-            HTMLElement
+            elements.previewOperatorBody instanceof
+            HTMLTableSectionElement
         )
     ) {
         console.error(
             "Não foi possível sincronizar a altura do recebimento.",
-            {
-                receiptPreview,
-                receiptControls,
-            },
         );
 
         return;
     }
 
     function synchronizeReceiptHeight() {
-        const previewRect =
-            receiptPreview
-                .getBoundingClientRect();
+        const previewRows =
+            Array.from(
+                elements
+                    .previewOperatorBody
+                    .rows,
+            );
 
         /*
-         * O painel ainda pode estar oculto
-         * porque pertence a uma aba.
+         * As primeiras nove linhas fazem
+         * parte da altura padrão.
          */
-        if (previewRect.height <= 0) {
-            return;
-        }
-
-        const operatorRect =
-            elements.operatorControls
-                .getBoundingClientRect();
-
-        const controlsStyle =
-            window.getComputedStyle(
-                receiptControls,
+        const extraRows =
+            previewRows.slice(
+                MINIMUM_RECEIPT_PREVIEW_ROWS,
             );
 
-        const bottomInset =
-            (
-                Number.parseFloat(
-                    controlsStyle.paddingBottom,
-                ) || 0
-            ) +
-            (
-                Number.parseFloat(
-                    controlsStyle.borderBottomWidth,
-                ) || 0
+        const extraRowsHeight =
+            extraRows.reduce(
+                function (
+                    total,
+                    row,
+                ) {
+                    return (
+                        total +
+                        row
+                            .getBoundingClientRect()
+                            .height
+                    );
+                },
+                0,
             );
-
-        const availableHeight =
-            previewRect.bottom -
-            operatorRect.top -
-            bottomInset;
 
         const newMaxHeight =
-            Math.max(
-                MINIMUM_RECEIPT_OPERATOR_CONTROLS_HEIGHT,
-                Math.round(
-                    availableHeight,
-                ),
+            MINIMUM_RECEIPT_OPERATOR_CONTROLS_HEIGHT +
+            Math.round(
+                extraRowsHeight,
             );
 
         const cssValue =
@@ -1094,7 +1069,7 @@ function initializeReceiptHeightSynchronization(
         );
 
     receiptHeightResizeObserver.observe(
-        receiptPreview,
+        elements.previewOperatorBody,
     );
 
     requestAnimationFrame(
