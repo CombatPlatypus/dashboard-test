@@ -1159,12 +1159,6 @@
 
                                     <div class="input-group">
                                         <div>
-                                            <h4>Volume Esperado</h4>
-
-                                            <input id="receiptExpectedInput" type="text" inputmode="numeric" maxlength="8" disabled>
-                                        </div>
-
-                                        <div>
                                             <h4>Janela</h4>
 
                                             <select class="standard-select" id="receiptWindowInput" disabled>
@@ -1173,6 +1167,13 @@
                                                 <option value="PM2">PM2</option>
                                             </select>
                                         </div>
+
+                                        <div>
+                                            <h4>Volume Esperado</h4>
+
+                                            <input id="receiptExpectedInput" type="text" inputmode="numeric" maxlength="8" disabled>
+                                        </div>
+
                                     </div>
 
                                     <!-- RECEBEDORES E ETIQUETADORES -->
@@ -1184,7 +1185,7 @@
                                             </h4>
 
                                             <div class="flex-box-start">
-                                                <input type="text" data-receipt-operator-field="labeler" placeholder="Nome do etiquetador" autocomplete="off" disabled>
+                                                <input type="text" data-receipt-operator-field="labeler" autocomplete="off" disabled>
 
                                                 <input type="text" data-receipt-operator-field="errorQuantity" placeholder="Erros" maxlength="5" autocomplete="off" inputmode="numeric" pattern="[0-9]*" disabled>
                                             </div>
