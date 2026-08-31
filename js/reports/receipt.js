@@ -358,6 +358,7 @@ function createReceiptOperatorControl(
 
 function createEmptyReceiptOperatorControl(
     template,
+    position,
 ) {
     const row =
         template.cloneNode(
@@ -373,7 +374,7 @@ function createEmptyReceiptOperatorControl(
         .receiptOperatorId;
 
     inputs.title.textContent =
-        "Etiquetador";
+        `Etiquetador ${position}`;
 
     inputs.labeler.value =
         "";
@@ -381,11 +382,21 @@ function createEmptyReceiptOperatorControl(
     inputs.labeler.disabled =
         true;
 
+    inputs.labeler.setAttribute(
+        "aria-label",
+        `Etiquetador ${position}`,
+    );
+
     inputs.errorQuantity.value =
         "";
 
     inputs.errorQuantity.disabled =
         true;
+
+    inputs.errorQuantity.setAttribute(
+        "aria-label",
+        `Erros do etiquetador ${position}`,
+    );
 
     return row;
 }
@@ -466,25 +477,40 @@ function renderReceiptOperatorControls(
 
     const fragment =
         document.createDocumentFragment();
+        
+    operators.forEach(
+        function (operator) {
+            fragment.appendChild(
+                createReceiptOperatorControl(
+                    template,
+                    operator,
+                ),
+            );
+        },
+    );
 
-    if (
-        operators.length === 0
+    const emptyControls =
+        Math.max(
+            MINIMUM_RECEIPT_PREVIEW_ROWS -
+                operators.length,
+            0,
+        );
+
+    for (
+        let index = 0;
+        index < emptyControls;
+        index += 1
     ) {
+        const position =
+            operators.length +
+            index +
+            1;
+
         fragment.appendChild(
             createEmptyReceiptOperatorControl(
                 template,
+                position,
             ),
-        );
-    } else {
-        operators.forEach(
-            function (operator) {
-                fragment.appendChild(
-                    createReceiptOperatorControl(
-                        template,
-                        operator,
-                    ),
-                );
-            },
         );
     }
 
