@@ -9,7 +9,7 @@ import {
 /* CONFIGURAÇÕES */
 
 const MINIMUM_RECEIPT_PREVIEW_ROWS = 9;
-const MINIMUM_RECEIPT_OPERATOR_CONTROLS_HEIGHT = 436;
+const MINIMUM_RECEIPT_OPERATOR_CONTROLS_HEIGHT = 350;
 
 const receiptNumberFormatter =
     new Intl.NumberFormat(
