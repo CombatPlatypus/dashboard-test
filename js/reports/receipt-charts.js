@@ -4,468 +4,322 @@ import {
     subscribeReceiptState,
 } from "./receipt-state.js";
 
-/* INSTÂNCIA DO GRÁFICO */
+/* FORMATADORES */
 
-let receiptSummaryChart =
-    null;
-
-/* FORMATAÇÃO */
-
-const receiptChartNumberFormatter =
+const receiptProgressQuantityFormatter =
     new Intl.NumberFormat(
         "pt-BR",
     );
 
-function formatReceiptChartQuantity(
+const receiptProgressPercentageFormatter =
+    new Intl.NumberFormat(
+        "pt-BR",
+        {
+            style: "percent",
+            minimumFractionDigits: 1,
+            maximumFractionDigits: 1,
+        },
+    );
+
+const receiptErrorRateFormatter =
+    new Intl.NumberFormat(
+        "pt-BR",
+        {
+            style: "percent",
+            minimumFractionDigits: 3,
+            maximumFractionDigits: 3,
+        },
+    );
+
+function formatReceiptProgressQuantity(
     value,
 ) {
-    const numericValue =
-        Number(value);
-
     if (
-        !Number.isFinite(
-            numericValue,
-        )
+        value === null ||
+        value === undefined
     ) {
         return "—";
     }
 
-    return receiptChartNumberFormatter
+    return receiptProgressQuantityFormatter
         .format(
-            numericValue,
+            value,
         );
 }
 
-/* MOSTRA OS VALORES ACIMA DAS BARRAS */
+/* ELEMENTOS */
 
-const receiptBarLabelsPlugin = {
-    id: "receiptBarLabels",
+function getReceiptProgressElements() {
+    return {
+        received:
+            document.getElementById(
+                "receiptProgressReceived",
+            ),
 
-    afterDatasetsDraw(chart) {
-        const dataset =
-            chart.data.datasets[0];
+        expected:
+            document.getElementById(
+                "receiptProgressExpected",
+            ),
 
-        const metadata =
-            chart.getDatasetMeta(0);
+        percentage:
+            document.getElementById(
+                "receiptProgressPercentage",
+            ),
 
-        const context =
-            chart.ctx;
+        bar:
+            document.getElementById(
+                "receiptProgressBar",
+            ),
 
-        context.save();
+        fill:
+            document.getElementById(
+                "receiptProgressFill",
+            ),
 
-        context.font =
-            '600 11px "Open Sans", sans-serif';
+        barLabel:
+            document.getElementById(
+                "receiptProgressBarLabel",
+            ),
 
-        context.textAlign =
-            "center";
+        difference:
+            document.getElementById(
+                "receiptProgressDifference",
+            ),
 
-        context.textBaseline =
-            "bottom";
+        errorRate:
+            document.getElementById(
+                "receiptProgressErrorRate",
+            ),
+    };
+}
 
-        context.lineWidth =
-            3;
+function hasReceiptProgressElements(
+    elements,
+) {
+    return Object.values(
+        elements,
+    ).every(
+        function (element) {
+            return element instanceof
+                HTMLElement;
+        },
+    );
+}
 
-        metadata.data.forEach(
-            function (
-                bar,
-                index,
-            ) {
-                const value =
-                    dataset.data[index];
+/* DIFERENÇA ENTRE ESPERADO E RECEBIDO */
 
-                if (
-                    value === null ||
-                    value === undefined ||
-                    !Number.isFinite(
-                        Number(value),
-                    )
-                ) {
-                    return;
-                }
+function getReceiptDifferenceText(
+    expectedVolume,
+    receivedVolume,
+) {
+    const difference =
+        expectedVolume -
+        receivedVolume;
 
-                const position =
-                    bar.tooltipPosition();
-
-                const text =
-                    formatReceiptChartQuantity(
-                        value,
-                    );
-
-                context.strokeStyle =
-                    "#18191a";
-
-                context.fillStyle =
-                    "#e4e6eb";
-
-                context.strokeText(
-                    text,
-                    position.x,
-                    position.y - 7,
-                );
-
-                context.fillText(
-                    text,
-                    position.x,
-                    position.y - 7,
-                );
-            },
+    if (difference > 0) {
+        return (
+            `Faltam ` +
+            `${formatReceiptProgressQuantity(difference)} pacotes`
         );
+    }
 
-        context.restore();
-    },
-};
+    if (difference < 0) {
+        return (
+            `Excedente de ` +
+            `${formatReceiptProgressQuantity(
+                Math.abs(difference),
+            )} pacotes`
+        );
+    }
 
-/* DADOS DO GRÁFICO */
+    return "Volume esperado atingido";
+}
 
-function getReceiptChartValues(
+/* TAXA DE ERROS */
+
+function formatReceiptErrorRate(
+    totalErrors,
+    receivedVolume,
+) {
+    if (
+        totalErrors === null ||
+        totalErrors === undefined ||
+        receivedVolume === null ||
+        receivedVolume === undefined ||
+        receivedVolume <= 0
+    ) {
+        return "—";
+    }
+
+    return receiptErrorRateFormatter
+        .format(
+            totalErrors /
+                receivedVolume,
+        );
+}
+
+/* RENDERIZA O INDICADOR */
+
+function renderReceiptProgress(
+    elements,
     state,
 ) {
     const summary =
         getReceiptSummary();
 
-    const hasOperators =
-        state.operators.length > 0;
+    const expectedVolume =
+        state.expectedVolume;
 
-    return [
-        state.expectedVolume,
-
-        hasOperators
+    const receivedVolume =
+        state.operators.length > 0
             ? summary.receivedVolume
-            : null,
+            : null;
 
-        hasOperators
-            ? summary.totalErrors
-            : null,
-    ];
-}
-
-/* CRIA O GRÁFICO */
-
-function createReceiptSummaryChart(
-    canvas,
-    state,
-) {
-    const context =
-        canvas.getContext(
-            "2d",
+    elements.received.textContent =
+        formatReceiptProgressQuantity(
+            receivedVolume,
         );
 
-    if (!context) {
-        return null;
+    elements.expected.textContent =
+        formatReceiptProgressQuantity(
+            expectedVolume,
+        );
+
+    elements.errorRate.textContent =
+        formatReceiptErrorRate(
+            summary.totalErrors,
+            receivedVolume,
+        );
+
+    const hasExpectedVolume =
+        expectedVolume !== null &&
+        expectedVolume !== undefined &&
+        expectedVolume > 0;
+
+    const hasReceivedVolume =
+        receivedVolume !== null &&
+        receivedVolume !== undefined;
+
+    if (
+        !hasExpectedVolume ||
+        !hasReceivedVolume
+    ) {
+        elements.percentage.textContent =
+            "—";
+
+        elements.fill.style.width =
+            "0%";
+
+        elements.barLabel.textContent =
+            "Aguardando informações";
+
+        elements.difference.textContent =
+            hasExpectedVolume
+                ? "Importe o recebimento para comparar."
+                : "Informe o volume esperado para comparar.";
+
+        elements.bar.setAttribute(
+            "aria-valuenow",
+            "0",
+        );
+
+        elements.bar.setAttribute(
+            "aria-valuetext",
+            "Aguardando os volumes esperado e recebido.",
+        );
+
+        return;
     }
 
-    /*
-     * Mantém o canvas com resolução superior,
-     * melhorando a exportação pelo html2canvas.
-     */
+    const progressRatio =
+        receivedVolume /
+        expectedVolume;
 
-    const pixelRatio =
+    const progressPercentage =
+        progressRatio * 100;
+
+    const visiblePercentage =
         Math.min(
             Math.max(
-                window.devicePixelRatio ||
-                    1,
-                2,
+                progressPercentage,
+                0,
             ),
-            3,
+            100,
         );
 
-    return new window.Chart(
-        context,
-        {
-            type: "bar",
-
-            data: {
-                labels: [
-                    "Esperado",
-                    "Recebido",
-                    "Erros",
-                ],
-
-                datasets: [
-                    {
-                        data:
-                            getReceiptChartValues(
-                                state,
-                            ),
-
-                        backgroundColor: [
-                            "#9a9da1",
-                            "#f5b042",
-                            "#d9534f",
-                        ],
-
-                        borderColor: [
-                            "#b7b9bd",
-                            "#ffc15c",
-                            "#ef6965",
-                        ],
-
-                        borderWidth: 1,
-                        borderRadius: 4,
-                        borderSkipped: false,
-                        barPercentage: 0.72,
-                        categoryPercentage: 0.8,
-                        maxBarThickness: 52,
-                    },
-                ],
-            },
-
-            options: {
-                responsive: true,
-
-                maintainAspectRatio:
-                    false,
-
-                animation: false,
-
-                devicePixelRatio:
-                    pixelRatio,
-
-                layout: {
-                    padding: {
-                        top: 24,
-                        right: 8,
-                        bottom: 0,
-                        left: 4,
-                    },
-                },
-
-                plugins: {
-                    legend: {
-                        display: false,
-                    },
-
-                    title: {
-                        display: true,
-
-                        text:
-                            "Resumo do Recebimento",
-
-                        color:
-                            "#e4e6eb",
-
-                        font: {
-                            family:
-                                "Open Sans",
-
-                            size: 13,
-
-                            weight:
-                                "600",
-                        },
-
-                        padding: {
-                            bottom: 18,
-                        },
-                    },
-
-                    tooltip: {
-                        displayColors:
-                            false,
-
-                        callbacks: {
-                            label(context) {
-                                return (
-                                    `${context.label}: ` +
-                                    formatReceiptChartQuantity(
-                                        context.raw,
-                                    )
-                                );
-                            },
-                        },
-                    },
-                },
-
-                scales: {
-                    x: {
-                        grid: {
-                            display:
-                                false,
-                        },
-
-                        border: {
-                            color:
-                                "#525252",
-                        },
-
-                        ticks: {
-                            color:
-                                "#e4e6eb",
-
-                            font: {
-                                family:
-                                    "Open Sans",
-
-                                size: 11,
-                            },
-                        },
-                    },
-
-                    y: {
-                        beginAtZero: true,
-
-                        /*
-                         * Reserva espaço para os números
-                         * mostrados acima das barras.
-                         */
-
-                        grace: "15%",
-
-                        grid: {
-                            color:
-                                "#343536",
-                        },
-
-                        border: {
-                            color:
-                                "#525252",
-                        },
-
-                        ticks: {
-                            color:
-                                "#c8c9cc",
-
-                            precision: 0,
-
-                            font: {
-                                family:
-                                    "Open Sans",
-
-                                size: 10,
-                            },
-
-                            callback(value) {
-                                return formatReceiptChartQuantity(
-                                    value,
-                                );
-                            },
-                        },
-                    },
-                },
-            },
-
-            plugins: [
-                receiptBarLabelsPlugin,
-            ],
-        },
-    );
-}
-
-/* ATUALIZA O GRÁFICO */
-
-function updateReceiptSummaryChart(
-    state,
-) {
-    if (!receiptSummaryChart) {
-        return;
-    }
-
-    receiptSummaryChart
-        .data
-        .datasets[0]
-        .data =
-            getReceiptChartValues(
-                state,
+    const formattedPercentage =
+        receiptProgressPercentageFormatter
+            .format(
+                progressRatio,
             );
 
-    receiptSummaryChart.update(
-        "none",
-    );
-}
+    elements.percentage.textContent =
+        formattedPercentage;
 
-/* CORRIGE O TAMANHO AO ABRIR A ABA */
+    elements.fill.style.width =
+        `${visiblePercentage}%`;
 
-function bindReceiptChartResize() {
-    const receiptTabLink =
-        document.querySelector(
-            '#report-choice a[href="#receipt"]',
+    elements.barLabel.textContent =
+        `${formattedPercentage} recebido`;
+
+    elements.difference.textContent =
+        getReceiptDifferenceText(
+            expectedVolume,
+            receivedVolume,
         );
 
-    if (!receiptTabLink) {
-        return;
-    }
+    elements.bar.setAttribute(
+        "aria-valuenow",
+        String(
+            visiblePercentage,
+        ),
+    );
 
-    receiptTabLink.addEventListener(
-        "click",
-        function () {
-            /*
-             * Aguarda o Foundation deixar
-             * o painel visível.
-             */
-
-            window.requestAnimationFrame(
-                function () {
-                    window.requestAnimationFrame(
-                        function () {
-                            receiptSummaryChart
-                                ?.resize();
-                        },
-                    );
-                },
-            );
-        },
+    elements.bar.setAttribute(
+        "aria-valuetext",
+        `${formattedPercentage} do volume esperado foi recebido.`,
     );
 }
 
 /* INICIALIZAÇÃO */
 
 function initializeReceiptCharts() {
-    const canvas =
-        document.getElementById(
-            "receiptSummaryChart",
-        );
+    const elements =
+        getReceiptProgressElements();
 
     if (
-        !(
-            canvas instanceof
-            HTMLCanvasElement
+        !hasReceiptProgressElements(
+            elements,
         )
     ) {
         return false;
     }
 
     if (
-        canvas.dataset
-            .receiptChartInitialized ===
+        elements.bar.dataset
+            .receiptProgressInitialized ===
         "true"
     ) {
         return true;
     }
 
-    if (
-        typeof window.Chart !==
-        "function"
-    ) {
-        console.error(
-            "A biblioteca Chart.js não foi carregada.",
-        );
-
-        return false;
-    }
-
-    canvas.dataset
-        .receiptChartInitialized =
+    elements.bar.dataset
+        .receiptProgressInitialized =
             "true";
-
-    receiptSummaryChart =
-        createReceiptSummaryChart(
-            canvas,
-            getReceiptState(),
-        );
-
-    if (!receiptSummaryChart) {
-        return false;
-    }
 
     subscribeReceiptState(
         function (state) {
-            updateReceiptSummaryChart(
+            renderReceiptProgress(
+                elements,
                 state,
             );
         },
     );
 
-    bindReceiptChartResize();
+    renderReceiptProgress(
+        elements,
+        getReceiptState(),
+    );
 
     return true;
 }
