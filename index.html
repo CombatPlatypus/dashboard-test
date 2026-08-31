@@ -322,6 +322,13 @@
                 height: 100% !important;
             }
 
+            /* Impede que os controles sejam esticados pela prévia */
+            #receipt > .flex-box-start {
+                align-items: flex-start;
+            }
+
+
+
             @media screen and (max-width: 900px) {
                 #receipt #receipt-charts > .preview-style {
                     height: auto;
