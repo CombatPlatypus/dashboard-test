@@ -66,21 +66,99 @@
                 padding-right: 10px;
             }
 
-            #receipt .receipt-chart {
-                position: relative;
-                min-width: 0;
-                height: 300px;
-                padding: 10px;
+            #receipt .receipt-progress {
+                margin-top: 20px;
+                margin-bottom: 20px;
+                padding: 18px 20px;
                 border: 1px solid #525252;
                 background-color: #1c1c1c;
             }
 
-            #receipt .receipt-chart canvas {
-                display: block;
-                width: 100% !important;
-                height: 100% !important;
+            #receipt .receipt-progress-header {
+                display: flex;
+                align-items: flex-end;
+                justify-content: space-between;
+                gap: 20px;
             }
 
+            #receipt .receipt-progress-header h3 {
+                margin: 0 0 5px;
+            }
+
+            #receipt .receipt-progress-header p {
+                margin: 0;
+                color: #a8a9ad;
+            }
+
+            #receipt .receipt-progress-percentage {
+                color: #e4e6eb;
+                font-size: 22px;
+                font-weight: 600;
+                white-space: nowrap;
+            }
+
+            #receipt .receipt-progress-track {
+                position: relative;
+                height: 30px;
+                margin: 18px 0 15px;
+                overflow: hidden;
+                background-color: #303030;
+            }
+
+            #receipt .receipt-progress-fill {
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                width: 0;
+                background-color: #f5b042;
+            }
+
+            #receipt .receipt-progress-label {
+                position: absolute;
+                inset: 0;
+                z-index: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #e4e6eb;
+                font-size: 13px;
+                font-weight: 600;
+                text-shadow: 0 1px 2px #18191a;
+            }
+
+            #receipt .receipt-progress-details {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 20px;
+                color: #a8a9ad;
+            }
+
+            #receipt .receipt-progress-details strong {
+                margin-left: 6px;
+                color: #e4e6eb;
+            }
+
+            #receipt #receiptProgressErrorRate {
+                color: #d9534f;
+            }
+
+            #receipt .receipt-operator-preview-table {
+                width: 100%;
+            }
+
+            @media screen and (max-width: 700px) {
+                #receipt .receipt-progress-header {
+                    align-items: flex-start;
+                }
+
+                #receipt .receipt-progress-details {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: 6px;
+                }
+            }
         </style>
     </head>	
 
@@ -855,66 +933,102 @@
                                                         </tr>
                                                     </tbody>
                                                 </table>
+                                                
+                                                <!-- PROGRESSO DO RECEBIMENTO -->
 
-                                                <!-- RECEBIMENTO POR OPERADOR E GRÁFICO -->
+                                                <div class="receipt-progress">
 
-                                                <div class="table-and-chart">
-                                                    <table>
-                                                        <thead>
-                                                            <tr>
-                                                                <th>Recebedor</th>
-                                                                <th>Etiquetador</th>
-                                                                <th>Pacotes Recebidos</th>
-                                                                <th>Erros de Etiqueta</th>
-                                                            </tr>
-                                                        </thead>
+                                                    <div class="receipt-progress-header">
 
-                                                        <tbody id="receiptPreviewOperatorBody">
-                                                            <tr>
-                                                                <td>—</td>
-                                                                <td>—</td>
-                                                                <td>—</td>
-                                                                <td>—</td>
-                                                            </tr>
+                                                        <div>
+                                                            <h3>Progresso do Recebimento</h3>
 
-                                                            <tr>
-                                                                <td>—</td>
-                                                                <td>—</td>
-                                                                <td>—</td>
-                                                                <td>—</td>
-                                                            </tr>
+                                                            <p>
+                                                                <span id="receiptProgressReceived">—</span>
+                                                                de
+                                                                <span id="receiptProgressExpected">—</span>
+                                                                pacotes
+                                                            </p>
+                                                        </div>
 
-                                                            <tr>
-                                                                <td>—</td>
-                                                                <td>—</td>
-                                                                <td>—</td>
-                                                                <td>—</td>
-                                                            </tr>
+                                                        <strong class="receipt-progress-percentage" id="receiptProgressPercentage">
+                                                            —
+                                                        </strong>
+                                                    </div>
 
-                                                            <tr>
-                                                                <td>—</td>
-                                                                <td>—</td>
-                                                                <td>—</td>
-                                                                <td>—</td>
-                                                            </tr>
+                                                    <div class="receipt-progress-track" id="receiptProgressBar" role="progressbar" aria-label="Percentual do volume recebido" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                                        <div class="receipt-progress-fill" id="receiptProgressFill"></div>
 
-                                                            <tr>
-                                                                <td>—</td>
-                                                                <td>—</td>
-                                                                <td>—</td>
-                                                                <td>—</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
+                                                        <span class="receipt-progress-label" id="receiptProgressBarLabel">
+                                                            Aguardando informações
+                                                        </span>
+                                                    </div>
 
-                                                    <div class="receipt-chart">
+                                                    <div class="receipt-progress-details">
 
-                                                        <canvas id="receiptSummaryChart">
-                                                            Seu navegador não suporta gráficos em canvas.
-                                                        </canvas>
+                                                        <span id="receiptProgressDifference">
+                                                            Informe o volume esperado para comparar.
+                                                        </span>
 
+                                                        <span>
+                                                            Taxa de erros
+
+                                                            <strong id="receiptProgressErrorRate">
+                                                                —
+                                                            </strong>
+                                                        </span>
                                                     </div>
                                                 </div>
+
+                                                <!-- RECEBIMENTO POR OPERADOR -->
+
+                                                <table>
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Recebedor</th>
+                                                            <th>Etiquetador</th>
+                                                            <th>Pacotes Recebidos</th>
+                                                            <th>Erros de Etiqueta</th>
+                                                        </tr>
+                                                    </thead>
+
+                                                    <tbody id="receiptPreviewOperatorBody">
+                                                        <tr>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
                                             </div>
 
                                             <!-- FOOTER -->
