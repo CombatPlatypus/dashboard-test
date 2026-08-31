@@ -26,12 +26,17 @@ import {
     initializeReceiptImport,
 } from "./receipt-import.js";
 
+import {
+    initializeReceiptCharts,
+} from "./receipt-charts.js";
+
 /* INICIALIZA O PAINEL DE RELATÓRIOS */
 
 function initializeReportsPanel() {
     initializePlanningLhList();
 
     initializeReceiptReport();
+    initializeReceiptCharts();
     initializeReceiptImport();
 
     initializeLossesRateReport();
