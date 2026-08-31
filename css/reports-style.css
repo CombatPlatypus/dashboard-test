@@ -52,7 +52,7 @@
     }
     #reports > .tabs-content > .tabs-panel > .flex-box-start {
         column-gap: 20px;
-        align-items: stretch;
+        align-items: start;
     }
 
     /* TABS QUE FICA DENTRO DO RELATÓRIO ESCOLHIDO */
@@ -88,6 +88,7 @@
         text-align: center;
         background-color: #2e2e2e;
         border: 1px solid #525252;
+        border-radius: 5px 5px 0 0;
     }
     #reports .preview .title > h2 {
         margin-bottom: 0;
