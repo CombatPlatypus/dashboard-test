@@ -30,14 +30,26 @@ import {
     initializeReceiptCharts,
 } from "./receipt-charts.js";
 
+import {
+    initializeReceiptExport,
+} from "./receipt-export.js";
+
 /* INICIALIZA O PAINEL DE RELATÓRIOS */
 
 function initializeReportsPanel() {
+
+    // PLANEJAMENTO
+
     initializePlanningLhList();
+
+    // RECEBIMENTO
 
     initializeReceiptReport();
     initializeReceiptCharts();
     initializeReceiptImport();
+    initializeReceiptExport();
+
+    // TAXA DE PERDAS
 
     initializeLossesRateReport();
     initializeLossesRateCharts();
