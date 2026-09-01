@@ -300,30 +300,9 @@
 
     /* PLANEJAMENTO - INDICADORES */
 
-    #planning .planning-sheet-metrics {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 10px;
-        margin-bottom: 0px;
-    }
-    #planning .planning-sheet-metrics > div {
-        min-width: 0;
-        text-align: center;
-        border: 1px solid #525252;
-    }
-    #planning .planning-sheet-metrics h4 {
-        padding: 8px;
-        margin-bottom: 0;
-        font-size: 13px;
-        background-color: #2e2e2e;
-        border-bottom: 1px solid #525252;
-    }
-    #planning .planning-sheet-metrics strong {
-        display: block;
-        padding: 10px;
-        font-size: 15px;
-        background-color: #141414;
-    }     
+    #planning .indicators tbody tr td {
+        text-align: center !important;
+    } 
 
     /* PLANEJAMENTO - COLUNAS DAS TABELAS */
 
