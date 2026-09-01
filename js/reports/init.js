@@ -3,6 +3,10 @@ import {
 } from "./planning.js";
 
 import {
+    initializePlanningImport,
+} from "./planning-import.js";
+
+import {
     initializeLossesRateReport,
 } from "./losses-rate.js";
 
@@ -41,6 +45,7 @@ function initializeReportsPanel() {
     // PLANEJAMENTO
 
     initializePlanningLhList();
+    initializePlanningImport();
 
     // RECEBIMENTO
 
