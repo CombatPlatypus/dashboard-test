@@ -1,6 +1,7 @@
 import {
     getReceiptState,
     getReceiptSummary,
+    resetReceiptReport,
     subscribeReceiptState,
     updateReceiptGeneralField,
     updateReceiptOperator,
@@ -215,6 +216,12 @@ function refreshReceiptWindowSelect(
 
 function getReceiptElements() {
     return {
+
+        clearReportButton:
+            document.getElementById(
+                "receiptClearReportButton",
+            ),      
+
         expectedInput:
             document.getElementById(
                 "receiptExpectedInput",
@@ -695,6 +702,9 @@ function setReceiptGeneralControlsAvailability(
 
     elements.errorCalculationToggle.disabled =
         disabled;
+
+    elements.clearReportButton.disabled =
+        disabled;   
 }
 
 /* RESUMO */
@@ -802,6 +812,45 @@ function renderReceiptReport(
         state
             .useTotalErrorParticipation,
     );
+}
+
+/* LIMPA TODO O RELATÓRIO */
+
+function handleResetReceiptReport() {
+    const shouldReset =
+        window.confirm(
+            "Limpar todas as informações do relatório de recebimento?",
+        );
+
+    if (!shouldReset) {
+        return;
+    }
+
+    resetReceiptReport();
+
+    const mainTabLink =
+        document.querySelector(
+            '#receipt-view-tabs a[href="#receipt-tables"]',
+        );
+
+    if (
+        mainTabLink instanceof
+        HTMLAnchorElement
+    ) {
+        mainTabLink.click();
+    }
+
+    const importButton =
+        document.getElementById(
+            "receiptImportButton",
+        );
+
+    if (
+        importButton instanceof
+        HTMLButtonElement
+    ) {
+        importButton.focus();
+    }
 }
 
 /* EVENTOS */
@@ -1125,6 +1174,11 @@ function initializeReceiptReport() {
 
     bindReceiptOperatorControls(
         elements,
+    );
+
+    elements.clearReportButton.addEventListener(
+        "click",
+        handleResetReceiptReport,
     );
 
     subscribeReceiptState(
