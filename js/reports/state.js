@@ -75,7 +75,7 @@ const planningCollectionPoolFields =
 let nextPlanningLhId = 1;
 let nextPlanningToId = 1;
 
-const MINIMUM_PLANNING_LHS = 6;
+const MINIMUM_PLANNING_LHS = 8;
 const MINIMUM_PLANNING_TOS_PER_LH = 1;
 
 /* NORMALIZA UM TEXTO */
