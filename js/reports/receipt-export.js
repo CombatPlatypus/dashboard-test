@@ -14,6 +14,7 @@ let receiptExportBusy = false;
 const receiptExportElements = {
     statusIcon: null,
     statusText: null,
+    clearButton: null,
     copyButton: null,
     downloadButton: null,
     mainArea: null,
@@ -92,6 +93,12 @@ function renderReceiptExportStatus(
     const canExport =
         pendingMessage === "";
 
+    receiptExportElements
+        .clearButton
+        .disabled =
+            receiptExportBusy ||
+            state.operators.length === 0;
+            
     receiptExportElements
         .copyButton
         .disabled =
@@ -547,6 +554,11 @@ async function runReceiptExport(
 /* INICIALIZAÇÃO */
 
 function initializeReceiptExport() {
+    receiptExportElements.clearButton =
+        document.getElementById(
+            "receiptClearReportButton",
+        );
+
     receiptExportElements.statusIcon =
         document.getElementById(
             "receiptReportStatusIcon",
