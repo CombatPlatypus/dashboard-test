@@ -404,7 +404,7 @@ const receiptComparisonBarValuesPlugin = {
         }
 
         context.font =
-            '600 11px "Open Sans", sans-serif';
+            '600 13px "Open Sans", sans-serif';
 
         context.textBaseline =
             "middle";
