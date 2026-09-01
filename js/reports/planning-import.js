@@ -1,0 +1,1415 @@
+import {
+    getPlanningState,
+    replacePlanningLhs,
+} from "./state.js";
+
+const PLANNING_IMPORT_BUTTON_ID =
+    "planningImportClipboardButton";
+
+const PLANNING_IMPORT_DEFAULT_TEXT =
+    "Importar do SPX";
+
+const PLANNING_IMPORT_SOURCE =
+    "spx-clipboard";
+
+const PLANNING_IMPORT_EXPECTED_MAXIMUM =
+    8;
+
+const PLANNING_IMPORT_SUCCESS_DURATION =
+    3000;
+
+const PLANNING_SPX_WINDOW_PATTERN =
+    /^(AM|PM1|PM2)$/i;
+
+const PLANNING_SPX_LH_PATTERN =
+    /\bLT[A-Z0-9]{8,24}\b/i;
+
+let planningImportFeedbackTimer =
+    null;
+
+/* NORMALIZA UM TEXTO PARA COMPARAÇÃO */
+
+function normalizePlanningImportText(
+    value,
+) {
+    return String(
+        value ?? "",
+    )
+        .normalize(
+            "NFD",
+        )
+        .replace(
+            /[\u0300-\u036f]/g,
+            "",
+        )
+        .replace(
+            /\u00a0/g,
+            " ",
+        )
+        .replace(
+            /\s+/g,
+            " ",
+        )
+        .trim()
+        .toLowerCase();
+}
+
+/* SEPARA OS VALORES INTERNOS DE UMA CÉLULA */
+
+function splitPlanningImportValues(
+    value,
+) {
+    return String(
+        value ?? "",
+    )
+        .replace(
+            /\r/g,
+            "",
+        )
+        .split(
+            /\n+/,
+        )
+        .map(
+            function (item) {
+                return item
+                    .replace(
+                        /\u00a0/g,
+                        " ",
+                    )
+                    .replace(
+                        /[\t ]+/g,
+                        " ",
+                    )
+                    .trim();
+            },
+        )
+        .filter(
+            Boolean,
+        );
+}
+
+/* LOCALIZA O CÓDIGO DE UM LH */
+
+function getPlanningImportLhCode(
+    value,
+) {
+    const match =
+        String(
+            value ?? "",
+        )
+            .toUpperCase()
+            .match(
+                PLANNING_SPX_LH_PATTERN,
+            );
+
+    return match?.[0] || "";
+}
+
+/* CONVERTE UMA QUANTIDADE DO SPX */
+
+function parsePlanningImportQuantity(
+    value,
+) {
+    const receivedValue =
+        String(
+            value ?? "",
+        )
+            .replace(
+                /\u00a0/g,
+                " ",
+            )
+            .trim();
+
+    if (
+        !/^\d{1,3}(?:[.\s]\d{3})*$/.test(
+            receivedValue,
+        ) &&
+        !/^\d+$/.test(
+            receivedValue,
+        )
+    ) {
+        return null;
+    }
+
+    const quantity =
+        Number(
+            receivedValue.replace(
+                /[.\s]/g,
+                "",
+            ),
+        );
+
+    return Number.isSafeInteger(
+        quantity,
+    )
+        ? quantity
+        : null;
+}
+
+/* IDENTIFICA A JANELA EXPLÍCITA */
+
+function getPlanningImportWindow(
+    values,
+) {
+    for (
+        const value of values
+    ) {
+        const match =
+            value
+                .trim()
+                .match(
+                    PLANNING_SPX_WINDOW_PATTERN,
+                );
+
+        if (match) {
+            return match[1]
+                .toUpperCase();
+        }
+    }
+
+    return "";
+}
+
+/* LÊ O TEXTO DE UMA CÉLULA */
+
+function getPlanningImportElementText(
+    element,
+) {
+    const copy =
+        element.cloneNode(
+            true,
+        );
+
+    copy
+        .querySelectorAll(
+            "br",
+        )
+        .forEach(
+            function (breakElement) {
+                breakElement.replaceWith(
+                    "\n",
+                );
+            },
+        );
+
+    return String(
+        copy.textContent ?? "",
+    )
+        .replace(
+            /\r/g,
+            "",
+        )
+        .replace(
+            /\n[\t ]+/g,
+            "\n",
+        )
+        .trim();
+}
+
+/* EXPANDE ROWSPAN E COLSPAN */
+
+function createPlanningImportTableMatrix(
+    table,
+) {
+    const matrix = [];
+
+    Array.from(
+        table.rows,
+    ).forEach(
+        function (
+            row,
+            rowIndex,
+        ) {
+            matrix[rowIndex] ||= [];
+
+            let columnIndex = 0;
+
+            Array.from(
+                row.cells,
+            ).forEach(
+                function (cell) {
+                    while (
+                        matrix[rowIndex][
+                            columnIndex
+                        ] !== undefined
+                    ) {
+                        columnIndex += 1;
+                    }
+
+                    const rowSpan =
+                        Math.max(
+                            Number(
+                                cell.rowSpan,
+                            ) || 1,
+                            1,
+                        );
+
+                    const columnSpan =
+                        Math.max(
+                            Number(
+                                cell.colSpan,
+                            ) || 1,
+                            1,
+                        );
+
+                    const text =
+                        getPlanningImportElementText(
+                            cell,
+                        );
+
+                    for (
+                        let rowOffset = 0;
+                        rowOffset < rowSpan;
+                        rowOffset += 1
+                    ) {
+                        const targetRowIndex =
+                            rowIndex +
+                            rowOffset;
+
+                        matrix[targetRowIndex] ||=
+                            [];
+
+                        for (
+                            let columnOffset = 0;
+                            columnOffset < columnSpan;
+                            columnOffset += 1
+                        ) {
+                            matrix[targetRowIndex][
+                                columnIndex +
+                                columnOffset
+                            ] = text;
+                        }
+                    }
+
+                    columnIndex +=
+                        columnSpan;
+                },
+            );
+        },
+    );
+
+    return matrix;
+}
+
+/* LOCALIZA AS COLUNAS NECESSÁRIAS */
+
+function getPlanningImportColumns(
+    row,
+) {
+    const normalizedRow =
+        Array.from(
+            row,
+            normalizePlanningImportText,
+        );
+
+    function findColumn(
+        expectedText,
+    ) {
+        return normalizedRow.findIndex(
+            function (value) {
+                return (
+                    value === expectedText ||
+                    value.includes(
+                        expectedText,
+                    )
+                );
+            },
+        );
+    }
+
+    const columns = {
+        code:
+            findColumn(
+                "numero do lh",
+            ),
+
+        origin:
+            findColumn(
+                "station",
+            ),
+
+        punctuality:
+            findColumn(
+                "indicador de pontualidade",
+            ),
+
+        cpt:
+            findColumn(
+                "cpt",
+            ),
+
+        quantity:
+            findColumn(
+                "pedido de entrada pendente",
+            ),
+    };
+
+    const hasAllColumns =
+        Object.values(
+            columns,
+        )
+            .every(
+                function (index) {
+                    return index >= 0;
+                },
+            );
+
+    return hasAllColumns
+        ? columns
+        : null;
+}
+
+/* CRIA UM REGISTRO A PARTIR DO HTML */
+
+function createPlanningImportHtmlRecord(
+    receivedRecord,
+) {
+    const origin =
+        receivedRecord.origin
+            .flatMap(
+                splitPlanningImportValues,
+            )
+            .find(
+                function (value) {
+                    return value !== "-";
+                },
+            ) || "";
+
+    const punctualityValues =
+        receivedRecord.punctuality
+            .flatMap(
+                splitPlanningImportValues,
+            );
+
+    const cptValues =
+        receivedRecord.cpt
+            .flatMap(
+                splitPlanningImportValues,
+            );
+
+    const quantity =
+        receivedRecord.quantity
+            .flatMap(
+                splitPlanningImportValues,
+            )
+            .map(
+                parsePlanningImportQuantity,
+            )
+            .find(
+                function (value) {
+                    return value !== null;
+                },
+            ) ?? null;
+
+    return {
+        code:
+            receivedRecord.code,
+
+        origin,
+
+        quantity,
+
+        window:
+            getPlanningImportWindow(
+                cptValues,
+            ),
+
+        waiting:
+            punctualityValues.some(
+                function (value) {
+                    return (
+                        normalizePlanningImportText(
+                            value,
+                        ) === "waiting"
+                    );
+                },
+            ),
+    };
+}
+
+/* EXTRAI OS REGISTROS DO HTML */
+
+function parsePlanningSpXHtml(
+    html,
+) {
+    if (
+        !html ||
+        typeof DOMParser !==
+            "function"
+    ) {
+        return [];
+    }
+
+    const documentCopy =
+        new DOMParser()
+            .parseFromString(
+                html,
+                "text/html",
+            );
+
+    const parsedRecords = [];
+
+    documentCopy
+        .querySelectorAll(
+            "table",
+        )
+        .forEach(
+            function (table) {
+                const matrix =
+                    createPlanningImportTableMatrix(
+                        table,
+                    );
+
+                let headerRowIndex =
+                    -1;
+
+                let columns =
+                    null;
+
+                for (
+                    let rowIndex = 0;
+                    rowIndex < matrix.length;
+                    rowIndex += 1
+                ) {
+                    const receivedColumns =
+                        getPlanningImportColumns(
+                            matrix[rowIndex],
+                        );
+
+                    if (receivedColumns) {
+                        headerRowIndex =
+                            rowIndex;
+
+                        columns =
+                            receivedColumns;
+
+                        break;
+                    }
+                }
+
+                if (
+                    headerRowIndex === -1 ||
+                    !columns
+                ) {
+                    return;
+                }
+
+                let currentRecord =
+                    null;
+
+                function finishCurrentRecord() {
+                    if (!currentRecord) {
+                        return;
+                    }
+
+                    parsedRecords.push(
+                        createPlanningImportHtmlRecord(
+                            currentRecord,
+                        ),
+                    );
+
+                    currentRecord =
+                        null;
+                }
+
+                matrix
+                    .slice(
+                        headerRowIndex + 1,
+                    )
+                    .forEach(
+                        function (row) {
+                            const code =
+                                getPlanningImportLhCode(
+                                    row[
+                                        columns.code
+                                    ],
+                                );
+
+                            if (
+                                code &&
+                                currentRecord?.code !==
+                                    code
+                            ) {
+                                finishCurrentRecord();
+
+                                currentRecord = {
+                                    code,
+                                    origin: [],
+                                    punctuality: [],
+                                    cpt: [],
+                                    quantity: [],
+                                };
+                            }
+
+                            if (!currentRecord) {
+                                return;
+                            }
+
+                            currentRecord
+                                .origin
+                                .push(
+                                    row[
+                                        columns.origin
+                                    ] ?? "",
+                                );
+
+                            currentRecord
+                                .punctuality
+                                .push(
+                                    row[
+                                        columns.punctuality
+                                    ] ?? "",
+                                );
+
+                            currentRecord
+                                .cpt
+                                .push(
+                                    row[
+                                        columns.cpt
+                                    ] ?? "",
+                                );
+
+                            currentRecord
+                                .quantity
+                                .push(
+                                    row[
+                                        columns.quantity
+                                    ] ?? "",
+                                );
+                        },
+                    );
+
+                finishCurrentRecord();
+            },
+        );
+
+    return parsedRecords;
+}
+
+/* LOCALIZA A QUANTIDADE NO TEXTO PURO */
+
+function getPlanningImportPlainQuantity(
+    values,
+) {
+    const dateTimePattern =
+        /^\d{2}-\d{2}-\d{4}\s+\d{2}:\d{2}:\d{2}$/;
+
+    let lastDateTimeIndex =
+        -1;
+
+    values.forEach(
+        function (
+            value,
+            index,
+        ) {
+            if (
+                dateTimePattern.test(
+                    value,
+                )
+            ) {
+                lastDateTimeIndex =
+                    index;
+            }
+        },
+    );
+
+    if (
+        lastDateTimeIndex !==
+        -1
+    ) {
+        const quantities =
+            values
+                .slice(
+                    lastDateTimeIndex + 1,
+                )
+                .map(
+                    parsePlanningImportQuantity,
+                )
+                .filter(
+                    function (value) {
+                        return value !== null;
+                    },
+                );
+
+        if (
+            quantities.length >= 2
+        ) {
+            return quantities[1];
+        }
+    }
+
+    const numericValues =
+        values.map(
+            parsePlanningImportQuantity,
+        );
+
+    for (
+        let firstIndex = 0;
+        firstIndex <
+            numericValues.length - 1;
+        firstIndex += 1
+    ) {
+        const firstValue =
+            numericValues[
+                firstIndex
+            ];
+
+        const secondValue =
+            numericValues[
+                firstIndex + 1
+            ];
+
+        if (
+            firstValue === null ||
+            secondValue === null
+        ) {
+            continue;
+        }
+
+        for (
+            let repeatedIndex =
+                firstIndex + 2;
+            repeatedIndex <
+                numericValues.length - 1;
+            repeatedIndex += 1
+        ) {
+            if (
+                numericValues[
+                    repeatedIndex
+                ] === firstValue &&
+                numericValues[
+                    repeatedIndex + 1
+                ] === secondValue
+            ) {
+                return secondValue;
+            }
+        }
+    }
+
+    return null;
+}
+
+/* EXTRAI OS REGISTROS DO TEXTO PURO */
+
+function parsePlanningSpXPlainText(
+    text,
+) {
+    const lines =
+        String(
+            text ?? "",
+        )
+            .replace(
+                /\r/g,
+                "",
+            )
+            .split(
+                "\n",
+            )
+            .map(
+                function (line) {
+                    return line
+                        .replace(
+                            /\u00a0/g,
+                            " ",
+                        )
+                        .replace(
+                            /\t+/g,
+                            " ",
+                        )
+                        .trim();
+                },
+            );
+
+    const normalizedText =
+        normalizePlanningImportText(
+            lines.join(
+                " ",
+            ),
+        );
+
+    const requiredHeadings = [
+        "numero do lh",
+        "indicador de pontualidade",
+        "cpt",
+        "pedido de entrada pendente",
+    ];
+
+    const hasRequiredHeadings =
+        requiredHeadings.every(
+            function (heading) {
+                return normalizedText
+                    .includes(
+                        heading,
+                    );
+            },
+        );
+
+    if (!hasRequiredHeadings) {
+        return [];
+    }
+
+    const recordStarts = [];
+
+    lines.forEach(
+        function (
+            line,
+            index,
+        ) {
+            const code =
+                getPlanningImportLhCode(
+                    line,
+                );
+
+            if (
+                code &&
+                line.toUpperCase() ===
+                    code
+            ) {
+                recordStarts.push({
+                    code,
+                    index,
+                });
+            }
+        },
+    );
+
+    return recordStarts.map(
+        function (
+            recordStart,
+            recordIndex,
+        ) {
+            const endIndex =
+                recordStarts[
+                    recordIndex + 1
+                ]?.index ??
+                lines.length;
+
+            const values =
+                lines
+                    .slice(
+                        recordStart.index + 1,
+                        endIndex,
+                    )
+                    .filter(
+                        Boolean,
+                    );
+
+            const origin =
+                values.find(
+                    function (value) {
+                        return /^\[\d+\]\s*\S+/.test(
+                            value,
+                        );
+                    },
+                ) || "";
+
+            return {
+                code:
+                    recordStart.code,
+
+                origin,
+
+                quantity:
+                    getPlanningImportPlainQuantity(
+                        values,
+                    ),
+
+                window:
+                    getPlanningImportWindow(
+                        values,
+                    ),
+
+                waiting:
+                    values.some(
+                        function (value) {
+                            return (
+                                normalizePlanningImportText(
+                                    value,
+                                ) ===
+                                "waiting"
+                            );
+                        },
+                    ),
+            };
+        },
+    );
+}
+
+/* SELECIONA A PRIMEIRA SEQUÊNCIA */
+
+function selectPlanningSpXLhs(
+    receivedRecords,
+) {
+    const records =
+        Array.isArray(
+            receivedRecords,
+        )
+            ? receivedRecords
+            : [];
+
+    const selectedRecords = [];
+
+    let recordsBeforeWindow = [];
+    let targetWindow = "";
+    let skippedWaiting = 0;
+    let stoppedByWindow = "";
+
+    for (
+        const record of records
+    ) {
+        if (record.waiting) {
+            skippedWaiting += 1;
+
+            if (!targetWindow) {
+                recordsBeforeWindow = [];
+            }
+
+            continue;
+        }
+
+        if (!record.window) {
+            if (targetWindow) {
+                selectedRecords.push(
+                    record,
+                );
+            } else {
+                recordsBeforeWindow.push(
+                    record,
+                );
+            }
+
+            continue;
+        }
+
+        if (!targetWindow) {
+            targetWindow =
+                record.window;
+
+            selectedRecords.push(
+                ...recordsBeforeWindow,
+                record,
+            );
+
+            recordsBeforeWindow = [];
+
+            continue;
+        }
+
+        if (
+            record.window !==
+            targetWindow
+        ) {
+            stoppedByWindow =
+                record.window;
+
+            break;
+        }
+
+        selectedRecords.push(
+            record,
+        );
+    }
+
+    const lhs = [];
+
+    const receivedCodes =
+        new Set();
+
+    let skippedIncomplete = 0;
+    let skippedDuplicates = 0;
+
+    selectedRecords.forEach(
+        function (record) {
+            const code =
+                getPlanningImportLhCode(
+                    record.code,
+                );
+
+            const origin =
+                String(
+                    record.origin ?? "",
+                ).trim();
+
+            const quantity =
+                parsePlanningImportQuantity(
+                    record.quantity,
+                );
+
+            if (
+                !code ||
+                !origin ||
+                quantity === null
+            ) {
+                skippedIncomplete += 1;
+                return;
+            }
+
+            if (
+                receivedCodes.has(
+                    code,
+                )
+            ) {
+                skippedDuplicates += 1;
+                return;
+            }
+
+            receivedCodes.add(
+                code,
+            );
+
+            lhs.push({
+                code,
+                origin,
+                quantity,
+            });
+        },
+    );
+
+    return {
+        lhs,
+        targetWindow,
+        skippedWaiting,
+        skippedIncomplete,
+        skippedDuplicates,
+        stoppedByWindow,
+    };
+}
+
+/* LÊ A ÁREA DE TRANSFERÊNCIA */
+
+async function readPlanningClipboard() {
+    if (!navigator.clipboard) {
+        throw new Error(
+            "A leitura da área de transferência não está disponível neste navegador.",
+        );
+    }
+
+    let html = "";
+    let text = "";
+    let readError = null;
+
+    if (
+        typeof navigator.clipboard.read ===
+        "function"
+    ) {
+        try {
+            const items =
+                await navigator.clipboard.read();
+
+            for (
+                const item of items
+            ) {
+                if (
+                    !html &&
+                    item.types.includes(
+                        "text/html",
+                    )
+                ) {
+                    const htmlBlob =
+                        await item.getType(
+                            "text/html",
+                        );
+
+                    html =
+                        await htmlBlob.text();
+                }
+
+                if (
+                    !text &&
+                    item.types.includes(
+                        "text/plain",
+                    )
+                ) {
+                    const textBlob =
+                        await item.getType(
+                            "text/plain",
+                        );
+
+                    text =
+                        await textBlob.text();
+                }
+            }
+        } catch (error) {
+            readError = error;
+        }
+    }
+
+    if (
+        !text &&
+        typeof navigator.clipboard.readText ===
+            "function"
+    ) {
+        try {
+            text =
+                await navigator.clipboard
+                    .readText();
+        } catch (error) {
+            readError = error;
+        }
+    }
+
+    if (
+        !html &&
+        !text
+    ) {
+        if (
+            readError?.name ===
+            "NotAllowedError"
+        ) {
+            throw new Error(
+                "O navegador bloqueou a área de transferência. Permita o acesso e clique em importar novamente.",
+            );
+        }
+
+        throw new Error(
+            "A área de transferência está vazia ou não pôde ser lida.",
+        );
+    }
+
+    return {
+        html,
+        text,
+    };
+}
+
+/* VERIFICA SE JÁ EXISTEM DADOS */
+
+function hasPlanningImportReplacementData() {
+    return getPlanningState()
+        .lhs
+        .some(
+            function (lh) {
+                return Boolean(
+                    lh.code.trim() ||
+                    lh.origin.trim() ||
+                    lh.quantity !== null,
+                );
+            },
+        );
+}
+
+/* RESTAURA O TEXTO DO BOTÃO */
+
+function restorePlanningImportButton(
+    button,
+) {
+    if (
+        planningImportFeedbackTimer !==
+        null
+    ) {
+        window.clearTimeout(
+            planningImportFeedbackTimer,
+        );
+    }
+
+    planningImportFeedbackTimer =
+        window.setTimeout(
+            function () {
+                button.textContent =
+                    PLANNING_IMPORT_DEFAULT_TEXT;
+
+                planningImportFeedbackTimer =
+                    null;
+            },
+            PLANNING_IMPORT_SUCCESS_DURATION,
+        );
+}
+
+/* IMPORTA OS LHS */
+
+async function handlePlanningClipboardImport(
+    event,
+) {
+    const button =
+        event.currentTarget instanceof
+            HTMLButtonElement
+            ? event.currentTarget
+            : null;
+
+    if (!button) {
+        return;
+    }
+
+    if (
+        planningImportFeedbackTimer !==
+        null
+    ) {
+        window.clearTimeout(
+            planningImportFeedbackTimer,
+        );
+
+        planningImportFeedbackTimer =
+            null;
+    }
+
+    button.disabled = true;
+
+    button.removeAttribute(
+        "title",
+    );
+
+    button.textContent =
+        "Lendo área de transferência...";
+
+    try {
+        const clipboard =
+            await readPlanningClipboard();
+
+        const htmlRecords =
+            parsePlanningSpXHtml(
+                clipboard.html,
+            );
+
+        const plainTextRecords =
+            parsePlanningSpXPlainText(
+                clipboard.text,
+            );
+
+        const importCandidates = [
+            {
+                format: "HTML",
+                records: htmlRecords,
+            },
+            {
+                format: "texto",
+                records: plainTextRecords,
+            },
+        ]
+            .filter(
+                function (candidate) {
+                    return (
+                        candidate
+                            .records
+                            .length > 0
+                    );
+                },
+            )
+            .map(
+                function (candidate) {
+                    return {
+                        ...candidate,
+
+                        selection:
+                            selectPlanningSpXLhs(
+                                candidate.records,
+                            ),
+                    };
+                },
+            );
+
+        if (
+            importCandidates.length === 0
+        ) {
+            throw new Error(
+                "Não encontrei a tabela de viagens do SPX. Abra a lista, pressione Ctrl+A e Ctrl+C e tente novamente.",
+            );
+        }
+
+        const selectedCandidate =
+            importCandidates.reduce(
+                function (
+                    bestCandidate,
+                    candidate,
+                ) {
+                    if (!bestCandidate) {
+                        return candidate;
+                    }
+
+                    const currentLength =
+                        candidate
+                            .selection
+                            .lhs
+                            .length;
+
+                    const bestLength =
+                        bestCandidate
+                            .selection
+                            .lhs
+                            .length;
+
+                    return currentLength >
+                        bestLength
+                        ? candidate
+                        : bestCandidate;
+                },
+                null,
+            );
+
+        const selection =
+            selectedCandidate.selection;
+
+        const importFormat =
+            selectedCandidate.format;
+
+        if (
+            !selection.targetWindow
+        ) {
+            throw new Error(
+                "Não foi possível identificar a janela CPT da próxima sequência de LHs.",
+            );
+        }
+
+        if (
+            selection.lhs.length === 0
+        ) {
+            throw new Error(
+                `Encontrei a janela ${selection.targetWindow}, mas nenhum LH possuía código, origem e quantidade completos.`,
+            );
+        }
+
+        if (
+            selection.lhs.length >
+            PLANNING_IMPORT_EXPECTED_MAXIMUM
+        ) {
+            const shouldContinue =
+                window.confirm(
+                    `Foram encontrados ${selection.lhs.length} LHs na primeira sequência de ${selection.targetWindow}. Normalmente a lista possui até ${PLANNING_IMPORT_EXPECTED_MAXIMUM}. Deseja importar todos mesmo assim?`,
+                );
+
+            if (!shouldContinue) {
+                button.textContent =
+                    PLANNING_IMPORT_DEFAULT_TEXT;
+
+                return;
+            }
+        }
+
+        if (
+            hasPlanningImportReplacementData()
+        ) {
+            const shouldReplace =
+                window.confirm(
+                    "A importação substituirá os LHs preenchidos atualmente. Deseja continuar?",
+                );
+
+            if (!shouldReplace) {
+                button.textContent =
+                    PLANNING_IMPORT_DEFAULT_TEXT;
+
+                return;
+            }
+        }
+
+        replacePlanningLhs(
+            selection.lhs,
+            PLANNING_IMPORT_SOURCE,
+        );
+
+        const ignoredParts = [];
+
+        if (
+            selection.skippedWaiting > 0
+        ) {
+            ignoredParts.push(
+                `${selection.skippedWaiting} com Waiting`,
+            );
+        }
+
+        if (
+            selection.skippedIncomplete > 0
+        ) {
+            ignoredParts.push(
+                `${selection.skippedIncomplete} incompleto(s)`,
+            );
+        }
+
+        if (
+            selection.skippedDuplicates > 0
+        ) {
+            ignoredParts.push(
+                `${selection.skippedDuplicates} duplicado(s)`,
+            );
+        }
+
+        button.textContent =
+            `${selection.lhs.length} LHs importados — ${selection.targetWindow}`;
+
+        button.title = [
+            `Importação por ${importFormat}.`,
+
+            ignoredParts.length > 0
+                ? `Ignorados: ${ignoredParts.join(", ")}.`
+                : "Nenhum registro precisou ser ignorado.",
+
+            selection.stoppedByWindow
+                ? `Leitura encerrada ao encontrar a janela ${selection.stoppedByWindow}.`
+                : "",
+        ]
+            .filter(
+                Boolean,
+            )
+            .join(
+                " ",
+            );
+
+        restorePlanningImportButton(
+            button,
+        );
+    } catch (error) {
+        console.error(
+            "Falha ao importar os LHs do SPX.",
+            error,
+        );
+
+        button.textContent =
+            "Não foi possível importar";
+
+        window.alert(
+            error instanceof Error
+                ? error.message
+                : "Não foi possível importar os dados copiados do SPX.",
+        );
+
+        restorePlanningImportButton(
+            button,
+        );
+    } finally {
+        button.disabled = false;
+    }
+}
+
+/* INICIALIZA A IMPORTAÇÃO */
+
+function initializePlanningImport() {
+    const button =
+        document.getElementById(
+            PLANNING_IMPORT_BUTTON_ID,
+        );
+
+    if (
+        !(
+            button instanceof
+            HTMLButtonElement
+        )
+    ) {
+        return false;
+    }
+
+    if (
+        button
+            .dataset
+            .planningImportInitialized ===
+        "true"
+    ) {
+        return true;
+    }
+
+    button
+        .dataset
+        .planningImportInitialized =
+            "true";
+
+    button.addEventListener(
+        "click",
+        handlePlanningClipboardImport,
+    );
+
+    return true;
+}
+
+export {
+    initializePlanningImport,
+    parsePlanningSpXHtml,
+    parsePlanningSpXPlainText,
+    selectPlanningSpXLhs,
+};
