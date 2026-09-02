@@ -1976,46 +1976,6 @@ async function handlePlanningClipboardImport(
                 )
                 ?.selection;
 
-        /*
-         * Mais de uma janela:
-         * abre o modal Foundation.
-         */
-
-        if (
-            selectedCandidate
-                .windowCandidates
-                .length > 1
-        ) {
-            button.textContent =
-                "Escolha a janela...";
-
-            selectedWindow =
-                await requestPlanningImportWindow(
-                    selectedCandidate
-                        .windowCandidates,
-                );
-
-            if (!selectedWindow) {
-                button.textContent =
-                    PLANNING_IMPORT_DEFAULT_TEXT;
-
-                return;
-            }
-        }
-
-        const selection =
-            selectedCandidate
-                .windowCandidates
-                .find(
-                    function (candidate) {
-                        return (
-                            candidate.window ===
-                            selectedWindow
-                        );
-                    },
-                )
-                ?.selection;
-
         if (
             !selection ||
             selection.lhs.length === 0
