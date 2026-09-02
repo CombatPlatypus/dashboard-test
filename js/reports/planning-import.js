@@ -896,6 +896,8 @@ function hasPlanningSpXMatchingWindowNeighbor(
 
 /* SELECIONA O PRIMEIRO BLOCO VÁLIDO DA JANELA */
 
+/* SELECIONA O PRIMEIRO BLOCO VÁLIDO DA JANELA */
+
 function selectPlanningSpXLhs(
     receivedRecords,
     receivedTargetWindow = "",
@@ -956,93 +958,184 @@ function selectPlanningSpXLhs(
             includedWithoutQuantity: 0,
             includedWithoutWindow: 0,
             skippedWaitingWithoutWindow: 0,
+            skippedAllWaitingGroups: 0,
+            skippedUngrouped: records.filter(
+                function (record) {
+                    return record.window ===
+                        targetWindow;
+                },
+            ).length,
+            skippedDuplicates: 0,
+        };
+    }
+
+    let blockStart = -1;
+    let blockEnd = -1;
+    let blockWindowIndexes = [];
+    let skippedAllWaitingGroups = 0;
+
+    const checkedBlocks =
+        new Set();
+
+    /*
+     * Percorre os agrupamentos da janela
+     * até encontrar um que possua pelo
+     * menos um LH que não esteja Waiting.
+     */
+
+    for (
+        const validIndex of
+            validWindowIndexes
+    ) {
+        let candidateStart =
+            validIndex;
+
+        let candidateEnd =
+            validIndex;
+
+        /*
+         * Expande o início do bloco até
+         * encontrar uma janela diferente.
+         */
+
+        while (
+            candidateStart > 0
+        ) {
+            const previousWindow =
+                records[
+                    candidateStart - 1
+                ].window;
+
+            if (
+                previousWindow &&
+                previousWindow !==
+                    targetWindow
+            ) {
+                break;
+            }
+
+            candidateStart -= 1;
+        }
+
+        /*
+         * Expande o final do bloco até
+         * encontrar uma janela diferente.
+         */
+
+        while (
+            candidateEnd <
+                records.length - 1
+        ) {
+            const nextWindow =
+                records[
+                    candidateEnd + 1
+                ].window;
+
+            if (
+                nextWindow &&
+                nextWindow !==
+                    targetWindow
+            ) {
+                break;
+            }
+
+            candidateEnd += 1;
+        }
+
+        const blockKey =
+            `${candidateStart}:${candidateEnd}`;
+
+        /*
+         * Evita verificar o mesmo bloco
+         * mais de uma vez.
+         */
+
+        if (
+            checkedBlocks.has(
+                blockKey,
+            )
+        ) {
+            continue;
+        }
+
+        checkedBlocks.add(
+            blockKey,
+        );
+
+        const candidateWindowIndexes =
+            validWindowIndexes.filter(
+                function (index) {
+                    return (
+                        index >=
+                            candidateStart &&
+                        index <=
+                            candidateEnd
+                    );
+                },
+            );
+
+        /*
+         * Um agrupamento composto somente
+         * por LHs Waiting não é válido.
+         *
+         * Um grupo misto continua válido,
+         * incluindo também seus LHs Waiting.
+         */
+
+        const hasNonWaitingLh =
+            candidateWindowIndexes.some(
+                function (index) {
+                    return !records[index]
+                        .waiting;
+                },
+            );
+
+        if (!hasNonWaitingLh) {
+            skippedAllWaitingGroups += 1;
+            continue;
+        }
+
+        blockStart =
+            candidateStart;
+
+        blockEnd =
+            candidateEnd;
+
+        blockWindowIndexes =
+            candidateWindowIndexes;
+
+        break;
+    }
+
+    /*
+     * Nenhum agrupamento válido foi
+     * encontrado para a janela escolhida.
+     */
+
+    if (
+        blockStart === -1 ||
+        blockWindowIndexes.length === 0
+    ) {
+        return {
+            lhs: [],
+            targetWindow,
+            includedWaiting: 0,
+            includedWithoutQuantity: 0,
+            includedWithoutWindow: 0,
+            skippedWaitingWithoutWindow: 0,
+            skippedAllWaitingGroups,
 
             skippedUngrouped:
                 records.filter(
                     function (record) {
-                        return (
-                            record.window ===
-                            targetWindow
-                        );
+                        return record.window ===
+                            targetWindow;
                     },
                 ).length,
 
             skippedDuplicates: 0,
         };
     }
-
-    const firstValidIndex =
-        validWindowIndexes[0];
-
-    let blockStart =
-        firstValidIndex;
-
-    let blockEnd =
-        firstValidIndex;
-
-    /*
-     * Volta até encontrar uma janela
-     * explicitamente diferente.
-     */
-
-    while (
-        blockStart > 0
-    ) {
-        const previousWindow =
-            records[
-                blockStart - 1
-            ].window;
-
-        if (
-            previousWindow &&
-            previousWindow !==
-                targetWindow
-        ) {
-            break;
-        }
-
-        blockStart -= 1;
-    }
-
-    /*
-     * Avança até encontrar uma janela
-     * explicitamente diferente.
-     */
-
-    while (
-        blockEnd <
-            records.length - 1
-    ) {
-        const nextWindow =
-            records[
-                blockEnd + 1
-            ].window;
-
-        if (
-            nextWindow &&
-            nextWindow !==
-                targetWindow
-        ) {
-            break;
-        }
-
-        blockEnd += 1;
-    }
-
-    /*
-     * Mantém somente os LHs da janela
-     * que possuem um vizinho igual.
-     */
-
-    const blockWindowIndexes =
-        validWindowIndexes.filter(
-            function (index) {
-                return (
-                    index >= blockStart &&
-                    index <= blockEnd
-                );
-            },
-        );
 
     const firstGroupedIndex =
         blockWindowIndexes[0];
@@ -1058,12 +1151,12 @@ function selectPlanningSpXLhs(
         );
 
     /*
-     * LHs sem CPT são aceitos somente
-     * dentro ou imediatamente ao lado
-     * do bloco.
+     * Inclui os LHs sem CPT que estiverem
+     * dentro ou imediatamente ao lado do
+     * agrupamento escolhido.
      *
-     * Um LH sem CPT e com Waiting
-     * continua sendo ignorado.
+     * LHs sem CPT marcados como Waiting
+     * continuam sendo ignorados.
      */
 
     for (
@@ -1153,11 +1246,6 @@ function selectPlanningSpXLhs(
                 return;
             }
 
-            /*
-             * A quantidade pode permanecer null.
-             * Isso não invalida mais o LH.
-             */
-
             const quantity =
                 parsePlanningImportQuantity(
                     record.quantity,
@@ -1240,6 +1328,7 @@ function selectPlanningSpXLhs(
         includedWithoutQuantity,
         includedWithoutWindow,
         skippedWaitingWithoutWindow,
+        skippedAllWaitingGroups,
         skippedUngrouped,
         skippedDuplicates,
     };
@@ -1876,6 +1965,15 @@ async function handlePlanningClipboardImport(
             !selection ||
             selection.lhs.length === 0
         ) {
+            if (
+                selection
+                    ?.skippedAllWaitingGroups > 0
+            ) {
+                throw new Error(
+                    `Todos os grupos da janela ${selectedWindow} estão integralmente como Waiting.`,
+                );
+            }
+
             throw new Error(
                 `A janela ${selectedWindow} não possui pelo menos dois LHs consecutivos com o mesmo CPT.`,
             );
@@ -1940,10 +2038,13 @@ async function handlePlanningClipboardImport(
 
         if (
             selection
-                .skippedWaitingWithoutWindow > 0
+                .skippedAllWaitingGroups > 0
         ) {
             ignoredParts.push(
-                `${selection.skippedWaitingWithoutWindow} com Waiting e sem CPT`,
+                selection
+                    .skippedAllWaitingGroups === 1
+                    ? "1 grupo composto somente por Waiting"
+                    : `${selection.skippedAllWaitingGroups} grupos compostos somente por Waiting`,
             );
         }
 
