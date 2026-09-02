@@ -69,51 +69,42 @@
                 overflow-y: auto;
                 outline: none;
             }
-            .reveal .container-style {
-                background-color: #1d1e1f;
-                border: 2px solid #393a3b;
-                border-radius: 5px;
+            .reveal .flex-box-center {
+                column-gap: 10px;
+                overflow: hidden;
+                height: 40px;
             }
-            .reveal .container-title {
-                padding: 20px;
-                border-bottom: 2px solid #393a3b;
-                display: -webkit-flex;
-                display: flex;
-                -webkit-flex-wrap: wrap;
-                flex-wrap: wrap;
-                -webkit-justify-content: space-between;
-                justify-content: space-between;
+            .reveal .flex-box-center .button {
+                flex: 1 1 0;
+                min-height: 40px;
+                font-size: 14px;
+                padding: 10px 15px;
             }
-            .reveal .container-title h4 {
-                margin-bottom: 0px;
+            .reveal h3 {
+                font-size: 20px;
+                letter-spacing: 1.5px;
+                text-align: center;
             }
-            .reveal .container-content {
-                padding: 35px 35px;
+            .reveal p {
+                width: 404px;
+                text-align: center;
+                margin: 0 auto;
             }
-            .reveal .button-support {
-                margin-top: 0;
+            .reveal .close-button {
+                position: absolute;
+                z-index: 10;
+                color: #8a8a8a;
+                cursor: pointer;
+                font-size: 2em;
+                line-height: 1;
             }
-            .reveal .type-accordion {
-                min-height: auto;
+            [data-whatinput='mouse'] .reveal .close-button {
+                outline: 0;
             }
-            .reveal .accordion-content ul {
-                margin-bottom: 0;
-                margin-left: 2rem;
-                list-style: disc;
+            .reveal .close-button:hover, .reveal .close-button:focus {
+                opacity: 0.7;
             }
-            .reveal .accordion-content ul li{
-                font-size: 16px;
-            }
-            .reveal .accordion .accordion-item:last-of-type ul li:last-of-type{
-                margin-bottom: 20px;
-            }
-            .standard-reveal {
-                max-width: 650px;
-            }
-            .small-reveal {
-                max-width: 450px;
-                user-select: none;
-            }
+
             [data-whatinput='mouse'] .reveal {
                 outline: 0;
             }
@@ -122,18 +113,9 @@
                     min-height: 0;
             }
             }
-            .reveal .column {
-                min-width: 0;
-            }
-            .reveal > :last-child {
-                margin-bottom: 0;
-            }
-            .reveal.collapse {
-                padding: 0;
-            }
             @media print, screen and (min-width: 40em) {
                 .reveal.tiny {
-                    width: 30%;
+                    width: 500px;
                     max-width: 75rem;
             }
             }
@@ -179,6 +161,19 @@
                 position: fixed;
             }
 
+
+            #planningImportWindowOptions {
+                margin: 20px 0;
+                display: flex;
+                flex-direction: column;
+                row-gap: 10px;
+                padding: 20px 0;
+                border-top: 2px solid #525252;
+                border-bottom: 2px solid #525252;
+            }
+            #planningImportWindowOptions input{
+                margin-right: 10px;
+            }
 
         </style>
     </head>	
@@ -1744,50 +1739,28 @@
             </div>
         </div>
 
-        <!-- MODAL - SELEÇÃO DA JANELA DO PLANEJAMENTO -->
+        <!-- REVEAL - SELEÇÃO DA JANELA DO PLANEJAMENTO -->
 
-        <div
-            class="reveal tiny"
-            id="planningImportWindowModal"
-            data-reveal
-            data-close-on-click="false"
-            aria-labelledby="planningImportWindowTitle">
-
-            <h3 id="planningImportWindowTitle">
-                Selecionar Janela
-            </h3>
+        <div class="reveal tiny" id="planningImportWindowModal" data-reveal data-close-on-click="false" aria-labelledby="planningImportWindowTitle">
+            <h3 id="planningImportWindowTitle">Escolha o Planejamento</h3>
 
             <p id="planningImportWindowDescription">
                 Escolha a janela que será importada para o planejamento.
             </p>
 
-            <fieldset
-                class="fieldset"
-                id="planningImportWindowOptions">
-            </fieldset>
+            <div id="planningImportWindowOptions"></div>
 
-            <div class="flex-box-end">
-                <button
-                    class="button"
-                    id="planningImportWindowCancel"
-                    type="button">
+            <div class="flex-box-center">
+                <button class="button" id="planningImportWindowCancel">
                     Cancelar
                 </button>
 
-                <button
-                    class="button"
-                    id="planningImportWindowConfirm"
-                    type="button">
+                <button class="button" id="planningImportWindowConfirm">
                     Importar Janela
                 </button>
             </div>
 
-            <button
-                class="close-button"
-                type="button"
-                data-close
-                aria-label="Fechar seleção de janela">
-
+            <button class="close-button" type="button" data-close>
                 <span aria-hidden="true">&times;</span>
             </button>
         </div>
