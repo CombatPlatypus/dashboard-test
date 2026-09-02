@@ -835,9 +835,9 @@ function parsePlanningSpXPlainText(
     );
 }
 
-/* SELECIONA A PRIMEIRA SEQUÊNCIA */
+/* RETORNA AS JANELAS NA ORDEM ENCONTRADA */
 
-function selectPlanningSpXLhs(
+function getPlanningSpXDetectedWindows(
     receivedRecords,
 ) {
     const records =
@@ -847,100 +847,300 @@ function selectPlanningSpXLhs(
             ? receivedRecords
             : [];
 
-    const selectedRecords = [];
+    const receivedWindows =
+        new Set();
 
-    let recordsBeforeWindow = [];
-    let targetWindow = "";
-    let skippedWaiting = 0;
-    let stoppedByWindow = "";
+    records.forEach(
+        function (record) {
+            const windowValue =
+                String(
+                    record.window ?? "",
+                )
+                    .trim()
+                    .toUpperCase();
 
-    for (
-        const record of records
+            if (
+                PLANNING_SPX_WINDOW_PATTERN.test(
+                    windowValue,
+                )
+            ) {
+                receivedWindows.add(
+                    windowValue,
+                );
+            }
+        },
+    );
+
+    return Array.from(
+        receivedWindows,
+    );
+}
+
+/* VERIFICA SE EXISTE UM VIZINHO COM O MESMO CPT */
+
+function hasPlanningSpXMatchingWindowNeighbor(
+    records,
+    index,
+    targetWindow,
+) {
+    return (
+        records[index - 1]
+            ?.window ===
+            targetWindow ||
+
+        records[index + 1]
+            ?.window ===
+            targetWindow
+    );
+}
+
+/* SELECIONA O PRIMEIRO BLOCO VÁLIDO DA JANELA */
+
+function selectPlanningSpXLhs(
+    receivedRecords,
+    receivedTargetWindow = "",
+) {
+    const records =
+        Array.isArray(
+            receivedRecords,
+        )
+            ? receivedRecords
+            : [];
+
+    const detectedWindows =
+        getPlanningSpXDetectedWindows(
+            records,
+        );
+
+    const targetWindow =
+        String(
+            receivedTargetWindow ||
+            detectedWindows[0] ||
+            "",
+        )
+            .trim()
+            .toUpperCase();
+
+    const validWindowIndexes = [];
+
+    records.forEach(
+        function (
+            record,
+            index,
+        ) {
+            if (
+                record.window ===
+                    targetWindow &&
+
+                hasPlanningSpXMatchingWindowNeighbor(
+                    records,
+                    index,
+                    targetWindow,
+                )
+            ) {
+                validWindowIndexes.push(
+                    index,
+                );
+            }
+        },
+    );
+
+    if (
+        !targetWindow ||
+        validWindowIndexes.length === 0
     ) {
-        if (record.waiting) {
-            skippedWaiting += 1;
+        return {
+            lhs: [],
+            targetWindow,
+            includedWaiting: 0,
+            includedWithoutQuantity: 0,
+            includedWithoutWindow: 0,
+            skippedWaitingWithoutWindow: 0,
 
-            if (!targetWindow) {
-                recordsBeforeWindow = [];
-            }
+            skippedUngrouped:
+                records.filter(
+                    function (record) {
+                        return (
+                            record.window ===
+                            targetWindow
+                        );
+                    },
+                ).length,
 
-            continue;
-        }
+            skippedDuplicates: 0,
+        };
+    }
 
-        if (!record.window) {
-            if (targetWindow) {
-                selectedRecords.push(
-                    record,
-                );
-            } else {
-                recordsBeforeWindow.push(
-                    record,
-                );
-            }
+    const firstValidIndex =
+        validWindowIndexes[0];
 
-            continue;
-        }
+    let blockStart =
+        firstValidIndex;
 
-        if (!targetWindow) {
-            targetWindow =
-                record.window;
+    let blockEnd =
+        firstValidIndex;
 
-            selectedRecords.push(
-                ...recordsBeforeWindow,
-                record,
-            );
+    /*
+     * Volta até encontrar uma janela
+     * explicitamente diferente.
+     */
 
-            recordsBeforeWindow = [];
-
-            continue;
-        }
+    while (
+        blockStart > 0
+    ) {
+        const previousWindow =
+            records[
+                blockStart - 1
+            ].window;
 
         if (
-            record.window !==
-            targetWindow
+            previousWindow &&
+            previousWindow !==
+                targetWindow
         ) {
-            stoppedByWindow =
-                record.window;
-
             break;
         }
 
-        selectedRecords.push(
-            record,
-        );
+        blockStart -= 1;
     }
+
+    /*
+     * Avança até encontrar uma janela
+     * explicitamente diferente.
+     */
+
+    while (
+        blockEnd <
+            records.length - 1
+    ) {
+        const nextWindow =
+            records[
+                blockEnd + 1
+            ].window;
+
+        if (
+            nextWindow &&
+            nextWindow !==
+                targetWindow
+        ) {
+            break;
+        }
+
+        blockEnd += 1;
+    }
+
+    /*
+     * Mantém somente os LHs da janela
+     * que possuem um vizinho igual.
+     */
+
+    const blockWindowIndexes =
+        validWindowIndexes.filter(
+            function (index) {
+                return (
+                    index >= blockStart &&
+                    index <= blockEnd
+                );
+            },
+        );
+
+    const firstGroupedIndex =
+        blockWindowIndexes[0];
+
+    const lastGroupedIndex =
+        blockWindowIndexes[
+            blockWindowIndexes.length - 1
+        ];
+
+    const selectedIndexes =
+        new Set(
+            blockWindowIndexes,
+        );
+
+    /*
+     * LHs sem CPT são aceitos somente
+     * dentro ou imediatamente ao lado
+     * do bloco.
+     *
+     * Um LH sem CPT e com Waiting
+     * continua sendo ignorado.
+     */
+
+    for (
+        let index = blockStart;
+        index <= blockEnd;
+        index += 1
+    ) {
+        const record =
+            records[index];
+
+        if (
+            record.window ||
+            record.waiting
+        ) {
+            continue;
+        }
+
+        const insideBlock =
+            index >= firstGroupedIndex &&
+            index <= lastGroupedIndex;
+
+        const immediatelyBefore =
+            index ===
+            firstGroupedIndex - 1;
+
+        const immediatelyAfter =
+            index ===
+            lastGroupedIndex + 1;
+
+        if (
+            insideBlock ||
+            immediatelyBefore ||
+            immediatelyAfter
+        ) {
+            selectedIndexes.add(
+                index,
+            );
+        }
+    }
+
+    const orderedIndexes =
+        Array.from(
+            selectedIndexes,
+        )
+            .sort(
+                function (
+                    firstIndex,
+                    secondIndex,
+                ) {
+                    return (
+                        firstIndex -
+                        secondIndex
+                    );
+                },
+            );
 
     const lhs = [];
 
     const receivedCodes =
         new Set();
 
-    let skippedIncomplete = 0;
+    let includedWaiting = 0;
+    let includedWithoutQuantity = 0;
+    let includedWithoutWindow = 0;
     let skippedDuplicates = 0;
 
-    selectedRecords.forEach(
-        function (record) {
+    orderedIndexes.forEach(
+        function (index) {
+            const record =
+                records[index];
+
             const code =
                 getPlanningImportLhCode(
                     record.code,
                 );
 
-            const origin =
-                String(
-                    record.origin ?? "",
-                ).trim();
-
-            const quantity =
-                parsePlanningImportQuantity(
-                    record.quantity,
-                );
-
-            if (
-                !code ||
-                !origin ||
-                quantity === null
-            ) {
-                skippedIncomplete += 1;
+            if (!code) {
                 return;
             }
 
@@ -953,26 +1153,384 @@ function selectPlanningSpXLhs(
                 return;
             }
 
+            /*
+             * A quantidade pode permanecer null.
+             * Isso não invalida mais o LH.
+             */
+
+            const quantity =
+                parsePlanningImportQuantity(
+                    record.quantity,
+                );
+
+            if (record.waiting) {
+                includedWaiting += 1;
+            }
+
+            if (quantity === null) {
+                includedWithoutQuantity += 1;
+            }
+
+            if (!record.window) {
+                includedWithoutWindow += 1;
+            }
+
             receivedCodes.add(
                 code,
             );
 
             lhs.push({
                 code,
-                origin,
+
+                origin:
+                    String(
+                        record.origin ?? "",
+                    ).trim(),
+
                 quantity,
             });
         },
     );
 
+    const selectedCodes =
+        new Set(
+            lhs.map(
+                function (lh) {
+                    return lh.code;
+                },
+            ),
+        );
+
+    const skippedWaitingWithoutWindow =
+        records
+            .slice(
+                blockStart,
+                blockEnd + 1,
+            )
+            .filter(
+                function (record) {
+                    return (
+                        !record.window &&
+                        record.waiting
+                    );
+                },
+            )
+            .length;
+
+    const skippedUngrouped =
+        records.filter(
+            function (record) {
+                return (
+                    record.window ===
+                        targetWindow &&
+
+                    !selectedCodes.has(
+                        getPlanningImportLhCode(
+                            record.code,
+                        ),
+                    )
+                );
+            },
+        ).length;
+
     return {
         lhs,
         targetWindow,
-        skippedWaiting,
-        skippedIncomplete,
+        includedWaiting,
+        includedWithoutQuantity,
+        includedWithoutWindow,
+        skippedWaitingWithoutWindow,
+        skippedUngrouped,
         skippedDuplicates,
-        stoppedByWindow,
     };
+}
+
+/* CRIA AS OPÇÕES DE JANELA */
+
+function createPlanningSpXWindowCandidates(
+    records,
+) {
+    return getPlanningSpXDetectedWindows(
+        records,
+    ).map(
+        function (windowValue) {
+            return {
+                window:
+                    windowValue,
+
+                selection:
+                    selectPlanningSpXLhs(
+                        records,
+                        windowValue,
+                    ),
+            };
+        },
+    );
+}
+
+/* LOCALIZA OS ELEMENTOS DO MODAL */
+
+function getPlanningImportWindowModalElements() {
+    return {
+        modal:
+            document.getElementById(
+                "planningImportWindowModal",
+            ),
+
+        description:
+            document.getElementById(
+                "planningImportWindowDescription",
+            ),
+
+        options:
+            document.getElementById(
+                "planningImportWindowOptions",
+            ),
+
+        confirmButton:
+            document.getElementById(
+                "planningImportWindowConfirm",
+            ),
+
+        cancelButton:
+            document.getElementById(
+                "planningImportWindowCancel",
+            ),
+    };
+}
+
+/* ABRE O MODAL FOUNDATION */
+
+function requestPlanningImportWindow(
+    windowCandidates,
+) {
+    const elements =
+        getPlanningImportWindowModalElements();
+
+    if (
+        !(
+            elements.modal instanceof
+            HTMLElement
+        ) ||
+        !(
+            elements.description instanceof
+            HTMLElement
+        ) ||
+        !(
+            elements.options instanceof
+            HTMLElement
+        ) ||
+        !(
+            elements.confirmButton instanceof
+            HTMLButtonElement
+        ) ||
+        !(
+            elements.cancelButton instanceof
+            HTMLButtonElement
+        ) ||
+        typeof window.jQuery !==
+            "function" ||
+        typeof window.Foundation?.Reveal !==
+            "function"
+    ) {
+        throw new Error(
+            "O modal de seleção de janela não pôde ser inicializado.",
+        );
+    }
+
+    const firstAvailableWindow =
+        windowCandidates.find(
+            function (candidate) {
+                return (
+                    candidate
+                        .selection
+                        .lhs
+                        .length > 0
+                );
+            },
+        )?.window || "";
+
+    elements.description.textContent =
+        "Foram encontradas mais de uma janela. Escolha qual delas será usada no planejamento.";
+
+    const optionElements =
+        windowCandidates.map(
+            function (candidate) {
+                const wrapper =
+                    document.createElement(
+                        "div",
+                    );
+
+                const input =
+                    document.createElement(
+                        "input",
+                    );
+
+                const label =
+                    document.createElement(
+                        "label",
+                    );
+
+                const inputId =
+                    `planningImportWindow${candidate.window}`;
+
+                const lhQuantity =
+                    candidate
+                        .selection
+                        .lhs
+                        .length;
+
+                input.type =
+                    "radio";
+
+                input.name =
+                    "planningImportWindow";
+
+                input.id =
+                    inputId;
+
+                input.value =
+                    candidate.window;
+
+                input.disabled =
+                    lhQuantity === 0;
+
+                /*
+                 * A primeira janela válida
+                 * fica selecionada por padrão.
+                 */
+
+                input.checked =
+                    candidate.window ===
+                    firstAvailableWindow;
+
+                label.htmlFor =
+                    inputId;
+
+                label.textContent =
+                    lhQuantity === 1
+                        ? `${candidate.window} — 1 LH válido`
+                        : `${candidate.window} — ${lhQuantity} LHs válidos`;
+
+                wrapper.append(
+                    input,
+                    label,
+                );
+
+                return wrapper;
+            },
+        );
+
+    elements.options.replaceChildren(
+        ...optionElements,
+    );
+
+    elements.confirmButton.disabled =
+        !firstAvailableWindow;
+
+    const modalQuery =
+        window.jQuery(
+            elements.modal,
+        );
+
+    const modalInstance =
+        modalQuery.data(
+            "zfPlugin",
+        ) ||
+        new window.Foundation.Reveal(
+            modalQuery,
+        );
+
+    return new Promise(
+        function (resolve) {
+            let finished = false;
+
+            function cleanup() {
+                elements.confirmButton
+                    .removeEventListener(
+                        "click",
+                        handleConfirm,
+                    );
+
+                elements.cancelButton
+                    .removeEventListener(
+                        "click",
+                        handleCancel,
+                    );
+
+                modalQuery.off(
+                    "closed.zf.reveal",
+                    handleClosed,
+                );
+            }
+
+            function finish(
+                windowValue,
+                closeModal = true,
+            ) {
+                if (finished) {
+                    return;
+                }
+
+                finished = true;
+
+                cleanup();
+
+                if (closeModal) {
+                    modalInstance.close();
+                }
+
+                resolve(
+                    windowValue,
+                );
+            }
+
+            function handleConfirm() {
+                const selectedInput =
+                    elements.options
+                        .querySelector(
+                            'input[name="planningImportWindow"]:checked',
+                        );
+
+                finish(
+                    selectedInput?.value ||
+                    "",
+                );
+            }
+
+            function handleCancel() {
+                finish(
+                    "",
+                );
+            }
+
+            function handleClosed() {
+                finish(
+                    "",
+                    false,
+                );
+            }
+
+            elements.confirmButton
+                .addEventListener(
+                    "click",
+                    handleConfirm,
+                );
+
+            elements.cancelButton
+                .addEventListener(
+                    "click",
+                    handleCancel,
+                );
+
+            modalQuery.on(
+                "closed.zf.reveal",
+                handleClosed,
+            );
+
+            modalInstance.open();
+        },
+    );
 }
 
 /* LÊ A ÁREA DE TRANSFERÊNCIA */
@@ -1186,12 +1744,31 @@ async function handlePlanningClipboardImport(
             )
             .map(
                 function (candidate) {
+                    const windowCandidates =
+                        createPlanningSpXWindowCandidates(
+                            candidate.records,
+                        );
+
                     return {
                         ...candidate,
 
-                        selection:
-                            selectPlanningSpXLhs(
-                                candidate.records,
+                        windowCandidates,
+
+                        validLhQuantity:
+                            windowCandidates.reduce(
+                                function (
+                                    total,
+                                    windowCandidate,
+                                ) {
+                                    return (
+                                        total +
+                                        windowCandidate
+                                            .selection
+                                            .lhs
+                                            .length
+                                    );
+                                },
+                                0,
                             ),
                     };
                 },
@@ -1205,6 +1782,11 @@ async function handlePlanningClipboardImport(
             );
         }
 
+        /*
+         * Escolhe o formato que encontrou
+         * mais LHs válidos.
+         */
+
         const selectedCandidate =
             importCandidates.reduce(
                 function (
@@ -1215,45 +1797,87 @@ async function handlePlanningClipboardImport(
                         return candidate;
                     }
 
-                    const currentLength =
+                    return (
                         candidate
-                            .selection
-                            .lhs
-                            .length;
-
-                    const bestLength =
+                            .validLhQuantity >
                         bestCandidate
-                            .selection
-                            .lhs
-                            .length;
-
-                    return currentLength >
-                        bestLength
+                            .validLhQuantity
+                    )
                         ? candidate
                         : bestCandidate;
                 },
                 null,
             );
 
-        const selection =
-            selectedCandidate.selection;
-
         const importFormat =
             selectedCandidate.format;
 
         if (
-            !selection.targetWindow
+            selectedCandidate
+                .windowCandidates
+                .length === 0
         ) {
             throw new Error(
-                "Não foi possível identificar a janela CPT da próxima sequência de LHs.",
+                "Não foi possível identificar nenhuma janela CPT nos dados copiados.",
             );
         }
 
+        /*
+         * A primeira janela encontrada
+         * é usada inicialmente.
+         */
+
+        let selectedWindow =
+            selectedCandidate
+                .windowCandidates[0]
+                .window;
+
+        /*
+         * Mais de uma janela:
+         * abre o modal Foundation.
+         */
+
         if (
+            selectedCandidate
+                .windowCandidates
+                .length > 1
+        ) {
+            button.textContent =
+                "Escolha a janela...";
+
+            selectedWindow =
+                await requestPlanningImportWindow(
+                    selectedCandidate
+                        .windowCandidates,
+                );
+
+            if (!selectedWindow) {
+                button.textContent =
+                    PLANNING_IMPORT_DEFAULT_TEXT;
+
+                return;
+            }
+        }
+
+        const selection =
+            selectedCandidate
+                .windowCandidates
+                .find(
+                    function (candidate) {
+                        return (
+                            candidate.window ===
+                            selectedWindow
+                        );
+                    },
+                )
+                ?.selection;
+
+        if (
+            !selection ||
             selection.lhs.length === 0
         ) {
             throw new Error(
-                `Encontrei a janela ${selection.targetWindow}, mas nenhum LH possuía código, origem e quantidade completos.`,
+                `A janela ${selectedWindow} não possui pelo menos dois LHs consecutivos com o mesmo CPT.`,
             );
         }
 
@@ -1263,7 +1887,7 @@ async function handlePlanningClipboardImport(
         ) {
             const shouldContinue =
                 window.confirm(
-                    `Foram encontrados ${selection.lhs.length} LHs na primeira sequência de ${selection.targetWindow}. Normalmente a lista possui até ${PLANNING_IMPORT_EXPECTED_MAXIMUM}. Deseja importar todos mesmo assim?`,
+                    `Foram encontrados ${selection.lhs.length} LHs no bloco da janela ${selection.targetWindow}. Normalmente a lista possui até ${PLANNING_IMPORT_EXPECTED_MAXIMUM}. Deseja importar todos mesmo assim?`,
                 );
 
             if (!shouldContinue) {
@@ -1296,20 +1920,13 @@ async function handlePlanningClipboardImport(
         );
 
         const ignoredParts = [];
+        const includedParts = [];
 
         if (
-            selection.skippedWaiting > 0
+            selection.skippedUngrouped > 0
         ) {
             ignoredParts.push(
-                `${selection.skippedWaiting} com Waiting`,
-            );
-        }
-
-        if (
-            selection.skippedIncomplete > 0
-        ) {
-            ignoredParts.push(
-                `${selection.skippedIncomplete} incompleto(s)`,
+                `${selection.skippedUngrouped} fora de um agrupamento válido`,
             );
         }
 
@@ -1318,6 +1935,41 @@ async function handlePlanningClipboardImport(
         ) {
             ignoredParts.push(
                 `${selection.skippedDuplicates} duplicado(s)`,
+            );
+        }
+
+        if (
+            selection
+                .skippedWaitingWithoutWindow > 0
+        ) {
+            ignoredParts.push(
+                `${selection.skippedWaitingWithoutWindow} com Waiting e sem CPT`,
+            );
+        }
+
+        if (
+            selection
+                .includedWithoutQuantity > 0
+        ) {
+            includedParts.push(
+                `${selection.includedWithoutQuantity} sem quantidade`,
+            );
+        }
+
+        if (
+            selection.includedWaiting > 0
+        ) {
+            includedParts.push(
+                `${selection.includedWaiting} com Waiting`,
+            );
+        }
+
+        if (
+            selection
+                .includedWithoutWindow > 0
+        ) {
+            includedParts.push(
+                `${selection.includedWithoutWindow} sem CPT`,
             );
         }
 
@@ -1331,8 +1983,8 @@ async function handlePlanningClipboardImport(
                 ? `Ignorados: ${ignoredParts.join(", ")}.`
                 : "Nenhum registro precisou ser ignorado.",
 
-            selection.stoppedByWindow
-                ? `Leitura encerrada ao encontrar a janela ${selection.stoppedByWindow}.`
+            includedParts.length > 0
+                ? `Incluídos: ${includedParts.join(", ")}.`
                 : "",
         ]
             .filter(
@@ -1408,6 +2060,7 @@ function initializePlanningImport() {
 }
 
 export {
+    getPlanningSpXDetectedWindows,
     initializePlanningImport,
     parsePlanningSpXHtml,
     parsePlanningSpXPlainText,
