@@ -1916,10 +1916,65 @@ async function handlePlanningClipboardImport(
          * é usada inicialmente.
          */
 
-        let selectedWindow =
+        const validWindowCandidates =
             selectedCandidate
-                .windowCandidates[0]
+                .windowCandidates
+                .filter(
+                    function (candidate) {
+                        return candidate
+                            .selection
+                            .lhs
+                            .length > 0;
+                    },
+                );
+
+        if (
+            validWindowCandidates
+                .length === 0
+        ) {
+            throw new Error(
+                "Nenhuma das janelas encontradas possui um agrupamento válido de LHs.",
+            );
+        }
+
+        let selectedWindow =
+            validWindowCandidates[0]
                 .window;
+
+        /*
+        * O Reveal só será aberto quando
+        * houver mais de uma janela válida.
+        */
+
+        if (
+            validWindowCandidates
+                .length > 1
+        ) {
+            button.textContent =
+                "Escolha a janela...";
+
+            selectedWindow =
+                await requestPlanningImportWindow(
+                    validWindowCandidates,
+                );
+
+            if (!selectedWindow) {
+                button.textContent =
+                    PLANNING_IMPORT_DEFAULT_TEXT;
+
+                return;
+            }
+        }
+
+        const selection =
+            validWindowCandidates
+                .find(
+                    function (candidate) {
+                        return candidate.window ===
+                            selectedWindow;
+                    },
+                )
+                ?.selection;
 
         /*
          * Mais de uma janela:
