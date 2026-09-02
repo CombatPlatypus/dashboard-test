@@ -1594,6 +1594,54 @@
                 </div>
             </div>
         </div>
+
+        <!-- MODAL - SELEÇÃO DA JANELA DO PLANEJAMENTO -->
+
+        <div
+            class="reveal tiny"
+            id="planningImportWindowModal"
+            data-reveal
+            data-close-on-click="false"
+            aria-labelledby="planningImportWindowTitle">
+
+            <h3 id="planningImportWindowTitle">
+                Selecionar Janela
+            </h3>
+
+            <p id="planningImportWindowDescription">
+                Escolha a janela que será importada para o planejamento.
+            </p>
+
+            <fieldset
+                class="fieldset"
+                id="planningImportWindowOptions">
+            </fieldset>
+
+            <div class="flex-box-end">
+                <button
+                    class="button"
+                    id="planningImportWindowCancel"
+                    type="button">
+                    Cancelar
+                </button>
+
+                <button
+                    class="button"
+                    id="planningImportWindowConfirm"
+                    type="button">
+                    Importar Janela
+                </button>
+            </div>
+
+            <button
+                class="close-button"
+                type="button"
+                data-close
+                aria-label="Fechar seleção de janela">
+
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
         
         <!-- JS - BARRA DE CARREGAMENTO -->  
 
