@@ -68,6 +68,10 @@
                 margin-left: auto;
                 overflow-y: auto;
                 outline: none;
+                background-color: rgb(31, 31, 31);
+                border: 2px solid rgb(82, 82, 82);
+                border-radius: 5px;
+                padding: 30px;
             }
             .reveal .flex-box-center {
                 column-gap: 10px;
@@ -92,8 +96,10 @@
             }
             .reveal .close-button {
                 position: absolute;
+                top: 15px;
+                right: 30px;
                 z-index: 10;
-                color: #8a8a8a;
+                color: #F44336;
                 cursor: pointer;
                 font-size: 2em;
                 line-height: 1;
@@ -171,8 +177,14 @@
                 border-top: 2px solid #525252;
                 border-bottom: 2px solid #525252;
             }
+            #planningImportWindowOptions div {
+                cursor: pointer;
+                width: max-content;
+            }
             #planningImportWindowOptions input{
                 margin-right: 10px;
+                cursor: pointer;
+
             }
 
         </style>
@@ -1759,10 +1771,6 @@
                     Importar Janela
                 </button>
             </div>
-
-            <button class="close-button" type="button" data-close>
-                <span aria-hidden="true">&times;</span>
-            </button>
         </div>
         
         <!-- JS - BARRA DE CARREGAMENTO -->  
