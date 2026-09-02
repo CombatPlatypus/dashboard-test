@@ -31,7 +31,156 @@
 
         <!-- ESTILOS TEMPORARIOS NÃO FINALIZADOS -->
 
-        <style></style>
+        <style>
+
+            /* DEFINE O ESTILO DE TODOS OS PAINEIS REVEAL */
+
+            body.is-reveal-open {
+                overflow: hidden;
+            }
+            html.is-reveal-open, html.is-reveal-open body {
+                min-height: 100%;
+                overflow: hidden;
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
+            .reveal-overlay {
+                position: fixed;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                left: 0;
+                z-index: 99999;
+                display: none;
+                background-color: rgba(10, 10, 10, 0.45);
+                overflow-y: scroll;
+            }
+            .reveal {
+                z-index: 1006;
+                -webkit-backface-visibility: hidden;
+                backface-visibility: hidden;
+                display: none;
+                position: relative;
+                top: 100px;
+                margin-right: auto;
+                margin-left: auto;
+                overflow-y: auto;
+                outline: none;
+            }
+            .reveal .container-style {
+                background-color: #1d1e1f;
+                border: 2px solid #393a3b;
+                border-radius: 5px;
+            }
+            .reveal .container-title {
+                padding: 20px;
+                border-bottom: 2px solid #393a3b;
+                display: -webkit-flex;
+                display: flex;
+                -webkit-flex-wrap: wrap;
+                flex-wrap: wrap;
+                -webkit-justify-content: space-between;
+                justify-content: space-between;
+            }
+            .reveal .container-title h4 {
+                margin-bottom: 0px;
+            }
+            .reveal .container-content {
+                padding: 35px 35px;
+            }
+            .reveal .button-support {
+                margin-top: 0;
+            }
+            .reveal .type-accordion {
+                min-height: auto;
+            }
+            .reveal .accordion-content ul {
+                margin-bottom: 0;
+                margin-left: 2rem;
+                list-style: disc;
+            }
+            .reveal .accordion-content ul li{
+                font-size: 16px;
+            }
+            .reveal .accordion .accordion-item:last-of-type ul li:last-of-type{
+                margin-bottom: 20px;
+            }
+            .standard-reveal {
+                max-width: 650px;
+            }
+            .small-reveal {
+                max-width: 450px;
+                user-select: none;
+            }
+            [data-whatinput='mouse'] .reveal {
+                outline: 0;
+            }
+            @media print, screen and (min-width: 40em) {
+                .reveal {
+                    min-height: 0;
+            }
+            }
+            .reveal .column {
+                min-width: 0;
+            }
+            .reveal > :last-child {
+                margin-bottom: 0;
+            }
+            .reveal.collapse {
+                padding: 0;
+            }
+            @media print, screen and (min-width: 40em) {
+                .reveal.tiny {
+                    width: 30%;
+                    max-width: 75rem;
+            }
+            }
+            @media print, screen and (min-width: 40em) {
+                .reveal.small {
+                    width: 50%;
+                    max-width: 75rem;
+            }
+            }
+            @media print, screen and (min-width: 40em) {
+                .reveal.large {
+                    width: 90%;
+                    max-width: 75rem;
+            }
+            }
+            .reveal.full {
+                top: 0;
+                left: 0;
+                width: 100%;
+                max-width: none;
+                height: 100%;
+                height: 100vh;
+                min-height: 100vh;
+                margin-left: 0;
+                border: 0;
+                border-radius: 0;
+            }
+            @media screen and (max-width: 39.9375em) {
+                .reveal {
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    max-width: none;
+                    height: 100%;
+                    height: 100vh;
+                    min-height: 100vh;
+                    margin-left: 0;
+                    border: 0;
+                    border-radius: 0;
+            }
+            }
+            .reveal.without-overlay {
+                position: fixed;
+            }
+
+
+        </style>
     </head>	
 
     <!-- CONTEÚDO DA PÁGINA -->
