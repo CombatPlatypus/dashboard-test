@@ -272,7 +272,6 @@
         margin-bottom: 0;
         border-bottom: none;
     }
-
     #receipt td {
         text-align: center;
     }
@@ -543,6 +542,26 @@
     }
     .input-group.operation, .input-group.fleet {
         grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)) !important;
+    }
+
+    /* PLANEJAMENTO - REVEAL */
+
+    #planningImportWindowOptions {
+        margin: 20px 0;
+        display: flex;
+        flex-direction: column;
+        row-gap: 10px;
+        padding: 20px 0;
+        border-top: 2px solid #525252;
+        border-bottom: 2px solid #525252;
+    }
+    #planningImportWindowOptions div {
+        cursor: pointer;
+        width: max-content;
+    }
+    #planningImportWindowOptions input{
+        margin-right: 10px;
+        cursor: pointer;
     }
 
     /* PLANEJAMENTO - RESPONSIVIDADE */
