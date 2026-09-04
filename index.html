@@ -83,12 +83,15 @@
                 gap: 15px;
             }
             #expedition #expedition-charts .charts > div {
-                position: relative;
-                flex: 1 1 auto;
-                min-height: 300px;
-                width: 100%;
-                height: auto;
-                margin-top: 15px;
+                display: flex;
+                flex-direction: column;
+                min-width: 0;
+                min-height: 460px;
+                height: 100%;
+                padding: 20px;
+                background-color: #1c1c1c;
+                border: 1px solid #525252;
+                border-radius: 0 0 5px 5px;
             }
             #expedition #expedition-charts .charts > div > h3 {
                 margin: 0 0 5px;
@@ -1198,6 +1201,18 @@
                                         <h4>Análise de Erros</h4>
                                     </a>
                                 </li>
+
+                                <li class="tabs-title">
+                                    <a href="#expedition-streets">
+                                        <h4>Análise de Ruas</h4>
+                                    </a>
+                                </li>
+
+                                <li class="tabs-title">
+                                    <a href="#expedition-damage">
+                                        <h4>Avarias e Pacotes Off</h4>
+                                    </a>
+                                </li>
                             </ul> 
                             
                             <!-- CONTEÚDO -->
@@ -1297,19 +1312,158 @@
                                                         </div>
                                                     </div>
                                                 </div>
-
                                             </div>
                                         </div>
 
                                         <div class="tabs-panel" id="expedition-mistakes">
-                                            <div class="preview-style" id="expeditionMistakestExportArea">
+                                            <div class="preview-style" id="expeditionMistakesExportArea">
                                                 <div class="title">
                                                     <h2>Análise de Erros</h2>
                                                 </div>
 
+                                                <table>
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Erros de Sorting</th>
+                                                            <th>Erros de Etiquetagem</th>
+                                                            <th>Total de Erros</th>
+                                                            <th>Taxa de Erros</th>
+                                                        </tr>
+                                                    </thead>
 
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+
+                                                <table>
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Rua mais Ofensora</th>
+                                                            <th>Guardião da Rua</th>
+                                                            <th>Erros da Rua</th>
+                                                            <th>Taxa de Erros</th>
+                                                        </tr>
+                                                    </thead>
+
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+
+                                                <table>
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Erros Revertidos</th>
+                                                            <th>De Sorting Revertidos</th>
+                                                            <th>De Etiqueta Revertidos</th>
+                                                            <th>Taxa de Revertidos</th>
+                                                        </tr>
+                                                    </thead>
+
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+
+                                                <table>
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Saldo Final - Sorting</th>
+                                                            <th>Saldo Final - Etiquetagem</th>
+                                                            <th>Saldo Final de Erros</th>
+                                                            <th>Taxa Final</th>
+                                                        </tr>
+                                                    </thead>
+
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
                                             </div>
                                         </div>
+
+                                         <div class="tabs-panel" id="expedition-streets">
+                                            <div class="preview-style" id="expeditionStreetsExportArea">
+                                                <div class="title">
+                                                    <h2>Análise de Ruas</h2>
+                                                </div>
+
+
+                                                <table>
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Rua</th>
+                                                            <th>Guardião</th>
+                                                            <th>Erros de Sorting</th>
+                                                            <th>Erros de Etiquetagem</th>
+                                                            <th>Taxa de Erros</th>
+                                                        </tr>
+                                                    </thead>
+
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                         </div>
+
+                                         <div class="tabs-panel" id="expedition-damage">
+                                            <div class="preview-style" id="expeditionDamageExportArea">
+                                                <div class="title">
+                                                    <h2>Avarias e Pacotes Off</h2>
+                                                </div>
+
+
+                                                <table>
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Rota</th>
+                                                            <th>Responsável da Rota</th>
+                                                            <th>BR do Pacote</th>
+                                                            <th>Situação</th>
+                                                            <th>Último a Recebeer</th>
+                                                        </tr>
+                                                    </thead>
+
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                         </div>
                                     </div>
                                 </div>
 
@@ -1890,7 +2044,6 @@
         <script src="js/libraries/html2canvas.min.js"></script>
         <script src="js/libraries/xlsx.full.min.js"></script>
         <script src="js/libraries/chart.umd.min.js"></script>
-        <script src="js/libraries/htmx.min.js"></script>
 
         <!-- JS - PAINEL DE PLANILHAS -->  
 

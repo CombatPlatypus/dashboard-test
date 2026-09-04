@@ -834,11 +834,6 @@
     #receipt #receipt-charts .cards p:last-child {
         margin: 0;
     }
-    #receipt .receipt-comparison-chart-container {
-        position: relative;
-        width: 100%;
-        margin-top: 15px;
-    }
     #receipt #receipt-charts > .preview-style {
         box-sizing: border-box;
         height: calc(var(--receipt-comparison-height, auto) - 129px);
