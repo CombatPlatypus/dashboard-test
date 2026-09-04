@@ -31,7 +31,90 @@
 
         <!-- ESTILOS TEMPORARIOS NÃO FINALIZADOS -->
 
-        <style></style>
+        <style>
+
+            #expedition .tabs {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            }
+
+            /* CARDS */
+
+            #expedition #expedition-charts .cards {
+                display: grid;
+                grid-template-columns:
+                    repeat(
+                        auto-fit,
+                        minmax(300px, 1fr)
+                    );
+                gap: 15px;
+                width: 100%;
+            }
+            #expedition #expedition-charts .cards > div {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 5px;
+                min-width: 0;
+                padding: 25px;
+                background-color: #1c1c1c;
+                border: 1px solid #525252;
+            }
+            #expedition #expedition-charts .cards > div > p:first-of-type {
+                margin: 0 0 5px;
+                color: #a8a9ad;
+                font-size: 13px;
+            }
+            #expedition #expedition-charts .cards > div > h4 {
+                margin: 0;
+                font-size: 18px;
+            }
+            #expedition #expedition-charts .cards > div > p:last-child {
+                margin: 0;
+            }
+
+            /* GRÁFICOS */
+
+            #expedition #expedition-charts .charts {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+                width: 100%;
+                height: auto;
+                gap: 15px;
+            }
+            #expedition #expedition-charts .charts > div {
+                position: relative;
+                flex: 1 1 auto;
+                min-height: 300px;
+                width: 100%;
+                height: auto;
+                margin-top: 15px;
+            }
+            #expedition #expedition-charts .charts > div > h3 {
+                margin: 0 0 5px;
+                text-align: center;
+            }
+            #expedition #expedition-charts .charts > div > p {
+                margin: 0;
+                color: #a8a9ad;
+                font-size: 14px;
+                text-align: center;
+            }
+            #expedition #expedition-charts .charts > div > div {
+                flex: 1 1 auto;
+                width: 100%;
+                min-height: 300px;
+                height: auto;
+                margin-top: 15px;
+                position: relative;
+            }
+            #expedition #expedition-charts .charts > div > div > canvas {
+                display: block;
+                width: 100% !important;
+                height: 100% !important;
+            }
+
+        </style>
     </head>	
 
     <!-- CONTEÚDO DA PÁGINA -->
@@ -40,73 +123,7 @@
 
         <!-- MENU PRINCIPAL -->
 
-        <nav class="main-menu">
-            <div class="flex-box-between">
-                <div class="container-1 flex-box-start">
-                    <img src="images/geral-icons/hub-logo-menu.svg">
-
-                    <div>
-                        <h3>Dashboard do Inventário</h3>
-                        <p><i>Um agregado de ferramentas.</i></p>
-                    </div>
-                </div>
-
-                <ul class="flex-box-start tabs" data-tabs id="switch-1">
-                    <li class="tabs-title">
-                        <a href="#spreadsheets">
-                            <div class="flex-box-center">
-                                <img src="images/geral-icons/sheets-icon.svg">
-                                <h4>Planilhas</h4>
-                            </div>
-                        </a>
-                    </li> 
-
-                    <li class="tabs-title is-active">
-                        <a href="#reports">
-                            <div class="flex-box-center">
-                                <img src="images/geral-icons/reports-icon.svg">
-                                <h4>Relatórios</h4>
-                            </div>
-                        </a>
-                    </li> 
-
-                    <li class="tabs-title">
-                        <a href="#statistics">
-                            <div class="flex-box-center">
-                                <img src="images/geral-icons/magnifier-icon.svg">
-                                <h4>Análises</h4>
-                            </div>
-                        </a>
-                    </li> 
-
-                    <div class="external-links">
-                        <a data-toggle="external-links">
-                            <img src="images/menu-icons/link-icon.svg">
-                        </a>
-
-                        <a href="https://docs.google.com/spreadsheets/d/1IS4QDnMenXTi07FhiL-nFINrEjLppAfZhSlogZq22hY/edit?gid=0#gid=0" target="_blank">
-                            <img src="images/menu-icons/settings-icon.svg">
-                        </a>
-                    </div>
-
-                    <div class="dropdown-pane" id="external-links" data-dropdown data-position="bottom" data-alignment="center" data-auto-focus="true" data-close-on-click="true">
-                        <a href="https://www.appsheet.com/start/9898e1c7-28cc-4bcc-9e15-b13a73533544?platform=desktop#appName=AVARIASLSP-63-957299733-25-10-22&vss=H4sIAAAAAAAAA6WRzU7CQBDHX4XMuREoWGBPihhjjB8BwoUSM7ZT2dh2m90tSJo-jM_iiznLR_TgBbjtzsxv5v-fqWAlaT2xGH2AmFe_vwfagIAqhOmmoBBECDcqt1qlIXghPGG2C758f73LHNsh1OCBIdTRcko6Y3Y49oPu4LLd6wwGfvuZ0xbfUnLoVE22lVx1vUIt0UDtnT78dUQWZeo01Avv0MaSAVEdZ0GcuwEZU25lIkm7Xo7kHnuO047iwIFh15CV27VsBTNTc-gU42co_9PlWAN79B8fMFbrnQ6M-v2g0_NFo9VttoKm3_ID0VhJq_SFkRmqK7NUBdFFpDKecKdVWQwZnPMpJ0rbw3tECZapnWFausvOF7XbVaKi0lA8Y--nezb3-e1ngXn8qGIWn2BqqP4BMXkggBsDAAA=&row=ac886372:%2004/06/2026:%20vitor.simao@shopee.com&view=P%C3%A1gina1_Detail" target="_blank" class="link-button">
-                            <div class="flex-box-center">
-                                <img src="images/links-icons/avarias-icon.svg" style="margin-right: 10px;">
-                                <h4>Avárias</h4>
-                            </div>
-                        </a>
-                        
-                        <a href="https://www.appsheet.com/start/e90438ea-37a9-47f7-a28f-1499b53fbd35#appName=ColetasLMHub-510641030&page=gallery&sort=%5B%5D&table=MenuInicial&view=Menu" target="_blank" class="link-button">
-                            <div class="flex-box-center">
-                                <img src="images/links-icons/coleta-icon.svg" style="margin-right: 10px;">
-                                <h4>Coletas</h4>
-                            </div>
-                        </a>
-                    </div>
-                </ul> 
-            </div>        
-        </nav>
+        <nav class="main-menu" hx-get="html/menu.html" hx-trigger="load" hx-swap="outerHTML"></nav>
 
         <!-- ESTRUTURA PRINCIPAL -->
 
@@ -151,7 +168,7 @@
                             </li> 
 
                             <li class="tabs-title">
-                                <a href="#l">
+                                <a href="#expedition">
                                     <div class="flex-box-full-center">
                                         <h4>Expedição</h4>
                                     </div>
@@ -1092,6 +1109,174 @@
                                 </div>
                             </div>
                         </div>
+
+                        <div class="tabs-panel" id="expedition">
+
+                            <!-- HEADER -->
+
+                            <ul class="tabs flex-box-start" data-tabs id="expedition-view-tabs">
+                                <li class="tabs-title is-active">
+                                    <a href="#expedition-tables">
+                                        <h4>Relatório Principal</h4>
+                                    </a>
+                                </li> 
+
+                                <li class="tabs-title">
+                                    <a href="#expedition-charts">
+                                        <h4>Comparação de Conferentes</h4>
+                                    </a>
+                                </li>
+
+                                <li class="tabs-title">
+                                    <a href="#expedition-mistakes">
+                                        <h4>Análise de Erros</h4>
+                                    </a>
+                                </li>
+                            </ul> 
+                            
+                            <!-- CONTEÚDO -->
+
+                            <div class="flex-box-start">
+
+                                <!-- PPÉVIA -->
+
+                                <div class="preview" id="expeditionSheetPreview">
+                                    <div class="tabs-content" data-tabs-content="expedition-view-tabs">
+                                        <div class="tabs-panel is-active" id="expedition-tables">
+                                            <div class="preview-style" id="expeditionReportExportArea">
+                                                <div class="title">
+                                                    <h2>Relatório de Conferência</h2>
+                                                </div>
+
+                                                <table>
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Volume Conferido</th>
+                                                            <th>Rotas Conferidas</th>
+                                                            <th>Rotas no Piso</th>
+                                                            <th>Total de Rotas</th>
+                                                        </tr>
+                                                    </thead>
+
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+
+                                                <table>
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Conferente</th>
+                                                            <th>Rotas Feitas</th>
+                                                            <th>Tempo Médio</th>
+                                                        </tr>
+                                                    </thead>
+
+                                                    <tbody id="expeditionPreviewOperatorBody">
+                                                        <tr>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                            
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+
+                                        <div class="tabs-panel" id="expedition-charts">
+                                            <div class="preview-style" id="expeditionChartstExportArea">
+                                                <div class="title">
+                                                    <h2>Comparação do Conferentes</h2>
+                                                </div>
+
+                                                <div class="cards">
+                                                    <div>
+                                                        <p>Maior Quantidade de Rotas</p>
+                                                        <h4>—</h4>
+                                                        <p>0 Rotas Conferidas</p>
+                                                    </div>
+
+                                                    <div>
+                                                        <p>Conferente Mais Rápido</p>
+                                                        <h4>—</h4>
+                                                        <p>Melhor Tempo</p>
+                                                    </div>
+                                                </div>
+
+                                                <div class="charts">
+                                                    <div>
+                                                        <h3>Rotas Conferidas por Conferente</h3>
+                                                        <p>Distribuição das rotas conferidas.</p>
+
+                                                        <div>
+                                                            <canvas id="expeditionVolumeComparisonChart" role="img">
+                                                                Seu navegador não suporta gráficos em canvas.
+                                                            </canvas>
+                                                        </div>
+                                                    </div>
+
+                                                    <div>
+                                                        <h3>Média de Tempo por Conferente</h3>
+
+                                                        <div>
+                                                            <canvas id="expeditionTimeComparisonChart" role="img">
+                                                                Seu navegador não suporta gráficos em canvas.
+                                                            </canvas>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+                                        <div class="tabs-panel" id="expedition-mistakes">
+                                            <div class="preview-style" id="expeditionMistakestExportArea">
+                                                <div class="title">
+                                                    <h2>Análise de Erros</h2>
+                                                </div>
+
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- CONTROLES DO RELATÓRIO -->
+
+                                <div class="report-controls">
+                                    <div class="history-link flex-box-start">
+                                        <a href="https://spx.shopee.com.br/#/generalReceiveTaskMgt" target="_blank">
+                                            <svg class="spreadsheets-link-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                                <path d="M7 17L17 7M9 7H17V15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                            </svg>
+                                        </a>
+
+                                        <div>
+                                            <h4>Gestão de Audit</h4>
+                                            <p>Exporte do SPX e importe aqui.</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="history-import flex-box-start">
+                                        <div>
+                                            <button class="button" id="receiptImportButton" type="button">
+                                                Importar Conferência
+                                            </button>
+                                        </div>
+
+                                        <input id="receiptFileInput" type="file" accept=".csv,.xlsx,.xls" hidden>
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -1639,6 +1824,7 @@
         <script src="js/libraries/html2canvas.min.js"></script>
         <script src="js/libraries/xlsx.full.min.js"></script>
         <script src="js/libraries/chart.umd.min.js"></script>
+        <script src="js/libraries/htmx.min.js"></script>
 
         <!-- JS - PAINEL DE PLANILHAS -->  
 
