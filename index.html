@@ -1223,6 +1223,7 @@
 
                                 <div class="preview" id="expeditionSheetPreview">
                                     <div class="tabs-content" data-tabs-content="expedition-view-tabs">
+
                                         <div class="tabs-panel is-active" id="expedition-tables">
                                             <div class="preview-style" id="expeditionReportExportArea">
                                                 <div class="title">
@@ -1464,6 +1465,25 @@
                                                 </table>
                                             </div>
                                          </div>
+
+                                    </div>
+
+                                    <!-- FOOTER -->
+
+                                    <div class="footer flex-box-between">
+                                        <div class="flex-box-start report-warning" id="expeditionReportStatus" role="status" aria-live="polite" aria-atomic="true">
+                                            <img id="expeditionReportStatusIcon" src="images/geral-icons/alert-icon.svg" alt="">
+
+                                            <p id="expeditionReportStatusText">
+                                                O relatório ainda aguarda informações.
+                                            </p>
+                                        </div>
+
+                                        <div>
+                                            <button class="button" id="expeditionClearReportButton" type="button" disabled>Limpar Relatório</button>
+                                            <button class="button" id="expeditionCopyReportButton" type="button" disabled>Copiar Relatório</button>
+                                            <button class="button" id="expeditionDownloadReportButton" type="button" disabled>Baixar Relatório</button>
+                                        </div>
                                     </div>
                                 </div>
 
