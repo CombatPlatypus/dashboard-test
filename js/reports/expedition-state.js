@@ -172,6 +172,10 @@ function createExpeditionRoute(
 const expeditionState = {
     window: "AM",
     sourceFileName: "",
+
+    routesOnFloor:
+        null,
+
     unknownOrders: null,
     exceptionOrders: null,
 
@@ -263,6 +267,9 @@ function getExpeditionState() {
 
         sourceFileName:
             expeditionState.sourceFileName,
+
+        routesOnFloor:
+            expeditionState.routesOnFloor,
 
         unknownOrders:
             expeditionState.unknownOrders,
@@ -457,12 +464,9 @@ function getExpeditionSummary(
     operatorCount:
         selectedOperatorCount,
 
-        routesOnFloor:
-            Math.max(
-                routes.length -
-                    validatedRoutes.length,
-                0,
-            ),
+    routesOnFloor:
+        state.routesOnFloor ??
+        null,
 
         expeditionDurationSeconds:
             canCalculateExpeditionDuration
@@ -746,6 +750,7 @@ function updateExpeditionManualQuantity(
     value,
 ) {
     if (
+        field !== "routesOnFloor" &&
         field !== "unknownOrders" &&
         field !== "exceptionOrders"
     ) {
@@ -876,6 +881,18 @@ function replaceExpeditionRoutes(
                 },
             );
 
+    const validatedRouteCount =
+        expeditionState.routes.filter(
+            isExpeditionValidatedRoute,
+        ).length;
+
+    expeditionState.routesOnFloor =
+        Math.max(
+            expeditionState.routes.length -
+                validatedRouteCount,
+            0,
+        );
+
     expeditionState.sourceFileName =
         normalizeExpeditionText(
             sourceFileName,
@@ -903,6 +920,9 @@ function replaceExpeditionRoutes(
 function resetExpeditionReport() {
     expeditionState.window =
         "AM";
+
+    expeditionState.routesOnFloor =
+        null;
 
     expeditionState.sourceFileName =
         "";

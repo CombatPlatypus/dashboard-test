@@ -519,7 +519,7 @@ function createExpeditionOperatorControl(
         true;
 
     nameInput.disabled =
-        true;
+        !operator;
 
     const checkbox =
         document.createElement(
@@ -882,6 +882,9 @@ function renderExpeditionReport(
             : null,
     );
 
+    elements.floorRoutesInput.disabled =
+        !summary.hasData;
+
     setExpeditionInputValue(
         elements.unknownInput,
         summary.unknownOrders,
@@ -972,6 +975,11 @@ function bindExpeditionEvents(
             },
         );
     }
+
+    bindManualQuantityInput(
+        elements.floorRoutesInput,
+        "routesOnFloor",
+    );
 
     bindManualQuantityInput(
         elements.unknownInput,
