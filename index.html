@@ -71,7 +71,7 @@
                 transform: none;
                 content: '';
             }
-            .checkbox > input {
+            .checkbox > input:last-of-type {
                 position: absolute;
                 margin-bottom: 0;
                 opacity: 0;
@@ -1685,13 +1685,10 @@
 
                                         <div>
                                             <h4>Conferente</h4>
-                                            <div class="flex-box-start">
+                                            <div class="checkbox flex-box-start">
                                                 <input id="" type="text" maxlength="8" readonly disabled>
                                                 <input type="checkbox" id="checker01">
-
-                                                <div class="checkbox">
-                                                    <label for="checker01"></label>
-                                                </div>
+                                                <label for="checker01"></label>
                                             </div>
                                         </div>
 
