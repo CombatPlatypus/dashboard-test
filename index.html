@@ -205,7 +205,29 @@
                 position: relative;
             }
 
-            
+            #expedition .streets {
+                column-gap: 15px;
+            }
+            #expedition .streets h4, p {
+                margin: 0;
+            }
+            #expedition .streets p {
+                font-size: 14px;
+            }
+            #expedition .streets .streets-chart {
+                flex: 1 1 0;
+            }
+            #expedition .streets .streets-card {
+                flex: 0 0 400px;
+            }
+            #expedition .streets .streets-chart, #expedition .streets .streets-card {
+                padding: 20px;
+                background-color: #1c1c1c;
+                border: 1px solid #525252;
+            }
+
+
+
 
             /* CONTROLES */
 
@@ -1624,21 +1646,22 @@
                                                     </tbody>
                                                 </table>
 
-                                                <div>
-
+                                                <div class="streets flex-box-start">
                                                     <div class="streets-chart">
                                                         <div class="chart-title">
                                                             <div class="flex-box-between">
                                                                 <h4>Erros por Rua</h4>
 
-                                                                <div>
-                                                                    <div></div>
-                                                                    <p>Sorting</p>
-                                                                </div>
+                                                                <div class="flex-box-start">
+                                                                    <div>
+                                                                        <div></div>
+                                                                        <p>Sorting</p>
+                                                                    </div>
 
-                                                                <div>
-                                                                    <div></div>
-                                                                    <p>Etiquetagem</p>
+                                                                    <div>
+                                                                        <div></div>
+                                                                        <p>Etiquetagem</p>
+                                                                    </div>
                                                                 </div>
 
                                                             </div>
