@@ -7,7 +7,7 @@
 }
 #reports > .flex-box-start {
     max-width: 1300px;
-    margin: 0 auto 30px auto;
+    margin: 0 auto 20px auto;
     column-gap: 15px;
     align-items: center;
 }
