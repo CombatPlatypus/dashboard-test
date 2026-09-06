@@ -36,7 +36,7 @@
             /* CHECKBOX PERSONALIZADA */
 
             .checkbox {
-                height: 25px;
+                height: 40px;
                 position: relative;
                 outline: 0;
                 font-size: 0.875rem;
@@ -70,12 +70,15 @@
                 transform: none;
                 content: '';
             }
-            .checkbox > input:last-of-type {
+            .checkbox > input[type="checkbox"] {
                 position: absolute;
+                width: 1px;
+                height: 1px;
+                overflow: hidden;
                 margin-bottom: 0;
                 opacity: 0;
             }
-            .checkbox > input:checked + label::after {
+            .checkbox > input[type="checkbox"]:checked + label::after {
                 content: '✕';
                 font-size: 25px;
                 text-align: center;
@@ -83,6 +86,10 @@
             .checkbox > input[type="checkbox"]:disabled + label {
                 cursor: not-allowed;
                 opacity: 0.5;
+            }
+            .checkbox > input[type="checkbox"]:focus-visible + label {
+                outline: 2px solid #e4e6eb;
+                outline-offset: 2px;
             }
 
             /* AJUSTES ESPECIFICOS */
