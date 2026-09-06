@@ -58,11 +58,15 @@
     /* TABS QUE FICA DENTRO DO RELATÓRIO ESCOLHIDO */
 
     #reports > .tabs-content > .tabs-panel > .tabs {
-        width: 100%;    
+        width: 100%;
         display: grid;
         align-items: center;
         column-gap: 15px;
         margin-bottom: 20px;
+        background-color: #1f1f1f;
+        border: 2px solid #525252;
+        padding: 20px;
+        border-radius: 5px;
     }
     #reports > .tabs-content > .tabs-panel > .tabs .tabs-title {
         width: 100%;
@@ -140,31 +144,22 @@
         padding: 30px;
         margin: 20px 0 0 0;
     }
-    #reports .footer p {
-        margin-bottom: 0;
-        font-size: 14px;
-    }
     #reports .footer > div {
+        width: 100%;
+        height: 45px;
+        overflow: hidden;
         gap: 10px;
         align-items: center;
     }
     #reports .footer > div > img {
         width: 25px;
     }
-    #reports .footer > div:last-of-type {
-        max-width: max-content;
-        height: 45px;
-        overflow: hidden;
-    }
     #reports .footer button {
         min-height: 45px;
         font-size: 14px;
         padding: 10px 15px;
     }
-    #reports .footer .report-warning {
-        width: max-content;
-    }
-                    
+         
     /* CONTROLES */
 
     #reports .report-controls {

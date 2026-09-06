@@ -95,7 +95,7 @@
             /* AJUSTES ESPECIFICOS */
 
             #expedition .tabs {
-                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                grid-template-columns: repeat(auto-fit, minmax(299px, 1fr));
             }
 
             #expedition .report-controls .input-group {
@@ -393,12 +393,15 @@
                         </div>
                     </div>
 
-                    <div class="warning">
+                    <div class="warning" id="reportsNotification" role="status" aria-live="polite" aria-atomic="true" data-notification-type="idle">
                         <div class="flex-box-start">
-                            <img src="images/geral-icons/bell-icon.svg">
-                            <h4>Tudo em silêncio por enquanto.</h4>
-                        </div>                
-                    </div> 
+                            <img id="reportsNotificationIcon" src="images/geral-icons/bell-icon.svg" alt="">
+
+                            <h4 id="reportsNotificationText">
+                                Tudo em silêncio por enquanto.
+                            </h4>
+                        </div>
+                    </div>
 
                     <div class="tabs-content" data-tabs-content="report-choice">
                         <div class="tabs-panel is-active" id="planning">
@@ -1650,14 +1653,6 @@
                                     <!-- FOOTER -->
 
                                     <div class="footer flex-box-between">
-                                        <div class="flex-box-start report-warning" id="expeditionReportStatus" role="status" aria-live="polite" aria-atomic="true">
-                                            <img id="expeditionReportStatusIcon" src="images/geral-icons/alert-icon.svg" alt="">
-
-                                            <p id="expeditionReportStatusText">
-                                                O relatório ainda aguarda informações.
-                                            </p>
-                                        </div>
-
                                         <div>
                                             <button class="button" id="expeditionClearReportButton" type="button" disabled>Limpar Relatório</button>
                                             <button class="button" id="expeditionCopyReportButton" type="button" disabled>Copiar Relatório</button>
