@@ -38,6 +38,14 @@ import {
     initializeReceiptExport,
 } from "./receipt-export.js";
 
+import {
+    initializeExpeditionReport,
+} from "./expedition.js";
+
+import {
+    initializeExpeditionImport,
+} from "./expedition-import.js";
+
 /* INICIALIZA O PAINEL DE RELATÓRIOS */
 
 function initializeReportsPanel() {
@@ -53,6 +61,11 @@ function initializeReportsPanel() {
     initializeReceiptCharts();
     initializeReceiptImport();
     initializeReceiptExport();
+
+    // EXPEDIÇÃO
+
+    initializeExpeditionReport();
+    initializeExpeditionImport();
 
     // TAXA DE PERDAS
 

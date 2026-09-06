@@ -1250,10 +1250,10 @@
 
                                                     <tbody>
                                                         <tr>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
+                                                            <td id="expeditionPreviewVolumeChecked">—</td>
+                                                            <td id="expeditionPreviewValidatedRoutes">—</td>
+                                                            <td id="expeditionPreviewFloorRoutes">—</td>
+                                                            <td id="expeditionPreviewTotalRoutes">—</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
@@ -1269,9 +1269,9 @@
 
                                                     <tbody>
                                                         <tr>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
+                                                            <td id="expeditionPreviewMissing">—</td>
+                                                            <td id="expeditionPreviewDuplicated">—</td>
+                                                            <td id="expeditionPreviewMissorted">—</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
@@ -1389,14 +1389,26 @@
                                                 <div class="cards">
                                                     <div>
                                                         <p>Maior Quantidade de Rotas</p>
-                                                        <h4>—</h4>
-                                                        <p>0 Rotas Conferidas</p>
+
+                                                        <h4 id="expeditionTopRoutesOperator">
+                                                            —
+                                                        </h4>
+
+                                                        <p id="expeditionTopRoutesDetails">
+                                                            0 Rotas Conferidas
+                                                        </p>
                                                     </div>
 
                                                     <div>
                                                         <p>Conferente Mais Rápido</p>
-                                                        <h4>—</h4>
-                                                        <p>Melhor Tempo</p>
+
+                                                        <h4 id="expeditionFastestOperator">
+                                                            —
+                                                        </h4>
+
+                                                        <p id="expeditionFastestOperatorDetails">
+                                                            Melhor Tempo
+                                                        </p>
                                                     </div>
                                                 </div>
 
@@ -1613,19 +1625,21 @@
 
                                     <div class="history-import flex-box-start">
                                         <div>
-                                            <button class="button" id="receiptImportButton" type="button">
-                                                Importar Conferência
-                                            </button>
+                                            <button class="button" id="expeditionImportButton" type="button">Importar Conferência</button>
                                         </div>
 
-                                        <input id="receiptFileInput" type="file" accept=".csv,.xlsx,.xls" hidden>
+                                        <input id="expeditionFileInput" type="file" accept=".csv,.xlsx,.xls" hidden>
                                     </div>
-
+                                    
                                     <div class="input-group">
                                         <div>
                                             <h4>Janela</h4>
 
-                                            <select class="standard-select" id="expeditionWindowInput" disabled>
+                                            <select
+                                                class="standard-select"
+                                                id="expeditionWindowInput"
+                                                disabled
+                                            >
                                                 <option value="AM">AM</option>
                                                 <option value="PM1">PM1</option>
                                                 <option value="PM2">PM2</option>
@@ -1635,21 +1649,41 @@
                                         <div>
                                             <h4>Pacotes Ausentes</h4>
 
-                                            <input id="" type="text" inputmode="numeric" maxlength="8" disabled>
+                                            <input
+                                                id="expeditionMissingInput"
+                                                type="text"
+                                                inputmode="numeric"
+                                                maxlength="8"
+                                                readonly
+                                                disabled
+                                            >
                                         </div>
 
                                         <div>
-                                            <h4>Pacotes Dupiclados</h4>
+                                            <h4>Pacotes Duplicados</h4>
 
-                                            <input id="" type="text" inputmode="numeric" maxlength="8" disabled>
+                                            <input
+                                                id="expeditionDuplicatedInput"
+                                                type="text"
+                                                inputmode="numeric"
+                                                maxlength="8"
+                                                readonly
+                                                disabled
+                                            >
                                         </div>
 
                                         <div>
-                                            <h4>Incorretos</h4>
+                                            <h4>Classificados Incorretamente</h4>
 
-                                            <input id="" type="text" inputmode="numeric" maxlength="8" disabled>
+                                            <input
+                                                id="expeditionMissortedInput"
+                                                type="text"
+                                                inputmode="numeric"
+                                                maxlength="8"
+                                                readonly
+                                                disabled
+                                            >
                                         </div>
-
                                     </div>
 
                                 </div>
