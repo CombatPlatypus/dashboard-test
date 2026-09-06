@@ -33,12 +33,65 @@
 
         <style>
 
+            /*  */
+
+
+            .checkbox {
+                height: 25px;
+                position: relative;
+                margin: 0 10px 0 0;
+                outline: 0;
+                font-size: 0.875rem;
+                font-weight: bold;
+                color: #fefefe;
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
+            .checkbox > label {
+                position: relative;
+                width: 25px;
+                height: 25px;
+                transition: all 0s;
+                font-weight: inherit;
+                background: #18191a;
+                border-radius: 3px;
+            }
+            .checkbox > label::after {
+                position: absolute;
+                display: block;
+                width: 25px;
+                height: 25px;
+                top: 0;
+                left: 0;
+                background: none;
+                border-radius: 0;
+                transition: none;
+                transform: none;
+                content: '';
+            }
+            .checkbox > input:checked ~ .checkbox > label::after {
+                left: 0;
+            }
+            .checkbox > input:checked + .checkbox > label::after {
+                content: '✕';
+                /* content: '✓'; */
+                font-size: 20px;
+                text-align: center;
+                background-color: #18191a;
+            }
+
+            /*  */
+
             #expedition .tabs {
                 grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             }
 
             #expedition .report-controls .input-group {
                 border-bottom: 2px solid #525252;
+                padding-bottom: 20px;
+                margin-bottom: 20px;
             }
             #expedition .report-controls .input-group:last-of-type {
                 padding-bottom: 0;
@@ -1626,7 +1679,14 @@
 
                                         <div>
                                             <h4>Conferente</h4>
-                                            <input id="" type="text" maxlength="8" readonly disabled>
+                                            <div class="flex-box-start">
+                                                <input id="" type="text" maxlength="8" readonly disabled>
+
+                                                <div class="checkbox">
+                                                    <input type="checkbox" id="checker01">
+                                                    <label for="checker01"></label>
+                                                </div>
+                                            </div>
                                         </div>
 
                                         
