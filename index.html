@@ -39,7 +39,6 @@
             .checkbox {
                 height: 25px;
                 position: relative;
-                margin: 0 10px 0 0;
                 outline: 0;
                 font-size: 0.875rem;
                 font-weight: bold;
@@ -71,14 +70,16 @@
                 transform: none;
                 content: '';
             }
+            .checkbox > input {
+                position: absolute;
+                margin-bottom: 0;
+                opacity: 0;
+            }
             .checkbox > input:checked + .checkbox > label::after {
                 content: '✕';
                 font-size: 20px;
                 text-align: center;
                 background-color: #18191a;
-            }
-            .checkbox > input:checked ~ .checkbox > label::after {
-                left: 0;
             }
 
             /*  */
