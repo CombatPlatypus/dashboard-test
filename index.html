@@ -220,26 +220,8 @@
                 width: 100% !important;
             }
             #expedition #expeditionOperatorControls {
-                display: flex;
-                flex-direction: column;
-                gap: 15px;
+                grid-template-columns: repeat(auto-fit, minmax(100%, 1fr)) !important;
             }
-            #expedition .expedition-operator-control {
-                width: 100%;
-            }
-            #expedition .expedition-operator-control > h4 {
-                margin-bottom: 8px;
-            }
-            #expedition .expedition-operator-control .checkbox {
-                gap: 10px;
-            }
-            #expedition
-            .expedition-operator-control
-            .checkbox > input[type="text"] {
-                flex: 1 1 auto;
-                min-width: 0;
-            }
-
 
         </style>
     </head>	
