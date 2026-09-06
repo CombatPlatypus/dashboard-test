@@ -33,8 +33,7 @@
 
         <style>
 
-            /*  */
-
+            /* CHECKBOX PERSONALIZADA */
 
             .checkbox {
                 height: 25px;
@@ -76,14 +75,12 @@
                 margin-bottom: 0;
                 opacity: 0;
             }
-            .checkbox > input:checked + label::after {
-                content: '✕';
-                font-size: 25px;
-                text-align: center;
-                background-color: #18191a;
+            .checkbox > input:disabled + label {
+                cursor: not-allowed;
+                opacity: 0.5;
             }
 
-            /*  */
+            /* AJUSTES ESPECIFICOS */
 
             #expedition .tabs {
                 grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -99,12 +96,6 @@
                 margin-bottom: 0;
                 border-bottom: none;
             }
-            #expedition .input-group [type='checkbox'] {
-                position: absolute;
-                margin-bottom: 0;
-                opacity: 0;
-            }
-
             #expedition td {
                 text-align: center;
             }
@@ -1684,7 +1675,7 @@
                                     <div class="input-group">
 
                                         <div>
-                                            <h4>Conferente</h4>
+                                            <h4>Conferente 01</h4>
                                             <div class="checkbox flex-box-start">
                                                 <input id="" type="text" maxlength="8" readonly disabled>
                                                 <input type="checkbox" id="checker01">
