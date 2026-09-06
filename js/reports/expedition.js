@@ -9,6 +9,10 @@ import {
     updateExpeditionWindow,
 } from "./expedition-state.js";
 
+import {
+    setReportNotification,
+} from "./report-notifications.js";
+
 /* CONFIGURAÇÕES */
 
 const MINIMUM_EXPEDITION_PREVIEW_ROWS =
@@ -262,21 +266,6 @@ function getExpeditionElements() {
                 "expeditionFastestOperatorDetails",
             ),
 
-        reportStatus:
-            document.getElementById(
-                "expeditionReportStatus",
-            ),
-
-        reportStatusIcon:
-            document.getElementById(
-                "expeditionReportStatusIcon",
-            ),
-
-        reportStatusText:
-            document.getElementById(
-                "expeditionReportStatusText",
-            ),
-
         clearButton:
             document.getElementById(
                 "expeditionClearReportButton",
@@ -313,21 +302,12 @@ function hasExpeditionElements(
             ),
         );
 
-        if (
-            elements.reportStatusIcon instanceof
-                HTMLImageElement
-        ) {
-            elements.reportStatusIcon.src =
-                "images/geral-icons/error-icon.svg";
-        }
+        setReportNotification({
+            type: "error",
 
-        if (
-            elements.reportStatusText instanceof
-                HTMLElement
-        ) {
-            elements.reportStatusText.textContent =
-                "Não foi possível inicializar o relatório de expedição.";
-        }
+            message:
+                "Não foi possível inicializar o relatório de expedição.",
+        });
     }
 
     return missingElements.length === 0;
@@ -757,43 +737,6 @@ function renderExpeditionRankingCards(
                 : "Melhor Tempo";
 }
 
-/* STATUS DO RELATÓRIO */
-
-function renderExpeditionStatus(
-    elements,
-    state,
-    summary,
-) {
-    if (!summary.hasData) {
-        elements.reportStatusIcon.src =
-            "images/geral-icons/alert-icon.svg";
-
-        elements.reportStatusText
-            .textContent =
-                "O relatório ainda aguarda informações.";
-
-        elements.clearButton.disabled =
-            true;
-
-        return;
-    }
-
-    elements.reportStatusIcon.src =
-        "images/geral-icons/success-icon.svg";
-
-    elements.reportStatusText
-        .textContent =
-            (
-                `${formatExpeditionQuantity(
-                    summary.totalRoutes,
-                )} rotas importadas de ` +
-                `${state.sourceFileName || "arquivo do SPX"}.`
-            );
-
-    elements.clearButton.disabled =
-        false;
-}
-
 /* RENDERIZA O RELATÓRIO */
 
 function renderExpeditionReport(
@@ -1065,7 +1008,12 @@ function bindExpeditionEvents(
                     );
 
                 if (shouldClear) {
-                    resetExpeditionReport();
+                        setReportNotification({
+                        type: "info",
+
+                        message:
+                            "Relatório de expedição limpo.",
+                    });
                 }
             },
         );
@@ -1103,10 +1051,8 @@ function initializeExpeditionReport() {
 
     subscribeExpeditionState(
         function (state) {
-            renderExpeditionReport(
-                elements,
-                state,
-            );
+            elements.clearButton.disabled =
+                !summary.hasData;
         },
     );
 

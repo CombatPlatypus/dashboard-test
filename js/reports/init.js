@@ -50,9 +50,17 @@ import {
     initializeExpeditionCharts,
 } from "./expedition-charts.js";
 
+import {
+    initializeReportNotifications,
+} from "./report-notifications.js";
+
 /* INICIALIZA O PAINEL DE RELATÓRIOS */
 
 function initializeReportsPanel() {
+
+    // BARRA DE NOTIFICAÇÕES
+
+    initializeReportNotifications();
 
     // PLANEJAMENTO
 

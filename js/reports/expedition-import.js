@@ -4,6 +4,10 @@ import {
     replaceExpeditionRoutes,
 } from "./expedition-state.js";
 
+import {
+    setReportNotification,
+} from "./report-notifications.js";
+
 /* CONFIGURAÇÕES */
 
 const MAX_EXPEDITION_FILE_SIZE =
@@ -636,31 +640,12 @@ async function readExpeditionFile(
 function showExpeditionImportError(
     message,
 ) {
-    const statusIcon =
-        document.getElementById(
-            "expeditionReportStatusIcon",
-        );
+    setReportNotification({
+        type: "error",
 
-    const statusText =
-        document.getElementById(
-            "expeditionReportStatusText",
-        );
-
-    if (
-        statusIcon instanceof
-            HTMLImageElement
-    ) {
-        statusIcon.src =
-            "images/geral-icons/error-icon.svg";
-    }
-
-    if (
-        statusText instanceof
-            HTMLElement
-    ) {
-        statusText.textContent =
-            `Falha na importação: ${message}`;
-    }
+        message:
+            `Falha na importação: ${message}`,
+    });
 
     window.alert(
         message,
@@ -709,21 +694,55 @@ async function importExpeditionFile(
             `${result.routes.length} rotas e ` +
             `${operators.length} conferentes importados.`;
 
+        const importWarnings = [];
+
         if (
             result.duplicateRoutes > 0
         ) {
+            const duplicateMessage =
+                `${result.duplicateRoutes} rota(s) duplicada(s) foram ignoradas.`;
+
             console.warn(
-                `${result.duplicateRoutes} rota(s) duplicada(s) foram ignoradas.`,
+                duplicateMessage,
+            );
+
+            importWarnings.push(
+                duplicateMessage,
             );
         }
 
         if (
             result.inconsistentRoutes > 0
         ) {
+            const inconsistentMessage =
+                `${result.inconsistentRoutes} rota(s) possuem totais incompatíveis.`;
+
             console.warn(
-                `${result.inconsistentRoutes} rota(s) possuem totais incompatíveis para calcular duplicados.`,
+                inconsistentMessage,
+            );
+
+            importWarnings.push(
+                inconsistentMessage,
             );
         }
+
+        setReportNotification({
+            type:
+                importWarnings.length > 0
+                    ? "warning"
+                    : "success",
+
+            message: [
+                `${result.routes.length.toLocaleString(
+                    "pt-BR",
+                )} rotas importadas de ${file.name}.`,
+
+                ...importWarnings,
+            ].join(
+                " ",
+            ),
+        });
+            
     } catch (error) {
         const errorMessage =
             error instanceof Error
