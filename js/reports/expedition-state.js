@@ -162,6 +162,8 @@ function createExpeditionRoute(
 const expeditionState = {
     window: "AM",
     sourceFileName: "",
+    unknownOrders: null,
+    exceptionOrders: null,
     routes: [],
 };
 
@@ -224,6 +226,12 @@ function getExpeditionState() {
         sourceFileName:
             expeditionState.sourceFileName,
 
+        unknownOrders:
+            expeditionState.unknownOrders,
+
+        exceptionOrders:
+            expeditionState.exceptionOrders,
+
         routes:
             expeditionState.routes.map(
                 function (route) {
@@ -282,6 +290,79 @@ function getExpeditionSummary(
             },
         );
 
+    const validationTimes =
+        validatedRoutes.reduce(
+            function (
+                times,
+                route,
+            ) {
+                const startTime =
+                    Date.parse(
+                        String(
+                            route.validationStartTime ||
+                            "",
+                        ).replace(
+                            " ",
+                            "T",
+                        ),
+                    );
+
+                const endTime =
+                    Date.parse(
+                        String(
+                            route.validationEndTime ||
+                            "",
+                        ).replace(
+                            " ",
+                            "T",
+                        ),
+                    );
+
+                if (
+                    Number.isFinite(
+                        startTime,
+                    )
+                ) {
+                    times.first =
+                        Math.min(
+                            times.first,
+                            startTime,
+                        );
+                }
+
+                if (
+                    Number.isFinite(
+                        endTime,
+                    )
+                ) {
+                    times.last =
+                        Math.max(
+                            times.last,
+                            endTime,
+                        );
+                }
+
+                return times;
+            },
+            {
+                first:
+                    Number.POSITIVE_INFINITY,
+
+                last:
+                    Number.NEGATIVE_INFINITY,
+            },
+        );
+
+    const canCalculateExpeditionDuration =
+        Number.isFinite(
+            validationTimes.first,
+        ) &&
+        Number.isFinite(
+            validationTimes.last,
+        ) &&
+        validationTimes.last >=
+            validationTimes.first;
+
     return {
         hasData:
             routes.length > 0,
@@ -298,6 +379,25 @@ function getExpeditionSummary(
                     validatedRoutes.length,
                 0,
             ),
+
+        expeditionDurationSeconds:
+            canCalculateExpeditionDuration
+                ? Math.round(
+                    (
+                        validationTimes.last -
+                        validationTimes.first
+                    ) /
+                    1000,
+                )
+                : null,
+
+        unknownOrders:
+            state.unknownOrders ??
+            null,
+
+        exceptionOrders:
+            state.exceptionOrders ??
+            null,
 
         ...totals,
     };
@@ -352,6 +452,8 @@ function getExpeditionOperatorRanking(
                             volumeChecked: 0,
                             totalDurationSeconds: 0,
                             routesWithDuration: 0,
+                            bestDurationSeconds: null,
+                            worstDurationSeconds: null,
                             missingOrders: 0,
                             duplicatedOrders: 0,
                             missortedOrders: 0,
@@ -380,14 +482,42 @@ function getExpeditionOperatorRanking(
                         route,
                     );
 
-                if (
-                    route.validationDurationSeconds !==
-                        null
-                ) {
-                    summary.totalDurationSeconds +=
-                        route.validationDurationSeconds;
+                const duration =
+                    route.validationDurationSeconds;
 
-                    summary.routesWithDuration += 1;
+                if (
+                    duration !== null &&
+                    duration !== undefined &&
+                    Number.isFinite(
+                        Number(duration),
+                    )
+                ) {
+                    const numericDuration =
+                        Number(duration);
+
+                    summary.totalDurationSeconds +=
+                        numericDuration;
+
+                    summary.routesWithDuration +=
+                        1;
+
+                    summary.bestDurationSeconds =
+                        summary.bestDurationSeconds ===
+                            null
+                            ? numericDuration
+                            : Math.min(
+                                summary.bestDurationSeconds,
+                                numericDuration,
+                            );
+
+                    summary.worstDurationSeconds =
+                        summary.worstDurationSeconds ===
+                            null
+                            ? numericDuration
+                            : Math.max(
+                                summary.worstDurationSeconds,
+                                numericDuration,
+                            );
                 }
             },
         );
@@ -515,6 +645,56 @@ function updateExpeditionWindow(
     return true;
 }
 
+/* ALTERA UMA QUANTIDADE MANUAL */
+
+function updateExpeditionManualQuantity(
+    field,
+    value,
+) {
+    if (
+        field !== "unknownOrders" &&
+        field !== "exceptionOrders"
+    ) {
+        return false;
+    }
+
+    const normalizedValue =
+        normalizeExpeditionQuantity(
+            value,
+        );
+
+    const isEmpty =
+        value === "" ||
+        value === null ||
+        value === undefined;
+
+    if (
+        normalizedValue === null &&
+        !isEmpty
+    ) {
+        return false;
+    }
+
+    if (
+        expeditionState[field] ===
+        normalizedValue
+    ) {
+        return true;
+    }
+
+    expeditionState[field] =
+        normalizedValue;
+
+    notifyExpeditionState({
+        type:
+            "manual-quantity-updated",
+
+        field,
+    });
+
+    return true;
+}
+
 /* SUBSTITUI AS ROTAS IMPORTADAS */
 
 function replaceExpeditionRoutes(
@@ -544,6 +724,12 @@ function replaceExpeditionRoutes(
             sourceFileName,
         );
 
+    expeditionState.unknownOrders =
+        null;
+
+    expeditionState.exceptionOrders =
+        null;
+
     notifyExpeditionState({
         type: "routes-replaced",
     });
@@ -554,12 +740,24 @@ function replaceExpeditionRoutes(
 /* LIMPA O RELATÓRIO */
 
 function resetExpeditionReport() {
-    expeditionState.window = "AM";
-    expeditionState.sourceFileName = "";
-    expeditionState.routes = [];
+    expeditionState.window =
+        "AM";
+
+    expeditionState.sourceFileName =
+        "";
+
+    expeditionState.unknownOrders =
+        null;
+
+    expeditionState.exceptionOrders =
+        null;
+
+    expeditionState.routes =
+        [];
 
     notifyExpeditionState({
-        type: "expedition-reset",
+        type:
+            "expedition-reset",
     });
 
     return true;
@@ -574,5 +772,6 @@ export {
     replaceExpeditionRoutes,
     resetExpeditionReport,
     subscribeExpeditionState,
+    updateExpeditionManualQuantity,
     updateExpeditionWindow,
 };
