@@ -46,6 +46,10 @@ import {
     initializeExpeditionImport,
 } from "./expedition-import.js";
 
+import {
+    initializeExpeditionCharts,
+} from "./expedition-charts.js";
+
 /* INICIALIZA O PAINEL DE RELATÓRIOS */
 
 function initializeReportsPanel() {
@@ -66,6 +70,7 @@ function initializeReportsPanel() {
 
     initializeExpeditionReport();
     initializeExpeditionImport();
+    initializeExpeditionCharts()
 
     // TAXA DE PERDAS
 

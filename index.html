@@ -98,46 +98,101 @@
 
             /* GRÁFICOS */
 
+            #expedition #expedition-charts .preview-style {
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+                box-sizing: border-box;
+                height: var(--expedition-charts-height, 650px);
+                min-height: 0;
+                overflow: hidden;
+            }
+
+            #expedition #expedition-charts .preview-style > .title,
+            #expedition #expedition-charts .cards {
+                flex: 0 0 auto;
+            }
+
             #expedition #expedition-charts .charts {
                 display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+                grid-template-columns:
+                    repeat(
+                        auto-fit,
+                        minmax(420px, 1fr)
+                    );
+                flex: 1 1 0;
                 width: 100%;
-                height: auto;
+                min-height: 0;
+                height: 0;
                 gap: 15px;
             }
+
             #expedition #expedition-charts .charts > div {
                 display: flex;
                 flex-direction: column;
                 min-width: 0;
-                min-height: 460px;
-                height: 100%;
+                min-height: 0;
+                height: auto;
                 padding: 20px;
                 background-color: #1c1c1c;
                 border: 1px solid #525252;
                 border-radius: 0 0 5px 5px;
+                overflow: hidden;
             }
+
             #expedition #expedition-charts .charts > div > h3 {
                 margin: 0 0 5px;
                 text-align: center;
             }
+
             #expedition #expedition-charts .charts > div > p {
                 margin: 0;
                 color: #a8a9ad;
                 font-size: 14px;
                 text-align: center;
             }
+
             #expedition #expedition-charts .charts > div > div {
-                flex: 1 1 auto;
+                position: relative;
+                flex: 1 1 0;
                 width: 100%;
-                min-height: 300px;
+                min-height: 0;
                 height: auto;
                 margin-top: 15px;
-                position: relative;
             }
-            #expedition #expedition-charts .charts > div > div > canvas {
+
+            #expedition #expedition-charts canvas {
                 display: block;
                 width: 100% !important;
                 height: 100% !important;
+            }
+
+            #expedition #expedition-charts .cards h4 {
+                max-width: 100%;
+                text-align: center;
+                overflow-wrap: anywhere;
+            }
+
+            @media screen and (max-width: 1100px) {
+                #expedition #expedition-charts .preview-style {
+                    height: auto;
+                    min-height:
+                        var(
+                            --expedition-charts-height,
+                            650px
+                        );
+                    overflow: visible;
+                }
+
+                #expedition #expedition-charts .charts {
+                    grid-template-columns: 1fr;
+                    flex: none;
+                    height: auto;
+                }
+
+                #expedition #expedition-charts .charts > div {
+                    height: 420px;
+                }
             }
 
             /* CONTROLES */
@@ -1328,7 +1383,7 @@
                                         </div>
 
                                         <div class="tabs-panel" id="expedition-charts">
-                                            <div class="preview-style" id="expeditionChartstExportArea">
+                                            <div class="preview-style" id="expeditionChartsExportArea">
                                                 <div class="title">
                                                     <h2>Rank de Conferentes</h2>
                                                 </div>
@@ -1354,7 +1409,7 @@
                                                         </h4>
 
                                                         <p id="expeditionFastestOperatorDetails">
-                                                            Melhor Tempo
+                                                            Tempo Médio: —
                                                         </p>
                                                     </div>
                                                 </div>
@@ -1365,19 +1420,16 @@
                                                         <p>Distribuição das rotas conferidas.</p>
 
                                                         <div>
-                                                            <canvas id="expeditionVolumeComparisonChart" role="img">
-                                                                Seu navegador não suporta gráficos em canvas.
-                                                            </canvas>
+                                                            <canvas id="expeditionVolumeComparisonChart" role="img"></canvas>
                                                         </div>
                                                     </div>
 
                                                     <div>
                                                         <h3>Média de Tempo por Conferente</h3>
+                                                        <p>Tempo médio para conclusão de cada rota.</p>
 
                                                         <div>
-                                                            <canvas id="expeditionTimeComparisonChart" role="img">
-                                                                Seu navegador não suporta gráficos em canvas.
-                                                            </canvas>
+                                                            <canvas id="expeditionTimeComparisonChart" role="img"></canvas>
                                                         </div>
                                                     </div>
                                                 </div>
