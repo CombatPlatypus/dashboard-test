@@ -880,10 +880,6 @@ function renderExpeditionReport(
         elements.windowInput,
     );
             
-    refreshExpeditionWindowSelect(
-        elements.windowInput,
-    );
-
     renderExpeditionOperators(
         elements,
         selectedOperators,
@@ -899,11 +895,8 @@ function renderExpeditionReport(
         operators,
     );
 
-    renderExpeditionStatus(
-        elements,
-        state,
-        summary,
-    );
+    elements.clearButton.disabled =
+        !summary.hasData;
 }
 
 /* EVENTOS */
@@ -1008,7 +1001,9 @@ function bindExpeditionEvents(
                     );
 
                 if (shouldClear) {
-                        setReportNotification({
+                    resetExpeditionReport();
+
+                    setReportNotification({
                         type: "info",
 
                         message:
@@ -1051,8 +1046,10 @@ function initializeExpeditionReport() {
 
     subscribeExpeditionState(
         function (state) {
-            elements.clearButton.disabled =
-                !summary.hasData;
+            renderExpeditionReport(
+                elements,
+                state,
+            );
         },
     );
 
