@@ -861,13 +861,13 @@
                             <ul class="tabs flex-box-start" data-tabs id="receipt-view-tabs">
                                 <li class="tabs-title is-active">
                                     <a href="#receipt-tables">
-                                        <h4>Relatório Principal</h4>
+                                        <h4>Resumo do Relatório</h4>
                                     </a>
                                 </li> 
 
                                 <li class="tabs-title">
                                     <a href="#receipt-charts">
-                                        <h4>Comparação de Recebedores</h4>
+                                        <h4>Rank de Recebedores</h4>
                                     </a>
                                 </li>
                             </ul> 
@@ -1044,7 +1044,7 @@
                                             <div class="preview-style" id="receiptComparisonExportArea">
                                                 <div class="title">
                                                     <h2>
-                                                        Comparação de Recebedores — <span id="receiptComparisonWindow">AM</span>
+                                                        Rank de Recebedores — <span id="receiptComparisonWindow">AM</span>
                                                     </h2>
                                                 </div>
 
@@ -1174,7 +1174,6 @@
 
                                         <p>Calcular participação no total de erros.</p>
                                     </label>
-
                                 </div>
                             </div>
                         </div>
@@ -1186,13 +1185,13 @@
                             <ul class="tabs flex-box-start" data-tabs id="expedition-view-tabs">
                                 <li class="tabs-title is-active">
                                     <a href="#expedition-tables">
-                                        <h4>Relatório Principal</h4>
+                                        <h4>Resumo do Relatório</h4>
                                     </a>
                                 </li> 
 
                                 <li class="tabs-title">
                                     <a href="#expedition-charts">
-                                        <h4>Comparação de Conferentes</h4>
+                                        <h4>Rank de Conferentes</h4>
                                     </a>
                                 </li>
 
@@ -1274,7 +1273,7 @@
                                         <div class="tabs-panel" id="expedition-charts">
                                             <div class="preview-style" id="expeditionChartstExportArea">
                                                 <div class="title">
-                                                    <h2>Comparação do Conferentes</h2>
+                                                    <h2>Rank de Conferentes</h2>
                                                 </div>
 
                                                 <div class="cards">
@@ -1465,7 +1464,6 @@
                                                 </table>
                                             </div>
                                          </div>
-
                                     </div>
 
                                     <!-- FOOTER -->
@@ -1511,6 +1509,25 @@
                                         </div>
 
                                         <input id="receiptFileInput" type="file" accept=".csv,.xlsx,.xls" hidden>
+                                    </div>
+
+                                    <div class="input-group">
+                                        <div>
+                                            <h4>Janela</h4>
+
+                                            <select class="standard-select" id="expeditionWindowInput" disabled>
+                                                <option value="AM">AM</option>
+                                                <option value="PM1">PM1</option>
+                                                <option value="PM2">PM2</option>
+                                            </select>
+                                        </div>
+
+                                        <div>
+                                            <h4>Volume Esperado</h4>
+
+                                            <input id="expeditionExpectedInput" type="text" inputmode="numeric" maxlength="8" disabled>
+                                        </div>
+
                                     </div>
 
                                 </div>
