@@ -363,6 +363,28 @@ function refreshExpeditionWindowSelect(
     );
 }
 
+/* ATIVA OU DESATIVA OS CONTROLES GERAIS */
+
+function setExpeditionGeneralControlsAvailability(
+    elements,
+    hasImportedFile,
+) {
+    const disabled =
+        !hasImportedFile;
+
+    elements.windowInput.disabled =
+        disabled;
+
+    elements.floorRoutesInput.disabled =
+        disabled;
+
+    elements.unknownInput.disabled =
+        disabled;
+
+    elements.exceptionInput.disabled =
+        disabled;
+}
+
 /* TABELA DOS CONFERENTES */
 
 function createExpeditionOperatorRow(
@@ -518,9 +540,6 @@ function createExpeditionOperatorControl(
     nameInput.readOnly =
         true;
 
-    nameInput.disabled =
-        !operator;
-
     const checkbox =
         document.createElement(
             "input",
@@ -546,6 +565,9 @@ function createExpeditionOperatorControl(
         checkboxId;
 
     if (operator) {
+        nameInput.disabled =
+            false;
+
         const operatorName =
             getExpeditionOperatorName(
                 operator.operator,
@@ -576,6 +598,12 @@ function createExpeditionOperatorControl(
             },
         );
     } else {
+        nameInput.disabled =
+            true;
+
+        checkbox.disabled =
+            true;
+
         checkbox.disabled =
             true;
 
@@ -777,6 +805,14 @@ function renderExpeditionReport(
             state,
         );
 
+    const hasImportedFile =
+        state.routes.length > 0;
+
+    setExpeditionGeneralControlsAvailability(
+        elements,
+        hasImportedFile,
+    );
+
     const operators =
         getExpeditionOperatorRanking(
             state,
@@ -882,9 +918,6 @@ function renderExpeditionReport(
             : null,
     );
 
-    elements.floorRoutesInput.disabled =
-        !summary.hasData;
-
     setExpeditionInputValue(
         elements.unknownInput,
         summary.unknownOrders,
@@ -895,18 +928,15 @@ function renderExpeditionReport(
         summary.exceptionOrders,
     );
 
-    elements.unknownInput.disabled =
-        !summary.hasData;
+    setExpeditionInputValue(
+        elements.windowInput,
+        state.window,
+    );
 
-    elements.exceptionInput.disabled =
-        !summary.hasData;
-
-    elements.windowInput.value =
-        state.window;
-
-    elements.windowInput.disabled =
-        !summary.hasData;
-
+    refreshExpeditionWindowSelect(
+        elements.windowInput,
+    );
+            
     refreshExpeditionWindowSelect(
         elements.windowInput,
     );
