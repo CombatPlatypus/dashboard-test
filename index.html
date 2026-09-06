@@ -50,20 +50,21 @@
             }
             .checkbox > label {
                 position: relative;
-                width: 25px;
-                height: 25px;
+                width: 39px;
+                height: 38px;
                 transition: all 0s;
-                font-weight: inherit;
-                background: #18191a;
                 border-radius: 3px;
+                background-color: #141414;
+                border: 1px solid #525252;
             }
             .checkbox > label::after {
                 position: absolute;
                 display: block;
-                width: 25px;
-                height: 25px;
-                top: 0;
-                left: 0;
+                width: 39px;
+                height: 38px;
+                padding: 2px 0px 0 1px;
+                top: 0px;
+                left: 0px;
                 background: none;
                 border-radius: 0;
                 transition: none;
@@ -77,7 +78,7 @@
             }
             .checkbox > input:checked + label::after {
                 content: '✕';
-                font-size: 20px;
+                font-size: 25px;
                 text-align: center;
                 background-color: #18191a;
             }
@@ -97,6 +98,11 @@
                 padding-bottom: 0;
                 margin-bottom: 0;
                 border-bottom: none;
+            }
+            #expedition .input-group [type='checkbox'] {
+                position: absolute;
+                margin-bottom: 0;
+                opacity: 0;
             }
 
             #expedition td {
@@ -1681,9 +1687,9 @@
                                             <h4>Conferente</h4>
                                             <div class="flex-box-start">
                                                 <input id="" type="text" maxlength="8" readonly disabled>
+                                                <input type="checkbox" id="checker01">
 
                                                 <div class="checkbox">
-                                                    <input type="checkbox" id="checker01">
                                                     <label for="checker01"></label>
                                                 </div>
                                             </div>
