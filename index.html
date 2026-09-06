@@ -77,6 +77,25 @@
                 margin: 0;
             }
 
+            /* TABELAS */
+
+            #expedition .expedition-operator-table {
+                table-layout: fixed;
+            }
+            #expedition .expedition-operator-table .operator-name-column {
+                width: 40%;
+            }
+            #expedition .expedition-operator-table .operator-metric-column {
+                width: 15%;
+            }
+            #expedition .expedition-operator-table th:first-child,
+            #expedition .expedition-operator-table td:first-child {
+                padding-left: 15px;
+                text-align: left;
+                white-space: normal;
+                overflow-wrap: anywhere;
+            }
+
             /* GRÁFICOS */
 
             #expedition #expedition-charts .charts {
@@ -1257,7 +1276,7 @@
                                                             <td id="expeditionPreviewVolumeChecked">—</td>
                                                             <td id="expeditionPreviewValidatedRoutes">—</td>
                                                             <td id="expeditionPreviewFloorRoutes">—</td>
-                                                            <td>—</td>
+                                                            <td id="expeditionPreviewDuration">—</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
@@ -1278,13 +1297,21 @@
                                                             <td id="expeditionPreviewMissing">—</td>
                                                             <td id="expeditionPreviewDuplicated">—</td>
                                                             <td id="expeditionPreviewMissorted">—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
+                                                            <td id="expeditionPreviewUnknown">—</td>
+                                                            <td id="expeditionPreviewException">—</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
 
-                                                <table>
+                                                <table class="expedition-operator-table">
+                                                    <colgroup>
+                                                        <col class="operator-name-column">
+                                                        <col class="operator-metric-column">
+                                                        <col class="operator-metric-column">
+                                                        <col class="operator-metric-column">
+                                                        <col class="operator-metric-column">
+                                                    </colgroup>
+
                                                     <thead>
                                                         <tr>
                                                             <th>Conferente</th>
@@ -1295,40 +1322,7 @@
                                                         </tr>
                                                     </thead>
 
-                                                    <tbody id="expeditionPreviewOperatorBody">
-                                                        <tr>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                        </tr>
-                                                        
-                                                        <tr>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                        </tr>
-
-                                                        <tr>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                        </tr>
-
-                                                        <tr>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                        </tr>
-
-                                                    </tbody>
+                                                    <tbody id="expeditionPreviewOperatorBody"></tbody>
                                                 </table>
                                             </div>
                                         </div>
@@ -1588,11 +1582,7 @@
                                         <div>
                                             <h4>Janela</h4>
 
-                                            <select
-                                                class="standard-select"
-                                                id="expeditionWindowInput"
-                                                disabled
-                                            >
+                                            <select class="standard-select" id="expeditionWindowInput" disabled>
                                                 <option value="AM">AM</option>
                                                 <option value="PM1">PM1</option>
                                                 <option value="PM2">PM2</option>
@@ -1601,44 +1591,32 @@
 
                                         <div>
                                             <h4>Pacotes Ausentes</h4>
-
-                                            <input
-                                                id="expeditionMissingInput"
-                                                type="text"
-                                                inputmode="numeric"
-                                                maxlength="8"
-                                                readonly
-                                                disabled
-                                            >
+                                            <input id="expeditionMissingInput" type="text" inputmode="numeric" maxlength="8" readonly disabled>
                                         </div>
 
                                         <div>
                                             <h4>Pacotes Duplicados</h4>
-
-                                            <input
-                                                id="expeditionDuplicatedInput"
-                                                type="text"
-                                                inputmode="numeric"
-                                                maxlength="8"
-                                                readonly
-                                                disabled
-                                            >
+                                            <input id="expeditionDuplicatedInput" type="text" inputmode="numeric" maxlength="8" readonly disabled>
                                         </div>
 
                                         <div>
                                             <h4>Classificados Incorretamente</h4>
+                                            <input id="expeditionMissortedInput" type="text" inputmode="numeric" maxlength="8" readonly disabled>
+                                        </div>
 
-                                            <input
-                                                id="expeditionMissortedInput"
-                                                type="text"
-                                                inputmode="numeric"
-                                                maxlength="8"
-                                                readonly
-                                                disabled
-                                            >
+                                        <div>
+                                            <h4>Pacotes Desconhecidos</h4>
+                                            <input id="expeditionUnknownInput" type="text" inputmode="numeric" maxlength="8" autocomplete="off" disabled>
+                                        </div>
+
+                                        <div>
+                                            <h4>Pacotes Exceção</h4>
+                                            <input id="expeditionExceptionInput" type="text" inputmode="numeric" maxlength="8" autocomplete="off" disabled>
                                         </div>
                                     </div>
 
+
+                                    
                                 </div>
                             </div>
                         </div>

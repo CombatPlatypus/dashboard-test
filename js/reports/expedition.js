@@ -324,7 +324,17 @@ function createExpeditionOperatorRow(
             "td",
         );
 
-    const timeCell =
+    const averageTimeCell =
+        document.createElement(
+            "td",
+        );
+
+    const worstTimeCell =
+        document.createElement(
+            "td",
+        );
+
+    const bestTimeCell =
         document.createElement(
             "td",
         );
@@ -343,22 +353,37 @@ function createExpeditionOperatorRow(
             )
             : "—";
 
-    timeCell.textContent =
+    averageTimeCell.textContent =
         operator
             ? formatExpeditionDuration(
                 operator.averageDurationSeconds,
             )
             : "—";
 
+    worstTimeCell.textContent =
+        operator
+            ? formatExpeditionDuration(
+                operator.worstDurationSeconds,
+            )
+            : "—";
+
+    bestTimeCell.textContent =
+        operator
+            ? formatExpeditionDuration(
+                operator.bestDurationSeconds,
+            )
+            : "—";
+
     row.append(
         nameCell,
         routesCell,
-        timeCell,
+        averageTimeCell,
+        worstTimeCell,
+        bestTimeCell,
     );
 
     return row;
 }
-
 function renderExpeditionOperators(
     elements,
     operators,
