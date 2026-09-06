@@ -1021,17 +1021,39 @@ function bindExpeditionEvents(
         "exceptionOrders",
     );
     
-    elements.windowInput
-        .addEventListener(
-            "change",
-            function () {
-                updateExpeditionWindow(
-                    elements
-                        .windowInput
-                        .value,
-                );
-            },
-        );
+    const handleWindowChange =
+        function () {
+            updateExpeditionWindow(
+                elements.windowInput.value,
+            );
+        };
+
+    /*
+    * O Select2 dispara o evento change
+    * por meio do jQuery.
+    */
+
+    if (
+        typeof window.jQuery ===
+        "function"
+    ) {
+        window.jQuery(
+            elements.windowInput,
+        )
+            .off(
+                "change.expeditionReport",
+            )
+            .on(
+                "change.expeditionReport",
+                handleWindowChange,
+            );
+    } else {
+        elements.windowInput
+            .addEventListener(
+                "change",
+                handleWindowChange,
+            );
+    }
 
     elements.clearButton
         .addEventListener(

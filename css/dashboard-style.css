@@ -338,7 +338,7 @@
         input::placeholder, textarea::placeholder {
             color: #cacaca;
         }
-        input:disabled, input[readonly], textarea:disabled, textarea[readonly] {
+        input:disabled, textarea:disabled {
             cursor: not-allowed;
         }
         input::-webkit-calendar-picker-indicator {
