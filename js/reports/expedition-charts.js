@@ -6,9 +6,7 @@ import {
 
 let routesChart = null;
 let averageTimeChart = null;
-let controlsHeightObserver = null;
 let visibilityObserver = null;
-let heightFrame = null;
 let resizeFrame = null;
 
 const CHART_PIXEL_RATIO = Math.max(
@@ -969,129 +967,10 @@ function resizeCharts() {
         );
 }
 
-/* SINCRONIZA A ALTURA */
-
-function initializeHeightSync(
-    elements,
-) {
-    const reportControls =
-        document.querySelector(
-            "#expedition > div.flex-box-start > .report-controls",
-        );
-
-    if (
-        !(
-            reportControls instanceof
-            HTMLElement
-        )
-    ) {
-        console.error(
-            "Não foi possível sincronizar a altura dos gráficos de expedição.",
-        );
-
-        return function () {};
-    }
-
-    function synchronizeHeight() {
-        if (
-            heightFrame !==
-            null
-        ) {
-            window.cancelAnimationFrame(
-                heightFrame,
-            );
-        }
-
-        heightFrame =
-            window.requestAnimationFrame(
-                function () {
-                    heightFrame =
-                        null;
-
-                    const controlsHeight =
-                        Math.ceil(
-                            reportControls
-                                .getBoundingClientRect()
-                                .height,
-                        );
-
-                    /*
-                     * O painel pode estar oculto
-                     * durante a inicialização.
-                     */
-
-                    if (
-                        controlsHeight <=
-                        0
-                    ) {
-                        return;
-                    }
-
-                    const cssHeight =
-                        `${controlsHeight}px`;
-
-                    const currentHeight =
-                        elements
-                            .preview
-                            .style
-                            .getPropertyValue(
-                                "--expedition-charts-height",
-                            );
-
-                    if (
-                        currentHeight ===
-                        cssHeight
-                    ) {
-                        return;
-                    }
-
-                    elements
-                        .preview
-                        .style
-                        .setProperty(
-                            "--expedition-charts-height",
-                            cssHeight,
-                        );
-
-                    resizeCharts();
-                },
-            );
-    }
-
-    controlsHeightObserver
-        ?.disconnect();
-
-    if (
-        typeof window
-            .ResizeObserver ===
-        "function"
-    ) {
-        controlsHeightObserver =
-            new ResizeObserver(
-                synchronizeHeight,
-            );
-
-        controlsHeightObserver
-            .observe(
-                reportControls,
-            );
-    }
-
-    window.addEventListener(
-        "resize",
-        synchronizeHeight,
-    );
-
-    synchronizeHeight();
-
-    return synchronizeHeight;
-}
-
 /* OBSERVA A EXIBIÇÃO DA GUIA */
 
 function observeVisibility(
     elements,
-    synchronizeHeight,
 ) {
     visibilityObserver
         ?.disconnect();
@@ -1110,7 +989,6 @@ function observeVisibility(
                     return;
                 }
 
-                synchronizeHeight();
                 resizeCharts();
             },
         );
@@ -1213,14 +1091,9 @@ function initializeExpeditionCharts() {
         getExpeditionState(),
     );
 
-    const synchronizeHeight =
-        initializeHeightSync(
-            elements,
-        );
 
     observeVisibility(
         elements,
-        synchronizeHeight,
     );
 
     return true;
