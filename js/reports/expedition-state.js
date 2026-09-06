@@ -176,8 +176,8 @@ const expeditionState = {
     routesOnFloor:
         null,
 
-    unknownOrders: null,
-    exceptionOrders: null,
+    unknownOrders: 0,
+    exceptionOrders: 0,
 
     excludedOperatorKeys:
         new Set(),
@@ -481,11 +481,11 @@ function getExpeditionSummary(
 
         unknownOrders:
             state.unknownOrders ??
-            null,
+            0,
 
         exceptionOrders:
             state.exceptionOrders ??
-            null,
+            0,
 
         ...totals,
     };
@@ -899,10 +899,10 @@ function replaceExpeditionRoutes(
         );
 
     expeditionState.unknownOrders =
-        null;
+        0;
 
     expeditionState.exceptionOrders =
-        null;
+        0;
 
     expeditionState
         .excludedOperatorKeys
@@ -928,10 +928,10 @@ function resetExpeditionReport() {
         "";
 
     expeditionState.unknownOrders =
-        null;
+        0;
 
     expeditionState.exceptionOrders =
-        null;
+        0;
 
     expeditionState
         .excludedOperatorKeys

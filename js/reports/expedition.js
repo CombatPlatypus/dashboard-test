@@ -584,9 +584,6 @@ function createExpeditionOperatorControl(
         checkbox.disabled =
             true;
 
-        checkbox.disabled =
-            true;
-
         checkbox.setAttribute(
             "aria-label",
             "Conferente indisponível",
@@ -617,7 +614,7 @@ function renderExpeditionOperatorControls(
     const visibleControls =
         Math.max(
             operators.length,
-            1,
+            MINIMUM_EXPEDITION_PREVIEW_ROWS,
         );
 
     for (
@@ -835,24 +832,22 @@ function renderExpeditionReport(
             quantityOrDash(
                 summary.missortedOrders,
             );
-
+            
     elements.previewUnknown
         .textContent =
-            summary.unknownOrders ===
-                null
-                ? "—"
-                : formatExpeditionQuantity(
+            summary.hasData
+                ? formatExpeditionQuantity(
                     summary.unknownOrders,
-                );
+                )
+                : "—";
 
     elements.previewException
         .textContent =
-            summary.exceptionOrders ===
-                null
-                ? "—"
-                : formatExpeditionQuantity(
+            summary.hasData
+                ? formatExpeditionQuantity(
                     summary.exceptionOrders,
-                );      
+                )
+                : "—";   
 
     setExpeditionInputValue(
         elements.floorRoutesInput,
