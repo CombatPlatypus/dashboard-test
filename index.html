@@ -75,6 +75,11 @@
                 margin-bottom: 0;
                 opacity: 0;
             }
+            .checkbox > input:checked + label::after {
+                content: '✕';
+                font-size: 25px;
+                text-align: center;
+            }
             .checkbox > input:disabled + label {
                 cursor: not-allowed;
                 opacity: 0.5;
