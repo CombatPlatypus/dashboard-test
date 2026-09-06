@@ -71,15 +71,14 @@
                 transform: none;
                 content: '';
             }
-            .checkbox > input:checked ~ .checkbox > label::after {
-                left: 0;
-            }
             .checkbox > input:checked + .checkbox > label::after {
                 content: '✕';
-                /* content: '✓'; */
                 font-size: 20px;
                 text-align: center;
                 background-color: #18191a;
+            }
+            .checkbox > input:checked ~ .checkbox > label::after {
+                left: 0;
             }
 
             /*  */
