@@ -80,7 +80,7 @@
                 font-size: 25px;
                 text-align: center;
             }
-            .checkbox > input:disabled + label {
+            .checkbox > input[type="checkbox"]:disabled + label {
                 cursor: not-allowed;
                 opacity: 0.5;
             }
@@ -1346,8 +1346,8 @@
 
                                                     <tbody>
                                                         <tr>
-                                                            <td>—</td>
-                                                            <td>—</td>
+                                                            <td id="expeditionPreviewWindow">—</td>
+                                                            <td id="expeditionPreviewOperatorCount">—</td>
                                                             <td id="expeditionPreviewVolumeChecked">—</td>
                                                             <td id="expeditionPreviewValidatedRoutes">—</td>
                                                             <td id="expeditionPreviewFloorRoutes">—</td>
@@ -1671,7 +1671,7 @@
 
                                         <div>
                                             <h4>Rotas no Piso</h4>
-                                            <input id="" type="text" inputmode="numeric" maxlength="8" readonly disabled>
+                                            <input id="expeditionFloorRoutesInput" type="text" inputmode="numeric" maxlength="8" readonly disabled>
                                         </div>
 
                                         <div>
@@ -1685,21 +1685,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="input-group">
-
-                                        <div>
-                                            <h4>Conferente 01</h4>
-                                            <div class="checkbox flex-box-start">
-                                                <input id="" type="text" maxlength="8" readonly disabled>
-                                                <input type="checkbox" id="checker01">
-                                                <label for="checker01"></label>
-                                            </div>
-                                        </div>
-
-                                        
-                                        
-                                    </div>
-
+                                    <div class="input-group" id="expeditionOperatorControls"></div>
                                 </div>
                             </div>
                         </div>

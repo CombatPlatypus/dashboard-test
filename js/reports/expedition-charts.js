@@ -815,6 +815,11 @@ function renderCharts(
     const operators =
         getExpeditionOperatorRanking(
             state,
+        ).filter(
+            function (operator) {
+                return operator.selected !==
+                    false;
+            },
         );
 
     /*

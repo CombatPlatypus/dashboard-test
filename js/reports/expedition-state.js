@@ -74,6 +74,16 @@ function normalizeExpeditionStatus(
         .toLowerCase();
 }
 
+function getExpeditionOperatorKey(
+    value,
+) {
+    return normalizeExpeditionText(
+        value,
+    ).toLocaleLowerCase(
+        "pt-BR",
+    );
+}
+
 /* CRIA UM REGISTRO DE ROTA */
 
 function createExpeditionRoute(
@@ -164,6 +174,10 @@ const expeditionState = {
     sourceFileName: "",
     unknownOrders: null,
     exceptionOrders: null,
+
+    excludedOperatorKeys:
+        new Set(),
+
     routes: [],
 };
 
@@ -180,6 +194,30 @@ function isExpeditionValidatedRoute(
     return (
         status === "validated" ||
         status === "validado"
+    );
+}
+
+function getExpeditionExcludedOperatorKeys(
+    state,
+) {
+    const receivedKeys =
+        state?.excludedOperatorKeys instanceof
+            Set
+            ? Array.from(
+                state.excludedOperatorKeys,
+            )
+            : Array.isArray(
+                state?.excludedOperatorKeys,
+            )
+                ? state.excludedOperatorKeys
+                : [];
+
+    return new Set(
+        receivedKeys
+            .map(
+                getExpeditionOperatorKey,
+            )
+            .filter(Boolean),
     );
 }
 
@@ -232,6 +270,12 @@ function getExpeditionState() {
         exceptionOrders:
             expeditionState.exceptionOrders,
 
+        excludedOperatorKeys:
+            Array.from(
+                expeditionState
+                    .excludedOperatorKeys,
+            ),   
+
         routes:
             expeditionState.routes.map(
                 function (route) {
@@ -260,38 +304,75 @@ function getExpeditionSummary(
             isExpeditionValidatedRoute,
         );
 
-    const totals =
-        validatedRoutes.reduce(
-            function (
-                summary,
-                route,
-            ) {
-                summary.volumeChecked +=
-                    route.scannedOrders ?? 0;
+    const excludedOperatorKeys =
+        getExpeditionExcludedOperatorKeys(
+            state,
+        );
 
-                summary.missingOrders +=
-                    route.missingOrders ?? 0;
-
-                summary.missortedOrders +=
-                    route.missortedOrders ?? 0;
-
-                summary.duplicatedOrders +=
-                    getExpeditionDuplicatedOrders(
-                        route,
+    const selectedValidatedRoutes =
+        validatedRoutes.filter(
+            function (route) {
+                const operatorKey =
+                    getExpeditionOperatorKey(
+                        route.validationOperator,
                     );
 
-                return summary;
-            },
-            {
-                volumeChecked: 0,
-                missingOrders: 0,
-                duplicatedOrders: 0,
-                missortedOrders: 0,
+                return (
+                    !operatorKey ||
+                    !excludedOperatorKeys.has(
+                        operatorKey,
+                    )
+                );
             },
         );
 
+    const selectedOperatorCount =
+        new Set(
+            selectedValidatedRoutes
+                .map(
+                    function (route) {
+                        return (
+                            getExpeditionOperatorKey(
+                                route.validationOperator,
+                            )
+                        );
+                    },
+                )
+                .filter(Boolean),
+        ).size;
+
+    const totals =
+    selectedValidatedRoutes.reduce(
+        function (
+            summary,
+            route,
+        ) {
+            summary.volumeChecked +=
+                route.scannedOrders ?? 0;
+
+            summary.missingOrders +=
+                route.missingOrders ?? 0;
+
+            summary.missortedOrders +=
+                route.missortedOrders ?? 0;
+
+            summary.duplicatedOrders +=
+                getExpeditionDuplicatedOrders(
+                    route,
+                );
+
+            return summary;
+        },
+        {
+            volumeChecked: 0,
+            missingOrders: 0,
+            duplicatedOrders: 0,
+            missortedOrders: 0,
+        },
+    );
+
     const validationTimes =
-        validatedRoutes.reduce(
+        selectedValidatedRoutes.reduce(
             function (
                 times,
                 route,
@@ -370,8 +451,11 @@ function getExpeditionSummary(
         totalRoutes:
             routes.length,
 
-        validatedRoutes:
-            validatedRoutes.length,
+    validatedRoutes:
+        selectedValidatedRoutes.length,
+
+    operatorCount:
+        selectedOperatorCount,
 
         routesOnFloor:
             Math.max(
@@ -418,6 +502,11 @@ function getExpeditionOperatorRanking(
     const operators =
         new Map();
 
+    const excludedOperatorKeys =
+        getExpeditionExcludedOperatorKeys(
+            state,
+        );
+
     routes
         .filter(
             isExpeditionValidatedRoute,
@@ -448,6 +537,11 @@ function getExpeditionOperatorRanking(
                         operatorKey,
                         {
                             operator,
+                            selected:
+                                !excludedOperatorKeys
+                                    .has(
+                                        operatorKey,
+                                    ),
                             routesChecked: 0,
                             volumeChecked: 0,
                             totalDurationSeconds: 0,
@@ -695,6 +789,69 @@ function updateExpeditionManualQuantity(
     return true;
 }
 
+/* ALTERA A SELEÇÃO DE UM CONFERENTE */
+
+function updateExpeditionOperatorSelection(
+    operator,
+    selected,
+) {
+    const operatorKey =
+        getExpeditionOperatorKey(
+            operator,
+        );
+
+    if (!operatorKey) {
+        return false;
+    }
+
+    const wasExcluded =
+        expeditionState
+            .excludedOperatorKeys
+            .has(
+                operatorKey,
+            );
+
+    if (selected) {
+        expeditionState
+            .excludedOperatorKeys
+            .delete(
+                operatorKey,
+            );
+    } else {
+        expeditionState
+            .excludedOperatorKeys
+            .add(
+                operatorKey,
+            );
+    }
+
+    const isExcluded =
+        expeditionState
+            .excludedOperatorKeys
+            .has(
+                operatorKey,
+            );
+
+    if (
+        wasExcluded ===
+        isExcluded
+    ) {
+        return true;
+    }
+
+    notifyExpeditionState({
+        type:
+            "operator-selection-updated",
+
+        operatorKey,
+
+        selected:
+            !isExcluded,
+    });
+
+    return true;
+}
+
 /* SUBSTITUI AS ROTAS IMPORTADAS */
 
 function replaceExpeditionRoutes(
@@ -730,6 +887,10 @@ function replaceExpeditionRoutes(
     expeditionState.exceptionOrders =
         null;
 
+    expeditionState
+        .excludedOperatorKeys
+        .clear();
+
     notifyExpeditionState({
         type: "routes-replaced",
     });
@@ -752,6 +913,10 @@ function resetExpeditionReport() {
     expeditionState.exceptionOrders =
         null;
 
+    expeditionState
+        .excludedOperatorKeys
+        .clear();
+
     expeditionState.routes =
         [];
 
@@ -773,5 +938,6 @@ export {
     resetExpeditionReport,
     subscribeExpeditionState,
     updateExpeditionManualQuantity,
+    updateExpeditionOperatorSelection,
     updateExpeditionWindow,
 };

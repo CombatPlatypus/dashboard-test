@@ -4,13 +4,15 @@ import {
     getExpeditionSummary,
     resetExpeditionReport,
     subscribeExpeditionState,
+    updateExpeditionManualQuantity,
+    updateExpeditionOperatorSelection,
     updateExpeditionWindow,
 } from "./expedition-state.js";
 
 /* CONFIGURAÇÕES */
 
 const MINIMUM_EXPEDITION_PREVIEW_ROWS =
-    15;
+    30;
 
 const MINIMUM_FASTEST_OPERATOR_ROUTES =
     3;
@@ -164,20 +166,11 @@ function getExpeditionElements() {
                 "expeditionWindowInput",
             ),
 
-        missingInput:
+        floorRoutesInput:
             document.getElementById(
-                "expeditionMissingInput",
+                "expeditionFloorRoutesInput",
             ),
 
-        duplicatedInput:
-            document.getElementById(
-                "expeditionDuplicatedInput",
-            ),
-
-        missortedInput:
-            document.getElementById(
-                "expeditionMissortedInput",
-            ),
         unknownInput:
             document.getElementById(
                 "expeditionUnknownInput",
@@ -187,6 +180,22 @@ function getExpeditionElements() {
             document.getElementById(
                 "expeditionExceptionInput",
             ),
+
+        operatorControls:
+            document.getElementById(
+                "expeditionOperatorControls",
+            ),
+
+        previewWindow:
+            document.getElementById(
+                "expeditionPreviewWindow",
+            ),
+
+        previewOperatorCount:
+            document.getElementById(
+                "expeditionPreviewOperatorCount",
+            ),
+
         previewVolumeChecked:
             document.getElementById(
                 "expeditionPreviewVolumeChecked",
@@ -466,6 +475,164 @@ function renderExpeditionOperators(
         );
 }
 
+/* CONTROLES DOS CONFERENTES */
+
+function createExpeditionOperatorControl(
+    operator,
+    index,
+) {
+    const field =
+        document.createElement(
+            "div",
+        );
+
+    field.className =
+        "expedition-operator-control";
+
+    const title =
+        document.createElement(
+            "h4",
+        );
+
+    title.textContent =
+        `Conferente ${String(
+            index + 1,
+        ).padStart(2, "0")}`;
+
+    const checkboxContainer =
+        document.createElement(
+            "div",
+        );
+
+    checkboxContainer.className =
+        "checkbox flex-box-start";
+
+    const nameInput =
+        document.createElement(
+            "input",
+        );
+
+    nameInput.type =
+        "text";
+
+    nameInput.readOnly =
+        true;
+
+    nameInput.disabled =
+        true;
+
+    const checkbox =
+        document.createElement(
+            "input",
+        );
+
+    checkbox.type =
+        "checkbox";
+
+    const checkboxId =
+        `expeditionChecker${String(
+            index + 1,
+        ).padStart(2, "0")}`;
+
+    checkbox.id =
+        checkboxId;
+
+    const label =
+        document.createElement(
+            "label",
+        );
+
+    label.htmlFor =
+        checkboxId;
+
+    if (operator) {
+        const operatorName =
+            getExpeditionOperatorName(
+                operator.operator,
+            );
+
+        nameInput.value =
+            operatorName;
+
+        nameInput.title =
+            operatorName;
+
+        checkbox.checked =
+            operator.selected !==
+            false;
+
+        checkbox.setAttribute(
+            "aria-label",
+            `Exibir ${operatorName} no relatório`,
+        );
+
+        checkbox.addEventListener(
+            "change",
+            function () {
+                updateExpeditionOperatorSelection(
+                    operator.operator,
+                    checkbox.checked,
+                );
+            },
+        );
+    } else {
+        checkbox.disabled =
+            true;
+
+        checkbox.setAttribute(
+            "aria-label",
+            "Conferente indisponível",
+        );
+    }
+
+    checkboxContainer.append(
+        nameInput,
+        checkbox,
+        label,
+    );
+
+    field.append(
+        title,
+        checkboxContainer,
+    );
+
+    return field;
+}
+
+function renderExpeditionOperatorControls(
+    elements,
+    operators,
+) {
+    const fragment =
+        document.createDocumentFragment();
+
+    const visibleControls =
+        Math.max(
+            operators.length,
+            1,
+        );
+
+    for (
+        let index = 0;
+        index < visibleControls;
+        index += 1
+    ) {
+        fragment.append(
+            createExpeditionOperatorControl(
+                operators[index] ||
+                    null,
+
+                index,
+            ),
+        );
+    }
+
+    elements.operatorControls
+        .replaceChildren(
+            fragment,
+        );
+}
+
 /* CARDS DO RANKING */
 
 function renderExpeditionRankingCards(
@@ -615,6 +782,14 @@ function renderExpeditionReport(
             state,
         );
 
+     const selectedOperators =
+        operators.filter(
+            function (operator) {
+                return operator.selected !==
+                    false;
+            },
+        );   
+
     const quantityOrDash =
         function (value) {
             return summary.hasData
@@ -623,6 +798,20 @@ function renderExpeditionReport(
                 )
                 : "—";
         };
+
+    elements.previewWindow
+        .textContent =
+            summary.hasData
+                ? state.window
+                : "—";
+
+    elements.previewOperatorCount
+        .textContent =
+            summary.hasData
+                ? formatExpeditionQuantity(
+                    summary.operatorCount,
+                )
+                : "—";
 
     elements.previewVolumeChecked
         .textContent =
@@ -668,26 +857,46 @@ function renderExpeditionReport(
                 summary.missortedOrders,
             );
 
+    elements.previewUnknown
+        .textContent =
+            summary.unknownOrders ===
+                null
+                ? "—"
+                : formatExpeditionQuantity(
+                    summary.unknownOrders,
+                );
+
+    elements.previewException
+        .textContent =
+            summary.exceptionOrders ===
+                null
+                ? "—"
+                : formatExpeditionQuantity(
+                    summary.exceptionOrders,
+                );      
+
     setExpeditionInputValue(
-        elements.missingInput,
+        elements.floorRoutesInput,
         summary.hasData
-            ? summary.missingOrders
+            ? summary.routesOnFloor
             : null,
     );
 
     setExpeditionInputValue(
-        elements.duplicatedInput,
-        summary.hasData
-            ? summary.duplicatedOrders
-            : null,
+        elements.unknownInput,
+        summary.unknownOrders,
     );
 
     setExpeditionInputValue(
-        elements.missortedInput,
-        summary.hasData
-            ? summary.missortedOrders
-            : null,
+        elements.exceptionInput,
+        summary.exceptionOrders,
     );
+
+    elements.unknownInput.disabled =
+        !summary.hasData;
+
+    elements.exceptionInput.disabled =
+        !summary.hasData;
 
     elements.windowInput.value =
         state.window;
@@ -701,10 +910,15 @@ function renderExpeditionReport(
 
     renderExpeditionOperators(
         elements,
-        operators,
+        selectedOperators,
     );
 
     renderExpeditionRankingCards(
+        elements,
+        selectedOperators,
+    );
+
+    renderExpeditionOperatorControls(
         elements,
         operators,
     );
@@ -721,6 +935,54 @@ function renderExpeditionReport(
 function bindExpeditionEvents(
     elements,
 ) {
+    function bindManualQuantityInput(
+        input,
+        field,
+    ) {
+        input.addEventListener(
+            "input",
+            function () {
+                const normalizedValue =
+                    input.value
+                        .replace(
+                            /\D/g,
+                            "",
+                        )
+                        .slice(
+                            0,
+                            8,
+                        );
+
+                if (
+                    input.value !==
+                    normalizedValue
+                ) {
+                    input.value =
+                        normalizedValue;
+                }
+
+                updateExpeditionManualQuantity(
+                    field,
+                    normalizedValue === ""
+                        ? null
+                        : Number(
+                            normalizedValue,
+                        ),
+                );
+            },
+        );
+    }
+
+    bindManualQuantityInput(
+        elements.unknownInput,
+        "unknownOrders",
+    );
+
+    bindManualQuantityInput(
+        elements.exceptionInput,
+        "exceptionOrders",
+    );
+    
     elements.windowInput
         .addEventListener(
             "change",
