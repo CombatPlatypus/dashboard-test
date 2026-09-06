@@ -178,7 +178,15 @@ function getExpeditionElements() {
             document.getElementById(
                 "expeditionMissortedInput",
             ),
+        unknownInput:
+            document.getElementById(
+                "expeditionUnknownInput",
+            ),
 
+        exceptionInput:
+            document.getElementById(
+                "expeditionExceptionInput",
+            ),
         previewVolumeChecked:
             document.getElementById(
                 "expeditionPreviewVolumeChecked",
@@ -193,12 +201,10 @@ function getExpeditionElements() {
             document.getElementById(
                 "expeditionPreviewFloorRoutes",
             ),
-
-        previewTotalRoutes:
+        previewDuration:
             document.getElementById(
-                "expeditionPreviewTotalRoutes",
+                "expeditionPreviewDuration",
             ),
-
         previewMissing:
             document.getElementById(
                 "expeditionPreviewMissing",
@@ -212,6 +218,14 @@ function getExpeditionElements() {
         previewMissorted:
             document.getElementById(
                 "expeditionPreviewMissorted",
+            ),
+        previewUnknown:
+            document.getElementById(
+                "expeditionPreviewUnknown",
+            ),
+        previewException:
+            document.getElementById(
+                "expeditionPreviewException",
             ),
 
         previewOperatorBody:
@@ -264,14 +278,50 @@ function getExpeditionElements() {
 function hasExpeditionElements(
     elements,
 ) {
-    return Object.values(
-        elements,
-    ).every(
-        function (element) {
-            return element instanceof
-                HTMLElement;
-        },
-    );
+    const missingElements =
+        Object.entries(
+            elements,
+        ).filter(
+            function (
+                entry,
+            ) {
+                return !(
+                    entry[1] instanceof
+                    HTMLElement
+                );
+            },
+        );
+
+    if (
+        missingElements.length > 0
+    ) {
+        console.error(
+            "Não foi possível inicializar o relatório de expedição. Elementos ausentes:",
+            missingElements.map(
+                function (entry) {
+                    return entry[0];
+                },
+            ),
+        );
+
+        if (
+            elements.reportStatusIcon instanceof
+                HTMLImageElement
+        ) {
+            elements.reportStatusIcon.src =
+                "images/geral-icons/error-icon.svg";
+        }
+
+        if (
+            elements.reportStatusText instanceof
+                HTMLElement
+        ) {
+            elements.reportStatusText.textContent =
+                "Não foi possível inicializar o relatório de expedição.";
+        }
+    }
+
+    return missingElements.length === 0;
 }
 
 /* SINCRONIZA O SELECT2 */
@@ -592,12 +642,14 @@ function renderExpeditionReport(
                 summary.routesOnFloor,
             );
 
-    elements.previewTotalRoutes
+    elements.previewDuration
         .textContent =
-            quantityOrDash(
-                summary.totalRoutes,
-            );
-
+            summary.hasData
+                ? formatExpeditionDuration(
+                    summary
+                        .expeditionDurationSeconds,
+                )
+                : "—";
     elements.previewMissing
         .textContent =
             quantityOrDash(

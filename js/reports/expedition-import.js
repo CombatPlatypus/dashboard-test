@@ -633,6 +633,40 @@ async function readExpeditionFile(
     };
 }
 
+function showExpeditionImportError(
+    message,
+) {
+    const statusIcon =
+        document.getElementById(
+            "expeditionReportStatusIcon",
+        );
+
+    const statusText =
+        document.getElementById(
+            "expeditionReportStatusText",
+        );
+
+    if (
+        statusIcon instanceof
+            HTMLImageElement
+    ) {
+        statusIcon.src =
+            "images/geral-icons/error-icon.svg";
+    }
+
+    if (
+        statusText instanceof
+            HTMLElement
+    ) {
+        statusText.textContent =
+            `Falha na importação: ${message}`;
+    }
+
+    window.alert(
+        message,
+    );
+}
+
 /* CONTROLA A IMPORTAÇÃO */
 
 async function importExpeditionFile(
@@ -691,6 +725,11 @@ async function importExpeditionFile(
             );
         }
     } catch (error) {
+        const errorMessage =
+            error instanceof Error
+                ? error.message
+                : "Não foi possível importar o arquivo.";
+
         console.error(
             "Não foi possível importar a conferência:",
             error,
@@ -700,9 +739,11 @@ async function importExpeditionFile(
             "Erro na Importação";
 
         importButton.title =
-            error instanceof Error
-                ? error.message
-                : "Não foi possível importar o arquivo.";
+            errorMessage;
+
+        showExpeditionImportError(
+            errorMessage,
+        );
     } finally {
         window.setTimeout(
             function () {
@@ -743,6 +784,10 @@ function initializeExpeditionImport() {
                 HTMLInputElement
         )
     ) {
+        console.error(
+            "Não foi possível inicializar a importação da expedição: botão ou input de arquivo não encontrado.",
+        );
+
         return false;
     }
 
