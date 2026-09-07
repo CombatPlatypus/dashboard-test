@@ -1,4 +1,5 @@
 import {
+    getExpeditionErrorAnalysis,
     getExpeditionOperatorRanking,
     getExpeditionState,
     getExpeditionSummary,
@@ -18,12 +19,25 @@ import {
 const MINIMUM_EXPEDITION_PREVIEW_ROWS =
     30;
 
+const MINIMUM_EXPEDITION_STREET_ROWS =
+    10;
+
 const MINIMUM_FASTEST_OPERATOR_ROUTES =
     3;
 
 const expeditionNumberFormatter =
     new Intl.NumberFormat(
         "pt-BR",
+    );
+
+const expeditionRateFormatter =
+    new Intl.NumberFormat(
+        "pt-BR",
+        {
+            style: "percent",
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        },
     );
 
 /* FORMATAÇÕES */
@@ -41,6 +55,25 @@ function formatExpeditionQuantity(
     return expeditionNumberFormatter
         .format(
             value,
+        );
+}
+
+function formatExpeditionRate(
+    value,
+) {
+    if (
+        value === null ||
+        value === undefined ||
+        !Number.isFinite(
+            Number(value),
+        )
+    ) {
+        return "—";
+    }
+
+    return expeditionRateFormatter
+        .format(
+            Number(value),
         );
 }
 
@@ -185,6 +218,16 @@ function getExpeditionElements() {
                 "expeditionExceptionInput",
             ),
 
+        revertedSortingInput:
+            document.getElementById(
+                "expeditionRevertedSortingInput",
+            ),
+
+        revertedLabelingInput:
+            document.getElementById(
+                "expeditionRevertedLabelingInput",
+            ),
+
         operatorControls:
             document.getElementById(
                 "expeditionOperatorControls",
@@ -244,6 +287,71 @@ function getExpeditionElements() {
         previewOperatorBody:
             document.getElementById(
                 "expeditionPreviewOperatorBody",
+            ),
+
+        previewSortingErrors:
+            document.getElementById(
+                "expeditionPreviewSortingErrors",
+            ),
+
+        previewLabelingErrors:
+            document.getElementById(
+                "expeditionPreviewLabelingErrors",
+            ),
+
+        previewTotalErrors:
+            document.getElementById(
+                "expeditionPreviewTotalErrors",
+            ),
+
+        previewErrorRate:
+            document.getElementById(
+                "expeditionPreviewErrorRate",
+            ),
+
+        previewRevertedErrors:
+            document.getElementById(
+                "expeditionPreviewRevertedErrors",
+            ),
+
+        previewRevertedSortingErrors:
+            document.getElementById(
+                "expeditionPreviewRevertedSortingErrors",
+            ),
+
+        previewRevertedLabelingErrors:
+            document.getElementById(
+                "expeditionPreviewRevertedLabelingErrors",
+            ),
+
+        previewRevertedRate:
+            document.getElementById(
+                "expeditionPreviewRevertedRate",
+            ),
+
+        previewFinalSortingErrors:
+            document.getElementById(
+                "expeditionPreviewFinalSortingErrors",
+            ),
+
+        previewFinalLabelingErrors:
+            document.getElementById(
+                "expeditionPreviewFinalLabelingErrors",
+            ),
+
+        previewFinalErrors:
+            document.getElementById(
+                "expeditionPreviewFinalErrors",
+            ),
+
+        previewFinalRate:
+            document.getElementById(
+                "expeditionPreviewFinalRate",
+            ),
+
+        previewStreetBody:
+            document.getElementById(
+                "expeditionPreviewStreetBody",
             ),
 
         topRoutesOperator:
@@ -348,6 +456,7 @@ function refreshExpeditionWindowSelect(
 function setExpeditionGeneralControlsAvailability(
     elements,
     hasImportedFile,
+    hasErrorAnalysis,
 ) {
     const disabled =
         !hasImportedFile;
@@ -363,6 +472,12 @@ function setExpeditionGeneralControlsAvailability(
 
     elements.exceptionInput.disabled =
         disabled;
+
+    elements.revertedSortingInput.disabled =
+        !hasErrorAnalysis;
+
+    elements.revertedLabelingInput.disabled =
+        !hasErrorAnalysis;
 }
 
 /* TABELA DOS CONFERENTES */
@@ -734,6 +849,202 @@ function renderExpeditionRankingCards(
                 : "Melhor Tempo";
 }
 
+/* TABELAS DE ERROS */
+
+function createExpeditionStreetRow(
+    street,
+) {
+    const row =
+        document.createElement(
+            "tr",
+        );
+
+    const values =
+        street
+            ? [
+                street.name || "—",
+                street.guardian || "—",
+                formatExpeditionQuantity(
+                    street.sortingErrors,
+                ),
+                formatExpeditionQuantity(
+                    street.labelingErrors,
+                ),
+                formatExpeditionRate(
+                    street.errorRate,
+                ),
+            ]
+            : [
+                "—",
+                "—",
+                "—",
+                "—",
+                "—",
+            ];
+
+    values.forEach(
+        function (value) {
+            const cell =
+                document.createElement(
+                    "td",
+                );
+
+            cell.textContent =
+                value;
+
+            row.append(
+                cell,
+            );
+        },
+    );
+
+    return row;
+}
+
+function renderExpeditionStreetTable(
+    elements,
+    streets,
+) {
+    const receivedStreets =
+        Array.isArray(streets)
+            ? streets
+            : [];
+
+    const fragment =
+        document.createDocumentFragment();
+
+    const visibleRows =
+        Math.max(
+            receivedStreets.length,
+            MINIMUM_EXPEDITION_STREET_ROWS,
+        );
+
+    for (
+        let index = 0;
+        index < visibleRows;
+        index += 1
+    ) {
+        fragment.append(
+            createExpeditionStreetRow(
+                receivedStreets[index] ||
+                    null,
+            ),
+        );
+    }
+
+    elements.previewStreetBody
+        .replaceChildren(
+            fragment,
+        );
+}
+
+function renderExpeditionErrorTables(
+    elements,
+    analysis,
+) {
+    const quantity =
+        function (value) {
+            return formatExpeditionQuantity(
+                value,
+            );
+        };
+
+    elements.previewSortingErrors
+        .textContent =
+            quantity(
+                analysis.sortingErrors,
+            );
+
+    elements.previewLabelingErrors
+        .textContent =
+            quantity(
+                analysis.labelingErrors,
+            );
+
+    elements.previewTotalErrors
+        .textContent =
+            quantity(
+                analysis.totalErrors,
+            );
+
+    elements.previewErrorRate
+        .textContent =
+            formatExpeditionRate(
+                analysis.errorRate,
+            );
+
+    elements.previewRevertedErrors
+        .textContent =
+            quantity(
+                analysis.totalRevertedErrors,
+            );
+
+    elements.previewRevertedSortingErrors
+        .textContent =
+            quantity(
+                analysis.revertedSortingErrors,
+            );
+
+    elements.previewRevertedLabelingErrors
+        .textContent =
+            quantity(
+                analysis.revertedLabelingErrors,
+            );
+
+    elements.previewRevertedRate
+        .textContent =
+            formatExpeditionRate(
+                analysis.revertedRate,
+            );
+
+    elements.previewFinalSortingErrors
+        .textContent =
+            quantity(
+                analysis.finalSortingErrors,
+            );
+
+    elements.previewFinalLabelingErrors
+        .textContent =
+            quantity(
+                analysis.finalLabelingErrors,
+            );
+
+    elements.previewFinalErrors
+        .textContent =
+            quantity(
+                analysis.finalErrors,
+            );
+
+    elements.previewFinalRate
+        .textContent =
+            formatExpeditionRate(
+                analysis.finalRate,
+            );
+
+    setExpeditionInputValue(
+        elements.revertedSortingInput,
+        analysis.canCalculate
+            ? analysis
+                .revertedSortingErrors
+            : null,
+    );
+
+    setExpeditionInputValue(
+        elements.revertedLabelingInput,
+        analysis.canCalculate
+            ? analysis
+                .revertedLabelingErrors
+            : null,
+    );
+
+    renderExpeditionStreetTable(
+        elements,
+        analysis.canCalculate
+            ? analysis.streets
+            : [],
+    );
+}
+
 /* RENDERIZA O RELATÓRIO */
 
 function renderExpeditionReport(
@@ -745,12 +1056,18 @@ function renderExpeditionReport(
             state,
         );
 
+    const errorAnalysis =
+        getExpeditionErrorAnalysis(
+            state,
+        );
+
     const hasImportedFile =
         state.routes.length > 0;
 
     setExpeditionGeneralControlsAvailability(
         elements,
         hasImportedFile,
+        errorAnalysis.canCalculate,
     );
 
     const operators =
@@ -890,8 +1207,14 @@ function renderExpeditionReport(
         operators,
     );
 
+    renderExpeditionErrorTables(
+        elements,
+        errorAnalysis,
+    );
+
     elements.clearButton.disabled =
-        !summary.hasData;
+        !summary.hasData &&
+        !errorAnalysis.hasErrorData;
 }
 
 /* EVENTOS */
@@ -950,6 +1273,16 @@ function bindExpeditionEvents(
     bindManualQuantityInput(
         elements.exceptionInput,
         "exceptionOrders",
+    );
+
+    bindManualQuantityInput(
+        elements.revertedSortingInput,
+        "revertedSortingErrors",
+    );
+
+    bindManualQuantityInput(
+        elements.revertedLabelingInput,
+        "revertedLabelingErrors",
     );
     
     const handleWindowChange =

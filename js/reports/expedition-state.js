@@ -84,6 +84,198 @@ function getExpeditionOperatorKey(
     );
 }
 
+function createExpeditionErrorStreet(
+    values = {},
+) {
+    return {
+        name:
+            normalizeExpeditionText(
+                values.name,
+            ),
+
+        guardian:
+            normalizeExpeditionText(
+                values.guardian,
+            ),
+
+        sortingErrors:
+            normalizeExpeditionQuantity(
+                values.sortingErrors,
+            ) ?? 0,
+
+        labelingErrors:
+            normalizeExpeditionQuantity(
+                values.labelingErrors,
+            ) ?? 0,
+    };
+}
+
+function allocateExpeditionQuantities(
+    values,
+    targetTotal,
+) {
+    const quantities =
+        Array.isArray(values)
+            ? values.map(
+                function (value) {
+                    return (
+                        normalizeExpeditionQuantity(
+                            value,
+                        ) ?? 0
+                    );
+                },
+            )
+            : [];
+
+    const total =
+        normalizeExpeditionQuantity(
+            targetTotal,
+        ) ?? 0;
+
+    if (quantities.length === 0) {
+        return [];
+    }
+
+    const sourceTotal =
+        quantities.reduce(
+            function (
+                sum,
+                value,
+            ) {
+                return sum + value;
+            },
+            0,
+        );
+
+    if (sourceTotal === total) {
+        return quantities;
+    }
+
+    if (sourceTotal === 0) {
+        return quantities.map(
+            function (
+                value,
+                index,
+            ) {
+                return index === 0
+                    ? total
+                    : 0;
+            },
+        );
+    }
+
+    const allocations =
+        quantities.map(
+            function (value) {
+                const exactValue =
+                    value *
+                    total /
+                    sourceTotal;
+
+                return {
+                    value:
+                        Math.floor(
+                            exactValue,
+                        ),
+
+                    remainder:
+                        exactValue -
+                        Math.floor(
+                            exactValue,
+                        ),
+                };
+            },
+        );
+
+    let remaining =
+        total -
+        allocations.reduce(
+            function (
+                sum,
+                allocation,
+            ) {
+                return (
+                    sum +
+                    allocation.value
+                );
+            },
+            0,
+        );
+
+    const allocationOrder =
+        allocations
+            .map(
+                function (
+                    allocation,
+                    index,
+                ) {
+                    return {
+                        index,
+                        remainder:
+                            allocation.remainder,
+                    };
+                },
+            )
+            .sort(
+                function (
+                    first,
+                    second,
+                ) {
+                    return (
+                        second.remainder -
+                            first.remainder ||
+                        first.index -
+                            second.index
+                    );
+                },
+            );
+
+    for (
+        let index = 0;
+        index < remaining;
+        index += 1
+    ) {
+        allocations[
+            allocationOrder[
+                index %
+                    allocationOrder.length
+            ].index
+        ].value += 1;
+    }
+
+    return allocations.map(
+        function (allocation) {
+            return allocation.value;
+        },
+    );
+}
+
+function calculateExpeditionRate(
+    value,
+    total,
+) {
+    if (
+        value === null ||
+        value === undefined ||
+        total === null ||
+        total === undefined ||
+        !Number.isFinite(
+            Number(value),
+        ) ||
+        !Number.isFinite(
+            Number(total),
+        ) ||
+        Number(total) <= 0
+    ) {
+        return null;
+    }
+
+    return (
+        Number(value) /
+        Number(total)
+    );
+}
+
 /* CRIA UM REGISTRO DE ROTA */
 
 function createExpeditionRoute(
@@ -172,6 +364,19 @@ function createExpeditionRoute(
 const expeditionState = {
     window: "AM",
     sourceFileName: "",
+
+    errorSourceFileName: "",
+    hasErrorData: false,
+
+    errorTotals: {
+        sortingErrors: 0,
+        labelingErrors: 0,
+    },
+
+    errorStreets: [],
+
+    revertedSortingErrors: 0,
+    revertedLabelingErrors: 0,
 
     routesOnFloor:
         null,
@@ -267,6 +472,34 @@ function getExpeditionState() {
 
         sourceFileName:
             expeditionState.sourceFileName,
+
+        errorSourceFileName:
+            expeditionState.errorSourceFileName,
+
+        hasErrorData:
+            expeditionState.hasErrorData,
+
+        errorTotals: {
+            ...expeditionState.errorTotals,
+        },
+
+        errorStreets:
+            expeditionState.errorStreets
+                .map(
+                    function (street) {
+                        return {
+                            ...street,
+                        };
+                    },
+                ),
+
+        revertedSortingErrors:
+            expeditionState
+                .revertedSortingErrors,
+
+        revertedLabelingErrors:
+            expeditionState
+                .revertedLabelingErrors,
 
         routesOnFloor:
             expeditionState.routesOnFloor,
@@ -667,6 +900,378 @@ function getExpeditionOperatorRanking(
         );
 }
 
+/* CALCULA AS TABELAS DE ERROS */
+
+function getExpeditionErrorAnalysis(
+    state = getExpeditionState(),
+) {
+    const summary =
+        getExpeditionSummary(
+            state,
+        );
+
+    const hasSpXData =
+        summary.hasData;
+
+    const hasErrorData =
+        state.hasErrorData ===
+        true;
+
+    const spxTotal =
+        hasSpXData
+            ? summary.missortedOrders
+            : null;
+
+    const rawSortingErrors =
+        normalizeExpeditionQuantity(
+            state.errorTotals
+                ?.sortingErrors,
+        ) ?? 0;
+
+    const rawLabelingErrors =
+        normalizeExpeditionQuantity(
+            state.errorTotals
+                ?.labelingErrors,
+        ) ?? 0;
+
+    const spreadsheetTotal =
+        rawSortingErrors +
+        rawLabelingErrors;
+
+    const canCalculate =
+        hasSpXData &&
+        hasErrorData;
+
+    if (!canCalculate) {
+        return {
+            hasSpXData,
+            hasErrorData,
+            canCalculate: false,
+
+            spreadsheetTotal:
+                hasErrorData
+                    ? spreadsheetTotal
+                    : null,
+
+            spxTotal,
+            sortingErrors: null,
+            labelingErrors: null,
+            totalErrors: spxTotal,
+
+            errorRate:
+                calculateExpeditionRate(
+                    spxTotal,
+                    summary.volumeChecked,
+                ),
+
+            revertedSortingErrors: null,
+            revertedLabelingErrors: null,
+            totalRevertedErrors: null,
+            revertedRate: null,
+
+            finalSortingErrors: null,
+            finalLabelingErrors: null,
+            finalErrors: null,
+            finalRate: null,
+
+            hasDivergence: false,
+            balanceDifference: null,
+            streets: [],
+        };
+    }
+
+    const balancedTypes =
+        spreadsheetTotal > 0
+            ? allocateExpeditionQuantities(
+                [
+                    rawSortingErrors,
+                    rawLabelingErrors,
+                ],
+                spxTotal,
+            )
+            : [
+                spxTotal,
+                0,
+            ];
+
+    const sortingErrors =
+        balancedTypes[0];
+
+    const labelingErrors =
+        balancedTypes[1];
+
+    const streets =
+        (
+            Array.isArray(
+                state.errorStreets,
+            )
+                ? state.errorStreets
+                : []
+        ).map(
+            createExpeditionErrorStreet,
+        );
+
+    const mappedSortingErrors =
+        streets.reduce(
+            function (
+                total,
+                street,
+            ) {
+                return (
+                    total +
+                    street.sortingErrors
+                );
+            },
+            0,
+        );
+
+    const mappedLabelingErrors =
+        streets.reduce(
+            function (
+                total,
+                street,
+            ) {
+                return (
+                    total +
+                    street.labelingErrors
+                );
+            },
+            0,
+        );
+
+    const unassignedSortingErrors =
+        Math.max(
+            rawSortingErrors -
+                mappedSortingErrors,
+            0,
+        );
+
+    const unassignedLabelingErrors =
+        Math.max(
+            rawLabelingErrors -
+                mappedLabelingErrors,
+            0,
+        );
+
+    if (
+        unassignedSortingErrors > 0 ||
+        unassignedLabelingErrors > 0
+    ) {
+        streets.push({
+            name:
+                "Não identificada",
+
+            guardian: "",
+
+            sortingErrors:
+                unassignedSortingErrors,
+
+            labelingErrors:
+                unassignedLabelingErrors,
+        });
+    }
+
+    const ensureUnassignedStreet =
+        function () {
+            let unassignedStreet =
+                streets.find(
+                    function (street) {
+                        return (
+                            street.name ===
+                            "Não identificada"
+                        );
+                    },
+                );
+
+            if (!unassignedStreet) {
+                unassignedStreet = {
+                    name:
+                        "Não identificada",
+
+                    guardian: "",
+                    sortingErrors: 0,
+                    labelingErrors: 0,
+                };
+
+                streets.push(
+                    unassignedStreet,
+                );
+            }
+
+            return unassignedStreet;
+        };
+
+    if (
+        sortingErrors > 0 &&
+        streets.every(
+            function (street) {
+                return (
+                    street.sortingErrors ===
+                    0
+                );
+            },
+        )
+    ) {
+        ensureUnassignedStreet()
+            .sortingErrors = 1;
+    }
+
+    if (
+        labelingErrors > 0 &&
+        streets.every(
+            function (street) {
+                return (
+                    street.labelingErrors ===
+                    0
+                );
+            },
+        )
+    ) {
+        ensureUnassignedStreet()
+            .labelingErrors = 1;
+    }
+
+    const balancedSortingByStreet =
+        allocateExpeditionQuantities(
+            streets.map(
+                function (street) {
+                    return street.sortingErrors;
+                },
+            ),
+            sortingErrors,
+        );
+
+    const balancedLabelingByStreet =
+        allocateExpeditionQuantities(
+            streets.map(
+                function (street) {
+                    return street.labelingErrors;
+                },
+            ),
+            labelingErrors,
+        );
+
+    const totalErrors =
+        spxTotal;
+
+    const revertedSortingErrors =
+        normalizeExpeditionQuantity(
+            state.revertedSortingErrors,
+        ) ?? 0;
+
+    const revertedLabelingErrors =
+        normalizeExpeditionQuantity(
+            state.revertedLabelingErrors,
+        ) ?? 0;
+
+    const totalRevertedErrors =
+        revertedSortingErrors +
+        revertedLabelingErrors;
+
+    const finalSortingErrors =
+        sortingErrors -
+        revertedSortingErrors;
+
+    const finalLabelingErrors =
+        labelingErrors -
+        revertedLabelingErrors;
+
+    const finalErrors =
+        finalSortingErrors +
+        finalLabelingErrors;
+
+    return {
+        hasSpXData,
+        hasErrorData,
+        canCalculate: true,
+
+        spreadsheetTotal,
+        spxTotal,
+        sortingErrors,
+        labelingErrors,
+        totalErrors,
+
+        errorRate:
+            calculateExpeditionRate(
+                totalErrors,
+                summary.volumeChecked,
+            ),
+
+        revertedSortingErrors,
+        revertedLabelingErrors,
+        totalRevertedErrors,
+
+        revertedRate:
+            calculateExpeditionRate(
+                totalRevertedErrors,
+                totalErrors,
+            ),
+
+        finalSortingErrors,
+        finalLabelingErrors,
+        finalErrors,
+
+        finalRate:
+            calculateExpeditionRate(
+                finalErrors,
+                summary.volumeChecked,
+            ),
+
+        hasDivergence:
+            spreadsheetTotal !==
+            spxTotal,
+
+        balanceDifference:
+            spxTotal -
+            spreadsheetTotal,
+
+        streets:
+            streets.map(
+                function (
+                    street,
+                    index,
+                ) {
+                    const streetSortingErrors =
+                        balancedSortingByStreet[
+                            index
+                        ];
+
+                    const streetLabelingErrors =
+                        balancedLabelingByStreet[
+                            index
+                        ];
+
+                    const streetTotalErrors =
+                        streetSortingErrors +
+                        streetLabelingErrors;
+
+                    return {
+                        name:
+                            street.name,
+
+                        guardian:
+                            street.guardian,
+
+                        sortingErrors:
+                            streetSortingErrors,
+
+                        labelingErrors:
+                            streetLabelingErrors,
+
+                        totalErrors:
+                            streetTotalErrors,
+
+                        errorRate:
+                            calculateExpeditionRate(
+                                streetTotalErrors,
+                                totalErrors,
+                            ),
+                    };
+                },
+            ),
+    };
+}
+
 /* NOTIFICA OS OUVINTES */
 
 function notifyExpeditionState(
@@ -752,7 +1357,9 @@ function updateExpeditionManualQuantity(
     if (
         field !== "routesOnFloor" &&
         field !== "unknownOrders" &&
-        field !== "exceptionOrders"
+        field !== "exceptionOrders" &&
+        field !== "revertedSortingErrors" &&
+        field !== "revertedLabelingErrors"
     ) {
         return false;
     }
@@ -915,6 +1522,57 @@ function replaceExpeditionRoutes(
     return true;
 }
 
+/* SUBSTITUI OS DADOS DA PLANILHA DE ERROS */
+
+function replaceExpeditionErrorData(
+    errorData,
+    sourceFileName = "",
+) {
+    expeditionState.errorTotals = {
+        sortingErrors:
+            normalizeExpeditionQuantity(
+                errorData?.sortingErrors,
+            ) ?? 0,
+
+        labelingErrors:
+            normalizeExpeditionQuantity(
+                errorData?.labelingErrors,
+            ) ?? 0,
+    };
+
+    expeditionState.errorStreets =
+        (
+            Array.isArray(
+                errorData?.streets,
+            )
+                ? errorData.streets
+                : []
+        ).map(
+            createExpeditionErrorStreet,
+        );
+
+    expeditionState.errorSourceFileName =
+        normalizeExpeditionText(
+            sourceFileName,
+        );
+
+    expeditionState.hasErrorData =
+        true;
+
+    expeditionState.revertedSortingErrors =
+        0;
+
+    expeditionState.revertedLabelingErrors =
+        0;
+
+    notifyExpeditionState({
+        type:
+            "error-data-replaced",
+    });
+
+    return true;
+}
+
 /* LIMPA O RELATÓRIO */
 
 function resetExpeditionReport() {
@@ -926,6 +1584,26 @@ function resetExpeditionReport() {
 
     expeditionState.sourceFileName =
         "";
+
+    expeditionState.errorSourceFileName =
+        "";
+
+    expeditionState.hasErrorData =
+        false;
+
+    expeditionState.errorTotals = {
+        sortingErrors: 0,
+        labelingErrors: 0,
+    };
+
+    expeditionState.errorStreets =
+        [];
+
+    expeditionState.revertedSortingErrors =
+        0;
+
+    expeditionState.revertedLabelingErrors =
+        0;
 
     expeditionState.unknownOrders =
         0;
@@ -949,11 +1627,13 @@ function resetExpeditionReport() {
 }
 
 export {
+    getExpeditionErrorAnalysis,
     getExpeditionDuplicatedOrders,
     getExpeditionOperatorRanking,
     getExpeditionState,
     getExpeditionSummary,
     isExpeditionValidatedRoute,
+    replaceExpeditionErrorData,
     replaceExpeditionRoutes,
     resetExpeditionReport,
     subscribeExpeditionState,

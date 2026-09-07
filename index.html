@@ -1571,10 +1571,10 @@
 
                                                     <tbody>
                                                         <tr>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
+                                                            <td id="expeditionPreviewSortingErrors">—</td>
+                                                            <td id="expeditionPreviewLabelingErrors">—</td>
+                                                            <td id="expeditionPreviewTotalErrors">—</td>
+                                                            <td id="expeditionPreviewErrorRate">—</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
@@ -1591,10 +1591,10 @@
 
                                                     <tbody>
                                                         <tr>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
+                                                            <td id="expeditionPreviewRevertedErrors">—</td>
+                                                            <td id="expeditionPreviewRevertedSortingErrors">—</td>
+                                                            <td id="expeditionPreviewRevertedLabelingErrors">—</td>
+                                                            <td id="expeditionPreviewRevertedRate">—</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
@@ -1611,10 +1611,10 @@
 
                                                     <tbody>
                                                         <tr>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
+                                                            <td id="expeditionPreviewFinalSortingErrors">—</td>
+                                                            <td id="expeditionPreviewFinalLabelingErrors">—</td>
+                                                            <td id="expeditionPreviewFinalErrors">—</td>
+                                                            <td id="expeditionPreviewFinalRate">—</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
@@ -1662,71 +1662,7 @@
                                                         </tr>
                                                     </thead>
 
-                                                    <tbody>
-                                                        <tr>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                        </tr>
-
-                                                        <tr>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                        </tr>
-
-                                                        <tr>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                        </tr>
-
-                                                        <tr>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                        </tr>
-
-                                                        <tr>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                        </tr>
-
-                                                        <tr>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                        </tr>
-
-                                                        <tr>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                        </tr>
-
-                                                        <tr>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                        </tr>
-
+                                                    <tbody id="expeditionPreviewStreetBody">
                                                         <tr>
                                                             <td>—</td>
                                                             <td>—</td>
@@ -1845,6 +1781,12 @@
                                         </div>
 
                                         <input id="expeditionFileInput" type="file" accept=".csv,.xlsx,.xls" hidden>
+
+                                        <div>
+                                            <button class="button" id="expeditionErrorsImportButton" type="button">Importar Planilha de Erros</button>
+                                        </div>
+
+                                        <input id="expeditionErrorsFileInput" type="file" accept=".xlsx,.xls" hidden>
                                     </div>
 
                                     <div class="input-group">
@@ -1871,6 +1813,16 @@
                                         <div>
                                             <h4>Pacotes Exceção</h4>
                                             <input id="expeditionExceptionInput" type="text" inputmode="numeric" maxlength="8" autocomplete="off" disabled>
+                                        </div>
+
+                                        <div>
+                                            <h4>Sorting Revertidos</h4>
+                                            <input id="expeditionRevertedSortingInput" type="text" inputmode="numeric" maxlength="8" autocomplete="off" disabled>
+                                        </div>
+
+                                        <div>
+                                            <h4>Etiqueta Revertidos</h4>
+                                            <input id="expeditionRevertedLabelingInput" type="text" inputmode="numeric" maxlength="8" autocomplete="off" disabled>
                                         </div>
                                     </div>
 

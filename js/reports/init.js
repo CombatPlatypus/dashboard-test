@@ -47,6 +47,10 @@ import {
 } from "./expedition-import.js";
 
 import {
+    initializeExpeditionErrorsImport,
+} from "./expedition-errors-import.js";
+
+import {
     initializeExpeditionCharts,
 } from "./expedition-charts.js";
 
@@ -78,6 +82,7 @@ function initializeReportsPanel() {
 
     initializeExpeditionReport();
     initializeExpeditionImport();
+    initializeExpeditionErrorsImport();
     initializeExpeditionCharts()
 
     // TAXA DE PERDAS
