@@ -533,68 +533,69 @@ function applyExpeditionErrorsToStreets(
                 ],
             );
 
-            const sortingPackageRoute =
-    normalizeExpeditionRouteCode(
-        row[
-            header.columns
-                .sortingRoute
-        ],
-    );
-
-const labelingPackageRoute =
-    normalizeExpeditionRouteCode(
-        row[
-            header.columns
-                .labelingRoute
-        ],
-    );
-
-if (sortingEntry) {
-    sortingErrors += 1;
-
-    const sortingRoute =
-        routeMap.has(
-            sortingPackageRoute,
-        )
-            ? sortingPackageRoute
-            : normalizeExpeditionRouteCode(
-                sortingEntry,
+        const sortingPackageRoute =
+            normalizeExpeditionRouteCode(
+                row[
+                    header.columns
+                        .sortingRoute
+                ],
             );
 
-    const streetIndex =
-        routeMap.get(
-            sortingRoute,
-        );
+        const labelingPackageRoute =
+            normalizeExpeditionRouteCode(
+                row[
+                    header.columns
+                        .labelingRoute
+                ],
+            );
 
-        if (
-            streetIndex ===
-            undefined
-        ) {
-            unmappedSortingErrors += 1;
-        } else {
-            streets[
-                streetIndex
-            ].sortingErrors += 1;
+        if (sortingEntry) {
+            sortingErrors += 1;
+
+            const sortingRoute =
+                routeMap.has(
+                    sortingPackageRoute,
+                )
+                    ? sortingPackageRoute
+                    : normalizeExpeditionRouteCode(
+                        sortingEntry,
+                    );
+
+            const streetIndex =
+                routeMap.get(
+                    sortingRoute,
+                );
+
+                if (
+                    streetIndex ===
+                    undefined
+                ) {
+                    unmappedSortingErrors += 1;
+                } else {
+                    streets[
+                        streetIndex
+                    ].sortingErrors += 1;
+                }
         }
-    }
 
-    if (labelingEntry) {
-        labelingErrors += 1;
+        if (labelingEntry) {
+            labelingErrors += 1;
 
-        const streetIndex =
-            routeMap.get(
-                labelingPackageRoute,
-            );
+            const streetIndex =
+                routeMap.get(
+                    labelingPackageRoute,
+                );
 
-        if (
-            streetIndex ===
-            undefined
-        ) {
-            unmappedLabelingErrors += 1;
-        } else {
-            streets[
-                streetIndex
-            ].labelingErrors += 1;
+            if (
+                streetIndex ===
+                undefined
+            ) {
+                unmappedLabelingErrors += 1;
+            } else {
+                streets[
+                    streetIndex
+                ].labelingErrors += 1;
+            }
         }
     }
 
@@ -605,7 +606,7 @@ if (sortingEntry) {
         unmappedLabelingErrors,
     };
 }
-
+    
 /* CONVERTE A PLANILHA PARA O ESTADO */
 
 function parseExpeditionErrorsWorkbook(
