@@ -20,7 +20,7 @@
     .main-structure  #spreadsheets .tabs-content .tabs-panel {
         width: 100%;
         height: 100%;
-        background-color: var(--color-container);
+        background-color: var(--color-container-iframe);
         border: solid 2px var(--color-border);
         border-radius: 5px;
     }

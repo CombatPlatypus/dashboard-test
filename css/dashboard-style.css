@@ -5,6 +5,7 @@
     :root {
         --color-body: #000000;
         --color-container: #101010;
+        --color-container-iframe: #fff;
         --color-container-houver: #262626;
         --color-container-focus: #262626;
         --color-border: #626262;
@@ -13,6 +14,7 @@
         --color-table-th: #262626;
         --color-table-tr: #1b1b1b;
         --color-button: #e4e6eb;
+        --color-button-text: #000000;
         --color-gray-p: #a8a9ad;
     }
 
@@ -405,7 +407,7 @@
                 font-size: 16px;
                 padding: 15px 15px;
                 border-radius: 5px;
-                color: var(--color-body);
+                color: var(--button-text);
                 background-color: var(--color-button);
                 border-bottom: 6px solid var(--color-border);
                 cursor: pointer;
@@ -1074,6 +1076,7 @@
         margin-bottom: 0;
         border-radius: 5px;
         border: 2px solid var(--color-border);
+        background-color: var(--color-container);
         align-items: center;
     }
     .tabs .tabs-title .flex-box-center {
