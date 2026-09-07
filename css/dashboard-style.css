@@ -407,7 +407,7 @@
                 font-size: 16px;
                 padding: 15px 15px;
                 border-radius: 5px;
-                color: var(--button-text);
+                color: var(--color-button-text);
                 background-color: var(--color-button);
                 border-bottom: 6px solid var(--color-border);
                 cursor: pointer;
