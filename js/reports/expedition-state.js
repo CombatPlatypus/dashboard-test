@@ -375,6 +375,7 @@ const expeditionState = {
 
     errorStreets: [],
 
+    revertedErrors: 0,
     revertedSortingErrors: 0,
     revertedLabelingErrors: 0,
 
@@ -492,6 +493,9 @@ function getExpeditionState() {
                         };
                     },
                 ),
+
+        revertedErrors:
+            expeditionState.revertedErrors,
 
         revertedSortingErrors:
             expeditionState
@@ -902,7 +906,7 @@ function getExpeditionOperatorRanking(
 
 /* CALCULA AS TABELAS DE ERROS */
 
-function getExpeditionErrorAnalysis(
+function getLegacyExpeditionErrorAnalysis(
     state = getExpeditionState(),
 ) {
     const summary =
@@ -1272,6 +1276,321 @@ function getExpeditionErrorAnalysis(
     };
 }
 
+/* AGRUPA AUSENTES E CLASSIFICADOS INCORRETAMENTE POR RUA */
+
+function getExpeditionStreetAnalysis(
+    state,
+    totalErrors,
+) {
+    const routes = Array.isArray(state.routes)
+        ? state.routes
+        : [];
+
+    const excludedOperatorKeys =
+        getExpeditionExcludedOperatorKeys(state);
+
+    const streets = new Map();
+
+    routes
+        .filter(isExpeditionValidatedRoute)
+        .filter(function (route) {
+            const operatorKey =
+                getExpeditionOperatorKey(
+                    route.validationOperator,
+                );
+
+            return !excludedOperatorKeys.has(
+                operatorKey,
+            );
+        })
+        .forEach(function (route) {
+            const name =
+                normalizeExpeditionText(
+                    route.corridor,
+                ) || "Não identificada";
+
+            if (!streets.has(name)) {
+                streets.set(name, {
+                    name,
+                    missingOrders: 0,
+                    totalErrors: 0,
+                    guardians: new Map(),
+                });
+            }
+
+            const street = streets.get(name);
+            const missingOrders =
+                normalizeExpeditionQuantity(
+                    route.missingOrders,
+                ) ?? 0;
+
+            const missortedOrders =
+                normalizeExpeditionQuantity(
+                    route.missortedOrders,
+                ) ?? 0;
+
+            street.missingOrders +=
+                missingOrders;
+
+            street.totalErrors +=
+                missortedOrders;
+
+            const guardian =
+                normalizeExpeditionText(
+                    route.validationOperator,
+                );
+
+            if (guardian) {
+                const guardianSummary =
+                    street.guardians.get(guardian) || {
+                        errors: 0,
+                        routes: 0,
+                    };
+
+                guardianSummary.errors +=
+                    missortedOrders;
+
+                guardianSummary.routes += 1;
+
+                street.guardians.set(
+                    guardian,
+                    guardianSummary,
+                );
+            }
+        });
+
+    return Array.from(streets.values())
+        .map(function (street) {
+            const guardian =
+                Array.from(
+                    street.guardians.entries(),
+                )
+                    .sort(function (
+                        first,
+                        second,
+                    ) {
+                        return (
+                            second[1].errors -
+                                first[1].errors ||
+                            second[1].routes -
+                                first[1].routes ||
+                            first[0].localeCompare(
+                                second[0],
+                                "pt-BR",
+                            )
+                        );
+                    })[0]?.[0] || "";
+
+            return {
+                name: street.name,
+                guardian,
+                missingOrders:
+                    street.missingOrders,
+                totalErrors:
+                    street.totalErrors,
+                errorRate:
+                    calculateExpeditionRate(
+                        street.totalErrors,
+                        totalErrors,
+                    ),
+            };
+        })
+        .sort(function (first, second) {
+            return first.name.localeCompare(
+                second.name,
+                "pt-BR",
+                {
+                    numeric: true,
+                },
+            );
+        });
+}
+
+/* CALCULA AS TABELAS DE ERROS NO MODELO ATUAL */
+
+function getExpeditionErrorAnalysis(
+    state = getExpeditionState(),
+) {
+    const summary =
+        getExpeditionSummary(state);
+
+    const hasSpXData =
+        summary.hasData;
+
+    const hasErrorData =
+        state.hasErrorData === true;
+
+    const spxTotal = hasSpXData
+        ? summary.missortedOrders
+        : null;
+
+    const rawSortingErrors =
+        normalizeExpeditionQuantity(
+            state.errorTotals?.sortingErrors,
+        ) ?? 0;
+
+    const rawLabelingErrors =
+        normalizeExpeditionQuantity(
+            state.errorTotals?.labelingErrors,
+        ) ?? 0;
+
+    const spreadsheetTotal =
+        rawSortingErrors +
+        rawLabelingErrors;
+
+    const streets = hasSpXData
+        ? getExpeditionStreetAnalysis(
+            state,
+            spxTotal,
+        )
+        : [];
+
+    const canCalculate =
+        hasSpXData &&
+        hasErrorData;
+
+    if (!canCalculate) {
+        const visibleTotal = hasSpXData
+            ? spxTotal
+            : hasErrorData
+                ? spreadsheetTotal
+                : null;
+
+        return {
+            hasSpXData,
+            hasErrorData,
+            canCalculate: false,
+            spreadsheetTotal:
+                hasErrorData
+                    ? spreadsheetTotal
+                    : null,
+            spxTotal,
+            sortingErrors:
+                hasErrorData
+                    ? rawSortingErrors
+                    : null,
+            labelingErrors:
+                hasErrorData
+                    ? rawLabelingErrors
+                    : null,
+            totalErrors: visibleTotal,
+            errorRate:
+                calculateExpeditionRate(
+                    visibleTotal,
+                    hasSpXData
+                        ? summary.volumeChecked
+                        : null,
+                ),
+            revertedSortingErrors: null,
+            revertedLabelingErrors: null,
+            totalRevertedErrors: null,
+            revertedRate: null,
+            finalSortingErrors: null,
+            finalLabelingErrors: null,
+            finalErrors: null,
+            finalRate: null,
+            hasDivergence: false,
+            balanceDifference: null,
+            streets,
+        };
+    }
+
+    const balancedTypes =
+        spreadsheetTotal > 0
+            ? allocateExpeditionQuantities(
+                [
+                    rawSortingErrors,
+                    rawLabelingErrors,
+                ],
+                spxTotal,
+            )
+            : [
+                spxTotal,
+                0,
+            ];
+
+    const sortingErrors =
+        balancedTypes[0];
+
+    const labelingErrors =
+        balancedTypes[1];
+
+    const requestedRevertedErrors =
+        normalizeExpeditionQuantity(
+            state.revertedErrors,
+        ) ?? 0;
+
+    const totalRevertedErrors =
+        Math.min(
+            requestedRevertedErrors,
+            spxTotal,
+        );
+
+    const revertedTypes =
+        allocateExpeditionQuantities(
+            [
+                sortingErrors,
+                labelingErrors,
+            ],
+            totalRevertedErrors,
+        );
+
+    const revertedSortingErrors =
+        revertedTypes[0];
+
+    const revertedLabelingErrors =
+        revertedTypes[1];
+
+    const finalSortingErrors =
+        sortingErrors -
+        revertedSortingErrors;
+
+    const finalLabelingErrors =
+        labelingErrors -
+        revertedLabelingErrors;
+
+    const finalErrors =
+        finalSortingErrors +
+        finalLabelingErrors;
+
+    return {
+        hasSpXData,
+        hasErrorData,
+        canCalculate: true,
+        spreadsheetTotal,
+        spxTotal,
+        sortingErrors,
+        labelingErrors,
+        totalErrors: spxTotal,
+        errorRate:
+            calculateExpeditionRate(
+                spxTotal,
+                summary.volumeChecked,
+            ),
+        revertedSortingErrors,
+        revertedLabelingErrors,
+        totalRevertedErrors,
+        revertedRate:
+            calculateExpeditionRate(
+                totalRevertedErrors,
+                spxTotal,
+            ),
+        finalSortingErrors,
+        finalLabelingErrors,
+        finalErrors,
+        finalRate:
+            calculateExpeditionRate(
+                finalErrors,
+                summary.volumeChecked,
+            ),
+        hasDivergence:
+            spreadsheetTotal !== spxTotal,
+        balanceDifference:
+            spxTotal - spreadsheetTotal,
+        streets,
+    };
+}
+
 /* NOTIFICA OS OUVINTES */
 
 function notifyExpeditionState(
@@ -1358,6 +1677,7 @@ function updateExpeditionManualQuantity(
         field !== "routesOnFloor" &&
         field !== "unknownOrders" &&
         field !== "exceptionOrders" &&
+        field !== "revertedErrors" &&
         field !== "revertedSortingErrors" &&
         field !== "revertedLabelingErrors"
     ) {
@@ -1559,6 +1879,9 @@ function replaceExpeditionErrorData(
     expeditionState.hasErrorData =
         true;
 
+    expeditionState.revertedErrors =
+        0;
+
     expeditionState.revertedSortingErrors =
         0;
 
@@ -1598,6 +1921,9 @@ function resetExpeditionReport() {
 
     expeditionState.errorStreets =
         [];
+
+    expeditionState.revertedErrors =
+        0;
 
     expeditionState.revertedSortingErrors =
         0;

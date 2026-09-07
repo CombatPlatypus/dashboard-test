@@ -1,5 +1,4 @@
 import {
-    getExpeditionErrorAnalysis,
     getExpeditionOperatorRanking,
     getExpeditionState,
     replaceExpeditionRoutes,
@@ -688,11 +687,6 @@ async function importExpeditionFile(
                 getExpeditionState(),
             );
 
-        const errorAnalysis =
-            getExpeditionErrorAnalysis(
-                getExpeditionState(),
-            );
-
         importButton.textContent =
             "Importação Concluída";
 
@@ -729,15 +723,6 @@ async function importExpeditionFile(
 
             importWarnings.push(
                 inconsistentMessage,
-            );
-        }
-
-        if (
-            errorAnalysis.hasErrorData &&
-            errorAnalysis.hasDivergence
-        ) {
-            importWarnings.push(
-                `A planilha de erros possui ${errorAnalysis.spreadsheetTotal.toLocaleString("pt-BR")} erro(s), mas o SPX possui ${errorAnalysis.spxTotal.toLocaleString("pt-BR")}. O total do SPX prevaleceu e a distribuição foi balanceada proporcionalmente.`,
             );
         }
 

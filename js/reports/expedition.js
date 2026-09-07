@@ -218,6 +218,11 @@ function getExpeditionElements() {
                 "expeditionExceptionInput",
             ),
 
+        revertedInput:
+            document.getElementById(
+                "expeditionRevertedInput",
+            ),
+
         revertedSortingInput:
             document.getElementById(
                 "expeditionRevertedSortingInput",
@@ -312,16 +317,6 @@ function getExpeditionElements() {
         previewRevertedErrors:
             document.getElementById(
                 "expeditionPreviewRevertedErrors",
-            ),
-
-        previewRevertedSortingErrors:
-            document.getElementById(
-                "expeditionPreviewRevertedSortingErrors",
-            ),
-
-        previewRevertedLabelingErrors:
-            document.getElementById(
-                "expeditionPreviewRevertedLabelingErrors",
             ),
 
         previewRevertedRate:
@@ -473,11 +468,11 @@ function setExpeditionGeneralControlsAvailability(
     elements.exceptionInput.disabled =
         disabled;
 
-    elements.revertedSortingInput.disabled =
+    elements.revertedInput.disabled =
         !hasErrorAnalysis;
 
-    elements.revertedLabelingInput.disabled =
-        !hasErrorAnalysis;
+    elements.revertedSortingInput.disabled = true;
+    elements.revertedLabelingInput.disabled = true;
 }
 
 /* TABELA DOS CONFERENTES */
@@ -865,10 +860,10 @@ function createExpeditionStreetRow(
                 street.name || "—",
                 street.guardian || "—",
                 formatExpeditionQuantity(
-                    street.sortingErrors,
+                    street.missingOrders,
                 ),
                 formatExpeditionQuantity(
-                    street.labelingErrors,
+                    street.totalErrors,
                 ),
                 formatExpeditionRate(
                     street.errorRate,
@@ -979,18 +974,6 @@ function renderExpeditionErrorTables(
                 analysis.totalRevertedErrors,
             );
 
-    elements.previewRevertedSortingErrors
-        .textContent =
-            quantity(
-                analysis.revertedSortingErrors,
-            );
-
-    elements.previewRevertedLabelingErrors
-        .textContent =
-            quantity(
-                analysis.revertedLabelingErrors,
-            );
-
     elements.previewRevertedRate
         .textContent =
             formatExpeditionRate(
@@ -1022,6 +1005,14 @@ function renderExpeditionErrorTables(
             );
 
     setExpeditionInputValue(
+        elements.revertedInput,
+        analysis.canCalculate
+            ? analysis
+                .totalRevertedErrors
+            : null,
+    );
+
+    setExpeditionInputValue(
         elements.revertedSortingInput,
         analysis.canCalculate
             ? analysis
@@ -1039,9 +1030,7 @@ function renderExpeditionErrorTables(
 
     renderExpeditionStreetTable(
         elements,
-        analysis.canCalculate
-            ? analysis.streets
-            : [],
+        analysis.streets,
     );
 }
 
@@ -1276,13 +1265,8 @@ function bindExpeditionEvents(
     );
 
     bindManualQuantityInput(
-        elements.revertedSortingInput,
-        "revertedSortingErrors",
-    );
-
-    bindManualQuantityInput(
-        elements.revertedLabelingInput,
-        "revertedLabelingErrors",
+        elements.revertedInput,
+        "revertedErrors",
     );
     
     const handleWindowChange =

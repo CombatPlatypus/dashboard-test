@@ -10,808 +10,331 @@ import {
 
 /* CONFIGURAÇÕES */
 
-const MAX_EXPEDITION_ERRORS_FILE_SIZE =
-    10 * 1024 * 1024;
+const EXPEDITION_ERRORS_HEADER_SEARCH_ROWS = 20;
+const EXPEDITION_ERRORS_FEEDBACK_DURATION = 1800;
 
-const MAX_EXPEDITION_ERRORS_HEADER_SEARCH_ROWS =
-    50;
-
-const expeditionErrorsFileExtensions =
-    new Set([
-        "xlsx",
-        "xls",
-    ]);
-
-const expeditionErrorsSheetNames = {
-    streets:
-        "layout das ruas",
-
-    errors:
-        "bipagem de erros",
-};
-
-const expeditionErrorsColumnAliases = {
-    code: [
-        "codigo br",
-    ],
-
+const expeditionErrorsHeaderAliases = {
     sorting: [
         "erro de sorting",
         "erros de sorting",
     ],
-
     labeling: [
         "erro de etiqueta",
         "erros de etiqueta",
         "erro de etiquetagem",
         "erros de etiquetagem",
     ],
-
-    route: [
-        "rota do pacote",
-        "rota",
+    code: [
+        "codigo br",
     ],
 };
 
 /* NORMALIZAÇÕES */
 
-function normalizeExpeditionErrorsText(
-    value,
-) {
-    return String(
-        value ?? "",
-    )
-        .replace(
-            /\s+/g,
-            " ",
-        )
+function normalizeExpeditionErrorsText(value) {
+    return String(value ?? "")
+        .replace(/\u00a0/g, " ")
+        .replace(/\s+/g, " ")
         .trim();
 }
 
-function normalizeExpeditionErrorsKey(
-    value,
-) {
-    return normalizeExpeditionErrorsText(
-        value,
-    )
-        .normalize(
-            "NFD",
-        )
-        .replace(
-            /[\u0300-\u036f]/g,
-            "",
-        )
+function normalizeExpeditionErrorsKey(value) {
+    return normalizeExpeditionErrorsText(value)
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
         .toLowerCase()
-        .replace(
-            /[^a-z0-9]+/g,
-            " ",
-        )
+        .replace(/[^a-z0-9]+/g, " ")
         .trim();
 }
 
-function normalizeExpeditionRouteCode(
-    value,
-) {
-    return normalizeExpeditionErrorsText(
-        value,
-    ).toUpperCase();
-}
-
-/* LOCALIZA AS ABAS DO MODELO */
-
-function findExpeditionErrorsWorksheet(
-    workbook,
-    expectedName,
-) {
-    const sheetName =
-        workbook.SheetNames.find(
-            function (receivedName) {
-                return (
-                    normalizeExpeditionErrorsKey(
-                        receivedName,
-                    ) ===
-                    expectedName
-                );
-            },
-        );
-
-    return sheetName
-        ? workbook.Sheets[
-            sheetName
-        ]
-        : null;
-}
-
-function getExpeditionWorksheetRows(
-    worksheet,
-) {
-    return window.XLSX.utils
-        .sheet_to_json(
-            worksheet,
-            {
-                header: 1,
-                defval: "",
-                raw: false,
-                blankrows: true,
-            },
-        );
-}
-
-/* LÊ O LAYOUT DAS RUAS */
-
-function getExpeditionStreetName(
-    sequence,
-    letter,
-) {
-    const receivedLetter =
-        normalizeExpeditionErrorsText(
-            letter,
-        );
-
-    if (receivedLetter) {
-        return /^rua\b/i.test(
-            receivedLetter,
-        )
-            ? receivedLetter
-            : `Rua ${receivedLetter}`;
-    }
-
-    return normalizeExpeditionErrorsText(
-        sequence,
+function isExpeditionPackageCode(value) {
+    return /^BR[A-Z0-9]+$/i.test(
+        normalizeExpeditionErrorsText(value),
     );
 }
 
-function createExpeditionStreets(
-    rows,
-) {
-    const streetColumnCount =
-        Math.max(
-            rows[0]?.length ?? 0,
-            rows[1]?.length ?? 0,
-            rows[2]?.length ?? 0,
-        );
+/* CONVERTE O TEXTO COPIADO EM LINHAS */
 
-    const streets = [];
+function getExpeditionErrorsClipboardRows(text) {
+    const clipboardText = String(text ?? "")
+        .replace(/\r\n?/g, "\n")
+        .trimEnd();
 
-    for (
-        let columnIndex = 1;
-        columnIndex <
-            streetColumnCount;
-        columnIndex += 1
-    ) {
-        const sequence =
-            normalizeExpeditionErrorsText(
-                rows[0]?.[
-                    columnIndex
-                ],
-            );
-
-        const letter =
-            normalizeExpeditionErrorsText(
-                rows[1]?.[
-                    columnIndex
-                ],
-            );
-
-        const guardian =
-            normalizeExpeditionErrorsText(
-                rows[2]?.[
-                    columnIndex
-                ],
-            );
-
-        const routeCodes =
-            new Set();
-
-        for (
-            let rowIndex = 3;
-            rowIndex < rows.length;
-            rowIndex += 1
-        ) {
-            const routeCode =
-                normalizeExpeditionRouteCode(
-                    rows[rowIndex]?.[
-                        columnIndex
-                    ],
-                );
-
-            if (routeCode) {
-                routeCodes.add(
-                    routeCode,
-                );
-            }
-        }
-
-        const name =
-            getExpeditionStreetName(
-                sequence,
-                letter,
-            );
-
-        if (
-            !name &&
-            !guardian &&
-            routeCodes.size === 0
-        ) {
-            continue;
-        }
-
-        streets.push({
-            name:
-                name ||
-                `Rua ${streets.length + 1}`,
-
-            guardian,
-            routeCodes,
-            sortingErrors: 0,
-            labelingErrors: 0,
-        });
-    }
-
-    if (streets.length === 0) {
+    if (!clipboardText.trim()) {
         throw new Error(
-            "Nenhuma rua foi encontrada na aba Layout das Ruas.",
+            "A área de transferência está vazia.",
         );
     }
 
-    return streets;
+    return clipboardText
+        .split("\n")
+        .map(function (line) {
+            return line.split("\t");
+        });
 }
 
-function createExpeditionStreetRouteMap(
-    streets,
-) {
-    const routes =
-        new Map();
-
-    let duplicateRoutes = 0;
-
-    streets.forEach(
-        function (
-            street,
-            streetIndex,
-        ) {
-            street.routeCodes
-                .forEach(
-                    function (routeCode) {
-                        if (
-                            routes.has(
-                                routeCode,
-                            )
-                        ) {
-                            duplicateRoutes += 1;
-                            return;
-                        }
-
-                        routes.set(
-                            routeCode,
-                            streetIndex,
-                        );
-                    },
-                );
-        },
-    );
-
-    return {
-        routes,
-        duplicateRoutes,
-    };
-}
-
-/* LÊ A BIPAGEM DE ERROS */
-
-function findExpeditionErrorsColumn(
-    headers,
+function findExpeditionErrorsHeaderColumn(
+    row,
     aliases,
-    startIndex = 0,
-    endIndex = headers.length,
 ) {
-    for (
-        let columnIndex = startIndex;
-        columnIndex < endIndex;
-        columnIndex += 1
-    ) {
-        if (
-            aliases.includes(
-                headers[columnIndex],
-            )
-        ) {
-            return columnIndex;
-        }
-    }
-
-    return -1;
+    return row
+        .map(normalizeExpeditionErrorsKey)
+        .findIndex(function (header) {
+            return aliases.includes(header);
+        });
 }
 
-function findExpeditionErrorsColumns(
-    rows,
-) {
-    const searchLimit =
-        Math.min(
-            rows.length,
-            MAX_EXPEDITION_ERRORS_HEADER_SEARCH_ROWS,
-        );
+function findExpeditionErrorsClipboardSource(rows) {
+    const searchLimit = Math.min(
+        rows.length,
+        EXPEDITION_ERRORS_HEADER_SEARCH_ROWS,
+    );
 
     for (
         let rowIndex = 0;
         rowIndex < searchLimit;
         rowIndex += 1
     ) {
-        const normalizedHeaders =
-            (
-                Array.isArray(
-                    rows[rowIndex],
-                )
-                    ? rows[rowIndex]
-                    : []
-            ).map(
-                normalizeExpeditionErrorsKey,
+        const row = Array.isArray(rows[rowIndex])
+            ? rows[rowIndex]
+            : [];
+
+        const sortingColumn =
+            findExpeditionErrorsHeaderColumn(
+                row,
+                expeditionErrorsHeaderAliases.sorting,
             );
 
-        const sortingGroupColumn =
-            findExpeditionErrorsColumn(
-                normalizedHeaders,
-                expeditionErrorsColumnAliases.sorting,
+        const labelingColumn =
+            findExpeditionErrorsHeaderColumn(
+                row,
+                expeditionErrorsHeaderAliases.labeling,
             );
 
-        const labelingGroupColumn =
-            findExpeditionErrorsColumn(
-                normalizedHeaders,
-                expeditionErrorsColumnAliases.labeling,
-            );
-
-        const legacyRouteColumn =
-            findExpeditionErrorsColumn(
-                normalizedHeaders,
-                expeditionErrorsColumnAliases.route,
-            );
-
-        /*
-         * Mantém compatibilidade com o formato antigo:
-         * Erro de Sorting | Erro de Etiqueta | Rota do Pacote
-         */
         if (
-            sortingGroupColumn !== -1 &&
-            labelingGroupColumn !== -1 &&
-            legacyRouteColumn !== -1
-        ) {
-            return {
-                rowIndex,
-
-                columns: {
-                    sorting:
-                        sortingGroupColumn,
-
-                    sortingRoute:
-                        legacyRouteColumn,
-
-                    labeling:
-                        labelingGroupColumn,
-
-                    labelingRoute:
-                        legacyRouteColumn,
-                },
-            };
-        }
-
-        /*
-         * Novo formato:
-         *
-         * Erro de Sorting       Erro de Etiqueta
-         * Código BR | Rota      Código BR | Rota
-         */
-        if (
-            sortingGroupColumn === -1 ||
-            labelingGroupColumn === -1 ||
-            rowIndex + 1 >= rows.length
+            sortingColumn === -1 ||
+            labelingColumn === -1
         ) {
             continue;
         }
 
-        const detailRowIndex =
-            rowIndex + 1;
+        const detailSearchLimit = Math.min(
+            rows.length,
+            rowIndex + 4,
+        );
 
-        const detailHeaders =
-            (
-                Array.isArray(
-                    rows[detailRowIndex],
-                )
-                    ? rows[detailRowIndex]
-                    : []
-            ).map(
-                normalizeExpeditionErrorsKey,
-            );
-
-        const sortingEndColumn =
-            labelingGroupColumn >
-            sortingGroupColumn
-                ? labelingGroupColumn
-                : detailHeaders.length;
-
-        const labelingEndColumn =
-            sortingGroupColumn >
-            labelingGroupColumn
-                ? sortingGroupColumn
-                : detailHeaders.length;
-
-        const sortingCodeColumn =
-            findExpeditionErrorsColumn(
-                detailHeaders,
-                expeditionErrorsColumnAliases.code,
-                sortingGroupColumn,
-                sortingEndColumn,
-            );
-
-        const sortingRouteColumn =
-            findExpeditionErrorsColumn(
-                detailHeaders,
-                expeditionErrorsColumnAliases.route,
-                sortingGroupColumn,
-                sortingEndColumn,
-            );
-
-        const labelingCodeColumn =
-            findExpeditionErrorsColumn(
-                detailHeaders,
-                expeditionErrorsColumnAliases.code,
-                labelingGroupColumn,
-                labelingEndColumn,
-            );
-
-        const labelingRouteColumn =
-            findExpeditionErrorsColumn(
-                detailHeaders,
-                expeditionErrorsColumnAliases.route,
-                labelingGroupColumn,
-                labelingEndColumn,
-            );
-
-        if (
-            sortingCodeColumn !== -1 &&
-            sortingRouteColumn !== -1 &&
-            labelingCodeColumn !== -1 &&
-            labelingRouteColumn !== -1
+        for (
+            let detailRowIndex = rowIndex + 1;
+            detailRowIndex < detailSearchLimit;
+            detailRowIndex += 1
         ) {
-            return {
-                rowIndex:
-                    detailRowIndex,
+            const detailRow =
+                rows[detailRowIndex] ?? [];
 
-                columns: {
-                    sorting:
-                        sortingCodeColumn,
+            const sortingHeader =
+                normalizeExpeditionErrorsKey(
+                    detailRow[sortingColumn],
+                );
 
-                    sortingRoute:
-                        sortingRouteColumn,
+            const labelingHeader =
+                normalizeExpeditionErrorsKey(
+                    detailRow[labelingColumn],
+                );
 
-                    labeling:
-                        labelingCodeColumn,
-
-                    labelingRoute:
-                        labelingRouteColumn,
-                },
-            };
+            if (
+                expeditionErrorsHeaderAliases.code
+                    .includes(sortingHeader) &&
+                expeditionErrorsHeaderAliases.code
+                    .includes(labelingHeader)
+            ) {
+                return {
+                    headerRowIndex: detailRowIndex,
+                    sortingColumn,
+                    labelingColumn,
+                };
+            }
         }
     }
 
     throw new Error(
-        "Não encontrei os blocos Erro de Sorting e Erro de Etiqueta com as colunas Código BR e Rota do Pacote na aba Bipagem de Erros.",
+        "Não encontrei os blocos Erro de Sorting e Erro de Etiqueta. Selecione e copie toda a planilha.",
     );
 }
 
-function applyExpeditionErrorsToStreets(
-    rows,
-    header,
-    streets,
-    routeMap,
-) {
+/* LÊ OS TOTAIS COPIADOS DA PLANILHA */
+
+function parseExpeditionErrorsClipboardText(text) {
+    const rows =
+        getExpeditionErrorsClipboardRows(text);
+
+    const source =
+        findExpeditionErrorsClipboardSource(rows);
+
     let sortingErrors = 0;
     let labelingErrors = 0;
-    let unmappedSortingErrors = 0;
-    let unmappedLabelingErrors = 0;
 
     for (
-        let rowIndex =
-            header.rowIndex + 1;
+        let rowIndex = source.headerRowIndex + 1;
         rowIndex < rows.length;
         rowIndex += 1
     ) {
-        const row =
-            rows[rowIndex] ?? [];
+        const row = rows[rowIndex] ?? [];
 
-        const sortingEntry =
-            normalizeExpeditionErrorsText(
-                row[
-                    header.columns
-                        .sorting
-                ],
-            );
-
-        const labelingEntry =
-            normalizeExpeditionErrorsText(
-                row[
-                    header.columns
-                        .labeling
-                ],
-            );
-
-        const sortingPackageRoute =
-            normalizeExpeditionRouteCode(
-                row[
-                    header.columns
-                        .sortingRoute
-                ],
-            );
-
-        const labelingPackageRoute =
-            normalizeExpeditionRouteCode(
-                row[
-                    header.columns
-                        .labelingRoute
-                ],
-            );
-
-        if (sortingEntry) {
+        if (
+            isExpeditionPackageCode(
+                row[source.sortingColumn],
+            )
+        ) {
             sortingErrors += 1;
-
-            const sortingRoute =
-                routeMap.has(
-                    sortingPackageRoute,
-                )
-                    ? sortingPackageRoute
-                    : normalizeExpeditionRouteCode(
-                        sortingEntry,
-                    );
-
-            const streetIndex =
-                routeMap.get(
-                    sortingRoute,
-                );
-
-                if (
-                    streetIndex ===
-                    undefined
-                ) {
-                    unmappedSortingErrors += 1;
-                } else {
-                    streets[
-                        streetIndex
-                    ].sortingErrors += 1;
-                }
         }
 
-        if (labelingEntry) {
+        if (
+            isExpeditionPackageCode(
+                row[source.labelingColumn],
+            )
+        ) {
             labelingErrors += 1;
-
-            const streetIndex =
-                routeMap.get(
-                    labelingPackageRoute,
-                );
-
-            if (
-                streetIndex ===
-                undefined
-            ) {
-                unmappedLabelingErrors += 1;
-            } else {
-                streets[
-                    streetIndex
-                ].labelingErrors += 1;
-            }
         }
+    }
+
+    if (
+        sortingErrors === 0 &&
+        labelingErrors === 0
+    ) {
+        throw new Error(
+            "Nenhum Código BR foi encontrado nas listas de Sorting e Etiqueta.",
+        );
     }
 
     return {
         sortingErrors,
         labelingErrors,
-        unmappedSortingErrors,
-        unmappedLabelingErrors,
-    };
-}
-    
-/* CONVERTE A PLANILHA PARA O ESTADO */
-
-function parseExpeditionErrorsWorkbook(
-    workbook,
-) {
-    const streetsWorksheet =
-        findExpeditionErrorsWorksheet(
-            workbook,
-            expeditionErrorsSheetNames
-                .streets,
-        );
-
-    const errorsWorksheet =
-        findExpeditionErrorsWorksheet(
-            workbook,
-            expeditionErrorsSheetNames
-                .errors,
-        );
-
-    if (!streetsWorksheet) {
-        throw new Error(
-            "Não encontrei a aba Layout das Ruas.",
-        );
-    }
-
-    if (!errorsWorksheet) {
-        throw new Error(
-            "Não encontrei a aba Bipagem de Erros.",
-        );
-    }
-
-    const streetRows =
-        getExpeditionWorksheetRows(
-            streetsWorksheet,
-        );
-
-    const errorRows =
-        getExpeditionWorksheetRows(
-            errorsWorksheet,
-        );
-
-    const streets =
-        createExpeditionStreets(
-            streetRows,
-        );
-
-    const routeMapping =
-        createExpeditionStreetRouteMap(
-            streets,
-        );
-
-    const header =
-        findExpeditionErrorsColumns(
-            errorRows,
-        );
-
-    const totals =
-        applyExpeditionErrorsToStreets(
-            errorRows,
-            header,
-            streets,
-            routeMapping.routes,
-        );
-
-    return {
-        sortingErrors:
-            totals.sortingErrors,
-
-        labelingErrors:
-            totals.labelingErrors,
-
-        streets:
-            streets.map(
-                function (street) {
-                    return {
-                        name:
-                            street.name,
-
-                        guardian:
-                            street.guardian,
-
-                        sortingErrors:
-                            street.sortingErrors,
-
-                        labelingErrors:
-                            street.labelingErrors,
-                    };
-                },
-            ),
-
-        duplicateRoutes:
-            routeMapping
-                .duplicateRoutes,
-
-        unmappedSortingErrors:
-            totals
-                .unmappedSortingErrors,
-
-        unmappedLabelingErrors:
-            totals
-                .unmappedLabelingErrors,
     };
 }
 
-/* LÊ O ARQUIVO */
+/* ACESSA A ÁREA DE TRANSFERÊNCIA */
 
-async function readExpeditionErrorsFile(
-    file,
-) {
-    const extension =
-        file.name
-            .split(".")
-            .pop()
-            .toLowerCase();
-
-    if (
-        !expeditionErrorsFileExtensions
-            .has(
-                extension,
-            )
-    ) {
+async function readExpeditionErrorsClipboardText() {
+    if (!navigator.clipboard) {
         throw new Error(
-            "Selecione a planilha XLSX ou XLS do processamento.",
+            "O navegador não disponibilizou acesso à área de transferência.",
         );
     }
 
+    let readError = null;
+
     if (
-        file.size >
-        MAX_EXPEDITION_ERRORS_FILE_SIZE
+        typeof navigator.clipboard.readText ===
+        "function"
     ) {
-        throw new Error(
-            "O arquivo ultrapassa o limite de 10 MB.",
-        );
+        try {
+            const text =
+                await navigator.clipboard.readText();
+
+            if (text) {
+                return text;
+            }
+        } catch (error) {
+            readError = error;
+        }
     }
 
     if (
-        typeof window.XLSX !==
-            "object" ||
-        typeof window.XLSX.read !==
-            "function"
+        typeof navigator.clipboard.read ===
+        "function"
     ) {
+        try {
+            const items =
+                await navigator.clipboard.read();
+
+            for (const item of items) {
+                if (
+                    !item.types.includes("text/plain")
+                ) {
+                    continue;
+                }
+
+                const blob = await item.getType(
+                    "text/plain",
+                );
+
+                const text = await blob.text();
+
+                if (text) {
+                    return text;
+                }
+            }
+        } catch (error) {
+            readError = error;
+        }
+    }
+
+    if (readError?.name === "NotAllowedError") {
         throw new Error(
-            "A biblioteca de leitura de planilhas não foi carregada.",
+            "O navegador bloqueou a área de transferência. Permita o acesso e clique novamente.",
         );
     }
 
-    const fileBuffer =
-        await file.arrayBuffer();
-
-    const workbook =
-        window.XLSX.read(
-            fileBuffer,
-            {
-                type: "array",
-            },
-        );
-
-    return parseExpeditionErrorsWorkbook(
-        workbook,
-    );
-}
-
-function showExpeditionErrorsImportError(
-    message,
-) {
-    setReportNotification({
-        type: "error",
-
-        message:
-            `Falha na importação: ${message}`,
-    });
-
-    window.alert(
-        message,
+    throw new Error(
+        "Não foi possível ler a área de transferência.",
     );
 }
 
 /* CONTROLA A IMPORTAÇÃO */
 
-async function importExpeditionErrorsFile(
-    file,
+function getExpeditionErrorsSuccessMessage(analysis) {
+    const spreadsheetTotal =
+        analysis.spreadsheetTotal.toLocaleString(
+            "pt-BR",
+        );
+
+    if (!analysis.hasSpXData) {
+        return (
+            `A planilha importada possui ${spreadsheetTotal} erro(s). ` +
+            "Importe também a conferência do SPX para calcular os totais."
+        );
+    }
+
+    const spxTotal =
+        analysis.spxTotal.toLocaleString("pt-BR");
+
+    if (analysis.hasDivergence) {
+        return (
+            `A planilha importada possui ${spreadsheetTotal} erro(s), ` +
+            `mas o SPX possui ${spxTotal}. ` +
+            "O total do SPX prevaleceu e a distribuição foi balanceada proporcionalmente."
+        );
+    }
+
+    return (
+        `A planilha importada possui ${spreadsheetTotal} erro(s), ` +
+        "igual ao total do SPX."
+    );
+}
+
+async function importExpeditionErrorsFromClipboard(
     importButton,
 ) {
     const originalLabel =
-        importButton.textContent
-            .trim();
+        importButton.textContent.trim();
 
-    const originalTitle =
-        importButton.title;
+    const originalTitle = importButton.title;
 
-    importButton.disabled =
-        true;
-
-    importButton.textContent =
-        "Importando...";
+    importButton.disabled = true;
+    importButton.textContent = "Importando...";
 
     try {
+        const clipboardText =
+            await readExpeditionErrorsClipboardText();
+
         const result =
-            await readExpeditionErrorsFile(
-                file,
+            parseExpeditionErrorsClipboardText(
+                clipboardText,
             );
 
         replaceExpeditionErrorData(
             result,
-            file.name,
+            "Área de transferência",
         );
 
         const analysis =
@@ -819,82 +342,46 @@ async function importExpeditionErrorsFile(
                 getExpeditionState(),
             );
 
-        const importWarnings = [];
-
-        if (
-            result.duplicateRoutes > 0
-        ) {
-            importWarnings.push(
-                `${result.duplicateRoutes} rota(s) repetida(s) no layout usaram a primeira rua encontrada.`,
+        const message =
+            getExpeditionErrorsSuccessMessage(
+                analysis,
             );
-        }
-
-        const unmappedErrors =
-            result.unmappedSortingErrors +
-            result.unmappedLabelingErrors;
-
-        if (unmappedErrors > 0) {
-            importWarnings.push(
-                `${unmappedErrors} erro(s) sem uma rua correspondente foram agrupados em Não identificada.`,
-            );
-        }
-
-        if (!analysis.hasSpXData) {
-            importWarnings.push(
-                "Importe também a conferência do SPX para calcular e balancear os totais.",
-            );
-        } else if (
-            analysis.hasDivergence
-        ) {
-            importWarnings.push(
-                `A planilha possui ${analysis.spreadsheetTotal.toLocaleString("pt-BR")} erro(s), mas o SPX possui ${analysis.spxTotal.toLocaleString("pt-BR")}. O total do SPX prevaleceu e a distribuição foi balanceada proporcionalmente.`,
-            );
-        }
 
         importButton.textContent =
             "Importação Concluída";
 
         importButton.title =
-            `${(
-                result.sortingErrors +
-                result.labelingErrors
-            ).toLocaleString(
-                "pt-BR",
-            )} erros importados.`;
+            `${analysis.spreadsheetTotal.toLocaleString("pt-BR")} erros importados.`;
 
         setReportNotification({
             type:
-                importWarnings.length > 0
+                analysis.hasDivergence ||
+                !analysis.hasSpXData
                     ? "warning"
                     : "success",
-
-            message: [
-                `Planilha de erros ${file.name} importada.`,
-                ...importWarnings,
-            ].join(
-                " ",
-            ),
+            message,
         });
     } catch (error) {
         const errorMessage =
             error instanceof Error
                 ? error.message
-                : "Não foi possível importar a planilha de erros.";
+                : "Não foi possível importar os erros copiados.";
 
         console.error(
-            "Não foi possível importar a planilha de erros:",
+            "Não foi possível importar os erros copiados:",
             error,
         );
 
         importButton.textContent =
             "Erro na Importação";
 
-        importButton.title =
-            errorMessage;
+        importButton.title = errorMessage;
 
-        showExpeditionErrorsImportError(
-            errorMessage,
-        );
+        setReportNotification({
+            type: "error",
+            message:
+                `Falha na importação: ${errorMessage}`,
+        });
     } finally {
         window.setTimeout(
             function () {
@@ -904,10 +391,9 @@ async function importExpeditionErrorsFile(
                 importButton.title =
                     originalTitle;
 
-                importButton.disabled =
-                    false;
+                importButton.disabled = false;
             },
-            1800,
+            EXPEDITION_ERRORS_FEEDBACK_DURATION,
         );
     }
 }
@@ -920,65 +406,37 @@ function initializeExpeditionErrorsImport() {
             "expeditionErrorsImportButton",
         );
 
-    const fileInput =
-        document.getElementById(
-            "expeditionErrorsFileInput",
-        );
-
     if (
         !(
             importButton instanceof
                 HTMLButtonElement
-        ) ||
-        !(
-            fileInput instanceof
-                HTMLInputElement
         )
     ) {
         console.error(
-            "Não foi possível inicializar a importação da planilha de erros: botão ou input de arquivo não encontrado.",
+            "Não foi possível inicializar a importação dos erros: botão não encontrado.",
         );
 
         return false;
     }
 
     if (
-        fileInput.dataset
+        importButton.dataset
             .expeditionErrorsImportInitialized ===
         "true"
     ) {
         return true;
     }
 
-    fileInput.dataset
+    importButton.dataset
         .expeditionErrorsImportInitialized =
             "true";
 
     importButton.addEventListener(
         "click",
         function () {
-            fileInput.click();
-        },
-    );
-
-    fileInput.addEventListener(
-        "change",
-        async function () {
-            const file =
-                fileInput.files?.[0];
-
-            if (!file) {
-                return;
-            }
-
-            try {
-                await importExpeditionErrorsFile(
-                    file,
-                    importButton,
-                );
-            } finally {
-                fileInput.value = "";
-            }
+            importExpeditionErrorsFromClipboard(
+                importButton,
+            );
         },
     );
 
@@ -987,6 +445,6 @@ function initializeExpeditionErrorsImport() {
 
 export {
     initializeExpeditionErrorsImport,
-    parseExpeditionErrorsWorkbook,
-    readExpeditionErrorsFile,
+    parseExpeditionErrorsClipboardText,
+    readExpeditionErrorsClipboardText,
 };

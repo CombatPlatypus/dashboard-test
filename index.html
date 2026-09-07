@@ -295,7 +295,7 @@
                 background-color: var(--color-border);
             }
 
-            #controls-mistakes .input-group:first-of-type {
+            #controls-mistakes .input-group {
                 grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)) !important;
             }
 
@@ -1823,7 +1823,7 @@
 
                                             <div>
                                                 <h4>Planilha Processamento e Expedição </h4>
-                                                <p>Exporte do Google Sheets e importe aqui.</p>
+                                                <p>Selecione e copie toda a planilha; depois importe aqui.</p>
                                             </div>
                                         </div>
 
@@ -1833,8 +1833,6 @@
                                                     Importar Planilha de Erros
                                                 </button>
                                             </div>
-
-                                            <input id="expeditionErrorsFileInput" type="file" accept=".xlsx,.xls" hidden>
                                         </div>
 
                                         <div class="input-group">
@@ -1845,12 +1843,12 @@
 
                                             <div>
                                                 <h4>Sorting</h4>
-                                                <input id="" type="text" inputmode="numeric" maxlength="8" autocomplete="off" disabled>
+                                                <input id="expeditionRevertedSortingInput" type="text" inputmode="numeric" maxlength="8" autocomplete="off" disabled>
                                             </div>
 
                                             <div>
                                                 <h4>Etiquetagem</h4>
-                                                <input id="" type="text" inputmode="numeric" maxlength="8" autocomplete="off" disabled>
+                                                <input id="expeditionRevertedLabelingInput" type="text" inputmode="numeric" maxlength="8" autocomplete="off" disabled>
                                             </div>
                                         </div>
                                     </div>
