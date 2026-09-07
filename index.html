@@ -218,15 +218,13 @@
             #expedition .streets p {
                 font-size: 14px;
                 color: var(--color-gray-p);
+                line-height: 1;
             }
             #expedition .streets .flex-box-start {
                 column-gap: 15px;
             }
             #expedition .streets .streets-chart {
                 flex: 1 1 0;
-            }
-            #expedition .streets .streets-card {
-                flex: 0 0 400px;
             }
             #expedition .streets .streets-chart, #expedition .streets .streets-card {
                 padding: 20px;
@@ -246,8 +244,8 @@
                 height: 20px;
                 border-radius: 3px;
             }
-
             #expedition .streets .streets-card {
+                flex: 0 0 350px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -255,21 +253,20 @@
             #expedition .streets .streets-card > div {
                 margin: auto 0;
             }
-            .streets-card p {
+             #expedition .streets .streets-card p {
                 text-align: center;
                 margin-bottom: 15px;
             }
-            .streets-card h4 {
+             #expedition .streets .streets-card h4 {
                 text-align: center;
-                margin-bottom: 15px;
+                margin-bottom: 5px;
             }
-            .streets-card h3 {
+             #expedition .streets .streets-card h3 {
                 text-align: center;
             }
-            .streets-card p:last-of-type {
+             #expedition .streets .streets-card p:last-of-type {
                 margin-bottom: 0px;
             }
-
 
             /* CONTROLES */
 
@@ -1583,17 +1580,13 @@
                                                     <thead>
                                                         <tr>
                                                             <th>Erros Revertidos</th>
-                                                            <th>De Sorting Revertidos</th>
-                                                            <th>De Etiqueta Revertidos</th>
-                                                            <th>Taxa de Revertidos</th>
+                                                            <th>Taxa de Erros Revertidos</th>
                                                         </tr>
                                                     </thead>
 
                                                     <tbody>
                                                         <tr>
                                                             <td id="expeditionPreviewRevertedErrors">—</td>
-                                                            <td id="expeditionPreviewRevertedSortingErrors">—</td>
-                                                            <td id="expeditionPreviewRevertedLabelingErrors">—</td>
                                                             <td id="expeditionPreviewRevertedRate">—</td>
                                                         </tr>
                                                     </tbody>
@@ -1627,21 +1620,20 @@
 
                                                                 <div class="flex-box-start">
                                                                     <div class="type">
-                                                                        <div style="background-color: #ccc;"></div>
+                                                                        <div style="background-color: #ffc107;"></div>
                                                                         <p>Identificados</p>
                                                                     </div>
 
                                                                     <div class="type">
-                                                                        <div style="background-color: #ffc107;"></div>
+                                                                        <div style="background-color: #8BC34A;"></div>
                                                                         <p>Revertidos</p>
                                                                     </div>
 
                                                                     <div class="type">
-                                                                        <div style="background-color: #2196f3;"></div>
+                                                                        <div style="background-color: #FF5722;"></div>
                                                                         <p>Saldo Final</p>
                                                                     </div>
                                                                 </div>
-
                                                             </div>
                                                         </div>
 
@@ -1656,8 +1648,8 @@
                                                         <tr>
                                                             <th>Rua</th>
                                                             <th>Guardião</th>
-                                                            <th>Erros de Sorting</th>
-                                                            <th>Erros de Etiquetagem</th>
+                                                            <th>Pacotes Ausentes</th>
+                                                            <th>Erros da Rua</th>
                                                             <th>Taxa de Erros</th>
                                                         </tr>
                                                     </thead>
@@ -1682,15 +1674,14 @@
                                                                 <div class="flex-box-start">
                                                                     <div class="type">
                                                                         <div style="background-color: #ffc107;"></div>
-                                                                        <p>Sorting</p>
+                                                                        <p>Pacotes Ausentes</p>
                                                                     </div>
 
                                                                     <div class="type">
-                                                                        <div style="background-color: #2196f3;"></div>
-                                                                        <p>Etiquetagem</p>
+                                                                        <div style="background-color: #F44336;"></div>
+                                                                        <p>Erros de Sorting / Etiqueta</p>
                                                                     </div>
                                                                 </div>
-
                                                             </div>
                                                         </div>
 
@@ -1701,11 +1692,10 @@
 
                                                     <div class="streets-card">
                                                         <div>
-                                                            <p>Maior Ofensora</p>
-
-                                                            <h4>Rua <span id="">—</span></h4>
+                                                            <p>Maior Ofensor</p>
 
                                                             <h3 id="">Guardião</h3>
+                                                            <h4>Rua <span id="">—</span></h4>
 
                                                             <p>
                                                                 Taxa de Erros: <span id="">—</span>
@@ -1845,17 +1835,20 @@
 
                                         <div class="input-group">
                                             <div>
-                                                <h4>Sorting Revertidos</h4>
-                                                <input id="expeditionRevertedSortingInput" type="text" inputmode="numeric" maxlength="8" autocomplete="off" disabled>
+                                                <h4>Erros Sorting</h4>
+                                                <input id="" type="text" inputmode="numeric" maxlength="8" autocomplete="off" disabled>
                                             </div>
 
                                             <div>
-                                                <h4>Etiqueta Revertidos</h4>
-                                                <input id="expeditionRevertedLabelingInput" type="text" inputmode="numeric" maxlength="8" autocomplete="off" disabled>
+                                                <h4>Erros Etiquetagem</h4>
+                                                <input id="" type="text" inputmode="numeric" maxlength="8" autocomplete="off" disabled>
+                                            </div>
+                                            
+                                            <div>
+                                                <h4>Erros Revertidos</h4>
+                                                <input id="expeditionRevertedInput" type="text" inputmode="numeric" maxlength="8" autocomplete="off" disabled>
                                             </div>
                                         </div>
-
-
                                     </div>
                                 </div>
                             </div>
