@@ -295,6 +295,10 @@
                 background-color: var(--color-border);
             }
 
+            #controls-mistakes .input-group:first-of-type {
+                grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)) !important;
+            }
+
         </style>
     </head>	
 
@@ -1835,18 +1839,18 @@
 
                                         <div class="input-group">
                                             <div>
-                                                <h4>Erros Sorting</h4>
+                                                <h4>Revertidos</h4>
+                                                <input id="expeditionRevertedInput" type="text" inputmode="numeric" maxlength="8" autocomplete="off" disabled>
+                                            </div>
+
+                                            <div>
+                                                <h4>Sorting</h4>
                                                 <input id="" type="text" inputmode="numeric" maxlength="8" autocomplete="off" disabled>
                                             </div>
 
                                             <div>
-                                                <h4>Erros Etiquetagem</h4>
+                                                <h4>Etiquetagem</h4>
                                                 <input id="" type="text" inputmode="numeric" maxlength="8" autocomplete="off" disabled>
-                                            </div>
-                                            
-                                            <div>
-                                                <h4>Erros Revertidos</h4>
-                                                <input id="expeditionRevertedInput" type="text" inputmode="numeric" maxlength="8" autocomplete="off" disabled>
                                             </div>
                                         </div>
                                     </div>
