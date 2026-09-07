@@ -31,6 +31,10 @@ const expeditionErrorsSheetNames = {
 };
 
 const expeditionErrorsColumnAliases = {
+    code: [
+        "codigo br",
+    ],
+
     sorting: [
         "erro de sorting",
         "erros de sorting",
@@ -295,6 +299,29 @@ function createExpeditionStreetRouteMap(
 
 /* LÊ A BIPAGEM DE ERROS */
 
+function findExpeditionErrorsColumn(
+    headers,
+    aliases,
+    startIndex = 0,
+    endIndex = headers.length,
+) {
+    for (
+        let columnIndex = startIndex;
+        columnIndex < endIndex;
+        columnIndex += 1
+    ) {
+        if (
+            aliases.includes(
+                headers[columnIndex],
+            )
+        ) {
+            return columnIndex;
+        }
+    }
+
+    return -1;
+}
+
 function findExpeditionErrorsColumns(
     rows,
 ) {
@@ -320,49 +347,153 @@ function findExpeditionErrorsColumns(
                 normalizeExpeditionErrorsKey,
             );
 
-        const columns = {};
+        const sortingGroupColumn =
+            findExpeditionErrorsColumn(
+                normalizedHeaders,
+                expeditionErrorsColumnAliases.sorting,
+            );
 
-        let hasAllColumns =
-            true;
+        const labelingGroupColumn =
+            findExpeditionErrorsColumn(
+                normalizedHeaders,
+                expeditionErrorsColumnAliases.labeling,
+            );
 
-        for (
-            const [
-                field,
-                aliases,
-            ] of Object.entries(
-                expeditionErrorsColumnAliases,
-            )
+        const legacyRouteColumn =
+            findExpeditionErrorsColumn(
+                normalizedHeaders,
+                expeditionErrorsColumnAliases.route,
+            );
+
+        /*
+         * Mantém compatibilidade com o formato antigo:
+         * Erro de Sorting | Erro de Etiqueta | Rota do Pacote
+         */
+        if (
+            sortingGroupColumn !== -1 &&
+            labelingGroupColumn !== -1 &&
+            legacyRouteColumn !== -1
         ) {
-            const columnIndex =
-                normalizedHeaders
-                    .findIndex(
-                        function (header) {
-                            return aliases.includes(
-                                header,
-                            );
-                        },
-                    );
-
-            if (columnIndex === -1) {
-                hasAllColumns =
-                    false;
-                break;
-            }
-
-            columns[field] =
-                columnIndex;
-        }
-
-        if (hasAllColumns) {
             return {
                 rowIndex,
-                columns,
+
+                columns: {
+                    sorting:
+                        sortingGroupColumn,
+
+                    sortingRoute:
+                        legacyRouteColumn,
+
+                    labeling:
+                        labelingGroupColumn,
+
+                    labelingRoute:
+                        legacyRouteColumn,
+                },
+            };
+        }
+
+        /*
+         * Novo formato:
+         *
+         * Erro de Sorting       Erro de Etiqueta
+         * Código BR | Rota      Código BR | Rota
+         */
+        if (
+            sortingGroupColumn === -1 ||
+            labelingGroupColumn === -1 ||
+            rowIndex + 1 >= rows.length
+        ) {
+            continue;
+        }
+
+        const detailRowIndex =
+            rowIndex + 1;
+
+        const detailHeaders =
+            (
+                Array.isArray(
+                    rows[detailRowIndex],
+                )
+                    ? rows[detailRowIndex]
+                    : []
+            ).map(
+                normalizeExpeditionErrorsKey,
+            );
+
+        const sortingEndColumn =
+            labelingGroupColumn >
+            sortingGroupColumn
+                ? labelingGroupColumn
+                : detailHeaders.length;
+
+        const labelingEndColumn =
+            sortingGroupColumn >
+            labelingGroupColumn
+                ? sortingGroupColumn
+                : detailHeaders.length;
+
+        const sortingCodeColumn =
+            findExpeditionErrorsColumn(
+                detailHeaders,
+                expeditionErrorsColumnAliases.code,
+                sortingGroupColumn,
+                sortingEndColumn,
+            );
+
+        const sortingRouteColumn =
+            findExpeditionErrorsColumn(
+                detailHeaders,
+                expeditionErrorsColumnAliases.route,
+                sortingGroupColumn,
+                sortingEndColumn,
+            );
+
+        const labelingCodeColumn =
+            findExpeditionErrorsColumn(
+                detailHeaders,
+                expeditionErrorsColumnAliases.code,
+                labelingGroupColumn,
+                labelingEndColumn,
+            );
+
+        const labelingRouteColumn =
+            findExpeditionErrorsColumn(
+                detailHeaders,
+                expeditionErrorsColumnAliases.route,
+                labelingGroupColumn,
+                labelingEndColumn,
+            );
+
+        if (
+            sortingCodeColumn !== -1 &&
+            sortingRouteColumn !== -1 &&
+            labelingCodeColumn !== -1 &&
+            labelingRouteColumn !== -1
+        ) {
+            return {
+                rowIndex:
+                    detailRowIndex,
+
+                columns: {
+                    sorting:
+                        sortingCodeColumn,
+
+                    sortingRoute:
+                        sortingRouteColumn,
+
+                    labeling:
+                        labelingCodeColumn,
+
+                    labelingRoute:
+                        labelingRouteColumn,
+                },
             };
         }
     }
 
     throw new Error(
-        "Não encontrei as colunas Erro de Sorting, Erro de Etiqueta e Rota do Pacote na aba Bipagem de Erros.",
+        "Não encontrei os blocos Erro de Sorting e Erro de Etiqueta com as colunas Código BR e Rota do Pacote na aba Bipagem de Erros.",
     );
 }
 
@@ -402,61 +533,68 @@ function applyExpeditionErrorsToStreets(
                 ],
             );
 
-        const packageRoute =
-            normalizeExpeditionRouteCode(
-                row[
-                    header.columns
-                        .route
-                ],
+            const sortingPackageRoute =
+    normalizeExpeditionRouteCode(
+        row[
+            header.columns
+                .sortingRoute
+        ],
+    );
+
+const labelingPackageRoute =
+    normalizeExpeditionRouteCode(
+        row[
+            header.columns
+                .labelingRoute
+        ],
+    );
+
+if (sortingEntry) {
+    sortingErrors += 1;
+
+    const sortingRoute =
+        routeMap.has(
+            sortingPackageRoute,
+        )
+            ? sortingPackageRoute
+            : normalizeExpeditionRouteCode(
+                sortingEntry,
             );
 
-        if (sortingEntry) {
-            sortingErrors += 1;
+    const streetIndex =
+        routeMap.get(
+            sortingRoute,
+        );
 
-            const sortingRoute =
-                routeMap.has(
-                    packageRoute,
-                )
-                    ? packageRoute
-                    : normalizeExpeditionRouteCode(
-                        sortingEntry,
-                    );
-
-            const streetIndex =
-                routeMap.get(
-                    sortingRoute,
-                );
-
-            if (
-                streetIndex ===
-                undefined
-            ) {
-                unmappedSortingErrors += 1;
-            } else {
-                streets[
-                    streetIndex
-                ].sortingErrors += 1;
-            }
+        if (
+            streetIndex ===
+            undefined
+        ) {
+            unmappedSortingErrors += 1;
+        } else {
+            streets[
+                streetIndex
+            ].sortingErrors += 1;
         }
+    }
 
-        if (labelingEntry) {
-            labelingErrors += 1;
+    if (labelingEntry) {
+        labelingErrors += 1;
 
-            const streetIndex =
-                routeMap.get(
-                    packageRoute,
-                );
+        const streetIndex =
+            routeMap.get(
+                labelingPackageRoute,
+            );
 
-            if (
-                streetIndex ===
-                undefined
-            ) {
-                unmappedLabelingErrors += 1;
-            } else {
-                streets[
-                    streetIndex
-                ].labelingErrors += 1;
-            }
+        if (
+            streetIndex ===
+            undefined
+        ) {
+            unmappedLabelingErrors += 1;
+        } else {
+            streets[
+                streetIndex
+            ].labelingErrors += 1;
         }
     }
 
