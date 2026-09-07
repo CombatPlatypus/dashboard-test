@@ -63,10 +63,6 @@
         align-items: center;
         column-gap: 15px;
         margin-bottom: 20px;
-        background-color: var(--color-container);
-        border: 2px solid var(--color-border);
-        padding: 20px;
-        border-radius: 5px;
     }
     #reports > .tabs-content > .tabs-panel > .tabs .tabs-title {
         width: 100%;
@@ -216,8 +212,8 @@
         min-height: 40px;
         font-size: 14px;
         padding: 10px 15px;
-        color: var(--color-button);
-        background-color: var(--color-container);
+        color: var(--color-text);
+        background-color: var(--color-button);
         border-bottom: 5px solid var(--color-border);
     }
 
