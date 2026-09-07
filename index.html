@@ -250,6 +250,7 @@
             #expedition .streets .streets-card {
                 display: flex;
                 align-items: center;
+                justify-content: center;
             }
             #expedition .streets .streets-card > div {
                 margin: auto 0;
@@ -262,8 +263,11 @@
                 text-align: center;
                 margin-bottom: 15px;
             }
+            .streets-card h3 {
+                text-align: center;
+            }
             .streets-card p:last-of-type {
-                margin-bottom: 05px;
+                margin-bottom: 0px;
             }
 
 
@@ -1396,12 +1400,6 @@
                                 </li>
 
                                 <li class="tabs-title">
-                                    <a href="#expedition-streets">
-                                        <h4>Análise de Ruas</h4>
-                                    </a>
-                                </li>
-
-                                <li class="tabs-title">
                                     <a href="#expedition-damage">
                                         <h4>Análise de Avarias</h4>
                                     </a>
@@ -1621,7 +1619,52 @@
                                                     </tbody>
                                                 </table>
 
-                             
+                                                <div class="streets flex-box-start">
+                                                    <div class="streets-chart">
+                                                        <div class="chart-title">
+                                                            <div class="flex-box-between">
+                                                                <h4>Indentificados x Revertidos x Saldo Final</h4>
+
+                                                                <div class="flex-box-start">
+                                                                    <div class="type">
+                                                                        <div style="background-color: #ccc;"></div>
+                                                                        <p>Indentificados</p>
+                                                                    </div>
+
+                                                                    <div class="type">
+                                                                        <div style="background-color: #ffc107;"></div>
+                                                                        <p>Revertidos</p>
+                                                                    </div>
+
+                                                                    <div class="type">
+                                                                        <div style="background-color: #2196f3;"></div>
+                                                                        <p>Saldo Final</p>
+                                                                    </div>
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+
+                                                        <div>
+                                                            <canvas id="" role="img"></canvas>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="streets-card">
+                                                        <div>
+                                                            <p>Maior Ofensora</p>
+
+                                                            <h4>Rua <span id="">—</span></h4>
+
+                                                            <h3 id="">Guardião</h3>
+
+                                                            <p>
+                                                                Taxa de Erros: <span id="">—</span>
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
                                                 <table>
                                                     <thead>
                                                         <tr>
@@ -1723,7 +1766,6 @@
                                                             </p>
                                                         </div>
                                                     </div>
-
                                                 </div>
                                             </div>
                                         </div>
