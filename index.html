@@ -1382,25 +1382,25 @@
 
                             <ul class="tabs flex-box-start" data-tabs id="expedition-view-tabs">
                                 <li class="tabs-title is-active">
-                                    <a href="#expedition-tables">
+                                    <a href="#expedition-tables" data-controls-target="controls-summary">
                                         <h4>Resumo do Relatório</h4>
                                     </a>
                                 </li> 
 
                                 <li class="tabs-title">
-                                    <a href="#expedition-charts">
+                                    <a href="#expedition-charts" data-controls-target="controls-summary">
                                         <h4>Rank de Conferentes</h4>
                                     </a>
                                 </li>
 
                                 <li class="tabs-title">
-                                    <a href="#expedition-mistakes">
+                                    <a href="#expedition-mistakes" data-controls-target="controls-mistakes">
                                         <h4>Análise de Erros</h4>
                                     </a>
                                 </li>
 
                                 <li class="tabs-title">
-                                    <a href="#expedition-damage">
+                                    <a href="#expedition-damage" data-controls-target="controls-mistakes">
                                         <h4>Análise de Avarias</h4>
                                     </a>
                                 </li>
@@ -1761,73 +1761,85 @@
 
                                 <!-- CONTROLES DO RELATÓRIO -->
 
-                                <div class="report-controls">
-                                    <div class="history-link flex-box-start">
-                                        <a href="https://spx.shopee.com.br/#/generalReceiveTaskMgt" target="_blank">
-                                            <svg class="spreadsheets-link-icon" viewBox="0 0 24 24" aria-hidden="true">
-                                                <path d="M7 17L17 7M9 7H17V15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                                            </svg>
-                                        </a>
+                                <div class="report-controls" id="expedition-controls">
 
-                                        <div>
-                                            <h4>Gestão de Audit</h4>
-                                            <p>Exporte do SPX e importe aqui.</p>
+                                    <div class="expedition-controls-panel is-active" id="controls-summary">
+                                        <div class="history-link flex-box-start">
+                                            <a href="https://spx.shopee.com.br/#/generalReceiveTaskMgt" target="_blank">
+                                                <svg class="spreadsheets-link-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                                    <path d="M7 17L17 7M9 7H17V15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                                </svg>
+                                            </a>
+
+                                            <div>
+                                                <h4>Gestão de Audit</h4>
+                                                <p>Exporte do SPX e importe aqui.</p>
+                                            </div>
                                         </div>
+
+                                        <div class="history-import flex-box-start">
+                                            <div>
+                                                <button class="button" id="expeditionImportButton" type="button">Importar Conferência</button>
+                                            </div>
+
+                                            <input id="expeditionFileInput" type="file" accept=".csv,.xlsx,.xls" hidden>
+                                        </div>
+
+                                        <div class="input-group">
+                                            <div>
+                                                <h4>Janela</h4>
+
+                                                <select class="standard-select" id="expeditionWindowInput" disabled>
+                                                    <option value="AM">AM</option>
+                                                    <option value="PM1">PM1</option>
+                                                    <option value="PM2">PM2</option>
+                                                </select>
+                                            </div>
+
+                                            <div>
+                                                <h4>Rotas no Piso</h4>
+                                                <input id="expeditionFloorRoutesInput" type="text" inputmode="numeric" maxlength="8" autocomplete="off" disabled>
+                                            </div>
+
+                                            <div>
+                                                <h4>Pacotes Desconhecidos</h4>
+                                                <input id="expeditionUnknownInput" type="text" inputmode="numeric" maxlength="8" autocomplete="off" disabled>
+                                            </div>
+
+                                            <div>
+                                                <h4>Pacotes Exceção</h4>
+                                                <input id="expeditionExceptionInput" type="text" inputmode="numeric" maxlength="8" autocomplete="off" disabled>
+                                            </div>
+                                        </div>
+
+                                        <div class="input-group" id="expeditionOperatorControls"></div>
                                     </div>
 
-                                    <div class="history-import flex-box-start">
-                                        <div>
-                                            <button class="button" id="expeditionImportButton" type="button">Importar Conferência</button>
+                                    <div class="expedition-controls-panel" id="controls-mistakes">
+                                        <div class="history-link flex-box-start">
+                                            <a href="" target="_blank">
+                                                <svg class="spreadsheets-link-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                                    <path d="M7 17L17 7M9 7H17V15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                                </svg>
+                                            </a>
+
+                                            <div>
+                                                <h4>Planilha Processamento e Expedição </h4>
+                                                <p>Exporte do Google Sheets e importe aqui.</p>
+                                            </div>
                                         </div>
 
-                                        <input id="expeditionFileInput" type="file" accept=".csv,.xlsx,.xls" hidden>
+                                        <div class="history-import flex-box-start">
+                                            <div>
+                                                <button class="button" id="expeditionImportButton" type="button">Importar Planilha</button>
+                                            </div>
 
-                                        <div>
-                                            <button class="button" id="expeditionErrorsImportButton" type="button">Importar Planilha de Erros</button>
+                                            <input id="expeditionFileInput" type="file" accept=".csv,.xlsx,.xls" hidden>
                                         </div>
 
-                                        <input id="expeditionErrorsFileInput" type="file" accept=".xlsx,.xls" hidden>
                                     </div>
-
-                                    <div class="input-group">
-                                        <div>
-                                            <h4>Janela</h4>
-
-                                            <select class="standard-select" id="expeditionWindowInput" disabled>
-                                                <option value="AM">AM</option>
-                                                <option value="PM1">PM1</option>
-                                                <option value="PM2">PM2</option>
-                                            </select>
-                                        </div>
-
-                                        <div>
-                                            <h4>Rotas no Piso</h4>
-                                            <input id="expeditionFloorRoutesInput" type="text" inputmode="numeric" maxlength="8" autocomplete="off" disabled>
-                                        </div>
-
-                                        <div>
-                                            <h4>Pacotes Desconhecidos</h4>
-                                            <input id="expeditionUnknownInput" type="text" inputmode="numeric" maxlength="8" autocomplete="off" disabled>
-                                        </div>
-
-                                        <div>
-                                            <h4>Pacotes Exceção</h4>
-                                            <input id="expeditionExceptionInput" type="text" inputmode="numeric" maxlength="8" autocomplete="off" disabled>
-                                        </div>
-
-                                        <div>
-                                            <h4>Sorting Revertidos</h4>
-                                            <input id="expeditionRevertedSortingInput" type="text" inputmode="numeric" maxlength="8" autocomplete="off" disabled>
-                                        </div>
-
-                                        <div>
-                                            <h4>Etiqueta Revertidos</h4>
-                                            <input id="expeditionRevertedLabelingInput" type="text" inputmode="numeric" maxlength="8" autocomplete="off" disabled>
-                                        </div>
-                                    </div>
-
-                                    <div class="input-group" id="expeditionOperatorControls"></div>
                                 </div>
+                                
                             </div>
                         </div>
                     </div>
@@ -2395,6 +2407,38 @@
         <script src="js/data-analysis/charts.js" defer></script>
         <script src="js/data-analysis/comparison.js" defer></script>
         <script src="js/data-analysis/init.js" defer></script>
+
+        <!-- -->
+
+        <script>
+
+            const expeditionTabs = $("#expedition-view-tabs");
+            const expeditionControls = $("#expedition-controls");
+
+            function updateExpeditionControls() {
+                const activeLink = expeditionTabs.find(
+                    ".tabs-title.is-active > a"
+                );
+
+                const controlsTarget = activeLink.data("controls-target");
+
+                expeditionControls
+                    .find(".expedition-controls-panel")
+                    .removeClass("is-active")
+                    .attr("hidden", true);
+
+                $("#" + controlsTarget)
+                    .addClass("is-active")
+                    .removeAttr("hidden");
+            }
+
+            expeditionTabs.on("change.zf.tabs", function () {
+                updateExpeditionControls();
+            });
+
+            updateExpeditionControls();
+
+        </script>
 
         <!-- PONTO DE ENTRADA DA APLICAÇÃO -->
 
