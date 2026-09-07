@@ -20,8 +20,8 @@
     .main-structure  #spreadsheets .tabs-content .tabs-panel {
         width: 100%;
         height: 100%;
-        background-color: #ffffff;
-        border: solid 2px #525252;
+        background-color: var(--color-container);
+        border: solid 2px var(--color-border);
         border-radius: 5px;
     }
     .main-structure #spreadsheets .tabs {
@@ -40,7 +40,7 @@
     }
     .main-structure #spreadsheets .tabs .tabs-title {
         border-radius: 5px;
-        border: 2px solid #525252;
+        border: 2px solid var(--color-border);
         align-items: center;
     }
     .main-structure #spreadsheets .tabs .tabs-title a {
@@ -55,13 +55,13 @@
         justify-content: center;
     }
     .main-structure #spreadsheets .tabs-title:hover {
-        background: #2e2e2e;
+        background: var(--color-container-houver);
     }
     .main-structure #spreadsheets .tabs-title.is-active{
-        background: #2e2e2e;
+        background: var(--color-container-focus);
     }
     .main-structure #spreadsheets .tabs-title:focus, .main-structure #spreadsheets .tabs-title[aria-selected='true'] {
-        background-color: #2e2e2e
+        background-color: var(--color-container-focus)
     }
     .main-structure #spreadsheets .tabs-title>a:hover {
         background: transparent;
@@ -80,10 +80,10 @@
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
-        color: #e4e6eb;
+        color: var(--color-text);
         background-color: transparent;
         border: none;
-        border-left: 2px solid #525252;
+        border-left: 2px solid var(--color-border);
         outline: none;
         cursor: pointer;
         transition: color 0.2s ease;
