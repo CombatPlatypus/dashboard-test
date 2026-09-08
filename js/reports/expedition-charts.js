@@ -306,7 +306,7 @@ const barValuesPlugin = {
         }
 
         context.font =
-            '600 11px "Open Sans", sans-serif';
+            '600 14px "Open Sans", sans-serif';
 
         context.textBaseline =
             "middle";
@@ -505,6 +505,19 @@ function createChart(
                     },
 
                     tooltip: {
+                        titleFont: {
+                            family:
+                                '"Open Sans", sans-serif',
+                            size: 14,
+                            weight: "600",
+                        },
+
+                        bodyFont: {
+                            family:
+                                '"Open Sans", sans-serif',
+                            size: 14,
+                        },
+
                         callbacks: {
                             title(
                                 contexts,
@@ -622,6 +635,12 @@ function createChart(
                             color:
                                 "#e4e6eb",
 
+                            font: {
+                                family:
+                                    '"Open Sans", sans-serif',
+                                size: 14,
+                            },
+
                             precision:
                                 isTimeMetric
                                     ? undefined
@@ -650,6 +669,12 @@ function createChart(
                         ticks: {
                             color:
                                 "#e4e6eb",
+
+                            font: {
+                                family:
+                                    '"Open Sans", sans-serif',
+                                size: 14,
+                            },
 
                             autoSkip:
                                 false,

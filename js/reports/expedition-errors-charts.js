@@ -12,8 +12,13 @@ let errorsResizeFrame = null;
 const ERROR_CHART_PIXEL_RATIO =
     Math.max(
         window.devicePixelRatio || 1,
-        3,
+        4,
     );
+
+const ERROR_CHART_FONT = {
+    family: '"Open Sans", sans-serif',
+    size: 14,
+};
 
 const errorChartQuantityFormatter =
     new Intl.NumberFormat(
@@ -149,6 +154,40 @@ function hasExpeditionErrorsChartElements(
     );
 }
 
+function applyExpeditionErrorsTextSpacing(
+    chart,
+) {
+    if (
+        "letterSpacing" in
+        chart.ctx
+    ) {
+        chart.ctx.letterSpacing =
+            "1px";
+    }
+}
+
+const expeditionErrorsTextSpacingPlugin = {
+    id: "expeditionErrorsTextSpacing",
+
+    beforeDraw(chart) {
+        applyExpeditionErrorsTextSpacing(
+            chart,
+        );
+    },
+
+    beforeDatasetsDraw(chart) {
+        applyExpeditionErrorsTextSpacing(
+            chart,
+        );
+    },
+
+    beforeTooltipDraw(chart) {
+        applyExpeditionErrorsTextSpacing(
+            chart,
+        );
+    },
+};
+
 function createErrorBalanceChart(
     canvas,
 ) {
@@ -160,36 +199,29 @@ function createErrorBalanceChart(
             data: {
                 labels: [
                     "Identificados",
-                    "Resultado",
+                    "Revertidos",
+                    "Saldo Final",
                 ],
 
                 datasets: [
                     {
-                        label: "Identificados",
-                        data: [0, 0],
-                        backgroundColor: "#ffc107",
+                        data: [0, 0, 0],
+                        backgroundColor: [
+                            "#ffc107",
+                            "#8BC34A",
+                            "#FF5722",
+                        ],
                         borderWidth: 0,
-                        stack: "errors",
-                        maxBarThickness: 70,
-                    },
-                    {
-                        label: "Revertidos",
-                        data: [0, 0],
-                        backgroundColor: "#8BC34A",
-                        borderWidth: 0,
-                        stack: "errors",
-                        maxBarThickness: 70,
-                    },
-                    {
-                        label: "Saldo Final",
-                        data: [0, 0],
-                        backgroundColor: "#FF5722",
-                        borderWidth: 0,
-                        stack: "errors",
-                        maxBarThickness: 70,
+                        maxBarThickness: 42,
+                        categoryPercentage: 0.8,
+                        barPercentage: 0.9,
                     },
                 ],
             },
+
+            plugins: [
+                expeditionErrorsTextSpacingPlugin,
+            ],
 
             options: {
                 indexAxis: "y",
@@ -213,16 +245,18 @@ function createErrorBalanceChart(
                     },
 
                     tooltip: {
-                        filter(context) {
-                            return Number(
-                                context.raw,
-                            ) > 0;
+                        titleFont: {
+                            ...ERROR_CHART_FONT,
+                            weight: "600",
                         },
+
+                        bodyFont:
+                            ERROR_CHART_FONT,
 
                         callbacks: {
                             label(context) {
                                 return (
-                                    `${context.dataset.label}: ` +
+                                    `${context.label}: ` +
                                     formatErrorChartQuantity(
                                         context.raw,
                                     )
@@ -234,13 +268,14 @@ function createErrorBalanceChart(
 
                 scales: {
                     x: {
-                        stacked: true,
                         beginAtZero: true,
                         grace: "12%",
 
                         ticks: {
                             color: "#e4e6eb",
                             precision: 0,
+                            font:
+                                ERROR_CHART_FONT,
 
                             callback(value) {
                                 return formatErrorChartQuantity(
@@ -256,10 +291,10 @@ function createErrorBalanceChart(
                     },
 
                     y: {
-                        stacked: true,
-
                         ticks: {
                             color: "#e4e6eb",
+                            font:
+                                ERROR_CHART_FONT,
                         },
 
                         grid: {
@@ -289,9 +324,9 @@ function createStreetOccurrencesChart(
                         data: [],
                         backgroundColor: "#ffc107",
                         borderWidth: 0,
-                        maxBarThickness: 18,
-                        categoryPercentage: 0.8,
-                        barPercentage: 0.85,
+                        maxBarThickness: 28,
+                        categoryPercentage: 0.9,
+                        barPercentage: 0.92,
                         expeditionStreets: [],
                     },
                     {
@@ -299,13 +334,17 @@ function createStreetOccurrencesChart(
                         data: [],
                         backgroundColor: "#F44336",
                         borderWidth: 0,
-                        maxBarThickness: 18,
-                        categoryPercentage: 0.8,
-                        barPercentage: 0.85,
+                        maxBarThickness: 28,
+                        categoryPercentage: 0.9,
+                        barPercentage: 0.92,
                         expeditionStreets: [],
                     },
                 ],
             },
+
+            plugins: [
+                expeditionErrorsTextSpacingPlugin,
+            ],
 
             options: {
                 responsive: true,
@@ -328,6 +367,17 @@ function createStreetOccurrencesChart(
                     },
 
                     tooltip: {
+                        titleFont: {
+                            ...ERROR_CHART_FONT,
+                            weight: "600",
+                        },
+
+                        bodyFont:
+                            ERROR_CHART_FONT,
+
+                        footerFont:
+                            ERROR_CHART_FONT,
+
                         callbacks: {
                             label(context) {
                                 return (
@@ -379,6 +429,8 @@ function createStreetOccurrencesChart(
                             color: "#e4e6eb",
                             autoSkip: false,
                             maxRotation: 0,
+                            font:
+                                ERROR_CHART_FONT,
                         },
 
                         grid: {
@@ -393,6 +445,8 @@ function createStreetOccurrencesChart(
                         ticks: {
                             color: "#e4e6eb",
                             precision: 0,
+                            font:
+                                ERROR_CHART_FONT,
 
                             callback(value) {
                                 return formatErrorChartQuantity(
@@ -430,22 +484,7 @@ function updateErrorBalanceChart(
         .datasets[0]
         .data = [
             totalErrors,
-            0,
-        ];
-
-    errorBalanceChart
-        .data
-        .datasets[1]
-        .data = [
-            0,
             revertedErrors,
-        ];
-
-    errorBalanceChart
-        .data
-        .datasets[2]
-        .data = [
-            0,
             finalErrors,
         ];
 
