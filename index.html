@@ -118,7 +118,7 @@
 
             /* CARDS */
 
-            #expedition #expedition-charts .cards {
+            #expedition .cards {
                 display: grid;
                 grid-template-columns:
                     repeat(
@@ -128,7 +128,7 @@
                 gap: 15px;
                 width: 100%;
             }
-            #expedition #expedition-charts .cards > div {
+            #expedition .cards > div {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
@@ -139,16 +139,16 @@
                 background-color: var(--color-container);
                 border: 1px solid var(--color-border);
             }
-            #expedition #expedition-charts .cards > div > p:first-of-type {
+            #expedition .cards > div > p:first-of-type {
                 margin: 0 0 5px;
                 color: var(--color-gray-p);
                 font-size: 13px;
             }
-            #expedition #expedition-charts .cards > div > h4 {
+            #expedition .cards > div > h4 {
                 margin: 0;
                 font-size: 18px;
             }
-            #expedition #expedition-charts .cards > div > p:last-child {
+            #expedition .cards > div > p:last-child {
                 margin: 0;
             }
 
@@ -209,25 +209,24 @@
                 position: relative;
             }
 
+            /*  */
 
-
-
-            #expedition .streets {
+            #expedition #expedition-streets .flex-box-start {
                 column-gap: 15px;
             }
 
-            #expedition .streets .streets-chart h4, p {
+            #expedition .streets-chart h4, p {
                 margin: 0;
             }
-            #expedition .streets p {
+            #expedition p {
                 font-size: 14px;
                 color: var(--color-gray-p);
                 line-height: 1;
             }
-            #expedition .streets .flex-box-start {
+            #expedition .flex-box-start {
                 column-gap: 15px;
             }
-            #expedition .streets .streets-chart {
+            #expedition .streets-chart {
                 flex: 1 1 0;
             }
             #expedition .streets-chart, #expedition .streets-card {
@@ -260,29 +259,7 @@
                 height: 20px;
                 border-radius: 3px;
             }
-            #expedition .streets-card {
-                flex: 0 0 350px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-            #expedition .streets-card > div {
-                margin: auto 0;
-            }
-             #expedition .streets-card p {
-                text-align: center;
-                margin-bottom: 15px;
-            }
-             #expedition .streets-card h4 {
-                text-align: center;
-                margin-bottom: 5px;
-            }
-             #expedition .streets-card h3 {
-                text-align: center;
-            }
-             #expedition .streets-card p:last-of-type {
-                margin-bottom: 0px;
-            }
+
 
             /* CONTROLES */
 
@@ -1659,31 +1636,30 @@
                                                     <h2>Análise de Ruas</h2>
                                                 </div>
 
-                                                <div class="flex-box-start">
-                                                    <div class="streets-card">
-                                                        <div>
-                                                            <p>Melhor Rua</p>
 
-                                                            <h3 id="">Guardião</h3>
-                                                            <h4>Rua <span id="">—</span></h4>
+                                                <div class="cards">
+                                                    <div>
+                                                        <p>Melhor Rua</p>
 
-                                                            <p>
-                                                                Taxa de Erros: <span id="">—</span>
-                                                            </p>
-                                                        </div>
+                                                        <h4 id="">
+                                                            —
+                                                        </h4>
+
+                                                        <p>
+                                                            Taxa de Erros: <span id="">—</span>
+                                                        </p>
                                                     </div>
 
-                                                    <div class="streets-card">
-                                                        <div>
-                                                            <p>Maior Ofensor</p>
+                                                    <div>
+                                                        <p>Pior Rua</p>
 
-                                                            <h3 id="expeditionTopOffenderGuardian">Guardião</h3>
-                                                            <h4>Rua <span id="expeditionTopOffenderStreet">—</span></h4>
+                                                        <h4 id="expeditionTopOffenderStreet">
+                                                            —
+                                                        </h4>
 
-                                                            <p>
-                                                                Taxa de Erros: <span id="expeditionTopOffenderRate">—</span>
-                                                            </p>
-                                                        </div>
+                                                        <p>
+                                                             Taxa de Erros: <span id="expeditionTopOffenderRate">—</span>
+                                                        </p>
                                                     </div>
                                                 </div>
 
