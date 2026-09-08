@@ -24,6 +24,10 @@ import {
     downloadReportBlob,
 } from "./export.js";
 
+import {
+    setReportNotification,
+} from "./report-notifications.js";
+
 /* ELEMENTOS DO PLANEJAMENTO */
 
 let planningLhList = null;
@@ -51,11 +55,11 @@ let planningPreviewCpErrors = null;
 let planningPreviewCpAdded = null;
 let planningPreviewCpRemoved = null;
 let planningHeightResizeObserver = null;
-let planningReportStatusIcon = null;
-let planningReportStatusText = null;
 let planningCopyReportButton = null;
 let planningDownloadReportButton = null;
 let planningReportExportArea = null;
+let planningPanel = null;
+let planningNotificationObserver = null;
 
 /* FORMATAÇÃO NUMÉRICA */
 
@@ -1186,15 +1190,25 @@ function renderPlanningReportStatus(
     planningDownloadReportButton.disabled =
         !canExport;
 
-    planningReportStatusIcon.src =
-        canExport
-            ? "images/geral-icons/success-icon.svg"
-            : "images/geral-icons/alert-icon.svg";
+    if (
+        !planningPanel.classList.contains(
+            "is-active",
+        )
+    ) {
+        return;
+    }
 
-    planningReportStatusText.textContent =
-        canExport
-            ? "O relatório está pronto para exportação."
-            : "O relatório ainda aguarda informações.";
+    setReportNotification({
+        type:
+            canExport
+                ? "success"
+                : "warning",
+
+        message:
+            canExport
+                ? "O relatório de planejamento está pronto para exportação."
+                : "O relatório de planejamento ainda aguarda informações.",
+    });
 }
 
 /* RENDERIZA A LISTA DE LHS */
@@ -2020,6 +2034,11 @@ function initializePlanningHeightSynchronization() {
 /* INICIALIZA A LISTA DE LHS */
 
 function initializePlanningLhList() {
+    planningPanel =
+        document.getElementById(
+            "planning",
+        );
+
     planningGeneralControls =
         document.getElementById(
             "planningGeneralControls",
@@ -2040,16 +2059,6 @@ function initializePlanningLhList() {
             "planningPreviewDailyCapacity",
         );  
         
-    planningReportStatusIcon =
-        document.getElementById(
-            "planningReportStatusIcon",
-        );
-
-    planningReportStatusText =
-        document.getElementById(
-            "planningReportStatusText",
-        );
-
     planningCopyReportButton =
         document.getElementById(
             "planningCopyReportButton",
@@ -2191,8 +2200,7 @@ function initializePlanningLhList() {
         !planningPreviewAverageSpr ||
         !planningPreviewDailyCapacity ||
         !planningReportExportArea ||
-        !planningReportStatusIcon ||
-        !planningReportStatusText ||
+        !planningPanel ||
         !planningCopyReportButton ||
         !planningDownloadReportButton
         
@@ -2205,6 +2213,34 @@ function initializePlanningLhList() {
     }
 
     ensureMinimumPlanningLhs();
+
+    planningNotificationObserver
+        ?.disconnect();
+
+    planningNotificationObserver =
+        new MutationObserver(
+            function () {
+                if (
+                    planningPanel.classList.contains(
+                        "is-active",
+                    )
+                ) {
+                    renderPlanningReportStatus(
+                        getPlanningState(),
+                    );
+                }
+            },
+        );
+
+    planningNotificationObserver.observe(
+        planningPanel,
+        {
+            attributes: true,
+            attributeFilter: [
+                "class",
+            ],
+        },
+    );
 
     subscribePlanningState(
         function (

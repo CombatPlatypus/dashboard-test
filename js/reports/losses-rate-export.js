@@ -10,13 +10,11 @@ import {
     downloadReportBlob,
 } from "./export.js";
 
+import {
+    setReportNotification,
+} from "./report-notifications.js";
+
 /* ELEMENTOS DA EXPORTAÇÃO */
-
-let lossesRateReportStatusIcon =
-    null;
-
-let lossesRateReportStatusText =
-    null;
 
 let lossesRateCopyReportButton =
     null;
@@ -25,6 +23,12 @@ let lossesRateDownloadReportButton =
     null;
 
 let lossesRateReportExportArea =
+    null;
+
+let lossesRatePanel =
+    null;
+
+let lossesRateNotificationObserver =
     null;
 
 /* ESTADO DA EXPORTAÇÃO */
@@ -131,15 +135,25 @@ function renderLossesRateExportStatus(
         lossesRateExportBusy ||
         !canExport;
 
-    lossesRateReportStatusIcon.src =
-        canExport
-            ? "images/geral-icons/success-icon.svg"
-            : "images/geral-icons/alert-icon.svg";
+    if (
+        !lossesRatePanel.classList.contains(
+            "is-active",
+        )
+    ) {
+        return;
+    }
 
-    lossesRateReportStatusText.textContent =
-        canExport
-            ? "O relatório está pronto para exportação."
-            : "O relatório ainda aguarda informações.";
+    setReportNotification({
+        type:
+            canExport
+                ? "success"
+                : "warning",
+
+        message:
+            canExport
+                ? "O relatório de taxa de perdas está pronto para exportação."
+                : "O relatório de taxa de perdas ainda aguarda informações.",
+    });
 }
 
 /* AGUARDA A ATUALIZAÇÃO DOS GRÁFICOS */
@@ -393,14 +407,9 @@ async function handleDownloadLossesRateReport() {
 /* INICIALIZA A EXPORTAÇÃO DO RELATÓRIO */
 
 function initializeLossesRateExport() {
-    lossesRateReportStatusIcon =
+    lossesRatePanel =
         document.getElementById(
-            "lossesRateReportStatusIcon",
-        );
-
-    lossesRateReportStatusText =
-        document.getElementById(
-            "lossesRateReportStatusText",
+            "losses-rate",
         );
 
     lossesRateCopyReportButton =
@@ -420,14 +429,6 @@ function initializeLossesRateExport() {
 
     if (
         !(
-            lossesRateReportStatusIcon instanceof
-            HTMLImageElement
-        ) ||
-        !(
-            lossesRateReportStatusText instanceof
-            HTMLElement
-        ) ||
-        !(
             lossesRateCopyReportButton instanceof
             HTMLButtonElement
         ) ||
@@ -437,6 +438,10 @@ function initializeLossesRateExport() {
         ) ||
         !(
             lossesRateReportExportArea instanceof
+            HTMLElement
+        ) ||
+        !(
+            lossesRatePanel instanceof
             HTMLElement
         )
     ) {
@@ -454,6 +459,34 @@ function initializeLossesRateExport() {
     lossesRateCopyReportButton.dataset
         .lossesRateExportInitialized =
             "true";
+
+    lossesRateNotificationObserver
+        ?.disconnect();
+
+    lossesRateNotificationObserver =
+        new MutationObserver(
+            function () {
+                if (
+                    lossesRatePanel.classList.contains(
+                        "is-active",
+                    )
+                ) {
+                    renderLossesRateExportStatus(
+                        getLossesRateState(),
+                    );
+                }
+            },
+        );
+
+    lossesRateNotificationObserver.observe(
+        lossesRatePanel,
+        {
+            attributes: true,
+            attributeFilter: [
+                "class",
+            ],
+        },
+    );
 
     lossesRateCopyReportButton.addEventListener(
         "click",

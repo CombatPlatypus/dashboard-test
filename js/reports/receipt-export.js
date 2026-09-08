@@ -9,17 +9,23 @@ import {
     downloadReportBlob,
 } from "./export.js";
 
+import {
+    setReportNotification,
+} from "./report-notifications.js";
+
 let receiptExportBusy = false;
 
 const receiptExportElements = {
-    statusIcon: null,
-    statusText: null,
+    panel: null,
     clearButton: null,
     copyButton: null,
     downloadButton: null,
     mainArea: null,
     comparisonArea: null,
 };
+
+let receiptNotificationObserver =
+    null;
 
 /* RETORNA A PENDÊNCIA DO RELATÓRIO */
 
@@ -111,19 +117,28 @@ function renderReceiptExportStatus(
             receiptExportBusy ||
             !canExport;
 
-    receiptExportElements
-        .statusIcon
-        .src =
-            canExport
-                ? "images/geral-icons/success-icon.svg"
-                : "images/geral-icons/alert-icon.svg";
+    if (
+        !receiptExportElements
+            .panel
+            .classList
+            .contains(
+                "is-active",
+            )
+    ) {
+        return;
+    }
 
-    receiptExportElements
-        .statusText
-        .textContent =
+    setReportNotification({
+        type:
             canExport
-                ? "O relatório está pronto para exportação."
-                : pendingMessage;
+                ? "success"
+                : "warning",
+
+        message:
+            canExport
+                ? "O relatório de recebimento está pronto para exportação."
+                : pendingMessage,
+    });
 }
 
 /* RETORNA A GUIA ATIVA */
@@ -554,19 +569,14 @@ async function runReceiptExport(
 /* INICIALIZAÇÃO */
 
 function initializeReceiptExport() {
+    receiptExportElements.panel =
+        document.getElementById(
+            "receipt",
+        );
+
     receiptExportElements.clearButton =
         document.getElementById(
             "receiptClearReportButton",
-        );
-
-    receiptExportElements.statusIcon =
-        document.getElementById(
-            "receiptReportStatusIcon",
-        );
-
-    receiptExportElements.statusText =
-        document.getElementById(
-            "receiptReportStatusText",
         );
 
     receiptExportElements.copyButton =
@@ -626,6 +636,37 @@ function initializeReceiptExport() {
         .dataset
         .receiptExportInitialized =
             "true";
+
+    receiptNotificationObserver
+        ?.disconnect();
+
+    receiptNotificationObserver =
+        new MutationObserver(
+            function () {
+                if (
+                    receiptExportElements
+                        .panel
+                        .classList
+                        .contains(
+                            "is-active",
+                        )
+                ) {
+                    renderReceiptExportStatus(
+                        getReceiptState(),
+                    );
+                }
+            },
+        );
+
+    receiptNotificationObserver.observe(
+        receiptExportElements.panel,
+        {
+            attributes: true,
+            attributeFilter: [
+                "class",
+            ],
+        },
+    );
 
     receiptExportElements
         .copyButton
