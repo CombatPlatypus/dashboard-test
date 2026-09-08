@@ -1278,6 +1278,63 @@ function getLegacyExpeditionErrorAnalysis(
 
 /* AGRUPA AUSENTES E CLASSIFICADOS INCORRETAMENTE POR RUA */
 
+function getExpeditionStreetName(
+    corridor,
+) {
+    const normalizedCorridor =
+        normalizeExpeditionText(
+            corridor,
+        )
+            .replace(
+                /^RUA\s+/i,
+                "",
+            )
+            .trim();
+
+    if (!normalizedCorridor) {
+        return "Não identificada";
+    }
+
+    return (
+        normalizedCorridor
+            .split("-")[0]
+            .trim()
+            .toUpperCase() ||
+        "Não identificada"
+    );
+}
+
+function formatExpeditionGuardian(
+    operator,
+) {
+    const normalizedOperator =
+        normalizeExpeditionText(
+            operator,
+        );
+
+    const match =
+        normalizedOperator.match(
+            /^\[\s*ops\s*(\d+)\s*\]\s*(.*)$/i,
+        );
+
+    if (!match) {
+        return normalizedOperator
+            .split(/\s+/)[0]
+            .toUpperCase();
+    }
+
+    const firstName =
+        normalizeExpeditionText(
+            match[2],
+        )
+            .split(/\s+/)[0]
+            .toUpperCase();
+
+    return firstName
+        ? `[ops${match[1]}] ${firstName}`
+        : `[ops${match[1]}]`;
+}
+
 function getExpeditionStreetAnalysis(
     state,
     totalErrors,
@@ -1305,9 +1362,9 @@ function getExpeditionStreetAnalysis(
         })
         .forEach(function (route) {
             const name =
-                normalizeExpeditionText(
+                getExpeditionStreetName(
                     route.corridor,
-                ) || "Não identificada";
+                );
 
             if (!streets.has(name)) {
                 streets.set(name, {
@@ -1336,7 +1393,7 @@ function getExpeditionStreetAnalysis(
                 missortedOrders;
 
             const guardian =
-                normalizeExpeditionText(
+                formatExpeditionGuardian(
                     route.validationOperator,
                 );
 
@@ -1481,12 +1538,8 @@ function getExpeditionErrorAnalysis(
                         ? summary.volumeChecked
                         : null,
                 ),
-            revertedSortingErrors: null,
-            revertedLabelingErrors: null,
             totalRevertedErrors: null,
             revertedRate: null,
-            finalSortingErrors: null,
-            finalLabelingErrors: null,
             finalErrors: null,
             finalRate: null,
             hasDivergence: false,
@@ -1526,32 +1579,9 @@ function getExpeditionErrorAnalysis(
             spxTotal,
         );
 
-    const revertedTypes =
-        allocateExpeditionQuantities(
-            [
-                sortingErrors,
-                labelingErrors,
-            ],
-            totalRevertedErrors,
-        );
-
-    const revertedSortingErrors =
-        revertedTypes[0];
-
-    const revertedLabelingErrors =
-        revertedTypes[1];
-
-    const finalSortingErrors =
-        sortingErrors -
-        revertedSortingErrors;
-
-    const finalLabelingErrors =
-        labelingErrors -
-        revertedLabelingErrors;
-
     const finalErrors =
-        finalSortingErrors +
-        finalLabelingErrors;
+        spxTotal -
+        totalRevertedErrors;
 
     return {
         hasSpXData,
@@ -1567,16 +1597,12 @@ function getExpeditionErrorAnalysis(
                 spxTotal,
                 summary.volumeChecked,
             ),
-        revertedSortingErrors,
-        revertedLabelingErrors,
         totalRevertedErrors,
         revertedRate:
             calculateExpeditionRate(
                 totalRevertedErrors,
                 spxTotal,
             ),
-        finalSortingErrors,
-        finalLabelingErrors,
         finalErrors,
         finalRate:
             calculateExpeditionRate(
@@ -1677,9 +1703,7 @@ function updateExpeditionManualQuantity(
         field !== "routesOnFloor" &&
         field !== "unknownOrders" &&
         field !== "exceptionOrders" &&
-        field !== "revertedErrors" &&
-        field !== "revertedSortingErrors" &&
-        field !== "revertedLabelingErrors"
+        field !== "revertedErrors"
     ) {
         return false;
     }

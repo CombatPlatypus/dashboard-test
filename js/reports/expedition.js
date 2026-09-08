@@ -223,16 +223,6 @@ function getExpeditionElements() {
                 "expeditionRevertedInput",
             ),
 
-        revertedSortingInput:
-            document.getElementById(
-                "expeditionRevertedSortingInput",
-            ),
-
-        revertedLabelingInput:
-            document.getElementById(
-                "expeditionRevertedLabelingInput",
-            ),
-
         operatorControls:
             document.getElementById(
                 "expeditionOperatorControls",
@@ -322,16 +312,6 @@ function getExpeditionElements() {
         previewRevertedRate:
             document.getElementById(
                 "expeditionPreviewRevertedRate",
-            ),
-
-        previewFinalSortingErrors:
-            document.getElementById(
-                "expeditionPreviewFinalSortingErrors",
-            ),
-
-        previewFinalLabelingErrors:
-            document.getElementById(
-                "expeditionPreviewFinalLabelingErrors",
             ),
 
         previewFinalErrors:
@@ -471,8 +451,6 @@ function setExpeditionGeneralControlsAvailability(
     elements.revertedInput.disabled =
         !hasErrorAnalysis;
 
-    elements.revertedSortingInput.disabled = true;
-    elements.revertedLabelingInput.disabled = true;
 }
 
 /* TABELA DOS CONFERENTES */
@@ -878,14 +856,50 @@ function createExpeditionStreetRow(
             ];
 
     values.forEach(
-        function (value) {
+        function (value, index) {
             const cell =
                 document.createElement(
                     "td",
                 );
 
-            cell.textContent =
-                value;
+            const guardianMatch =
+                index === 1 && street
+                    ? String(value).match(
+                        /^(\[ops\d+\])\s*(.*)$/i,
+                    )
+                    : null;
+
+            if (guardianMatch) {
+                const code =
+                    document.createElement(
+                        "span",
+                    );
+
+                code.textContent =
+                    guardianMatch[1]
+                        .toLowerCase();
+
+                const name =
+                    document.createElement(
+                        "span",
+                    );
+
+                name.classList.add(
+                    "expedition-guardian-name",
+                );
+
+                name.textContent =
+                    guardianMatch[2];
+
+                cell.append(
+                    code,
+                    " ",
+                    name,
+                );
+            } else {
+                cell.textContent =
+                    value;
+            }
 
             row.append(
                 cell,
@@ -980,18 +994,6 @@ function renderExpeditionErrorTables(
                 analysis.revertedRate,
             );
 
-    elements.previewFinalSortingErrors
-        .textContent =
-            quantity(
-                analysis.finalSortingErrors,
-            );
-
-    elements.previewFinalLabelingErrors
-        .textContent =
-            quantity(
-                analysis.finalLabelingErrors,
-            );
-
     elements.previewFinalErrors
         .textContent =
             quantity(
@@ -1009,22 +1011,6 @@ function renderExpeditionErrorTables(
         analysis.canCalculate
             ? analysis
                 .totalRevertedErrors
-            : null,
-    );
-
-    setExpeditionInputValue(
-        elements.revertedSortingInput,
-        analysis.canCalculate
-            ? analysis
-                .revertedSortingErrors
-            : null,
-    );
-
-    setExpeditionInputValue(
-        elements.revertedLabelingInput,
-        analysis.canCalculate
-            ? analysis
-                .revertedLabelingErrors
             : null,
     );
 
