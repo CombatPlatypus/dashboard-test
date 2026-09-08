@@ -4,17 +4,12 @@ import {
     replaceLossesRateHistory,
 } from "./losses-rate-state.js";
 
-/* CONFIGURAÇÕES DA IMPORTAÇÃO */
+import {
+    setReportNotification,
+} from "./report-notifications.js";
 
-const MAX_LOSSES_RATE_FILE_SIZE =
-    5 * 1024 * 1024;
-
-const LOSSES_RATE_FILE_EXTENSIONS =
-    new Set([
-        "csv",
-        "xlsx",
-        "xls",
-    ]);
+const LOSSES_RATE_IMPORT_FEEDBACK_DURATION =
+    1800;
 
 /* NOMES ACEITOS PARA AS COLUNAS */
 
@@ -268,6 +263,13 @@ function parseLossesRateQuantity(
             );
 
     if (
+        receivedValue === "-" ||
+        receivedValue === "—"
+    ) {
+        return null;
+    }
+
+    if (
         /^\d+$/.test(
             receivedValue,
         )
@@ -318,7 +320,7 @@ function createLossesRateHistory(
         rows.length === 0
     ) {
         throw new Error(
-            "A planilha importada está vazia.",
+            "A tabela copiada está vazia.",
         );
     }
 
@@ -434,80 +436,105 @@ function createLossesRateHistory(
     };
 }
 
-/* LÊ O ARQUIVO */
+/* LÊ E CONVERTE A ÁREA DE TRANSFERÊNCIA */
 
-async function readLossesRateHistoryFile(
-    file,
+async function readLossesRateClipboardText() {
+    if (!navigator.clipboard) {
+        throw new Error(
+            "A leitura da área de transferência não está disponível neste navegador.",
+        );
+    }
+
+    let readError = null;
+
+    if (
+        typeof navigator.clipboard.readText ===
+        "function"
+    ) {
+        try {
+            const text =
+                await navigator.clipboard.readText();
+
+            if (text.trim()) {
+                return text;
+            }
+        } catch (error) {
+            readError = error;
+        }
+    }
+
+    if (
+        typeof navigator.clipboard.read ===
+        "function"
+    ) {
+        try {
+            const items =
+                await navigator.clipboard.read();
+
+            for (const item of items) {
+                if (
+                    !item.types.includes(
+                        "text/plain",
+                    )
+                ) {
+                    continue;
+                }
+
+                const blob =
+                    await item.getType(
+                        "text/plain",
+                    );
+
+                const text =
+                    await blob.text();
+
+                if (text.trim()) {
+                    return text;
+                }
+            }
+        } catch (error) {
+            readError = error;
+        }
+    }
+
+    if (
+        readError?.name ===
+        "NotAllowedError"
+    ) {
+        throw new Error(
+            "O navegador bloqueou a área de transferência. Permita o acesso e clique novamente.",
+        );
+    }
+
+    throw new Error(
+        "A área de transferência está vazia ou não pôde ser lida.",
+    );
+}
+
+function parseLossesRateClipboardText(
+    clipboardText,
 ) {
-    const extension =
-        file.name
-            .split(".")
-            .pop()
-            .toLowerCase();
-
-    if (
-        !LOSSES_RATE_FILE_EXTENSIONS.has(
-            extension,
+    const normalizedText =
+        String(
+            clipboardText ?? "",
         )
-    ) {
+            .replace(/\r\n?/g, "\n")
+            .trim();
+
+    if (!normalizedText) {
         throw new Error(
-            "Selecione um arquivo CSV, XLSX ou XLS.",
+            "A tabela copiada está vazia.",
         );
     }
-
-    if (
-        file.size >
-        MAX_LOSSES_RATE_FILE_SIZE
-    ) {
-        throw new Error(
-            "O arquivo ultrapassa o limite de 5 MB.",
-        );
-    }
-
-    if (
-        typeof window.XLSX !==
-        "object"
-    ) {
-        throw new Error(
-            "A biblioteca de leitura de planilhas não foi carregada.",
-        );
-    }
-
-    const fileBuffer =
-        await file.arrayBuffer();
-
-    const workbook =
-        window.XLSX.read(
-            fileBuffer,
-            {
-                type: "array",
-            },
-        );
-
-    const firstSheetName =
-        workbook.SheetNames[0];
-
-    if (!firstSheetName) {
-        throw new Error(
-            "O arquivo não possui nenhuma planilha.",
-        );
-    }
-
-    const worksheet =
-        workbook.Sheets[
-            firstSheetName
-        ];
 
     const rows =
-        window.XLSX.utils.sheet_to_json(
-            worksheet,
-            {
-                header: 1,
-                defval: "",
-                raw: false,
-                blankrows: false,
-            },
-        );
+        normalizedText
+            .split("\n")
+            .map(
+                function (row) {
+                    return row.split("\t");
+                },
+            );
 
     return createLossesRateHistory(
         rows,
@@ -701,15 +728,95 @@ async function copyLossesRateUpdatedBase(
 
 /* INICIALIZA A IMPORTAÇÃO */
 
+async function importLossesRateFromClipboard(
+    importButton,
+) {
+    const originalLabel =
+        importButton.textContent.trim();
+
+    const originalTitle =
+        importButton.title;
+
+    importButton.disabled =
+        true;
+
+    importButton.textContent =
+        "Importando...";
+
+    try {
+        const clipboardText =
+            await readLossesRateClipboardText();
+
+        const result =
+            parseLossesRateClipboardText(
+                clipboardText,
+            );
+
+        replaceLossesRateHistory(
+            result.history,
+        );
+
+        const monthLabel =
+            result.importedRows === 1
+                ? "mês importado"
+                : "meses importados";
+
+        const successMessage =
+            `${result.importedRows} ${monthLabel} da Taxa de Perdas.`;
+
+        importButton.textContent =
+            "Importação Concluída";
+
+        importButton.title =
+            successMessage;
+
+        setReportNotification({
+            type: "success",
+            message: successMessage,
+        });
+    } catch (error) {
+        const errorMessage =
+            error instanceof Error
+                ? error.message
+                : "Não foi possível importar a tabela copiada.";
+
+        console.error(
+            "Não foi possível importar o histórico copiado:",
+            error,
+        );
+
+        importButton.textContent =
+            "Erro na Importação";
+
+        importButton.title =
+            errorMessage;
+
+        setReportNotification({
+            type: "error",
+            message:
+                `Falha na importação: ${errorMessage}`,
+        });
+    } finally {
+        window.setTimeout(
+            function () {
+                importButton.textContent =
+                    originalLabel;
+
+                importButton.title =
+                    originalTitle;
+
+                importButton.disabled =
+                    false;
+            },
+            LOSSES_RATE_IMPORT_FEEDBACK_DURATION,
+        );
+    }
+}
+
 function initializeLossesRateImport() {
     const importButton =
         document.getElementById(
             "lossesRateImportHistoryButton",
-        );
-
-    const fileInput =
-        document.getElementById(
-            "lossesRateHistoryFileInput",
         );
 
     const copyBaseButton =
@@ -718,59 +825,29 @@ function initializeLossesRateImport() {
         );  
 
     if (
-        !(importButton instanceof HTMLButtonElement) ||
-        !(fileInput instanceof HTMLInputElement)
+        !(importButton instanceof HTMLButtonElement)
     ) {
         return false;
     }
 
     if (
-        fileInput.dataset
+        importButton.dataset
             .lossesRateInitialized ===
         "true"
     ) {
         return true;
     }
 
-    fileInput.dataset
+    importButton.dataset
         .lossesRateInitialized =
             "true";
 
     importButton.addEventListener(
         "click",
         function () {
-            fileInput.click();
-        },
-    );
-
-    fileInput.addEventListener(
-        "change",
-        async function () {
-            const file =
-                fileInput.files[0];
-
-            if (!file) {
-                return;
-            }
-
-            try {
-                const result =
-                    await readLossesRateHistoryFile(
-                        file,
-                    );
-
-                replaceLossesRateHistory(
-                    result.history,
-                );
-            } catch (error) {
-                console.error(
-                    "Não foi possível importar o histórico:",
-                    error,
-                );
-            } finally {
-                fileInput.value =
-                    "";
-            }
+            importLossesRateFromClipboard(
+                importButton,
+            );
         },
     );
 
