@@ -75,9 +75,14 @@ function getExpeditionErrorsChartElements() {
                 "expedition",
             ),
 
-        panel:
+        errorsPanel:
             document.getElementById(
                 "expedition-mistakes",
+            ),
+
+        streetsPanel:
+            document.getElementById(
+                "expedition-streets",
             ),
 
         errorBalanceCanvas:
@@ -95,19 +100,24 @@ function getExpeditionErrorsChartElements() {
                 "expeditionStreetOccurrencesChartContainer",
             ),
 
-        topOffenderGuardian:
+        bestStreet:
             document.getElementById(
-                "expeditionTopOffenderGuardian",
+                "expeditionBestStreet",
             ),
 
-        topOffenderStreet:
+        bestStreetRate:
             document.getElementById(
-                "expeditionTopOffenderStreet",
+                "expeditionBestStreetRate",
             ),
 
-        topOffenderRate:
+        worstStreet:
             document.getElementById(
-                "expeditionTopOffenderRate",
+                "expeditionWorstStreet",
+            ),
+
+        worstStreetRate:
+            document.getElementById(
+                "expeditionWorstStreetRate",
             ),
     };
 }
@@ -118,7 +128,9 @@ function hasExpeditionErrorsChartElements(
     return (
         elements.expeditionPanel instanceof
             HTMLElement &&
-        elements.panel instanceof
+        elements.errorsPanel instanceof
+            HTMLElement &&
+        elements.streetsPanel instanceof
             HTMLElement &&
         elements.errorBalanceCanvas instanceof
             HTMLCanvasElement &&
@@ -126,76 +138,14 @@ function hasExpeditionErrorsChartElements(
             HTMLCanvasElement &&
         elements.streetOccurrencesContainer instanceof
             HTMLElement &&
-        elements.topOffenderGuardian instanceof
+        elements.bestStreet instanceof
             HTMLElement &&
-        elements.topOffenderStreet instanceof
+        elements.bestStreetRate instanceof
             HTMLElement &&
-        elements.topOffenderRate instanceof
+        elements.worstStreet instanceof
+            HTMLElement &&
+        elements.worstStreetRate instanceof
             HTMLElement
-    );
-}
-
-function renderTopOffenderGuardian(
-    element,
-    guardian,
-) {
-    const receivedGuardian =
-        String(
-            guardian ?? "",
-        ).trim();
-
-    element.classList.remove(
-        "expedition-guardian-name",
-    );
-
-    if (!receivedGuardian) {
-        element.textContent =
-            "Não informado";
-
-        return;
-    }
-
-    const guardianMatch =
-        receivedGuardian.match(
-            /^(\[ops\d+\])\s*(.*)$/i,
-        );
-
-    if (!guardianMatch) {
-        element.classList.add(
-            "expedition-guardian-name",
-        );
-
-        element.textContent =
-            receivedGuardian;
-
-        return;
-    }
-
-    const code =
-        document.createElement(
-            "span",
-        );
-
-    code.textContent =
-        guardianMatch[1]
-            .toLowerCase();
-
-    const name =
-        document.createElement(
-            "span",
-        );
-
-    name.classList.add(
-        "expedition-guardian-name",
-    );
-
-    name.textContent =
-        guardianMatch[2];
-
-    element.replaceChildren(
-        code,
-        " ",
-        name,
     );
 }
 
@@ -242,6 +192,7 @@ function createErrorBalanceChart(
             },
 
             options: {
+                indexAxis: "y",
                 responsive: true,
                 maintainAspectRatio: false,
                 devicePixelRatio:
@@ -284,18 +235,6 @@ function createErrorBalanceChart(
                 scales: {
                     x: {
                         stacked: true,
-
-                        ticks: {
-                            color: "#e4e6eb",
-                        },
-
-                        grid: {
-                            display: false,
-                        },
-                    },
-
-                    y: {
-                        stacked: true,
                         beginAtZero: true,
                         grace: "12%",
 
@@ -313,6 +252,18 @@ function createErrorBalanceChart(
                         grid: {
                             color:
                                 "rgba(82, 82, 82, 0.45)",
+                        },
+                    },
+
+                    y: {
+                        stacked: true,
+
+                        ticks: {
+                            color: "#e4e6eb",
+                        },
+
+                        grid: {
+                            display: false,
                         },
                     },
                 },
@@ -346,7 +297,7 @@ function createStreetOccurrencesChart(
                     {
                         label: "Erros da Rua",
                         data: [],
-                        backgroundColor: "#2196F3",
+                        backgroundColor: "#F44336",
                         borderWidth: 0,
                         maxBarThickness: 18,
                         categoryPercentage: 0.8,
@@ -357,7 +308,6 @@ function createStreetOccurrencesChart(
             },
 
             options: {
-                indexAxis: "y",
                 responsive: true,
                 maintainAspectRatio: false,
                 devicePixelRatio:
@@ -425,6 +375,18 @@ function createStreetOccurrencesChart(
 
                 scales: {
                     x: {
+                        ticks: {
+                            color: "#e4e6eb",
+                            autoSkip: false,
+                            maxRotation: 0,
+                        },
+
+                        grid: {
+                            display: false,
+                        },
+                    },
+
+                    y: {
                         beginAtZero: true,
                         grace: "12%",
 
@@ -442,17 +404,6 @@ function createStreetOccurrencesChart(
                         grid: {
                             color:
                                 "rgba(82, 82, 82, 0.45)",
-                        },
-                    },
-
-                    y: {
-                        ticks: {
-                            color: "#e4e6eb",
-                            autoSkip: false,
-                        },
-
-                        grid: {
-                            display: false,
                         },
                     },
                 },
@@ -538,17 +489,6 @@ function updateStreetOccurrencesChart(
                 );
             });
 
-    elements
-        .streetOccurrencesContainer
-        .style
-        .height =
-            `${Math.max(
-                300,
-                rankedStreets.length *
-                    42 +
-                    70,
-            )}px`;
-
     streetOccurrencesChart.data.labels =
         rankedStreets.map(
             function (street) {
@@ -593,25 +533,22 @@ function updateStreetOccurrencesChart(
     );
 }
 
-function updateTopOffenderCard(
+function updateStreetCards(
     elements,
     streets,
 ) {
-    const topOffender =
+    const rankedStreets =
         streets
-            .filter(function (street) {
-                return street.totalErrors > 0;
-            })
             .slice()
             .sort(function (
                 first,
                 second,
             ) {
                 return (
-                    second.totalErrors -
-                        first.totalErrors ||
-                    second.missingOrders -
-                        first.missingOrders ||
+                    first.totalErrors -
+                        second.totalErrors ||
+                    first.missingOrders -
+                        second.missingOrders ||
                     first.name.localeCompare(
                         second.name,
                         "pt-BR",
@@ -620,42 +557,47 @@ function updateTopOffenderCard(
                         },
                     )
                 );
-            })[0] || null;
+            });
 
-    if (!topOffender) {
-        elements.topOffenderGuardian
-            .classList
-            .remove(
-                "expedition-guardian-name",
-            );
+    const bestStreet =
+        rankedStreets[0] || null;
 
-        elements.topOffenderGuardian
-            .textContent =
-                "Guardião";
+    const worstStreet =
+        rankedStreets[
+            rankedStreets.length - 1
+        ] || null;
 
-        elements.topOffenderStreet
-            .textContent = "—";
+    if (!bestStreet || !worstStreet) {
+        elements.bestStreet.textContent =
+            "—";
 
-        elements.topOffenderRate
-            .textContent = "—";
+        elements.bestStreetRate.textContent =
+            "—";
+
+        elements.worstStreet.textContent =
+            "—";
+
+        elements.worstStreetRate.textContent =
+            "—";
 
         return;
     }
 
-    renderTopOffenderGuardian(
-        elements.topOffenderGuardian,
-        topOffender.guardian,
-    );
+    elements.bestStreet.textContent =
+        bestStreet.name;
 
-    elements.topOffenderStreet
-        .textContent =
-            topOffender.name;
+    elements.bestStreetRate.textContent =
+        formatErrorChartRate(
+            bestStreet.errorRate,
+        );
 
-    elements.topOffenderRate
-        .textContent =
-            formatErrorChartRate(
-                topOffender.errorRate,
-            );
+    elements.worstStreet.textContent =
+        worstStreet.name;
+
+    elements.worstStreetRate.textContent =
+        formatErrorChartRate(
+            worstStreet.errorRate,
+        );
 }
 
 function renderExpeditionErrorsCharts(
@@ -667,27 +609,34 @@ function renderExpeditionErrorsCharts(
             state,
         );
 
-    const animate =
-        elements.panel
+    const animateErrors =
+        elements.errorsPanel
             .classList
             .contains(
                 "is-active",
             );
 
-    updateTopOffenderCard(
+    const animateStreets =
+        elements.streetsPanel
+            .classList
+            .contains(
+                "is-active",
+            );
+
+    updateStreetCards(
         elements,
         analysis.streets,
     );
 
     updateErrorBalanceChart(
         analysis,
-        animate,
+        animateErrors,
     );
 
     updateStreetOccurrencesChart(
         elements,
         analysis.streets,
-        animate,
+        animateStreets,
     );
 }
 
@@ -728,11 +677,12 @@ function observeExpeditionErrorsVisibility(
         new MutationObserver(
             function () {
                 if (
-                    !elements.panel
+                    !elements.errorsPanel
                         .classList
-                        .contains(
-                            "is-active",
-                        )
+                        .contains("is-active") &&
+                    !elements.streetsPanel
+                        .classList
+                        .contains("is-active")
                 ) {
                     return;
                 }
@@ -743,7 +693,8 @@ function observeExpeditionErrorsVisibility(
 
     [
         elements.expeditionPanel,
-        elements.panel,
+        elements.errorsPanel,
+        elements.streetsPanel,
     ].forEach(function (element) {
         errorsVisibilityObserver.observe(
             element,
@@ -785,14 +736,14 @@ function initializeExpeditionErrorsCharts() {
     }
 
     if (
-        elements.panel.dataset
+        elements.errorsPanel.dataset
             .expeditionErrorsChartsInitialized ===
         "true"
     ) {
         return true;
     }
 
-    elements.panel.dataset
+    elements.errorsPanel.dataset
         .expeditionErrorsChartsInitialized =
             "true";
 

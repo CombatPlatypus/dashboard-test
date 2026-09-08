@@ -968,20 +968,39 @@ function renderExpeditionGuardianControls(
             ? streets
             : [];
 
-    elements.streetGuardianControls.hidden =
-        receivedStreets.length === 0;
+    const visibleInputs =
+        Math.max(
+            receivedStreets.length,
+            MINIMUM_EXPEDITION_STREET_ROWS,
+        );
+
+    const inputStreets =
+        Array.from(
+            {
+                length: visibleInputs,
+            },
+            function (
+                unused,
+                index,
+            ) {
+                return (
+                    receivedStreets[index] ||
+                    null
+                );
+            },
+        );
 
     const currentInputs =
         Array.from(
             elements.streetGuardianControls
                 .querySelectorAll(
-                    "input[data-expedition-street]",
+                    "input[data-expedition-guardian-input]",
                 ),
         );
 
     const hasSameStreets =
         currentInputs.length ===
-            receivedStreets.length &&
+            inputStreets.length &&
         currentInputs.every(function (
             input,
             index,
@@ -989,7 +1008,11 @@ function renderExpeditionGuardianControls(
             return (
                 input.dataset
                     .expeditionStreet ===
-                receivedStreets[index].name
+                (
+                    inputStreets[index]
+                        ?.name ||
+                    ""
+                )
             );
         });
 
@@ -997,7 +1020,7 @@ function renderExpeditionGuardianControls(
         const fragment =
             document.createDocumentFragment();
 
-        receivedStreets.forEach(function (
+        inputStreets.forEach(function (
             street,
             index,
         ) {
@@ -1020,7 +1043,7 @@ function renderExpeditionGuardianControls(
                 );
 
             streetName.textContent =
-                street.name;
+                street?.name || "—";
 
             title.append(
                 streetName,
@@ -1039,10 +1062,17 @@ function renderExpeditionGuardianControls(
             input.autocomplete = "off";
             input.setAttribute(
                 "aria-label",
-                `Guardião da rua ${street.name}`,
+                street
+                    ? `Guardião da rua ${street.name}`
+                    : "Guardião de rua ainda não importada",
             );
+            input.dataset
+                .expeditionGuardianInput =
+                    "true";
             input.dataset.expeditionStreet =
-                street.name;
+                street?.name || "";
+            input.disabled =
+                !street;
 
             field.append(
                 title,
@@ -1063,14 +1093,18 @@ function renderExpeditionGuardianControls(
     const inputs =
         elements.streetGuardianControls
             .querySelectorAll(
-                "input[data-expedition-street]",
+                "input[data-expedition-guardian-input]",
             );
 
     inputs.forEach(function (
         input,
         index,
     ) {
-        input.disabled = false;
+        const street =
+            inputStreets[index];
+
+        input.disabled =
+            !street;
 
         if (
             document.activeElement !==
@@ -1078,8 +1112,9 @@ function renderExpeditionGuardianControls(
         ) {
             setExpeditionInputValue(
                 input,
-                receivedStreets[index]
-                    .guardian,
+                street
+                    ?.guardian ||
+                    null,
             );
         }
     });
