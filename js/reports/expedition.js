@@ -7,6 +7,7 @@ import {
     subscribeExpeditionState,
     updateExpeditionManualQuantity,
     updateExpeditionOperatorSelection,
+    updateExpeditionStreetGuardian,
     updateExpeditionWindow,
 } from "./expedition-state.js";
 
@@ -221,6 +222,11 @@ function getExpeditionElements() {
         revertedInput:
             document.getElementById(
                 "expeditionRevertedInput",
+            ),
+
+        streetGuardianControls:
+            document.getElementById(
+                "expeditionStreetGuardianControls",
             ),
 
         operatorControls:
@@ -897,6 +903,12 @@ function createExpeditionStreetRow(
                     name,
                 );
             } else {
+                if (index === 1 && street) {
+                    cell.classList.add(
+                        "expedition-guardian-name",
+                    );
+                }
+
                 cell.textContent =
                     value;
             }
@@ -945,6 +957,132 @@ function renderExpeditionStreetTable(
         .replaceChildren(
             fragment,
         );
+}
+
+function renderExpeditionGuardianControls(
+    elements,
+    streets,
+) {
+    const receivedStreets =
+        Array.isArray(streets)
+            ? streets
+            : [];
+
+    elements.streetGuardianControls.hidden =
+        receivedStreets.length === 0;
+
+    const currentInputs =
+        Array.from(
+            elements.streetGuardianControls
+                .querySelectorAll(
+                    "input[data-expedition-street]",
+                ),
+        );
+
+    const hasSameStreets =
+        currentInputs.length ===
+            receivedStreets.length &&
+        currentInputs.every(function (
+            input,
+            index,
+        ) {
+            return (
+                input.dataset
+                    .expeditionStreet ===
+                receivedStreets[index].name
+            );
+        });
+
+    if (!hasSameStreets) {
+        const fragment =
+            document.createDocumentFragment();
+
+        receivedStreets.forEach(function (
+            street,
+            index,
+        ) {
+            const field =
+                document.createElement(
+                    "div",
+                );
+
+            const title =
+                document.createElement(
+                    "h4",
+                );
+
+            title.textContent =
+                "Rua ";
+
+            const streetName =
+                document.createElement(
+                    "span",
+                );
+
+            streetName.textContent =
+                street.name;
+
+            title.append(
+                streetName,
+            );
+
+            const input =
+                document.createElement(
+                    "input",
+                );
+
+            input.id =
+                `expeditionStreetGuardianInput${index}`;
+
+            input.type = "text";
+            input.maxLength = 60;
+            input.autocomplete = "off";
+            input.setAttribute(
+                "aria-label",
+                `Guardião da rua ${street.name}`,
+            );
+            input.dataset.expeditionStreet =
+                street.name;
+
+            field.append(
+                title,
+                input,
+            );
+
+            fragment.append(
+                field,
+            );
+        });
+
+        elements.streetGuardianControls
+            .replaceChildren(
+                fragment,
+            );
+    }
+
+    const inputs =
+        elements.streetGuardianControls
+            .querySelectorAll(
+                "input[data-expedition-street]",
+            );
+
+    inputs.forEach(function (
+        input,
+        index,
+    ) {
+        input.disabled = false;
+
+        if (
+            document.activeElement !==
+            input
+        ) {
+            setExpeditionInputValue(
+                input,
+                receivedStreets[index]
+                    .guardian,
+            );
+        }
+    });
 }
 
 function renderExpeditionErrorTables(
@@ -1187,6 +1325,11 @@ function renderExpeditionReport(
         errorAnalysis,
     );
 
+    renderExpeditionGuardianControls(
+        elements,
+        errorAnalysis.streets,
+    );
+
     elements.clearButton.disabled =
         !summary.hasData &&
         !errorAnalysis.hasErrorData;
@@ -1254,6 +1397,27 @@ function bindExpeditionEvents(
         elements.revertedInput,
         "revertedErrors",
     );
+
+    elements.streetGuardianControls
+        .addEventListener(
+            "input",
+            function (event) {
+                const input =
+                    event.target.closest(
+                        "input[data-expedition-street]",
+                    );
+
+                if (!input) {
+                    return;
+                }
+
+                updateExpeditionStreetGuardian(
+                    input.dataset
+                        .expeditionStreet,
+                    input.value,
+                );
+            },
+        );
     
     const handleWindowChange =
         function () {

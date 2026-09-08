@@ -375,6 +375,8 @@ const expeditionState = {
 
     errorStreets: [],
 
+    streetGuardians: {},
+
     revertedErrors: 0,
     revertedSortingErrors: 0,
     revertedLabelingErrors: 0,
@@ -493,6 +495,11 @@ function getExpeditionState() {
                         };
                     },
                 ),
+
+        streetGuardians: {
+            ...expeditionState
+                .streetGuardians,
+        },
 
         revertedErrors:
             expeditionState.revertedErrors,
@@ -1304,37 +1311,6 @@ function getExpeditionStreetName(
     );
 }
 
-function formatExpeditionGuardian(
-    operator,
-) {
-    const normalizedOperator =
-        normalizeExpeditionText(
-            operator,
-        );
-
-    const match =
-        normalizedOperator.match(
-            /^\[\s*ops\s*(\d+)\s*\]\s*(.*)$/i,
-        );
-
-    if (!match) {
-        return normalizedOperator
-            .split(/\s+/)[0]
-            .toUpperCase();
-    }
-
-    const firstName =
-        normalizeExpeditionText(
-            match[2],
-        )
-            .split(/\s+/)[0]
-            .toUpperCase();
-
-    return firstName
-        ? `[ops${match[1]}] ${firstName}`
-        : `[ops${match[1]}]`;
-}
-
 function getExpeditionStreetAnalysis(
     state,
     totalErrors,
@@ -1371,7 +1347,6 @@ function getExpeditionStreetAnalysis(
                     name,
                     missingOrders: 0,
                     totalErrors: 0,
-                    guardians: new Map(),
                 });
             }
 
@@ -1392,51 +1367,16 @@ function getExpeditionStreetAnalysis(
             street.totalErrors +=
                 missortedOrders;
 
-            const guardian =
-                formatExpeditionGuardian(
-                    route.validationOperator,
-                );
-
-            if (guardian) {
-                const guardianSummary =
-                    street.guardians.get(guardian) || {
-                        errors: 0,
-                        routes: 0,
-                    };
-
-                guardianSummary.errors +=
-                    missortedOrders;
-
-                guardianSummary.routes += 1;
-
-                street.guardians.set(
-                    guardian,
-                    guardianSummary,
-                );
-            }
         });
 
     return Array.from(streets.values())
         .map(function (street) {
             const guardian =
-                Array.from(
-                    street.guardians.entries(),
-                )
-                    .sort(function (
-                        first,
-                        second,
-                    ) {
-                        return (
-                            second[1].errors -
-                                first[1].errors ||
-                            second[1].routes -
-                                first[1].routes ||
-                            first[0].localeCompare(
-                                second[0],
-                                "pt-BR",
-                            )
-                        );
-                    })[0]?.[0] || "";
+                normalizeExpeditionText(
+                    state.streetGuardians?.[
+                        street.name
+                    ],
+                );
 
             return {
                 name: street.name,
@@ -1745,6 +1685,73 @@ function updateExpeditionManualQuantity(
     return true;
 }
 
+/* ALTERA MANUALMENTE O GUARDIÃO DE UMA RUA */
+
+function updateExpeditionStreetGuardian(
+    street,
+    guardian,
+) {
+    const streetName =
+        normalizeExpeditionText(
+            street,
+        );
+
+    if (!streetName) {
+        return false;
+    }
+
+    const availableStreets =
+        new Set(
+            expeditionState.routes
+                .filter(
+                    isExpeditionValidatedRoute,
+                )
+                .map(function (route) {
+                    return getExpeditionStreetName(
+                        route.corridor,
+                    );
+                }),
+        );
+
+    if (!availableStreets.has(streetName)) {
+        return false;
+    }
+
+    const normalizedGuardian =
+        normalizeExpeditionText(
+            guardian,
+        );
+
+    if (
+        normalizeExpeditionText(
+            expeditionState.streetGuardians[
+                streetName
+            ],
+        ) === normalizedGuardian
+    ) {
+        return true;
+    }
+
+    if (normalizedGuardian) {
+        expeditionState.streetGuardians[
+            streetName
+        ] = normalizedGuardian;
+    } else {
+        delete expeditionState.streetGuardians[
+            streetName
+        ];
+    }
+
+    notifyExpeditionState({
+        type:
+            "street-guardian-updated",
+
+        street: streetName,
+    });
+
+    return true;
+}
+
 /* ALTERA A SELEÇÃO DE UM CONFERENTE */
 
 function updateExpeditionOperatorSelection(
@@ -1855,6 +1862,9 @@ function replaceExpeditionRoutes(
     expeditionState.exceptionOrders =
         0;
 
+    expeditionState.streetGuardians =
+        {};
+
     expeditionState
         .excludedOperatorKeys
         .clear();
@@ -1946,6 +1956,9 @@ function resetExpeditionReport() {
     expeditionState.errorStreets =
         [];
 
+    expeditionState.streetGuardians =
+        {};
+
     expeditionState.revertedErrors =
         0;
 
@@ -1989,5 +2002,6 @@ export {
     subscribeExpeditionState,
     updateExpeditionManualQuantity,
     updateExpeditionOperatorSelection,
+    updateExpeditionStreetGuardian,
     updateExpeditionWindow,
 };
