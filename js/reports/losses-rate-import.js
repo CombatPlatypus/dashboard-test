@@ -771,6 +771,8 @@ async function importLossesRateFromClipboard(
             successMessage;
 
         setReportNotification({
+            reportId: "losses-rate",
+
             type: "success",
             message: successMessage,
         });
@@ -792,6 +794,8 @@ async function importLossesRateFromClipboard(
             errorMessage;
 
         setReportNotification({
+            reportId: "losses-rate",
+
             type: "error",
             message:
                 `Falha na importação: ${errorMessage}`,

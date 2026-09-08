@@ -420,6 +420,8 @@ function hasExpeditionElements(
         );
 
         setReportNotification({
+            reportId: "expedition",
+
             type: "error",
 
             message:
@@ -1529,6 +1531,8 @@ function bindExpeditionEvents(
                     resetExpeditionReport();
 
                     setReportNotification({
+                        reportId: "expedition",
+
                         type: "info",
 
                         message:

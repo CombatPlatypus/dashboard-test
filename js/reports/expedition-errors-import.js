@@ -354,6 +354,8 @@ async function importExpeditionErrorsFromClipboard(
             `${analysis.spreadsheetTotal.toLocaleString("pt-BR")} erros importados.`;
 
         setReportNotification({
+            reportId: "expedition",
+
             type:
                 analysis.hasDivergence ||
                 !analysis.hasSpXData
@@ -378,6 +380,8 @@ async function importExpeditionErrorsFromClipboard(
         importButton.title = errorMessage;
 
         setReportNotification({
+            reportId: "expedition",
+
             type: "error",
             message:
                 `Falha na importação: ${errorMessage}`,

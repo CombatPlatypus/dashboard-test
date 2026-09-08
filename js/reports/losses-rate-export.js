@@ -144,6 +144,8 @@ function renderLossesRateExportStatus(
     }
 
     setReportNotification({
+        reportId: "losses-rate",
+
         type:
             canExport
                 ? "success"

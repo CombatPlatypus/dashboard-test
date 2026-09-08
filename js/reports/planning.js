@@ -1199,6 +1199,8 @@ function renderPlanningReportStatus(
     }
 
     setReportNotification({
+        reportId: "planning",
+
         type:
             canExport
                 ? "success"

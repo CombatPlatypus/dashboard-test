@@ -527,9 +527,9 @@ function createLossesRateCompositionChart(
                         ],
 
                         borderColor:
-                            "#1f1f1f",
+                            "transparent",
 
-                        borderWidth: 3,
+                        borderWidth: 0,
                     },
                 ],
             },
@@ -759,7 +759,9 @@ function createLossesRateHistoryChart(
 
                     y: {
                         beginAtZero: true,
+                        suggestedMax:
                             LOSSES_RATE_HISTORY_INITIAL_MAXIMUM,
+
                         ticks: {
                             color: "#e4e6eb",
                             stepSize: 0.01,

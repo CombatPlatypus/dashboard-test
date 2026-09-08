@@ -129,6 +129,8 @@ function renderReceiptExportStatus(
     }
 
     setReportNotification({
+        reportId: "receipt",
+
         type:
             canExport
                 ? "success"

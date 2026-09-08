@@ -631,6 +631,8 @@ function showExpeditionImportError(
     message,
 ) {
     setReportNotification({
+        reportId: "expedition",
+
         type: "error",
 
         message:
@@ -702,6 +704,8 @@ async function importExpeditionFile(
         }
 
         setReportNotification({
+            reportId: "expedition",
+
             type:
                 importWarnings.length > 0
                     ? "warning"

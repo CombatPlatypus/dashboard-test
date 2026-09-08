@@ -16,12 +16,55 @@ const REPORT_NOTIFICATION_ICONS =
             "images/geral-icons/error-icon.svg",
     });
 
-let lastReportNotification = {
+const IDLE_REPORT_NOTIFICATION =
+    Object.freeze({
     type: "idle",
 
     message:
         "Tudo em silêncio por enquanto.",
-};
+    });
+
+const reportNotifications =
+    new Map();
+
+let reportsVisibilityObserver =
+    null;
+
+/* IDENTIFICA O RELATÓRIO ATIVO */
+
+function normalizeReportId(
+    value,
+) {
+    return String(
+        value ?? "",
+    )
+        .trim()
+        .replace(/^#/, "");
+}
+
+function getActiveReportId() {
+    const activeLink =
+        document.querySelector(
+            "#report-choice " +
+            ".tabs-title.is-active > " +
+            'a[href^="#"]',
+        );
+
+    return normalizeReportId(
+        activeLink?.getAttribute(
+            "href",
+        ),
+    );
+}
+
+function getActiveReportNotification() {
+    return (
+        reportNotifications.get(
+            getActiveReportId(),
+        ) ||
+        IDLE_REPORT_NOTIFICATION
+    );
+}
 
 /* LOCALIZA OS ELEMENTOS */
 
@@ -46,7 +89,10 @@ function getReportNotificationElements() {
 
 /* RENDERIZA A ÚLTIMA NOTIFICAÇÃO */
 
-function renderReportNotification() {
+function renderReportNotification(
+    notification =
+        getActiveReportNotification(),
+) {
     const elements =
         getReportNotificationElements();
 
@@ -73,16 +119,16 @@ function renderReportNotification() {
 
     elements.container.dataset
         .notificationType =
-            lastReportNotification.type;
+            notification.type;
 
     elements.icon.src =
         REPORT_NOTIFICATION_ICONS[
-            lastReportNotification.type
+            notification.type
         ] ||
         REPORT_NOTIFICATION_ICONS.info;
 
     elements.text.textContent =
-        lastReportNotification.message;
+        notification.message;
 
     return true;
 }
@@ -92,6 +138,7 @@ function renderReportNotification() {
 function setReportNotification({
     type = "info",
     message,
+    reportId,
 } = {}) {
     const normalizedMessage =
         String(
@@ -110,17 +157,71 @@ function setReportNotification({
             ? type
             : "info";
 
-    lastReportNotification = {
+    const normalizedReportId =
+        normalizeReportId(
+            reportId,
+        ) ||
+        getActiveReportId();
+
+    const notification = {
         type: normalizedType,
         message: normalizedMessage,
     };
 
-    return renderReportNotification();
+    if (normalizedReportId) {
+        reportNotifications.set(
+            normalizedReportId,
+            notification,
+        );
+    }
+
+    if (
+        !normalizedReportId ||
+        normalizedReportId ===
+            getActiveReportId()
+    ) {
+        return renderReportNotification(
+            notification,
+        );
+    }
+
+    return true;
 }
 
 /* INICIALIZAÇÃO */
 
 function initializeReportNotifications() {
+    const reportsContent =
+        document.querySelector(
+            '[data-tabs-content="report-choice"]',
+        );
+
+    reportsVisibilityObserver
+        ?.disconnect();
+
+    if (
+        reportsContent instanceof
+        HTMLElement
+    ) {
+        reportsVisibilityObserver =
+            new MutationObserver(
+                function () {
+                    renderReportNotification();
+                },
+            );
+
+        reportsVisibilityObserver.observe(
+            reportsContent,
+            {
+                attributes: true,
+                attributeFilter: [
+                    "class",
+                ],
+                subtree: true,
+            },
+        );
+    }
+
     return renderReportNotification();
 }
 
