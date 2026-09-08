@@ -593,7 +593,7 @@ function getExpeditionSummary(
         ).size;
 
     const volumeChecked =
-        routes.reduce(
+        validatedRoutes.reduce(
             function (
                 total,
                 route,
