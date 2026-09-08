@@ -363,13 +363,13 @@
         min-height: 40px;
         font-size: 14px;
         padding: 10px 15px;
-        color: var(--color-button);
-        background-color: var(--color-container);
+        color: var(--color-button-text);
+        background-color: var(--color-button);
         border-bottom: 5px solid var(--color-border);
     }
     .lhs-buttons > div > .button:hover, .lhs-buttons > div > .button:focus  {
-        color: var(--color-button);
-        background-color: var(--color-container-houver);
+        color: var(--color-button-text);
+        background-color: var(--color--button);
     }
     #planning #planningSegregatedTosTab[hidden] {
         display: none;
@@ -777,7 +777,7 @@
         height: 15px;
         margin-top: 18px;
         overflow: hidden;
-        background-color: var(--color-container);
+        background-color: var(--color-progress-bar);
     }
     #receipt .receipt-progress-fill {
         position: absolute;
