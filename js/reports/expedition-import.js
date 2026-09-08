@@ -366,7 +366,6 @@ function createExpeditionRoutes(
         new Set();
 
     let duplicateRoutes = 0;
-    let inconsistentRoutes = 0;
 
     for (
         let rowIndex =
@@ -448,14 +447,6 @@ function createExpeditionRoutes(
             throw new Error(
                 `A linha ${rowIndex + 1} possui uma quantidade inválida.`,
             );
-        }
-
-        if (
-            scannedOrders -
-                finalOrders -
-                missortedOrders < 0
-        ) {
-            inconsistentRoutes += 1;
         }
 
         const validationStartTime =
@@ -557,7 +548,6 @@ function createExpeditionRoutes(
     return {
         routes,
         duplicateRoutes,
-        inconsistentRoutes,
     };
 }
 
@@ -708,21 +698,6 @@ async function importExpeditionFile(
 
             importWarnings.push(
                 duplicateMessage,
-            );
-        }
-
-        if (
-            result.inconsistentRoutes > 0
-        ) {
-            const inconsistentMessage =
-                `${result.inconsistentRoutes} rota(s) possuem totais incompatíveis.`;
-
-            console.warn(
-                inconsistentMessage,
-            );
-
-            importWarnings.push(
-                inconsistentMessage,
             );
         }
 

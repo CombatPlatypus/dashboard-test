@@ -592,15 +592,29 @@ function getExpeditionSummary(
                 .filter(Boolean),
         ).size;
 
+    const volumeChecked =
+        routes.reduce(
+            function (
+                total,
+                route,
+            ) {
+                return (
+                    total +
+                    (
+                        route.scannedOrders ??
+                        0
+                    )
+                );
+            },
+            0,
+        );
+
     const totals =
     selectedValidatedRoutes.reduce(
         function (
             summary,
             route,
         ) {
-            summary.volumeChecked +=
-                route.scannedOrders ?? 0;
-
             summary.missingOrders +=
                 route.missingOrders ?? 0;
 
@@ -615,7 +629,6 @@ function getExpeditionSummary(
             return summary;
         },
         {
-            volumeChecked: 0,
             missingOrders: 0,
             duplicatedOrders: 0,
             missortedOrders: 0,
@@ -730,6 +743,8 @@ function getExpeditionSummary(
         exceptionOrders:
             state.exceptionOrders ??
             0,
+
+        volumeChecked,
 
         ...totals,
     };

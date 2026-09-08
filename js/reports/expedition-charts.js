@@ -11,7 +11,7 @@ let resizeFrame = null;
 
 const CHART_PIXEL_RATIO = Math.max(
     window.devicePixelRatio || 1,
-    3,
+    4,
 );
 
 const quantityFormatter =
@@ -103,7 +103,16 @@ function getOperatorName(value) {
             )
             : receivedValue;
 
-    return name.trim() || "—";
+    const normalizedName =
+        name.trim();
+
+    if (!normalizedName) {
+        return "—";
+    }
+
+    return normalizedName
+        .split(/\s+/)[0]
+        .toUpperCase();
 }
 
 function getCompactOperatorName(
