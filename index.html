@@ -291,6 +291,23 @@
             #controls-mistakes .input-group {
                 grid-template-columns: repeat(auto-fit, minmax(100%, 1fr)) !important;
             }
+            #expedition #expeditionStreetGuardianControls.is-errors-tab-active {
+                max-height: 477px;
+                overflow-y: auto;
+                padding-right: 15px;
+            }
+            #expedition #expeditionStreetGuardianControls.is-errors-tab-active::-webkit-scrollbar-track {
+                background-color: transparent;
+            }
+            #expedition #expeditionStreetGuardianControls.is-errors-tab-active::-webkit-scrollbar {
+                width: 5px;
+                height: 5px;
+                background-color: transparent;
+            }
+            #expedition #expeditionStreetGuardianControls.is-errors-tab-active::-webkit-scrollbar-thumb {
+                border-radius: 5px;
+                background-color: var(--color-border);
+            }
             #expeditionStreetGuardianControls input {
                 text-transform: uppercase;
             }
@@ -2394,6 +2411,7 @@
                 );
 
                 const controlsTarget = activeLink.data("controls-target");
+                const activeTabTarget = activeLink.attr("href");
 
                 expeditionControls
                     .find(".expedition-controls-panel")
@@ -2403,6 +2421,12 @@
                 $("#" + controlsTarget)
                     .addClass("is-active")
                     .removeAttr("hidden");
+
+                $("#expeditionStreetGuardianControls")
+                    .toggleClass(
+                        "is-errors-tab-active",
+                        activeTabTarget === "#expedition-mistakes"
+                    );
             }
 
             expeditionTabs.on("change.zf.tabs", function () {
