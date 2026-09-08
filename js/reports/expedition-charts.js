@@ -110,9 +110,21 @@ function getOperatorName(value) {
         return "—";
     }
 
-    return normalizedName
-        .split(/\s+/)[0]
-        .toUpperCase();
+    const firstName =
+        normalizedName
+            .split(/\s+/)[0]
+            .toLocaleLowerCase(
+                "pt-BR",
+            );
+
+    return (
+        firstName
+            .charAt(0)
+            .toLocaleUpperCase(
+                "pt-BR",
+            ) +
+        firstName.slice(1)
+    );
 }
 
 function getCompactOperatorName(

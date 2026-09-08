@@ -168,7 +168,35 @@ function getExpeditionOperatorName(
             )
             : receivedValue;
 
-    return name.trim() || "—";
+    const normalizedName =
+        name
+            .trim()
+            .replace(/\s+/g, " ");
+
+    if (!normalizedName) {
+        return "—";
+    }
+
+    return normalizedName
+        .split(" ")
+        .map(
+            function (word) {
+                const lowercaseWord =
+                    word.toLocaleLowerCase(
+                        "pt-BR",
+                    );
+
+                return (
+                    lowercaseWord
+                        .charAt(0)
+                        .toLocaleUpperCase(
+                            "pt-BR",
+                        ) +
+                    lowercaseWord.slice(1)
+                );
+            },
+        )
+        .join(" ");
 }
 
 function setExpeditionInputValue(
