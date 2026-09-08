@@ -968,6 +968,65 @@
         white-space: nowrap !important;
     }
 
+/* CHECKBOX PERSONALIZADA */
+
+.checkbox {
+    height: 40px;
+    position: relative;
+    outline: 0;
+    font-size: 0.875rem;
+    font-weight: bold;
+    color: var(--color-text);
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.checkbox > label {
+    position: relative;
+    width: 39px;
+    height: 38px;
+    transition: all 0s;
+    border-radius: 3px;
+    background-color: var(--color-container);
+    border: 1px solid var(--color-border);
+}
+.checkbox > label::after {
+    position: absolute;
+    display: block;
+    width: 39px;
+    height: 38px;
+    padding: 2px 0px 0 1px;
+    top: 0px;
+    left: 0px;
+    background: none;
+    border-radius: 0;
+    transition: none;
+    transform: none;
+    content: '';
+}
+.checkbox > input[type="checkbox"] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    margin-bottom: 0;
+    opacity: 0;
+}
+.checkbox > input[type="checkbox"]:checked + label::after {
+    content: '✕';
+    font-size: 25px;
+    text-align: center;
+}
+.checkbox > input[type="checkbox"]:disabled + label {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+.checkbox > input[type="checkbox"]:focus-visible + label {
+    outline: 2px solid var(--color-text);
+    outline-offset: 2px;
+}
+
 /* MENU PRINCIPAL */
 
     .main-menu {

@@ -27,6 +27,9 @@ const receiptExportElements = {
 let receiptNotificationObserver =
     null;
 
+let receiptReportHasActivity =
+    false;
+
 /* RETORNA A PENDÊNCIA DO RELATÓRIO */
 
 function getReceiptExportPendingMessage(
@@ -124,6 +127,7 @@ function renderReceiptExportStatus(
             .contains(
                 "is-active",
             )
+        || !receiptReportHasActivity
     ) {
         return;
     }
@@ -695,7 +699,14 @@ function initializeReceiptExport() {
         );
 
     subscribeReceiptState(
-        renderReceiptExportStatus,
+        function (state) {
+            receiptReportHasActivity =
+                true;
+
+            renderReceiptExportStatus(
+                state,
+            );
+        },
     );
 
     renderReceiptExportStatus(

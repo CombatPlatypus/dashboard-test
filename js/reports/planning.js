@@ -60,6 +60,7 @@ let planningDownloadReportButton = null;
 let planningReportExportArea = null;
 let planningPanel = null;
 let planningNotificationObserver = null;
+let planningReportHasActivity = false;
 
 /* FORMATAÇÃO NUMÉRICA */
 
@@ -1194,6 +1195,7 @@ function renderPlanningReportStatus(
         !planningPanel.classList.contains(
             "is-active",
         )
+        || !planningReportHasActivity
     ) {
         return;
     }
@@ -2249,6 +2251,9 @@ function initializePlanningLhList() {
             state,
             change,
         ) {
+            planningReportHasActivity =
+                true;
+
             if (
                 change.type === "lh-added" ||
                 change.type === "lh-removed" ||

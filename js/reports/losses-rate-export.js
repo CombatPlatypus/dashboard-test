@@ -31,6 +31,9 @@ let lossesRatePanel =
 let lossesRateNotificationObserver =
     null;
 
+let lossesRateReportHasActivity =
+    false;
+
 /* ESTADO DA EXPORTAÇÃO */
 
 let lossesRateExportBusy =
@@ -139,6 +142,7 @@ function renderLossesRateExportStatus(
         !lossesRatePanel.classList.contains(
             "is-active",
         )
+        || !lossesRateReportHasActivity
     ) {
         return;
     }
@@ -502,6 +506,9 @@ function initializeLossesRateExport() {
 
     subscribeLossesRateState(
         function (state) {
+            lossesRateReportHasActivity =
+                true;
+
             renderLossesRateExportStatus(
                 state,
             );

@@ -31,288 +31,7 @@
 
         <!-- ESTILOS TEMPORARIOS NÃO FINALIZADOS -->
 
-        <style>
-
-            /* CHECKBOX PERSONALIZADA */
-
-            .checkbox {
-                height: 40px;
-                position: relative;
-                outline: 0;
-                font-size: 0.875rem;
-                font-weight: bold;
-                color: var(--color-text);
-                -webkit-user-select: none;
-                -moz-user-select: none;
-                -ms-user-select: none;
-                user-select: none;
-            }
-            .checkbox > label {
-                position: relative;
-                width: 39px;
-                height: 38px;
-                transition: all 0s;
-                border-radius: 3px;
-                background-color: var(--color-container);
-                border: 1px solid var(--color-border);
-            }
-            .checkbox > label::after {
-                position: absolute;
-                display: block;
-                width: 39px;
-                height: 38px;
-                padding: 2px 0px 0 1px;
-                top: 0px;
-                left: 0px;
-                background: none;
-                border-radius: 0;
-                transition: none;
-                transform: none;
-                content: '';
-            }
-            .checkbox > input[type="checkbox"] {
-                position: absolute;
-                width: 1px;
-                height: 1px;
-                overflow: hidden;
-                margin-bottom: 0;
-                opacity: 0;
-            }
-            .checkbox > input[type="checkbox"]:checked + label::after {
-                content: '✕';
-                font-size: 25px;
-                text-align: center;
-            }
-            .checkbox > input[type="checkbox"]:disabled + label {
-                cursor: not-allowed;
-                opacity: 0.5;
-            }
-            .checkbox > input[type="checkbox"]:focus-visible + label {
-                outline: 2px solid var(--color-text);
-                outline-offset: 2px;
-            }
-
-            /* AJUSTES ESPECIFICOS */
-
-            #expedition .tabs {
-                grid-template-columns: repeat(auto-fit, minmax(299px, 1fr));
-            }
-
-            #expedition .report-controls .input-group {
-                border-bottom: 2px solid var(--color-border);
-                padding-bottom: 20px;
-                margin-bottom: 20px;
-            }
-            #expedition .report-controls .input-group:last-of-type {
-                padding-bottom: 0;
-                margin-bottom: 0;
-                border-bottom: none;
-            }
-            #expedition td {
-                text-align: center;
-            }
-
-            #expedition .expedition-guardian-name {
-                text-transform: uppercase;
-            }
-
-            /* CARDS */
-
-            #expedition .cards {
-                display: grid;
-                grid-template-columns:
-                    repeat(
-                        auto-fit,
-                        minmax(300px, 1fr)
-                    );
-                gap: 15px;
-                width: 100%;
-            }
-            #expedition .cards > div {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                gap: 5px;
-                min-width: 0;
-                padding: 25px;
-                background-color: var(--color-container);
-                border: 1px solid var(--color-border);
-            }
-            #expedition .cards > div > p:first-of-type {
-                margin: 0 0 5px;
-                color: var(--color-gray-p);
-                font-size: 13px;
-            }
-            #expedition .cards > div > h4 {
-                margin: 0;
-                font-size: 18px;
-            }
-            #expedition .cards > div > p {
-                font-size: 14px;
-                color: var(--color-gray-p);
-                line-height: 1;
-            }
-            #expedition .cards > div > p:last-child {
-                margin: 0;
-            }
-
-            /* TABELAS */
-
-            #expedition .expedition-operator-table {
-                table-layout: fixed;
-            }
-            #expedition .expedition-operator-table .operator-name-column {
-                width: 40%;
-            }
-            #expedition .expedition-operator-table .operator-metric-column {
-                width: 15%;
-            }
-            #expedition .expedition-operator-table th:first-child,
-            #expedition .expedition-operator-table td:first-child {
-                padding-left: 15px;
-                text-align: left;
-                white-space: normal;
-                overflow-wrap: anywhere;
-            }
-
-            /* GRÁFICOS */
-
-            #expedition #expedition-charts .charts {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
-                width: 100%;
-                height: auto;
-                gap: 15px;
-            }
-            #expedition #expedition-charts .charts > div {
-                display: flex;
-                flex-direction: column;
-                min-width: 0;
-                min-height: 1216px;
-                padding: 20px;
-                background-color: var(--color-container);
-                border: 1px solid var(--color-border);
-                border-radius: 0 0 5px 5px;
-            }
-            #expedition #expedition-charts .charts > div > h3 {
-                margin: 0 0 5px;
-                text-align: center;
-            }
-            #expedition #expedition-charts .charts > div > p {
-                margin: 0;
-                color: var(--color-gray-p);
-                font-size: 14px;
-                text-align: center;
-            }
-            #expedition #expedition-charts .charts > div > div {
-                flex: 1 1 auto;
-                width: 100%;
-                min-height: 300px;
-                height: auto;
-                margin-top: 15px;
-                position: relative;
-            }
-
-            /*  */
-
-            #expedition .streets-chart {
-                width: 100%;
-                padding: 20px;
-                background-color: var(--color-container);
-                border: 1px solid var(--color-border);
-            }
-            #expedition .streets-chart h4, p {
-                margin: 0;
-            }
-            #expedition .streets-chart p {
-                font-size: 14px;
-                color: var(--color-gray-p);
-                line-height: 1;
-            }
-            #expedition .streets-chart .chart-title {
-                margin-bottom: 20px;
-            }
-            #expedition .streets-chart .chart-title .flex-box-start {
-               column-gap: 15px;
-            }
-            #expedition .streets-chart .chart-title .type {
-                display: flex;
-                align-items: center;
-                gap: 8px;
-            }
-            #expedition .streets-chart .chart-title .type > div {
-                width: 20px;
-                height: 20px;
-                border-radius: 3px;
-            }
-            #expedition .streets-chart .chart-title h4,
-            #expedition .streets-chart .chart-title p {
-                letter-spacing: 1px;
-            }
-            #expedition .expedition-error-balance-chart {
-                position: relative;
-                width: 100%;
-                height: 300px;
-            }
-            #expedition .expedition-street-occurrences-chart {
-                position: relative;
-                width: 100%;
-                min-height: 228px;
-                height: 228px;
-            }
-
-            /* CONTROLES */
-
-            #expedition #expeditionWindowInput {
-                width: 100%;
-            }
-            #expedition #expeditionWindowInput + .select2-container {
-                width: 100% !important;
-            }
-            #expedition #expeditionOperatorControls {
-                grid-template-columns: repeat(auto-fit, minmax(100%, 1fr)) !important;
-                height: 1192px;
-                overflow: auto;
-                padding-right: 15px;
-            }
-            #expedition #expeditionOperatorControls::-webkit-scrollbar-track {
-                background-color: transparent;
-            }
-            #expedition #expeditionOperatorControls::-webkit-scrollbar {
-                width: 5px;
-                height: 5px;
-                background-color: transparent;
-            }
-            #expedition #expeditionOperatorControls::-webkit-scrollbar-thumb {
-                border-radius: 5px;
-                background-color: var(--color-border);
-            }
-            #controls-mistakes .input-group {
-                grid-template-columns: repeat(auto-fit, minmax(100%, 1fr)) !important;
-            }
-            #expedition #expeditionStreetGuardianControls.is-errors-tab-active {
-                max-height: 477px;
-                overflow-y: auto;
-                padding-right: 15px;
-            }
-            #expedition #expeditionStreetGuardianControls.is-errors-tab-active::-webkit-scrollbar-track {
-                background-color: transparent;
-            }
-            #expedition #expeditionStreetGuardianControls.is-errors-tab-active::-webkit-scrollbar {
-                width: 5px;
-                height: 5px;
-                background-color: transparent;
-            }
-            #expedition #expeditionStreetGuardianControls.is-errors-tab-active::-webkit-scrollbar-thumb {
-                border-radius: 5px;
-                background-color: var(--color-border);
-            }
-            #expeditionStreetGuardianControls input {
-                text-transform: uppercase;
-            }
-
-        </style>
+        <style></style>
     </head>	
 
     <!-- CONTEÚDO DA PÁGINA -->
@@ -960,7 +679,7 @@
 
                                 <div class="report-controls">
                                     <div class="history-link flex-box-start">
-                                        <a href="https://docs.google.com/spreadsheets/d/12hwMXkw5vMvpvEWcXaXyJqNFv8nF8ugZSPHlKIJq5ko/edit?gid=0#gid=0" target="_blank">
+                                        <a href="https://docs.google.com/spreadsheets/d/1TUOf4Bvv7L_Q87xOkCQqPKkNpSi03OSs3aKobbAn724/edit?gid=275287237#gid=275287237" target="_blank">
                                             <svg class="spreadsheets-link-icon" viewBox="0 0 24 24" aria-hidden="true">
                                                 <path d="M7 17L17 7M9 7H17V15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
                                             </svg>
@@ -968,7 +687,7 @@
 
                                         <div>
                                             <h4>Planilha - Taxa de Perdas</h4>
-                                            <p>Copie toda página e importe aqui./p>
+                                            <p>Copie toda página e importe aqui.</p>
                                         </div>
                                     </div>
 
@@ -1775,7 +1494,7 @@
 
                                     <div class="expedition-controls-panel" id="controls-mistakes">
                                         <div class="history-link flex-box-start">
-                                            <a href="" target="_blank">
+                                            <a href="https://docs.google.com/spreadsheets/d/1TUOf4Bvv7L_Q87xOkCQqPKkNpSi03OSs3aKobbAn724/edit?gid=354393054#gid=354393054" target="_blank">
                                                 <svg class="spreadsheets-link-icon" viewBox="0 0 24 24" aria-hidden="true">
                                                     <path d="M7 17L17 7M9 7H17V15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
                                                 </svg>
@@ -2373,7 +2092,7 @@
         <script src="js/data-analysis/comparison.js" defer></script>
         <script src="js/data-analysis/init.js" defer></script>
 
-        <!-- -->
+        <!-- AJUSTES TABS -->
 
         <script>
 
