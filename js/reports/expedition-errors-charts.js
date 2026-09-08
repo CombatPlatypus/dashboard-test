@@ -94,6 +94,21 @@ function getExpeditionErrorsChartElements() {
             document.getElementById(
                 "expeditionStreetOccurrencesChartContainer",
             ),
+
+        topOffenderGuardian:
+            document.getElementById(
+                "expeditionTopOffenderGuardian",
+            ),
+
+        topOffenderStreet:
+            document.getElementById(
+                "expeditionTopOffenderStreet",
+            ),
+
+        topOffenderRate:
+            document.getElementById(
+                "expeditionTopOffenderRate",
+            ),
     };
 }
 
@@ -110,7 +125,77 @@ function hasExpeditionErrorsChartElements(
         elements.streetOccurrencesCanvas instanceof
             HTMLCanvasElement &&
         elements.streetOccurrencesContainer instanceof
+            HTMLElement &&
+        elements.topOffenderGuardian instanceof
+            HTMLElement &&
+        elements.topOffenderStreet instanceof
+            HTMLElement &&
+        elements.topOffenderRate instanceof
             HTMLElement
+    );
+}
+
+function renderTopOffenderGuardian(
+    element,
+    guardian,
+) {
+    const receivedGuardian =
+        String(
+            guardian ?? "",
+        ).trim();
+
+    element.classList.remove(
+        "expedition-guardian-name",
+    );
+
+    if (!receivedGuardian) {
+        element.textContent =
+            "Não informado";
+
+        return;
+    }
+
+    const guardianMatch =
+        receivedGuardian.match(
+            /^(\[ops\d+\])\s*(.*)$/i,
+        );
+
+    if (!guardianMatch) {
+        element.classList.add(
+            "expedition-guardian-name",
+        );
+
+        element.textContent =
+            receivedGuardian;
+
+        return;
+    }
+
+    const code =
+        document.createElement(
+            "span",
+        );
+
+    code.textContent =
+        guardianMatch[1]
+            .toLowerCase();
+
+    const name =
+        document.createElement(
+            "span",
+        );
+
+    name.classList.add(
+        "expedition-guardian-name",
+    );
+
+    name.textContent =
+        guardianMatch[2];
+
+    element.replaceChildren(
+        code,
+        " ",
+        name,
     );
 }
 
@@ -508,6 +593,71 @@ function updateStreetOccurrencesChart(
     );
 }
 
+function updateTopOffenderCard(
+    elements,
+    streets,
+) {
+    const topOffender =
+        streets
+            .filter(function (street) {
+                return street.totalErrors > 0;
+            })
+            .slice()
+            .sort(function (
+                first,
+                second,
+            ) {
+                return (
+                    second.totalErrors -
+                        first.totalErrors ||
+                    second.missingOrders -
+                        first.missingOrders ||
+                    first.name.localeCompare(
+                        second.name,
+                        "pt-BR",
+                        {
+                            numeric: true,
+                        },
+                    )
+                );
+            })[0] || null;
+
+    if (!topOffender) {
+        elements.topOffenderGuardian
+            .classList
+            .remove(
+                "expedition-guardian-name",
+            );
+
+        elements.topOffenderGuardian
+            .textContent =
+                "Guardião";
+
+        elements.topOffenderStreet
+            .textContent = "—";
+
+        elements.topOffenderRate
+            .textContent = "—";
+
+        return;
+    }
+
+    renderTopOffenderGuardian(
+        elements.topOffenderGuardian,
+        topOffender.guardian,
+    );
+
+    elements.topOffenderStreet
+        .textContent =
+            topOffender.name;
+
+    elements.topOffenderRate
+        .textContent =
+            formatErrorChartRate(
+                topOffender.errorRate,
+            );
+}
+
 function renderExpeditionErrorsCharts(
     elements,
     state,
@@ -523,6 +673,11 @@ function renderExpeditionErrorsCharts(
             .contains(
                 "is-active",
             );
+
+    updateTopOffenderCard(
+        elements,
+        analysis.streets,
+    );
 
     updateErrorBalanceChart(
         analysis,
