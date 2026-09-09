@@ -428,135 +428,135 @@
 
                                 <!-- CONTROLES -->
 
-                                <div class="tabs-content report-controls" data-tabs-content="planning-choice">
-                                    <div class="tabs-panel is-active" id="lhs-list">
-                                        <div class="history-link flex-box-start">
-                                            <a href="https://spx.shopee.com.br/#/hubLinehaulTrips/trip" target="_blank">
-                                                <svg class="spreadsheets-link-icon" viewBox="0 0 24 24" aria-hidden="true">
-                                                    <path d="M7 17L17 7M9 7H17V15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                                                </svg>
-                                            </a>
+                                <div class="report-controls">
+                                    <div class="tabs-content" data-tabs-content="planning-choice">
+                                        <div class="tabs-panel is-active" id="lhs-list">
+                                            <div class="history-link flex-box-start">
+                                                <a href="https://spx.shopee.com.br/#/hubLinehaulTrips/trip" target="_blank">
+                                                    <svg class="spreadsheets-link-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                                        <path d="M7 17L17 7M9 7H17V15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                                    </svg>
+                                                </a>
 
-                                            <div>
-                                                <h4>Transporte Principal</h4>
-                                                <p>Exporte do SPX e importe aqui.</p>
+                                                <div>
+                                                    <h4>Transporte Principal</h4>
+                                                    <p>Exporte do SPX e importe aqui.</p>
+                                                </div>
                                             </div>
+
+                                            <div class="history-import flex-box-start">
+                                                <div>
+                                                    <button class="button" id="planningImportClipboardButton" type="button">
+                                                        Importar Viagens de Carga
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <div class="planning-lh-list flex-box-column" id="planningLhList"></div>
                                         </div>
 
-                                        <div class="history-import flex-box-start">
-                                            <div>
-                                                <button class="button" id="planningImportClipboardButton" type="button">
-                                                    Importar Viagens de Carga
-                                                </button>
+                                        <div class="tabs-panel" id="segregated-tos">
+
+                                            <!-- LISTAS DE TOS SEPARADAS POR LH -->
+
+                                            <div class="planning-to-empty" id="planningToEmpty">
+                                                <p>Marque “Segregar” e “Segregar TO” em um LH para adicionar suas TOs.</p>
                                             </div>
+
+                                            <div class="planning-to-groups flex-box-column" id="planningToGroups" hidden></div>
                                         </div>
 
-                                        <div class="lhs-buttons">
-                                            <div>
-                                                <button class="button" id="planningAddLh" type="button">Adicionar LH</button>
-                                                <button class="button" id="planningClearLhs" type="button">Limpar Lista</button>
-                                            </div>
-                                        </div>
+                                        <div class="tabs-panel" id="collection-indicators">
 
-                                        <div class="planning-lh-list flex-box-column" id="planningLhList"></div>
-                                    </div>
+                                            <!-- COLLECTION POOL -->
 
-                                    <div class="tabs-panel" id="segregated-tos">
+                                            <div id="planningPoolControls">
 
-                                        <!-- LISTAS DE TOS SEPARADAS POR LH -->
+                                                <h4>Quantidade de Backlog</h4>
 
-                                        <div class="planning-to-empty" id="planningToEmpty">
-                                            <p>Marque “Segregar” e “Segregar TO” em um LH para adicionar suas TOs.</p>
-                                        </div>
+                                                <div class="input-group">
+                                                    <div>
+                                                        <h4>Pacotes</h4>
+                                                        <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="backlogPackages">
+                                                    </div>
 
-                                        <div class="planning-to-groups flex-box-column" id="planningToGroups" hidden></div>
-                                    </div>
-
-                                    <div class="tabs-panel" id="collection-indicators">
-
-                                        <!-- COLLECTION POOL -->
-
-                                        <div id="planningPoolControls">
-
-                                            <h4>Quantidade de Backlog</h4>
-
-                                            <div class="input-group">
-                                                <div>
-                                                    <h4>Pacotes</h4>
-                                                    <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="backlogPackages">
+                                                    <div>
+                                                        <h4>Volumosos</h4>
+                                                        <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="backlogBulky">
+                                                    </div>
                                                 </div>
 
-                                                <div>
-                                                    <h4>Volumosos</h4>
-                                                    <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="backlogBulky">
-                                                </div>
-                                            </div>
+                                                <h4>Operações na Pool</h4>
 
-                                            <h4>Operações na Pool</h4>
+                                                <div class="input-group operation">
+                                                    <div>
+                                                        <h4>Adicionados</h4>
+                                                        <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="added">
+                                                    </div>
 
-                                            <div class="input-group operation">
-                                                <div>
-                                                    <h4>Adicionados</h4>
-                                                    <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="added">
-                                                </div>
+                                                    <div>
+                                                        <h4>Retirados</h4>
+                                                        <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="removed">
+                                                    </div>
 
-                                                <div>
-                                                    <h4>Retirados</h4>
-                                                    <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="removed">
-                                                </div>
-
-                                                <div>
-                                                    <h4>Erros</h4>
-                                                    <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="errors">
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- CONTROLES DOS INDICADORES -->
-
-                                        <div id="planningGeneralControls">
-
-                                            <h4>Indicadores Operacionais</h4>
-
-                                            <div class="input-group">
-                                                <div>
-                                                    <h4>Cap do Dia</h4>
-
-                                                    <input type="text" inputmode="numeric" maxlength="6" data-planning-field="dailyCapacity">
-                                                </div>
-
-                                                <div>
-                                                    <h4>SPR Médio</h4>
-
-                                                    <input type="text" inputmode="numeric" maxlength="5" data-planning-field="averageSpr">
+                                                    <div>
+                                                        <h4>Erros</h4>
+                                                        <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="errors">
+                                                    </div>
                                                 </div>
                                             </div>
 
-                                            <h4>Composição da Frota</h4>
+                                            <!-- CONTROLES DOS INDICADORES -->
 
-                                            <div class="input-group fleet">
-                                                <div>
-                                                    <h4>Carros</h4>
+                                            <div id="planningGeneralControls">
 
-                                                    <input type="text" inputmode="numeric" maxlength="4" data-planning-vehicle-field="cars">
+                                                <h4>Indicadores Operacionais</h4>
+
+                                                <div class="input-group">
+                                                    <div>
+                                                        <h4>Cap do Dia</h4>
+
+                                                        <input type="text" inputmode="numeric" maxlength="6" data-planning-field="dailyCapacity">
+                                                    </div>
+
+                                                    <div>
+                                                        <h4>SPR Médio</h4>
+
+                                                        <input type="text" inputmode="numeric" maxlength="5" data-planning-field="averageSpr">
+                                                    </div>
                                                 </div>
 
-                                                <div>
-                                                    <h4>Motos</h4>
+                                                <h4>Composição da Frota</h4>
 
-                                                    <input type="text" inputmode="numeric" maxlength="4" data-planning-vehicle-field="motorcycles">
-                                                </div>
+                                                <div class="input-group fleet">
+                                                    <div>
+                                                        <h4>Carros</h4>
 
-                                                <div>
-                                                    <h4>Fiorinos</h4>
+                                                        <input type="text" inputmode="numeric" maxlength="4" data-planning-vehicle-field="cars">
+                                                    </div>
 
-                                                    <input type="text" inputmode="numeric" maxlength="4" data-planning-vehicle-field="fiorinos">
+                                                    <div>
+                                                        <h4>Motos</h4>
+
+                                                        <input type="text" inputmode="numeric" maxlength="4" data-planning-vehicle-field="motorcycles">
+                                                    </div>
+
+                                                    <div>
+                                                        <h4>Fiorinos</h4>
+
+                                                        <input type="text" inputmode="numeric" maxlength="4" data-planning-vehicle-field="fiorinos">
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div class="tabs-panel" id="planning-import"></div>
+                                    <div class="lhs-buttons">
+                                        <div>
+                                            <button class="button" id="planningAddLh" type="button">Adicionar LH</button>
+                                            <button class="button" id="planningClearLhs" type="button">Limpar Lista</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
