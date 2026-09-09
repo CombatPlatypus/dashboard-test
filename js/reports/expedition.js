@@ -232,7 +232,7 @@ function getExpeditionElements() {
                 "expeditionWindowInput",
             ),
 
-        floorRoutesInput:
+        floorVolumeInput:
             document.getElementById(
                 "expeditionFloorRoutesInput",
             ),
@@ -282,7 +282,7 @@ function getExpeditionElements() {
                 "expeditionPreviewValidatedRoutes",
             ),
 
-        previewFloorRoutes:
+        previewFloorVolume:
             document.getElementById(
                 "expeditionPreviewFloorRoutes",
             ),
@@ -475,8 +475,8 @@ function setExpeditionGeneralControlsAvailability(
     elements.windowInput.disabled =
         disabled;
 
-    elements.floorRoutesInput.disabled =
-        disabled;
+    elements.floorVolumeInput.disabled =
+        true;
 
     elements.unknownInput.disabled =
         disabled;
@@ -1296,10 +1296,10 @@ function renderExpeditionReport(
                 summary.validatedRoutes,
             );
 
-    elements.previewFloorRoutes
+    elements.previewFloorVolume
         .textContent =
             quantityOrDash(
-                summary.routesOnFloor,
+                summary.floorVolume,
             );
 
     elements.previewDuration
@@ -1345,9 +1345,9 @@ function renderExpeditionReport(
                 : "—";   
 
     setExpeditionInputValue(
-        elements.floorRoutesInput,
+        elements.floorVolumeInput,
         summary.hasData
-            ? summary.routesOnFloor
+            ? summary.floorVolume
             : null,
     );
 
@@ -1442,11 +1442,6 @@ function bindExpeditionEvents(
             },
         );
     }
-
-    bindManualQuantityInput(
-        elements.floorRoutesInput,
-        "routesOnFloor",
-    );
 
     bindManualQuantityInput(
         elements.unknownInput,

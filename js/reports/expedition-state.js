@@ -381,7 +381,7 @@ const expeditionState = {
     revertedSortingErrors: 0,
     revertedLabelingErrors: 0,
 
-    routesOnFloor:
+    floorVolume:
         null,
 
     unknownOrders: 0,
@@ -406,6 +406,16 @@ function isExpeditionValidatedRoute(
     return (
         status === "validated" ||
         status === "validado"
+    );
+}
+
+function isExpeditionNotValidatedRoute(
+    route,
+) {
+    return (
+        normalizeExpeditionStatus(
+            route?.status,
+        ) === "not validated"
     );
 }
 
@@ -512,8 +522,8 @@ function getExpeditionState() {
             expeditionState
                 .revertedLabelingErrors,
 
-        routesOnFloor:
-            expeditionState.routesOnFloor,
+        floorVolume:
+            expeditionState.floorVolume,
 
         unknownOrders:
             expeditionState.unknownOrders,
@@ -721,8 +731,8 @@ function getExpeditionSummary(
     operatorCount:
         selectedOperatorCount,
 
-    routesOnFloor:
-        state.routesOnFloor ??
+    floorVolume:
+        state.floorVolume ??
         null,
 
         expeditionDurationSeconds:
@@ -1655,7 +1665,6 @@ function updateExpeditionManualQuantity(
     value,
 ) {
     if (
-        field !== "routesOnFloor" &&
         field !== "unknownOrders" &&
         field !== "exceptionOrders" &&
         field !== "revertedErrors"
@@ -1854,17 +1863,26 @@ function replaceExpeditionRoutes(
                 },
             );
 
-    const validatedRouteCount =
-        expeditionState.routes.filter(
-            isExpeditionValidatedRoute,
-        ).length;
-
-    expeditionState.routesOnFloor =
-        Math.max(
-            expeditionState.routes.length -
-                validatedRouteCount,
-            0,
-        );
+    expeditionState.floorVolume =
+        expeditionState.routes
+            .filter(
+                isExpeditionNotValidatedRoute,
+            )
+            .reduce(
+                function (
+                    total,
+                    route,
+                ) {
+                    return (
+                        total +
+                        (
+                            route.initialOrders ??
+                            0
+                        )
+                    );
+                },
+                0,
+            );
 
     expeditionState.sourceFileName =
         normalizeExpeditionText(
@@ -1951,7 +1969,7 @@ function resetExpeditionReport() {
     expeditionState.window =
         "AM";
 
-    expeditionState.routesOnFloor =
+    expeditionState.floorVolume =
         null;
 
     expeditionState.sourceFileName =
