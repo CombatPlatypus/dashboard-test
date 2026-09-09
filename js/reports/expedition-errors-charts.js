@@ -232,7 +232,7 @@ function createErrorBalanceChart(
 
                 layout: {
                     padding: {
-                        left: 24,
+                        left: 40,
                         right: 10,
                     },
                 },
