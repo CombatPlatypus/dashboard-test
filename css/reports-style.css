@@ -422,8 +422,8 @@
         margin-bottom: 0;
     }
     #planning .planning-lh-remove {
-        color: var(--color-text);
-        background-color: var(--color-container);
+        color: var(--color-button-text);
+        background-color: var(--color-button);
         border-bottom: 5px solid var(--color-border);
     }
 
@@ -542,7 +542,7 @@
     }
     #planningPoolControls > h4,
     #planningGeneralControls > h4 {
-        margin-bottom: 20px;
+        margin-bottom: 18px;
     }
     #planningPoolControls > h4:last-of-type {
         margin-top: 20px;
@@ -550,11 +550,18 @@
     .input-group.operation, .input-group.fleet {
         grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)) !important;
     }
-
     #planningGeneralControls > p {
-        margin: 15px 0 0 0;
+        margin: 10px 0 7px 0;
         color: var(--color-gray-p);
         font-size: 13px;
+    }
+    #planningGeneralControls > a {
+        font-size: 13px;
+        transition: color 0.2s ease;
+    }
+    #planningGeneralControls > a:hover,
+    #planningGeneralControls > a:focus-visible {
+        color: #1a73e8;
     }
 
     /* PLANEJAMENTO - REVEAL */
