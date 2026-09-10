@@ -476,7 +476,10 @@ function setExpeditionGeneralControlsAvailability(
         disabled;
 
     elements.floorVolumeInput.disabled =
-        true;
+        disabled;
+
+    elements.floorVolumeInput.readOnly =
+        hasImportedFile;
 
     elements.unknownInput.disabled =
         disabled;
