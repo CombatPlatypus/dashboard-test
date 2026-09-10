@@ -187,32 +187,40 @@ function createPlanningLhElement(
         segregateText,
     );
 
-    const removeButton =
-        document.createElement(
-            "button",
-        );
-
-    removeButton.type =
-        "button";
-
-    removeButton.className =
-        "button planning-lh-remove";
-
-    removeButton.dataset.action =
-        "remove-lh";
-
-    removeButton.textContent =
-        "Remover";
-
-    removeButton.setAttribute(
-        "aria-label",
-        `Remover LH ${position}`,
-    );
-
     headerActions.append(
         segregateLabel,
-        removeButton,
     );
+
+    if (
+        position >
+        MINIMUM_PLANNING_LHS
+    ) {
+        const removeButton =
+            document.createElement(
+                "button",
+            );
+
+        removeButton.type =
+            "button";
+
+        removeButton.className =
+            "button planning-lh-remove";
+
+        removeButton.dataset.action =
+            "remove-lh";
+
+        removeButton.textContent =
+            "Remover";
+
+        removeButton.setAttribute(
+            "aria-label",
+            `Remover LH ${position}`,
+        );
+
+        headerActions.append(
+            removeButton,
+        );
+    }
 
     header.append(
         title,
@@ -1231,19 +1239,6 @@ function renderPlanningLhList(lhs) {
     planningLhList.replaceChildren(
         ...lhElements,
     );
-
-    const removeDisabled =
-    lhs.length <= MINIMUM_PLANNING_LHS;
-
-    planningLhList
-        .querySelectorAll('[data-action="remove-lh"]')
-        .forEach(function(button) {
-            button.disabled = removeDisabled;
-
-            button.title = removeDisabled
-                ? `O planejamento deve possuir pelo menos ${MINIMUM_PLANNING_LHS} LHs.`
-                : "Remover LH";
-        });
 }
 
 /* ATUALIZA UM CAMPO GERAL */
