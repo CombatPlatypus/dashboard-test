@@ -37,11 +37,13 @@ const lossesRateChartPercentageFormatter =
         },
     );
 
-const lossesRateChartQuantityFormatter =
+const lossesRateCompositionPercentageFormatter =
     new Intl.NumberFormat(
         "pt-BR",
         {
-            maximumFractionDigits: 0,
+            style: "percent",
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
         },
     );
 
@@ -122,7 +124,7 @@ const lossesRateCenterTextPlugin = {
     },
 };
 
-/* MOSTRA OS VALORES NAS FATIAS DO GRÁFICO DE ROSCA */
+/* MOSTRA AS PORCENTAGENS NAS FATIAS DO GRÁFICO DE ROSCA */
 
 const lossesRateCompositionLabelsPlugin = {
     id: "lossesRateCompositionLabels",
@@ -140,6 +142,27 @@ const lossesRateCompositionLabelsPlugin = {
 
         const metadata =
             chart.getDatasetMeta(0);
+
+        const total =
+            dataset.data.reduce(
+                function (
+                    sum,
+                    item,
+                ) {
+                    return (
+                        sum +
+                        (
+                            Number(item) ||
+                            0
+                        )
+                    );
+                },
+                0,
+            );
+
+        if (total <= 0) {
+            return;
+        }
 
         const context =
             chart.ctx;
@@ -210,8 +233,9 @@ const lossesRateCompositionLabelsPlugin = {
                         radius;
 
                 const text =
-                    lossesRateChartQuantityFormatter.format(
-                        value,
+                    lossesRateCompositionPercentageFormatter.format(
+                        value /
+                            total,
                     );
 
                 if (smallSlice) {
