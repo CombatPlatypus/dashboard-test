@@ -1022,40 +1022,6 @@
         margin-top: 15px;
         position: relative;
     }
-    #expedition .streets-chart {
-        width: 100%;
-        padding: 20px;
-        background-color: var(--color-container);
-        border: 1px solid var(--color-border);
-    }
-    #expedition .streets-chart h4, #expedition .streets-chart p {
-        margin: 0;
-    }
-    #expedition .streets-chart p {
-        font-size: 14px;
-        color: var(--color-gray-p);
-        line-height: 1;
-    }
-    #expedition .streets-chart .chart-title {
-        margin-bottom: 20px;
-    }
-    #expedition .streets-chart .chart-title .flex-box-start {
-        column-gap: 15px;
-    }
-    #expedition .streets-chart .chart-title .type {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-    #expedition .streets-chart .chart-title .type > div {
-        width: 20px;
-        height: 20px;
-        border-radius: 3px;
-    }
-    #expedition .streets-chart .chart-title h4,
-    #expedition .streets-chart .chart-title p {
-        letter-spacing: 1px;
-    }
     #expedition .expedition-error-balance-chart {
         position: relative;
         width: 100%;

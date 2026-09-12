@@ -42,6 +42,46 @@
             }
 
 
+            /*  */
+
+
+            #reports .horizontal-bars-chart {
+                width: 100%;
+                padding: 20px;
+                background-color: var(--color-container);
+                border: 1px solid var(--color-border);
+            }
+            #reports .horizontal-bars-chart h4, #reports .horizontal-bars-chart p {
+                margin: 0;
+            }
+            #reports .horizontal-bars-chart p {
+                font-size: 14px;
+                color: var(--color-gray-p);
+                line-height: 1;
+            }
+            #reports .horizontal-bars-chart .chart-title {
+                margin-bottom: 20px;
+            }
+            #reports .horizontal-bars-chart .chart-title .flex-box-start {
+                column-gap: 15px;
+            }
+            #reports .horizontal-bars-chart .chart-title .type {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            #reports .horizontal-bars-chart .chart-title .type > div {
+                width: 20px;
+                height: 20px;
+                border-radius: 3px;
+            }
+            #reports .horizontal-bars-chart .chart-title h4,
+            #reports .horizontal-bars-chart .chart-title p {
+                letter-spacing: 1px;
+            }
+
+
+
         </style>
     </head>	
 
@@ -1322,34 +1362,32 @@
                                                     </tbody>
                                                 </table>
 
-                                                <div class="streets">
-                                                    <div class="streets-chart">
-                                                        <div class="chart-title">
-                                                            <div class="flex-box-between">
-                                                                <h4>Identificados x Revertidos x Saldo Final</h4>
+                                                <div class="horizontal-bars-chart">
+                                                    <div class="chart-title">
+                                                        <div class="flex-box-between">
+                                                            <h4>Identificados x Revertidos x Saldo Final</h4>
 
-                                                                <div class="flex-box-start">
-                                                                    <div class="type">
-                                                                        <div style="background-color: #ffc107;"></div>
-                                                                        <p>Identificados</p>
-                                                                    </div>
+                                                            <div class="flex-box-start">
+                                                                <div class="type">
+                                                                    <div style="background-color: #ffc107;"></div>
+                                                                    <p>Identificados</p>
+                                                                </div>
 
-                                                                    <div class="type">
-                                                                        <div style="background-color: #8BC34A;"></div>
-                                                                        <p>Revertidos</p>
-                                                                    </div>
+                                                                <div class="type">
+                                                                    <div style="background-color: #8BC34A;"></div>
+                                                                    <p>Revertidos</p>
+                                                                </div>
 
-                                                                    <div class="type">
-                                                                        <div style="background-color: #FF5722;"></div>
-                                                                        <p>Saldo Final</p>
-                                                                    </div>
+                                                                <div class="type">
+                                                                    <div style="background-color: #FF5722;"></div>
+                                                                    <p>Saldo Final</p>
                                                                 </div>
                                                             </div>
                                                         </div>
+                                                    </div>
 
-                                                        <div class="expedition-error-balance-chart">
-                                                            <canvas id="expeditionErrorBalanceChart" role="img" aria-label="Comparação entre erros identificados, revertidos e saldo final"></canvas>
-                                                        </div>
+                                                    <div class="expedition-error-balance-chart">
+                                                        <canvas id="expeditionErrorBalanceChart" role="img" aria-label="Comparação entre erros identificados, revertidos e saldo final"></canvas>
                                                     </div>
                                                 </div>
                                             </div>
@@ -1658,6 +1696,33 @@
                                                         </tr>
                                                     </tbody>
                                                 </table>
+
+
+                                                <div class="horizontal-bars-chart">
+                                                    <div class="chart-title">
+
+                                                        <div class="flex-box-start">
+                                                            <div class="type">
+                                                                <div style="background-color: #ffc107;"></div>
+                                                                <p>Identificados</p>
+                                                            </div>
+
+                                                            <div class="type">
+                                                                <div style="background-color: #8BC34A;"></div>
+                                                                <p>Revertidos</p>
+                                                            </div>
+
+                                                            <div class="type">
+                                                                <div style="background-color: #FF5722;"></div>
+                                                                <p>Saldo Final</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="expedition-error-balance-chart">
+                                                        <canvas id="expeditionErrorBalanceChart" role="img" aria-label="Comparação entre erros identificados, revertidos e saldo final"></canvas>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
 
@@ -1713,7 +1778,7 @@
 
                                                     <tbody>
                                                         <tr>
-                                                            <th scope="row">Salvos Aguardando Ticket</th>
+                                                            <th scope="row">Pacotes Salvos <br> Aguardando Ticket</th>
                                                             <td>-</td>
                                                             <td>-</td>
                                                             <td>-</td>
@@ -1726,7 +1791,7 @@
 
                                                     <tbody>
                                                         <tr>
-                                                            <th scope="row">Vazios Aguardando Ticket</th>
+                                                            <th scope="row">Pacotes Vazios <br> Aguardando Ticket</th>
                                                             <td>-</td>
                                                             <td>-</td>
                                                             <td>-</td>
