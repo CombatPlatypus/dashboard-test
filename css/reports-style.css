@@ -33,11 +33,6 @@
         column-gap: 15px;
         overflow: hidden;
     }
-    #reports .action-buttons #reportDownloadButton {
-        min-height: 45px;
-        font-size: 14px;
-        padding: 10px 15px;
-    }
     #reports .action-buttons #reportImportButton {
         background-color: transparent;
         border-bottom: none;
