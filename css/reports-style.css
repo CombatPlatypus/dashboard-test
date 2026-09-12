@@ -47,7 +47,7 @@
         opacity: 0.61;
         transition: all 0.5s ease;
     }
-    #reports .action-buttons #reportImportButton img {
+    #reports .action-buttons button img {
         width: 35px;
     }
     #reports > .tabs-content > .tabs-panel > .flex-box-start {
