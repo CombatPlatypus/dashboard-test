@@ -1079,7 +1079,7 @@
     .main-menu > div > ul > .external-links > a > img {
         width: 35px;
     }
-    .main-menu > div > ul > .dropdown-pane{
+    .main-menu > div > ul > .dropdown-pane {
         width: max-content;
         padding: 20px;
         background-color: var(--color-container);
@@ -1107,6 +1107,13 @@
     }
     .main-menu > div > ul > .dropdown-pane > .link-button > .flex-box-center {
         align-items: center;
+    }
+    .main-menu > div > ul > .button > img:hover {
+        opacity: 0.61;
+        transition: all 0.5s ease;
+    }
+    .main-menu > div > ul > .button > img {
+        width: 35px;
     }
 
 /* BASE ESTRUTURAL */
