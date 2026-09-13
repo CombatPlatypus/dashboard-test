@@ -15,20 +15,8 @@ import {
 } from "./expedition/index.js";
 
 import {
-    initializeLossesRateReport,
-} from "./losses-rate.js";
-
-import {
-    initializeLossesRateCharts,
-} from "./losses-rate-charts.js";
-
-import {
-    initializeLossesRateImport,
-} from "./losses-rate-import.js";
-
-import {
-    initializeLossesRateExport,
-} from "./losses-rate-export.js";
+    lossesRateReport,
+} from "./losses-rate/index.js";
 
 import {
     initializeReportNotifications,
@@ -56,14 +44,11 @@ function initializeReportsPanel() {
         expeditionReport,
     );
 
+    reportManager.register(
+        lossesRateReport,
+    );
+
     reportManager.initializeAll();
-
-    // TAXA DE PERDAS
-
-    initializeLossesRateReport();
-    initializeLossesRateCharts();
-    initializeLossesRateImport();
-    initializeLossesRateExport();
 }
 
 if (
