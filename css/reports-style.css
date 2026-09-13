@@ -818,47 +818,7 @@
             align-items: flex-start;
         }
     }
-    #receipt #receipt-charts .cards {
-        display: grid;
-        grid-template-columns:
-            repeat(
-                auto-fit,
-                minmax(300px, 1fr)
-            );
-        gap: 15px;
-        width: 100%;
-    }
-    #receipt #receipt-charts .cards > div {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 5px;
-        min-width: 0;
-        padding: 25px;
-        background-color: var(--color-container);
-        border: 1px solid var(--color-border);
-    }
-    #receipt .receipt-comparison-card-label {
-        margin: 0 0 5px;
-        color: var(--color-gray-p);
-        font-size: 13px;
-    }
-    #receipt #receipt-charts .cards h4 {
-        margin: 0;
-        font-size: 18px;
-    }
-    #receipt #receipt-charts .cards p:last-child {
-        margin: 0;
-    }
-    #receipt #receipt-charts > .preview-style {
-        box-sizing: border-box;
-        height: calc(var(--receipt-comparison-height, auto) - 129px);
-    }
-    #receipt #receipt-charts > .preview-style > .title,
-    #receipt #receipt-charts > .preview-style > .cards {
-        flex: 0 0 auto;
-    }
+
     #receipt #receipt-charts .charts {
         display: grid;
         grid-template-columns:
@@ -920,47 +880,6 @@
             height: 360px;
             min-height: 360px;
         }
-    }
-
-    /* EXPEDIÇÃO - CARDS */
-
-    #expedition .cards {
-        display: grid;
-        grid-template-columns:
-            repeat(
-                auto-fit,
-                minmax(300px, 1fr)
-            );
-        gap: 15px;
-        width: 100%;
-    }
-    #expedition .cards > div {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 5px;
-        min-width: 0;
-        padding: 25px;
-        background-color: var(--color-container);
-        border: 1px solid var(--color-border);
-    }
-    #expedition .cards > div > p:first-of-type {
-        margin: 0 0 5px;
-        color: var(--color-gray-p);
-        font-size: 13px;
-    }
-    #expedition .cards > div > h4 {
-        margin: 0;
-        font-size: 18px;
-    }
-    #expedition .cards > div > p {
-        font-size: 14px;
-        color: var(--color-gray-p);
-        line-height: 1;
-    }
-    #expedition .cards > div > p:last-child {
-        margin: 0;
     }
 
     /* EXPEDIÇÃO - TABELAS */
