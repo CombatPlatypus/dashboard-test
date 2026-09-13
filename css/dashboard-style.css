@@ -1114,6 +1114,7 @@
     }
     .main-menu > div > ul > button > img {
         width: 35px;
+        cursor: pointer;
     }
 
 /* BASE ESTRUTURAL */
