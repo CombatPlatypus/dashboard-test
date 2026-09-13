@@ -130,6 +130,15 @@
                         </a>
                     </li> 
 
+                    <li class="tabs-title">
+                        <a href="#docs">
+                            <div class="flex-box-center">
+                                <img src="images/menu-icons/docs-icon.svg">
+                                <h4>Manual</h4>
+                            </div>
+                        </a>
+                    </li> 
+
                     <div class="nav-actions">
                         <button id="reportDownloadButton">
                             <img src="images/geral-icons/save-icon.svg" disabled>
@@ -241,7 +250,6 @@
                                 </a>
                             </li>
                         </ul>
-                    
                     </div>
 
                     <div class="warning" id="reportsNotification" role="status" aria-live="polite" aria-atomic="true" data-notification-type="idle">
@@ -1580,286 +1588,288 @@
                         </div>
 
                         <div class="tabs-panel" id="heat-map">
-                            <div class="preview-style">
-                                <div class="title">
-                                    <h2>Análise do Dia</h2>
-                                </div>
+                            <div class="preview">
+                                <div class="preview-style">
+                                    <div class="title">
+                                        <h2>Análise do Dia</h2>
+                                    </div>
 
 
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th scope="col">Ocorrência</th>
-                                            <th scope="col">Hoje</th>
-                                            <th scope="col">Ontem</th>
-                                            <th scope="col">Anteontem</th>
-                                            <th scope="col">Dê 3 a 7<br>Dias Atrás</th>
-                                            <th scope="col">Dê 8 a 14<br>Dias Atrás</th>
-                                            <th scope="col">Dê 15 Dias<br>Em Diante</th>
-                                            <th scope="col">Total</th>
-                                        </tr>
-                                    </thead>
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Ocorrência</th>
+                                                <th scope="col">Hoje</th>
+                                                <th scope="col">Ontem</th>
+                                                <th scope="col">Anteontem</th>
+                                                <th scope="col">Dê 3 a 7<br>Dias Atrás</th>
+                                                <th scope="col">Dê 8 a 14<br>Dias Atrás</th>
+                                                <th scope="col">Dê 15 Dias<br>Em Diante</th>
+                                                <th scope="col">Total</th>
+                                            </tr>
+                                        </thead>
 
-                                    <tbody>
-                                        <tr>
-                                            <th scope="row">Backlog Pacotes</th>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                        </tr>
-                                    </tbody>
+                                        <tbody>
+                                            <tr>
+                                                <th scope="row">Backlog Pacotes</th>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                            </tr>
+                                        </tbody>
 
-                                    <tbody>
-                                        <tr>
-                                            <th scope="row">Backlog Volumosos</th>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                        </tr>
-                                    </tbody>
+                                        <tbody>
+                                            <tr>
+                                                <th scope="row">Backlog Volumosos</th>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                            </tr>
+                                        </tbody>
 
-                                    <tbody>
-                                        <tr>
-                                            <th scope="row">Carga Segregada</th>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                        </tr>
-                                    </tbody>
-                                    
-                                    <tbody>
-                                        <tr>
-                                            <th scope="row">Volume no Piso</th>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                        </tr>
-                                    </tbody>
+                                        <tbody>
+                                            <tr>
+                                                <th scope="row">Carga Segregada</th>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                            </tr>
+                                        </tbody>
+                                        
+                                        <tbody>
+                                            <tr>
+                                                <th scope="row">Volume no Piso</th>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                            </tr>
+                                        </tbody>
 
-                                    <tbody>
-                                        <tr>
-                                            <th scope="row">Erro de roteirização</th>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                                        <tbody>
+                                            <tr>
+                                                <th scope="row">Erro de roteirização</th>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
 
-                                <div class="horizontal-bars-chart">
-                                    <div class="chart-title">
+                                    <div class="horizontal-bars-chart">
+                                        <div class="chart-title">
 
-                                        <div class="flex-box-start">
-                                            <div class="type">
-                                                <div style="background-color: #ffc107;"></div>
-                                                <p>De Hoje Até Anteontem</p>
+                                            <div class="flex-box-start">
+                                                <div class="type">
+                                                    <div style="background-color: #ffc107;"></div>
+                                                    <p>De Hoje Até Anteontem</p>
+                                                </div>
+
+                                                <div class="type">
+                                                    <div style="background-color: #8BC34A;"></div>
+                                                    <p>Dê 3 a 7 Dias Atrás</p>
+                                                </div>
+
+                                                <div class="type">
+                                                    <div style="background-color: #FF5722;"></div>
+                                                    <p>Dê 8 a 14 Dias Atrás</p>
+                                                </div>
+
+                                                <div class="type">
+                                                    <div style="background-color: #ccc;"></div>
+                                                    <p>Dê 15 Dias Em Diante</p>
+                                                </div>
                                             </div>
+                                        </div>
 
-                                            <div class="type">
-                                                <div style="background-color: #8BC34A;"></div>
-                                                <p>Dê 3 a 7 Dias Atrás</p>
-                                            </div>
-
-                                            <div class="type">
-                                                <div style="background-color: #FF5722;"></div>
-                                                <p>Dê 8 a 14 Dias Atrás</p>
-                                            </div>
-
-                                            <div class="type">
-                                                <div style="background-color: #ccc;"></div>
-                                                <p>Dê 15 Dias Em Diante</p>
-                                            </div>
+                                        <div class="expedition-error-balance-chart">
+                                            <canvas id="expeditionErrorBalanceChart" role="img" aria-label="Comparação entre erros identificados, revertidos e saldo final"></canvas>
                                         </div>
                                     </div>
 
-                                    <div class="expedition-error-balance-chart">
-                                        <canvas id="expeditionErrorBalanceChart" role="img" aria-label="Comparação entre erros identificados, revertidos e saldo final"></canvas>
-                                    </div>
+                                    <hr>
+
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Ocorrência</th>
+                                                <th scope="col">Hoje</th>
+                                                <th scope="col">Ontem</th>
+                                                <th scope="col">Anteontem</th>
+                                                <th scope="col">Dê 3 a 7<br>Dias Atrás</th>
+                                                <th scope="col">Dê 8 a 14<br>Dias Atrás</th>
+                                                <th scope="col">Dê 15 Dias<br>Em Diante</th>
+                                                <th scope="col">Total</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            <tr>
+                                                <th scope="row">Recebida</th>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                            </tr>
+                                        </tbody>
+
+                                        <tbody>
+                                            <tr>
+                                                <th scope="row">Não Recebida</th>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                            </tr>
+                                        </tbody>
+
+                                        <tbody>
+                                            <tr>
+                                                <th scope="row">Pacotes Salvos <br> Aguardando Ticket</th>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                            </tr>
+                                        </tbody>
+
+                                        <tbody>
+                                            <tr>
+                                                <th scope="row">Pacotes Vazios <br> Aguardando Ticket</th>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <hr>
+
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Ocorrência</th>
+                                                <th scope="col">Hoje</th>
+                                                <th scope="col">Ontem</th>
+                                                <th scope="col">Anteontem</th>
+                                                <th scope="col">Dê 3 a 7<br>Dias Atrás</th>
+                                                <th scope="col">Dê 8 a 14<br>Dias Atrás</th>
+                                                <th scope="col">Dê 15 Dias<br>Em Diante</th>
+                                                <th scope="col">Total</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            <tr>
+                                                <th scope="row">Return</th>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                            </tr>
+                                        </tbody>
+
+                                        <tbody>
+                                            <tr>
+                                                <th scope="row">Outro HUB</th>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                            </tr>
+                                        </tbody>
+
+                                        <tbody>
+                                            <tr>
+                                                <th scope="row">Liquidate</th>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                            </tr>
+                                        </tbody>
+
+                                        <tbody>
+                                            <tr>
+                                                <th scope="row">Confiscado</th>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                            </tr>
+                                        </tbody>
+
+                                        <tbody>
+                                            <tr>
+                                                <th scope="row">Em Análise</th>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                            </tr>
+                                        </tbody>
+
+                                        <tfoot>
+                                            <tr>
+                                                <th scope="row">Lost</th>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
                                 </div>
-
-                                <hr>
-
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th scope="col">Ocorrência</th>
-                                            <th scope="col">Hoje</th>
-                                            <th scope="col">Ontem</th>
-                                            <th scope="col">Anteontem</th>
-                                            <th scope="col">Dê 3 a 7<br>Dias Atrás</th>
-                                            <th scope="col">Dê 8 a 14<br>Dias Atrás</th>
-                                            <th scope="col">Dê 15 Dias<br>Em Diante</th>
-                                            <th scope="col">Total</th>
-                                        </tr>
-                                    </thead>
-
-                                    <tbody>
-                                        <tr>
-                                            <th scope="row">Recebida</th>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                        </tr>
-                                    </tbody>
-
-                                    <tbody>
-                                        <tr>
-                                            <th scope="row">Não Recebida</th>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                        </tr>
-                                    </tbody>
-
-                                    <tbody>
-                                        <tr>
-                                            <th scope="row">Pacotes Salvos <br> Aguardando Ticket</th>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                        </tr>
-                                    </tbody>
-
-                                    <tbody>
-                                        <tr>
-                                            <th scope="row">Pacotes Vazios <br> Aguardando Ticket</th>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-
-                                <hr>
-
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th scope="col">Ocorrência</th>
-                                            <th scope="col">Hoje</th>
-                                            <th scope="col">Ontem</th>
-                                            <th scope="col">Anteontem</th>
-                                            <th scope="col">Dê 3 a 7<br>Dias Atrás</th>
-                                            <th scope="col">Dê 8 a 14<br>Dias Atrás</th>
-                                            <th scope="col">Dê 15 Dias<br>Em Diante</th>
-                                            <th scope="col">Total</th>
-                                        </tr>
-                                    </thead>
-
-                                    <tbody>
-                                        <tr>
-                                            <th scope="row">Return</th>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                        </tr>
-                                    </tbody>
-
-                                    <tbody>
-                                        <tr>
-                                            <th scope="row">Outro HUB</th>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                        </tr>
-                                    </tbody>
-
-                                    <tbody>
-                                        <tr>
-                                            <th scope="row">Liquidate</th>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                        </tr>
-                                    </tbody>
-
-                                    <tbody>
-                                        <tr>
-                                            <th scope="row">Confiscado</th>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                        </tr>
-                                    </tbody>
-
-                                    <tbody>
-                                        <tr>
-                                            <th scope="row">Em Análise</th>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                        </tr>
-                                    </tbody>
-
-                                    <tfoot>
-                                        <tr>
-                                            <th scope="row">Lost</th>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                        </tr>
-                                    </tfoot>
-                                </table>
                             </div>
                       
                         </div>
