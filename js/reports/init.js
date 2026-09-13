@@ -1,10 +1,10 @@
 import {
-    initializePlanningLhList,
-} from "./planning.js";
+    reportManager,
+} from "./core/report-manager.js";
 
 import {
-    initializePlanningImport,
-} from "./planning-import.js";
+    planningReport,
+} from "./planning/index.js";
 
 import {
     initializeLossesRateReport,
@@ -72,8 +72,11 @@ function initializeReportsPanel() {
 
     // PLANEJAMENTO
 
-    initializePlanningLhList();
-    initializePlanningImport();
+    reportManager.register(
+        planningReport,
+    );
+
+    reportManager.initializeAll();
 
     // RECEBIMENTO
 

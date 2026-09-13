@@ -238,7 +238,7 @@
     #planning #planningGeneralControls > .input-group:first-of-type {
         padding-bottom: 20px;
         border-bottom: 2px solid var(--color-border);
-        margin-bottom: 28px;
+        margin-bottom: 15px;
     }
     #losses-rate .tabs {
         grid-template-columns: repeat(auto-fit, minmax(115px, 1fr));
@@ -540,7 +540,7 @@
         margin-top: 20px;
     }
     #planningPoolControls > .input-group:first-of-type {
-        margin-bottom: 20px;
+        margin-bottom: 18px;
     }
     .input-group.operation, .input-group.fleet {
         grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)) !important;
