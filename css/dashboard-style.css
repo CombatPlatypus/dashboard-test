@@ -1021,7 +1021,8 @@
     opacity: 0;
 }
 .checkbox > input[type="checkbox"]:checked + label::after {
-    content: '✕';
+    /* content: '✕'; */
+    content: '✓';
     font-size: 25px;
     text-align: center;
 }
