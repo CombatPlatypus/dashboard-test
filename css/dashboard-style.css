@@ -411,9 +411,9 @@
                 width: 100%;
             }
             .button {
-                min-height: 55px;
-                font-size: 16px;
-                padding: 15px 15px;
+                min-height: 40px;
+                font-size: 14px;
+                padding: 10px 15px;
                 border-radius: 5px;
                 color: var(--color-button-text);
                 background-color: var(--color-button);
