@@ -11,7 +11,6 @@ import {
 /* CONFIGURAÇÕES */
 
 const MINIMUM_RECEIPT_PREVIEW_ROWS = 9;
-const MINIMUM_RECEIPT_OPERATOR_CONTROLS_HEIGHT = 451;
 
 const receiptNumberFormatter =
     new Intl.NumberFormat(
@@ -29,9 +28,6 @@ const receiptErrorRateFormatter =
     );
 
 let receiptOperatorStructureSignature =
-    null;
-
-let receiptHeightResizeObserver =
     null;
 
 let receiptPanel = null;
@@ -1142,105 +1138,6 @@ function bindReceiptOperatorControls(
 }
 
 
-/* SINCRONIZA A ALTURA DOS CONTROLES COM A PRÉVIA */
-
-function initializeReceiptHeightSynchronization(
-    elements,
-) {
-    if (
-        !(
-            elements.previewOperatorBody instanceof
-            HTMLTableSectionElement
-        )
-    ) {
-        console.error(
-            "Não foi possível sincronizar a altura do recebimento.",
-        );
-
-        return;
-    }
-
-    function synchronizeReceiptHeight() {
-        const previewRows =
-            Array.from(
-                elements
-                    .previewOperatorBody
-                    .rows,
-            );
-
-        /*
-         * As primeiras nove linhas fazem
-         * parte da altura padrão.
-         */
-        const extraRows =
-            previewRows.slice(
-                MINIMUM_RECEIPT_PREVIEW_ROWS,
-            );
-
-        const extraRowsHeight =
-            extraRows.reduce(
-                function (
-                    total,
-                    row,
-                ) {
-                    return (
-                        total +
-                        row
-                            .getBoundingClientRect()
-                            .height
-                    );
-                },
-                0,
-            );
-
-        const newMaxHeight =
-            MINIMUM_RECEIPT_OPERATOR_CONTROLS_HEIGHT +
-            Math.round(
-                extraRowsHeight,
-            );
-
-        const cssValue =
-            `${newMaxHeight}px`;
-
-        if (
-            elements.operatorControls
-                .style
-                .getPropertyValue(
-                    "--receipt-operator-controls-max-height",
-                ) === cssValue
-        ) {
-            return;
-        }
-
-        elements.operatorControls
-            .style
-            .setProperty(
-                "--receipt-operator-controls-max-height",
-                cssValue,
-            );
-    }
-
-    receiptHeightResizeObserver
-        ?.disconnect();
-
-    receiptHeightResizeObserver =
-        new ResizeObserver(
-            function () {
-                requestAnimationFrame(
-                    synchronizeReceiptHeight,
-                );
-            },
-        );
-
-    receiptHeightResizeObserver.observe(
-        elements.previewOperatorBody,
-    );
-
-    requestAnimationFrame(
-        synchronizeReceiptHeight,
-    );
-}
-
 /* INICIALIZAÇÃO */
 
 function renderReceiptView(
@@ -1380,10 +1277,6 @@ function initializeReceiptView(
     );
 
     renderReceiptView();
-
-    initializeReceiptHeightSynchronization(
-        elements,
-    );
 
     return true;
 }
