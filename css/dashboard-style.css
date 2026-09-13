@@ -1108,11 +1108,11 @@
     .main-menu > div > ul > .dropdown-pane > .link-button > .flex-box-center {
         align-items: center;
     }
-    .main-menu > div > ul > .button > img:hover {
+    .main-menu > div > ul > button > img:hover {
         opacity: 0.61;
         transition: all 0.5s ease;
     }
-    .main-menu > div > ul > .button > img {
+    .main-menu > div > ul > button > img {
         width: 35px;
     }
 
