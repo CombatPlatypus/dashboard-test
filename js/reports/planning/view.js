@@ -287,6 +287,9 @@ function createPlanningLhElement(
     segregateTosLabel.className =
         "planning-lh-segregate-to-toggle";
 
+    segregateTosLabel.hidden =
+        !lh.segregate;
+
     const segregateTosCheckbox =
         document.createElement(
             "input",
@@ -1095,7 +1098,7 @@ function synchronizePlanningIndicatorControls(
             state,
         );
 
-    planningGeneralControls
+    planningPanel
         .querySelectorAll(
             "[data-planning-field]",
         )
@@ -1431,6 +1434,12 @@ function handlePlanningLhInput(event) {
                 '[data-field="segregateTos"]',
             );
 
+        const segregateTosLabel =
+            segregateTosCheckbox
+                ?.closest(
+                    ".planning-lh-segregate-to-toggle",
+                );
+
         updatePlanningLh(
             lhId,
             field,
@@ -1449,6 +1458,11 @@ function handlePlanningLhInput(event) {
                 segregateTosCheckbox.checked =
                     false;
             }
+        }
+
+        if (segregateTosLabel) {
+            segregateTosLabel.hidden =
+                !input.checked;
         }
 
         return;
@@ -2106,7 +2120,7 @@ function initializePlanningView(
         handlePlanningToClick,
     );
 
-    planningGeneralControls.addEventListener(
+    planningPanel.addEventListener(
         "input",
         handlePlanningGeneralInput,
     );

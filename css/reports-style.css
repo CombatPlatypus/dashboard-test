@@ -516,6 +516,9 @@
         border: 1px solid var(--color-border);
         border-radius: 5px;
     }
+    #planning .planning-lh-segregate-to-toggle[hidden] {
+        display: none;
+    }
     #planning .planning-lh-segregate-to-toggle:has(input:disabled) {
         opacity: 0.5;
         cursor: not-allowed;
