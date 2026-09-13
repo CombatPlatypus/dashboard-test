@@ -668,227 +668,24 @@
                             </div>
                         </div>
 
-                        <!-- RELATÓRIO DE TAXA DE PERDAS -->
-
-                        <div class="tabs-panel" id="losses-rate">
-
-                            <!-- HISTÓRICO POR MÊS -->
-
-                            <ul class="tabs flex-box-start" id="lossesRateMonthTabs" role="tablist" aria-label="Mês do relatório"></ul>
-
-                            <!-- CONTEÚDO DO RELATÓRIO -->
-
-                            <div class="flex-box-start">
-
-                                <!-- PPÉVIA DO RELATÓRIO -->
-
-                                <div class="preview">
-                                    <div class="preview-style" id="lossesRatePreview">
-
-                                        <!-- TABELAS -->
-
-                                        <div class="title">
-                                            <h2>Relatório de Taxas de Perdas</h2>
-                                        </div>
-
-                                        <table class="losses-rate-identification-table">
-                                            <thead>
-                                                <tr>
-                                                    <th>Descrição</th>
-                                                    <th>Código do Hub</th>
-                                                    <th>Sub Regional</th>
-                                                    <th>Volume Movimentado</th>
-                                                </tr>
-                                            </thead>
-
-                                            <tbody>
-                                                <tr>
-                                                    <td id="lossesRatePreviewDescription">—</td>
-                                                    <td id="lossesRatePreviewHubCode">—</td>
-                                                    <td id="lossesRatePreviewSubRegional">—</td>
-                                                    <td id="lossesRatePreviewMoved">—</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-
-                                        <table>
-                                            <thead>
-                                                <tr>
-                                                    <th>Possíveis Perdas</th>
-                                                    <th>Quantidade de LOST</th>
-                                                    <th>Quantidade de AVARIA</th>
-                                                    <th>Total de Perdas</th>
-                                                    <th>Taxa de Perda</th>
-                                                </tr>
-                                            </thead>
-
-                                            <tbody>
-                                                <tr>
-                                                    <td id="lossesRatePreviewPossibleLosses">—</td>
-                                                    <td id="lossesRatePreviewLost">—</td>
-                                                    <td id="lossesRatePreviewDamage">—</td>
-                                                    <td id="lossesRatePreviewTotal">—</td>
-                                                    <td id="lossesRatePreviewRate">—</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-
-                                        <!-- GRÁFICOS -->
-
-                                        <div class="losses-rate-charts">
-                                            <div class="losses-rate-chart-panel">
-                                                <h3>
-                                                    Composição das Ocorrências —
-                                                    <span id="lossesRateCompositionMonth"></span>
-                                                </h3>
-
-                                                <div class="losses-rate-chart-container">
-                                                    <canvas id="lossesRateCompositionChart">
-                                                        Seu navegador não suporta gráficos em canvas.
-                                                    </canvas>
-                                                </div>
-                                            </div>
-
-                                            <div class="losses-rate-chart-panel">
-                                                <h3>
-                                                    Histórico da Taxa de Perda —
-                                                    <span id="lossesRateHistoryYear"></span>
-                                                </h3>
-
-                                                <div class="losses-rate-chart-container">
-                                                    <canvas id="lossesRateHistoryChart">
-                                                        Seu navegador não suporta gráficos em canvas.
-                                                    </canvas>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                    </div>
-
-                                    <!-- FOOTER -->
-
-                                    <div class="footer flex-box-between">
-                                        <div>
-                                            <button class="button" id="lossesRateCopyBaseButton" type="button">
-                                                Copiar Base Atualizada
-                                            </button>
-
-                                            <button class="button" id="lossesRateCopyReportButton" type="button" disabled>
-                                                Copiar Relatório
-                                            </button>
-
-                                            <button class="button" id="lossesRateDownloadReportButton" type="button" disabled>
-                                                Baixar Relatório
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- CONTROLES DO RELATÓRIO -->
-
-                                <div class="report-controls">
-                                    <div class="history-link flex-box-start">
-                                        <a href="https://docs.google.com/spreadsheets/d/1TUOf4Bvv7L_Q87xOkCQqPKkNpSi03OSs3aKobbAn724/edit?gid=275287237#gid=275287237" target="_blank">
-                                            <svg class="spreadsheets-link-icon" viewBox="0 0 24 24" aria-hidden="true">
-                                                <path d="M7 17L17 7M9 7H17V15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                                            </svg>
-                                        </a>
-
-                                        <div>
-                                            <h4>Planilha - Taxa de Perdas</h4>
-                                            <p>Crtl A + Crtl C, e clique em importar.</p>
-                                        </div>
-                                    </div>
-
-                                    <div class="history-import flex-box-start">
-                                        <div>
-                                            <button class="button" id="lossesRateImportHistoryButton" type="button">
-                                                Importar Histórico
-                                            </button>
-                                        </div>
-
-                                    </div>
-
-                                    <div class="input-group losses-rate-identification">
-                                        <div>
-                                            <h4>Descrição</h4>
-                                            <input id="lossesRateDescriptionInput" type="text" value="LM HUB SP Santos Praia Grande 02" readonly>                                        
-                                        </div>
-
-                                        <div>
-                                            <h4>Código do Hub</h4>
-                                            <input id="lossesRateHubCodeInput" type="text" value="LSP-63" readonly>
-                                        </div>
-
-                                        <div>
-                                            <h4>Sub Regional</h4>
-                                            <input id="lossesRateSubRegionalInput" type="text" value="SPM07" readonly>                                        
-                                        </div>
-                                    </div>
-
-                                    <div class="input-group losses-rate-values">
-                                        <div>
-                                            <h4>Volume Movimentado</h4>
-                                            <input id="lossesRateMovedInput" type="text" inputmode="numeric" maxlength="9">
-                                        </div>
-
-                                        <div>
-                                            <h4>Possíveis Perdas</h4>
-                                            <input id="lossesRatePossibleLossesInput" type="text" inputmode="numeric" maxlength="6">                                        
-                                        </div>
-
-                                        <div>
-                                            <h4>Quantidade de LOST</h4>
-                                            <input id="lossesRateLostInput" type="text" inputmode="numeric" maxlength="6">                                        
-                                        </div>
-
-                                        <div>
-                                            <h4>Quantidade de AVARIA</h4>
-                                            <input id="lossesRateDamageInput" type="text" inputmode="numeric" maxlength="6">
-                                        </div>
-                                    </div>
-
-                                    <div class="losses-rate-controls-summary">
-                                        <h4>Resumo do Mês</h4>
-
-                                        <div class="losses-rate-goal-status">
-                                            <span>Referência máxima</span>
-                                            <span>0,030%</span>
-                                        </div>
-
-                                        <div>
-                                            <span>Total de Perdas</span>
-                                            <span id="lossesRateControlsTotal">—</span>
-                                        </div>
-
-                                        <div>
-                                            <span>Taxa de Perda</span>
-                                            <span id="lossesRateControlsRate">—</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- RELATÓRIO DE RECEBIMENTO -->
+                        <!-- RELATÓRIO DE PROCESSAMENTO -->
 
                         <div class="tabs-panel" id="receipt">
 
-                            <!-- HEADER -->
+                            <!-- TABS DO RELATÓRIO -->
 
                             <ul class="tabs flex-box-start" data-tabs id="receipt-view-tabs">
-                                
-                                <li class="tabs-title is-active">
-                                    <a href="#receipt-tables">
-                                        <h4>Mesa de Recebimento</h4>
-                                    </a>
-                                </li> 
-
                                 <li class="tabs-title">
                                     <a href="#linehaul">
                                         <h4>Descarga de LH</h4>
                                     </a>
                                 </li>
+
+                                <li class="tabs-title is-active">
+                                    <a href="#receipt-tables">
+                                        <h4>Mesa de Recebimento</h4>
+                                    </a>
+                                </li> 
 
                                 <li class="tabs-title">
                                     <a href="#receipt-charts">
@@ -897,7 +694,7 @@
                                 </li>
                             </ul> 
                             
-                            <!-- CONTEÚDO -->
+                            <!-- CONTEÚDO DO RELATÓRIO -->
 
                             <div class="flex-box-start">
                                 <div class="preview" id="receiptSheetPreview">
@@ -905,14 +702,18 @@
                                     <!-- PPÉVIA -->
 
                                     <div class="tabs-content" data-tabs-content="receipt-view-tabs">
-                                        <div class="tabs-panel is-active" id="receipt-tables">
 
+                                        <!-- DESCARGGA DE LHs -->
+
+                                        <div class="tabs-panel" id="linehaul"></div>
+
+                                        <!-- MESA DE RECEBIMENTO -->
+
+                                        <div class="tabs-panel is-active" id="receipt-tables">
                                             <div class="preview-style" id="receiptReportExportArea">
                                                 <div class="title">
                                                     <h2>Relatório de Recebimento</h2>
                                                 </div>
-
-                                                <!-- TABELA DE RESUMO -->
 
                                                 <table>
                                                     <thead>
@@ -936,12 +737,8 @@
                                                     </tbody>
                                                 </table>
                                                 
-                                                <!-- PROGRESSO DO RECEBIMENTO -->
-
                                                 <div class="receipt-progress">
-
                                                     <div class="receipt-progress-header">
-
                                                         <div>
                                                             <h4>Progresso do Recebimento</h4>
 
@@ -958,24 +755,10 @@
                                                         </p>
                                                     </div>
 
-                                                    <div
-                                                        class="receipt-progress-track"
-                                                        id="receiptProgressBar"
-                                                        role="progressbar"
-                                                        aria-label="Percentual do volume recebido"
-                                                        aria-valuenow="0"
-                                                        aria-valuemin="0"
-                                                        aria-valuemax="100"
-                                                    >
-                                                        <div
-                                                            class="receipt-progress-fill"
-                                                            id="receiptProgressFill"
-                                                        ></div>
+                                                    <div class="receipt-progress-track" id="receiptProgressBar" role="progressbar" aria-label="Percentual do volume recebido" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                                        <div class="receipt-progress-fill" id="receiptProgressFill"></div>
                                                     </div>
-
                                                 </div>
-
-                                                <!-- RECEBIMENTO POR OPERADOR -->
 
                                                 <table>
                                                     <thead>
@@ -1065,6 +848,8 @@
                                             </div>
                                         </div>
 
+                                        <!-- RANK DE RECEBEDORES -->
+
                                         <div class="tabs-panel" id="receipt-charts">
                                             <div class="preview-style" id="receiptComparisonExportArea">
                                                 <div class="title">
@@ -1076,14 +861,14 @@
                                                 <div class="cards">
                                                     <div>
                                                         <p class="receipt-comparison-card-label">Maior Volume Recebido</p>
-                                                        <h4 id="receiptComparisonTopReceiver">—</h4>
                                                         <p id="receiptComparisonTopVolume">— Pacotes</p>
+                                                        <h4 id="receiptComparisonTopReceiver">—</h4>
                                                     </div>
 
                                                     <div>
                                                         <p class="receipt-comparison-card-label" id="receiptComparisonTopRateLabel">Maior Taxa de Erros</p>
-                                                        <h4 id="receiptComparisonTopRate">—</h4>
                                                         <p id="receiptComparisonTopRateDetails">—</p>
+                                                        <h4 id="receiptComparisonTopRate">—</h4>
                                                     </div>
                                                 </div>
 
@@ -1114,7 +899,7 @@
                                         </div>
                                     </div>
 
-                                    <!-- FOOTER -->
+                                    <!-- OPÇÕES DO RELATÓRIO -->
 
                                     <div class="footer flex-box-between">
                                         <div>
@@ -1195,7 +980,7 @@
                             </div>
                         </div>
 
-                        <!-- RELATÓRIO DE RECEBIMENTO -->
+                        <!-- RELATÓRIO DE EXPEDIÇÃO -->
 
                         <div class="tabs-panel" id="expedition">
 
@@ -1639,6 +1424,204 @@
                             </div>
                         </div>
 
+                        <!-- RELATÓRIO DE TAXA DE PERDAS -->
+
+                        <div class="tabs-panel" id="losses-rate">
+
+                            <!-- TABS DO RELATÓRIO -->
+
+                            <ul class="tabs flex-box-start" id="lossesRateMonthTabs" role="tablist"></ul>
+
+                            <!-- CONTEÚDO DO RELATÓRIO -->
+
+                            <div class="flex-box-start">
+
+                                <!-- PPÉVIA DO RELATÓRIO -->
+
+                                <div class="preview">
+                                    <div class="preview-style" id="lossesRatePreview">
+                                        <div class="title">
+                                            <h2>Relatório de Taxas de Perdas</h2>
+                                        </div>
+
+                                        <table class="losses-rate-identification-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Descrição</th>
+                                                    <th>Código do Hub</th>
+                                                    <th>Sub Regional</th>
+                                                    <th>Volume Movimentado</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                <tr>
+                                                    <td id="lossesRatePreviewDescription">—</td>
+                                                    <td id="lossesRatePreviewHubCode">—</td>
+                                                    <td id="lossesRatePreviewSubRegional">—</td>
+                                                    <td id="lossesRatePreviewMoved">—</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+
+                                        <table>
+                                            <thead>
+                                                <tr>
+                                                    <th>Possíveis Perdas</th>
+                                                    <th>Quantidade de LOST</th>
+                                                    <th>Quantidade de AVARIA</th>
+                                                    <th>Total de Perdas</th>
+                                                    <th>Taxa de Perda</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                <tr>
+                                                    <td id="lossesRatePreviewPossibleLosses">—</td>
+                                                    <td id="lossesRatePreviewLost">—</td>
+                                                    <td id="lossesRatePreviewDamage">—</td>
+                                                    <td id="lossesRatePreviewTotal">—</td>
+                                                    <td id="lossesRatePreviewRate">—</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+
+                                        <div class="losses-rate-charts">
+                                            <div class="losses-rate-chart-panel">
+                                                <h3>
+                                                    Composição das Ocorrências —
+                                                    <span id="lossesRateCompositionMonth"></span>
+                                                </h3>
+
+                                                <div class="losses-rate-chart-container">
+                                                    <canvas id="lossesRateCompositionChart">
+                                                        Seu navegador não suporta gráficos em canvas.
+                                                    </canvas>
+                                                </div>
+                                            </div>
+
+                                            <div class="losses-rate-chart-panel">
+                                                <h3>
+                                                    Histórico da Taxa de Perda —
+                                                    <span id="lossesRateHistoryYear"></span>
+                                                </h3>
+
+                                                <div class="losses-rate-chart-container">
+                                                    <canvas id="lossesRateHistoryChart">
+                                                        Seu navegador não suporta gráficos em canvas.
+                                                    </canvas>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- OPÇÕES DO RELATÓRIO -->
+
+                                    <div class="footer flex-box-between">
+                                        <div>
+                                            <button class="button" id="lossesRateCopyBaseButton" type="button">
+                                                Copiar Base Atualizada
+                                            </button>
+
+                                            <button class="button" id="lossesRateCopyReportButton" type="button" disabled>
+                                                Copiar Relatório
+                                            </button>
+
+                                            <button class="button" id="lossesRateDownloadReportButton" type="button" disabled>
+                                                Baixar Relatório
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- CONTROLES DO RELATÓRIO -->
+
+                                <div class="report-controls">
+                                    <div class="history-link flex-box-start">
+                                        <a href="https://docs.google.com/spreadsheets/d/1TUOf4Bvv7L_Q87xOkCQqPKkNpSi03OSs3aKobbAn724/edit?gid=275287237#gid=275287237" target="_blank">
+                                            <svg class="spreadsheets-link-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                                <path d="M7 17L17 7M9 7H17V15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                            </svg>
+                                        </a>
+
+                                        <div>
+                                            <h4>Planilha - Taxa de Perdas</h4>
+                                            <p>Crtl A + Crtl C, e clique em importar.</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="history-import flex-box-start">
+                                        <div>
+                                            <button class="button" id="lossesRateImportHistoryButton" type="button">
+                                                Importar Histórico
+                                            </button>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="input-group losses-rate-identification">
+                                        <div>
+                                            <h4>Descrição</h4>
+                                            <input id="lossesRateDescriptionInput" type="text" value="LM HUB SP Santos Praia Grande 02" readonly>                                        
+                                        </div>
+
+                                        <div>
+                                            <h4>Código do Hub</h4>
+                                            <input id="lossesRateHubCodeInput" type="text" value="LSP-63" readonly>
+                                        </div>
+
+                                        <div>
+                                            <h4>Sub Regional</h4>
+                                            <input id="lossesRateSubRegionalInput" type="text" value="SPM07" readonly>                                        
+                                        </div>
+                                    </div>
+
+                                    <div class="input-group losses-rate-values">
+                                        <div>
+                                            <h4>Volume Movimentado</h4>
+                                            <input id="lossesRateMovedInput" type="text" inputmode="numeric" maxlength="9">
+                                        </div>
+
+                                        <div>
+                                            <h4>Possíveis Perdas</h4>
+                                            <input id="lossesRatePossibleLossesInput" type="text" inputmode="numeric" maxlength="6">                                        
+                                        </div>
+
+                                        <div>
+                                            <h4>Quantidade de LOST</h4>
+                                            <input id="lossesRateLostInput" type="text" inputmode="numeric" maxlength="6">                                        
+                                        </div>
+
+                                        <div>
+                                            <h4>Quantidade de AVARIA</h4>
+                                            <input id="lossesRateDamageInput" type="text" inputmode="numeric" maxlength="6">
+                                        </div>
+                                    </div>
+
+                                    <div class="losses-rate-controls-summary">
+                                        <h4>Resumo do Mês</h4>
+
+                                        <div class="losses-rate-goal-status">
+                                            <span>Referência máxima</span>
+                                            <span>0,030%</span>
+                                        </div>
+
+                                        <div>
+                                            <span>Total de Perdas</span>
+                                            <span id="lossesRateControlsTotal">—</span>
+                                        </div>
+
+                                        <div>
+                                            <span>Taxa de Perda</span>
+                                            <span id="lossesRateControlsRate">—</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- RELATÓRIO ANÁLISE DO DIA -->
+
                         <div class="tabs-panel" id="heat-map">
                             <div class="preview">
                                 <div class="preview-style">
@@ -1931,7 +1914,6 @@
                                     </table> -->
                                 </div>
                             </div>
-                      
                         </div>
                     </div>
                 </div>
