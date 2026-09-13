@@ -784,44 +784,6 @@
 
     /* RECEBIMENTO - GRAFICOS E PARTE DE COMPARAÇÃO */
 
-    #receipt .receipt-progress {
-        padding: 18px 20px;
-        border: 1px solid var(--color-border);
-        background-color: var(--color-container);
-    }
-    #receipt .receipt-progress-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 20px;
-    }
-    #receipt .receipt-progress-header h4 {
-        margin: 0 0 5px;
-    }
-    #receipt .receipt-progress-header p {
-        margin: 0;
-        color: var(--color-gray-p);
-        font-size: 14px;
-    }
-    #receipt .receipt-progress-percentage {
-        color: var(--color-text) !important;
-        font-size: 16px !important;
-        font-weight: 600;
-        white-space: nowrap;
-    }
-    #receipt .receipt-progress-track {
-        position: relative;
-        height: 15px;
-        margin-top: 18px;
-        overflow: hidden;
-        background-color: var(--color-progress-bar);
-    }
-    #receipt .receipt-progress-fill {
-        position: absolute;
-        inset: 0 auto 0 0;
-        width: 0;
-        background-color: #4CAF50;
-    }
     #receipt .receipt-operator-preview-table {
         width: 100%;
     }
