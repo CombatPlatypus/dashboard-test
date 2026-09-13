@@ -250,9 +250,9 @@
                     <div class="tabs-content" data-tabs-content="report-choice">
                         <div class="tabs-panel is-active" id="planning">
 
-                            <!-- HEADER DO RELATÓRIO -->
+                            <!-- TABS DO PLANEJAMENTO -->
 
-                            <ul class="tabs flex-box-start" data-tabs id="planning-choice">
+                            <ul class="tabs flex-box-start" data-tabs id="planningTabs">
                                 <li class="tabs-title is-active">
                                     <a href="#lhs-list">
                                         <h4>Lista de LHs</h4>
@@ -279,15 +279,10 @@
                                 <!-- PPÉVIA -->
 
                                 <div class="preview" id="planningSheetPreview">
-
-                                    <!-- RELATÓRIO DE PLANEJAMENTO -->
-
                                     <div class="preview-style" id="planningReportExportArea">
                                         <div class="title">
                                             <h2>Relatório de Planejamento</h2>
                                         </div>
-
-                                        <!-- INDICADORES -->
 
                                         <table class="indicators">
                                             <thead>
@@ -308,12 +303,9 @@
                                         </table>
 
                                         <div class="planning-sheet-layout">
-
-                                            <!-- COLUNA PRINCIPAL -->
-
                                             <div class="planning-sheet-main">
 
-                                                <!-- LISTA DE LHS -->
+                                                <!-- LISTA DE LHS PARA ROTEIRIZAR -->
 
                                                 <table>
                                                     <thead>
@@ -388,8 +380,6 @@
                                                     </tbody>
                                                 </table>
                                             </div>
-
-                                            <!-- COLUNA LATERAL -->
 
                                             <div class="planning-sheet-sidebar">
 
@@ -480,7 +470,7 @@
                                 <!-- CONTROLES -->
 
                                 <div class="report-controls">
-                                    <div class="tabs-content" data-tabs-content="planning-choice">
+                                    <div class="tabs-content" data-tabs-content="planningTabs">
                                         <div class="tabs-panel is-active" id="lhs-list">
                                             <div class="history-link flex-box-start">
                                                 <a href="https://spx.shopee.com.br/#/hubLinehaulTrips/trip" target="_blank">
@@ -530,17 +520,19 @@
 
                                             <div id="planningPoolControls">
 
-                                                <h4>Quantidade de Backlog</h4>
+                                                <h4>Indicadores Operacionais</h4>
 
                                                 <div class="input-group">
                                                     <div>
-                                                        <h4>Pacotes</h4>
-                                                        <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="backlogPackages">
+                                                        <h4>Cap do Dia</h4>
+
+                                                        <input type="text" inputmode="numeric" maxlength="6" data-planning-field="dailyCapacity">
                                                     </div>
 
                                                     <div>
-                                                        <h4>Volumosos</h4>
-                                                        <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="backlogBulky">
+                                                        <h4>SPR Médio</h4>
+
+                                                        <input type="text" inputmode="numeric" maxlength="5" data-planning-field="averageSpr">
                                                     </div>
                                                 </div>
 
@@ -562,27 +554,27 @@
                                                         <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="errors">
                                                     </div>
                                                 </div>
+
+                                                <h4>Quantidade de Backlog</h4>
+
+                                                <div class="input-group">
+                                                    <div>
+                                                        <h4>Pacotes</h4>
+                                                        <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="backlogPackages">
+                                                    </div>
+
+                                                    <div>
+                                                        <h4>Volumosos</h4>
+                                                        <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="backlogBulky">
+                                                    </div>
+                                                </div>
                                             </div>
 
                                             <!-- CONTROLES DOS INDICADORES -->
 
                                             <div id="planningGeneralControls">
 
-                                                <h4>Indicadores Operacionais</h4>
-
-                                                <div class="input-group">
-                                                    <div>
-                                                        <h4>Cap do Dia</h4>
-
-                                                        <input type="text" inputmode="numeric" maxlength="6" data-planning-field="dailyCapacity">
-                                                    </div>
-
-                                                    <div>
-                                                        <h4>SPR Médio</h4>
-
-                                                        <input type="text" inputmode="numeric" maxlength="5" data-planning-field="averageSpr">
-                                                    </div>
-                                                </div>
+                                         
 
                                                 <h4>Composição da Frota</h4>
 
