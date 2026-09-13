@@ -20,6 +20,11 @@
         grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
         gap: 15px;
     }
+    #report-choice > .tabs-title:nth-last-child(-n + 2) {
+        flex-basis: calc(
+            (100% - 15px) / 2
+        );
+    }
     #report-choice .tabs-title {
         width: 100%;
     }
