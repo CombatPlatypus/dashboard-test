@@ -7,6 +7,10 @@ import {
 } from "./planning/index.js";
 
 import {
+    receiptReport,
+} from "./receipt/index.js";
+
+import {
     initializeLossesRateReport,
 } from "./losses-rate.js";
 
@@ -21,22 +25,6 @@ import {
 import {
     initializeLossesRateExport,
 } from "./losses-rate-export.js";
-
-import {
-    initializeReceiptReport,
-} from "./receipt.js";
-
-import {
-    initializeReceiptImport,
-} from "./receipt-import.js";
-
-import {
-    initializeReceiptCharts,
-} from "./receipt-charts.js";
-
-import {
-    initializeReceiptExport,
-} from "./receipt-export.js";
 
 import {
     initializeExpeditionReport,
@@ -70,20 +58,17 @@ function initializeReportsPanel() {
 
     initializeReportNotifications();
 
-    // PLANEJAMENTO
+    // RELATÓRIOS MODULARIZADOS
 
     reportManager.register(
         planningReport,
     );
 
+    reportManager.register(
+        receiptReport,
+    );
+
     reportManager.initializeAll();
-
-    // RECEBIMENTO
-
-    initializeReceiptReport();
-    initializeReceiptCharts();
-    initializeReceiptImport();
-    initializeReceiptExport();
 
     // EXPEDIÇÃO
 
