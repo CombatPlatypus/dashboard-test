@@ -5,6 +5,7 @@ import {
     subscribeReceiptState,
     updateReceiptGeneralField,
     updateReceiptOperator,
+    updateReceiptOperatorSelection,
 } from "./state.js";
 
 /* CONFIGURAÇÕES */
@@ -338,6 +339,16 @@ function getReceiptOperatorInputs(
             row.querySelector(
                 '[data-receipt-operator-field="errorQuantity"]',
             ),
+
+        selection:
+            row.querySelector(
+                "[data-receipt-operator-selection]",
+            ),
+
+        selectionLabel:
+            row.querySelector(
+                ".checkbox > label",
+            ),
     };
 }
 
@@ -407,6 +418,28 @@ function createReceiptOperatorControl(
             : "Erros do etiquetador",
     );
 
+    const selectionId =
+        `receiptReceiver${operator.id}`;
+
+    inputs.selection.id =
+        selectionId;
+
+    inputs.selection.checked =
+        operator.selected !== false;
+
+    inputs.selection.disabled =
+        false;
+
+    inputs.selection.setAttribute(
+        "aria-label",
+        receiverName
+            ? `Exibir ${receiverName} no relatório`
+            : "Exibir recebedor no relatório",
+    );
+
+    inputs.selectionLabel.htmlFor =
+        selectionId;
+
     return row;
 }
 
@@ -451,6 +484,26 @@ function createEmptyReceiptOperatorControl(
         "aria-label",
         `Erros do etiquetador ${position}`,
     );
+
+    const selectionId =
+        `receiptReceiverEmpty${position}`;
+
+    inputs.selection.id =
+        selectionId;
+
+    inputs.selection.checked =
+        false;
+
+    inputs.selection.disabled =
+        true;
+
+    inputs.selection.setAttribute(
+        "aria-label",
+        `Recebedor ${position} indisponível`,
+    );
+
+    inputs.selectionLabel.htmlFor =
+        selectionId;
 
     return row;
 }
@@ -500,6 +553,9 @@ function synchronizeReceiptOperatorControls(
                 inputs.errorQuantity,
                 operator.errorQuantity,
             );
+
+            inputs.selection.checked =
+                operator.selected !== false;
         },
     );
 }
@@ -807,6 +863,14 @@ function renderReceiptReport(
     template,
     state,
 ) {
+    const selectedOperators =
+        state.operators.filter(
+            function (operator) {
+                return operator.selected !==
+                    false;
+            },
+        );
+
     const summary =
         getReceiptSummary(
             state,
@@ -832,7 +896,7 @@ function renderReceiptReport(
 
     renderReceiptOperatorPreview(
         elements,
-        state.operators,
+        selectedOperators,
         summary.totalErrors,
         state
             .useTotalErrorParticipation,
@@ -1020,6 +1084,58 @@ function bindReceiptOperatorControls(
                     operatorId,
                     field,
                     value,
+                );
+            },
+        );
+
+    elements.operatorControls
+        .addEventListener(
+            "change",
+            function (event) {
+                const checkbox =
+                    event.target.closest(
+                        "[data-receipt-operator-selection]",
+                    );
+
+                if (
+                    !(
+                        checkbox instanceof
+                        HTMLInputElement
+                    ) ||
+                    !elements.operatorControls
+                        .contains(
+                            checkbox,
+                        )
+                ) {
+                    return;
+                }
+
+                const row =
+                    checkbox.closest(
+                        "[data-receipt-operator-id]",
+                    );
+
+                if (!row) {
+                    return;
+                }
+
+                const operatorId =
+                    Number(
+                        row.dataset
+                            .receiptOperatorId,
+                    );
+
+                if (
+                    !Number.isInteger(
+                        operatorId,
+                    )
+                ) {
+                    return;
+                }
+
+                updateReceiptOperatorSelection(
+                    operatorId,
+                    checkbox.checked,
                 );
             },
         );
@@ -1213,6 +1329,14 @@ function initializeReceiptView(
         !(
             templateInputs.errorQuantity instanceof
             HTMLInputElement
+        ) ||
+        !(
+            templateInputs.selection instanceof
+            HTMLInputElement
+        ) ||
+        !(
+            templateInputs.selectionLabel instanceof
+            HTMLLabelElement
         )
     ) {
         return false;

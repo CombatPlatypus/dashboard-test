@@ -805,8 +805,17 @@ function createReceiptComparisonData(
         state
             .useTotalErrorParticipation;
 
+    const selectedOperators =
+        state.operators
+            .filter(
+                function (operator) {
+                    return operator.selected !==
+                        false;
+                },
+            );
+
     const operators =
-        state.operators.map(
+        selectedOperators.map(
             function (
                 operator,
             ) {

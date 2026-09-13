@@ -135,6 +135,9 @@ function createReceiptOperatorRecord(
             normalizeReceiptQuantity(
                 values.errorQuantity,
             ),
+
+        selected:
+            values.selected !== false,
     };
 }
 
@@ -186,7 +189,12 @@ function getReceiptSummary(
         Array.isArray(
             state.operators,
         )
-            ? state.operators
+            ? state.operators.filter(
+                function (operator) {
+                    return operator.selected !==
+                        false;
+                },
+            )
             : [];
 
     const hasReceivedPackages =
@@ -414,6 +422,52 @@ function updateReceiptOperator(
     return true;
 }
 
+/* ALTERA A SELEÇÃO DE UM RECEBEDOR */
+
+function updateReceiptOperatorSelection(
+    operatorId,
+    selected,
+) {
+    const operator =
+        receiptState.operators.find(
+            function (
+                currentOperator,
+            ) {
+                return (
+                    currentOperator.id ===
+                    operatorId
+                );
+            },
+        );
+
+    if (!operator) {
+        return false;
+    }
+
+    const normalizedSelection =
+        Boolean(
+            selected,
+        );
+
+    if (
+        operator.selected ===
+        normalizedSelection
+    ) {
+        return true;
+    }
+
+    operator.selected =
+        normalizedSelection;
+
+    notifyReceiptState({
+        type: "operator-selection-updated",
+        operatorId,
+        selected: normalizedSelection,
+    });
+
+    return true;
+}
+
 /* SUBSTITUI OS RECEBEDORES IMPORTADOS */
 
 function replaceReceiptOperators(
@@ -497,6 +551,12 @@ function replaceReceiptOperators(
                                 .errorQuantity ??
                             previousOperator
                                 ?.errorQuantity,
+
+                        selected:
+                            receivedValues
+                                .selected ??
+                            previousOperator
+                                ?.selected,
                     });
                 },
             )
@@ -610,4 +670,5 @@ export {
     subscribeReceiptState,
     updateReceiptGeneralField,
     updateReceiptOperator,
+    updateReceiptOperatorSelection,
 };

@@ -722,6 +722,18 @@
         overflow-y: auto;
         padding-right: 15px;
     }
+    #receipt .receipt-operator-controls [data-receipt-operator-field="labeler"] {
+        min-width: 0;
+        flex: 1 1 0;
+    }
+    #receipt .receipt-operator-controls [data-receipt-operator-field="errorQuantity"] {
+        width: 86px;
+        flex: 0 0 86px;
+        text-align: center;
+    }
+    #receipt .receipt-operator-controls .checkbox {
+        flex: 0 0 40px;
+    }
 
     #receipt .receipt-operator-controls::-webkit-scrollbar-track {
         background-color: transparent;

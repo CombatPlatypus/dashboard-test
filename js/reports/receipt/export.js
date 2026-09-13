@@ -44,6 +44,18 @@ function getReceiptExportPendingMessage(
         return "Importe o arquivo de recebimento.";
     }
 
+    const selectedOperators =
+        state.operators.filter(
+            function (operator) {
+                return operator.selected !==
+                    false;
+            },
+        );
+
+    if (selectedOperators.length === 0) {
+        return "Selecione ao menos um recebedor.";
+    }
+
     if (
         !Number.isSafeInteger(
             state.expectedVolume,
@@ -54,7 +66,7 @@ function getReceiptExportPendingMessage(
     }
 
     const hasMissingErrors =
-        state.operators.some(
+        selectedOperators.some(
             function (
                 operator,
             ) {
