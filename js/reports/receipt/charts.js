@@ -294,12 +294,6 @@ function getReceiptComparisonElements(
                 "receipt-charts",
             ),
 
-        windowLabel:
-            getReceiptChartElementById(
-                rootElement,
-                "receiptComparisonWindow",
-            ),
-
         topReceiver:
             getReceiptChartElementById(
                 rootElement,
@@ -361,9 +355,6 @@ function hasReceiptComparisonElements(
 ) {
     return (
         elements.panel instanceof
-            HTMLElement &&
-
-        elements.windowLabel instanceof
             HTMLElement &&
 
         elements.topReceiver instanceof
@@ -891,10 +882,6 @@ function renderReceiptComparison(
         createReceiptComparisonData(
             state,
         );
-
-    elements.windowLabel.textContent =
-        state.window.trim() ||
-        "—";
 
     const volumeRanking =
         data.operators
