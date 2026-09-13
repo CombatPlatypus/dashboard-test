@@ -59,16 +59,11 @@
                 flex-direction: column;
                 align-items: center;
                 justify-content: center;
-                gap: 5px;
+                gap: 12px;
                 min-width: 0;
                 padding: 25px;
                 background-color: var(--color-container);
                 border: 1px solid var(--color-border);
-            }
-            #reports .cards > div > p:first-of-type {
-                margin: 0 0 5px;
-                color: var(--color-gray-p);
-                font-size: 13px;
             }
             #reports .cards > div > h4 {
                 margin: 0;
@@ -78,6 +73,7 @@
                 font-size: 14px;
                 color: var(--color-gray-p);
                 line-height: 1;
+                margin: 0;
             }
             #reports .cards > div > p:last-child {
                 margin: 0;
@@ -864,9 +860,9 @@
                                                     </div>
 
                                                     <div>
+                                                        <h4 id="receiptComparisonTopRate">—</h4>
                                                         <p class="receipt-comparison-card-label" id="receiptComparisonTopRateLabel">Maior Taxa de Erros</p>
                                                         <p id="receiptComparisonTopRateDetails">—</p>
-                                                        <h4 id="receiptComparisonTopRate">—</h4>
                                                     </div>
                                                 </div>
 
@@ -876,7 +872,7 @@
                                                         <p>Distribuição dos pacotes processados.</p>
 
                                                         <div class="receipt-comparison-chart-container">
-                                                            <canvas id="receiptVolumeComparisonChart" role="img" aria-label="Comparação do volume recebido por recebedor">
+                                                            <canvas id="receiptVolumeComparisonChart" role="img">
                                                                 Seu navegador não suporta gráficos em canvas.
                                                             </canvas>
                                                         </div>
@@ -887,7 +883,7 @@
                                                         <p id="receiptComparisonErrorChartSubtitle">Aguardando importação.</p>
 
                                                         <div class="receipt-comparison-chart-container">
-                                                            <canvas id="receiptErrorComparisonChart" role="img" aria-label="Comparação da taxa de erros por recebedor">
+                                                            <canvas id="receiptErrorComparisonChart" role="img">
                                                                 Seu navegador não suporta gráficos em canvas.
                                                             </canvas>
                                                         </div>
