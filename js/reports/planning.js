@@ -2160,7 +2160,7 @@ function initializePlanningLhList() {
 
     planningLhTabLink =
         document.querySelector(
-            '#planning-choice a[href="#lhs-list"]',
+            '#planningTabs a[href="#lhs-list"]',
         );
 
     planningSegregatedSection =
