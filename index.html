@@ -79,7 +79,7 @@
                 margin: 0;
             }
 
-            /* GRAFICOS - BARRAS HORIZONTAIS */
+            /* GRAFICOS - BARRAS HORIZONTAIS ÚNICO */
 
             #reports .horizontal-bars-chart {
                 width: 100%;
@@ -114,6 +114,43 @@
             #reports .horizontal-bars-chart .chart-title h4,
             #reports .horizontal-bars-chart .chart-title p {
                 letter-spacing: 1px;
+            }
+
+            /* GRAFICOS - BARRAS HORIZONTAIS DUPLO */
+
+            #reports .two-horizontal-bars-chart {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+                width: 100%;
+                height: auto;
+                gap: 15px;
+            }
+            #reports .two-horizontal-bars-chart .chart-panel {
+                display: flex;
+                flex-direction: column;
+                height: 470px;
+                padding: 20px;
+                background-color: var(--color-container);
+                border: 1px solid var(--color-border);
+                border-radius: 0 0 5px 5px;
+            }
+            #reports .two-horizontal-bars-chart .chart-panel h3 {
+                margin: 0 0 5px;
+                text-align: center;
+            }
+            #reports .two-horizontal-bars-chart .chart-panel > p {
+                margin: 0 0 15px 0;
+                color: var(--color-gray-p);
+                font-size: 14px;
+                text-align: center;
+            }
+            #reports .two-horizontal-bars-chart .chart-panel > div {
+                height: 300px
+            }
+            #reports .two-horizontal-bars-chart .chart-panel > div > canvas {
+                display: block;
+                width: 100% !important;
+                height: 100% !important;
             }
 
         </style>
@@ -866,23 +903,27 @@
                                                     </div>
                                                 </div>
 
-                                                <div class="charts">
-                                                    <div class="receipt-comparison-chart-panel">
+                                                <div class="two-horizontal-bars-chart">
+                                                    <div class="chart-panel">
                                                         <h3>Volume Recebido por Recebedor</h3>
                                                         <p>Distribuição dos pacotes processados.</p>
 
-                                                        <canvas id="receiptVolumeComparisonChart" role="img">
-                                                            Seu navegador não suporta gráficos em canvas.
-                                                        </canvas>
+                                                        <div>
+                                                            <canvas id="receiptVolumeComparisonChart" role="img">
+                                                                Seu navegador não suporta gráficos em canvas.
+                                                            </canvas>
+                                                        </div>
                                                     </div>
 
-                                                    <div class="receipt-comparison-chart-panel">
+                                                    <div class="chart-panel">
                                                         <h3 id="receiptComparisonErrorChartTitle">Taxa de Erros por Recebedor</h3>
                                                         <p id="receiptComparisonErrorChartSubtitle">Aguardando importação.</p>
 
-                                                        <canvas id="receiptErrorComparisonChart" role="img">
-                                                            Seu navegador não suporta gráficos em canvas.
-                                                        </canvas>
+                                                        <div>
+                                                            <canvas id="receiptErrorComparisonChart" role="img">
+                                                                Seu navegador não suporta gráficos em canvas.
+                                                            </canvas>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>

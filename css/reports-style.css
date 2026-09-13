@@ -831,42 +831,7 @@
         }
     }
 
-    #receipt #receipt-charts .charts {
-        display: grid;
-        grid-template-columns:
-            repeat(
-                auto-fit,
-                minmax(420px, 1fr)
-            );
-        width: 100%;
-        height: auto;
-        gap: 15px;
-    }
-    #receipt .receipt-comparison-chart-panel {
-        display: flex;
-        flex-direction: column;
-        height: 470px;
-        padding: 20px;
-        background-color: var(--color-container);
-        border: 1px solid var(--color-border);
-        border-radius: 0 0 5px 5px;
-    }
-    #receipt .receipt-comparison-chart-panel h3 {
-        margin: 0 0 5px;
-        text-align: center;
-    }
-    #receipt .receipt-comparison-chart-panel > p {
-        margin: 0;
-        color: var(--color-gray-p);
-        font-size: 14px;
-        text-align: center;
-    }
-    #receipt canvas {
-        display: block;
-        width: 100% !important;
-        height: 100% !important;
-        margin-top: 15px;
-    }
+
 
     /* RECEBIMENTO - RESPONSIVDADE */
 
