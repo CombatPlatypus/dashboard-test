@@ -542,6 +542,9 @@
     #planningPoolControls > h4:last-of-type {
         margin-top: 20px;
     }
+    #planningPoolControls > .input-group:first-of-type {
+        margin-top: 20px;
+    }
     .input-group.operation, .input-group.fleet {
         grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)) !important;
     }
