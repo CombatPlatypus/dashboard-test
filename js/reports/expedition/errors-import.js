@@ -2,11 +2,11 @@ import {
     getExpeditionErrorAnalysis,
     getExpeditionState,
     replaceExpeditionErrorData,
-} from "./expedition-state.js";
+} from "./state.js";
 
 import {
     setReportNotification,
-} from "./report-notifications.js";
+} from "../report-notifications.js";
 
 /* CONFIGURAÇÕES */
 
@@ -404,10 +404,12 @@ async function importExpeditionErrorsFromClipboard(
 
 /* INICIALIZAÇÃO */
 
-function initializeExpeditionErrorsImport() {
+function initializeExpeditionErrorsImport(
+    rootElement = document,
+) {
     const importButton =
-        document.getElementById(
-            "expeditionErrorsImportButton",
+        rootElement.querySelector(
+            "#expeditionErrorsImportButton",
         );
 
     if (

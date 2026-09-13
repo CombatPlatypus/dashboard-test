@@ -2,7 +2,7 @@ import {
     getExpeditionOperatorRanking,
     getExpeditionState,
     subscribeExpeditionState,
-} from "./expedition-state.js";
+} from "./state.js";
 
 let routesChart = null;
 let averageTimeChart = null;
@@ -10,7 +10,9 @@ let visibilityObserver = null;
 let resizeFrame = null;
 
 const CHART_PIXEL_RATIO = Math.max(
-    window.devicePixelRatio || 1,
+    typeof window !== "undefined"
+        ? window.devicePixelRatio || 1
+        : 1,
     4,
 );
 
@@ -161,50 +163,66 @@ function getCompactOperatorName(
 
 /* ELEMENTOS */
 
-function getChartElements() {
+function getChartElements(
+    rootElement = document,
+) {
+    const getElementById =
+        function (elementId) {
+            if (
+                rootElement.id ===
+                elementId
+            ) {
+                return rootElement;
+            }
+
+            return rootElement.querySelector(
+                `#${elementId}`,
+            );
+        };
+
     return {
         expeditionPanel:
-            document.getElementById(
+            getElementById(
                 "expedition",
             ),
 
         panel:
-            document.getElementById(
+            getElementById(
                 "expedition-charts",
             ),
 
         preview:
-            document.getElementById(
+            getElementById(
                 "expeditionChartsExportArea",
             ),
 
         topRoutesOperator:
-            document.getElementById(
+            getElementById(
                 "expeditionTopRoutesOperator",
             ),
 
         topRoutesDetails:
-            document.getElementById(
+            getElementById(
                 "expeditionTopRoutesDetails",
             ),
 
         fastestOperator:
-            document.getElementById(
+            getElementById(
                 "expeditionFastestOperator",
             ),
 
         fastestOperatorDetails:
-            document.getElementById(
+            getElementById(
                 "expeditionFastestOperatorDetails",
             ),
 
         routesCanvas:
-            document.getElementById(
+            getElementById(
                 "expeditionVolumeComparisonChart",
             ),
 
         timeCanvas:
-            document.getElementById(
+            getElementById(
                 "expeditionTimeComparisonChart",
             ),
     };
@@ -1064,9 +1082,13 @@ function observeVisibility(
 
 /* INICIALIZAÇÃO */
 
-function initializeExpeditionCharts() {
+function initializeExpeditionCharts(
+    rootElement = document,
+) {
     const elements =
-        getChartElements();
+        getChartElements(
+            rootElement,
+        );
 
     if (
         !hasChartElements(

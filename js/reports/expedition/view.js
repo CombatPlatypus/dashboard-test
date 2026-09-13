@@ -9,11 +9,11 @@ import {
     updateExpeditionOperatorSelection,
     updateExpeditionStreetGuardian,
     updateExpeditionWindow,
-} from "./expedition-state.js";
+} from "./state.js";
 
 import {
     setReportNotification,
-} from "./report-notifications.js";
+} from "../report-notifications.js";
 
 /* CONFIGURAÇÕES */
 
@@ -25,6 +25,9 @@ const MINIMUM_EXPEDITION_STREET_ROWS =
 
 const MINIMUM_FASTEST_OPERATOR_ROUTES =
     3;
+
+let expeditionViewElements =
+    null;
 
 const expeditionNumberFormatter =
     new Intl.NumberFormat(
@@ -220,171 +223,187 @@ function setExpeditionInputValue(
 
 /* ELEMENTOS */
 
-function getExpeditionElements() {
+function getExpeditionElements(
+    rootElement = document,
+) {
+    const getElementById =
+        function (elementId) {
+            if (
+                rootElement.id ===
+                elementId
+            ) {
+                return rootElement;
+            }
+
+            return rootElement.querySelector(
+                `#${elementId}`,
+            );
+        };
+
     return {
         panel:
-            document.getElementById(
+            getElementById(
                 "expedition",
             ),
 
         windowInput:
-            document.getElementById(
+            getElementById(
                 "expeditionWindowInput",
             ),
 
         floorVolumeInput:
-            document.getElementById(
+            getElementById(
                 "expeditionFloorRoutesInput",
             ),
 
         unknownInput:
-            document.getElementById(
+            getElementById(
                 "expeditionUnknownInput",
             ),
 
         exceptionInput:
-            document.getElementById(
+            getElementById(
                 "expeditionExceptionInput",
             ),
 
         revertedInput:
-            document.getElementById(
+            getElementById(
                 "expeditionRevertedInput",
             ),
 
         streetGuardianControls:
-            document.getElementById(
+            getElementById(
                 "expeditionStreetGuardianControls",
             ),
 
         operatorControls:
-            document.getElementById(
+            getElementById(
                 "expeditionOperatorControls",
             ),
 
         previewWindow:
-            document.getElementById(
+            getElementById(
                 "expeditionPreviewWindow",
             ),
 
         previewOperatorCount:
-            document.getElementById(
+            getElementById(
                 "expeditionPreviewOperatorCount",
             ),
 
         previewVolumeChecked:
-            document.getElementById(
+            getElementById(
                 "expeditionPreviewVolumeChecked",
             ),
 
         previewValidatedRoutes:
-            document.getElementById(
+            getElementById(
                 "expeditionPreviewValidatedRoutes",
             ),
 
         previewFloorVolume:
-            document.getElementById(
+            getElementById(
                 "expeditionPreviewFloorRoutes",
             ),
         previewDuration:
-            document.getElementById(
+            getElementById(
                 "expeditionPreviewDuration",
             ),
         previewMissing:
-            document.getElementById(
+            getElementById(
                 "expeditionPreviewMissing",
             ),
 
         previewDuplicated:
-            document.getElementById(
+            getElementById(
                 "expeditionPreviewDuplicated",
             ),
 
         previewMissorted:
-            document.getElementById(
+            getElementById(
                 "expeditionPreviewMissorted",
             ),
         previewUnknown:
-            document.getElementById(
+            getElementById(
                 "expeditionPreviewUnknown",
             ),
         previewException:
-            document.getElementById(
+            getElementById(
                 "expeditionPreviewException",
             ),
 
         previewOperatorBody:
-            document.getElementById(
+            getElementById(
                 "expeditionPreviewOperatorBody",
             ),
 
         previewSortingErrors:
-            document.getElementById(
+            getElementById(
                 "expeditionPreviewSortingErrors",
             ),
 
         previewLabelingErrors:
-            document.getElementById(
+            getElementById(
                 "expeditionPreviewLabelingErrors",
             ),
 
         previewTotalErrors:
-            document.getElementById(
+            getElementById(
                 "expeditionPreviewTotalErrors",
             ),
 
         previewErrorRate:
-            document.getElementById(
+            getElementById(
                 "expeditionPreviewErrorRate",
             ),
 
         previewRevertedErrors:
-            document.getElementById(
+            getElementById(
                 "expeditionPreviewRevertedErrors",
             ),
 
         previewRevertedRate:
-            document.getElementById(
+            getElementById(
                 "expeditionPreviewRevertedRate",
             ),
 
         previewFinalErrors:
-            document.getElementById(
+            getElementById(
                 "expeditionPreviewFinalErrors",
             ),
 
         previewFinalRate:
-            document.getElementById(
+            getElementById(
                 "expeditionPreviewFinalRate",
             ),
 
         previewStreetBody:
-            document.getElementById(
+            getElementById(
                 "expeditionPreviewStreetBody",
             ),
 
         topRoutesOperator:
-            document.getElementById(
+            getElementById(
                 "expeditionTopRoutesOperator",
             ),
 
         topRoutesDetails:
-            document.getElementById(
+            getElementById(
                 "expeditionTopRoutesDetails",
             ),
 
         fastestOperator:
-            document.getElementById(
+            getElementById(
                 "expeditionFastestOperator",
             ),
 
         fastestOperatorDetails:
-            document.getElementById(
+            getElementById(
                 "expeditionFastestOperatorDetails",
             ),
 
         clearButton:
-            document.getElementById(
+            getElementById(
                 "expeditionClearReportButton",
             ),
     };
@@ -1543,17 +1562,26 @@ function bindExpeditionEvents(
 
 /* INICIALIZAÇÃO */
 
-function initializeExpeditionReport() {
+function initializeExpeditionView(
+    rootElement,
+) {
     const elements =
-        getExpeditionElements();
+        getExpeditionElements(
+            rootElement,
+        );
 
     if (
         !hasExpeditionElements(
             elements,
-        )
+        ) ||
+        elements.panel !==
+            rootElement
     ) {
         return false;
     }
+
+    expeditionViewElements =
+        elements;
 
     if (
         elements.panel.dataset
@@ -1588,6 +1616,22 @@ function initializeExpeditionReport() {
     return true;
 }
 
+function renderExpeditionView(
+    state = getExpeditionState(),
+) {
+    if (!expeditionViewElements) {
+        return false;
+    }
+
+    renderExpeditionReport(
+        expeditionViewElements,
+        state,
+    );
+
+    return true;
+}
+
 export {
-    initializeExpeditionReport,
+    initializeExpeditionView,
+    renderExpeditionView,
 };

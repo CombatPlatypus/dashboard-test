@@ -2,7 +2,7 @@ import {
     getExpeditionErrorAnalysis,
     getExpeditionState,
     subscribeExpeditionState,
-} from "./expedition-state.js";
+} from "./state.js";
 
 let errorBalanceChart = null;
 let streetOccurrencesChart = null;
@@ -11,7 +11,9 @@ let errorsResizeFrame = null;
 
 const ERROR_CHART_PIXEL_RATIO =
     Math.max(
-        window.devicePixelRatio || 1,
+        typeof window !== "undefined"
+            ? window.devicePixelRatio || 1
+            : 1,
         4,
     );
 
@@ -73,55 +75,71 @@ function formatErrorChartRate(
         );
 }
 
-function getExpeditionErrorsChartElements() {
+function getExpeditionErrorsChartElements(
+    rootElement = document,
+) {
+    const getElementById =
+        function (elementId) {
+            if (
+                rootElement.id ===
+                elementId
+            ) {
+                return rootElement;
+            }
+
+            return rootElement.querySelector(
+                `#${elementId}`,
+            );
+        };
+
     return {
         expeditionPanel:
-            document.getElementById(
+            getElementById(
                 "expedition",
             ),
 
         errorsPanel:
-            document.getElementById(
+            getElementById(
                 "expedition-mistakes",
             ),
 
         streetsPanel:
-            document.getElementById(
+            getElementById(
                 "expedition-streets",
             ),
 
         errorBalanceCanvas:
-            document.getElementById(
+            getElementById(
                 "expeditionErrorBalanceChart",
             ),
 
         streetOccurrencesCanvas:
-            document.getElementById(
+            getElementById(
                 "expeditionStreetOccurrencesChart",
             ),
 
         streetOccurrencesContainer:
-            document.getElementById(
+            getElementById(
                 "expeditionStreetOccurrencesChartContainer",
             ),
 
         bestStreet:
-            document.getElementById(
+            getElementById(
                 "expeditionBestStreet",
             ),
 
         bestStreetRate:
-            document.getElementById(
+            getElementById(
                 "expeditionBestStreetRate",
             ),
 
         worstStreet:
-            document.getElementById(
+            getElementById(
                 "expeditionWorstStreet",
             ),
 
         worstStreetRate:
-            document.getElementById(
+            getElementById(
                 "expeditionWorstStreetRate",
             ),
     };
@@ -754,9 +772,13 @@ function observeExpeditionErrorsVisibility(
     });
 }
 
-function initializeExpeditionErrorsCharts() {
+function initializeExpeditionErrorsCharts(
+    rootElement = document,
+) {
     const elements =
-        getExpeditionErrorsChartElements();
+        getExpeditionErrorsChartElements(
+            rootElement,
+        );
 
     if (
         !hasExpeditionErrorsChartElements(

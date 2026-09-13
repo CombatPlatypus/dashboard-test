@@ -2,11 +2,11 @@ import {
     getExpeditionOperatorRanking,
     getExpeditionState,
     replaceExpeditionRoutes,
-} from "./expedition-state.js";
+} from "./state.js";
 
 import {
     setReportNotification,
-} from "./report-notifications.js";
+} from "../report-notifications.js";
 
 /* CONFIGURAÇÕES */
 
@@ -761,15 +761,17 @@ async function importExpeditionFile(
 
 /* INICIALIZAÇÃO */
 
-function initializeExpeditionImport() {
+function initializeExpeditionImport(
+    rootElement = document,
+) {
     const importButton =
-        document.getElementById(
-            "expeditionImportButton",
+        rootElement.querySelector(
+            "#expeditionImportButton",
         );
 
     const fileInput =
-        document.getElementById(
-            "expeditionFileInput",
+        rootElement.querySelector(
+            "#expeditionFileInput",
         );
 
     if (

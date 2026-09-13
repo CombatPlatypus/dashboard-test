@@ -1963,6 +1963,184 @@ function replaceExpeditionErrorData(
     return true;
 }
 
+/* RESTAURA UMA SESSÃO SALVA */
+
+function restoreExpeditionState(
+    sessionState,
+) {
+    if (
+        !sessionState ||
+        typeof sessionState !== "object" ||
+        Array.isArray(sessionState)
+    ) {
+        return false;
+    }
+
+    const windowValue =
+        normalizeExpeditionText(
+            sessionState.window,
+        ).toUpperCase();
+
+    expeditionState.window =
+        expeditionWindows.has(
+            windowValue,
+        )
+            ? windowValue
+            : "AM";
+
+    expeditionState.sourceFileName =
+        normalizeExpeditionText(
+            sessionState.sourceFileName,
+        );
+
+    expeditionState.errorSourceFileName =
+        normalizeExpeditionText(
+            sessionState.errorSourceFileName,
+        );
+
+    expeditionState.hasErrorData =
+        Boolean(
+            sessionState.hasErrorData,
+        );
+
+    expeditionState.errorTotals = {
+        sortingErrors:
+            normalizeExpeditionQuantity(
+                sessionState.errorTotals
+                    ?.sortingErrors,
+            ) ?? 0,
+
+        labelingErrors:
+            normalizeExpeditionQuantity(
+                sessionState.errorTotals
+                    ?.labelingErrors,
+            ) ?? 0,
+    };
+
+    expeditionState.errorStreets =
+        (
+            Array.isArray(
+                sessionState.errorStreets,
+            )
+                ? sessionState.errorStreets
+                : []
+        ).map(
+            createExpeditionErrorStreet,
+        );
+
+    const streetGuardians =
+        sessionState.streetGuardians &&
+        typeof sessionState.streetGuardians ===
+            "object" &&
+        !Array.isArray(
+            sessionState.streetGuardians,
+        )
+            ? sessionState.streetGuardians
+            : {};
+
+    expeditionState.streetGuardians =
+        Object.fromEntries(
+            Object.entries(
+                streetGuardians,
+            )
+                .map(
+                    function (
+                        entry,
+                    ) {
+                        return [
+                            normalizeExpeditionText(
+                                entry[0],
+                            ),
+                            normalizeExpeditionText(
+                                entry[1],
+                            ),
+                        ];
+                    },
+                )
+                .filter(
+                    function (entry) {
+                        return (
+                            entry[0] !== "" &&
+                            entry[1] !== ""
+                        );
+                    },
+                ),
+        );
+
+    [
+        "revertedErrors",
+        "revertedSortingErrors",
+        "revertedLabelingErrors",
+        "unknownOrders",
+        "exceptionOrders",
+    ].forEach(
+        function (field) {
+            expeditionState[field] =
+                Object.prototype
+                    .hasOwnProperty.call(
+                        sessionState,
+                        field,
+                    )
+                    ? normalizeExpeditionQuantity(
+                        sessionState[field],
+                    )
+                    : 0;
+        },
+    );
+
+    expeditionState.floorVolume =
+        Object.prototype
+            .hasOwnProperty.call(
+                sessionState,
+                "floorVolume",
+            )
+            ? normalizeExpeditionQuantity(
+                sessionState.floorVolume,
+            )
+            : null;
+
+    expeditionState.excludedOperatorKeys =
+        new Set(
+            (
+                Array.isArray(
+                    sessionState
+                        .excludedOperatorKeys,
+                )
+                    ? sessionState
+                        .excludedOperatorKeys
+                    : []
+            )
+                .map(
+                    getExpeditionOperatorKey,
+                )
+                .filter(Boolean),
+        );
+
+    expeditionState.routes =
+        (
+            Array.isArray(
+                sessionState.routes,
+            )
+                ? sessionState.routes
+                : []
+        )
+            .map(
+                createExpeditionRoute,
+            )
+            .filter(
+                function (route) {
+                    return route.code !== "";
+                },
+            );
+
+    notifyExpeditionState({
+        type:
+            "expedition-session-imported",
+    });
+
+    return true;
+}
+
 /* LIMPA O RELATÓRIO */
 
 function resetExpeditionReport() {
@@ -2032,6 +2210,7 @@ export {
     replaceExpeditionErrorData,
     replaceExpeditionRoutes,
     resetExpeditionReport,
+    restoreExpeditionState,
     subscribeExpeditionState,
     updateExpeditionManualQuantity,
     updateExpeditionOperatorSelection,
