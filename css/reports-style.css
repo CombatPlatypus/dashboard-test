@@ -897,10 +897,13 @@
     #controls-mistakes .input-group {
         grid-template-columns: repeat(auto-fit, minmax(100%, 1fr)) !important;
     }
-    #expedition #expeditionStreetGuardianControls.is-errors-tab-active {
-        max-height: 477px;
+    #expedition #expeditionStreetGuardianControls {
+        max-height: 864px;
         overflow-y: auto;
         padding-right: 15px;
+    }
+    #expedition #expeditionStreetGuardianControls.is-errors-tab-active {
+        max-height: 472px;
     }
     #expedition #expeditionStreetGuardianControls.is-errors-tab-active::-webkit-scrollbar-track {
         background-color: transparent;
