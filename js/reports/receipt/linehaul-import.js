@@ -7,6 +7,7 @@ import {
 import {
     createSpXLinehaulWindowCandidates,
     formatSpXLinehaulOrigin,
+    getSpXLinehaulPlainLoadedOrders,
 } from "../core/spx-linehaul-rules.js";
 
 const RECEIPT_LINEHAUL_IMPORT_BUTTON_ID =
@@ -153,101 +154,6 @@ function getReceiptLinehaulLoadedOrders(
 
         if (quantity !== null) {
             return quantity;
-        }
-    }
-
-    return null;
-}
-
-function getReceiptLinehaulPlainLoadedOrders(
-    values,
-) {
-    const dateTimePattern =
-        /^\d{2}-\d{2}-\d{4}\s+\d{2}:\d{2}:\d{2}$/;
-
-    let lastDateTimeIndex = -1;
-
-    values.forEach(
-        function (
-            value,
-            index,
-        ) {
-            if (
-                dateTimePattern.test(
-                    value,
-                )
-            ) {
-                lastDateTimeIndex =
-                    index;
-            }
-        },
-    );
-
-    if (lastDateTimeIndex !== -1) {
-        const quantities =
-            values
-                .slice(
-                    lastDateTimeIndex + 1,
-                )
-                .map(
-                    parseReceiptLinehaulImportQuantity,
-                )
-                .filter(
-                    function (value) {
-                        return value !== null;
-                    },
-                );
-
-        if (quantities.length >= 2) {
-            return quantities[1];
-        }
-    }
-
-    const numericValues =
-        values.map(
-            parseReceiptLinehaulImportQuantity,
-        );
-
-    for (
-        let firstIndex = 0;
-        firstIndex <
-            numericValues.length - 1;
-        firstIndex += 1
-    ) {
-        const firstValue =
-            numericValues[
-                firstIndex
-            ];
-
-        const secondValue =
-            numericValues[
-                firstIndex + 1
-            ];
-
-        if (
-            firstValue === null ||
-            secondValue === null
-        ) {
-            continue;
-        }
-
-        for (
-            let repeatedIndex =
-                firstIndex + 2;
-            repeatedIndex <
-                numericValues.length - 1;
-            repeatedIndex += 1
-        ) {
-            if (
-                numericValues[
-                    repeatedIndex
-                ] === firstValue &&
-                numericValues[
-                    repeatedIndex + 1
-                ] === secondValue
-            ) {
-                return secondValue;
-            }
         }
     }
 
@@ -501,13 +407,20 @@ function getReceiptLinehaulColumns(
             ),
     };
 
-    return Object.values(
+    return Object.entries(
         columns,
-    ).every(
-        function (index) {
-            return index >= 0;
-        },
     )
+        .filter(
+            function ([key]) {
+                return key !==
+                    "loadedOrders";
+            },
+        )
+        .every(
+            function ([, index]) {
+                return index >= 0;
+            },
+        )
         ? columns
         : null;
 }
@@ -784,9 +697,6 @@ function parseReceiptLinehaulSpXPlainText(
         ) &&
         normalizedText.includes(
             "indicador de pontualidade",
-        ) &&
-        normalizedText.includes(
-            "pedido carregado",
         ) &&
         normalizedText.includes(
             "placa do veiculo",
@@ -1314,7 +1224,7 @@ async function handleReceiptLinehaulClipboardImport(
 
         if (importCandidates.length === 0) {
             throw new Error(
-                "Não encontrei uma tabela com Número do LH, Station, Indicador de Pontualidade, CPT, Pedido Carregado e Placa do Veículo.",
+                "Não encontrei uma tabela com Número do LH, Station, Indicador de Pontualidade, CPT e Placa do Veículo.",
             );
         }
 

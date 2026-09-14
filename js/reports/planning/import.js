@@ -6,6 +6,7 @@ import {
 import {
     createSpXLinehaulWindowCandidates,
     formatSpXLinehaulOrigin,
+    getSpXLinehaulPlainLoadedOrders,
 } from "../core/spx-linehaul-rules.js";
 
 const PLANNING_IMPORT_BUTTON_ID =
@@ -350,11 +351,17 @@ function getPlanningImportColumns(
     };
 
     const hasAllColumns =
-        Object.values(
+        Object.entries(
             columns,
         )
+            .filter(
+                function ([key]) {
+                    return key !==
+                        "quantity";
+                },
+            )
             .every(
-                function (index) {
+                function ([, index]) {
                     return index >= 0;
                 },
             );
@@ -598,102 +605,9 @@ function parsePlanningSpXHtml(
 function getPlanningImportPlainQuantity(
     values,
 ) {
-    const dateTimePattern =
-        /^\d{2}-\d{2}-\d{4}\s+\d{2}:\d{2}:\d{2}$/;
-
-    let lastDateTimeIndex =
-        -1;
-
-    values.forEach(
-        function (
-            value,
-            index,
-        ) {
-            if (
-                dateTimePattern.test(
-                    value,
-                )
-            ) {
-                lastDateTimeIndex =
-                    index;
-            }
-        },
+    return getSpXLinehaulPlainLoadedOrders(
+        values,
     );
-
-    if (
-        lastDateTimeIndex !==
-        -1
-    ) {
-        const quantities =
-            values
-                .slice(
-                    lastDateTimeIndex + 1,
-                )
-                .map(
-                    parsePlanningImportQuantity,
-                )
-                .filter(
-                    function (value) {
-                        return value !== null;
-                    },
-                );
-
-        if (
-            quantities.length >= 2
-        ) {
-            return quantities[1];
-        }
-    }
-
-    const numericValues =
-        values.map(
-            parsePlanningImportQuantity,
-        );
-
-    for (
-        let firstIndex = 0;
-        firstIndex <
-            numericValues.length - 1;
-        firstIndex += 1
-    ) {
-        const firstValue =
-            numericValues[
-                firstIndex
-            ];
-
-        const secondValue =
-            numericValues[
-                firstIndex + 1
-            ];
-
-        if (
-            firstValue === null ||
-            secondValue === null
-        ) {
-            continue;
-        }
-
-        for (
-            let repeatedIndex =
-                firstIndex + 2;
-            repeatedIndex <
-                numericValues.length - 1;
-            repeatedIndex += 1
-        ) {
-            if (
-                numericValues[
-                    repeatedIndex
-                ] === firstValue &&
-                numericValues[
-                    repeatedIndex + 1
-                ] === secondValue
-            ) {
-                return secondValue;
-            }
-        }
-    }
-
-    return null;
 }
 
 /* EXTRAI OS REGISTROS DO TEXTO PURO */
@@ -738,7 +652,6 @@ function parsePlanningSpXPlainText(
         "numero do lh",
         "indicador de pontualidade",
         "cpt",
-        "pedido carregado",
     ];
 
     const hasRequiredHeadings =

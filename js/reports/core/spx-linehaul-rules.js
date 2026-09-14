@@ -25,29 +25,31 @@ function formatSpXLinehaulOrigin(
             )
             .trim();
 
-    const prefixedOrigin =
-        origin.match(
-            /^(soc|fm\s+hub)\b\s*(?:-\s*)?(.*)$/i,
+    const originParts =
+        origin.split(
+            " ",
         );
 
-    if (!prefixedOrigin) {
+    const stateIndex =
+        originParts.findIndex(
+            function (part) {
+                return part.toUpperCase() ===
+                    "SP";
+            },
+        );
+
+    if (stateIndex === -1) {
         return origin;
     }
 
-    const prefix =
-        prefixedOrigin[1]
-            .replace(
-                /\s+/g,
-                " ",
-            )
-            .toUpperCase();
-
-    const remainingName =
-        prefixedOrigin[2].trim();
-
-    return remainingName
-        ? `${prefix} - ${remainingName}`
-        : prefix;
+    return originParts
+        .slice(
+            stateIndex + 1,
+        )
+        .join(
+            " ",
+        )
+        .trim();
 }
 
 function getSpXLinehaulCode(
@@ -127,92 +129,46 @@ function getSpXLinehaulWindow(
 function getSpXLinehaulPlainLoadedOrders(
     values,
 ) {
-    const dateTimePattern =
-        /^\d{2}-\d{2}-\d{4}\s+\d{2}:\d{2}:\d{2}$/;
-
-    let lastDateTimeIndex = -1;
-
-    values.forEach(
-        function (
-            value,
-            index,
-        ) {
-            if (
-                dateTimePattern.test(
-                    value,
-                )
-            ) {
-                lastDateTimeIndex =
-                    index;
-            }
-        },
-    );
-
-    if (lastDateTimeIndex !== -1) {
-        const quantities =
-            values
-                .slice(
-                    lastDateTimeIndex + 1,
-                )
-                .map(
-                    parseSpXLinehaulQuantity,
-                )
-                .filter(
-                    function (value) {
-                        return value !== null;
-                    },
-                );
-
-        if (quantities.length >= 2) {
-            return quantities[1];
-        }
-    }
-
-    const numericValues =
-        values.map(
-            parseSpXLinehaulQuantity,
-        );
+    const receivedValues =
+        Array.isArray(values)
+            ? values
+            : [];
 
     for (
-        let firstIndex = 0;
-        firstIndex <
-            numericValues.length - 1;
-        firstIndex += 1
+        let index = 0;
+        index < receivedValues.length;
+        index += 1
     ) {
-        const firstValue =
-            numericValues[
-                firstIndex
-            ];
+        const value =
+            String(
+                receivedValues[index] ??
+                "",
+            )
+                .replace(
+                    /\u00a0/g,
+                    " ",
+                )
+                .trim();
 
-        const secondValue =
-            numericValues[
-                firstIndex + 1
-            ];
+        const inlineMatch =
+            value.match(
+                /^pedidos? carregados?\s*[:=-]\s*(.+)$/i,
+            );
 
-        if (
-            firstValue === null ||
-            secondValue === null
-        ) {
-            continue;
+        if (inlineMatch) {
+            return parseSpXLinehaulQuantity(
+                inlineMatch[1],
+            );
         }
 
-        for (
-            let repeatedIndex =
-                firstIndex + 2;
-            repeatedIndex <
-                numericValues.length - 1;
-            repeatedIndex += 1
+        if (
+            /^pedidos? carregados?$/i.test(
+                value,
+            )
         ) {
-            if (
-                numericValues[
-                    repeatedIndex
-                ] === firstValue &&
-                numericValues[
-                    repeatedIndex + 1
-                ] === secondValue
-            ) {
-                return secondValue;
-            }
+            return parseSpXLinehaulQuantity(
+                receivedValues[index + 1],
+            );
         }
     }
 

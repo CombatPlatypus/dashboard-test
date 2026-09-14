@@ -360,10 +360,7 @@ function updateReceiptLinehaulRecord(
     return true;
 }
 
-function enableReceiptLinehaulManualEntry() {
-    receiptLinehaulState
-        .manualEntryEnabled = true;
-
+function ensureReceiptLinehaulManualRows() {
     while (
         receiptLinehaulState
             .linehauls
@@ -380,6 +377,13 @@ function enableReceiptLinehaulManualEntry() {
                 }),
             );
     }
+}
+
+function enableReceiptLinehaulManualEntry() {
+    receiptLinehaulState
+        .manualEntryEnabled = true;
+
+    ensureReceiptLinehaulManualRows();
 
     notifyReceiptLinehaulState({
         type: "linehaul-manual-entry-enabled",
@@ -453,7 +457,7 @@ function replaceReceiptLinehauls(
         );
 
     receiptLinehaulState
-        .manualEntryEnabled = false;
+        .manualEntryEnabled = true;
 
     receiptLinehaulState.linehauls =
         receivedLinehauls
@@ -536,6 +540,8 @@ function replaceReceiptLinehauls(
                 0,
             ) || null;
 
+    ensureReceiptLinehaulManualRows();
+
     notifyReceiptLinehaulState({
         type: "linehauls-replaced",
     });
@@ -617,22 +623,7 @@ function restoreReceiptLinehaulState(
         receiptLinehaulState
             .manualEntryEnabled
     ) {
-        while (
-            receiptLinehaulState
-                .linehauls
-                .length <
-            MINIMUM_RECEIPT_LINEHAUL_MANUAL_ROWS
-        ) {
-            receiptLinehaulState
-                .linehauls
-                .push(
-                    createReceiptLinehaulRecord({
-                        cpt:
-                            receiptLinehaulState
-                                .window,
-                    }),
-                );
-        }
+        ensureReceiptLinehaulManualRows();
     }
 
     notifyReceiptLinehaulState({
