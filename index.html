@@ -121,7 +121,7 @@
             .flow .mini-cards {
                 gap: 15px;
                 display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(266px, 1fr));
+                grid-template-columns: repeat(auto-fit, minmax(236px, 1fr));
             }
             .flow .mini-cards > div {
                 padding: 25px;
@@ -151,14 +151,27 @@
 
 
             .final-report-highlights {
-                flex: 0 0 378px;
+                flex: 0 0 500px;
             }
             .final-report-highlights img {
                 width: 25px;
             }
             .final-report-highlights ul {
+                display: flex;
+                row-gap: 15px;
                 padding: 25px;
                 border: 1px solid var(--color-border);
+            }
+            .final-report-highlights ul li {
+                display: flex;
+                column-gap: 10px;
+                align-items: center;
+                padding-bottom: 10px;
+                border-bottom: 1px solid var(--color-border);
+            }
+            .final-report-highlights ul li:last-of-type {
+                padding-bottom: 0;
+                border-bottom: none;
             }
 
             /* AJUSTES */
