@@ -57,15 +57,21 @@
                 flex-direction: column;
                 align-items: center;
                 justify-content: center;
-                gap: 12px;
+                gap: 11px;
                 min-width: 0;
                 padding: 25px;
                 background-color: var(--color-container);
                 border: 1px solid var(--color-border);
             }
-            #reports .cards > div > h4 {
+            #reports .cards > div > .flex-box-start {
+                align-items: center;
+                column-gap: 6px;
+            }
+            #reports .cards > div > .flex-box-start > h4 {
                 margin: 0;
-                font-size: 18px;
+            }
+            #reports .cards > div > .flex-box-start > img {
+                width: 25px;
             }
             #reports .cards > div > p {
                 font-size: 14px;
@@ -1083,7 +1089,11 @@
                                                     </div>
 
                                                     <div>
-                                                        <h4 id="receiptComparisonTopRate">—</h4>
+                                                        <div class="flex-box-start">
+                                                            <img src="images/geral-icons/alert-icon.svg">
+                                                            <h4 id="receiptComparisonTopRate">—</h4>
+                                                        </div>
+
                                                         <p class="receipt-comparison-card-label" id="receiptComparisonTopRateLabel">Maior Taxa de Erros</p>
                                                         <p id="receiptComparisonTopRateDetails">—</p>
                                                     </div>
@@ -1400,14 +1410,21 @@
 
                                                 <div class="cards">
                                                     <div>
+                                                        <div class="flex-box-start">
+                                                            <img src="images/geral-icons/star-icon.svg">
+                                                             <h4 id="expeditionTopRoutesOperator">—</h4>
+                                                        </div>
 
-                                                        <h4 id="expeditionTopRoutesOperator">—</h4>
                                                         <p>Maior Quantidade de Rotas</p>
                                                         <p id="expeditionTopRoutesDetails">0 Rotas Conferidas</p>
                                                     </div>
 
                                                     <div>
-                                                        <h4 id="expeditionFastestOperator">—</h4>
+                                                        <div class="flex-box-start">
+                                                            <img src="images/geral-icons/speed-icon.svg">
+                                                            <h4 id="expeditionFastestOperator">—</h4>
+                                                        </div>
+
                                                         <p>Conferente Mais Rápido</p>
                                                         <p id="expeditionFastestOperatorDetails">Tempo Médio: —</p>
                                                     </div>
