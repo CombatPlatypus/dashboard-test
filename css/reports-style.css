@@ -722,16 +722,15 @@
     /* RECEBIMENTO - CONTROLES */
 
     #receipt .receipt-operator-controls,
-    #reports #receipt .receipt-linehaul-controls {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-        max-height: var(
-            --receipt-operator-controls-max-height,
-            431px
-        );
+    #receipt .receipt-linehaul-controls {
         overflow-y: auto;
         padding-right: 15px;
+    }
+    #receipt .receipt-operator-controls {
+        max-height: 446px;
+    }
+    #receipt .receipt-linehaul-controls {
+        max-height: 511px;
     }
     #receipt .receipt-linehaul-controls > div {
         width: 100%;
