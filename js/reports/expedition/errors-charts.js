@@ -248,13 +248,6 @@ function createErrorBalanceChart(
                 devicePixelRatio:
                     ERROR_CHART_PIXEL_RATIO,
 
-                layout: {
-                    padding: {
-                        left: 40,
-                        right: 10,
-                    },
-                },
-
                 animation: {
                     duration: 250,
                 },
