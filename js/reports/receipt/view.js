@@ -251,6 +251,18 @@ function getReceiptElements(rootElement) {
                 "receiptOperatorControls",
             ),
 
+        viewTabs:
+            getReceiptElementById(
+                rootElement,
+                "receipt-view-tabs",
+            ),
+
+        controls:
+            getReceiptElementById(
+                rootElement,
+                "receipt-controls",
+            ),
+
         previewWindow:
             getReceiptElementById(
                 rootElement,
@@ -1137,6 +1149,94 @@ function bindReceiptOperatorControls(
         );
 }
 
+/* SINCRONIZA AS ABAS COM OS PAINÉIS DE CONTROLE */
+
+function synchronizeReceiptControlPanel(
+    elements,
+) {
+    const activeLink =
+        elements.viewTabs.querySelector(
+            ".tabs-title.is-active > a[data-controls-target]",
+        );
+
+    const controlsTarget =
+        activeLink?.dataset
+            .controlsTarget || "";
+
+    elements.controls
+        .querySelectorAll(
+            ".receipt-controls-panel",
+        )
+        .forEach(
+            function (panel) {
+                const isActive =
+                    panel.id ===
+                    controlsTarget;
+
+                panel.classList.toggle(
+                    "is-active",
+                    isActive,
+                );
+
+                panel.hidden =
+                    !isActive;
+            },
+        );
+}
+
+function initializeReceiptControlPanels(
+    elements,
+) {
+    if (
+        elements.viewTabs.dataset
+            .receiptControlsInitialized ===
+        "true"
+    ) {
+        synchronizeReceiptControlPanel(
+            elements,
+        );
+
+        return;
+    }
+
+    elements.viewTabs.dataset
+        .receiptControlsInitialized =
+            "true";
+
+    if (
+        typeof window.jQuery ===
+        "function"
+    ) {
+        window.jQuery(
+            elements.viewTabs,
+        ).on(
+            "change.zf.tabs",
+            function () {
+                synchronizeReceiptControlPanel(
+                    elements,
+                );
+            },
+        );
+    } else {
+        elements.viewTabs.addEventListener(
+            "click",
+            function () {
+                window.requestAnimationFrame(
+                    function () {
+                        synchronizeReceiptControlPanel(
+                            elements,
+                        );
+                    },
+                );
+            },
+        );
+    }
+
+    synchronizeReceiptControlPanel(
+        elements,
+    );
+}
+
 
 /* INICIALIZAÇÃO */
 
@@ -1260,6 +1360,10 @@ function initializeReceiptView(
     );
 
     bindReceiptOperatorControls(
+        elements,
+    );
+
+    initializeReceiptControlPanels(
         elements,
     );
 

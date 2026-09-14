@@ -1117,8 +1117,7 @@
 
                                 <!-- CONTROLES DO RELATÓRIO -->
 
-                                <div class="report-controls">
-
+                                <div class="report-controls" id="receipt-controls">
                                     <div class="receipt-controls-panel is-active" id="receipt-controls-1">
                                         <div class="history-link flex-box-start">
                                             <a href="https://spx.shopee.com.br/#/generalReceiveTaskMgt" target="_blank">
@@ -1185,7 +1184,7 @@
                                         </label>
                                     </div>
 
-                                    <div class="receipt-controls-panel is-active" id="receipt-controls-2">
+                                    <div class="receipt-controls-panel" id="receipt-controls-2" hidden>
                                         <div class="history-link flex-box-start">
                                             <a href="https://spx.shopee.com.br/#/hubLinehaulTrips/trip" target="_blank">
                                                 <svg class="spreadsheets-link-icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -2721,34 +2720,6 @@
         <!-- AJUSTES TABS -->
 
         <script>
-
-            // 
-
-            const receiptTabs = $("#receipt-view-tabs");
-            const receiptControls = $("#receipt-controls");
-
-            function updateReceiptontrols() {
-                const activeLink = receiptTabs.find(
-                    ".tabs-title.is-active > a"
-                );
-
-                const controlsTarget = activeLink.data("controls-target");
-
-                receiptControls
-                    .find(".receipt-controls-panel")
-                    .removeClass("is-active")
-                    .attr("hidden", true);
-
-                $("#" + controlsTarget)
-                    .addClass("is-active")
-                    .removeAttr("hidden");
-            }
-
-            receiptTabs.on("change.zf.tabs", function () {
-                updateReceiptControls();
-            });
-
-            updateReceiptControls();
 
             // AJUSTE DO TABS DE EXPEDIÇÃO
 
