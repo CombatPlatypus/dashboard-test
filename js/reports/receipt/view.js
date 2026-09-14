@@ -8,6 +8,10 @@ import {
     updateReceiptOperatorSelection,
 } from "./state.js";
 
+import {
+    resetReceiptLinehaulState,
+} from "./linehaul-state.js";
+
 /* CONFIGURAÇÕES */
 
 const MINIMUM_RECEIPT_PREVIEW_ROWS = 9;
@@ -924,6 +928,7 @@ function handleResetReceiptReport() {
     }
 
     resetReceiptReport();
+    resetReceiptLinehaulState();
 
     const mainTabLink =
         receiptPanel?.querySelector(

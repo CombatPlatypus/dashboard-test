@@ -798,11 +798,11 @@
 
                                                     <tbody>
                                                         <tr>
-                                                            <td id="">—</td>
-                                                            <td id="">—</td>
-                                                            <td id="">—</td>
-                                                            <td id="">—</td>
-                                                            <td id="">—</td>
+                                                            <td id="receiptLinehaulPreviewWindow">—</td>
+                                                            <td id="receiptLinehaulPreviewExpected">—</td>
+                                                            <td id="receiptLinehaulPreviewUnloadedVolume">—</td>
+                                                            <td id="receiptLinehaulPreviewUnloadedCount">—</td>
+                                                            <td id="receiptLinehaulPreviewReversesSent">—</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
@@ -813,18 +813,18 @@
                                                             <h4>Progresso do Descarregamento</h4>
 
                                                             <p>
-                                                                <span id="">—</span>
+                                                                <span id="receiptLinehaulProgressUnloaded">—</span>
                                                                 de
-                                                                <span id="">—</span>
+                                                                <span id="receiptLinehaulProgressExpected">—</span>
                                                                 pacotes
                                                             </p>
                                                         </div>
 
-                                                        <p class="chart-progress-percentage" id="">—</p>
+                                                        <p class="chart-progress-percentage" id="receiptLinehaulProgressPercentage">—</p>
                                                     </div>
 
-                                                    <div class="chart-progress-track" id="" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-                                                        <div class="chart-progress-fill" id=""></div>
+                                                    <div class="chart-progress-track" id="receiptLinehaulProgressBar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                                        <div class="chart-progress-fill" id="receiptLinehaulProgressFill"></div>
                                                     </div>
                                                 </div>
 
@@ -838,7 +838,7 @@
                                                         </tr>
                                                     </thead>
 
-                                                    <tbody>
+                                                    <tbody id="receiptLinehaulPreviewBody">
                                                         <tr>
                                                             <td>—</td>
                                                             <td>—</td>
@@ -1190,7 +1190,7 @@
 
                                         <div class="history-import flex-box-start">
                                             <div>
-                                                <button class="button" id="" type="button">
+                                                <button class="button" id="receiptLinehaulImportButton" type="button">
                                                     Importar Viagens de Carga
                                                 </button>
                                             </div>
@@ -1200,7 +1200,7 @@
                                             <div>
                                                 <h4>Janela</h4>
 
-                                                <select class="standard-select" id="" disabled style="width: 100%;"> 
+                                                <select class="standard-select" id="receiptLinehaulWindowInput" disabled>
                                                     <option value="AM">AM</option>
                                                     <option value="PM1">PM1</option>
                                                     <option value="PM2">PM2</option>
@@ -1210,27 +1210,26 @@
                                             <div>
                                                 <h4>Volume Esperado</h4>
 
-                                                <input id="" type="text" inputmode="numeric" maxlength="8" disabled>
+                                                <input id="receiptLinehaulExpectedInput" type="text" inputmode="numeric" maxlength="8" disabled>
                                             </div>
 
                                             <div>
                                                 <h4>Reversas Enviadas</h4>
 
-                                                <input id="" type="text" inputmode="numeric" maxlength="8" disabled>
+                                                <input id="receiptLinehaulReversesInput" type="text" inputmode="numeric" maxlength="8" disabled>
                                             </div>
                                         </div>
 
-                                        <div class="input-group" id="">
+                                        <div class="input-group receipt-linehaul-controls" id="receiptLinehaulControls">
                                             <div>
-                                                <h4>Código do 1 LH</h4>
+                                                <h4 data-receipt-linehaul-label>Código do LH 1</h4>
 
                                                 <div class="flex-box-start">
-                                                    <input type="text" autocomplete="off" disabled>
-                                                    <input type="text" maxlength="5" autocomplete="off" inputmode="numeric" pattern="[0-9]*" disabled>
-
+                                                    <input type="text" data-receipt-linehaul-field="code" autocomplete="off" readonly disabled>
+                                                    <input type="text" data-receipt-linehaul-field="loadedOrders" placeholder="Qtd" maxlength="8" autocomplete="off" inputmode="numeric" pattern="[0-9]*" readonly disabled>
 
                                                     <div class="checkbox">
-                                                        <input type="checkbox" disabled>
+                                                        <input type="checkbox" data-receipt-linehaul-selection disabled>
                                                         <label for=""></label>
                                                     </div>
                                                 </div>

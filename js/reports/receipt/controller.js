@@ -19,6 +19,21 @@ import {
 } from "./import.js";
 
 import {
+    getReceiptLinehaulState,
+    resetReceiptLinehaulState,
+    restoreReceiptLinehaulState,
+} from "./linehaul-state.js";
+
+import {
+    initializeReceiptLinehaulView,
+    renderReceiptLinehaulView,
+} from "./linehaul-view.js";
+
+import {
+    initializeReceiptLinehaulImport,
+} from "./linehaul-import.js";
+
+import {
     canExportReceiptReport,
     initializeReceiptExport,
     renderReceiptExportStatus,
@@ -45,8 +60,10 @@ function initializeReceiptController() {
 
     const initializers = [
         initializeReceiptView,
+        initializeReceiptLinehaulView,
         initializeReceiptCharts,
         initializeReceiptImport,
+        initializeReceiptLinehaulImport,
         initializeReceiptExport,
     ];
 
@@ -78,20 +95,33 @@ function renderReceiptController() {
     const state =
         getReceiptState();
 
-    const rendered =
+    const receiptRendered =
         renderReceiptView(
             state,
+        );
+
+    const linehaulRendered =
+        renderReceiptLinehaulView(
+            getReceiptLinehaulState(),
         );
 
     renderReceiptExportStatus(
         state,
     );
 
-    return rendered;
+    return receiptRendered &&
+        linehaulRendered;
 }
 
 function resetReceiptController() {
-    return resetReceiptReport();
+    const receiptReset =
+        resetReceiptReport();
+
+    const linehaulReset =
+        resetReceiptLinehaulState();
+
+    return receiptReset &&
+        linehaulReset;
 }
 
 function importReceiptData(data) {
@@ -112,7 +142,11 @@ function importReceiptData(data) {
 }
 
 function exportReceiptSession() {
-    return getReceiptState();
+    return {
+        ...getReceiptState(),
+        linehaul:
+            getReceiptLinehaulState(),
+    };
 }
 
 function importReceiptSession(
@@ -123,7 +157,15 @@ function importReceiptSession(
             sessionState,
         );
 
-    if (!imported) {
+    const linehaulImported =
+        restoreReceiptLinehaulState(
+            sessionState?.linehaul ?? {},
+        );
+
+    if (
+        !imported ||
+        !linehaulImported
+    ) {
         throw new TypeError(
             "Os dados da sessão do processamento são inválidos.",
         );
