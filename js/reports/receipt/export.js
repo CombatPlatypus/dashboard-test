@@ -4,6 +4,11 @@ import {
 } from "./state.js";
 
 import {
+    getReceiptLinehaulState,
+    subscribeReceiptLinehaulState,
+} from "./linehaul-state.js";
+
+import {
     createReportImageBlob,
     copyReportBlob,
     downloadReportBlob,
@@ -103,6 +108,34 @@ function canExportReceiptReport(
 
 /* ATUALIZA O RODAPÉ */
 
+function renderReceiptClearStatus(
+    state,
+    linehaulState =
+        getReceiptLinehaulState(),
+) {
+    const hasReceiptData =
+        Array.isArray(
+            state.operators,
+        ) &&
+        state.operators.length > 0;
+
+    const hasLinehaulData =
+        Array.isArray(
+            linehaulState.linehauls,
+        ) &&
+        linehaulState.linehauls.length >
+            0;
+
+    receiptExportElements
+        .clearButton
+        .disabled =
+            receiptExportBusy ||
+            !(
+                hasReceiptData ||
+                hasLinehaulData
+            );
+}
+
 function renderReceiptExportStatus(
     state,
 ) {
@@ -114,11 +147,9 @@ function renderReceiptExportStatus(
     const canExport =
         pendingMessage === "";
 
-    receiptExportElements
-        .clearButton
-        .disabled =
-            receiptExportBusy ||
-            state.operators.length === 0;
+    renderReceiptClearStatus(
+        state,
+    );
             
     receiptExportElements
         .copyButton
@@ -732,6 +763,15 @@ function initializeReceiptExport(
 
             renderReceiptExportStatus(
                 state,
+            );
+        },
+    );
+
+    subscribeReceiptLinehaulState(
+        function (linehaulState) {
+            renderReceiptClearStatus(
+                getReceiptState(),
+                linehaulState,
             );
         },
     );
