@@ -181,6 +181,9 @@ const lossesRateCompositionLabelsPlugin = {
         context.textBaseline =
             "middle";
 
+        context.textAlign =
+            "center";
+
         context.lineWidth =
             3;
 
@@ -214,19 +217,11 @@ const lossesRateCompositionLabelsPlugin = {
                     ) /
                     2;
 
-                const smallSlice =
-                    arc.circumference <
-                    0.4;
-
                 const radius =
-                    smallSlice
-                        ? arc.outerRadius + 16
-                        : arc.innerRadius +
-                          (
-                              arc.outerRadius -
-                              arc.innerRadius
-                          ) *
-                              0.55;
+                    (
+                        arc.innerRadius +
+                        arc.outerRadius
+                    ) / 2;
 
                 const positionX =
                     arc.x +
@@ -243,46 +238,6 @@ const lossesRateCompositionLabelsPlugin = {
                         value /
                             total,
                     );
-
-                if (smallSlice) {
-                    const edgeX =
-                        arc.x +
-                        Math.cos(angle) *
-                            arc.outerRadius;
-
-                    const edgeY =
-                        arc.y +
-                        Math.sin(angle) *
-                            arc.outerRadius;
-
-                    context.beginPath();
-
-                    context.moveTo(
-                        edgeX,
-                        edgeY,
-                    );
-
-                    context.lineTo(
-                        positionX,
-                        positionY,
-                    );
-
-                    context.strokeStyle =
-                        "#8a8d91";
-
-                    context.lineWidth =
-                        1;
-
-                    context.stroke();
-
-                    context.textAlign =
-                        Math.cos(angle) >= 0
-                            ? "left"
-                            : "right";
-                } else {
-                    context.textAlign =
-                        "center";
-                }
 
                 context.lineWidth =
                     3;
@@ -592,6 +547,7 @@ function createLossesRateCompositionChart(
                 plugins: {
                     legend: {
                         position: "bottom",
+                        onClick: null,
 
                         labels: {
                             color: "#e4e6eb",
