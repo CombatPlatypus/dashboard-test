@@ -724,7 +724,7 @@
         gap: 15px;
         max-height: var(
             --receipt-operator-controls-max-height,
-            446px
+            431px
         );
         overflow-y: auto;
         padding-right: 15px;
