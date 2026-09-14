@@ -76,9 +76,20 @@
             
             .final-report-flow {
                 flex: 1 1 0;
+            }
+            .final-report-flow .flow {
                 min-height: 300px;
                 padding: 25px;
                 border: 1px solid var(--color-border);
+            }
+            .final-report-flow .title h4 {
+                padding: 0.5rem 0.625rem 0.625rem;
+                letter-spacing: 1.5px;
+                font-size: 15px;
+                background-color: var(--color-table-th);
+                border-right: 1px solid var(--color-border);
+                border-left: 1px solid var(--color-border);
+                border-top: 1px solid var(--color-border);
             }
 
             /*  */
@@ -96,8 +107,24 @@
                 position: relative;
                 padding: 15px;
                 border: 1px solid var(--color-border);
+                margin-top: 15px;
             }
 
+
+            .flow .mini-cards {
+                gap: 15px;
+                padding: 25px;
+                border: 1px solid var(--color-border);
+            }
+            .flow .mini-cards img {
+                width: 35px;
+            }
+            .flow .mini-cards h4 {
+                margin: 0;
+            }
+            .flow .mini-cards h3 {
+                margin: 0;
+            }
 
             /* AJUSTES */
 
@@ -1836,11 +1863,58 @@
 
                                     <!-- FLUXO DO DIA E DASTAQUES DA OPERAÇÃO -->
 
-                                    <div class="flex-box-start">
-                                        <div class="final-report-flow"></div>
-                                        <div class="final-report-highlights"></div>
+                                    <div class="final-report-flow">
+                                        <div class="title">
+                                            <h4>Fluxo do Dia</h4>
+                                        </div>
+
+                                        <div class="flow">
+                                            <div class="mini-cards">
+                                                
+                                                <div class="flex-box-start">
+                                                    <img src="images/geral-icons/clipboard-icon.svg">
+
+                                                    <div>
+                                                        <h4>Planejado</h4>
+                                                        <h3>-</h3>
+                                                    </div>
+                                                </div>
+
+                                                <div class="flex-box-start">
+                                                    <img src="images/geral-icons/box-icon.svg">
+
+                                                    <div>
+                                                        <h4>Processado</h4>
+                                                        <h3>-</h3>
+                                                    </div>
+                                                </div>
+
+                                                <div class="flex-box-start">
+                                                    <img src="images/geral-icons/success-icon.svg">
+
+                                                    <div>
+                                                        <h4>Expedido</h4>
+                                                        <h3>-</h3>
+                                                    </div>
+                                                </div>
+
+                                                <div class="flex-box-start">
+                                                    <img src="images/geral-icons/forklift-icon.svg">
+
+                                                    <div>
+                                                        <h4>No Piso</h4>
+                                                        <h3>-</h3>
+                                                    </div>
+                                                </div>
+                                 
+                                            </div>
+
+                                            <div class="dashed-border"></div>
+
+                                            <h5 id="">- Pacotes Abaixo do Planejado</h5>
+                                        </div>
                                     </div>
-                                    
+
                                     <!-- RECEBIMENTO E EXPEDIÇÃO -->
 
                                     <div class="final-report-receipt-and-expedition flex-box-start">
