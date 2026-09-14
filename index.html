@@ -157,9 +157,11 @@
             }
             .final-report-highlights ul {
                 display: flex;
-                row-gap: 15px;
+                min-height: 237px;
+                row-gap: 17px;
                 padding: 25px;
                 border: 1px solid var(--color-border);
+                flex-direction: column;
             }
             .final-report-highlights ul li {
                 display: flex;
@@ -171,6 +173,9 @@
             .final-report-highlights ul li:last-of-type {
                 padding-bottom: 0;
                 border-bottom: none;
+            }
+            .final-report-highlights ul li h5 {
+                margin: 0;
             }
 
             /* AJUSTES */
@@ -1913,7 +1918,7 @@
                                     <div class="flex-box-start" style="column-gap: 15px;">
                                         <div class="final-report-flow">
                                             <div class="final-report-title">
-                                                <h4>Fluxo do Dia</h4>
+                                                <h4>Fluxo da Janela</h4>
                                             </div>
 
                                             <div class="flow">
@@ -1963,7 +1968,7 @@
 
                                         <div class="final-report-highlights">
                                             <div class="final-report-title">
-                                                <h4>Destaques do Janela</h4>
+                                                <h4>Destaques da Janela</h4>
                                             </div>
 
                                             <ul>
@@ -2058,8 +2063,80 @@
                                     <!-- AVARIAS E PERDAS -->
 
                                     <div class="final-report-damage-and-lost">
-                                        <div class="final-report-damage"></div>
-                                        <div class="final-report-lost"></div>
+                                        <div class="final-report-damage">
+
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Ocorrência</th>
+                                                <th scope="col">Hoje</th>
+                                                <th scope="col">Ontem</th>
+                                                <th scope="col">Anteontem</th>
+                                                <th scope="col">Dê 3 a 7<br>Dias Atrás</th>
+                                                <th scope="col">Dê 8 a 14<br>Dias Atrás</th>
+                                                <th scope="col">Dê 15 Dias<br>Em Diante</th>
+                                                <th scope="col">Total</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            <tr>
+                                                <th scope="row">Recebida</th>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                            </tr>
+                                        </tbody>
+
+                                        <tbody>
+                                            <tr>
+                                                <th scope="row">Não Recebida</th>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                            </tr>
+                                        </tbody>
+
+                                        <tbody>
+                                            <tr>
+                                                <th scope="row">Pacotes Salvos <br> Aguardando Ticket</th>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                            </tr>
+                                        </tbody>
+
+                                        <tbody>
+                                            <tr>
+                                                <th scope="row">Pacotes Vazios <br> Aguardando Ticket</th>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                        </div>
+
+                                        <div class="final-report-lost">
+
+                                        </div>
                                     </div>
 
                                     <!-- DESVISOS -->
