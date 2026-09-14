@@ -790,7 +790,7 @@ function parseReceiptLinehaulSpXPlainText(
                         ),
 
                     loadedOrders:
-                        getReceiptLinehaulPlainLoadedOrders(
+                        getSpXLinehaulPlainLoadedOrders(
                             values,
                         ),
 

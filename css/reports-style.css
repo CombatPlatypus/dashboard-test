@@ -878,7 +878,7 @@
     }
     #expedition #expeditionOperatorControls {
         grid-template-columns: repeat(auto-fit, minmax(100%, 1fr)) !important;
-        height: 1192px;
+        height: 1187px;
         overflow: auto;
         padding-right: 15px;
     }
