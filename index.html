@@ -68,10 +68,26 @@
                 min-width: 0;
                 min-height: 125px;
                 padding: 25px;
-                background-color: var(--color-container);
                 border: 1px solid var(--color-border);
             }
+
+            /*  */
             
+            .final-report-flow {
+                flex: 1 1 0;
+                min-height: 300px;
+                padding: 25px;
+                border: 1px solid var(--color-border);
+            }
+
+            /*  */
+
+            .final-report-receipt-and-expedition {
+                gap: 15px;
+            }
+            .final-report-receipt-and-expedition > div {
+                flex: 1 1 0;
+            }
 
 
             /* AJUSTES */
@@ -1797,7 +1813,7 @@
                                             <p id="">Dia 14 / 09 / 2026 - Segunda Feira</p>
                                         </div>
 
-                                       <p>Janela do <span id="">PM 2</span> - Analista: <span id="">Lucas Campos Junqueira</span></p>
+                                       <p>Janela do <span id="">PM 2</span> - Analista do Turno: <span id="">Lucas Campos</span></p>
                                     </div>
 
                                     <!-- CARDS -->
@@ -1822,6 +1838,8 @@
                                         <div class="final-report-receipt">
 
                                             <table>
+                                                <caption>Processamento</caption>
+
                                                 <thead>
                                                     <tr>
                                                         <th>Volume Esperado</th>
@@ -1846,12 +1864,14 @@
                                         <div class="final-report-expedition">
 
                                             <table>
+                                                <caption>Expedição</caption>
+
                                                 <thead>
                                                     <tr>
-                                                        <th>Volume Esperado</th>
-                                                        <th>Volume Recebido</th>
-                                                        <th>Total de Erros</th>
-                                                        <th>Taxa de Erros</th>
+                                                        <th>Rotas Conferidas</th>
+                                                        <th>Volume Conferido</th>
+                                                        <th>Volume no Piso</th>
+                                                        <th>Tempo de Expedição</th>
                                                     </tr>
                                                 </thead>
 
