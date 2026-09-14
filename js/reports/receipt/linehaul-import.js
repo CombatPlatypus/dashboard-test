@@ -137,19 +137,6 @@ function getReceiptLinehaulLoadedOrders(
     values,
 ) {
     for (const value of values) {
-        const fractionMatch =
-            String(value).match(
-                /\b\d+\s*\/\s*(\d+)\b/,
-            );
-
-        if (fractionMatch) {
-            return Number(
-                fractionMatch[1],
-            );
-        }
-    }
-
-    for (const value of values) {
         const quantity =
             parseReceiptLinehaulImportQuantity(
                 value,
@@ -388,7 +375,6 @@ function getReceiptLinehaulColumns(
                 [
                     "pedido carregado",
                     "pedidos carregados",
-                    "inbound",
                 ],
             ),
 
@@ -661,19 +647,26 @@ function parseReceiptLinehaulSpXPlainText(
         normalizedText.includes(
             "cpt",
         ) &&
-        (
-            normalizedText.includes(
-                "pedido carregado",
-            ) ||
-            normalizedText.includes(
-                "inbound",
-            )
+        normalizedText.includes(
+            "pedido carregado",
         ) &&
         normalizedText.includes(
             "placa do veiculo",
         );
 
     if (!hasRequiredHeadings) {
+        return [];
+    }
+
+    const hasAmbiguousVolumeColumns =
+        normalizedText.includes(
+            "inbound",
+        ) ||
+        normalizedText.includes(
+            "to carregado",
+        );
+
+    if (hasAmbiguousVolumeColumns) {
         return [];
     }
 
