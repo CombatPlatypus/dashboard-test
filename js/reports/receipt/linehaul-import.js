@@ -150,6 +150,101 @@ function getReceiptLinehaulLoadedOrders(
     return null;
 }
 
+function getReceiptLinehaulPlainLoadedOrders(
+    values,
+) {
+    const dateTimePattern =
+        /^\d{2}-\d{2}-\d{4}\s+\d{2}:\d{2}:\d{2}$/;
+
+    let lastDateTimeIndex = -1;
+
+    values.forEach(
+        function (
+            value,
+            index,
+        ) {
+            if (
+                dateTimePattern.test(
+                    value,
+                )
+            ) {
+                lastDateTimeIndex =
+                    index;
+            }
+        },
+    );
+
+    if (lastDateTimeIndex !== -1) {
+        const quantities =
+            values
+                .slice(
+                    lastDateTimeIndex + 1,
+                )
+                .map(
+                    parseReceiptLinehaulImportQuantity,
+                )
+                .filter(
+                    function (value) {
+                        return value !== null;
+                    },
+                );
+
+        if (quantities.length >= 2) {
+            return quantities[1];
+        }
+    }
+
+    const numericValues =
+        values.map(
+            parseReceiptLinehaulImportQuantity,
+        );
+
+    for (
+        let firstIndex = 0;
+        firstIndex <
+            numericValues.length - 1;
+        firstIndex += 1
+    ) {
+        const firstValue =
+            numericValues[
+                firstIndex
+            ];
+
+        const secondValue =
+            numericValues[
+                firstIndex + 1
+            ];
+
+        if (
+            firstValue === null ||
+            secondValue === null
+        ) {
+            continue;
+        }
+
+        for (
+            let repeatedIndex =
+                firstIndex + 2;
+            repeatedIndex <
+                numericValues.length - 1;
+            repeatedIndex += 1
+        ) {
+            if (
+                numericValues[
+                    repeatedIndex
+                ] === firstValue &&
+                numericValues[
+                    repeatedIndex + 1
+                ] === secondValue
+            ) {
+                return secondValue;
+            }
+        }
+    }
+
+    return null;
+}
+
 function getReceiptLinehaulCpt(
     values,
 ) {
@@ -658,18 +753,6 @@ function parseReceiptLinehaulSpXPlainText(
         return [];
     }
 
-    const hasAmbiguousVolumeColumns =
-        normalizedText.includes(
-            "inbound",
-        ) ||
-        normalizedText.includes(
-            "to carregado",
-        );
-
-    if (hasAmbiguousVolumeColumns) {
-        return [];
-    }
-
     const recordStarts = [];
 
     normalizedLines.forEach(
@@ -725,7 +808,7 @@ function parseReceiptLinehaulSpXPlainText(
                         ),
 
                     loadedOrders:
-                        getReceiptLinehaulLoadedOrders(
+                        getReceiptLinehaulPlainLoadedOrders(
                             values,
                         ),
 
