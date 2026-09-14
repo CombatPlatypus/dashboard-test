@@ -36,7 +36,6 @@
             #heat-map .tabs {
                 grid-template-columns: repeat(auto-fit, minmax(254px, 1fr));
             }
-
             #heat-map table tr th:first-of-type {
                 width: 180px;
             }
@@ -192,6 +191,12 @@
                 inset: 0 auto 0 0;
                 width: 0;
                 background-color: #4CAF50;
+            }
+
+            /* AJUSTES */
+
+            #expedition #expedition-charts .charts > div {
+                min-height: 1216px;
             }
 
         </style>
@@ -833,6 +838,7 @@
                                                         <tr>
                                                             <th>LH Descarregado</th>
                                                             <th>Volume Descarregado</th>
+                                                            <th>Origem</th>
                                                             <th>CPT</th>
                                                             <th>Placa do Veículo </th>
                                                         </tr>
@@ -844,6 +850,7 @@
                                                             <td>—</td>
                                                             <td>—</td>
                                                             <td>—</td>
+                                                            <td>—</td>
                                                         </tr>
                                                         
                                                         <tr>
@@ -851,23 +858,11 @@
                                                             <td>—</td>
                                                             <td>—</td>
                                                             <td>—</td>
-                                                        </tr>
-
-                                                        <tr>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
                                                             <td>—</td>
                                                         </tr>
 
                                                         <tr>
                                                             <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                        </tr>
-
-                                                        <tr>
                                                             <td>—</td>
                                                             <td>—</td>
                                                             <td>—</td>
@@ -879,12 +874,6 @@
                                                             <td>—</td>
                                                             <td>—</td>
                                                             <td>—</td>
-                                                        </tr>
-
-                                                        <tr>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
                                                             <td>—</td>
                                                         </tr>
 
@@ -893,9 +882,35 @@
                                                             <td>—</td>
                                                             <td>—</td>
                                                             <td>—</td>
+                                                            <td>—</td>
                                                         </tr>
 
                                                         <tr>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>—</td>
                                                             <td>—</td>
                                                             <td>—</td>
                                                             <td>—</td>
@@ -1244,7 +1259,7 @@
 
                         <div class="tabs-panel" id="expedition">
 
-                            <!-- HEADER -->
+                            <!-- TABS DO RELATÓRIO -->
 
                             <ul class="tabs flex-box-start" data-tabs id="expedition-view-tabs">
                                 <li class="tabs-title is-active">
@@ -1272,7 +1287,7 @@
                                 </li>
                             </ul> 
                             
-                            <!-- CONTEÚDO -->
+                            <!-- CONTEÚDO DO RELATÓRIO -->
 
                             <div class="flex-box-start">
 
@@ -1280,6 +1295,8 @@
 
                                 <div class="preview" id="expeditionSheetPreview">
                                     <div class="tabs-content" data-tabs-content="expedition-view-tabs">
+
+                                        <!-- RESUMO DA EXPEDIÇÃO -->
 
                                         <div class="tabs-panel is-active" id="expedition-tables">
                                             <div class="preview-style" id="expeditionReportExportArea">
@@ -1366,6 +1383,8 @@
                                             </div>
                                         </div>
 
+                                        <!-- RANK DE CONFERENTES -->
+
                                         <div class="tabs-panel" id="expedition-charts">
                                             <div class="preview-style" id="expeditionChartsExportArea">
                                                 <div class="title">
@@ -1374,31 +1393,20 @@
 
                                                 <div class="cards">
                                                     <div>
+
+                                                        <h4 id="expeditionTopRoutesOperator">—</h4>
                                                         <p>Maior Quantidade de Rotas</p>
-
-                                                        <h4 id="expeditionTopRoutesOperator">
-                                                            —
-                                                        </h4>
-
-                                                        <p id="expeditionTopRoutesDetails">
-                                                            0 Rotas Conferidas
-                                                        </p>
+                                                        <p id="expeditionTopRoutesDetails">0 Rotas Conferidas</p>
                                                     </div>
 
                                                     <div>
+                                                        <h4 id="expeditionFastestOperator">—</h4>
                                                         <p>Conferente Mais Rápido</p>
-
-                                                        <h4 id="expeditionFastestOperator">
-                                                            —
-                                                        </h4>
-
-                                                        <p id="expeditionFastestOperatorDetails">
-                                                            Tempo Médio: —
-                                                        </p>
+                                                        <p id="expeditionFastestOperatorDetails">Tempo Médio: —</p>
                                                     </div>
                                                 </div>
 
-                                                <div class="charts">
+                                                <div class="two-horizontal-bars-chart">
                                                     <div>
                                                         <h3>Rotas Conferidas por Conferente</h3>
                                                         <p>Distribuição das rotas conferidas.</p>
@@ -1419,6 +1427,8 @@
                                                 </div>
                                             </div>
                                         </div>
+
+                                        <!-- ANÁLISE DE ERROS -->
 
                                         <div class="tabs-panel" id="expedition-mistakes">
                                             <div class="preview-style" id="expeditionMistakesExportArea">
@@ -1496,6 +1506,8 @@
                                                 </div>
                                             </div>
                                         </div>
+
+                                        <!-- ANÁLISE DE RUAS -->
 
                                          <div class="tabs-panel" id="expedition-streets">
                                             <div class="preview-style" id="expeditionStreetsExportArea">
@@ -2699,6 +2711,28 @@
                 </button>
 
                 <button class="button" id="planningImportWindowConfirm">
+                    Importar Janela
+                </button>
+            </div>
+        </div>
+
+        <!-- REVEAL - SELEÇÃO DA JANELA DOS DESCARREGAMENTOS -->
+
+        <div class="reveal tiny" id="receiptLinehaulImportWindowModal" data-reveal data-close-on-click="false" aria-labelledby="receiptLinehaulImportWindowTitle">
+            <h3 id="receiptLinehaulImportWindowTitle">Escolha os Descarregamentos</h3>
+
+            <p id="receiptLinehaulImportWindowDescription">
+                Escolha a janela que será importada para os descarregamentos.
+            </p>
+
+            <div id="receiptLinehaulImportWindowOptions"></div>
+
+            <div class="flex-box-center">
+                <button class="button" id="receiptLinehaulImportWindowCancel">
+                    Cancelar
+                </button>
+
+                <button class="button" id="receiptLinehaulImportWindowConfirm">
                     Importar Janela
                 </button>
             </div>

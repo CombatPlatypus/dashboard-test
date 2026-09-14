@@ -3,6 +3,7 @@ import {
     getReceiptLinehaulSummary,
     subscribeReceiptLinehaulState,
     updateReceiptLinehaulField,
+    updateReceiptLinehaulRecord,
     updateReceiptLinehaulSelection,
 } from "./linehaul-state.js";
 
@@ -214,6 +215,7 @@ function createReceiptLinehaulControl(
     template,
     linehaul,
     position,
+    manualEntryEnabled,
 ) {
     const row =
         template.cloneNode(
@@ -239,7 +241,8 @@ function createReceiptLinehaulControl(
     );
 
     inputs.code.disabled = false;
-    inputs.code.readOnly = true;
+    inputs.code.readOnly =
+        !manualEntryEnabled;
     inputs.code.title =
         linehaul.code;
 
@@ -252,7 +255,7 @@ function createReceiptLinehaulControl(
         false;
 
     inputs.loadedOrders.readOnly =
-        true;
+        !manualEntryEnabled;
 
     const selectionId =
         `receiptLinehaulSelection${linehaul.id}`;
@@ -325,19 +328,25 @@ function createEmptyReceiptLinehaulControl(
 
 function getReceiptLinehaulStructureSignature(
     linehauls,
+    manualEntryEnabled,
 ) {
     return JSON.stringify(
-        linehauls.map(
-            function (linehaul) {
-                return linehaul.id;
-            },
-        ),
+        {
+            manualEntryEnabled,
+            ids:
+                linehauls.map(
+                    function (linehaul) {
+                        return linehaul.id;
+                    },
+                ),
+        },
     );
 }
 
 function synchronizeReceiptLinehaulControls(
     elements,
     linehauls,
+    manualEntryEnabled,
 ) {
     linehauls.forEach(
         function (linehaul) {
@@ -366,6 +375,12 @@ function synchronizeReceiptLinehaulControls(
                 linehaul.loadedOrders,
             );
 
+            inputs.code.readOnly =
+                !manualEntryEnabled;
+
+            inputs.loadedOrders.readOnly =
+                !manualEntryEnabled;
+
             inputs.selection.checked =
                 linehaul.selected === true;
         },
@@ -376,10 +391,12 @@ function renderReceiptLinehaulControls(
     elements,
     template,
     linehauls,
+    manualEntryEnabled,
 ) {
     const signature =
         getReceiptLinehaulStructureSignature(
             linehauls,
+            manualEntryEnabled,
         );
 
     if (
@@ -389,6 +406,7 @@ function renderReceiptLinehaulControls(
         synchronizeReceiptLinehaulControls(
             elements,
             linehauls,
+            manualEntryEnabled,
         );
 
         return;
@@ -421,6 +439,7 @@ function renderReceiptLinehaulControls(
                     template,
                     linehaul,
                     index + 1,
+                    manualEntryEnabled,
                 )
                 : createEmptyReceiptLinehaulControl(
                     template,
@@ -465,6 +484,10 @@ function createReceiptLinehaulPreviewRow(
             formatReceiptLinehaulQuantity(
                 linehaul?.loadedOrders,
             ),
+        ),
+
+        createReceiptLinehaulPreviewCell(
+            linehaul?.origin,
         ),
 
         createReceiptLinehaulPreviewCell(
@@ -696,6 +719,8 @@ function renderReceiptLinehaulView(
         receiptLinehaulElements,
         receiptLinehaulTemplate,
         state.linehauls,
+        state.manualEntryEnabled ===
+            true,
     );
 
     renderReceiptLinehaulPreview(
@@ -774,6 +799,62 @@ function bindReceiptLinehaulInputs(
                 sanitizeReceiptLinehaulInput(
                     elements.reversesInput,
                 ),
+            );
+        },
+    );
+
+    elements.controls.addEventListener(
+        "input",
+        function (event) {
+            const input =
+                event.target.closest(
+                    "[data-receipt-linehaul-field]",
+                );
+
+            if (
+                !(
+                    input instanceof
+                    HTMLInputElement
+                ) ||
+                input.readOnly
+            ) {
+                return;
+            }
+
+            const row =
+                input.closest(
+                    "[data-receipt-linehaul-id]",
+                );
+
+            const linehaulId =
+                Number(
+                    row?.dataset
+                        .receiptLinehaulId,
+                );
+
+            if (
+                !Number.isInteger(
+                    linehaulId,
+                )
+            ) {
+                return;
+            }
+
+            const field =
+                input.dataset
+                    .receiptLinehaulField;
+
+            const value =
+                field === "loadedOrders"
+                    ? sanitizeReceiptLinehaulInput(
+                        input,
+                    )
+                    : input.value;
+
+            updateReceiptLinehaulRecord(
+                linehaulId,
+                field,
+                value,
             );
         },
     );

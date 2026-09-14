@@ -8,6 +8,9 @@ const receiptLinehaulWindows =
         "PM2",
     ]);
 
+const MINIMUM_RECEIPT_LINEHAUL_MANUAL_ROWS =
+    9;
+
 let nextReceiptLinehaulId = 1;
 
 function normalizeReceiptLinehaulText(
@@ -92,6 +95,11 @@ function createReceiptLinehaulRecord(
                 values.code,
             ),
 
+        origin:
+            normalizeReceiptLinehaulText(
+                values.origin,
+            ),
+
         cpt:
             normalizeReceiptLinehaulText(
                 values.cpt,
@@ -117,6 +125,7 @@ const receiptLinehaulState = {
     expectedVolume: null,
     reversesSent: null,
     linehauls: [],
+    manualEntryEnabled: false,
 };
 
 function getReceiptLinehaulState() {
@@ -131,6 +140,10 @@ function getReceiptLinehaulState() {
         reversesSent:
             receiptLinehaulState
                 .reversesSent,
+
+        manualEntryEnabled:
+            receiptLinehaulState
+                .manualEntryEnabled,
 
         linehauls:
             receiptLinehaulState
@@ -165,6 +178,8 @@ function getReceiptLinehaulSummary(
 
     return {
         hasData:
+            state.manualEntryEnabled ===
+                true ||
             linehauls.length > 0,
 
         selectedLinehauls,
@@ -262,9 +277,112 @@ function updateReceiptLinehaulField(
     receiptLinehaulState[field] =
         normalizedValue;
 
+    if (
+        field === "window" &&
+        receiptLinehaulState
+            .manualEntryEnabled
+    ) {
+        receiptLinehaulState
+            .linehauls
+            .forEach(
+                function (linehaul) {
+                    linehaul.cpt =
+                        normalizedValue;
+                },
+            );
+    }
+
     notifyReceiptLinehaulState({
         type: "linehaul-field-updated",
         field,
+    });
+
+    return true;
+}
+
+function updateReceiptLinehaulRecord(
+    linehaulId,
+    field,
+    value,
+) {
+    if (
+        !receiptLinehaulState
+            .manualEntryEnabled
+    ) {
+        return false;
+    }
+
+    const linehaul =
+        receiptLinehaulState
+            .linehauls
+            .find(
+                function (currentLinehaul) {
+                    return currentLinehaul.id ===
+                        linehaulId;
+                },
+            );
+
+    if (!linehaul) {
+        return false;
+    }
+
+    let normalizedValue;
+
+    if (field === "code") {
+        normalizedValue =
+            createReceiptLinehaulKey(
+                value,
+            );
+    } else if (field === "loadedOrders") {
+        normalizedValue =
+            normalizeReceiptLinehaulQuantity(
+                value,
+            );
+    } else {
+        return false;
+    }
+
+    if (
+        linehaul[field] ===
+        normalizedValue
+    ) {
+        return true;
+    }
+
+    linehaul[field] = normalizedValue;
+
+    notifyReceiptLinehaulState({
+        type: "linehaul-record-updated",
+        linehaulId,
+        field,
+    });
+
+    return true;
+}
+
+function enableReceiptLinehaulManualEntry() {
+    receiptLinehaulState
+        .manualEntryEnabled = true;
+
+    while (
+        receiptLinehaulState
+            .linehauls
+            .length <
+        MINIMUM_RECEIPT_LINEHAUL_MANUAL_ROWS
+    ) {
+        receiptLinehaulState
+            .linehauls
+            .push(
+                createReceiptLinehaulRecord({
+                    cpt:
+                        receiptLinehaulState
+                            .window,
+                }),
+            );
+    }
+
+    notifyReceiptLinehaulState({
+        type: "linehaul-manual-entry-enabled",
     });
 
     return true;
@@ -333,6 +451,9 @@ function replaceReceiptLinehauls(
                     },
                 ),
         );
+
+    receiptLinehaulState
+        .manualEntryEnabled = false;
 
     receiptLinehaulState.linehauls =
         receivedLinehauls
@@ -427,6 +548,8 @@ function resetReceiptLinehaulState() {
     receiptLinehaulState.expectedVolume = null;
     receiptLinehaulState.reversesSent = null;
     receiptLinehaulState.linehauls = [];
+    receiptLinehaulState.manualEntryEnabled =
+        false;
     nextReceiptLinehaulId = 1;
 
     notifyReceiptLinehaulState({
@@ -461,6 +584,10 @@ function restoreReceiptLinehaulState(
             receivedState.reversesSent,
         );
 
+    receiptLinehaulState.manualEntryEnabled =
+        receivedState.manualEntryEnabled ===
+            true;
+
     nextReceiptLinehaulId = 1;
 
     receiptLinehaulState.linehauls =
@@ -476,11 +603,37 @@ function restoreReceiptLinehaulState(
             )
             .filter(
                 function (linehaul) {
-                    return Boolean(
-                        linehaul.code,
+                    return (
+                        receiptLinehaulState
+                            .manualEntryEnabled ||
+                        Boolean(
+                            linehaul.code,
+                        )
                     );
                 },
             );
+
+    if (
+        receiptLinehaulState
+            .manualEntryEnabled
+    ) {
+        while (
+            receiptLinehaulState
+                .linehauls
+                .length <
+            MINIMUM_RECEIPT_LINEHAUL_MANUAL_ROWS
+        ) {
+            receiptLinehaulState
+                .linehauls
+                .push(
+                    createReceiptLinehaulRecord({
+                        cpt:
+                            receiptLinehaulState
+                                .window,
+                    }),
+                );
+        }
+    }
 
     notifyReceiptLinehaulState({
         type: "linehaul-session-imported",
@@ -490,6 +643,7 @@ function restoreReceiptLinehaulState(
 }
 
 export {
+    enableReceiptLinehaulManualEntry,
     getReceiptLinehaulState,
     getReceiptLinehaulSummary,
     replaceReceiptLinehauls,
@@ -497,5 +651,6 @@ export {
     restoreReceiptLinehaulState,
     subscribeReceiptLinehaulState,
     updateReceiptLinehaulField,
+    updateReceiptLinehaulRecord,
     updateReceiptLinehaulSelection,
 };

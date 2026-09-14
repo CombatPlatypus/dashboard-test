@@ -1,7 +1,13 @@
 import {
+    enableReceiptLinehaulManualEntry,
     getReceiptLinehaulState,
     replaceReceiptLinehauls,
 } from "./linehaul-state.js";
+
+import {
+    createSpXLinehaulWindowCandidates,
+    formatSpXLinehaulOrigin,
+} from "../core/spx-linehaul-rules.js";
 
 const RECEIPT_LINEHAUL_IMPORT_BUTTON_ID =
     "receiptLinehaulImportButton";
@@ -11,6 +17,9 @@ const RECEIPT_LINEHAUL_IMPORT_DEFAULT_TEXT =
 
 const RECEIPT_LINEHAUL_IMPORT_FEEDBACK_DURATION =
     3000;
+
+const RECEIPT_LINEHAUL_IMPORT_EXPECTED_MAXIMUM =
+    8;
 
 const RECEIPT_LINEHAUL_CODE_PATTERN =
     /\bLT[A-Z0-9]{8,24}\b/i;
@@ -458,10 +467,22 @@ function getReceiptLinehaulColumns(
                 ["numero do lh"],
             ),
 
+        origin:
+            findReceiptLinehaulColumn(
+                normalizedRow,
+                ["station"],
+            ),
+
         cpt:
             findReceiptLinehaulColumn(
                 normalizedRow,
                 ["cpt"],
+            ),
+
+        punctuality:
+            findReceiptLinehaulColumn(
+                normalizedRow,
+                ["indicador de pontualidade"],
             ),
 
         loadedOrders:
@@ -494,13 +515,49 @@ function getReceiptLinehaulColumns(
 function createReceiptLinehaulRecord(
     receivedRecord,
 ) {
+    const origin =
+        formatSpXLinehaulOrigin(
+            receivedRecord.origin
+                .flatMap(
+                    splitReceiptLinehaulImportValues,
+                )
+                .find(
+                    function (value) {
+                        return value !== "-";
+                    },
+                ) || "",
+        );
+
+    const cpt =
+        getReceiptLinehaulCpt(
+            receivedRecord.cpt,
+        );
+
+    const punctualityValues =
+        receivedRecord.punctuality
+            .flatMap(
+                splitReceiptLinehaulImportValues,
+            );
+
     return {
         code:
             receivedRecord.code,
 
-        cpt:
-            getReceiptLinehaulCpt(
-                receivedRecord.cpt,
+        origin,
+
+        cpt,
+
+        window: cpt,
+
+        waiting:
+            punctualityValues.some(
+                function (value) {
+                    return (
+                        normalizeReceiptLinehaulImportText(
+                            value,
+                        ) === "waiting"
+                    );
+                },
             ),
 
         loadedOrders:
@@ -586,7 +643,9 @@ function parseReceiptLinehaulMatrix(
 
                     currentRecord = {
                         code,
+                        origin: [],
                         cpt: [],
+                        punctuality: [],
                         loadedOrders: [],
                         vehiclePlate: [],
                     };
@@ -596,8 +655,17 @@ function parseReceiptLinehaulMatrix(
                     return;
                 }
 
+                currentRecord.origin.push(
+                    row[columns.origin] ?? "",
+                );
+
                 currentRecord.cpt.push(
                     row[columns.cpt] ?? "",
+                );
+
+                currentRecord.punctuality.push(
+                    row[columns.punctuality] ??
+                        "",
                 );
 
                 currentRecord.loadedOrders.push(
@@ -613,33 +681,6 @@ function parseReceiptLinehaulMatrix(
     finishCurrentRecord();
 
     return records;
-}
-
-function deduplicateReceiptLinehauls(
-    records,
-) {
-    const recordsByCode =
-        new Map();
-
-    records.forEach(
-        function (record) {
-            if (
-                record.code &&
-                !recordsByCode.has(
-                    record.code,
-                )
-            ) {
-                recordsByCode.set(
-                    record.code,
-                    record,
-                );
-            }
-        },
-    );
-
-    return Array.from(
-        recordsByCode.values(),
-    );
 }
 
 function parseReceiptLinehaulSpXHtml(
@@ -676,9 +717,7 @@ function parseReceiptLinehaulSpXHtml(
         },
     );
 
-    return deduplicateReceiptLinehauls(
-        records,
-    );
+    return records;
 }
 
 function parseReceiptLinehaulSpXPlainText(
@@ -711,9 +750,7 @@ function parseReceiptLinehaulSpXPlainText(
         );
 
     if (tabularRecords.length > 0) {
-        return deduplicateReceiptLinehauls(
-            tabularRecords,
-        );
+        return tabularRecords;
     }
 
     const normalizedLines =
@@ -740,7 +777,13 @@ function parseReceiptLinehaulSpXPlainText(
             "numero do lh",
         ) &&
         normalizedText.includes(
+            "station",
+        ) &&
+        normalizedText.includes(
             "cpt",
+        ) &&
+        normalizedText.includes(
+            "indicador de pontualidade",
         ) &&
         normalizedText.includes(
             "pedido carregado",
@@ -798,13 +841,42 @@ function parseReceiptLinehaulSpXPlainText(
                         )
                         .filter(Boolean);
 
+                const cpt =
+                    getReceiptLinehaulCpt(
+                        values,
+                    );
+
+                const origin =
+                    formatSpXLinehaulOrigin(
+                        values.find(
+                            function (value) {
+                                return /^\[[^\]]+\]\s*\S+/.test(
+                                    value,
+                                );
+                            },
+                        ) || "",
+                    );
+
                 return {
                     code:
                         recordStart.code,
 
-                    cpt:
-                        getReceiptLinehaulCpt(
-                            values,
+                    origin,
+
+                    cpt,
+
+                    window: cpt,
+
+                    waiting:
+                        values.some(
+                            function (value) {
+                                return (
+                                    normalizeReceiptLinehaulImportText(
+                                        value,
+                                    ) ===
+                                    "waiting"
+                                );
+                            },
                         ),
 
                     loadedOrders:
@@ -820,8 +892,235 @@ function parseReceiptLinehaulSpXPlainText(
             },
         );
 
-    return deduplicateReceiptLinehauls(
-        records,
+    return records;
+}
+
+function getReceiptLinehaulImportWindowModalElements() {
+    return {
+        modal:
+            document.getElementById(
+                "receiptLinehaulImportWindowModal",
+            ),
+
+        description:
+            document.getElementById(
+                "receiptLinehaulImportWindowDescription",
+            ),
+
+        options:
+            document.getElementById(
+                "receiptLinehaulImportWindowOptions",
+            ),
+
+        confirmButton:
+            document.getElementById(
+                "receiptLinehaulImportWindowConfirm",
+            ),
+
+        cancelButton:
+            document.getElementById(
+                "receiptLinehaulImportWindowCancel",
+            ),
+    };
+}
+
+function requestReceiptLinehaulImportWindow(
+    windowCandidates,
+) {
+    const elements =
+        getReceiptLinehaulImportWindowModalElements();
+
+    if (
+        !(elements.modal instanceof HTMLElement) ||
+        !(elements.description instanceof HTMLElement) ||
+        !(elements.options instanceof HTMLElement) ||
+        !(
+            elements.confirmButton instanceof
+            HTMLButtonElement
+        ) ||
+        !(
+            elements.cancelButton instanceof
+            HTMLButtonElement
+        ) ||
+        typeof window.jQuery !== "function" ||
+        typeof window.Foundation?.Reveal !==
+            "function"
+    ) {
+        throw new Error(
+            "O modal de seleção de janela não pôde ser inicializado.",
+        );
+    }
+
+    const firstAvailableWindow =
+        windowCandidates.find(
+            function (candidate) {
+                return candidate
+                    .selection
+                    .records
+                    .length > 0;
+            },
+        )?.window || "";
+
+    elements.description.textContent =
+        "Foram encontradas mais de uma janela. Escolha qual delas será usada nos descarregamentos.";
+
+    const optionElements =
+        windowCandidates.map(
+            function (candidate) {
+                const wrapper =
+                    document.createElement(
+                        "div",
+                    );
+
+                const input =
+                    document.createElement(
+                        "input",
+                    );
+
+                const label =
+                    document.createElement(
+                        "label",
+                    );
+
+                const inputId =
+                    `receiptLinehaulImportWindow${candidate.window}`;
+
+                const linehaulQuantity =
+                    candidate
+                        .selection
+                        .records
+                        .length;
+
+                input.type = "radio";
+                input.name =
+                    "receiptLinehaulImportWindow";
+                input.id = inputId;
+                input.value = candidate.window;
+                input.disabled =
+                    linehaulQuantity === 0;
+                input.checked =
+                    candidate.window ===
+                    firstAvailableWindow;
+
+                label.htmlFor = inputId;
+                label.textContent =
+                    linehaulQuantity === 1
+                        ? `${candidate.window} — 1 LH válido`
+                        : `${candidate.window} — ${linehaulQuantity} LHs válidos`;
+
+                wrapper.append(
+                    input,
+                    label,
+                );
+
+                return wrapper;
+            },
+        );
+
+    elements.options.replaceChildren(
+        ...optionElements,
+    );
+
+    elements.confirmButton.disabled =
+        !firstAvailableWindow;
+
+    const modalQuery =
+        window.jQuery(
+            elements.modal,
+        );
+
+    const modalInstance =
+        modalQuery.data(
+            "zfPlugin",
+        ) ||
+        new window.Foundation.Reveal(
+            modalQuery,
+        );
+
+    return new Promise(
+        function (resolve) {
+            let finished = false;
+
+            function cleanup() {
+                elements.confirmButton
+                    .removeEventListener(
+                        "click",
+                        handleConfirm,
+                    );
+
+                elements.cancelButton
+                    .removeEventListener(
+                        "click",
+                        handleCancel,
+                    );
+
+                modalQuery.off(
+                    "closed.zf.reveal",
+                    handleClosed,
+                );
+            }
+
+            function finish(
+                windowValue,
+                closeModal = true,
+            ) {
+                if (finished) {
+                    return;
+                }
+
+                finished = true;
+                cleanup();
+
+                if (closeModal) {
+                    modalInstance.close();
+                }
+
+                resolve(windowValue);
+            }
+
+            function handleConfirm() {
+                const selectedInput =
+                    elements.options
+                        .querySelector(
+                            'input[name="receiptLinehaulImportWindow"]:checked',
+                        );
+
+                finish(
+                    selectedInput?.value ||
+                        "",
+                );
+            }
+
+            function handleCancel() {
+                finish("");
+            }
+
+            function handleClosed() {
+                finish(
+                    "",
+                    false,
+                );
+            }
+
+            elements.confirmButton
+                .addEventListener(
+                    "click",
+                    handleConfirm,
+                );
+
+            elements.cancelButton
+                .addEventListener(
+                    "click",
+                    handleCancel,
+                );
+
+            modalQuery.on(
+                "closed.zf.reveal",
+                handleClosed,
+            );
+
+            modalInstance.open();
+        },
     );
 }
 
@@ -959,25 +1258,10 @@ async function handleReceiptLinehaulClipboardImport(
         "Lendo área de transferência...";
 
     try {
-        const currentState =
-            getReceiptLinehaulState();
-
-        if (
-            currentState.linehauls.length > 0 &&
-            !window.confirm(
-                "A importação substituirá as viagens carregadas atualmente. Deseja continuar?",
-            )
-        ) {
-            button.textContent =
-                RECEIPT_LINEHAUL_IMPORT_DEFAULT_TEXT;
-
-            return;
-        }
-
         const clipboard =
             await readReceiptLinehaulClipboard();
 
-        const candidates = [
+        const importCandidates = [
             {
                 format: "HTML",
                 records:
@@ -992,39 +1276,176 @@ async function handleReceiptLinehaulClipboardImport(
                         clipboard.text,
                     ),
             },
-        ];
+        ]
+            .filter(
+                function (candidate) {
+                    return candidate
+                        .records
+                        .length > 0;
+                },
+            )
+            .map(
+                function (candidate) {
+                    const windowCandidates =
+                        createSpXLinehaulWindowCandidates(
+                            candidate.records,
+                        );
+
+                    return {
+                        ...candidate,
+                        windowCandidates,
+                        validLinehaulQuantity:
+                            windowCandidates.reduce(
+                                function (
+                                    total,
+                                    windowCandidate,
+                                ) {
+                                    return total +
+                                        windowCandidate
+                                            .selection
+                                            .records
+                                            .length;
+                                },
+                                0,
+                            ),
+                    };
+                },
+            );
+
+        if (importCandidates.length === 0) {
+            throw new Error(
+                "Não encontrei uma tabela com Número do LH, Station, Indicador de Pontualidade, CPT, Pedido Carregado e Placa do Veículo.",
+            );
+        }
 
         const selectedCandidate =
-            candidates.reduce(
+            importCandidates.reduce(
                 function (
                     bestCandidate,
                     candidate,
                 ) {
                     return (
-                        candidate.records.length >
-                        bestCandidate.records.length
+                        candidate
+                            .validLinehaulQuantity >
+                        bestCandidate
+                            .validLinehaulQuantity
                     )
                         ? candidate
                         : bestCandidate;
                 },
-                candidates[0],
+                importCandidates[0],
             );
 
         if (
-            selectedCandidate.records.length ===
-            0
+            selectedCandidate
+                .windowCandidates
+                .length === 0
         ) {
             throw new Error(
-                "Não encontrei uma tabela com Número do LH, CPT, Pedido Carregado e Placa do Veículo.",
+                "Não foi possível identificar nenhuma janela CPT nos dados copiados.",
             );
         }
 
+        const validWindowCandidates =
+            selectedCandidate
+                .windowCandidates
+                .filter(
+                    function (candidate) {
+                        return candidate
+                            .selection
+                            .records
+                            .length > 0;
+                    },
+                );
+
+        if (validWindowCandidates.length === 0) {
+            throw new Error(
+                "Nenhuma das janelas encontradas possui um agrupamento válido de LHs.",
+            );
+        }
+
+        let selectedWindow =
+            validWindowCandidates[0]
+                .window;
+
+        if (validWindowCandidates.length > 1) {
+            button.textContent =
+                "Escolha a janela...";
+
+            selectedWindow =
+                await requestReceiptLinehaulImportWindow(
+                    validWindowCandidates,
+                );
+
+            if (!selectedWindow) {
+                button.textContent =
+                    RECEIPT_LINEHAUL_IMPORT_DEFAULT_TEXT;
+
+                return;
+            }
+        }
+
+        const selection =
+            validWindowCandidates.find(
+                function (candidate) {
+                    return candidate.window ===
+                        selectedWindow;
+                },
+            )?.selection;
+
+        if (
+            !selection ||
+            selection.records.length === 0
+        ) {
+            throw new Error(
+                `A janela ${selectedWindow} não possui pelo menos dois LHs consecutivos com o mesmo CPT.`,
+            );
+        }
+
+        if (
+            selection.records.length >
+            RECEIPT_LINEHAUL_IMPORT_EXPECTED_MAXIMUM
+        ) {
+            const shouldContinue =
+                window.confirm(
+                    `Foram encontrados ${selection.records.length} LHs no bloco da janela ${selection.targetWindow}. Normalmente a lista possui até ${RECEIPT_LINEHAUL_IMPORT_EXPECTED_MAXIMUM}. Deseja importar todos mesmo assim?`,
+                );
+
+            if (!shouldContinue) {
+                button.textContent =
+                    RECEIPT_LINEHAUL_IMPORT_DEFAULT_TEXT;
+
+                return;
+            }
+        }
+
+        const currentState =
+            getReceiptLinehaulState();
+
+        if (
+            currentState.linehauls.some(
+                function (linehaul) {
+                    return Boolean(
+                        linehaul.code,
+                    );
+                },
+            ) &&
+            !window.confirm(
+                "A importação substituirá as viagens carregadas atualmente. Deseja continuar?",
+            )
+        ) {
+            button.textContent =
+                RECEIPT_LINEHAUL_IMPORT_DEFAULT_TEXT;
+
+            return;
+        }
+
         replaceReceiptLinehauls(
-            selectedCandidate.records,
+            selection.records,
         );
 
         button.textContent =
-            `${selectedCandidate.records.length} LHs importados`;
+            `${selection.records.length} LHs importados — ${selection.targetWindow}`;
 
         button.title =
             `Importação realizada por ${selectedCandidate.format}.`;
@@ -1040,6 +1461,8 @@ async function handleReceiptLinehaulClipboardImport(
 
         button.textContent =
             "Não foi possível importar";
+
+        enableReceiptLinehaulManualEntry();
 
         window.alert(
             error instanceof Error
