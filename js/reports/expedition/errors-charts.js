@@ -250,7 +250,7 @@ function createErrorBalanceChart(
 
                 layout: {
                     padding: {
-                        left: 60,
+                        left: 40,
                         right: 10,
                     },
                 },
@@ -316,6 +316,10 @@ function createErrorBalanceChart(
                     },
 
                     y: {
+                        afterFit(scale) {
+                            scale.width += 16;
+                        },
+
                         ticks: {
                             color: "#e4e6eb",
                             font:
