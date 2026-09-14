@@ -247,9 +247,7 @@
         margin-bottom: 20px;
         border-bottom: 2px solid var(--color-border);
     }
-    #receipt .report-controls #receipt-controls-2 .input-group:first-of-type {
-         grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
-    }
+
     #receipt .report-controls .input-group:last-of-type {
         padding-bottom: 0;
         margin-bottom: 0;
