@@ -114,6 +114,9 @@
             }
 
             
+            .final-report-flow {
+                flex: 1 1 0;
+            }
             .flow .mini-cards {
                 gap: 15px;
                 display: grid;
@@ -122,15 +125,15 @@
             .flow .mini-cards > div {
                 padding: 25px;
                 border: 1px solid var(--color-border);
+                gap: 15px;
+                align-items: center;
             }
             .flow .mini-cards img {
                 width: 35px;
             }
-            .flow .mini-cards h4 {
+            .flow .mini-cards h4, .flow .mini-cards p {
                 margin: 0;
-            }
-            .flow .mini-cards h3 {
-                margin: 0;
+                text-align: center;
             }
             .flow .dashed-border {
                 width: 80%;
@@ -145,6 +148,10 @@
                 text-align: center;
             }
 
+
+            .final-report-highlights {
+                flex: 0 0 300px;
+            }
 
             /* AJUSTES */
 
@@ -1883,55 +1890,86 @@
 
                                     <!-- FLUXO DO DIA E DASTAQUES DA OPERAÇÃO -->
 
-                                    <div class="final-report-flow">
-                                        <div class="final-report-title">
-                                            <h4>Fluxo do Dia</h4>
-                                        </div>
-
-                                        <div class="flow">
-                                            <div class="mini-cards">
-                                                
-                                                <div class="flex-box-start">
-                                                    <img src="images/geral-icons/clipboard-icon.svg">
-
-                                                    <div>
-                                                        <h4>Planejado</h4>
-                                                        <h3>-</h3>
-                                                    </div>
-                                                </div>
-
-                                                <div class="flex-box-start">
-                                                    <img src="images/geral-icons/box-icon.svg">
-
-                                                    <div>
-                                                        <h4>Processado</h4>
-                                                        <h3>-</h3>
-                                                    </div>
-                                                </div>
-
-                                                <div class="flex-box-start">
-                                                    <img src="images/geral-icons/success-icon.svg">
-
-                                                    <div>
-                                                        <h4>Expedido</h4>
-                                                        <h3>-</h3>
-                                                    </div>
-                                                </div>
-
-                                                <div class="flex-box-start">
-                                                    <img src="images/geral-icons/forklift-icon.svg">
-
-                                                    <div>
-                                                        <h4>No Piso</h4>
-                                                        <h3>-</h3>
-                                                    </div>
-                                                </div>
-                                 
+                                    <div class="flex-box-start" style="column-gap: 15px;">
+                                        <div class="final-report-flow">
+                                            <div class="final-report-title">
+                                                <h4>Fluxo do Dia</h4>
                                             </div>
 
-                                            <div class="dashed-border"></div>
+                                            <div class="flow">
+                                                <div class="mini-cards">
+                                                    
+                                                    <div class="flex-box-center">
+                                                        <img src="images/geral-icons/clipboard-icon.svg">
 
-                                            <h5 id="">- Pacotes Abaixo do Planejado</h5>
+                                                        <div>
+                                                            <h4>Planejado</h4>
+                                                            <p>-</p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="flex-box-center">
+                                                        <img src="images/geral-icons/box-icon.svg">
+
+                                                        <div>
+                                                            <h4>Processado</h4>
+                                                            <p>-</p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="flex-box-center">
+                                                        <img src="images/geral-icons/success-icon.svg">
+
+                                                        <div>
+                                                            <h4>Expedido</h4>
+                                                            <p>-</p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="flex-box-center">
+                                                        <img src="images/geral-icons/forklift-icon.svg">
+
+                                                        <div>
+                                                            <h4>No Piso</h4>
+                                                            <p>-</p>
+                                                        </div>
+                                                    </div>
+                                    
+                                                </div>
+
+                                                <div class="dashed-border"></div>
+
+                                                <h5 id="">- Pacotes Abaixo do Planejado</h5>
+                                            </div>
+                                        </div>
+
+                                        <div class="final-report-highlights">
+                                            <div class="final-report-title">
+                                                <h4>Destaques do Janela</h4>
+                                            </div>
+
+                                            <ul>
+                                                <li>
+                                                    <img src="images/geral-icons/speed-icon.svg">
+                                                    <h5>Recebedor Mais Rápido: <span id=""></span></h5>
+                                                </li>
+
+                                                <li>
+                                                    <img src="images/geral-icons/star-icon.svg">
+                                                    <h5>Recebeu Mais Pacotes: <span id=""></span></h5>
+                                                </li>
+
+                                                <li>
+                                                    <img src="images/geral-icons/speed-icon.svg">
+                                                    <h5>Conferente Mais Rápido: <span id=""></span></h5>
+                                                </li>
+
+                                                <li>
+                                                    <img src="images/geral-icons/star-icon.svg">
+                                                    <h5>Conferiu Mais Rotas: <span id=""></span></h5>
+                                                </li>
+
+                                            </ul>
                                         </div>
                                     </div>
 
