@@ -14,6 +14,20 @@ const LOSSES_RATE_IMPORT_FEEDBACK_DURATION =
 /* NOMES ACEITOS PARA AS COLUNAS */
 
 const lossesRateColumnAliases = {
+    description: [
+        "descricao",
+    ],
+
+    hubCode: [
+        "codigo do hub",
+        "codigo hub",
+    ],
+
+    subRegional: [
+        "sub regional",
+        "subregional",
+    ],
+
     month: [
         "mes",
         "month",
@@ -146,6 +160,88 @@ function getLossesRateColumnIndexes(
     }
 
     return indexes;
+}
+
+/* LÊ OS DADOS DE IDENTIFICAÇÃO */
+
+function getLossesRateIdentification(
+    rows,
+    columnIndexes,
+) {
+    const fields = [
+        {
+            key: "description",
+            label: "Descrição",
+        },
+        {
+            key: "hubCode",
+            label: "Código do Hub",
+        },
+        {
+            key: "subRegional",
+            label: "Sub Regional",
+        },
+    ];
+
+    return fields.reduce(
+        function (
+            identification,
+            field,
+        ) {
+            const receivedValues =
+                new Set();
+
+            rows
+                .slice(1)
+                .forEach(
+                    function (row) {
+                        const value =
+                            String(
+                                row[
+                                    columnIndexes[
+                                        field.key
+                                    ]
+                                ] ?? "",
+                            ).trim();
+
+                        if (
+                            value &&
+                            value !== "-" &&
+                            value !== "—"
+                        ) {
+                            receivedValues.add(
+                                value,
+                            );
+                        }
+                    },
+                );
+
+            if (
+                receivedValues.size === 0
+            ) {
+                throw new Error(
+                    `O campo ${field.label} não foi informado na base.`,
+                );
+            }
+
+            if (
+                receivedValues.size > 1
+            ) {
+                throw new Error(
+                    `O campo ${field.label} possui valores diferentes na base.`,
+                );
+            }
+
+            identification[
+                field.key
+            ] = [
+                ...receivedValues,
+            ][0];
+
+            return identification;
+        },
+        {},
+    );
 }
 
 /* MAPA DOS MESES */
@@ -301,11 +397,22 @@ function parseLossesRateQuantity(
 
 function isLossesRateRowEmpty(
     row,
+    columnIndexes,
 ) {
-    return row.every(
-        function (value) {
+    const historyFields = [
+        "month",
+        "possibleLosses",
+        "lost",
+        "damage",
+        "moved",
+    ];
+
+    return historyFields.every(
+        function (field) {
             return String(
-                value ?? "",
+                row[
+                    columnIndexes[field]
+                ] ?? "",
             ).trim() === "";
         },
     );
@@ -329,6 +436,12 @@ function createLossesRateHistory(
             rows[0],
         );
 
+    const identification =
+        getLossesRateIdentification(
+            rows,
+            columnIndexes,
+        );
+
     const history =
         new Array(
             LOSSES_RATE_MONTHS.length,
@@ -349,6 +462,7 @@ function createLossesRateHistory(
                 if (
                     isLossesRateRowEmpty(
                         row,
+                        columnIndexes,
                     )
                 ) {
                     return;
@@ -432,6 +546,7 @@ function createLossesRateHistory(
 
     return {
         history,
+        identification,
         importedRows,
     };
 }
@@ -571,6 +686,12 @@ function createLossesRateUpdatedBaseText() {
             "Qtd AVARIA",
             "Volume Movimentado",
             "Mês",
+            "",
+            "Descrição",
+            "",
+            "",
+            "Código do Hub",
+            "Sub Regional",
         ],
     ];
 
@@ -599,6 +720,26 @@ function createLossesRateUpdatedBaseText() {
                 LOSSES_RATE_MONTHS[
                     monthIndex
                 ],
+
+                "",
+
+                monthIndex === 0
+                    ? state.identification
+                        .description
+                    : "",
+
+                "",
+                "",
+
+                monthIndex === 0
+                    ? state.identification
+                        .hubCode
+                    : "",
+
+                monthIndex === 0
+                    ? state.identification
+                        .subRegional
+                    : "",
             ]);
         },
     );
@@ -754,6 +895,7 @@ async function importLossesRateFromClipboard(
 
         replaceLossesRateHistory(
             result.history,
+            result.identification,
         );
 
         const monthLabel =

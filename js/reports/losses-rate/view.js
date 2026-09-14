@@ -4,7 +4,6 @@ import {
     getLossesRateState,
     setActiveLossesRateMonth,
     subscribeLossesRateState,
-    updateLossesRateIdentification,
     updateLossesRateMonthField,
 } from "./state.js";
 
@@ -397,6 +396,28 @@ function renderLossesRateInputs(
     );
 }
 
+/* ATUALIZA OS INPUTS DE IDENTIFICAÇÃO */
+
+function renderLossesRateIdentification(
+    elements,
+    identification,
+) {
+    setLossesRateInputValue(
+        elements.descriptionInput,
+        identification.description,
+    );
+
+    setLossesRateInputValue(
+        elements.hubCodeInput,
+        identification.hubCode,
+    );
+
+    setLossesRateInputValue(
+        elements.subRegionalInput,
+        identification.subRegional,
+    );
+}
+
 /* ATUALIZA O RESUMO DOS CONTROLES */
 
 function renderLossesRateControlsSummary(
@@ -487,6 +508,11 @@ function renderLossesRateReport(
         state,
     );
 
+    renderLossesRateIdentification(
+        elements,
+        state.identification,
+    );
+
     renderLossesRateInputs(
         elements,
         summary,
@@ -501,27 +527,6 @@ function renderLossesRateReport(
         elements,
         state,
         summary,
-    );
-}
-
-/* REGISTRA OS DADOS DE IDENTIFICAÇÃO */
-
-function initializeLossesRateIdentification(
-    elements,
-) {
-    updateLossesRateIdentification(
-        "description",
-        elements.descriptionInput.value,
-    );
-
-    updateLossesRateIdentification(
-        "hubCode",
-        elements.hubCodeInput.value,
-    );
-
-    updateLossesRateIdentification(
-        "subRegional",
-        elements.subRegionalInput.value,
     );
 }
 
@@ -648,10 +653,6 @@ function initializeLossesRateView(
     elements.monthTabs.dataset
         .lossesRateInitialized =
             "true";
-
-    initializeLossesRateIdentification(
-        elements,
-    );
 
     createLossesRateMonthTabs(
         elements,

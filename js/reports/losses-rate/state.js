@@ -16,14 +16,7 @@ const LOSSES_RATE_MONTHS =
         "Dezembro",
     ]);
 
-/* CAMPOS ACEITOS */
-
-const lossesRateIdentificationFields =
-    new Set([
-        "description",
-        "hubCode",
-        "subRegional",
-    ]);
+/* CAMPOS MENSAIS ACEITOS */
 
 const lossesRateMonthFields =
     new Set([
@@ -53,6 +46,29 @@ function normalizeLossesRateText(
     return String(
         value,
     ).trim();
+}
+
+/* CRIA OS DADOS DE IDENTIFICAÇÃO */
+
+function createLossesRateIdentification(
+    values = {},
+) {
+    return {
+        description:
+            normalizeLossesRateText(
+                values.description,
+            ),
+
+        hubCode:
+            normalizeLossesRateText(
+                values.hubCode,
+            ),
+
+        subRegional:
+            normalizeLossesRateText(
+                values.subRegional,
+            ),
+    };
 }
 
 /* NORMALIZA UMA QUANTIDADE */
@@ -137,11 +153,8 @@ const lossesRateState = {
     year:
         new Date().getFullYear(),
 
-    identification: {
-        description: "",
-        hubCode: "",
-        subRegional: "",
-    },
+    identification:
+        createLossesRateIdentification(),
 
     months:
         LOSSES_RATE_MONTHS.map(
@@ -260,45 +273,6 @@ function setActiveLossesRateMonth(
     return true;
 }
 
-/* ATUALIZA UM CAMPO DE IDENTIFICAÇÃO */
-
-function updateLossesRateIdentification(
-    field,
-    value,
-) {
-    if (
-        !lossesRateIdentificationFields.has(
-            field,
-        )
-    ) {
-        return false;
-    }
-
-    const normalizedValue =
-        normalizeLossesRateText(
-            value,
-        );
-
-    if (
-        lossesRateState
-            .identification[field] ===
-        normalizedValue
-    ) {
-        return true;
-    }
-
-    lossesRateState
-        .identification[field] =
-            normalizedValue;
-
-    notifyLossesRateState({
-        type: "identification-updated",
-        field,
-    });
-
-    return true;
-}
-
 /* ATUALIZA UM CAMPO MENSAL */
 
 function updateLossesRateMonthField(
@@ -391,6 +365,7 @@ function getLossesRateMonthSummary(
 
 function replaceLossesRateHistory(
     months,
+    identification = {},
 ) {
     if (
         !Array.isArray(
@@ -399,6 +374,11 @@ function replaceLossesRateHistory(
     ) {
         return false;
     }
+
+    lossesRateState.identification =
+        createLossesRateIdentification(
+            identification,
+        );
 
     lossesRateState.months =
         LOSSES_RATE_MONTHS.map(
@@ -468,22 +448,10 @@ function restoreLossesRateState(
             ? sessionState.identification
             : {};
 
-    lossesRateState.identification = {
-        description:
-            normalizeLossesRateText(
-                identification.description,
-            ),
-
-        hubCode:
-            normalizeLossesRateText(
-                identification.hubCode,
-            ),
-
-        subRegional:
-            normalizeLossesRateText(
-                identification.subRegional,
-            ),
-    };
+    lossesRateState.identification =
+        createLossesRateIdentification(
+            identification,
+        );
 
     lossesRateState.months =
         LOSSES_RATE_MONTHS.map(
@@ -523,6 +491,9 @@ function resetLossesRateReport() {
     lossesRateState.year =
         currentDate.getFullYear();
 
+    lossesRateState.identification =
+        createLossesRateIdentification();
+
     lossesRateState.months =
         LOSSES_RATE_MONTHS.map(
             function () {
@@ -547,6 +518,5 @@ export {
     restoreLossesRateState,
     setActiveLossesRateMonth,
     subscribeLossesRateState,
-    updateLossesRateIdentification,
     updateLossesRateMonthField,
 };
