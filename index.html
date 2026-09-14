@@ -750,19 +750,19 @@
 
                             <ul class="tabs flex-box-start" data-tabs id="receipt-view-tabs">
                                 <li class="tabs-title">
-                                    <a href="#linehaul">
+                                    <a href="#linehaul" data-controls-target="receipt-controls-2">
                                         <h4>Descarregamentos e Reversas</h4>
                                     </a>
                                 </li>
 
                                 <li class="tabs-title is-active">
-                                    <a href="#receipt-tables">
+                                    <a href="#receipt-tables" data-controls-target="receipt-controls-1">
                                         <h4>Mesa de Recebimento</h4>
                                     </a>
                                 </li> 
 
                                 <li class="tabs-title">
-                                    <a href="#receipt-charts">
+                                    <a href="#receipt-charts" data-controls-target="receipt-controls-1">
                                         <h4>Rank de Recebedores</h4>
                                     </a>
                                 </li>
@@ -1118,71 +1118,97 @@
                                 <!-- CONTROLES DO RELATÓRIO -->
 
                                 <div class="report-controls">
-                                    <div class="history-link flex-box-start">
-                                        <a href="https://spx.shopee.com.br/#/generalReceiveTaskMgt" target="_blank">
-                                            <svg class="spreadsheets-link-icon" viewBox="0 0 24 24" aria-hidden="true">
-                                                <path d="M7 17L17 7M9 7H17V15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                                            </svg>
-                                        </a>
 
-                                        <div>
-                                            <h4>Gestão de Recebimento</h4>
-                                            <p>Exporte do SPX e importe aqui.</p>
-                                        </div>
-                                    </div>
+                                    <div class="receipt-controls-panel is-active" id="receipt-controls-1">
+                                        <div class="history-link flex-box-start">
+                                            <a href="https://spx.shopee.com.br/#/generalReceiveTaskMgt" target="_blank">
+                                                <svg class="spreadsheets-link-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                                    <path d="M7 17L17 7M9 7H17V15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                                </svg>
+                                            </a>
 
-                                    <div class="history-import flex-box-start">
-                                        <div>
-                                            <button class="button" id="receiptImportButton" type="button">
-                                                Importar Recebimento
-                                            </button>
+                                            <div>
+                                                <h4>Gestão de Recebimento</h4>
+                                                <p>Exporte do SPX e importe aqui.</p>
+                                            </div>
                                         </div>
 
-                                        <input id="receiptFileInput" type="file" accept=".csv,.xlsx,.xls" hidden>
-                                    </div>
+                                        <div class="history-import flex-box-start">
+                                            <div>
+                                                <button class="button" id="receiptImportButton" type="button">
+                                                    Importar Recebimento
+                                                </button>
+                                            </div>
 
-                                    <div class="input-group">
-                                        <div>
-                                            <h4>Janela</h4>
-
-                                            <select class="standard-select" id="receiptWindowInput" disabled>
-                                                <option value="AM">AM</option>
-                                                <option value="PM1">PM1</option>
-                                                <option value="PM2">PM2</option>
-                                            </select>
+                                            <input id="receiptFileInput" type="file" accept=".csv,.xlsx,.xls" hidden>
                                         </div>
 
-                                        <div>
-                                            <h4>Volume Esperado</h4>
+                                        <div class="input-group">
+                                            <div>
+                                                <h4>Janela</h4>
 
-                                            <input id="receiptExpectedInput" type="text" inputmode="numeric" maxlength="8" disabled>
+                                                <select class="standard-select" id="receiptWindowInput" disabled>
+                                                    <option value="AM">AM</option>
+                                                    <option value="PM1">PM1</option>
+                                                    <option value="PM2">PM2</option>
+                                                </select>
+                                            </div>
+
+                                            <div>
+                                                <h4>Volume Esperado</h4>
+
+                                                <input id="receiptExpectedInput" type="text" inputmode="numeric" maxlength="8" disabled>
+                                            </div>
+
                                         </div>
 
-                                    </div>
+                                        <div class="input-group receipt-operator-controls" id="receiptOperatorControls">
+                                            <div>
+                                                <h4 data-receipt-operator-label>Etiquetador</h4>
 
-                                    <!-- RECEBEDORES E ETIQUETADORES -->
+                                                <div class="flex-box-start">
+                                                    <input type="text" data-receipt-operator-field="labeler" autocomplete="off" disabled>
+                                                    <input type="text" data-receipt-operator-field="errorQuantity" placeholder="Erros" maxlength="5" autocomplete="off" inputmode="numeric" pattern="[0-9]*" disabled>
 
-                                    <div class="input-group receipt-operator-controls" id="receiptOperatorControls">
-                                        <div>
-                                            <h4 data-receipt-operator-label>Etiquetador</h4>
-
-                                            <div class="flex-box-start">
-                                                <input type="text" data-receipt-operator-field="labeler" autocomplete="off" disabled>
-                                                <input type="text" data-receipt-operator-field="errorQuantity" placeholder="Erros" maxlength="5" autocomplete="off" inputmode="numeric" pattern="[0-9]*" disabled>
-
-                                                <div class="checkbox">
-                                                    <input type="checkbox" data-receipt-operator-selection disabled>
-                                                    <label for=""></label>
+                                                    <div class="checkbox">
+                                                        <input type="checkbox" data-receipt-operator-selection disabled>
+                                                        <label for=""></label>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
+
+                                        <label class="receipt-error-calculation-option" for="receiptErrorCalculationToggle">
+                                            <input id="receiptErrorCalculationToggle" type="checkbox" disabled>
+
+                                            <p>Calcular participação no total de erros.</p>
+                                        </label>
                                     </div>
 
-                                    <label class="receipt-error-calculation-option" for="receiptErrorCalculationToggle">
-                                        <input id="receiptErrorCalculationToggle" type="checkbox" disabled>
+                                    <div class="receipt-controls-panel is-active" id="receipt-controls-2">
+                                        <div class="history-link flex-box-start">
+                                            <a href="https://spx.shopee.com.br/#/hubLinehaulTrips/trip" target="_blank">
+                                                <svg class="spreadsheets-link-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                                    <path d="M7 17L17 7M9 7H17V15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                                </svg>
+                                            </a>
 
-                                        <p>Calcular participação no total de erros.</p>
-                                    </label>
+                                            <div>
+                                                <h4>Transporte Principal - Inbound</h4>
+                                                <p>Crtl A + Crtl C, e clique em importar.</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="history-import flex-box-start">
+                                            <div>
+                                                <button class="button" id="" type="button">
+                                                    Importar Recebimento
+                                                </button>
+                                            </div>
+                                        </div>
+
+
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -2695,6 +2721,36 @@
         <!-- AJUSTES TABS -->
 
         <script>
+
+            // 
+
+            const receiptTabs = $("#receipt-view-tabs");
+            const receiptControls = $("#receipt-controls");
+
+            function updateReceiptontrols() {
+                const activeLink = receiptTabs.find(
+                    ".tabs-title.is-active > a"
+                );
+
+                const controlsTarget = activeLink.data("controls-target");
+
+                receiptControls
+                    .find(".receipt-controls-panel")
+                    .removeClass("is-active")
+                    .attr("hidden", true);
+
+                $("#" + controlsTarget)
+                    .addClass("is-active")
+                    .removeAttr("hidden");
+            }
+
+            receiptTabs.on("change.zf.tabs", function () {
+                updateReceiptControls();
+            });
+
+            updateReceiptControls();
+
+            // AJUSTE DO TABS DE EXPEDIÇÃO
 
             const expeditionTabs = $("#expedition-view-tabs");
             const expeditionControls = $("#expedition-controls");
