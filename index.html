@@ -38,6 +38,7 @@
             .final-report-header {
                 padding: 15px 20px;
                 border: 1px solid var(--color-border);
+                align-items: center;
             }
             .final-report-header .flex-box-start {
                 column-gap: 15px;
@@ -87,6 +88,14 @@
             }
             .final-report-receipt-and-expedition > div {
                 flex: 1 1 0;
+            }
+            .final-report-receipt > div,
+            .final-report-expedition > div {
+                width: 100%;
+                height: 320px;
+                position: relative;
+                padding: 15px;
+                border: 1px solid var(--color-border);
             }
 
 
@@ -1836,7 +1845,6 @@
 
                                     <div class="final-report-receipt-and-expedition flex-box-start">
                                         <div class="final-report-receipt">
-
                                             <table>
                                                 <caption>Processamento</caption>
 
@@ -1859,10 +1867,14 @@
                                                 </tbody>
                                             </table>
 
+                                            <div>
+                                                <canvas id="">
+                                                    Seu navegador não suporta gráficos em canvas.
+                                                </canvas>
+                                            </div>
                                         </div>
 
                                         <div class="final-report-expedition">
-
                                             <table>
                                                 <caption>Expedição</caption>
 
@@ -1885,6 +1897,11 @@
                                                 </tbody>
                                             </table>
 
+                                            <div>
+                                                <canvas id="">
+                                                    Seu navegador não suporta gráficos em canvas.
+                                                </canvas>
+                                            </div>
                                         </div>
                                     </div>
 
