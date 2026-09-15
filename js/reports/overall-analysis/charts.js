@@ -2,6 +2,12 @@ import {
     formatOverallAnalysisQuantity,
 } from "./view.js";
 
+let overallAnalysisCapacityChart =
+    null;
+
+let overallAnalysisLossRateChart =
+    null;
+
 let overallAnalysisReceiptChart =
     null;
 
@@ -71,6 +77,108 @@ const overallAnalysisTextSpacingPlugin = {
         );
     },
 };
+
+/* GRÁFICOS DE ROSCA DOS CARDS */
+
+function createOverallAnalysisMiniChart(
+    canvas,
+    activeColor,
+) {
+    return new window.Chart(
+        canvas,
+        {
+            type: "doughnut",
+
+            data: {
+                datasets: [
+                    {
+                        data: [
+                            0,
+                            1,
+                        ],
+
+                        backgroundColor: [
+                            activeColor,
+                            "#4b4b4b",
+                        ],
+
+                        hoverBackgroundColor: [
+                            activeColor,
+                            "#4b4b4b",
+                        ],
+
+                        borderWidth: 0,
+                    },
+                ],
+            },
+
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                devicePixelRatio:
+                    OVERALL_ANALYSIS_CHART_PIXEL_RATIO,
+                cutout: "72%",
+                events: [],
+
+                animation: {
+                    duration: 250,
+                },
+
+                plugins: {
+                    legend: {
+                        display: false,
+                    },
+
+                    tooltip: {
+                        enabled: false,
+                    },
+                },
+            },
+        },
+    );
+}
+
+function updateOverallAnalysisMiniChart(
+    chart,
+    progress,
+    activeColor,
+    updateMode,
+) {
+    const normalizedProgress =
+        progress === null ||
+        progress === undefined ||
+        !Number.isFinite(
+            Number(progress),
+        )
+            ? 0
+            : Math.min(
+                Math.max(
+                    Number(progress),
+                    0,
+                ),
+                1,
+            );
+
+    const dataset =
+        chart.data.datasets[0];
+
+    dataset.data = [
+        normalizedProgress,
+        1 - normalizedProgress,
+    ];
+
+    dataset.backgroundColor = [
+        activeColor,
+        "#4b4b4b",
+    ];
+
+    dataset.hoverBackgroundColor =
+        dataset.backgroundColor;
+
+    chart.update(
+        updateMode,
+    );
+}
 
 /* VALORES AO FINAL DAS BARRAS */
 
@@ -368,6 +476,8 @@ function resizeOverallAnalysisCharts() {
                     null;
 
                 [
+                    overallAnalysisCapacityChart,
+                    overallAnalysisLossRateChart,
                     overallAnalysisReceiptChart,
                     overallAnalysisExpeditionChart,
                 ].forEach(
@@ -422,6 +532,8 @@ function renderOverallAnalysisCharts(
     data,
 ) {
     if (
+        !overallAnalysisCapacityChart ||
+        !overallAnalysisLossRateChart ||
         !overallAnalysisReceiptChart ||
         !overallAnalysisExpeditionChart
     ) {
@@ -454,6 +566,34 @@ function renderOverallAnalysisCharts(
             ? undefined
             : "none";
 
+    const capacityProgress =
+        data.cards.capacity.usageRate;
+
+    const lossRateProgress =
+        data.cards.lossesRate.rate !==
+            null &&
+        data.cards.lossesRate.limit > 0
+            ? data.cards.lossesRate.rate /
+                data.cards.lossesRate.limit
+            : null;
+
+    updateOverallAnalysisMiniChart(
+        overallAnalysisCapacityChart,
+        capacityProgress,
+        "#e4e6eb",
+        updateMode,
+    );
+
+    updateOverallAnalysisMiniChart(
+        overallAnalysisLossRateChart,
+        lossRateProgress,
+        data.cards.lossesRate
+            .withinLimit === false
+            ? "#d9534f"
+            : "#e4e6eb",
+        updateMode,
+    );
+
     overallAnalysisReceiptChart.update(
         updateMode,
     );
@@ -468,6 +608,16 @@ function renderOverallAnalysisCharts(
 function initializeOverallAnalysisCharts(
     rootElement,
 ) {
+    const capacityCanvas =
+        rootElement.querySelector(
+            "#overallAnalysisCapacityChart",
+        );
+
+    const lossRateCanvas =
+        rootElement.querySelector(
+            "#overallAnalysisLossRateChart",
+        );
+
     const receiptCanvas =
         rootElement.querySelector(
             "#overallAnalysisReceiptChart",
@@ -479,6 +629,10 @@ function initializeOverallAnalysisCharts(
         );
 
     if (
+        !(capacityCanvas instanceof
+            HTMLCanvasElement) ||
+        !(lossRateCanvas instanceof
+            HTMLCanvasElement) ||
         !(receiptCanvas instanceof
             HTMLCanvasElement) ||
         !(expeditionCanvas instanceof
@@ -495,6 +649,18 @@ function initializeOverallAnalysisCharts(
 
     overallAnalysisPanel =
         rootElement;
+
+    overallAnalysisCapacityChart =
+        createOverallAnalysisMiniChart(
+            capacityCanvas,
+            "#e4e6eb",
+        );
+
+    overallAnalysisLossRateChart =
+        createOverallAnalysisMiniChart(
+            lossRateCanvas,
+            "#e4e6eb",
+        );
 
     overallAnalysisReceiptChart =
         createOverallAnalysisChart(

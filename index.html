@@ -111,6 +111,18 @@
             .final-report-cards .final-report-card .final-report-mini-chart canvas {
                 width: 100%;
                 height: 100%;
+                display: block;
+            }
+            .final-report-cards .final-report-card .final-report-mini-chart img {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                z-index: 1;
+                width: 42px;
+                height: 42px;
+                object-fit: contain;
+                pointer-events: none;
+                transform: translate(-50%, -50%);
             }
 
             /*  */
@@ -1930,14 +1942,16 @@
                                             <div class="final-report-card">
                                                 <div class="flex-box-start">
                                                     <div class="final-report-mini-chart">
-                                                        <canvas id="">
+                                                        <canvas id="overallAnalysisCapacityChart" role="img" aria-label="Uso da capacidade operacional">
                                                             Seu navegador não suporta gráficos em canvas.
                                                         </canvas>
+
+                                                        <img src="images/geral-icons/box-icon.svg" alt="" aria-hidden="true">
                                                     </div>
 
                                                     <div>
-                                                        <h2>-</h2>
-                                                        <p>Folga de <span id="">-</span> Pacotes</p>
+                                                        <h2 id="overallAnalysisCapacityUsage">—</h2>
+                                                        <p id="overallAnalysisCapacityStatus">Folga de — Pacotes</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -1972,14 +1986,16 @@
                                             <div class="final-report-card">
                                                 <div class="flex-box-start">
                                                     <div class="final-report-mini-chart">
-                                                        <canvas id="">
+                                                        <canvas id="overallAnalysisLossRateChart" role="img" aria-label="Taxa de perdas em relação ao limite">
                                                             Seu navegador não suporta gráficos em canvas.
                                                         </canvas>
+
+                                                        <img src="images/geral-icons/bars-icon.svg" alt="" aria-hidden="true">
                                                     </div>
 
                                                     <div>
-                                                        <h2>-</h2>
-                                                        <p><span id=""></span> p.p <span id="">Abaixo</span> do Limite</p>
+                                                        <h2 id="overallAnalysisLossRate">—</h2>
+                                                        <p id="overallAnalysisLossRateStatus">—</p>
                                                     </div>
                                                 </div>
                                             </div>

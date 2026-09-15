@@ -13,6 +13,35 @@ const overallAnalysisRateFormatter =
         },
     );
 
+const overallAnalysisCapacityRateFormatter =
+    new Intl.NumberFormat(
+        "pt-BR",
+        {
+            style: "percent",
+            minimumFractionDigits: 1,
+            maximumFractionDigits: 1,
+        },
+    );
+
+const overallAnalysisLossRateFormatter =
+    new Intl.NumberFormat(
+        "pt-BR",
+        {
+            style: "percent",
+            minimumFractionDigits: 3,
+            maximumFractionDigits: 3,
+        },
+    );
+
+const overallAnalysisPercentagePointFormatter =
+    new Intl.NumberFormat(
+        "pt-BR",
+        {
+            minimumFractionDigits: 3,
+            maximumFractionDigits: 3,
+        },
+    );
+
 const overallAnalysisWeekdays =
     Object.freeze([
         "Domingo",
@@ -65,6 +94,63 @@ function formatOverallAnalysisRate(
     }
 
     return overallAnalysisRateFormatter
+        .format(
+            Number(value),
+        );
+}
+
+function formatOverallAnalysisCapacityRate(
+    value,
+) {
+    if (
+        value === null ||
+        value === undefined ||
+        !Number.isFinite(
+            Number(value),
+        )
+    ) {
+        return "—";
+    }
+
+    return overallAnalysisCapacityRateFormatter
+        .format(
+            Number(value),
+        );
+}
+
+function formatOverallAnalysisLossRate(
+    value,
+) {
+    if (
+        value === null ||
+        value === undefined ||
+        !Number.isFinite(
+            Number(value),
+        )
+    ) {
+        return "—";
+    }
+
+    return overallAnalysisLossRateFormatter
+        .format(
+            Number(value),
+        );
+}
+
+function formatOverallAnalysisPercentagePoints(
+    value,
+) {
+    if (
+        value === null ||
+        value === undefined ||
+        !Number.isFinite(
+            Number(value),
+        )
+    ) {
+        return "—";
+    }
+
+    return overallAnalysisPercentagePointFormatter
         .format(
             Number(value),
         );
@@ -178,6 +264,26 @@ function getOverallAnalysisViewElements(
         date:
             getElement(
                 "overallAnalysisDate",
+            ),
+
+        capacityUsage:
+            getElement(
+                "overallAnalysisCapacityUsage",
+            ),
+
+        capacityStatus:
+            getElement(
+                "overallAnalysisCapacityStatus",
+            ),
+
+        lossRate:
+            getElement(
+                "overallAnalysisLossRate",
+            ),
+
+        lossRateStatus:
+            getElement(
+                "overallAnalysisLossRateStatus",
             ),
 
         planned:
@@ -332,6 +438,61 @@ function renderOverallAnalysisView(
         overallAnalysisViewElements;
 
     renderOverallAnalysisDate();
+
+    elements.capacityUsage.textContent =
+        formatOverallAnalysisCapacityRate(
+            data.cards.capacity.usageRate,
+        );
+
+    if (
+        data.cards.capacity.balance ===
+        null
+    ) {
+        elements.capacityStatus.textContent =
+            "Folga de — Pacotes";
+    } else if (
+        data.cards.capacity.balance >= 0
+    ) {
+        elements.capacityStatus.textContent =
+            "Folga de " +
+            formatOverallAnalysisQuantity(
+                data.cards.capacity.balance,
+            ) +
+            " Pacotes";
+    } else {
+        elements.capacityStatus.textContent =
+            "Excesso de " +
+            formatOverallAnalysisQuantity(
+                Math.abs(
+                    data.cards.capacity.balance,
+                ),
+            ) +
+            " Pacotes";
+    }
+
+    elements.lossRate.textContent =
+        formatOverallAnalysisLossRate(
+            data.cards.lossesRate.rate,
+        );
+
+    elements.lossRateStatus.textContent =
+        data.cards.lossesRate.rate ===
+            null
+            ? "—"
+            : (
+                formatOverallAnalysisPercentagePoints(
+                    data.cards.lossesRate
+                        .differencePercentagePoints,
+                ) +
+                " p.p " +
+                (
+                    data.cards.lossesRate
+                        .withinLimit
+                        ? "Abaixo"
+                        : "Acima"
+                ) +
+                " do Limite"
+            );
 
     elements.planned.textContent =
         formatOverallAnalysisQuantity(

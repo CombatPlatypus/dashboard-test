@@ -322,6 +322,8 @@ function updateLossesRateMonthField(
 function getLossesRateMonthSummary(
     monthIndex =
         lossesRateState.activeMonth,
+    state =
+        lossesRateState,
 ) {
     if (
         !isValidLossesRateMonthIndex(
@@ -332,9 +334,13 @@ function getLossesRateMonthSummary(
     }
 
     const month =
-        lossesRateState.months[
+        state?.months?.[
             monthIndex
         ];
+
+    if (!month) {
+        return null;
+    }
 
     const hasLosses =
         month.lost !== null ||

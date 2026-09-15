@@ -7,6 +7,16 @@ import {
     getExpeditionSummary,
 } from "../expedition/state.js";
 
+import {
+    getLossesRateMonthSummary,
+} from "../losses-rate/state.js";
+
+const OVERALL_ANALYSIS_CAPACITY =
+    20000;
+
+const OVERALL_ANALYSIS_LOSS_RATE_LIMIT =
+    0.0003;
+
 /* NORMALIZA O NOME EXIBIDO NOS DESTAQUES */
 
 function getOverallAnalysisPersonName(
@@ -199,6 +209,7 @@ function getExpeditionHighlights(
 function createOverallAnalysisData(
     receiptState,
     expeditionState,
+    lossesRateState,
 ) {
     const receiptSummary =
         getReceiptSummary(
@@ -244,7 +255,75 @@ function createOverallAnalysisData(
     const floorVolume =
         expeditionSummary.floorVolume;
 
+    const capacityUsed =
+        expectedVolume;
+
+    const capacityUsageRate =
+        capacityUsed !== null
+            ? capacityUsed /
+                OVERALL_ANALYSIS_CAPACITY
+            : null;
+
+    const capacityBalance =
+        capacityUsed !== null
+            ? OVERALL_ANALYSIS_CAPACITY -
+                capacityUsed
+            : null;
+
+    const lossesRateSummary =
+        lossesRateState
+            ? getLossesRateMonthSummary(
+                lossesRateState.activeMonth,
+                lossesRateState,
+            )
+            : null;
+
+    const lossRate =
+        lossesRateSummary?.lossRate ??
+        null;
+
+    const lossRateDifference =
+        lossRate !== null
+            ? Math.abs(
+                OVERALL_ANALYSIS_LOSS_RATE_LIMIT -
+                    lossRate,
+            ) * 100
+            : null;
+
     return {
+        cards: {
+            capacity: {
+                limit:
+                    OVERALL_ANALYSIS_CAPACITY,
+
+                used:
+                    capacityUsed,
+
+                usageRate:
+                    capacityUsageRate,
+
+                balance:
+                    capacityBalance,
+            },
+
+            lossesRate: {
+                rate:
+                    lossRate,
+
+                limit:
+                    OVERALL_ANALYSIS_LOSS_RATE_LIMIT,
+
+                differencePercentagePoints:
+                    lossRateDifference,
+
+                withinLimit:
+                    lossRate !== null
+                        ? lossRate <=
+                            OVERALL_ANALYSIS_LOSS_RATE_LIMIT
+                        : null,
+            },
+        },
+
         flow: {
             planned:
                 expectedVolume,
