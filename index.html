@@ -274,13 +274,15 @@
                     </li> 
 
                     <div class="nav-actions">
-                        <button id="reportDownloadButton">
-                            <img src="images/geral-icons/save-icon.svg" disabled>
+                        <button id="reportDownloadButton" type="button" title="Salvar sessão" aria-label="Salvar sessão dos relatórios">
+                            <img src="images/geral-icons/save-icon.svg" alt="" aria-hidden="true">
                         </button>
 
-                        <button id="reportImportButton">
-                            <img src="images/geral-icons/import-icon.svg" disabled>
+                        <button id="reportImportButton" type="button" title="Importar sessão" aria-label="Importar sessão dos relatórios">
+                            <img src="images/geral-icons/import-icon.svg" alt="" aria-hidden="true">
                         </button>
+
+                        <input id="reportSessionFileInput" type="file" accept=".js,text/javascript,application/javascript" hidden>
 
                         <a data-toggle="external-links">
                             <img src="images/menu-icons/link-icon.svg">
@@ -309,6 +311,14 @@
                 </ul> 
             </div>        
         </nav>
+
+        <div class="warning report-session-feedback" id="reportSessionFeedback" role="status" aria-live="polite" aria-atomic="true" data-notification-type="info" hidden>
+            <div class="flex-box-start">
+                <img id="reportSessionFeedbackIcon" src="images/geral-icons/bell-icon.svg" alt="">
+
+                <h4 id="reportSessionFeedbackText"></h4>
+            </div>
+        </div>
 
         <!-- ESTRUTURA PRINCIPAL -->
 

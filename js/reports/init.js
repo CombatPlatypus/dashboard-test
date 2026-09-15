@@ -26,6 +26,10 @@ import {
     initializeReportNotifications,
 } from "./report-notifications.js";
 
+import {
+    initializeReportSession,
+} from "./session.js";
+
 /* INICIALIZA O PAINEL DE RELATÓRIOS */
 
 function initializeReportsPanel() {
@@ -57,6 +61,10 @@ function initializeReportsPanel() {
     );
 
     reportManager.initializeAll();
+
+    // SESSÃO DOS RELATÓRIOS
+
+    initializeReportSession();
 }
 
 if (
