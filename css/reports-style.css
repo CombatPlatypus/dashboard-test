@@ -469,6 +469,16 @@
     #expedition .expedition-guardian-name {
         text-transform: uppercase;
     }
+    #expedition .two-horizontal-bars-chart .chart-panel {
+        height: auto !important;
+        min-height: 1226px !important;
+    }
+    #expedition .two-horizontal-bars-chart .chart-panel > div {
+        height: 1115px;
+    }
+    #overall-analysis td {
+        text-align: center;
+    }
 
 /* ESTILOS ÚNICOS DE CADA RELATÓRIO */
 

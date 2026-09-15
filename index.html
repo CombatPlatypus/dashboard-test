@@ -33,6 +33,8 @@
 
         <style>
 
+            /* RELATÓRIO FINAL - TITULOS */
+
             .final-report-title {
                 padding: 0.5rem 0.625rem 0.625rem;
                 background-color: var(--color-table-th);
@@ -120,25 +122,6 @@
                 padding: 25px;
                 border: 1px solid var(--color-border);
             }
-
-            /*  */
-
-            .final-report-receipt-and-expedition {
-                gap: 15px;
-            }
-            .final-report-receipt-and-expedition > div {
-                flex: 1 1 0;
-            }
-            .final-report-receipt > .horizontal-bars-chart > div,
-            .final-report-expedition > .horizontal-bars-chart > div {
-                height: 320px;
-                margin-top: 15px;
-            }
-
-            
-            .final-report-flow {
-                flex: 1 1 0;
-            }
             .flow .mini-cards {
                 gap: 15px;
                 display: grid;
@@ -170,6 +153,7 @@
                 text-align: center;
             }
 
+            /*  */
 
             .final-report-highlights {
                 flex: 0 0 500px;
@@ -200,15 +184,23 @@
                 margin: 0;
             }
 
+            /*  */
+
+            .final-report-receipt-and-expedition {
+                gap: 15px;
+            }
+            .final-report-receipt-and-expedition > div {
+                flex: 1 1 0;
+            }
+            .final-report-receipt > .horizontal-bars-chart > div,
+            .final-report-expedition > .horizontal-bars-chart > div {
+                height: 320px;
+                margin-top: 15px;
+            }
+
             /* AJUSTES */
 
-            #expedition .two-horizontal-bars-chart .chart-panel {
-                height: auto !important;
-                min-height: 1226px !important;
-            }
-            #expedition .two-horizontal-bars-chart .chart-panel > div {
-                height: 1115px;
-            }
+
 
         </style>
     </head>	
@@ -2147,7 +2139,7 @@
                                                         <h4>Situação da Expedição</h4>
                                                     </div>
                                                 </div>
-                                                
+
                                                 <div>
                                                     <canvas id="overallAnalysisExpeditionChart" role="img" aria-label="Comparação entre volume conferido e volume no piso da expedição">
                                                         Seu navegador não suporta gráficos em canvas.
