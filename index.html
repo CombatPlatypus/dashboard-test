@@ -74,15 +74,23 @@
                 width: 100%;
             }
             .final-report-cards > div {
+                min-width: 0;
+                min-height: 125px;
+            }
+            .final-report-cards > .final-report-card {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
                 justify-content: center;
                 gap: 11px;
-                min-width: 0;
-                min-height: 125px;
                 padding: 25px;
                 border: 1px solid var(--color-border);
+            }
+            .final-report-cards > .final-report-card > .final-report-mini-chart {
+                width: 100%;
+                min-height: 150px;
+                height: 150px;
+                position: relative;
             }
 
             /*  */
@@ -1907,10 +1915,90 @@
                                     <!-- CARDS -->
 
                                     <div class="final-report-cards">
-                                        <div class=""></div>
-                                        <div class=""></div>
-                                        <div class=""></div>
-                                        <div class=""></div>
+                                        <div>
+                                            <div class="final-report-title">
+                                                <h4>Uso da Capacidade</h4>
+                                            </div>
+
+                                            <div class="final-report-card">
+                                                <div class="flex-box-start">
+                                                    <div class="final-report-mini-chart">
+                                                        <canvas id="">
+                                                            Seu navegador não suporta gráficos em canvas.
+                                                        </canvas>
+                                                    </div>
+
+                                                    <div>
+                                                        <h2>-</h2>
+                                                        <p>Folga de <span id="">-</span> Pacotes</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <div class="final-report-title">
+                                                <h4>Avarias Recebidas</h4>
+                                            </div>
+
+                                            <div class="final-report-card">
+                                                <div class="flex-box-start">
+                                                    <div class="final-report-mini-chart">
+                                                        <canvas id="">
+                                                            Seu navegador não suporta gráficos em canvas.
+                                                        </canvas>
+                                                    </div>
+
+                                                    <div>
+                                                        <h2>-</h2>
+                                                        <p id="">-</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <div class="final-report-title">
+                                                <h4>Perdas Confirmadas</h4>
+                                            </div>
+
+                                            <div class="final-report-card">
+                                                <div class="flex-box-start">
+                                                    <div class="final-report-mini-chart">
+                                                        <canvas id="">
+                                                            Seu navegador não suporta gráficos em canvas.
+                                                        </canvas>
+                                                    </div>
+
+                                                    <div>
+                                                        <h2>-</h2>
+                                                        <p id="">-</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <div class="final-report-title">
+                                                <h4>Taxa de Perdas</h4>
+                                            </div>
+
+                                            <div class="final-report-card">
+                                                <div class="flex-box-start">
+                                                    <div class="final-report-mini-chart">
+                                                        <canvas id="">
+                                                            Seu navegador não suporta gráficos em canvas.
+                                                        </canvas>
+                                                    </div>
+
+                                                    <div>
+                                                        <h2>-</h2>
+                                                        <p><span id=""></span> p.p <span id="">Abaixo</span> do Limite</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                     </div>
 
                                     <!-- FLUXO DO DIA E DASTAQUES DA OPERAÇÃO -->
