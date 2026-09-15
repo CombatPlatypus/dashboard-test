@@ -86,11 +86,33 @@
                 padding: 25px;
                 border: 1px solid var(--color-border);
             }
+            .final-report-cards .final-report-card h2 {
+                margin: 0;
+                font-weight: 600;
+            }
+            .final-report-cards .final-report-card h2 {
+                margin: 0;
+                font-weight: 600;
+            }
+            .final-report-cards .final-report-card p {
+                margin: 0;
+            }
+            .final-report-cards .final-report-card .flex-box-start {
+                column-gap: 15px;
+                align-items: center;
+            }
+            .final-report-cards .final-report-card .flex-box-start > div {
+                text-align: center;
+            }
             .final-report-cards .final-report-card .final-report-mini-chart {
                 width: 100%;
                 min-height: 150px;
                 height: 150px;
                 position: relative;
+            }
+            .final-report-cards .final-report-card .final-report-mini-chart canvas {
+                width: 100%;
+                height: 100%;
             }
 
             /*  */
@@ -2113,24 +2135,7 @@
                                             <div class="horizontal-bars-chart">
                                                 <div class="chart-title">
                                                     <div class="flex-box-between">
-                                                        <h4>Esperado x Recebido x Gap</h4>
-
-                                                        <div class="flex-box-start">
-                                                            <div class="type">
-                                                                <div style="background-color: #e4e6eb;"></div>
-                                                                <p>Esperado</p>
-                                                            </div>
-
-                                                            <div class="type">
-                                                                <div style="background-color: #8BC34A;"></div>
-                                                                <p>Recebido</p>
-                                                            </div>
-
-                                                            <div class="type">
-                                                                <div style="background-color: #ffc107;"></div>
-                                                                <p>Gap</p>
-                                                            </div>
-                                                        </div>
+                                                        <h4>Situação do Processamento</h4>
                                                     </div>
                                                 </div>
 
@@ -2166,24 +2171,7 @@
                                             <div class="horizontal-bars-chart">
                                                 <div class="chart-title">
                                                     <div class="flex-box-between">
-                                                        <h4>Esperado x Recebido x Gap</h4>
-
-                                                        <div class="flex-box-start">
-                                                            <div class="type">
-                                                                <div style="background-color: #8BC34A;"></div>
-                                                                <p>Volume Conferido</p>
-                                                            </div>
-
-                                                            <div class="type">
-                                                                <div style="background-color: #e4e6eb;"></div>
-                                                                <p>Volume Retirado</p>
-                                                            </div>
-
-                                                            <div class="type">
-                                                                <div style="background-color: #ffc107;"></div>
-                                                                <p>Volume no Piso</p>
-                                                            </div>
-                                                        </div>
+                                                        <h4>Situação da Expedição</h4>
                                                     </div>
                                                 </div>
 
