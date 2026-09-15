@@ -288,8 +288,6 @@
     /* TABELAS */
 
     #reports table {
-        width: 100%;
-        margin: 0;
         table-layout: fixed;
         border-collapse: collapse;
         background-color: var(--color-container);
@@ -503,12 +501,6 @@
     #planning .planning-report-layout {
         align-items: flex-start !important;
     }
-
-    /* PLANEJAMENTO - INDICADORES */
-
-    #planning .indicators tbody tr td {
-        text-align: center !important;
-    } 
 
     /* PLANEJAMENTO - COLUNAS DAS TABELAS */
 
