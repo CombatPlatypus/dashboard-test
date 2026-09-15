@@ -129,13 +129,9 @@
             .final-report-receipt-and-expedition > div {
                 flex: 1 1 0;
             }
-            .final-report-receipt > div,
-            .final-report-expedition > div {
-                width: 100%;
+            .final-report-receipt > .horizontal-bars-chart > div,
+            .final-report-expedition > .horizontal-bars-chart > div {
                 height: 320px;
-                position: relative;
-                padding: 15px;
-                border: 1px solid var(--color-border);
                 margin-top: 15px;
             }
 
@@ -2114,9 +2110,11 @@
                                                     </div>
                                                 </div>
 
-                                                <canvas id="overallAnalysisReceiptChart" role="img" aria-label="Comparação entre volume esperado, volume recebido e gap do processamento">
-                                                    Seu navegador não suporta gráficos em canvas.
-                                                </canvas>
+                                                <div>
+                                                    <canvas id="overallAnalysisReceiptChart" role="img" aria-label="Comparação entre volume esperado, volume recebido e gap do processamento">
+                                                        Seu navegador não suporta gráficos em canvas.
+                                                    </canvas>
+                                                </div>
                                             </div>
                                         </div>
 
@@ -2149,10 +2147,12 @@
                                                         <h4>Situação da Expedição</h4>
                                                     </div>
                                                 </div>
-
-                                                <canvas id="overallAnalysisExpeditionChart" role="img" aria-label="Comparação entre volume conferido e volume no piso da expedição">
-                                                    Seu navegador não suporta gráficos em canvas.
-                                                </canvas>
+                                                
+                                                <div>
+                                                    <canvas id="overallAnalysisExpeditionChart" role="img" aria-label="Comparação entre volume conferido e volume no piso da expedição">
+                                                        Seu navegador não suporta gráficos em canvas.
+                                                    </canvas>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
