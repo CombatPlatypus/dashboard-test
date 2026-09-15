@@ -25,6 +25,53 @@ const OVERALL_ANALYSIS_CHART_PIXEL_RATIO =
         2,
     );
 
+const OVERALL_ANALYSIS_CHART_FONT = {
+    family: '"Open Sans", sans-serif',
+    size: 14,
+};
+
+/* ESPAÇAMENTO DOS TEXTOS DO CANVAS */
+
+function applyOverallAnalysisTextSpacing(
+    chart,
+) {
+    if (
+        "letterSpacing" in
+        chart.ctx
+    ) {
+        chart.ctx.letterSpacing =
+            "1px";
+    }
+}
+
+const overallAnalysisTextSpacingPlugin = {
+    id: "overallAnalysisTextSpacing",
+
+    beforeDraw(
+        chart,
+    ) {
+        applyOverallAnalysisTextSpacing(
+            chart,
+        );
+    },
+
+    beforeDatasetsDraw(
+        chart,
+    ) {
+        applyOverallAnalysisTextSpacing(
+            chart,
+        );
+    },
+
+    beforeTooltipDraw(
+        chart,
+    ) {
+        applyOverallAnalysisTextSpacing(
+            chart,
+        );
+    },
+};
+
 /* VALORES AO FINAL DAS BARRAS */
 
 const overallAnalysisBarValuesPlugin = {
@@ -44,8 +91,17 @@ const overallAnalysisBarValuesPlugin = {
             chart.chartArea;
 
         context.save();
+
+        if (
+            "letterSpacing" in
+            context
+        ) {
+            context.letterSpacing =
+                "1px";
+        }
+
         context.font =
-            '600 13px "Open Sans", sans-serif';
+            '600 14px "Open Sans", sans-serif';
         context.textBaseline =
             "middle";
         context.lineWidth = 3;
@@ -172,6 +228,7 @@ function createOverallAnalysisChart(
                 },
 
                 plugins: [
+                    overallAnalysisTextSpacingPlugin,
                     overallAnalysisBarValuesPlugin,
                 ],
 
@@ -198,6 +255,14 @@ function createOverallAnalysisChart(
                         },
 
                         tooltip: {
+                            titleFont: {
+                                ...OVERALL_ANALYSIS_CHART_FONT,
+                                weight: "600",
+                            },
+
+                            bodyFont:
+                                OVERALL_ANALYSIS_CHART_FONT,
+
                             callbacks: {
                                 label(
                                     context,
@@ -224,11 +289,21 @@ function createOverallAnalysisChart(
                                 text:
                                     "Quantidade de pacotes",
                                 color: "#e4e6eb",
+
+                                font:
+                                    OVERALL_ANALYSIS_CHART_FONT,
+
+                                padding: {
+                                    top: 15,
+                                },
                             },
 
                             ticks: {
                                 color: "#e4e6eb",
                                 precision: 0,
+
+                                font:
+                                    OVERALL_ANALYSIS_CHART_FONT,
 
                                 callback(
                                     value,
@@ -246,10 +321,20 @@ function createOverallAnalysisChart(
                         },
 
                         y: {
+                            afterFit(
+                                scale,
+                            ) {
+                                scale.width +=
+                                    18;
+                            },
+
                             ticks: {
                                 color: "#e4e6eb",
                                 autoSkip: false,
-                                padding: 6,
+                                padding: 8,
+
+                                font:
+                                    OVERALL_ANALYSIS_CHART_FONT,
                             },
 
                             grid: {
