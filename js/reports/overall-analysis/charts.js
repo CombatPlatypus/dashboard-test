@@ -5,6 +5,9 @@ import {
 let overallAnalysisCapacityChart =
     null;
 
+let overallAnalysisPackagesAnalysisChart =
+    null;
+
 let overallAnalysisLossRateChart =
     null;
 
@@ -477,6 +480,7 @@ function resizeOverallAnalysisCharts() {
 
                 [
                     overallAnalysisCapacityChart,
+                    overallAnalysisPackagesAnalysisChart,
                     overallAnalysisLossRateChart,
                     overallAnalysisReceiptChart,
                     overallAnalysisExpeditionChart,
@@ -533,6 +537,7 @@ function renderOverallAnalysisCharts(
 ) {
     if (
         !overallAnalysisCapacityChart ||
+        !overallAnalysisPackagesAnalysisChart ||
         !overallAnalysisLossRateChart ||
         !overallAnalysisReceiptChart ||
         !overallAnalysisExpeditionChart
@@ -618,6 +623,11 @@ function initializeOverallAnalysisCharts(
             "#overallAnalysisLossRateChart",
         );
 
+    const packagesAnalysisCanvas =
+        rootElement.querySelector(
+            "#overallAnalysisPackagesAnalysisChart",
+        );
+
     const receiptCanvas =
         rootElement.querySelector(
             "#overallAnalysisReceiptChart",
@@ -630,6 +640,8 @@ function initializeOverallAnalysisCharts(
 
     if (
         !(capacityCanvas instanceof
+            HTMLCanvasElement) ||
+        !(packagesAnalysisCanvas instanceof
             HTMLCanvasElement) ||
         !(lossRateCanvas instanceof
             HTMLCanvasElement) ||
@@ -655,6 +667,19 @@ function initializeOverallAnalysisCharts(
             capacityCanvas,
             "#e4e6eb",
         );
+
+    overallAnalysisPackagesAnalysisChart =
+        createOverallAnalysisMiniChart(
+            packagesAnalysisCanvas,
+            "#d9534f",
+        );
+
+    updateOverallAnalysisMiniChart(
+        overallAnalysisPackagesAnalysisChart,
+        0.08,
+        "#d9534f",
+        "none",
+    );
 
     overallAnalysisLossRateChart =
         createOverallAnalysisMiniChart(
