@@ -1924,7 +1924,7 @@
                                     <div class="final-report-header flex-box-between">
                                         <div class="flex-box-start">
                                             <img src="images/geral-icons/calendar-icon.svg">
-                                            <p id="">Dia 14 / 09 / 2026 - Segunda Feira</p>
+                                            <p id="overallAnalysisDate">—</p>
                                         </div>
 
                                        <p>Janela do <span id="">PM 2</span> - Analista do Turno: <span id="">-</span></p>
@@ -2013,7 +2013,7 @@
 
                                                         <div>
                                                             <h4>Planejado</h4>
-                                                            <p>-</p>
+                                                            <p id="overallAnalysisPlanned">—</p>
                                                         </div>
                                                     </div>
 
@@ -2022,7 +2022,7 @@
 
                                                         <div>
                                                             <h4>Processado</h4>
-                                                            <p>-</p>
+                                                            <p id="overallAnalysisProcessed">—</p>
                                                         </div>
                                                     </div>
 
@@ -2031,7 +2031,7 @@
 
                                                         <div>
                                                             <h4>Expedido</h4>
-                                                            <p>-</p>
+                                                            <p id="overallAnalysisExpedited">—</p>
                                                         </div>
                                                     </div>
 
@@ -2040,7 +2040,7 @@
 
                                                         <div>
                                                             <h4>No Piso</h4>
-                                                            <p>-</p>
+                                                            <p id="overallAnalysisFloor">—</p>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -2059,22 +2059,22 @@
                                             <ul>
                                                 <li>
                                                     <img src="images/geral-icons/speed-icon.svg">
-                                                    <h5>Recebedor Mais Rápido: <span id=""></span></h5>
+                                                    <h5>Recebedor Mais Rápido: <span id="overallAnalysisFastestReceiver">—</span></h5>
                                                 </li>
 
                                                 <li>
                                                     <img src="images/geral-icons/star-icon.svg">
-                                                    <h5>Recebeu Mais Pacotes: <span id=""></span></h5>
+                                                    <h5>Recebeu Mais Pacotes: <span id="overallAnalysisMostPackages">—</span></h5>
                                                 </li>
 
                                                 <li>
                                                     <img src="images/geral-icons/speed-icon.svg">
-                                                    <h5>Conferente Mais Rápido: <span id=""></span></h5>
+                                                    <h5>Conferente Mais Rápido: <span id="overallAnalysisFastestChecker">—</span></h5>
                                                 </li>
 
                                                 <li>
                                                     <img src="images/geral-icons/star-icon.svg">
-                                                    <h5>Conferiu Mais Rotas: <span id=""></span></h5>
+                                                    <h5>Conferiu Mais Rotas: <span id="overallAnalysisMostRoutesChecker">—</span></h5>
                                                 </li>
 
                                             </ul>
@@ -2099,10 +2099,10 @@
 
                                                 <tbody>
                                                     <tr>
-                                                        <td>—</td>
-                                                        <td>—</td>
-                                                        <td>—</td>
-                                                        <td>—</td>
+                                                        <td id="overallAnalysisExpectedVolume">—</td>
+                                                        <td id="overallAnalysisReceivedVolume">—</td>
+                                                        <td id="overallAnalysisReceiptErrors">—</td>
+                                                        <td id="overallAnalysisReceiptErrorRate">—</td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -2114,7 +2114,7 @@
                                                     </div>
                                                 </div>
 
-                                                <canvas id="">
+                                                <canvas id="overallAnalysisReceiptChart" role="img" aria-label="Comparação entre volume esperado, volume recebido e gap do processamento">
                                                     Seu navegador não suporta gráficos em canvas.
                                                 </canvas>
                                             </div>
@@ -2135,10 +2135,10 @@
 
                                                 <tbody>
                                                     <tr>
-                                                        <td>—</td>
-                                                        <td>—</td>
-                                                        <td>—</td>
-                                                        <td>—</td>
+                                                        <td id="overallAnalysisRoutesChecked">—</td>
+                                                        <td id="overallAnalysisVolumeChecked">—</td>
+                                                        <td id="overallAnalysisFloorVolume">—</td>
+                                                        <td id="overallAnalysisExpeditionTime">—</td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -2150,7 +2150,7 @@
                                                     </div>
                                                 </div>
 
-                                                <canvas id="">
+                                                <canvas id="overallAnalysisExpeditionChart" role="img" aria-label="Comparação entre volume conferido e volume no piso da expedição">
                                                     Seu navegador não suporta gráficos em canvas.
                                                 </canvas>
                                             </div>

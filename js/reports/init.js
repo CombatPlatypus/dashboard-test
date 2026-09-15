@@ -19,6 +19,10 @@ import {
 } from "./losses-rate/index.js";
 
 import {
+    overallAnalysisReport,
+} from "./overall-analysis/index.js";
+
+import {
     initializeReportNotifications,
 } from "./report-notifications.js";
 
@@ -46,6 +50,10 @@ function initializeReportsPanel() {
 
     reportManager.register(
         lossesRateReport,
+    );
+
+    reportManager.register(
+        overallAnalysisReport,
     );
 
     reportManager.initializeAll();
