@@ -312,7 +312,7 @@
         background-color: var(--color-table-tr);
     }
     #reports td {
-        text-align: left;
+        text-align: center;
     }
     #reports .empty-row td {
         color: var(--color-gray-p);
@@ -494,7 +494,10 @@
     #planning .planning-sheet-sidebar {
         min-width: 0;
     }
-
+    .planning-sheet-table td {
+        text-align: left !important;
+    }
+    
     /* PLANEJAMENTO - LAYOUT ENTRE PRÉVIA E CONTROLES */
 
     #planning .planning-report-layout {
@@ -1009,31 +1012,6 @@
     #receipt .receipt-error-calculation-option:has(input:disabled) {
         opacity: 0.55;
         cursor: not-allowed;
-    }
-
-    /* RECEBIMENTO - GRAFICOS E PARTE DE COMPARAÇÃO */
-
-    #receipt .receipt-operator-preview-table {
-        width: 100%;
-    }
-    @media screen and (max-width: 700px) {
-        #receipt .receipt-progress-header {
-            align-items: flex-start;
-        }
-    }
-
-
-
-    /* RECEBIMENTO - RESPONSIVDADE */
-
-    @media screen and (max-width: 900px) {
-        #receipt #receipt-charts > .preview-style {
-            height: auto;
-        }
-
-        #receipt #receipt-charts .charts {
-            grid-template-columns: 1fr;
-        }
     }
 
     /* EXPEDIÇÃO - TABELAS */
