@@ -7,6 +7,7 @@ import {
     createSpXLinehaulWindowCandidates,
     formatSpXLinehaulOrigin,
     getSpXLinehaulPlainLoadedOrders,
+    parseSpXLinehaulQuantity,
 } from "../core/spx-linehaul-rules.js";
 
 const PLANNING_IMPORT_BUTTON_ID =
@@ -116,40 +117,9 @@ function getPlanningImportLhCode(
 function parsePlanningImportQuantity(
     value,
 ) {
-    const receivedValue =
-        String(
-            value ?? "",
-        )
-            .replace(
-                /\u00a0/g,
-                " ",
-            )
-            .trim();
-
-    if (
-        !/^\d{1,3}(?:[.\s]\d{3})*$/.test(
-            receivedValue,
-        ) &&
-        !/^\d+$/.test(
-            receivedValue,
-        )
-    ) {
-        return null;
-    }
-
-    const quantity =
-        Number(
-            receivedValue.replace(
-                /[.\s]/g,
-                "",
-            ),
-        );
-
-    return Number.isSafeInteger(
-        quantity,
-    )
-        ? quantity
-        : null;
+    return parseSpXLinehaulQuantity(
+        value,
+    );
 }
 
 /* IDENTIFICA A JANELA EXPLÍCITA */
@@ -441,6 +411,117 @@ function createPlanningImportHtmlRecord(
     };
 }
 
+/* EXTRAI OS REGISTROS DE UMA MATRIZ TABULAR */
+
+function parsePlanningImportMatrix(
+    matrix,
+) {
+    let headerRowIndex =
+        -1;
+
+    let columns =
+        null;
+
+    for (
+        let rowIndex = 0;
+        rowIndex < matrix.length;
+        rowIndex += 1
+    ) {
+        const receivedColumns =
+            getPlanningImportColumns(
+                matrix[rowIndex],
+            );
+
+        if (receivedColumns) {
+            headerRowIndex =
+                rowIndex;
+
+            columns =
+                receivedColumns;
+
+            break;
+        }
+    }
+
+    if (
+        headerRowIndex === -1 ||
+        !columns
+    ) {
+        return [];
+    }
+
+    const parsedRecords = [];
+    let currentRecord = null;
+
+    function finishCurrentRecord() {
+        if (!currentRecord) {
+            return;
+        }
+
+        parsedRecords.push(
+            createPlanningImportHtmlRecord(
+                currentRecord,
+            ),
+        );
+
+        currentRecord = null;
+    }
+
+    matrix
+        .slice(
+            headerRowIndex + 1,
+        )
+        .forEach(
+            function (row) {
+                const code =
+                    getPlanningImportLhCode(
+                        row[columns.code],
+                    );
+
+                if (
+                    code &&
+                    currentRecord?.code !==
+                        code
+                ) {
+                    finishCurrentRecord();
+
+                    currentRecord = {
+                        code,
+                        origin: [],
+                        punctuality: [],
+                        cpt: [],
+                        quantity: [],
+                    };
+                }
+
+                if (!currentRecord) {
+                    return;
+                }
+
+                currentRecord.origin.push(
+                    row[columns.origin] ?? "",
+                );
+
+                currentRecord.punctuality.push(
+                    row[columns.punctuality] ??
+                        "",
+                );
+
+                currentRecord.cpt.push(
+                    row[columns.cpt] ?? "",
+                );
+
+                currentRecord.quantity.push(
+                    row[columns.quantity] ?? "",
+                );
+            },
+        );
+
+    finishCurrentRecord();
+
+    return parsedRecords;
+}
+
 /* EXTRAI OS REGISTROS DO HTML */
 
 function parsePlanningSpXHtml(
@@ -469,131 +550,13 @@ function parsePlanningSpXHtml(
         )
         .forEach(
             function (table) {
-                const matrix =
-                    createPlanningImportTableMatrix(
-                        table,
-                    );
-
-                let headerRowIndex =
-                    -1;
-
-                let columns =
-                    null;
-
-                for (
-                    let rowIndex = 0;
-                    rowIndex < matrix.length;
-                    rowIndex += 1
-                ) {
-                    const receivedColumns =
-                        getPlanningImportColumns(
-                            matrix[rowIndex],
-                        );
-
-                    if (receivedColumns) {
-                        headerRowIndex =
-                            rowIndex;
-
-                        columns =
-                            receivedColumns;
-
-                        break;
-                    }
-                }
-
-                if (
-                    headerRowIndex === -1 ||
-                    !columns
-                ) {
-                    return;
-                }
-
-                let currentRecord =
-                    null;
-
-                function finishCurrentRecord() {
-                    if (!currentRecord) {
-                        return;
-                    }
-
-                    parsedRecords.push(
-                        createPlanningImportHtmlRecord(
-                            currentRecord,
+                parsedRecords.push(
+                    ...parsePlanningImportMatrix(
+                        createPlanningImportTableMatrix(
+                            table,
                         ),
-                    );
-
-                    currentRecord =
-                        null;
-                }
-
-                matrix
-                    .slice(
-                        headerRowIndex + 1,
-                    )
-                    .forEach(
-                        function (row) {
-                            const code =
-                                getPlanningImportLhCode(
-                                    row[
-                                        columns.code
-                                    ],
-                                );
-
-                            if (
-                                code &&
-                                currentRecord?.code !==
-                                    code
-                            ) {
-                                finishCurrentRecord();
-
-                                currentRecord = {
-                                    code,
-                                    origin: [],
-                                    punctuality: [],
-                                    cpt: [],
-                                    quantity: [],
-                                };
-                            }
-
-                            if (!currentRecord) {
-                                return;
-                            }
-
-                            currentRecord
-                                .origin
-                                .push(
-                                    row[
-                                        columns.origin
-                                    ] ?? "",
-                                );
-
-                            currentRecord
-                                .punctuality
-                                .push(
-                                    row[
-                                        columns.punctuality
-                                    ] ?? "",
-                                );
-
-                            currentRecord
-                                .cpt
-                                .push(
-                                    row[
-                                        columns.cpt
-                                    ] ?? "",
-                                );
-
-                            currentRecord
-                                .quantity
-                                .push(
-                                    row[
-                                        columns.quantity
-                                    ] ?? "",
-                                );
-                        },
-                    );
-
-                finishCurrentRecord();
+                    ),
+                );
             },
         );
 
@@ -615,7 +578,7 @@ function getPlanningImportPlainQuantity(
 function parsePlanningSpXPlainText(
     text,
 ) {
-    const lines =
+    const receivedLines =
         String(
             text ?? "",
         )
@@ -625,7 +588,25 @@ function parsePlanningSpXPlainText(
             )
             .split(
                 "\n",
-            )
+            );
+
+    const tabularRecords =
+        parsePlanningImportMatrix(
+            receivedLines.map(
+                function (line) {
+                    return line.split(
+                        "\t",
+                    );
+                },
+            ),
+        );
+
+    if (tabularRecords.length > 0) {
+        return tabularRecords;
+    }
+
+    const lines =
+        receivedLines
             .map(
                 function (line) {
                     return line
@@ -1799,6 +1780,71 @@ async function handlePlanningClipboardImport(
             parsePlanningSpXPlainText(
                 clipboard.text,
             );
+
+        const quantityByCode =
+            new Map();
+
+        [
+            ...htmlRecords,
+            ...plainTextRecords,
+        ].forEach(
+            function (record) {
+                const code =
+                    getPlanningImportLhCode(
+                        record.code,
+                    );
+
+                const quantity =
+                    parsePlanningImportQuantity(
+                        record.quantity,
+                    );
+
+                if (
+                    code &&
+                    quantity !== null
+                ) {
+                    quantityByCode.set(
+                        code,
+                        quantity,
+                    );
+                }
+            },
+        );
+
+        [
+            htmlRecords,
+            plainTextRecords,
+        ].forEach(
+            function (records) {
+                records.forEach(
+                    function (record) {
+                        if (
+                            parsePlanningImportQuantity(
+                                record.quantity,
+                            ) !== null
+                        ) {
+                            return;
+                        }
+
+                        const code =
+                            getPlanningImportLhCode(
+                                record.code,
+                            );
+
+                        if (
+                            quantityByCode.has(
+                                code,
+                            )
+                        ) {
+                            record.quantity =
+                                quantityByCode.get(
+                                    code,
+                                );
+                        }
+                    },
+                );
+            },
+        );
 
         const importCandidates = [
             {

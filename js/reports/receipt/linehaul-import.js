@@ -8,6 +8,7 @@ import {
     createSpXLinehaulWindowCandidates,
     formatSpXLinehaulOrigin,
     getSpXLinehaulPlainLoadedOrders,
+    parseSpXLinehaulQuantity,
 } from "../core/spx-linehaul-rules.js";
 
 const RECEIPT_LINEHAUL_IMPORT_BUTTON_ID =
@@ -107,40 +108,9 @@ function getReceiptLinehaulImportCode(
 function parseReceiptLinehaulImportQuantity(
     value,
 ) {
-    const receivedValue =
-        String(
-            value ?? "",
-        )
-            .replace(
-                /\u00a0/g,
-                " ",
-            )
-            .trim();
-
-    if (
-        !/^\d{1,3}(?:[.\s]\d{3})*$/.test(
-            receivedValue,
-        ) &&
-        !/^\d+$/.test(
-            receivedValue,
-        )
-    ) {
-        return null;
-    }
-
-    const quantity =
-        Number(
-            receivedValue.replace(
-                /[.\s]/g,
-                "",
-            ),
-        );
-
-    return Number.isSafeInteger(
-        quantity,
-    )
-        ? quantity
-        : null;
+    return parseSpXLinehaulQuantity(
+        value,
+    );
 }
 
 function getReceiptLinehaulLoadedOrders(
@@ -1171,20 +1141,89 @@ async function handleReceiptLinehaulClipboardImport(
         const clipboard =
             await readReceiptLinehaulClipboard();
 
+        const htmlRecords =
+            parseReceiptLinehaulSpXHtml(
+                clipboard.html,
+            );
+
+        const plainTextRecords =
+            parseReceiptLinehaulSpXPlainText(
+                clipboard.text,
+            );
+
+        const loadedOrdersByCode =
+            new Map();
+
+        [
+            ...htmlRecords,
+            ...plainTextRecords,
+        ].forEach(
+            function (record) {
+                const code =
+                    getReceiptLinehaulImportCode(
+                        record.code,
+                    );
+
+                const loadedOrders =
+                    parseReceiptLinehaulImportQuantity(
+                        record.loadedOrders,
+                    );
+
+                if (
+                    code &&
+                    loadedOrders !== null
+                ) {
+                    loadedOrdersByCode.set(
+                        code,
+                        loadedOrders,
+                    );
+                }
+            },
+        );
+
+        [
+            htmlRecords,
+            plainTextRecords,
+        ].forEach(
+            function (records) {
+                records.forEach(
+                    function (record) {
+                        if (
+                            parseReceiptLinehaulImportQuantity(
+                                record.loadedOrders,
+                            ) !== null
+                        ) {
+                            return;
+                        }
+
+                        const code =
+                            getReceiptLinehaulImportCode(
+                                record.code,
+                            );
+
+                        if (
+                            loadedOrdersByCode.has(
+                                code,
+                            )
+                        ) {
+                            record.loadedOrders =
+                                loadedOrdersByCode.get(
+                                    code,
+                                );
+                        }
+                    },
+                );
+            },
+        );
+
         const importCandidates = [
             {
                 format: "HTML",
-                records:
-                    parseReceiptLinehaulSpXHtml(
-                        clipboard.html,
-                    ),
+                records: htmlRecords,
             },
             {
                 format: "texto",
-                records:
-                    parseReceiptLinehaulSpXPlainText(
-                        clipboard.text,
-                    ),
+                records: plainTextRecords,
             },
         ]
             .filter(

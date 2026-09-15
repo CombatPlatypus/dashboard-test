@@ -172,6 +172,79 @@ function getSpXLinehaulPlainLoadedOrders(
         }
     }
 
+    /*
+     * No texto puro copiado da grade do SPX, os cabeçalhos aparecem
+     * apenas uma vez. A posição de "Pedido Carregado" pode ser
+     * determinada pelas colunas finais da própria grade:
+     *
+     * Pedido carregado, MTB carregado, Tempo na fila, Ticket, Status.
+     *
+     * Esta posição evita usar Inbound ou qualquer outro número como
+     * alternativa quando Pedido Carregado não foi informado.
+     */
+
+    const actionPattern =
+        /^visualizar\b/i;
+
+    let actionIndex =
+        -1;
+
+    receivedValues.forEach(
+        function (value, index) {
+            if (
+                actionPattern.test(
+                    String(value ?? "")
+                        .replace(
+                            /\u00a0/g,
+                            " ",
+                        )
+                        .trim(),
+                )
+            ) {
+                actionIndex = index;
+            }
+        },
+    );
+
+    if (actionIndex >= 5) {
+        return parseSpXLinehaulQuantity(
+            receivedValues[
+                actionIndex - 5
+            ],
+        );
+    }
+
+    const statusPattern =
+        /^(arrived|pending|unloaded|unseal)$/i;
+
+    let statusIndex =
+        -1;
+
+    receivedValues.forEach(
+        function (value, index) {
+            if (
+                statusPattern.test(
+                    String(value ?? "")
+                        .replace(
+                            /\u00a0/g,
+                            " ",
+                        )
+                        .trim(),
+                )
+            ) {
+                statusIndex = index;
+            }
+        },
+    );
+
+    if (statusIndex >= 4) {
+        return parseSpXLinehaulQuantity(
+            receivedValues[
+                statusIndex - 4
+            ],
+        );
+    }
+
     return null;
 }
 
