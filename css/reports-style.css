@@ -826,7 +826,7 @@
         vertical-align: middle;
     }
 
-    /* RECEBIMENTO */
+    /* PROCESSAMENTO */
 
     #receipt #receiptWindowInput {
         width: 100%;
@@ -847,12 +847,78 @@
         width: 100%;
     }
 
-    /* RECEBIMENTO - CONTROLES */
+    /* PROCESSAMENTO - CONTROLES */
 
-
+    #receipt-controls #receipt-controls-1 .input-group {
+        max-height: 542px;
+        overflow-y: auto;
+        padding-right: 15px;
+        grid-template-columns: repeat(auto-fit, minmax(100%, 1fr)) !important;
+    }
+    #receipt-controls #receipt-controls-1 .input-group::-webkit-scrollbar-track {
+        background-color: transparent;
+    }
+    #receipt-controls #receipt-controls-1 .input-group::-webkit-scrollbar {
+        width: 5px;
+        height: 5px;
+        background-color: transparent;
+    }
+    #receipt-controls #receipt-controls-1 .input-group::-webkit-scrollbar-thumb {
+        border-radius: 5px;
+        background-color: var(--color-border);
+    }
+    #receipt-controls #receipt-controls-1 .padding .erro-checkbox {
+        display: flex;
+        align-items: center;
+        user-select: none;
+        gap: 10px;
+        width: 100%;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 2px solid var(--color-border);
+        cursor: pointer;
+    }
+    #receipt-controls #receipt-controls-1 .padding .erro-checkbox input {
+        flex: 0 0 auto;
+    }
+    #receipt-controls #receipt-controls-1 .padding .erro-checkbox span {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+    #receipt-controls #receipt-controls-1 .padding .erro-checkbox p {
+        color: var(--color-text);
+        margin: 0;
+        font-size: 14px;
+    }
+    #receipt-controls #receipt-controls-1 .padding .erro-checkbox small {
+        color: var(--color-gray-p);
+        font-size: 12px;
+        line-height: 1.4;
+    }
+    #receipt-controls #receipt-controls-1 .padding .erro-checkbox :has(input:disabled) {
+        opacity: 0.55;
+        cursor: not-allowed;
+    }
+    #receipt-controls #receipt-controls-2 .input-group:last-of-type {
+        max-height: 499px;
+        overflow-y: auto;
+        padding-right: 15px;
+        grid-template-columns: repeat(auto-fit, minmax(100%, 1fr)) !important;
+    }
+    #receipt-controls #receipt-controls-2 .input-group:last-of-type::-webkit-scrollbar-track {
+        background-color: transparent;
+    }
+    #receipt-controls #receipt-controls-2 .input-group:last-of-type::-webkit-scrollbar {
+        width: 5px;
+        height: 5px;
+        background-color: transparent;
+    }
+    #receipt-controls #receipt-controls-2 .input-group:last-of-type::-webkit-scrollbar-thumb {
+        border-radius: 5px;
+        background-color: var(--color-border);
+    }
     
-
-
     /* EXPEDIÇÃO - TABELAS */
 
     #expedition .expedition-operator-table {
