@@ -757,15 +757,12 @@
 
                                             <div class="padding">
                                                 <div class="lhs-list" id="">
-                                                    
                                                     <div data-lh-id="">
-
                                                         <div class="flex-box-between">
                                                             <h4>Primeiro LH</h4>
                                                             <label><input type="checkbox" data-field="segregate">Segregar</label>
                                                         </div>
                                                         
-
                                                         <div class="lhs-inputs">
                                                             <input type="text" data-field="code" placeholder="Código" maxlength="30" autocomplete="off">
                                                             <input type="text" data-field="origin" placeholder="Origem" maxlength="30" autocomplete="off">
@@ -782,12 +779,9 @@
                                                             <input type="text" data-field="quantity" placeholder="Qtd" maxlength="5" autocomplete="off" inputmode="numeric" pattern="[0-9]*">
                                                         </div>
                                                     </div>
-
-
-
                                                 </div>
 
-
+                                                <!-- A SER APAGADO, JUNTO COM O ESTE COMENTARIO -->
 
                                                 <div class="planning-lh-list flex-box-column" id="planningLhList" style="display: none;"></div>
 
@@ -797,6 +791,9 @@
                                                         <button class="button" id="planningClearLhs" type="button">Limpar Lista</button>
                                                     </div>
                                                 </div>
+
+
+
                                             </div>
                                         </div>
 
@@ -812,13 +809,11 @@
                                         </div>
 
                                         <div class="tabs-panel" id="collection-indicators">
+                                            <div class="title">
+                                                <h4>Collection Pool e Indicadores</h4>
+                                            </div>
 
-                                            <!-- COLLECTION POOL -->
-
-                                            <div id="planningPoolControls">
-
-                                                <h4>Indicadores Operacionais</h4>
-
+                                            <div class="padding">
                                                 <div class="input-group">
                                                     <div>
                                                         <h4>Cap do Dia</h4>
@@ -833,8 +828,6 @@
                                                     </div>
                                                 </div>
 
-                                                <h4>Quantidade de Backlog</h4>
-
                                                 <div class="input-group">
                                                     <div>
                                                         <h4>Pacotes</h4>
@@ -846,8 +839,6 @@
                                                         <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="backlogBulky">
                                                     </div>
                                                 </div>
-
-                                                <h4>Operações na Pool</h4>
 
                                                 <div class="input-group operation">
                                                     <div>
@@ -865,11 +856,6 @@
                                                         <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="errors">
                                                     </div>
                                                 </div>
-                                            </div>
-
-                                            <!-- CONTROLES DOS INDICADORES -->
-
-                                            <div id="planningGeneralControls">
 
                                                 <h4>Composição da Frota</h4>
 
@@ -895,6 +881,12 @@
 
                                                 <p>Os valores da frota afetarão o cálculo do indicador SPR Médio, preencher a composição da frota é opcional.</p>
                                                 <a href="#">Consultar Frota ➚</a>
+
+                                                <!-- A SER APAGADO  -->
+                                                
+                                                <div id="planningGeneralControls"></div>
+                                                <div id="planningPoolControls"></div>
+
                                             </div>
                                         </div>
                                     </div>
