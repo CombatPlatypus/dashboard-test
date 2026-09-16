@@ -1757,6 +1757,40 @@
 
                             <ul class="tabs flex-box-start" id="lossesRateMonthTabs" role="tablist"></ul>
 
+                            <!-- BARRA DE NOTIFICAÇÕES E BOTÕES DE AÇÃO -->
+
+                            <div class="flex-box-start">
+                                <div class="warning" id="">
+                                    <div class="flex-box-start">
+                                        <img id="" src="images/geral-icons/bell-icon.svg" alt="">
+
+                                        <h4 id="">
+                                            Tudo em silêncio por enquanto.
+                                        </h4>
+                                    </div>
+                                </div>
+
+                                <div class="report-actions">
+                                    <button id="lossesRateDownloadReportButton" type="button">
+                                        <img src="images/geral-icons/save-icon.svg">
+                                    </button>
+
+                                    <button id="lossesRateCopyReportButton" type="button">
+                                        <img src="images/geral-icons/copy-icon.svg">
+                                    </button>
+
+                                    <button id="lossesRateImportClipboardButton" type="button">
+                                        <img src="images/geral-icons/import-icon.svg">
+                                    </button>
+
+                                    <input id="lossesRateFileInput" type="file" accept=".csv,.xlsx,.xls" hidden>
+                
+                                    <button id="expeditionClearReportButton"  type="button">
+                                        <img src="images/geral-icons/trash-basket-icon.svg">
+                                    </button>
+                                </div>
+                            </div>
+
                             <!-- CONTEÚDO DO RELATÓRIO -->
 
                             <div class="flex-box-start">
@@ -1833,108 +1867,79 @@
                                             </div>
                                         </div>
                                     </div>
-
-                                    <!-- OPÇÕES DO RELATÓRIO -->
-
-                                    <div class="footer flex-box-between">
-                                        <div>
-                                            <button class="button" id="lossesRateCopyBaseButton" type="button">
-                                                Copiar Base Atualizada
-                                            </button>
-
-                                            <button class="button" id="lossesRateCopyReportButton" type="button" disabled>
-                                                Copiar Relatório
-                                            </button>
-
-                                            <button class="button" id="lossesRateDownloadReportButton" type="button" disabled>
-                                                Baixar Relatório
-                                            </button>
-                                        </div>
-                                    </div>
                                 </div>
 
                                 <!-- CONTROLES DO RELATÓRIO -->
 
                                 <div class="report-controls">
-                                    <div class="history-link flex-box-start">
-                                        <a href="https://docs.google.com/spreadsheets/d/1TUOf4Bvv7L_Q87xOkCQqPKkNpSi03OSs3aKobbAn724/edit?gid=275287237#gid=275287237" target="_blank">
-                                            <svg class="spreadsheets-link-icon" viewBox="0 0 24 24" aria-hidden="true">
-                                                <path d="M7 17L17 7M9 7H17V15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                                            </svg>
-                                        </a>
-
-                                        <div>
-                                            <h4>Planilha - Taxa de Perdas</h4>
-                                            <p>Crtl A + Crtl C, e clique em importar.</p>
-                                        </div>
+                                    <div class="title">
+                                        <h4>Importe a Bipagem de Erros</h4>
                                     </div>
 
-                                    <div class="history-import flex-box-start">
-                                        <div>
-                                            <button class="button" id="lossesRateImportHistoryButton" type="button">
-                                                Importar Histórico
-                                            </button>
+                                    <div class="padding">
+                                
+                                        <div class="input-group losses-rate-identification">
+                                            <div>
+                                                <h4>Descrição</h4>
+                                                <input id="lossesRateDescriptionInput" type="text">
+                                            </div>
+
+                                            <div>
+                                                <h4>Código do Hub</h4>
+                                                <input id="lossesRateHubCodeInput" type="text">
+                                            </div>
+
+                                            <div>
+                                                <h4>Sub Regional</h4>
+                                                <input id="lossesRateSubRegionalInput" type="text">
+                                            </div>
                                         </div>
 
-                                    </div>
+                                        <div class="input-group losses-rate-values">
+                                            <div>
+                                                <h4>Volume Movimentado</h4>
+                                                <input id="lossesRateMovedInput" type="text" inputmode="numeric" maxlength="9">
+                                            </div>
 
-                                    <div class="input-group losses-rate-identification">
-                                        <div>
-                                            <h4>Descrição</h4>
-                                            <input id="lossesRateDescriptionInput" type="text">
+                                            <div>
+                                                <h4>Possíveis Perdas</h4>
+                                                <input id="lossesRatePossibleLossesInput" type="text" inputmode="numeric" maxlength="6">                                        
+                                            </div>
+
+                                            <div>
+                                                <h4>Quantidade de LOST</h4>
+                                                <input id="lossesRateLostInput" type="text" inputmode="numeric" maxlength="6">                                        
+                                            </div>
+
+                                            <div>
+                                                <h4>Quantidade de AVARIA</h4>
+                                                <input id="lossesRateDamageInput" type="text" inputmode="numeric" maxlength="6">
+                                            </div>
                                         </div>
 
-                                        <div>
-                                            <h4>Código do Hub</h4>
-                                            <input id="lossesRateHubCodeInput" type="text">
-                                        </div>
+                                        <div class="losses-rate-controls-summary">
+                                            <h4>Resumo do Mês</h4>
 
-                                        <div>
-                                            <h4>Sub Regional</h4>
-                                            <input id="lossesRateSubRegionalInput" type="text">
-                                        </div>
-                                    </div>
+                                            <div class="losses-rate-goal-status">
+                                                <span>Referência máxima</span>
+                                                <span>0,030%</span>
+                                            </div>
 
-                                    <div class="input-group losses-rate-values">
-                                        <div>
-                                            <h4>Volume Movimentado</h4>
-                                            <input id="lossesRateMovedInput" type="text" inputmode="numeric" maxlength="9">
-                                        </div>
+                                            <div>
+                                                <span>Total de Perdas</span>
+                                                <span id="lossesRateControlsTotal">—</span>
+                                            </div>
 
-                                        <div>
-                                            <h4>Possíveis Perdas</h4>
-                                            <input id="lossesRatePossibleLossesInput" type="text" inputmode="numeric" maxlength="6">                                        
-                                        </div>
-
-                                        <div>
-                                            <h4>Quantidade de LOST</h4>
-                                            <input id="lossesRateLostInput" type="text" inputmode="numeric" maxlength="6">                                        
-                                        </div>
-
-                                        <div>
-                                            <h4>Quantidade de AVARIA</h4>
-                                            <input id="lossesRateDamageInput" type="text" inputmode="numeric" maxlength="6">
-                                        </div>
-                                    </div>
-
-                                    <div class="losses-rate-controls-summary">
-                                        <h4>Resumo do Mês</h4>
-
-                                        <div class="losses-rate-goal-status">
-                                            <span>Referência máxima</span>
-                                            <span>0,030%</span>
-                                        </div>
-
-                                        <div>
-                                            <span>Total de Perdas</span>
-                                            <span id="lossesRateControlsTotal">—</span>
-                                        </div>
-
-                                        <div>
-                                            <span>Taxa de Perda</span>
-                                            <span id="lossesRateControlsRate">—</span>
+                                            <div>
+                                                <span>Taxa de Perda</span>
+                                                <span id="lossesRateControlsRate">—</span>
+                                            </div>
                                         </div>
                                     </div>
+                                    
+                                    <!-- A SER APAGADO -->
+
+                                    <button class="button" id="lossesRateImportHistoryButton" type="button"></button>
                                 </div>
                             </div>
                         </div>
