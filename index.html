@@ -222,39 +222,6 @@
                 padding-right: 15px;
                 grid-template-columns: repeat(auto-fit, minmax(100%, 1fr)) !important;
             }
-            #receipt-controls #receipt-controls-1 .padding label {
-                display: flex;
-                align-items: center;
-                user-select: none;
-                gap: 10px;
-                width: 100%;
-                margin-top: 20px;
-                padding-top: 20px;
-                border-top: 2px solid var(--color-border);
-                cursor: pointer;
-            }
-            #receipt-controls #receipt-controls-1 .padding label  input {
-                flex: 0 0 auto;
-            }
-            #receipt-controls #receipt-controls-1 .padding label  span {
-                display: flex;
-                flex-direction: column;
-                gap: 4px;
-            }
-            #receipt-controls #receipt-controls-1 .padding label  p {
-                color: var(--color-text);
-                margin: 0;
-                font-size: 14px;
-            }
-            #receipt-controls #receipt-controls-1 .padding label  small {
-                color: var(--color-gray-p);
-                font-size: 12px;
-                line-height: 1.4;
-            }
-            #receipt-controls #receipt-controls-1 .padding label :has(input:disabled) {
-                opacity: 0.55;
-                cursor: not-allowed;
-            }
             #receipt-controls #receipt-controls-1 .input-group::-webkit-scrollbar-track {
                 background-color: transparent;
             }
@@ -268,6 +235,41 @@
                 background-color: var(--color-border);
             }
 
+
+
+            #receipt-controls #receipt-controls-1 .padding label:last-of-type {
+                display: flex;
+                align-items: center;
+                user-select: none;
+                gap: 10px;
+                width: 100%;
+                margin-top: 20px;
+                padding-top: 20px;
+                border-top: 2px solid var(--color-border);
+                cursor: pointer;
+            }
+            #receipt-controls #receipt-controls-1 .padding label:last-of-type input {
+                flex: 0 0 auto;
+            }
+            #receipt-controls #receipt-controls-1 .padding label:last-of-type span {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+            }
+            #receipt-controls #receipt-controls-1 .padding label:last-of-type p {
+                color: var(--color-text);
+                margin: 0;
+                font-size: 14px;
+            }
+            #receipt-controls #receipt-controls-1 .padding label:last-of-type small {
+                color: var(--color-gray-p);
+                font-size: 12px;
+                line-height: 1.4;
+            }
+            #receipt-controls #receipt-controls-1 .padding label:last-of-type :has(input:disabled) {
+                opacity: 0.55;
+                cursor: not-allowed;
+            }
 
 
 
