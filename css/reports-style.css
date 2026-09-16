@@ -671,6 +671,9 @@
 
     /* PLANEJAMENTO - COLLECTION POOL E INDICADORES */
 
+    #collection-indicators .report-controls .input-group {
+        grid-template-columns: repeat(auto-fit, minmax(159px, 1fr));
+    }
     #collection-indicators .padding {
         display: flex;
         flex-direction: column;

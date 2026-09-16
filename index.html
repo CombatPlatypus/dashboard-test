@@ -1318,66 +1318,51 @@
                                     </div>
 
                                     <div class="receipt-controls-panel" id="receipt-controls-2" hidden>
-                                        <div class="history-link flex-box-start">
-                                            <a href="https://spx.shopee.com.br/#/hubLinehaulTrips/trip" target="_blank">
-                                                <svg class="spreadsheets-link-icon" viewBox="0 0 24 24" aria-hidden="true">
-                                                    <path d="M7 17L17 7M9 7H17V15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                                                </svg>
-                                            </a>
-
-                                            <div>
-                                                <h4>Transporte Principal - Inbound</h4>
-                                                <p>Crtl A + Crtl C, e clique em importar.</p>
-                                            </div>
+                                        <div class="title">
+                                            <h4>Defina os LHs</h4>
                                         </div>
 
-                                        <div class="history-import flex-box-start">
-                                            <div>
-                                                <button class="button" id="receiptLinehaulImportButton" type="button">
-                                                    Importar Viagens de Carga
-                                                </button>
-                                            </div>
-                                        </div>
+                                        <div class="padding">
+                                            <div class="input-group">
+                                                <div>
+                                                    <h4>Esperado</h4>
 
-                                        <div class="input-group" style="grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));">
-                                            <div>
-                                                <h4>Janela</h4>
+                                                    <input id="receiptLinehaulExpectedInput" type="text" inputmode="numeric" maxlength="8" disabled>
+                                                </div>
 
-                                                <select class="standard-select" id="receiptLinehaulWindowInput" disabled>
-                                                    <option value="AM">AM</option>
-                                                    <option value="PM1">PM1</option>
-                                                    <option value="PM2">PM2</option>
-                                                </select>
+                                                <div>
+                                                    <h4>Reversas</h4>
+
+                                                    <input id="receiptLinehaulReversesInput" type="text" inputmode="numeric" maxlength="8" disabled>
+                                                </div>
                                             </div>
 
-                                            <div>
-                                                <h4>Esperado</h4>
+                                            <div class="input-group receipt-linehaul-controls" id="receiptLinehaulControls">
+                                                <div>
+                                                    <h4 data-receipt-linehaul-label>Código do LH 1</h4>
 
-                                                <input id="receiptLinehaulExpectedInput" type="text" inputmode="numeric" maxlength="8" disabled>
-                                            </div>
+                                                    <div class="flex-box-start">
+                                                        <input type="text" data-receipt-linehaul-field="code" autocomplete="off" readonly disabled>
+                                                        <input type="text" data-receipt-linehaul-field="loadedOrders" maxlength="8" autocomplete="off" inputmode="numeric" pattern="[0-9]*" readonly disabled>
 
-                                            <div>
-                                                <h4>Reversas</h4>
-
-                                                <input id="receiptLinehaulReversesInput" type="text" inputmode="numeric" maxlength="8" disabled>
-                                            </div>
-                                        </div>
-
-                                        <div class="input-group receipt-linehaul-controls" id="receiptLinehaulControls">
-                                            <div>
-                                                <h4 data-receipt-linehaul-label>Código do LH 1</h4>
-
-                                                <div class="flex-box-start">
-                                                    <input type="text" data-receipt-linehaul-field="code" autocomplete="off" readonly disabled>
-                                                    <input type="text" data-receipt-linehaul-field="loadedOrders" maxlength="8" autocomplete="off" inputmode="numeric" pattern="[0-9]*" readonly disabled>
-
-                                                    <div class="checkbox">
-                                                        <input type="checkbox" data-receipt-linehaul-selection disabled>
-                                                        <label for=""></label>
+                                                        <div class="checkbox">
+                                                            <input type="checkbox" data-receipt-linehaul-selection disabled>
+                                                            <label for=""></label>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
+
+                                        <!-- A SER APAGADO -->
+
+                                        <button class="button" id="receiptLinehaulImportButton" type="button" style="display: none;"></button>
+
+                                        <select class="standard-select" id="receiptLinehaulWindowInput" disabled  style="display: none;">
+                                            <option value="AM">AM</option>
+                                            <option value="PM1">PM1</option>
+                                            <option value="PM2">PM2</option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
