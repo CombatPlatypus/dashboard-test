@@ -252,11 +252,14 @@
                 display: flex;
                 justify-content: space-between;
                 border-bottom: 2px solid var(--color-border);
-                padding-bottom: 20px;
-                margin-bottom: 20px;
+                padding: 20px;
             }
-            #reports .report-controls .title h4 {
+            #reports .report-controls .title > h4 {
                 margin: 0;
+            }
+            #reports .report-controls .title > div {
+                width: 50px;
+                height: 50px;
             }
 
         </style>
@@ -701,11 +704,13 @@
                                             <div class="title">
                                                 <h4>Transporte Principal</h4>
                                                 
-                                                <a href="https://spx.shopee.com.br/#/hubLinehaulTrips/trip" target="_blank">
-                                                    <svg class="spreadsheets-link-icon" viewBox="0 0 24 24" aria-hidden="true">
-                                                        <path d="M7 17L17 7M9 7H17V15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                                                    </svg>
-                                                </a>
+                                                <div>
+                                                    <a href="https://spx.shopee.com.br/#/hubLinehaulTrips/trip" target="_blank">
+                                                        <svg class="spreadsheets-link-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                                            <path d="M7 17L17 7M9 7H17V15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                                        </svg>
+                                                    </a>
+                                                </div>
                                             </div>
 
                                             <div class="padding">
