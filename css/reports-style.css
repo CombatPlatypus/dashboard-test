@@ -846,94 +846,9 @@
 
     /* RECEBIMENTO - CONTROLES */
 
-    #receipt .receipt-operator-controls,
-    #receipt .receipt-linehaul-controls {
-        overflow-y: auto;
-        padding-right: 15px;
-    }
-    #receipt .receipt-operator-controls {
-        max-height: 446px;
-    }
-    #receipt .receipt-linehaul-controls {
-        max-height: 511px;
-    }
-    #receipt .receipt-linehaul-controls > div {
-        width: 100%;
-    }
-    #receipt .receipt-linehaul-controls [data-receipt-linehaul-field="code"] {
-        min-width: 0;
-        flex: 1 1 0;
-    }
-    #receipt .receipt-linehaul-controls [data-receipt-linehaul-field="loadedOrders"] {
-        width: 86px;
-        flex: 0 0 86px;
-        text-align: center;
-    }
-    #receipt .receipt-linehaul-controls .checkbox {
-        flex: 0 0 40px;
-    }
-    #receipt .receipt-operator-controls [data-receipt-operator-field="labeler"] {
-        min-width: 0;
-        flex: 1 1 0;
-    }
-    #receipt .receipt-operator-controls [data-receipt-operator-field="errorQuantity"] {
-        width: 86px;
-        flex: 0 0 86px;
-        text-align: center;
-    }
-    #receipt .receipt-operator-controls .checkbox {
-        flex: 0 0 40px;
-    }
 
-    #receipt .receipt-operator-controls::-webkit-scrollbar-track,
-    #receipt .receipt-linehaul-controls::-webkit-scrollbar-track {
-        background-color: transparent;
-    }
-    #receipt .receipt-operator-controls::-webkit-scrollbar,
-    #receipt .receipt-linehaul-controls::-webkit-scrollbar {
-        width: 5px;
-        height: 5px;
-        background-color: transparent;
-    }
-    #receipt .receipt-operator-controls::-webkit-scrollbar-thumb,
-    #receipt .receipt-linehaul-controls::-webkit-scrollbar-thumb {
-        border-radius: 5px;
-        background-color: var(--color-border);
-    }
-    #receipt .receipt-error-calculation-option {
-        display: flex;
-        align-items: center;
-        user-select: none;
-        gap: 10px;
-        width: 100%;
-        margin-top: 20px;
-        padding-top: 20px;
-        border-top: 2px solid var(--color-border);
-        cursor: pointer;
-    }
-    #receipt .receipt-error-calculation-option input {
-        flex: 0 0 auto;
-    }
+    
 
-    #receipt .receipt-error-calculation-option span {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-    }
-    #receipt .receipt-error-calculation-option p {
-        color: var(--color-text);
-        margin: 0;
-        font-size: 14px;
-    }
-    #receipt .receipt-error-calculation-option small {
-        color: var(--color-gray-p);
-        font-size: 12px;
-        line-height: 1.4;
-    }
-    #receipt .receipt-error-calculation-option:has(input:disabled) {
-        opacity: 0.55;
-        cursor: not-allowed;
-    }
 
     /* EXPEDIÇÃO - TABELAS */
 
