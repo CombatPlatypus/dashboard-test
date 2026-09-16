@@ -272,6 +272,16 @@
                 overflow: auto;
                 padding-right: 15px;
             }
+            .lhs-list label {
+                display: flex;
+                align-items: center;
+                column-gap: 6px;
+                margin: 0;
+                font-size: 14px;
+                color: var(--color-text);
+                cursor: pointer;
+                user-select: none;
+            }
             .lhs-list h4 {
                 margin-bottom: 15px;
             }
@@ -729,10 +739,15 @@
                                             </div>
 
                                             <div class="padding">
-                                                <div class="lhs-list" class="">
+                                                <div class="lhs-list" id="">
                                                     
                                                     <div data-lh-id="">
-                                                        <h4>Primeiro LH</h4>
+
+                                                        <div class="flex-box-between">
+                                                            <h4>Primeiro LH</h4>
+                                                            <label><input type="checkbox" data-field="segregate">Segregar</label>
+                                                        </div>
+                                                        
 
                                                         <div class="lhs-inputs">
                                                             <input type="text" data-field="code" placeholder="Código" maxlength="30" autocomplete="off">
