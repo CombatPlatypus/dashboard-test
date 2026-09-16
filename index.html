@@ -234,9 +234,6 @@
                 border-radius: 5px;
                 background-color: var(--color-border);
             }
-
-
-
             #receipt-controls #receipt-controls-1 .padding .erro-checkbox {
                 display: flex;
                 align-items: center;
@@ -271,9 +268,24 @@
                 cursor: not-allowed;
             }
 
-
-
-
+            #receipt-controls #receipt-controls-2 .input-group:last-of-type {
+                max-height: 542px;
+                overflow-y: auto;
+                padding-right: 15px;
+                grid-template-columns: repeat(auto-fit, minmax(100%, 1fr)) !important;
+            }
+            #receipt-controls #receipt-controls-2 .input-group:last-of-type::-webkit-scrollbar-track {
+                background-color: transparent;
+            }
+            #receipt-controls #receipt-controls-2 .input-group:last-of-type::-webkit-scrollbar {
+                width: 5px;
+                height: 5px;
+                background-color: transparent;
+            }
+            #receipt-controls #receipt-controls-2 .input-group:last-of-type::-webkit-scrollbar-thumb {
+                border-radius: 5px;
+                background-color: var(--color-border);
+            }
 
         </style>
     </head>	
