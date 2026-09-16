@@ -216,14 +216,11 @@
 
             /* AJUSTES */
 
-            #reports .preview {
-                flex: 0 0 1000px;
-            }
 
 
-            #reports .report-controls .padding {
-                padding: 30px;
-            }
+ 
+
+            /* BOTÕES DE AÇÃO  */
 
             .report-actions {
                 display: flex;
@@ -247,6 +244,7 @@
                 cursor: pointer;
             }
 
+            /* TITULO DOS CONTROLES  */
 
             #reports .report-controls .title {
                 display: flex;
@@ -263,8 +261,7 @@
                 height: 30px;
             }
 
-
-
+            /* PLANJEMENTO - LISTA DE LHS */
 
             .lhs-list {
                 display: flex;
@@ -305,6 +302,27 @@
             .lhs-list::-webkit-scrollbar-thumb {
                 border-radius: 5px;
                 background-color: var(--color-border);
+            }
+
+            /* PLANJEMENTO - COLLECTION POOL E INDICADORES */
+
+            #collection-indicators .padding {
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+            }
+            #collection-indicators p {
+                margin: 0 0 4px 0;
+                color: var(--color-gray-p);
+                font-size: 14px;
+            }
+            #collection-indicators > a {
+                font-size: 13px;
+                transition: color 0.2s ease;
+            }
+            #collection-indicators > a:hover,
+            #collection-indicators > a:focus-visible {
+                color: #1a73e8;
             }
 
 
