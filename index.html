@@ -224,8 +224,14 @@
 
             .report-actions {
                 display: flex;
+                margin: 0 0 20px 0;
                 padding: 20px;
+                border-radius: 5px;
                 gap: 15px;
+                justify-content: center;
+                flex: 0 0 max-content;
+                background-color: var(--color-container);
+                border: 2px solid var(--color-border);
             }
             .report-actions > button:hover,
             .report-actions > a:hover {
@@ -238,6 +244,17 @@
                 cursor: pointer;
             }
 
+
+            #reports .report-controls .title {
+                display: flex;
+                justify-content: space-between;
+                border-bottom: 2px solid var(--color-border);
+                padding-bottom: 20px;
+                margin-bottom: 20px;
+            }
+            #reports .report-controls .title h4 {
+                margin: 0;
+            }
 
         </style>
     </head>	
@@ -464,11 +481,9 @@
                                 </li> 
                             </ul> 
 
+                            <!-- BARRA DE NOTIFICAÇÕES E BOTÕES DE AÇÃO -->
 
                             <div class="flex-box-start">
-
-                                <!-- BARRA DE NOTIFICAÇÕES -->
-
                                 <div class="warning" id="">
                                     <div class="flex-box-start">
                                         <img id="" src="images/geral-icons/bell-icon.svg" alt="">
@@ -480,25 +495,24 @@
                                 </div>
 
                                 <div class="report-actions">
-                                    <button id="" type="button">
-                                        <img src="images/geral-icons/import-icon.svg">
+                                    <button id="planningDownloadReportButton" type="button">
+                                        <img src="images/geral-icons/save-icon.svg">
                                     </button>
-                                    
-                                    <button id="" type="button">
-                                        <img src="images/geral-icons/trash-basket-icon.svg">
-                                    </button>
-                                    
-                                    <button id="" type="button">
+
+                                    <button id="planningCopyReportButton" type="button">
                                         <img src="images/geral-icons/copy-icon.svg">
                                     </button>
-                                    
-                                    <button id="" type="button">
-                                        <img src="images/geral-icons/save-icon.svg">
+
+                                    <button id="planningImportClipboardButton" type="button">
+                                        <img src="images/geral-icons/import-icon.svg">
+                                    </button>
+                
+                                    <button id="planningClearReportButton"  type="button">
+                                        <img src="images/geral-icons/trash-basket-icon.svg">
                                     </button>
                                 </div>
                             </div>
       
-
                             <!-- CONTEÚDO DO RELATÓRIO -->
 
                             <div class="flex-box-start planning-report-layout">
@@ -674,24 +688,6 @@
                                             </div>
                                         </div>
                                     </div>
-
-                                    <!-- OPÇÕES DO RELATÓRIO -->
-
-                                    <div class="footer flex-box-between">
-                                        <div>
-                                            <button class="button" id="planningClearReportButton" type="button">
-                                                Limpar Relatório
-                                            </button>
-
-                                            <button class="button" id="planningCopyReportButton" type="button" disabled>
-                                                Copiar Relatório
-                                            </button>
-
-                                            <button class="button" id="planningDownloadReportButton" type="button" disabled>
-                                                Baixar Relatório
-                                            </button>
-                                        </div>
-                                    </div>
                                 </div>
 
                                 <!-- CONTROLES DO RELATÓRIO -->
@@ -699,7 +695,20 @@
                                 <div class="report-controls">
                                     <div class="tabs-content" data-tabs-content="planningTabs">
                                         <div class="tabs-panel is-active" id="lhs-list">
-                                            <div class="history-link flex-box-start">
+
+                                            <div class="title">
+                                                <h4>Transporte Principal</h4>
+                                                
+                                                <a href="https://spx.shopee.com.br/#/hubLinehaulTrips/trip" target="_blank">
+                                                    <svg class="spreadsheets-link-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                                        <path d="M7 17L17 7M9 7H17V15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                                    </svg>
+                                                </a>
+                                            </div>
+
+
+
+                                            <!-- <div class="history-link flex-box-start">
                                                 <a href="https://spx.shopee.com.br/#/hubLinehaulTrips/trip" target="_blank">
                                                     <svg class="spreadsheets-link-icon" viewBox="0 0 24 24" aria-hidden="true">
                                                         <path d="M7 17L17 7M9 7H17V15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
@@ -710,15 +719,7 @@
                                                     <h4>Transporte Principal - Inbound</h4>
                                                     <p>Crtl A + Crtl C, e clique em importar.</p>
                                                 </div>
-                                            </div>
-
-                                            <div class="history-import flex-box-start">
-                                                <div>
-                                                    <button class="button" id="planningImportClipboardButton" type="button">
-                                                        Importar Viagens de Carga
-                                                    </button>
-                                                </div>
-                                            </div>
+                                            </div> -->
 
                                             <div class="planning-lh-list flex-box-column" id="planningLhList"></div>
 

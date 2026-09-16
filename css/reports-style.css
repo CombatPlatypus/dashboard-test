@@ -317,30 +317,6 @@
         text-align: center;
     }
 
-    /* FOOTER DO RELATÓRIO */
-
-    #reports .footer {
-        background-color: var(--color-container);
-        border: 2px solid var(--color-border);
-        border-radius: 5px;
-        padding: 30px;
-        margin: 20px 0 0 0;
-    }
-    #reports .footer > div {
-        width: 100%;
-        height: 40px;
-        display: flex;
-        overflow: hidden;
-        gap: 10px;
-        align-items: center;
-    }
-    #reports .footer > div > img {
-        width: 25px;
-    }
-    #reports .footer button {
-        flex: 1 1 0;
-    }
-         
     /* CONTROLES */
 
     #reports .report-controls {
