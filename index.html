@@ -702,19 +702,39 @@
                                     <div class="tabs-content" data-tabs-content="planningTabs">
                                         <div class="tabs-panel is-active" id="lhs-list">
                                             <div class="title">
-                                                <h4>Transporte Principal</h4>
-                                                
-                                                <div>
-                                                    <a href="https://spx.shopee.com.br/#/hubLinehaulTrips/trip" target="_blank">
-                                                        <svg class="spreadsheets-link-icon" viewBox="0 0 24 24" aria-hidden="true">
-                                                            <path d="M7 17L17 7M9 7H17V15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                                                        </svg>
-                                                    </a>
-                                                </div>
+                                                <h4>Lista de LHs</h4>
                                             </div>
 
                                             <div class="padding">
-                                                <div class="planning-lh-list flex-box-column" id="planningLhList"></div>
+                                                <div class="">
+                                                    
+                                                    <div data-lh-id="">
+                                                        <h4>LH 1</h4>
+
+                                                        <div class="lhs-inputs">
+                                                            <input type="text" data-field="code" placeholder="Código" maxlength="30" autocomplete="off">
+                                                            <input type="text" data-field="origin" placeholder="Origem" maxlength="30" autocomplete="off">
+                                                            <input type="text" data-field="quantity" placeholder="Qtd" maxlength="5" autocomplete="off" inputmode="numeric" pattern="[0-9]*">
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div data-lh-id="">
+                                                        <h4>LH 2</h4>
+
+                                                        <div class="lhs-inputs">
+                                                            <input type="text" data-field="code" placeholder="Código" maxlength="30" autocomplete="off">
+                                                            <input type="text" data-field="origin" placeholder="Origem" maxlength="30" autocomplete="off">
+                                                            <input type="text" data-field="quantity" placeholder="Qtd" maxlength="5" autocomplete="off" inputmode="numeric" pattern="[0-9]*">
+                                                        </div>
+                                                    </div>
+
+
+
+                                                </div>
+
+
+
+                                                <div class="planning-lh-list flex-box-column" id="planningLhList" style="display: none;"></div>
 
                                                 <div class="lhs-buttons">
                                                     <div>
