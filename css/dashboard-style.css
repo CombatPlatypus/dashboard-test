@@ -1002,6 +1002,7 @@
 /* CHECKBOX PERSONALIZADA */
 
 .checkbox {
+    flex: 0 0 40px;
     height: 40px;
     position: relative;
     outline: 0;
