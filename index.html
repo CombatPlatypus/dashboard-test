@@ -222,6 +222,23 @@
 
 
 
+            .report-actions {
+                display: flex;
+                padding: 20px;
+                gap: 15px;
+            }
+            .report-actions > button:hover,
+            .report-actions > a:hover {
+                opacity: 0.61;
+                transition: all 0.5s ease;
+            }
+            .report-actions > button > img, 
+            .report-actions > a > img {
+                width: 35px;
+                cursor: pointer;
+            }
+
+
         </style>
     </head>	
 
@@ -447,17 +464,40 @@
                                 </li> 
                             </ul> 
 
-                            <!-- BARRA DE NOTIFICAÇÕES -->
 
-                            <div class="warning" id="">
-                                <div class="flex-box-start">
-                                    <img id="" src="images/geral-icons/bell-icon.svg" alt="">
+                            <div class="flex-box-start">
 
-                                    <h4 id="">
-                                        Tudo em silêncio por enquanto.
-                                    </h4>
+                                <!-- BARRA DE NOTIFICAÇÕES -->
+
+                                <div class="warning" id="">
+                                    <div class="flex-box-start">
+                                        <img id="" src="images/geral-icons/bell-icon.svg" alt="">
+
+                                        <h4 id="">
+                                            Tudo em silêncio por enquanto.
+                                        </h4>
+                                    </div>
+                                </div>
+
+                                <div class="report-actions">
+                                    <button id="" type="button">
+                                        <img src="images/geral-icons/import-icon.svg">
+                                    </button>
+                                    
+                                    <button id="" type="button">
+                                        <img src="images/geral-icons/trash-basket-icon.svg">
+                                    </button>
+                                    
+                                    <button id="" type="button">
+                                        <img src="images/geral-icons/copy-icon.svg">
+                                    </button>
+                                    
+                                    <button id="" type="button">
+                                        <img src="images/geral-icons/save-icon.svg">
+                                    </button>
                                 </div>
                             </div>
+      
 
                             <!-- CONTEÚDO DO RELATÓRIO -->
 
