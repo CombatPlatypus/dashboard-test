@@ -262,6 +262,29 @@
                 height: 50px;
             }
 
+
+
+
+            .lhs-list {
+                display: flex;
+                flex-direction: column;
+                row-gap: 20px;
+                overflow: auto;
+                padding-right: 15px;
+            }
+            .lhs-list h4 {
+                margin-bottom: 15px;
+            }
+            .lhs-list .lhs-inputs {
+                display: flex;
+                gap: 10px;
+            }
+            .lhs-list .lhs-inputs input:last-of-type{
+                flex: 0 0 86px;
+                text-align: center;
+            }
+            
+
         </style>
     </head>	
 
@@ -706,10 +729,10 @@
                                             </div>
 
                                             <div class="padding">
-                                                <div class="">
+                                                <div class="lhs-list" class="">
                                                     
                                                     <div data-lh-id="">
-                                                        <h4>LH 1</h4>
+                                                        <h4>Primeiro LH</h4>
 
                                                         <div class="lhs-inputs">
                                                             <input type="text" data-field="code" placeholder="Código" maxlength="30" autocomplete="off">
@@ -719,7 +742,7 @@
                                                     </div>
                                                     
                                                     <div data-lh-id="">
-                                                        <h4>LH 2</h4>
+                                                        <h4>Segundo LH</h4>
 
                                                         <div class="lhs-inputs">
                                                             <input type="text" data-field="code" placeholder="Código" maxlength="30" autocomplete="off">
