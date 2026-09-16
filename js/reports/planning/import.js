@@ -10,11 +10,15 @@ import {
     parseSpXLinehaulQuantity,
 } from "../core/spx-linehaul-rules.js";
 
+import {
+    setReportNotification,
+} from "../report-notifications.js";
+
 const PLANNING_IMPORT_BUTTON_ID =
     "planningImportClipboardButton";
 
 const PLANNING_IMPORT_DEFAULT_TEXT =
-    "Importar do SPX";
+    "Importar LHs da área de transferência";
 
 const PLANNING_IMPORT_SOURCE =
     "spx-clipboard";
@@ -1721,8 +1725,17 @@ function restorePlanningImportButton(
     planningImportFeedbackTimer =
         window.setTimeout(
             function () {
-                button.textContent =
+                button.title =
+                    button.dataset
+                        .planningImportDefaultTitle ||
                     PLANNING_IMPORT_DEFAULT_TEXT;
+
+                button.setAttribute(
+                    "aria-label",
+                    button.dataset
+                        .planningImportDefaultAriaLabel ||
+                    PLANNING_IMPORT_DEFAULT_TEXT,
+                );
 
                 planningImportFeedbackTimer =
                     null;
@@ -1764,8 +1777,18 @@ async function handlePlanningClipboardImport(
         "title",
     );
 
-    button.textContent =
+    button.title =
         "Lendo área de transferência...";
+
+    button.setAttribute(
+        "aria-label",
+        "Lendo área de transferência",
+    );
+
+    button.setAttribute(
+        "aria-busy",
+        "true",
+    );
 
     try {
         const clipboard =
@@ -1984,8 +2007,8 @@ async function handlePlanningClipboardImport(
             validWindowCandidates
                 .length > 1
         ) {
-            button.textContent =
-                "Escolha a janela...";
+            button.title =
+                "Escolha a janela da importação";
 
             selectedWindow =
                 await requestPlanningImportWindow(
@@ -1993,8 +2016,9 @@ async function handlePlanningClipboardImport(
                 );
 
             if (!selectedWindow) {
-                button.textContent =
-                    PLANNING_IMPORT_DEFAULT_TEXT;
+                restorePlanningImportButton(
+                    button,
+                );
 
                 return;
             }
@@ -2038,8 +2062,9 @@ async function handlePlanningClipboardImport(
                 );
 
             if (!shouldContinue) {
-                button.textContent =
-                    PLANNING_IMPORT_DEFAULT_TEXT;
+                restorePlanningImportButton(
+                    button,
+                );
 
                 return;
             }
@@ -2054,8 +2079,9 @@ async function handlePlanningClipboardImport(
                 );
 
             if (!shouldReplace) {
-                button.textContent =
-                    PLANNING_IMPORT_DEFAULT_TEXT;
+                restorePlanningImportButton(
+                    button,
+                );
 
                 return;
             }
@@ -2123,7 +2149,7 @@ async function handlePlanningClipboardImport(
             );
         }
 
-        button.textContent =
+        button.title =
             `${selection.lhs.length} LHs importados — ${selection.targetWindow}`;
 
         button.title = [
@@ -2147,14 +2173,29 @@ async function handlePlanningClipboardImport(
         restorePlanningImportButton(
             button,
         );
+
+        setReportNotification({
+            reportId: "planning",
+            type: "success",
+            message: `${selection.lhs.length} LHs importados da janela ${selection.targetWindow}.`,
+        });
     } catch (error) {
         console.error(
             "Falha ao importar os LHs do SPX.",
             error,
         );
 
-        button.textContent =
+        button.title =
             "Não foi possível importar";
+
+        setReportNotification({
+            reportId: "planning",
+            type: "error",
+            message:
+                error instanceof Error
+                    ? error.message
+                    : "Não foi possível importar os LHs do SPX.",
+        });
 
         window.alert(
             error instanceof Error
@@ -2167,6 +2208,10 @@ async function handlePlanningClipboardImport(
         );
     } finally {
         button.disabled = false;
+
+        button.removeAttribute(
+            "aria-busy",
+        );
     }
 }
 
@@ -2202,6 +2247,18 @@ function initializePlanningImport(
         .dataset
         .planningImportInitialized =
             "true";
+
+    button.dataset
+        .planningImportDefaultTitle =
+            button.title ||
+            PLANNING_IMPORT_DEFAULT_TEXT;
+
+    button.dataset
+        .planningImportDefaultAriaLabel =
+            button.getAttribute(
+                "aria-label",
+            ) ||
+            PLANNING_IMPORT_DEFAULT_TEXT;
 
     button.addEventListener(
         "click",

@@ -1,14 +1,11 @@
+import {
+    FIXED_REPORT_WINDOW,
+} from "../core/report-context.js";
+
 /* OUVINTES DO ESTADO */
 
 const expeditionStateListeners =
     new Set();
-
-const expeditionWindows =
-    new Set([
-        "AM",
-        "PM1",
-        "PM2",
-    ]);
 
 /* NORMALIZAÇÕES */
 
@@ -362,7 +359,7 @@ function createExpeditionRoute(
 /* ESTADO DA EXPEDIÇÃO */
 
 const expeditionState = {
-    window: "AM",
+    window: FIXED_REPORT_WINDOW,
     sourceFileName: "",
 
     errorSourceFileName: "",
@@ -1626,30 +1623,17 @@ function subscribeExpeditionState(
 /* ALTERA A JANELA */
 
 function updateExpeditionWindow(
-    value,
+    _value,
 ) {
-    const windowValue =
-        normalizeExpeditionText(
-            value,
-        ).toUpperCase();
-
-    if (
-        !expeditionWindows.has(
-            windowValue,
-        )
-    ) {
-        return false;
-    }
-
     if (
         expeditionState.window ===
-        windowValue
+        FIXED_REPORT_WINDOW
     ) {
         return true;
     }
 
     expeditionState.window =
-        windowValue;
+        FIXED_REPORT_WINDOW;
 
     notifyExpeditionState({
         type: "window-updated",
@@ -1976,17 +1960,8 @@ function restoreExpeditionState(
         return false;
     }
 
-    const windowValue =
-        normalizeExpeditionText(
-            sessionState.window,
-        ).toUpperCase();
-
     expeditionState.window =
-        expeditionWindows.has(
-            windowValue,
-        )
-            ? windowValue
-            : "AM";
+        FIXED_REPORT_WINDOW;
 
     expeditionState.sourceFileName =
         normalizeExpeditionText(
@@ -2145,7 +2120,7 @@ function restoreExpeditionState(
 
 function resetExpeditionReport() {
     expeditionState.window =
-        "AM";
+        FIXED_REPORT_WINDOW;
 
     expeditionState.floorVolume =
         null;

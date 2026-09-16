@@ -11,8 +11,6 @@ import {
 /* CONFIGURAÇÕES */
 
 const EXPEDITION_ERRORS_HEADER_SEARCH_ROWS = 20;
-const EXPEDITION_ERRORS_FEEDBACK_DURATION = 1800;
-
 const expeditionErrorsHeaderAliases = {
     sorting: [
         "erro de sorting",
@@ -315,13 +313,26 @@ function getExpeditionErrorsSuccessMessage(analysis) {
 async function importExpeditionErrorsFromClipboard(
     importButton,
 ) {
-    const originalLabel =
-        importButton.textContent.trim();
-
     const originalTitle = importButton.title;
 
+    const originalAriaLabel =
+        importButton.getAttribute(
+            "aria-label",
+        );
+
     importButton.disabled = true;
-    importButton.textContent = "Importando...";
+    importButton.title =
+        "Importando erros da área de transferência...";
+
+    importButton.setAttribute(
+        "aria-label",
+        "Importando erros da área de transferência",
+    );
+
+    importButton.setAttribute(
+        "aria-busy",
+        "true",
+    );
 
     try {
         const clipboardText =
@@ -347,12 +358,6 @@ async function importExpeditionErrorsFromClipboard(
                 analysis,
             );
 
-        importButton.textContent =
-            "Importação Concluída";
-
-        importButton.title =
-            `${analysis.spreadsheetTotal.toLocaleString("pt-BR")} erros importados.`;
-
         setReportNotification({
             reportId: "expedition",
 
@@ -374,11 +379,6 @@ async function importExpeditionErrorsFromClipboard(
             error,
         );
 
-        importButton.textContent =
-            "Erro na Importação";
-
-        importButton.title = errorMessage;
-
         setReportNotification({
             reportId: "expedition",
 
@@ -387,18 +387,21 @@ async function importExpeditionErrorsFromClipboard(
                 `Falha na importação: ${errorMessage}`,
         });
     } finally {
-        window.setTimeout(
-            function () {
-                importButton.textContent =
-                    originalLabel;
+        importButton.title =
+            originalTitle;
 
-                importButton.title =
-                    originalTitle;
+        if (originalAriaLabel) {
+            importButton.setAttribute(
+                "aria-label",
+                originalAriaLabel,
+            );
+        }
 
-                importButton.disabled = false;
-            },
-            EXPEDITION_ERRORS_FEEDBACK_DURATION,
+        importButton.removeAttribute(
+            "aria-busy",
         );
+
+        importButton.disabled = false;
     }
 }
 
@@ -409,7 +412,7 @@ function initializeExpeditionErrorsImport(
 ) {
     const importButton =
         rootElement.querySelector(
-            "#expeditionErrorsImportButton",
+            "#expeditionImportActionButton",
         );
 
     if (
@@ -440,6 +443,20 @@ function initializeExpeditionErrorsImport(
     importButton.addEventListener(
         "click",
         function () {
+            const activeTarget =
+                rootElement.querySelector(
+                    "#expedition-view-tabs .tabs-title.is-active > a",
+                )?.getAttribute(
+                    "href",
+                );
+
+            if (
+                activeTarget !== "#expedition-mistakes" &&
+                activeTarget !== "#expedition-streets"
+            ) {
+                return;
+            }
+
             importExpeditionErrorsFromClipboard(
                 importButton,
             );

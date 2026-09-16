@@ -1,6 +1,7 @@
 import {
     LOSSES_RATE_MONTHS,
     getLossesRateState,
+    resetLossesRateReport,
     subscribeLossesRateState,
 } from "./state.js";
 
@@ -20,6 +21,9 @@ let lossesRateCopyReportButton =
     null;
 
 let lossesRateDownloadReportButton =
+    null;
+
+let lossesRateClearReportButton =
     null;
 
 let lossesRateReportExportArea =
@@ -120,6 +124,37 @@ function canExportLossesRateReport(
     );
 }
 
+function hasLossesRateReportData(
+    state,
+) {
+    const identification =
+        state.identification || {};
+
+    return (
+        Object.values(
+            identification,
+        ).some(
+            function (value) {
+                return isLossesRateTextFilled(
+                    value,
+                );
+            },
+        ) ||
+        state.months.some(
+            function (month) {
+                return Object.values(
+                    month,
+                ).some(
+                    function (value) {
+                        return value !== null &&
+                            value !== undefined;
+                    },
+                );
+            },
+        )
+    );
+}
+
 /* ATUALIZA O STATUS DA EXPORTAÇÃO */
 
 function renderLossesRateExportStatus(
@@ -137,6 +172,12 @@ function renderLossesRateExportStatus(
     lossesRateDownloadReportButton.disabled =
         lossesRateExportBusy ||
         !canExport;
+
+    lossesRateClearReportButton.disabled =
+        lossesRateExportBusy ||
+        !hasLossesRateReportData(
+            state,
+        );
 
     if (
         !lossesRatePanel.classList.contains(
@@ -270,12 +311,13 @@ async function handleCopyLossesRateReport() {
         return;
     }
 
-    const originalText =
-        lossesRateCopyReportButton
-            .textContent;
+    const originalTitle =
+        lossesRateCopyReportButton.title;
 
-    let copySucceeded =
-        false;
+    const originalAriaLabel =
+        lossesRateCopyReportButton.getAttribute(
+            "aria-label",
+        );
 
     lossesRateExportBusy =
         true;
@@ -284,8 +326,8 @@ async function handleCopyLossesRateReport() {
         state,
     );
 
-    lossesRateCopyReportButton.textContent =
-        "Copiando...";
+    lossesRateCopyReportButton.title =
+        "Copiando relatório...";
 
     lossesRateCopyReportButton.setAttribute(
         "aria-busy",
@@ -300,11 +342,11 @@ async function handleCopyLossesRateReport() {
             reportBlob,
         );
 
-        copySucceeded =
-            true;
-
-        lossesRateCopyReportButton.textContent =
-            "Copiado!";
+        setReportNotification({
+            reportId: "losses-rate",
+            type: "success",
+            message: "Relatório de taxa de perdas copiado.",
+        });
     } catch (error) {
         showLossesRateExportError(
             error,
@@ -315,32 +357,22 @@ async function handleCopyLossesRateReport() {
             "aria-busy",
         );
 
-        if (copySucceeded) {
-            window.setTimeout(
-                function () {
-                    lossesRateExportBusy =
-                        false;
+        lossesRateExportBusy =
+            false;
 
-                    lossesRateCopyReportButton.textContent =
-                        originalText;
+        lossesRateCopyReportButton.title =
+            originalTitle;
 
-                    renderLossesRateExportStatus(
-                        getLossesRateState(),
-                    );
-                },
-                1200,
-            );
-        } else {
-            lossesRateExportBusy =
-                false;
-
-            lossesRateCopyReportButton.textContent =
-                originalText;
-
-            renderLossesRateExportStatus(
-                getLossesRateState(),
+        if (originalAriaLabel) {
+            lossesRateCopyReportButton.setAttribute(
+                "aria-label",
+                originalAriaLabel,
             );
         }
+
+        renderLossesRateExportStatus(
+            getLossesRateState(),
+        );
     }
 }
 
@@ -359,9 +391,13 @@ async function handleDownloadLossesRateReport() {
         return;
     }
 
-    const originalText =
-        lossesRateDownloadReportButton
-            .textContent;
+    const originalTitle =
+        lossesRateDownloadReportButton.title;
+
+    const originalAriaLabel =
+        lossesRateDownloadReportButton.getAttribute(
+            "aria-label",
+        );
 
     lossesRateExportBusy =
         true;
@@ -370,8 +406,8 @@ async function handleDownloadLossesRateReport() {
         state,
     );
 
-    lossesRateDownloadReportButton.textContent =
-        "Gerando...";
+    lossesRateDownloadReportButton.title =
+        "Gerando relatório...";
 
     lossesRateDownloadReportButton.setAttribute(
         "aria-busy",
@@ -388,6 +424,12 @@ async function handleDownloadLossesRateReport() {
                 state,
             ),
         );
+
+        setReportNotification({
+            reportId: "losses-rate",
+            type: "success",
+            message: "Relatório de taxa de perdas baixado.",
+        });
     } catch (error) {
         showLossesRateExportError(
             error,
@@ -397,8 +439,15 @@ async function handleDownloadLossesRateReport() {
         lossesRateExportBusy =
             false;
 
-        lossesRateDownloadReportButton.textContent =
-            originalText;
+        lossesRateDownloadReportButton.title =
+            originalTitle;
+
+        if (originalAriaLabel) {
+            lossesRateDownloadReportButton.setAttribute(
+                "aria-label",
+                originalAriaLabel,
+            );
+        }
 
         lossesRateDownloadReportButton.removeAttribute(
             "aria-busy",
@@ -433,6 +482,11 @@ function initializeLossesRateExport(
             "#lossesRateDownloadReportButton",
         );
 
+    lossesRateClearReportButton =
+        rootElement.querySelector(
+            "#lossesRateClearReportButton",
+        );
+
     lossesRateReportExportArea =
         rootElement.querySelector(
             "#lossesRatePreview",
@@ -445,6 +499,10 @@ function initializeLossesRateExport(
         ) ||
         !(
             lossesRateDownloadReportButton instanceof
+            HTMLButtonElement
+        ) ||
+        !(
+            lossesRateClearReportButton instanceof
             HTMLButtonElement
         ) ||
         !(
@@ -507,6 +565,27 @@ function initializeLossesRateExport(
     lossesRateDownloadReportButton.addEventListener(
         "click",
         handleDownloadLossesRateReport,
+    );
+
+    lossesRateClearReportButton.addEventListener(
+        "click",
+        function () {
+            if (
+                !window.confirm(
+                    "Limpar todas as informações do relatório de taxa de perdas?",
+                )
+            ) {
+                return;
+            }
+
+            resetLossesRateReport();
+
+            setReportNotification({
+                reportId: "losses-rate",
+                type: "idle",
+                message: "Relatório de taxa de perdas limpo.",
+            });
+        },
     );
 
     subscribeLossesRateState(

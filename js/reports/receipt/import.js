@@ -2,6 +2,10 @@ import {
     replaceReceiptOperators,
 } from "./state.js";
 
+import {
+    setReportNotification,
+} from "../report-notifications.js";
+
 /* CONFIGURAÇÕES */
 
 const MAX_RECEIPT_FILE_SIZE =
@@ -400,18 +404,33 @@ async function importReceiptFile(
     file,
     importButton,
 ) {
-    const originalLabel =
-        importButton.textContent
-            .trim();
-
     const originalTitle =
+        importButton.dataset
+            .receiptLinehaulImportDefaultTitle ||
         importButton.title;
+
+    const originalAriaLabel =
+        importButton.dataset
+            .receiptLinehaulImportDefaultAriaLabel ||
+        importButton.getAttribute(
+            "aria-label",
+        );
 
     importButton.disabled =
         true;
 
-    importButton.textContent =
-        "Importando...";
+    importButton.title =
+        "Importando arquivo de recebimento...";
+
+    importButton.setAttribute(
+        "aria-label",
+        "Importando arquivo de recebimento",
+    );
+
+    importButton.setAttribute(
+        "aria-busy",
+        "true",
+    );
 
     try {
         const result =
@@ -423,12 +442,13 @@ async function importReceiptFile(
             result.operators,
         );
 
-        importButton.textContent =
-            "Importação Concluída";
-
-        importButton.title =
-            `${result.importedPackages} pacotes únicos e ` +
-            `${result.operators.length} recebedores importados.`;
+        setReportNotification({
+            reportId: "receipt",
+            type: "success",
+            message:
+                `${result.importedPackages} pacotes únicos e ` +
+                `${result.operators.length} recebedores importados.`,
+        });
 
         if (
             result.duplicateTrackings >
@@ -444,27 +464,31 @@ async function importReceiptFile(
             error,
         );
 
-        importButton.textContent =
-            "Erro na Importação";
-
-        importButton.title =
-            error instanceof Error
-                ? error.message
-                : "Não foi possível importar o arquivo.";
+        setReportNotification({
+            reportId: "receipt",
+            type: "error",
+            message:
+                error instanceof Error
+                    ? error.message
+                    : "Não foi possível importar o arquivo de recebimento.",
+        });
     } finally {
-        window.setTimeout(
-            function () {
-                importButton.textContent =
-                    originalLabel;
+        importButton.title =
+            originalTitle;
 
-                importButton.title =
-                    originalTitle;
+        if (originalAriaLabel) {
+            importButton.setAttribute(
+                "aria-label",
+                originalAriaLabel,
+            );
+        }
 
-                importButton.disabled =
-                    false;
-            },
-            1800,
+        importButton.removeAttribute(
+            "aria-busy",
         );
+
+        importButton.disabled =
+            false;
     }
 }
 
@@ -487,7 +511,7 @@ function initializeReceiptImport(
 
     const importButton =
         receiptPanel.querySelector(
-            "#receiptImportButton",
+            "#receiptImportActionButton",
         );
 
     const fileInput =
@@ -523,6 +547,20 @@ function initializeReceiptImport(
     importButton.addEventListener(
         "click",
         function () {
+            const activeTarget =
+                receiptPanel.querySelector(
+                    "#receipt-view-tabs .tabs-title.is-active > a",
+                )?.getAttribute(
+                    "href",
+                );
+
+            if (
+                activeTarget ===
+                "#linehaul"
+            ) {
+                return;
+            }
+
             fileInput.click();
         },
     );

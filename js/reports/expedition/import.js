@@ -1,6 +1,4 @@
 import {
-    getExpeditionOperatorRanking,
-    getExpeditionState,
     replaceExpeditionRoutes,
 } from "./state.js";
 
@@ -650,18 +648,29 @@ async function importExpeditionFile(
     file,
     importButton,
 ) {
-    const originalLabel =
-        importButton.textContent
-            .trim();
-
     const originalTitle =
         importButton.title;
+
+    const originalAriaLabel =
+        importButton.getAttribute(
+            "aria-label",
+        );
 
     importButton.disabled =
         true;
 
-    importButton.textContent =
-        "Importando...";
+    importButton.title =
+        "Importando arquivo da expedição...";
+
+    importButton.setAttribute(
+        "aria-label",
+        "Importando arquivo da expedição",
+    );
+
+    importButton.setAttribute(
+        "aria-busy",
+        "true",
+    );
 
     try {
         const result =
@@ -673,18 +682,6 @@ async function importExpeditionFile(
             result.routes,
             file.name,
         );
-
-        const operators =
-            getExpeditionOperatorRanking(
-                getExpeditionState(),
-            );
-
-        importButton.textContent =
-            "Importação Concluída";
-
-        importButton.title =
-            `${result.routes.length} rotas e ` +
-            `${operators.length} conferentes importados.`;
 
         const importWarnings = [];
 
@@ -733,29 +730,26 @@ async function importExpeditionFile(
             error,
         );
 
-        importButton.textContent =
-            "Erro na Importação";
-
-        importButton.title =
-            errorMessage;
-
         showExpeditionImportError(
             errorMessage,
         );
     } finally {
-        window.setTimeout(
-            function () {
-                importButton.textContent =
-                    originalLabel;
+        importButton.title =
+            originalTitle;
 
-                importButton.title =
-                    originalTitle;
+        if (originalAriaLabel) {
+            importButton.setAttribute(
+                "aria-label",
+                originalAriaLabel,
+            );
+        }
 
-                importButton.disabled =
-                    false;
-            },
-            1800,
+        importButton.removeAttribute(
+            "aria-busy",
         );
+
+        importButton.disabled =
+            false;
     }
 }
 
@@ -766,7 +760,7 @@ function initializeExpeditionImport(
 ) {
     const importButton =
         rootElement.querySelector(
-            "#expeditionImportButton",
+            "#expeditionImportActionButton",
         );
 
     const fileInput =
@@ -806,6 +800,20 @@ function initializeExpeditionImport(
     importButton.addEventListener(
         "click",
         function () {
+            const activeTarget =
+                rootElement.querySelector(
+                    "#expedition-view-tabs .tabs-title.is-active > a",
+                )?.getAttribute(
+                    "href",
+                );
+
+            if (
+                activeTarget !== "#expedition-tables" &&
+                activeTarget !== "#expedition-charts"
+            ) {
+                return;
+            }
+
             fileInput.click();
         },
     );

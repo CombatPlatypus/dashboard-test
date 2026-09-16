@@ -28,6 +28,10 @@ import {
     initializeExpeditionErrorsCharts,
 } from "./errors-charts.js";
 
+import {
+    initializeExpeditionExport,
+} from "./export.js";
+
 let expeditionControllerInitialized =
     false;
 
@@ -53,6 +57,7 @@ function initializeExpeditionController() {
         initializeExpeditionErrorsImport,
         initializeExpeditionCharts,
         initializeExpeditionErrorsCharts,
+        initializeExpeditionExport,
     ];
 
     const initialized =

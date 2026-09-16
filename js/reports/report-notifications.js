@@ -27,8 +27,15 @@ const IDLE_REPORT_NOTIFICATION =
 const reportNotifications =
     new Map();
 
-let reportsVisibilityObserver =
-    null;
+const REPORT_NOTIFICATION_PREFIXES =
+    Object.freeze({
+        planning: "planning",
+        receipt: "receipt",
+        expedition: "expedition",
+        "losses-rate": "lossesRate",
+        "overall-analysis":
+            "overallAnalysis",
+    });
 
 /* IDENTIFICA O RELATÓRIO ATIVO */
 
@@ -57,10 +64,14 @@ function getActiveReportId() {
     );
 }
 
-function getActiveReportNotification() {
+function getReportNotification(
+    reportId,
+) {
     return (
         reportNotifications.get(
-            getActiveReportId(),
+            normalizeReportId(
+                reportId,
+            ),
         ) ||
         IDLE_REPORT_NOTIFICATION
     );
@@ -68,21 +79,34 @@ function getActiveReportNotification() {
 
 /* LOCALIZA OS ELEMENTOS */
 
-function getReportNotificationElements() {
+function getReportNotificationElements(
+    reportId,
+) {
+    const prefix =
+        REPORT_NOTIFICATION_PREFIXES[
+            normalizeReportId(
+                reportId,
+            )
+        ];
+
+    if (!prefix) {
+        return null;
+    }
+
     return {
         container:
             document.getElementById(
-                "reportsNotification",
+                `${prefix}Notification`,
             ),
 
         icon:
             document.getElementById(
-                "reportsNotificationIcon",
+                `${prefix}NotificationIcon`,
             ),
 
         text:
             document.getElementById(
-                "reportsNotificationText",
+                `${prefix}NotificationText`,
             ),
     };
 }
@@ -90,13 +114,20 @@ function getReportNotificationElements() {
 /* RENDERIZA A ÚLTIMA NOTIFICAÇÃO */
 
 function renderReportNotification(
+    reportId =
+        getActiveReportId(),
     notification =
-        getActiveReportNotification(),
+        getReportNotification(
+            reportId,
+        ),
 ) {
     const elements =
-        getReportNotificationElements();
+        getReportNotificationElements(
+            reportId,
+        );
 
     if (
+        !elements ||
         !(
             elements.container instanceof
                 HTMLElement
@@ -110,10 +141,6 @@ function renderReportNotification(
                 HTMLElement
         )
     ) {
-        console.error(
-            "Não foi possível localizar a caixa global de notificações dos relatórios.",
-        );
-
         return false;
     }
 
@@ -175,54 +202,24 @@ function setReportNotification({
         );
     }
 
-    if (
-        !normalizedReportId ||
-        normalizedReportId ===
-            getActiveReportId()
-    ) {
-        return renderReportNotification(
-            notification,
-        );
-    }
-
-    return true;
+    return renderReportNotification(
+        normalizedReportId,
+        notification,
+    );
 }
 
 /* INICIALIZAÇÃO */
 
 function initializeReportNotifications() {
-    const reportsContent =
-        document.querySelector(
-            '[data-tabs-content="report-choice"]',
-        );
-
-    reportsVisibilityObserver
-        ?.disconnect();
-
-    if (
-        reportsContent instanceof
-        HTMLElement
-    ) {
-        reportsVisibilityObserver =
-            new MutationObserver(
-                function () {
-                    renderReportNotification();
-                },
+    return Object.keys(
+        REPORT_NOTIFICATION_PREFIXES,
+    ).every(
+        function (reportId) {
+            return renderReportNotification(
+                reportId,
             );
-
-        reportsVisibilityObserver.observe(
-            reportsContent,
-            {
-                attributes: true,
-                attributeFilter: [
-                    "class",
-                ],
-                subtree: true,
-            },
-        );
-    }
-
-    return renderReportNotification();
+        },
+    );
 }
 
 export {

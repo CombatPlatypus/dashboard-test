@@ -187,36 +187,6 @@ function setReceiptInputValue(
     }
 }
 
-/* SINCRONIZA O SELECT DA JANELA COM O SELECT2 */
-
-function refreshReceiptWindowSelect(
-    select,
-) {
-    if (
-        typeof window.jQuery !==
-        "function"
-    ) {
-        return;
-    }
-
-    const selectElement =
-        window.jQuery(
-            select,
-        );
-
-    if (
-        !selectElement.hasClass(
-            "select2-hidden-accessible",
-        )
-    ) {
-        return;
-    }
-
-    selectElement.trigger(
-        "change.select2",
-    );
-}
-
 /* ELEMENTOS */
 
 function getReceiptElementById(
@@ -241,12 +211,6 @@ function getReceiptElements(rootElement) {
             getReceiptElementById(
                 rootElement,
                 "receiptExpectedInput",
-            ),
-
-        windowInput:
-            getReceiptElementById(
-                rootElement,
-                "receiptWindowInput",
             ),
 
         operatorControls:
@@ -790,14 +754,9 @@ function setReceiptGeneralControlsAvailability(
     elements.expectedInput.disabled =
         disabled;
 
-    elements.windowInput.disabled =
-        disabled;
-
     elements.errorCalculationToggle.disabled =
         disabled;
 
-    elements.clearReportButton.disabled =
-        disabled;   
 }
 
 /* RESUMO */
@@ -830,15 +789,6 @@ function renderReceiptSummary(
             totalErrors,
             receivedVolume,
         );
-
-    setReceiptInputValue(
-        elements.windowInput,
-        state.window,
-    );
-
-    refreshReceiptWindowSelect(
-        elements.windowInput,
-    );
 
     setReceiptInputValue(
         elements.expectedInput,
@@ -944,7 +894,7 @@ function handleResetReceiptReport() {
 
     const importButton =
         receiptPanel?.querySelector(
-            "#receiptImportButton",
+            "#receiptImportActionButton",
         );
 
     if (
@@ -974,41 +924,6 @@ function bindReceiptGeneralInputs(
             );
         },
     );
-
-    const handleWindowChange =
-        function () {
-            updateReceiptGeneralField(
-                "window",
-                elements.windowInput.value,
-            );
-        };
-
-    /*
-     * O Select2 dispara o evento change
-     * por meio do jQuery.
-     */
-
-    if (
-        typeof window.jQuery ===
-        "function"
-    ) {
-        window.jQuery(
-            elements.windowInput,
-        )
-            .off(
-                "change.receiptReport",
-            )
-            .on(
-                "change.receiptReport",
-                handleWindowChange,
-            );
-    } else {
-        elements.windowInput
-            .addEventListener(
-                "change",
-                handleWindowChange,
-            );
-    }
 
     elements.errorCalculationToggle
         .addEventListener(

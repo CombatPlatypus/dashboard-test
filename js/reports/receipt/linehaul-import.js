@@ -11,11 +11,15 @@ import {
     parseSpXLinehaulQuantity,
 } from "../core/spx-linehaul-rules.js";
 
+import {
+    setReportNotification,
+} from "../report-notifications.js";
+
 const RECEIPT_LINEHAUL_IMPORT_BUTTON_ID =
-    "receiptLinehaulImportButton";
+    "receiptImportActionButton";
 
 const RECEIPT_LINEHAUL_IMPORT_DEFAULT_TEXT =
-    "Importar Viagens de Carga";
+    "Importar viagens de carga da área de transferência";
 
 const RECEIPT_LINEHAUL_IMPORT_FEEDBACK_DURATION =
     3000;
@@ -1110,8 +1114,28 @@ function restoreReceiptLinehaulImportButton(
     receiptLinehaulImportFeedbackTimer =
         window.setTimeout(
             function () {
-                button.textContent =
+                if (
+                    button.getAttribute(
+                        "aria-busy",
+                    ) === "true"
+                ) {
+                    receiptLinehaulImportFeedbackTimer =
+                        null;
+
+                    return;
+                }
+
+                button.title =
+                    button.dataset
+                        .receiptLinehaulImportDefaultTitle ||
                     RECEIPT_LINEHAUL_IMPORT_DEFAULT_TEXT;
+
+                button.setAttribute(
+                    "aria-label",
+                    button.dataset
+                        .receiptLinehaulImportDefaultAriaLabel ||
+                    RECEIPT_LINEHAUL_IMPORT_DEFAULT_TEXT,
+                );
 
                 receiptLinehaulImportFeedbackTimer =
                     null;
@@ -1133,9 +1157,47 @@ async function handleReceiptLinehaulClipboardImport(
         return;
     }
 
+    const activeTarget =
+        button.closest(
+            "#receipt",
+        )?.querySelector(
+            "#receipt-view-tabs .tabs-title.is-active > a",
+        )?.getAttribute(
+            "href",
+        );
+
+    if (
+        activeTarget !==
+        "#linehaul"
+    ) {
+        return;
+    }
+
+    if (
+        receiptLinehaulImportFeedbackTimer !==
+        null
+    ) {
+        window.clearTimeout(
+            receiptLinehaulImportFeedbackTimer,
+        );
+
+        receiptLinehaulImportFeedbackTimer =
+            null;
+    }
+
     button.disabled = true;
-    button.textContent =
+    button.title =
         "Lendo área de transferência...";
+
+    button.setAttribute(
+        "aria-label",
+        "Lendo viagens de carga da área de transferência",
+    );
+
+    button.setAttribute(
+        "aria-busy",
+        "true",
+    );
 
     try {
         const clipboard =
@@ -1318,8 +1380,8 @@ async function handleReceiptLinehaulClipboardImport(
                 .window;
 
         if (validWindowCandidates.length > 1) {
-            button.textContent =
-                "Escolha a janela...";
+            button.title =
+                "Escolha a janela da importação";
 
             selectedWindow =
                 await requestReceiptLinehaulImportWindow(
@@ -1327,8 +1389,9 @@ async function handleReceiptLinehaulClipboardImport(
                 );
 
             if (!selectedWindow) {
-                button.textContent =
-                    RECEIPT_LINEHAUL_IMPORT_DEFAULT_TEXT;
+                restoreReceiptLinehaulImportButton(
+                    button,
+                );
 
                 return;
             }
@@ -1361,8 +1424,9 @@ async function handleReceiptLinehaulClipboardImport(
                 );
 
             if (!shouldContinue) {
-                button.textContent =
-                    RECEIPT_LINEHAUL_IMPORT_DEFAULT_TEXT;
+                restoreReceiptLinehaulImportButton(
+                    button,
+                );
 
                 return;
             }
@@ -1383,8 +1447,9 @@ async function handleReceiptLinehaulClipboardImport(
                 "A importação substituirá as viagens carregadas atualmente. Deseja continuar?",
             )
         ) {
-            button.textContent =
-                RECEIPT_LINEHAUL_IMPORT_DEFAULT_TEXT;
+            restoreReceiptLinehaulImportButton(
+                button,
+            );
 
             return;
         }
@@ -1393,25 +1458,38 @@ async function handleReceiptLinehaulClipboardImport(
             selection.records,
         );
 
-        button.textContent =
-            `${selection.records.length} LHs importados — ${selection.targetWindow}`;
-
         button.title =
+            `${selection.records.length} LHs importados — ${selection.targetWindow}. ` +
             `Importação realizada por ${selectedCandidate.format}.`;
 
         restoreReceiptLinehaulImportButton(
             button,
         );
+
+        setReportNotification({
+            reportId: "receipt",
+            type: "success",
+            message: `${selection.records.length} LHs importados da janela ${selection.targetWindow}.`,
+        });
     } catch (error) {
         console.error(
             "Falha ao importar os LHs do processamento.",
             error,
         );
 
-        button.textContent =
+        button.title =
             "Não foi possível importar";
 
         enableReceiptLinehaulManualEntry();
+
+        setReportNotification({
+            reportId: "receipt",
+            type: "error",
+            message:
+                error instanceof Error
+                    ? error.message
+                    : "Não foi possível importar as viagens copiadas do SPX.",
+        });
 
         window.alert(
             error instanceof Error
@@ -1424,6 +1502,10 @@ async function handleReceiptLinehaulClipboardImport(
         );
     } finally {
         button.disabled = false;
+
+        button.removeAttribute(
+            "aria-busy",
+        );
     }
 }
 
@@ -1452,6 +1534,18 @@ function initializeReceiptLinehaulImport(
     button.dataset
         .receiptLinehaulImportInitialized =
             "true";
+
+    button.dataset
+        .receiptLinehaulImportDefaultTitle =
+            button.title ||
+            RECEIPT_LINEHAUL_IMPORT_DEFAULT_TEXT;
+
+    button.dataset
+        .receiptLinehaulImportDefaultAriaLabel =
+            button.getAttribute(
+                "aria-label",
+            ) ||
+            RECEIPT_LINEHAUL_IMPORT_DEFAULT_TEXT;
 
     button.addEventListener(
         "click",

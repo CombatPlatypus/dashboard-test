@@ -8,9 +8,6 @@ import {
     setReportNotification,
 } from "../report-notifications.js";
 
-const LOSSES_RATE_IMPORT_FEEDBACK_DURATION =
-    1800;
-
 /* NOMES ACEITOS PARA AS COLUNAS */
 
 const lossesRateColumnAliases = {
@@ -872,17 +869,29 @@ async function copyLossesRateUpdatedBase(
 async function importLossesRateFromClipboard(
     importButton,
 ) {
-    const originalLabel =
-        importButton.textContent.trim();
-
     const originalTitle =
         importButton.title;
+
+    const originalAriaLabel =
+        importButton.getAttribute(
+            "aria-label",
+        );
 
     importButton.disabled =
         true;
 
-    importButton.textContent =
-        "Importando...";
+    importButton.title =
+        "Importando histórico da área de transferência...";
+
+    importButton.setAttribute(
+        "aria-label",
+        "Importando histórico da taxa de perdas",
+    );
+
+    importButton.setAttribute(
+        "aria-busy",
+        "true",
+    );
 
     try {
         const clipboardText =
@@ -906,12 +915,6 @@ async function importLossesRateFromClipboard(
         const successMessage =
             `${result.importedRows} ${monthLabel} da Taxa de Perdas.`;
 
-        importButton.textContent =
-            "Importação Concluída";
-
-        importButton.title =
-            successMessage;
-
         setReportNotification({
             reportId: "losses-rate",
 
@@ -929,12 +932,6 @@ async function importLossesRateFromClipboard(
             error,
         );
 
-        importButton.textContent =
-            "Erro na Importação";
-
-        importButton.title =
-            errorMessage;
-
         setReportNotification({
             reportId: "losses-rate",
 
@@ -943,19 +940,22 @@ async function importLossesRateFromClipboard(
                 `Falha na importação: ${errorMessage}`,
         });
     } finally {
-        window.setTimeout(
-            function () {
-                importButton.textContent =
-                    originalLabel;
+        importButton.title =
+            originalTitle;
 
-                importButton.title =
-                    originalTitle;
+        if (originalAriaLabel) {
+            importButton.setAttribute(
+                "aria-label",
+                originalAriaLabel,
+            );
+        }
 
-                importButton.disabled =
-                    false;
-            },
-            LOSSES_RATE_IMPORT_FEEDBACK_DURATION,
+        importButton.removeAttribute(
+            "aria-busy",
         );
+
+        importButton.disabled =
+            false;
     }
 }
 
@@ -964,7 +964,7 @@ function initializeLossesRateImport(
 ) {
     const importButton =
         rootElement.querySelector(
-            "#lossesRateImportHistoryButton",
+            "#lossesRateImportActionButton",
         );
 
     const copyBaseButton =

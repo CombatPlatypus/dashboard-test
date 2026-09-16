@@ -346,14 +346,6 @@
 
                 <div class="tabs-panel is-active" id="reports">
 
-                    <div class="global-inputs">
-
-                        <input type="text" placeholder="Janela">
-                        <input type="text" placeholder="Analista">
-                        <input type="text">
-
-                    </div>
-
                     <!-- NAVEGAÇÃO ENTRE OS RELATÓRIOS -->
 
                     <div class="flex-box-start">
@@ -408,18 +400,6 @@
                         </ul>
                     </div>
 
-                    <!-- BARRA DE NOTIFICAÇÕES DOS RELATÓRIOS -->
-
-                    <div class="warning" id="reportsNotification" role="status" aria-live="polite" aria-atomic="true" data-notification-type="idle" style="display: none;">
-                        <div class="flex-box-start">
-                            <img id="reportsNotificationIcon" src="images/geral-icons/bell-icon.svg" alt="">
-
-                            <h4 id="reportsNotificationText">
-                                Tudo em silêncio por enquanto.
-                            </h4>
-                        </div>
-                    </div>
-
                     <!-- CONTEÚDO DOS RELATÓRIOS -->
 
                     <div class="tabs-content" data-tabs-content="report-choice">
@@ -453,31 +433,31 @@
                             <!-- BARRA DE NOTIFICAÇÕES E BOTÕES DE AÇÃO -->
 
                             <div class="flex-box-start">
-                                <div class="warning" id="">
+                                <div class="warning" id="planningNotification" role="status" aria-live="polite" aria-atomic="true" data-notification-type="idle">
                                     <div class="flex-box-start">
-                                        <img id="" src="images/geral-icons/bell-icon.svg" alt="">
+                                        <img id="planningNotificationIcon" src="images/geral-icons/bell-icon.svg" alt="">
 
-                                        <h4 id="">
+                                        <h4 id="planningNotificationText">
                                             Tudo em silêncio por enquanto.
                                         </h4>
                                     </div>
                                 </div>
 
                                 <div class="report-actions">
-                                    <button id="planningDownloadReportButton" type="button">
-                                        <img src="images/geral-icons/save-icon.svg">
+                                    <button id="planningDownloadReportButton" type="button" title="Baixar relatório" aria-label="Baixar relatório de planejamento">
+                                        <img src="images/geral-icons/save-icon.svg" alt="">
                                     </button>
 
-                                    <button id="planningCopyReportButton" type="button">
-                                        <img src="images/geral-icons/copy-icon.svg">
+                                    <button id="planningCopyReportButton" type="button" title="Copiar relatório" aria-label="Copiar relatório de planejamento">
+                                        <img src="images/geral-icons/copy-icon.svg" alt="">
                                     </button>
 
-                                    <button id="planningImportClipboardButton" type="button">
-                                        <img src="images/geral-icons/import-icon.svg">
+                                    <button id="planningImportClipboardButton" type="button" title="Importar LHs da área de transferência" aria-label="Importar LHs da área de transferência">
+                                        <img src="images/geral-icons/import-icon.svg" alt="">
                                     </button>
-                
-                                    <button id="planningClearReportButton"  type="button">
-                                        <img src="images/geral-icons/trash-basket-icon.svg">
+
+                                    <button id="planningClearReportButton" type="button" title="Limpar relatório" aria-label="Limpar relatório de planejamento">
+                                        <img src="images/geral-icons/trash-basket-icon.svg" alt="">
                                     </button>
                                 </div>
                             </div>
@@ -667,47 +647,13 @@
                                             <div class="title">
                                                 <h4>Lista de LHs</h4>
 
-                                                <button id="planningAddLh" type="button">
-                                                    <img src="images/geral-icons/truck-add-icon.svg">
+                                                <button id="planningAddLh" type="button" title="Adicionar LH" aria-label="Adicionar LH">
+                                                    <img src="images/geral-icons/truck-add-icon.svg" alt="">
                                                 </button>
                                             </div>
 
                                             <div class="padding">
-                                                <div class="lhs-list" id="">
-                                                    <div data-lh-id="">
-                                                        <div class="flex-box-between">
-                                                            <h4>Primeiro LH</h4>
-                                                            <label><input type="checkbox" data-field="segregate">Segregar</label>
-                                                        </div>
-                                                        
-                                                        <div class="lhs-inputs">
-                                                            <input type="text" data-field="code" placeholder="Código" maxlength="30" autocomplete="off">
-                                                            <input type="text" data-field="origin" placeholder="Origem" maxlength="30" autocomplete="off">
-                                                            <input type="text" data-field="quantity" placeholder="Qtd" maxlength="5" autocomplete="off" inputmode="numeric" pattern="[0-9]*">
-                                                        </div>
-                                                    </div>
-                                                    
-                                                    <div data-lh-id="">
-                                                        <h4>Segundo LH</h4>
-
-                                                        <div class="lhs-inputs">
-                                                            <input type="text" data-field="code" placeholder="Código" maxlength="30" autocomplete="off">
-                                                            <input type="text" data-field="origin" placeholder="Origem" maxlength="30" autocomplete="off">
-                                                            <input type="text" data-field="quantity" placeholder="Qtd" maxlength="5" autocomplete="off" inputmode="numeric" pattern="[0-9]*">
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <!-- A SER APAGADO -->
-
-                                                <div class="planning-lh-list flex-box-column" id="planningLhList" style="display: none;"></div>
-
-                                                <div class="lhs-buttons" style="display: none;">
-                                                    <div>
-                                                        <button class="button" id="planningAddLh" type="button">Adicionar LH</button>
-                                                        <button class="button" id="planningClearLhs" type="button">Limpar Lista</button>
-                                                    </div>
-                                                </div>
+                                                <div class="lhs-list planning-lh-list" id="planningLhList"></div>
                                             </div>
                                         </div>
 
@@ -716,7 +662,7 @@
                                             <!-- LISTAS DE TOS SEPARADAS POR LH -->
 
                                             <div class="planning-to-empty" id="planningToEmpty">
-                                                <p>Marque “Segregar” e “Segregar TO” em um LH para adicionar suas TOs.</p>
+                                                <p>Marque “Segregar” em um LH para adicionar suas TOs.</p>
                                             </div>
 
                                             <div class="planning-to-groups flex-box-column" id="planningToGroups" hidden></div>
@@ -794,11 +740,6 @@
                                                 <p>Os valores da frota afetarão o cálculo do indicador SPR Médio, preencher a composição da frota é opcional.</p>
                                                 <a href="#">Consultar Frota ➚</a>
 
-                                                <!-- A SER APAGADO  -->
-                                                
-                                                <div id="planningGeneralControls"></div>
-                                                <div id="planningPoolControls"></div>
-
                                             </div>
                                         </div>
                                     </div>
@@ -835,33 +776,33 @@
                             <!-- BARRA DE NOTIFICAÇÕES E BOTÕES DE AÇÃO -->
 
                             <div class="flex-box-start">
-                                <div class="warning" id="">
+                                <div class="warning" id="receiptNotification" role="status" aria-live="polite" aria-atomic="true" data-notification-type="idle">
                                     <div class="flex-box-start">
-                                        <img id="" src="images/geral-icons/bell-icon.svg" alt="">
+                                        <img id="receiptNotificationIcon" src="images/geral-icons/bell-icon.svg" alt="">
 
-                                        <h4 id="">
+                                        <h4 id="receiptNotificationText">
                                             Tudo em silêncio por enquanto.
                                         </h4>
                                     </div>
                                 </div>
 
                                 <div class="report-actions">
-                                    <button id="receiptDownloadReportButton" type="button">
-                                        <img src="images/geral-icons/save-icon.svg">
+                                    <button id="receiptDownloadReportButton" type="button" title="Baixar relatório" aria-label="Baixar relatório de processamento">
+                                        <img src="images/geral-icons/save-icon.svg" alt="">
                                     </button>
 
-                                    <button id="receiptCopyReportButton" type="button">
-                                        <img src="images/geral-icons/copy-icon.svg">
+                                    <button id="receiptCopyReportButton" type="button" title="Copiar relatório" aria-label="Copiar relatório de processamento">
+                                        <img src="images/geral-icons/copy-icon.svg" alt="">
                                     </button>
 
-                                    <button id="receiptImportClipboardButton" type="button">
-                                        <img src="images/geral-icons/import-icon.svg">
+                                    <button id="receiptImportActionButton" type="button" title="Importar dados da aba atual" aria-label="Importar dados da aba atual do processamento">
+                                        <img src="images/geral-icons/import-icon.svg" alt="">
                                     </button>
 
                                     <input id="receiptFileInput" type="file" accept=".csv,.xlsx,.xls" hidden>
-                
-                                    <button id="receiptClearReportButton"  type="button">
-                                        <img src="images/geral-icons/trash-basket-icon.svg">
+
+                                    <button id="receiptClearReportButton" type="button" title="Limpar relatório" aria-label="Limpar relatório de processamento">
+                                        <img src="images/geral-icons/trash-basket-icon.svg" alt="">
                                     </button>
                                 </div>
                             </div>
@@ -1249,16 +1190,6 @@
 
                                         <div class="input-group" style="display: none;">
                                             <div>
-                                                <h4>Janela</h4>
-
-                                                <select class="standard-select" id="receiptWindowInput" disabled>
-                                                    <option value="AM">AM</option>
-                                                    <option value="PM1">PM1</option>
-                                                    <option value="PM2">PM2</option>
-                                                </select>
-                                            </div>
-
-                                            <div>
                                                 <h4>Volume Esperado</h4>
 
                                                 <input id="receiptExpectedInput" type="text" inputmode="numeric" maxlength="8" disabled>
@@ -1304,15 +1235,6 @@
                                             </div>
                                         </div>
 
-                                        <!-- A SER APAGADO -->
-
-                                        <button class="button" id="receiptLinehaulImportButton" type="button" style="display: none;"></button>
-
-                                        <select class="standard-select" id="receiptLinehaulWindowInput" disabled  style="display: none;">
-                                            <option value="AM">AM</option>
-                                            <option value="PM1">PM1</option>
-                                            <option value="PM2">PM2</option>
-                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -1353,33 +1275,33 @@
                             <!-- BARRA DE NOTIFICAÇÕES E BOTÕES DE AÇÃO -->
 
                             <div class="flex-box-start">
-                                <div class="warning" id="">
+                                <div class="warning" id="expeditionNotification" role="status" aria-live="polite" aria-atomic="true" data-notification-type="idle">
                                     <div class="flex-box-start">
-                                        <img id="" src="images/geral-icons/bell-icon.svg" alt="">
+                                        <img id="expeditionNotificationIcon" src="images/geral-icons/bell-icon.svg" alt="">
 
-                                        <h4 id="">
+                                        <h4 id="expeditionNotificationText">
                                             Tudo em silêncio por enquanto.
                                         </h4>
                                     </div>
                                 </div>
 
                                 <div class="report-actions">
-                                    <button id="expeditionDownloadReportButton" type="button">
-                                        <img src="images/geral-icons/save-icon.svg">
+                                    <button id="expeditionDownloadReportButton" type="button" title="Baixar relatório" aria-label="Baixar relatório de expedição">
+                                        <img src="images/geral-icons/save-icon.svg" alt="">
                                     </button>
 
-                                    <button id="expeditionCopyReportButton" type="button">
-                                        <img src="images/geral-icons/copy-icon.svg">
+                                    <button id="expeditionCopyReportButton" type="button" title="Copiar relatório" aria-label="Copiar relatório de expedição">
+                                        <img src="images/geral-icons/copy-icon.svg" alt="">
                                     </button>
 
-                                    <button id="expeditionImportClipboardButton" type="button">
-                                        <img src="images/geral-icons/import-icon.svg">
+                                    <button id="expeditionImportActionButton" type="button" title="Importar dados da aba atual" aria-label="Importar dados da aba atual da expedição">
+                                        <img src="images/geral-icons/import-icon.svg" alt="">
                                     </button>
 
                                     <input id="expeditionFileInput" type="file" accept=".csv,.xlsx,.xls" hidden>
                 
-                                    <button id="expeditionClearReportButton"  type="button">
-                                        <img src="images/geral-icons/trash-basket-icon.svg">
+                                    <button id="expeditionClearReportButton" type="button" title="Limpar relatório" aria-label="Limpar relatório de expedição">
+                                        <img src="images/geral-icons/trash-basket-icon.svg" alt="">
                                     </button>
                                 </div>
                             </div>
@@ -1721,14 +1643,6 @@
                                             <div class="input-group" id="expeditionOperatorControls"></div>
                                         </div>
 
-                                        <!-- A SER APAGADO -->
-
-                                        <button class="button" id="expeditionImportButton" type="button" style="display: none;">Importar Conferência</button>
-                                        <select class="" id="expeditionWindowInput" disabled  style="display: none;">
-                                            <option value="AM">AM</option>
-                                            <option value="PM1">PM1</option>
-                                            <option value="PM2">PM2</option>
-                                        </select>
                                     </div>
 
                                     <!-- ANÁLISE DOS ERROS ENCONTRADOS NA GESTÃO AUDIT -->
@@ -1749,9 +1663,6 @@
                                             <div class="input-group" id="expeditionStreetGuardianControls"></div>
                                         </div>
 
-                                        <!-- A SER APGAADO -->
-
-                                        <button class="button" id="expeditionErrorsImportButton" type="button" style="display: none;"></button>
                                     </div>
                                 </div>
                             </div>
@@ -1768,33 +1679,31 @@
                             <!-- BARRA DE NOTIFICAÇÕES E BOTÕES DE AÇÃO -->
 
                             <div class="flex-box-start">
-                                <div class="warning" id="">
+                                <div class="warning" id="lossesRateNotification" role="status" aria-live="polite" aria-atomic="true" data-notification-type="idle">
                                     <div class="flex-box-start">
-                                        <img id="" src="images/geral-icons/bell-icon.svg" alt="">
+                                        <img id="lossesRateNotificationIcon" src="images/geral-icons/bell-icon.svg" alt="">
 
-                                        <h4 id="">
+                                        <h4 id="lossesRateNotificationText">
                                             Tudo em silêncio por enquanto.
                                         </h4>
                                     </div>
                                 </div>
 
                                 <div class="report-actions">
-                                    <button id="lossesRateDownloadReportButton" type="button">
-                                        <img src="images/geral-icons/save-icon.svg">
+                                    <button id="lossesRateDownloadReportButton" type="button" title="Baixar relatório" aria-label="Baixar relatório de taxa de perdas">
+                                        <img src="images/geral-icons/save-icon.svg" alt="">
                                     </button>
 
-                                    <button id="lossesRateCopyReportButton" type="button">
-                                        <img src="images/geral-icons/copy-icon.svg">
+                                    <button id="lossesRateCopyReportButton" type="button" title="Copiar relatório" aria-label="Copiar relatório de taxa de perdas">
+                                        <img src="images/geral-icons/copy-icon.svg" alt="">
                                     </button>
 
-                                    <button id="lossesRateImportClipboardButton" type="button">
-                                        <img src="images/geral-icons/import-icon.svg">
+                                    <button id="lossesRateImportActionButton" type="button" title="Importar histórico da área de transferência" aria-label="Importar histórico da taxa de perdas">
+                                        <img src="images/geral-icons/import-icon.svg" alt="">
                                     </button>
 
-                                    <input id="lossesRateFileInput" type="file" accept=".csv,.xlsx,.xls" hidden>
-                
-                                    <button id="expeditionClearReportButton"  type="button">
-                                        <img src="images/geral-icons/trash-basket-icon.svg">
+                                    <button id="lossesRateClearReportButton" type="button" title="Limpar relatório" aria-label="Limpar relatório de taxa de perdas">
+                                        <img src="images/geral-icons/trash-basket-icon.svg" alt="">
                                     </button>
                                 </div>
                             </div>
@@ -1945,9 +1854,6 @@
                                         </div>
                                     </div>
                                     
-                                    <!-- A SER APAGADO -->
-
-                                    <button class="button" id="lossesRateImportHistoryButton" type="button"></button>
                                 </div>
                             </div>
                         </div>
@@ -1955,6 +1861,16 @@
                         <!-- RELATÓRIO ANÁLISE GERAL -->
 
                         <div class="tabs-panel" id="overall-analysis">
+                            <div class="warning" id="overallAnalysisNotification" role="status" aria-live="polite" aria-atomic="true" data-notification-type="idle">
+                                <div class="flex-box-start">
+                                    <img id="overallAnalysisNotificationIcon" src="images/geral-icons/bell-icon.svg" alt="">
+
+                                    <h4 id="overallAnalysisNotificationText">
+                                        Tudo em silêncio por enquanto.
+                                    </h4>
+                                </div>
+                            </div>
+
                             <div class="preview">
                                 <div class="preview-style">
                                     <div class="title">
@@ -1969,7 +1885,7 @@
                                             <p id="overallAnalysisDate">—</p>
                                         </div>
 
-                                       <p>Janela do <span id="">PM 2</span> - Analista do Turno: <span id="">-</span></p>
+                                       <p>Janela do <span id="overallAnalysisWindow">PM1</span> - Analista do Turno: <span id="">-</span></p>
                                     </div>
 
                                     <!-- CARDS -->

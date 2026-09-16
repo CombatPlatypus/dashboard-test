@@ -48,12 +48,6 @@ function getReceiptLinehaulElements(
                 "receiptLinehaulControls",
             ),
 
-        windowInput:
-            getReceiptLinehaulElement(
-                rootElement,
-                "receiptLinehaulWindowInput",
-            ),
-
         expectedInput:
             getReceiptLinehaulElement(
                 rootElement,
@@ -533,32 +527,6 @@ function renderReceiptLinehaulPreview(
     );
 }
 
-function refreshReceiptLinehaulWindowSelect(
-    select,
-) {
-    if (
-        typeof window.jQuery !==
-        "function"
-    ) {
-        return;
-    }
-
-    const selectElement =
-        window.jQuery(
-            select,
-        );
-
-    if (
-        selectElement.hasClass(
-            "select2-hidden-accessible",
-        )
-    ) {
-        selectElement.trigger(
-            "change.select2",
-        );
-    }
-}
-
 function renderReceiptLinehaulSummary(
     elements,
     state,
@@ -595,11 +563,6 @@ function renderReceiptLinehaulSummary(
             );
 
     setReceiptLinehaulInputValue(
-        elements.windowInput,
-        state.window,
-    );
-
-    setReceiptLinehaulInputValue(
         elements.expectedInput,
         expectedVolume,
     );
@@ -609,18 +572,11 @@ function renderReceiptLinehaulSummary(
         state.reversesSent,
     );
 
-    elements.windowInput.disabled =
-        !hasData;
-
     elements.expectedInput.disabled =
         !hasData;
 
     elements.reversesInput.disabled =
         !hasData;
-
-    refreshReceiptLinehaulWindowSelect(
-        elements.windowInput,
-    );
 
     elements.previewWindow.textContent =
         hasData
@@ -750,35 +706,6 @@ function sanitizeReceiptLinehaulInput(
 function bindReceiptLinehaulInputs(
     elements,
 ) {
-    const handleWindowChange =
-        function () {
-            updateReceiptLinehaulField(
-                "window",
-                elements.windowInput.value,
-            );
-        };
-
-    if (
-        typeof window.jQuery ===
-        "function"
-    ) {
-        window.jQuery(
-            elements.windowInput,
-        )
-            .off(
-                "change.receiptLinehaul",
-            )
-            .on(
-                "change.receiptLinehaul",
-                handleWindowChange,
-            );
-    } else {
-        elements.windowInput.addEventListener(
-            "change",
-            handleWindowChange,
-        );
-    }
-
     elements.expectedInput.addEventListener(
         "input",
         function () {

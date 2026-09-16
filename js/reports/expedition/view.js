@@ -8,7 +8,6 @@ import {
     updateExpeditionManualQuantity,
     updateExpeditionOperatorSelection,
     updateExpeditionStreetGuardian,
-    updateExpeditionWindow,
 } from "./state.js";
 
 import {
@@ -246,11 +245,6 @@ function getExpeditionElements(
                 "expedition",
             ),
 
-        windowInput:
-            getElementById(
-                "expeditionWindowInput",
-            ),
-
         floorVolumeInput:
             getElementById(
                 "expeditionFloorRoutesInput",
@@ -451,36 +445,6 @@ function hasExpeditionElements(
     return missingElements.length === 0;
 }
 
-/* SINCRONIZA O SELECT2 */
-
-function refreshExpeditionWindowSelect(
-    select,
-) {
-    if (
-        typeof window.jQuery !==
-        "function"
-    ) {
-        return;
-    }
-
-    const selectElement =
-        window.jQuery(
-            select,
-        );
-
-    if (
-        !selectElement.hasClass(
-            "select2-hidden-accessible",
-        )
-    ) {
-        return;
-    }
-
-    selectElement.trigger(
-        "change.select2",
-    );
-}
-
 /* ATIVA OU DESATIVA OS CONTROLES GERAIS */
 
 function setExpeditionGeneralControlsAvailability(
@@ -490,9 +454,6 @@ function setExpeditionGeneralControlsAvailability(
 ) {
     const disabled =
         !hasImportedFile;
-
-    elements.windowInput.disabled =
-        disabled;
 
     elements.floorVolumeInput.disabled =
         disabled;
@@ -1383,15 +1344,6 @@ function renderExpeditionReport(
         summary.exceptionOrders,
     );
 
-    setExpeditionInputValue(
-        elements.windowInput,
-        state.window,
-    );
-
-    refreshExpeditionWindowSelect(
-        elements.windowInput,
-    );
-            
     renderExpeditionOperators(
         elements,
         selectedOperators,
@@ -1501,40 +1453,6 @@ function bindExpeditionEvents(
             },
         );
     
-    const handleWindowChange =
-        function () {
-            updateExpeditionWindow(
-                elements.windowInput.value,
-            );
-        };
-
-    /*
-    * O Select2 dispara o evento change
-    * por meio do jQuery.
-    */
-
-    if (
-        typeof window.jQuery ===
-        "function"
-    ) {
-        window.jQuery(
-            elements.windowInput,
-        )
-            .off(
-                "change.expeditionReport",
-            )
-            .on(
-                "change.expeditionReport",
-                handleWindowChange,
-            );
-    } else {
-        elements.windowInput
-            .addEventListener(
-                "change",
-                handleWindowChange,
-            );
-    }
-
     elements.clearButton
         .addEventListener(
             "click",

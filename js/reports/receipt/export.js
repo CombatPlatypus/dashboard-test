@@ -542,8 +542,13 @@ async function runReceiptExport(
             : receiptExportElements
                 .downloadButton;
 
-    const originalText =
-        button.textContent;
+    const originalTitle =
+        button.title;
+
+    const originalAriaLabel =
+        button.getAttribute(
+            "aria-label",
+        );
 
     receiptExportBusy =
         true;
@@ -552,10 +557,17 @@ async function runReceiptExport(
         state,
     );
 
-    button.textContent =
+    button.title =
         isCopy
-            ? "Copiando..."
-            : "Gerando...";
+            ? "Copiando relatório..."
+            : "Gerando relatório...";
+
+    button.setAttribute(
+        "aria-label",
+        isCopy
+            ? "Copiando relatório de processamento"
+            : "Gerando relatório de processamento",
+    );
 
     button.setAttribute(
         "aria-busy",
@@ -571,19 +583,6 @@ async function runReceiptExport(
                 reportBlob,
             );
 
-            button.textContent =
-                "Copiado!";
-
-            await new Promise(
-                function (
-                    resolve,
-                ) {
-                    window.setTimeout(
-                        resolve,
-                        1200,
-                    );
-                },
-            );
         } else {
             downloadReportBlob(
                 reportBlob,
@@ -593,6 +592,15 @@ async function runReceiptExport(
                 ),
             );
         }
+
+        setReportNotification({
+            reportId: "receipt",
+            type: "success",
+            message:
+                isCopy
+                    ? "Relatório de processamento copiado."
+                    : "Relatório de processamento baixado.",
+        });
     } catch (error) {
         console.error(
             "Não foi possível exportar o relatório:",
@@ -604,12 +612,25 @@ async function runReceiptExport(
                 ? error.message
                 : "Não foi possível exportar a imagem.",
         );
+
+        setReportNotification({
+            reportId: "receipt",
+            type: "error",
+            message: "Não foi possível exportar o relatório de processamento.",
+        });
     } finally {
         receiptExportBusy =
             false;
 
-        button.textContent =
-            originalText;
+        button.title =
+            originalTitle;
+
+        if (originalAriaLabel) {
+            button.setAttribute(
+                "aria-label",
+                originalAriaLabel,
+            );
+        }
 
         button.removeAttribute(
             "aria-busy",

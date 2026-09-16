@@ -1,5 +1,4 @@
 import {
-    MINIMUM_PLANNING_LHS,
     MINIMUM_PLANNING_TOS_PER_LH,
     ensureMinimumPlanningLhs,
     addPlanningLh,
@@ -13,7 +12,6 @@ import {
     updatePlanningLh,
     updatePlanningTo,
     updatePlanningVehicleCount,
-    resetPlanningLhs,
     resetPlanningReport,
 } from "./state.js";
 
@@ -46,8 +44,6 @@ let planningEstimatedVolume = null;
 let planningPreviewLhBody = null;
 let planningPreviewSegregatedBody = null;
 let planningPreviewSegregatedTosBody = null;
-let planningGeneralControls = null;
-let planningPoolControls = null;
 let planningPreviewAverageSpr = null;
 let planningPreviewDailyCapacity = null;
 let planningToGroups = null;
@@ -59,7 +55,6 @@ let planningPreviewCpBulky = null;
 let planningPreviewCpLhPool = null;
 let planningSegregatedSection = null;    
 let planningSegregatedTosSection = null;
-let planningClearLhsButton = null;
 let planningClearReportButton = null;
 let planningPreviewCpErrors = null;
 let planningPreviewCpAdded = null;
@@ -122,13 +117,25 @@ function createPlanningLhElement(
     lh,
     position,
 ) {
+    const ordinalNames = [
+        "Primeiro",
+        "Segundo",
+        "Terceiro",
+        "Quarto",
+        "Quinto",
+        "Sexto",
+        "Sétimo",
+        "Oitavo",
+        "Nono",
+    ];
+
     const item =
         document.createElement(
             "div",
         );
 
     item.className =
-        "input-group planning-lh-item";
+        "planning-lh-item";
 
     item.dataset.lhId =
         String(lh.id);
@@ -139,7 +146,7 @@ function createPlanningLhElement(
         );
 
     header.className =
-        "planning-lh-item-header flex-box-between";
+        "flex-box-between";
 
     const title =
         document.createElement(
@@ -147,7 +154,7 @@ function createPlanningLhElement(
         );
 
     title.textContent =
-        `LH ${position}`;
+        `${ordinalNames[position - 1] ?? `${position}º`} LH`;
 
     const headerActions =
         document.createElement(
@@ -201,36 +208,36 @@ function createPlanningLhElement(
         segregateLabel,
     );
 
-    if (
-        position >
-        MINIMUM_PLANNING_LHS
-    ) {
-        const removeButton =
-            document.createElement(
-                "button",
-            );
-
-        removeButton.type =
-            "button";
-
-        removeButton.className =
-            "button planning-lh-remove";
-
-        removeButton.dataset.action =
-            "remove-lh";
-
-        removeButton.textContent =
-            "Remover";
-
-        removeButton.setAttribute(
-            "aria-label",
-            `Remover LH ${position}`,
+    const removeButton =
+        document.createElement(
+            "button",
         );
 
-        headerActions.append(
-            removeButton,
-        );
-    }
+    removeButton.type =
+        "button";
+
+    removeButton.className =
+        "planning-lh-remove";
+
+    removeButton.dataset.action =
+        "remove-lh";
+
+    removeButton.textContent =
+        "×";
+
+    removeButton.disabled = true;
+
+    removeButton.title =
+        "A remoção individual será habilitada em uma próxima etapa.";
+
+    removeButton.setAttribute(
+        "aria-label",
+        `Remover LH ${position}`,
+    );
+
+    headerActions.append(
+        removeButton,
+    );
 
     header.append(
         title,
@@ -243,15 +250,24 @@ function createPlanningLhElement(
         );
 
     mainFields.className =
-        "flex-box-start";
+        "lhs-inputs";
 
     const codeInput =
         createPlanningLhInput({
             field: "code",
             value: lh.code,
-            placeholder: "Código do LH",
+            placeholder: "Código",
             ariaLabel:
                 `Código do LH ${position}`,
+        });
+
+    const originInput =
+        createPlanningLhInput({
+            field: "origin",
+            value: lh.origin,
+            placeholder: "Origem",
+            ariaLabel:
+                `Origem do LH ${position}`,
         });
 
     const quantityInput =
@@ -270,70 +286,14 @@ function createPlanningLhElement(
     quantityInput.pattern =
         "[0-9]*";
 
-    const originInput =
-        createPlanningLhInput({
-            field: "origin",
-            value: lh.origin,
-            placeholder: "Origem do LH",
-            ariaLabel:
-                `Origem do LH ${position}`,
-        });
-
-    const segregateTosLabel =
-        document.createElement(
-            "label",
-        );
-
-    segregateTosLabel.className =
-        "planning-lh-segregate-to-toggle";
-
-    segregateTosLabel.hidden =
-        !lh.segregate;
-
-    const segregateTosCheckbox =
-        document.createElement(
-            "input",
-        );
-
-    segregateTosCheckbox.type =
-        "checkbox";
-
-    segregateTosCheckbox.dataset.field =
-        "segregateTos";
-
-    segregateTosCheckbox.checked =
-        lh.segregateTos;
-
-    segregateTosCheckbox.disabled =
-        !lh.segregate;
-
-    segregateTosCheckbox.setAttribute(
-        "aria-label",
-        `Segregar TOs do LH ${position}`,
-    );
-
-    const segregateTosText =
-        document.createElement(
-            "span",
-        );
-
-    segregateTosText.textContent =
-        "Segregar TO";
-
-    segregateTosLabel.append(
-        segregateTosCheckbox,
-        segregateTosText,
-    );
-
     item.append(
         header,
         mainFields,
-        originInput,
-        segregateTosLabel,
     );
 
     mainFields.append(
         codeInput,
+        originInput,
         quantityInput,
     );
 
@@ -1115,7 +1075,7 @@ function synchronizePlanningIndicatorControls(
             },
         );
 
-    planningGeneralControls
+    planningPanel
         .querySelectorAll(
             "[data-planning-vehicle-field]",
         )
@@ -1138,7 +1098,7 @@ function synchronizePlanningIndicatorControls(
 function synchronizePlanningPoolControls(
     state,
 ) {
-    planningPoolControls
+    planningPanel
         .querySelectorAll(
             "[data-planning-pool-field]",
         )
@@ -1186,23 +1146,6 @@ function handleAddPlanningLh() {
             '[data-field="code"]',
         )
         ?.focus();
-}
-
-/* REINICIA A LISTA DE LHS */
-
-function handleResetPlanningLhs() {
-    const shouldReset =
-        window.confirm(
-            "Limpar todos os LHs e TOs informados?",
-        );
-
-    if (!shouldReset) {
-        return;
-    }
-
-    resetPlanningLhs();
-
-    planningAddLhButton.focus();
 }
 
 /* REINICIA TODO O RELATÓRIO */
@@ -1259,18 +1202,24 @@ async function handleCopyPlanningReport() {
         return;
     }
 
-    const originalText =
-        planningCopyReportButton
-            .textContent;
+    const originalTitle =
+        planningCopyReportButton.title;
 
-    let copySucceeded =
-        false;
+    const originalAriaLabel =
+        planningCopyReportButton.getAttribute(
+            "aria-label",
+        );
 
     planningCopyReportButton.disabled =
         true;
 
-    planningCopyReportButton.textContent =
-        "Copiando...";
+    planningCopyReportButton.title =
+        "Copiando relatório...";
+
+    planningCopyReportButton.setAttribute(
+        "aria-label",
+        "Copiando relatório de planejamento",
+    );
 
     planningCopyReportButton.setAttribute(
         "aria-busy",
@@ -1287,11 +1236,11 @@ async function handleCopyPlanningReport() {
             reportBlob,
         );
 
-        copySucceeded =
-            true;
-
-        planningCopyReportButton.textContent =
-            "Copiado!";
+        setReportNotification({
+            reportId: "planning",
+            type: "success",
+            message: "Relatório de planejamento copiado.",
+        });
     } catch (error) {
         console.error(
             "Não foi possível copiar o relatório:",
@@ -1303,31 +1252,31 @@ async function handleCopyPlanningReport() {
                 ? error.message
                 : "Não foi possível copiar a imagem do relatório.",
         );
+
+        setReportNotification({
+            reportId: "planning",
+            type: "error",
+            message: "Não foi possível copiar o relatório de planejamento.",
+        });
     } finally {
         planningCopyReportButton.removeAttribute(
             "aria-busy",
         );
 
-        if (copySucceeded) {
-            window.setTimeout(
-                function () {
-                    planningCopyReportButton.textContent =
-                        originalText;
+        planningCopyReportButton.title =
+            originalTitle;
 
-                    renderPlanningReportStatus(
-                        getPlanningState(),
-                    );
-                },
-                1200,
-            );
-        } else {
-            planningCopyReportButton.textContent =
-                originalText;
-
-            renderPlanningReportStatus(
-                getPlanningState(),
+        if (originalAriaLabel) {
+            planningCopyReportButton.setAttribute(
+                "aria-label",
+                originalAriaLabel,
             );
         }
+
+        planningCopyReportButton.disabled =
+            !canExportPlanningReport(
+                getPlanningState(),
+            );
     }
 }
 
@@ -1345,15 +1294,24 @@ async function handleDownloadPlanningReport() {
         return;
     }
 
-    const originalText =
-        planningDownloadReportButton
-            .textContent;
+    const originalTitle =
+        planningDownloadReportButton.title;
+
+    const originalAriaLabel =
+        planningDownloadReportButton.getAttribute(
+            "aria-label",
+        );
 
     planningDownloadReportButton.disabled =
         true;
 
-    planningDownloadReportButton.textContent =
-        "Gerando...";
+    planningDownloadReportButton.title =
+        "Gerando relatório...";
+
+    planningDownloadReportButton.setAttribute(
+        "aria-label",
+        "Gerando relatório de planejamento",
+    );
 
     planningDownloadReportButton.setAttribute(
         "aria-busy",
@@ -1370,6 +1328,12 @@ async function handleDownloadPlanningReport() {
             reportBlob,
             createPlanningReportFileName(),
         );
+
+        setReportNotification({
+            reportId: "planning",
+            type: "success",
+            message: "Relatório de planejamento baixado.",
+        });
     } catch (error) {
         console.error(
             "Não foi possível gerar o relatório:",
@@ -1379,17 +1343,31 @@ async function handleDownloadPlanningReport() {
         window.alert(
             "Não foi possível gerar a imagem do relatório.",
         );
+
+        setReportNotification({
+            reportId: "planning",
+            type: "error",
+            message: "Não foi possível baixar o relatório de planejamento.",
+        });
     } finally {
-        planningDownloadReportButton.textContent =
-            originalText;
+        planningDownloadReportButton.title =
+            originalTitle;
+
+        if (originalAriaLabel) {
+            planningDownloadReportButton.setAttribute(
+                "aria-label",
+                originalAriaLabel,
+            );
+        }
 
         planningDownloadReportButton.removeAttribute(
             "aria-busy",
         );
 
-        renderPlanningReportStatus(
-            getPlanningState(),
-        );
+        planningDownloadReportButton.disabled =
+            !canExportPlanningReport(
+                getPlanningState(),
+            );
     }
 }
 
@@ -1429,17 +1407,6 @@ function handlePlanningLhInput(event) {
     if (
         field === "segregate"
     ) {
-        const segregateTosCheckbox =
-            item.querySelector(
-                '[data-field="segregateTos"]',
-            );
-
-        const segregateTosLabel =
-            segregateTosCheckbox
-                ?.closest(
-                    ".planning-lh-segregate-to-toggle",
-                );
-
         updatePlanningLh(
             lhId,
             field,
@@ -1447,22 +1414,13 @@ function handlePlanningLhInput(event) {
         );
 
         if (
-            segregateTosCheckbox
+            input.checked
         ) {
-            segregateTosCheckbox.disabled =
-                !input.checked;
-
-            if (
-                !input.checked
-            ) {
-                segregateTosCheckbox.checked =
-                    false;
-            }
-        }
-
-        if (segregateTosLabel) {
-            segregateTosLabel.hidden =
-                !input.checked;
+            updatePlanningLh(
+                lhId,
+                "segregateTos",
+                true,
+            );
         }
 
         return;
@@ -1665,7 +1623,10 @@ function handlePlanningLhClick(event) {
             '[data-action="remove-lh"]',
         );
 
-    if (!removeButton) {
+    if (
+        !removeButton ||
+        removeButton.disabled
+    ) {
         return;
     }
 
@@ -1763,10 +1724,8 @@ function initializePlanningHeightSynchronization() {
                         fixedControlsHeight,
                     );
 
-                planningLhListElement.style.setProperty(
-                    "--planning-lh-list-max-height",
-                    `${Math.round(newListMaxHeight)}px`,
-                );
+                planningLhListElement.style.maxHeight =
+                    `${Math.round(newListMaxHeight)}px`;
             }
 
             planningHeightResizeObserver
@@ -1798,16 +1757,6 @@ function initializePlanningView(
         rootElement instanceof HTMLElement
             ? rootElement
             : null;
-
-    planningGeneralControls =
-        getPlanningElementById(
-            "planningGeneralControls",
-        );
-
-    planningPoolControls =
-        getPlanningElementById(
-            "planningPoolControls",
-        );
 
     planningPreviewAverageSpr =
         getPlanningElementById(
@@ -1842,11 +1791,6 @@ function initializePlanningView(
     planningAddLhButton =
         getPlanningElementById(
             "planningAddLh",
-        );
-
-    planningClearLhsButton =
-        getPlanningElementById(
-            "planningClearLhs",
         );
 
     planningClearReportButton =
@@ -1942,7 +1886,6 @@ function initializePlanningView(
         !planningPreviewCpBacklog ||
         !planningPreviewCpBulky ||
         !planningPreviewCpLhPool ||
-        !planningClearLhsButton ||
         !planningClearReportButton ||
         !planningPreviewCpErrors ||
         !planningPreviewCpAdded ||
@@ -1955,8 +1898,6 @@ function initializePlanningView(
         !planningToEmpty ||
         !planningSegregatedTosTab ||
         !planningLhTabLink ||
-        !planningGeneralControls ||
-        !planningPoolControls ||
         !planningPreviewAverageSpr ||
         !planningPreviewDailyCapacity ||
         !planningReportExportArea ||
@@ -2080,11 +2021,6 @@ function initializePlanningView(
         handleAddPlanningLh,
     );
 
-    planningClearLhsButton.addEventListener(
-        "click",
-        handleResetPlanningLhs,
-    );
-
     planningClearReportButton.addEventListener(
         "click",
         handleResetPlanningReport,
@@ -2125,12 +2061,12 @@ function initializePlanningView(
         handlePlanningGeneralInput,
     );
 
-    planningGeneralControls.addEventListener(
+    planningPanel.addEventListener(
         "input",
         handlePlanningVehicleInput,
     );
 
-    planningPoolControls.addEventListener(
+    planningPanel.addEventListener(
         "input",
         handlePlanningPoolInput,
     );
@@ -2149,9 +2085,7 @@ function renderPlanningReport(
 ) {
     if (
         !planningLhList ||
-        !planningToGroups ||
-        !planningGeneralControls ||
-        !planningPoolControls
+        !planningToGroups
     ) {
         return false;
     }
