@@ -1341,7 +1341,41 @@
                                     </a>
                                 </li>
                             </ul> 
-                            
+
+                            <!-- BARRA DE NOTIFICAÇÕES E BOTÕES DE AÇÃO -->
+
+                            <div class="flex-box-start">
+                                <div class="warning" id="">
+                                    <div class="flex-box-start">
+                                        <img id="" src="images/geral-icons/bell-icon.svg" alt="">
+
+                                        <h4 id="">
+                                            Tudo em silêncio por enquanto.
+                                        </h4>
+                                    </div>
+                                </div>
+
+                                <div class="report-actions">
+                                    <button id="expeditionDownloadReportButton" type="button">
+                                        <img src="images/geral-icons/save-icon.svg">
+                                    </button>
+
+                                    <button id="expeditionCopyReportButton" type="button">
+                                        <img src="images/geral-icons/copy-icon.svg">
+                                    </button>
+
+                                    <button id="expeditionImportClipboardButton" type="button">
+                                        <img src="images/geral-icons/import-icon.svg">
+                                    </button>
+
+                                    <input id="expeditionFileInput" type="file" accept=".csv,.xlsx,.xls" hidden>
+                
+                                    <button id="expeditionClearReportButton"  type="button">
+                                        <img src="images/geral-icons/trash-basket-icon.svg">
+                                    </button>
+                                </div>
+                            </div>
+
                             <!-- CONTEÚDO DO RELATÓRIO -->
 
                             <div class="flex-box-start">
@@ -1655,97 +1689,61 @@
 
                                     <div class="expedition-controls-panel is-active" id="controls-summary">
                                         <div class="title">
-                                            <h4>Defina os LHs</h4>
+                                            <h4>Importe a Gestão Audit</h4>
                                         </div>
 
-                                        <div class="padding"></div>
+                                        <div class="padding">
+                                            <div class="input-group">
+                                                <div>
+                                                    <h4>Volume no Piso</h4>
+                                                    <input id="expeditionFloorRoutesInput" type="text" inputmode="numeric" maxlength="8" autocomplete="off" disabled>
+                                                </div>
 
+                                                <div>
+                                                    <h4>Pacotes Desconhecidos</h4>
+                                                    <input id="expeditionUnknownInput" type="text" inputmode="numeric" maxlength="8" autocomplete="off" disabled>
+                                                </div>
 
-
-
-                                        <div class="history-link flex-box-start">
-                                            <a href="https://spx.shopee.com.br/#/generalReceiveTaskMgt" target="_blank">
-                                                <svg class="spreadsheets-link-icon" viewBox="0 0 24 24" aria-hidden="true">
-                                                    <path d="M7 17L17 7M9 7H17V15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                                                </svg>
-                                            </a>
-
-                                            <div>
-                                                <h4>Gestão de Audit</h4>
-                                                <p>Exporte do SPX e importe aqui.</p>
+                                                <div>
+                                                    <h4>Pacotes Exceção</h4>
+                                                    <input id="expeditionExceptionInput" type="text" inputmode="numeric" maxlength="8" autocomplete="off" disabled>
+                                                </div>
                                             </div>
+
+                                            <div class="input-group" id="expeditionOperatorControls"></div>
                                         </div>
 
-                                        <div class="history-import flex-box-start">
-                                            <div>
-                                                <button class="button" id="expeditionImportButton" type="button">Importar Conferência</button>
-                                            </div>
+                                        <!-- A SER APAGADO -->
 
-                                            <input id="expeditionFileInput" type="file" accept=".csv,.xlsx,.xls" hidden>
-                                        </div>
-
-                                        <div class="input-group">
-                                            <div>
-                                                <h4>Janela</h4>
-
-                                                <select class="standard-select" id="expeditionWindowInput" disabled>
-                                                    <option value="AM">AM</option>
-                                                    <option value="PM1">PM1</option>
-                                                    <option value="PM2">PM2</option>
-                                                </select>
-                                            </div>
-
-                                            <div>
-                                                <h4>Volume no Piso</h4>
-                                                <input id="expeditionFloorRoutesInput" type="text" inputmode="numeric" maxlength="8" autocomplete="off" disabled>
-                                            </div>
-
-                                            <div>
-                                                <h4>Pacotes Desconhecidos</h4>
-                                                <input id="expeditionUnknownInput" type="text" inputmode="numeric" maxlength="8" autocomplete="off" disabled>
-                                            </div>
-
-                                            <div>
-                                                <h4>Pacotes Exceção</h4>
-                                                <input id="expeditionExceptionInput" type="text" inputmode="numeric" maxlength="8" autocomplete="off" disabled>
-                                            </div>
-                                        </div>
-
-                                        <div class="input-group" id="expeditionOperatorControls"></div>
+                                        <button class="button" id="expeditionImportButton" type="button" style="display: none;">Importar Conferência</button>
+                                        <select class="" id="expeditionWindowInput" disabled  style="display: none;">
+                                            <option value="AM">AM</option>
+                                            <option value="PM1">PM1</option>
+                                            <option value="PM2">PM2</option>
+                                        </select>
                                     </div>
 
                                     <!-- ANÁLISE DOS ERROS ENCONTRADOS NA GESTÃO AUDIT -->
 
                                     <div class="expedition-controls-panel" id="controls-mistakes">
-                                        <div class="history-link flex-box-start">
-                                            <a href="https://docs.google.com/spreadsheets/d/1TUOf4Bvv7L_Q87xOkCQqPKkNpSi03OSs3aKobbAn724/edit?gid=354393054#gid=354393054" target="_blank">
-                                                <svg class="spreadsheets-link-icon" viewBox="0 0 24 24" aria-hidden="true">
-                                                    <path d="M7 17L17 7M9 7H17V15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                                                </svg>
-                                            </a>
-
-                                            <div>
-                                                <h4>Planilha - Bipagem de Erros</h4>
-                                                <p>Crtl A + Crtl C, e clique em importar.</p>
-                                            </div>
+                                        <div class="title">
+                                            <h4>Importe a Bipagem de Erros</h4>
                                         </div>
 
-                                        <div class="history-import flex-box-start">
-                                            <div>
-                                                <button class="button" id="expeditionErrorsImportButton" type="button">
-                                                    Importar Planilha de Erros
-                                                </button>
+                                        <div class="padding">
+                                            <div class="input-group">
+                                                <div>
+                                                    <h4>Revertidos</h4>
+                                                    <input id="expeditionRevertedInput" type="text" inputmode="numeric" maxlength="8" autocomplete="off" disabled>
+                                                </div>
                                             </div>
+
+                                            <div class="input-group" id="expeditionStreetGuardianControls"></div>
                                         </div>
 
-                                        <div class="input-group">
-                                            <div>
-                                                <h4>Revertidos</h4>
-                                                <input id="expeditionRevertedInput" type="text" inputmode="numeric" maxlength="8" autocomplete="off" disabled>
-                                            </div>
-                                        </div>
+                                        <!-- A SER APGAADO -->
 
-                                        <div class="input-group" id="expeditionStreetGuardianControls"></div>
+                                        <button class="button" id="expeditionErrorsImportButton" type="button" style="display: none;"></button>
                                     </div>
                                 </div>
                             </div>
