@@ -221,6 +221,9 @@
             }
 
 
+            #reports .report-controls > .padding {
+                padding: 30px;
+            }
 
             .report-actions {
                 display: flex;
@@ -695,7 +698,6 @@
                                 <div class="report-controls">
                                     <div class="tabs-content" data-tabs-content="planningTabs">
                                         <div class="tabs-panel is-active" id="lhs-list">
-
                                             <div class="title">
                                                 <h4>Transporte Principal</h4>
                                                 
@@ -706,27 +708,14 @@
                                                 </a>
                                             </div>
 
+                                            <div class="padding">
+                                                <div class="planning-lh-list flex-box-column" id="planningLhList"></div>
 
-
-                                            <!-- <div class="history-link flex-box-start">
-                                                <a href="https://spx.shopee.com.br/#/hubLinehaulTrips/trip" target="_blank">
-                                                    <svg class="spreadsheets-link-icon" viewBox="0 0 24 24" aria-hidden="true">
-                                                        <path d="M7 17L17 7M9 7H17V15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                                                    </svg>
-                                                </a>
-
-                                                <div>
-                                                    <h4>Transporte Principal - Inbound</h4>
-                                                    <p>Crtl A + Crtl C, e clique em importar.</p>
-                                                </div>
-                                            </div> -->
-
-                                            <div class="planning-lh-list flex-box-column" id="planningLhList"></div>
-
-                                            <div class="lhs-buttons">
-                                                <div>
-                                                    <button class="button" id="planningAddLh" type="button">Adicionar LH</button>
-                                                    <button class="button" id="planningClearLhs" type="button">Limpar Lista</button>
+                                                <div class="lhs-buttons">
+                                                    <div>
+                                                        <button class="button" id="planningAddLh" type="button">Adicionar LH</button>
+                                                        <button class="button" id="planningClearLhs" type="button">Limpar Lista</button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>

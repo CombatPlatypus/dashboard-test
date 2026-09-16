@@ -324,7 +324,6 @@
         background-color: var(--color-container);
         border: 2px solid var(--color-border);
         border-radius: 5px;
-        padding: 30px;
     }
     #reports .report-controls .history-link {
         padding-bottom: 20px;
