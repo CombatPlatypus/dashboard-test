@@ -62,6 +62,30 @@
         width: 100%;
     }
 
+    /* BOTÕES DE AÇÃO  */
+
+    #reports .report-actions {
+        display: flex;
+        margin: 0 0 20px 0;
+        padding: 20px;
+        border-radius: 5px;
+        gap: 15px;
+        justify-content: center;
+        flex: 0 0 max-content;
+        background-color: var(--color-container);
+        border: 2px solid var(--color-border);
+    }
+    #reports .report-actions > button:hover,
+    #reports .report-actions > a:hover {
+        opacity: 0.61;
+        transition: all 0.5s ease;
+    }
+    #reports .report-actions > button > img, 
+    #reports .report-actions > a > img {
+        width: 35px;
+        cursor: pointer;
+    }
+
     /* PREVIEW */
 
     #reports .preview {
@@ -325,6 +349,20 @@
         border: 2px solid var(--color-border);
         border-radius: 5px;
     }
+    #reports .report-controls .title {
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 2px solid var(--color-border);
+        padding: 20px;
+        align-items: center;
+    }
+    #reports .report-controls .title > h4 {
+        margin: 0;
+    }
+    #reports .report-controls .title > button {
+        width: 30px;
+        height: 30px;
+    }
     #reports .report-controls .padding {
         padding: 30px;
     }
@@ -481,60 +519,45 @@
 
     /* PLANEJAMENTO - LISTA DINÂMICA DE LHS */
 
-    .lhs-buttons {
-        padding: 20px 0 0px 0;
-        margin-top: 20px;
-        border-top: 2px solid var(--color-border);
-    }
-    .lhs-buttons > div {
+    .lhs-list {
         display: flex;
-        column-gap: 10px;
-        justify-content: center;
-        overflow: hidden;
-        height: 40px;
-    }
-    .lhs-buttons > div > .button {
-        width: 50%;
-        cursor: pointer;
-        min-height: 40px;
-        font-size: 14px;
-        padding: 10px 15px;
-        color: var(--color-button-text);
-        background-color: var(--color-button);
-        border-bottom: 5px solid var(--color-border);
-    }
-    .lhs-buttons > div > .button:hover, .lhs-buttons > div > .button:focus  {
-        color: var(--color-button-text);
-        background-color: var(--color-button);
-    }
-    #planning #planningSegregatedTosTab[hidden] {
-        display: none;
-    }
-    #planning .planning-lh-remove {
-        min-height: 38px;
-        padding: 8px 12px;
-        font-size: 12px;
-    }
-    #planning .planning-lh-list {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(298px, 1fr));
-        max-height: var(--planning-lh-list-max-height, 469px);
+        flex-direction: column;
+        row-gap: 20px;
         overflow: auto;
         padding-right: 15px;
-        gap: 15px;
     }
-
-    #planning .planning-lh-item-header {
+    .lhs-list label {
+        display: flex;
         align-items: center;
-        flex-wrap: nowrap;
+        column-gap: 6px;
+        font-size: 14px;
+        color: var(--color-text);
+        cursor: pointer;
+        user-select: none;
+        margin-bottom: 15px;
     }
-    #planning .planning-lh-item-header > h4 {
-        margin-bottom: 0;
+    .lhs-list h4 {
+        margin-bottom: 15px;
     }
-    #planning .planning-lh-remove {
-        color: var(--color-button-text);
-        background-color: var(--color-button);
-        border-bottom: 5px solid var(--color-border);
+    .lhs-list .lhs-inputs {
+        display: flex;
+        gap: 10px;
+    }
+    .lhs-list .lhs-inputs input:last-of-type{
+        flex: 0 0 86px;
+        text-align: center;
+    }
+    .lhs-list::-webkit-scrollbar-track {
+        background-color: transparent;
+    }
+    .lhs-list::-webkit-scrollbar {
+        width: 5px;
+        height: 5px;
+        background-color: transparent;
+    }
+    .lhs-list::-webkit-scrollbar-thumb {
+        border-radius: 5px;
+        background-color: var(--color-border);
     }
 
     /* PLANEJAMENTO - LISTA DINÂMICA DE TOS */
@@ -648,35 +671,22 @@
 
     /* PLANEJAMENTO - COLLECTION POOL E INDICADORES */
 
-    #planningPoolControls {
-        padding-bottom: 20px;
-        border-bottom: 2px solid var(--color-border);
-        margin-bottom: 30px;
+    #collection-indicators .padding {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
     }
-    #planningPoolControls > h4,
-    #planningGeneralControls > h4 {
-        margin-bottom: 18px;
-    }
-    #planningPoolControls > h4:last-of-type {
-        margin-top: 20px;
-    }
-    #planningPoolControls > .input-group:first-of-type {
-        margin-bottom: 18px;
-    }
-    .input-group.operation, .input-group.fleet {
-        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)) !important;
-    }
-    #planningGeneralControls > p {
-        margin: 10px 0 7px 0;
+    #collection-indicators p {
+        margin: 0 0 4px 0;
         color: var(--color-gray-p);
-        font-size: 13px;
+        font-size: 14px;
     }
-    #planningGeneralControls > a {
+    #collection-indicators > a {
         font-size: 13px;
         transition: color 0.2s ease;
     }
-    #planningGeneralControls > a:hover,
-    #planningGeneralControls > a:focus-visible {
+    #collection-indicators > a:hover,
+    #collection-indicators > a:focus-visible {
         color: #1a73e8;
     }
 

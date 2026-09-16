@@ -216,114 +216,29 @@
 
             /* AJUSTES */
 
-
-
- 
-
-            /* BOTÕES DE AÇÃO  */
-
-            .report-actions {
-                display: flex;
-                margin: 0 0 20px 0;
-                padding: 20px;
-                border-radius: 5px;
-                gap: 15px;
-                justify-content: center;
-                flex: 0 0 max-content;
-                background-color: var(--color-container);
-                border: 2px solid var(--color-border);
-            }
-            .report-actions > button:hover,
-            .report-actions > a:hover {
-                opacity: 0.61;
-                transition: all 0.5s ease;
-            }
-            .report-actions > button > img, 
-            .report-actions > a > img {
-                width: 35px;
-                cursor: pointer;
-            }
-
-            /* TITULO DOS CONTROLES  */
-
-            #reports .report-controls .title {
-                display: flex;
-                justify-content: space-between;
-                border-bottom: 2px solid var(--color-border);
-                padding: 20px;
-                align-items: center;
-            }
-            #reports .report-controls .title > h4 {
-                margin: 0;
-            }
-            #reports .report-controls .title > button {
-                width: 30px;
-                height: 30px;
-            }
-
-            /* PLANJEMENTO - LISTA DE LHS */
-
-            .lhs-list {
-                display: flex;
-                flex-direction: column;
-                row-gap: 20px;
-                overflow: auto;
+            #receipt-controls #receipt-controls-1 .input-group {
+                max-height: 446px;
+                overflow-y: auto;
                 padding-right: 15px;
             }
-            .lhs-list label {
-                display: flex;
-                align-items: center;
-                column-gap: 6px;
-                font-size: 14px;
-                color: var(--color-text);
-                cursor: pointer;
-                user-select: none;
-                margin-bottom: 15px;
-            }
-            .lhs-list h4 {
-                margin-bottom: 15px;
-            }
-            .lhs-list .lhs-inputs {
-                display: flex;
-                gap: 10px;
-            }
-            .lhs-list .lhs-inputs input:last-of-type{
-                flex: 0 0 86px;
-                text-align: center;
-            }
-            .lhs-list::-webkit-scrollbar-track {
+            #receipt-controls #receipt-controls-1 .input-group::-webkit-scrollbar-track {
                 background-color: transparent;
             }
-            .lhs-list::-webkit-scrollbar {
+            #receipt-controls #receipt-controls-1 .input-group::-webkit-scrollbar {
                 width: 5px;
                 height: 5px;
                 background-color: transparent;
             }
-            .lhs-list::-webkit-scrollbar-thumb {
+            #receipt-controls #receipt-controls-1 .input-group::-webkit-scrollbar-thumb {
                 border-radius: 5px;
                 background-color: var(--color-border);
             }
 
-            /* PLANJEMENTO - COLLECTION POOL E INDICADORES */
 
-            #collection-indicators .padding {
-                display: flex;
-                flex-direction: column;
-                gap: 20px;
-            }
-            #collection-indicators p {
-                margin: 0 0 4px 0;
-                color: var(--color-gray-p);
-                font-size: 14px;
-            }
-            #collection-indicators > a {
-                font-size: 13px;
-                transition: color 0.2s ease;
-            }
-            #collection-indicators > a:hover,
-            #collection-indicators > a:focus-visible {
-                color: #1a73e8;
-            }
+
+
+
+
 
 
 
@@ -800,7 +715,7 @@
                                                     </div>
                                                 </div>
 
-                                                <!-- A SER APAGADO, JUNTO COM O ESTE COMENTARIO -->
+                                                <!-- A SER APAGADO -->
 
                                                 <div class="planning-lh-list flex-box-column" id="planningLhList" style="display: none;"></div>
 
@@ -810,9 +725,6 @@
                                                         <button class="button" id="planningClearLhs" type="button">Limpar Lista</button>
                                                     </div>
                                                 </div>
-
-
-
                                             </div>
                                         </div>
 
@@ -876,9 +788,7 @@
                                                     </div>
                                                 </div>
 
-                                                <h4>Composição da Frota</h4>
-
-                                                <div class="input-group fleet">
+                                                <div class="input-group">
                                                     <div>
                                                         <h4>Carros</h4>
 
@@ -938,7 +848,41 @@
                                     </a>
                                 </li>
                             </ul> 
-                            
+                        
+                            <!-- BARRA DE NOTIFICAÇÕES E BOTÕES DE AÇÃO -->
+
+                            <div class="flex-box-start">
+                                <div class="warning" id="">
+                                    <div class="flex-box-start">
+                                        <img id="" src="images/geral-icons/bell-icon.svg" alt="">
+
+                                        <h4 id="">
+                                            Tudo em silêncio por enquanto.
+                                        </h4>
+                                    </div>
+                                </div>
+
+                                <div class="report-actions">
+                                    <button id="receiptDownloadReportButton" type="button">
+                                        <img src="images/geral-icons/save-icon.svg">
+                                    </button>
+
+                                    <button id="receiptCopyReportButton" type="button">
+                                        <img src="images/geral-icons/copy-icon.svg">
+                                    </button>
+
+                                    <button id="receiptImportClipboardButton" type="button">
+                                        <img src="images/geral-icons/import-icon.svg">
+                                    </button>
+
+                                    <input id="receiptFileInput" type="file" accept=".csv,.xlsx,.xls" hidden>
+                
+                                    <button id="receiptClearReportButton"  type="button">
+                                        <img src="images/geral-icons/trash-basket-icon.svg">
+                                    </button>
+                                </div>
+                            </div>
+
                             <!-- CONTEÚDO DO RELATÓRIO -->
 
                             <div class="flex-box-start">
@@ -1282,46 +1226,46 @@
                                             </div>
                                         </div>
                                     </div>
-
-                                    <!-- OPÇÕES DO RELATÓRIO -->
-
-                                    <div class="footer flex-box-between">
-                                        <div>
-                                            <button class="button" id="receiptClearReportButton" type="button" disabled>Limpar Relatório</button>
-                                            <button class="button" id="receiptCopyReportButton" type="button" disabled>Copiar Relatório</button>
-                                            <button class="button" id="receiptDownloadReportButton" type="button" disabled>Baixar Relatório</button>
-                                        </div>
-                                    </div>
                                 </div>
 
                                 <!-- CONTROLES DO RELATÓRIO -->
 
                                 <div class="report-controls" id="receipt-controls">
                                     <div class="receipt-controls-panel is-active" id="receipt-controls-1">
-                                        <div class="history-link flex-box-start">
-                                            <a href="https://spx.shopee.com.br/#/generalReceiveTaskMgt" target="_blank">
-                                                <svg class="spreadsheets-link-icon" viewBox="0 0 24 24" aria-hidden="true">
-                                                    <path d="M7 17L17 7M9 7H17V15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                                                </svg>
-                                            </a>
-
-                                            <div>
-                                                <h4>Gestão de Recebimento</h4>
-                                                <p>Exporte do SPX e importe aqui.</p>
-                                            </div>
+                                        <div class="title">
+                                            <h4>Mesa de Recebimento</h4>
                                         </div>
 
-                                        <div class="history-import flex-box-start">
-                                            <div>
-                                                <button class="button" id="receiptImportButton" type="button">
-                                                    Importar Recebimento
-                                                </button>
+                                        <div class="padding">
+
+                                        
+                                            <div class="input-group receipt-operator-controls" id="receiptOperatorControls">
+                                                <div>
+                                                    <h4 data-receipt-operator-label>Etiquetador</h4>
+
+                                                    <div class="flex-box-start">
+                                                        <input type="text" data-receipt-operator-field="labeler" autocomplete="off" disabled>
+                                                        <input type="text" data-receipt-operator-field="errorQuantity" maxlength="5" autocomplete="off" inputmode="numeric" pattern="[0-9]*" disabled>
+
+                                                        <div class="checkbox">
+                                                            <input type="checkbox" data-receipt-operator-selection disabled>
+                                                            <label for=""></label>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
 
-                                            <input id="receiptFileInput" type="file" accept=".csv,.xlsx,.xls" hidden>
+                                            <label class="receipt-error-calculation-option" for="receiptErrorCalculationToggle">
+                                                <input id="receiptErrorCalculationToggle" type="checkbox" disabled>
+
+                                                <p>Calcular participação no total de erros.</p>
+                                            </label>
+
                                         </div>
 
-                                        <div class="input-group">
+                                        <!-- A SER APAGADO -->
+
+                                        <div class="input-group" style="display: none;">
                                             <div>
                                                 <h4>Janela</h4>
 
@@ -1339,28 +1283,6 @@
                                             </div>
 
                                         </div>
-
-                                        <div class="input-group receipt-operator-controls" id="receiptOperatorControls">
-                                            <div>
-                                                <h4 data-receipt-operator-label>Etiquetador</h4>
-
-                                                <div class="flex-box-start">
-                                                    <input type="text" data-receipt-operator-field="labeler" autocomplete="off" disabled>
-                                                    <input type="text" data-receipt-operator-field="errorQuantity" maxlength="5" autocomplete="off" inputmode="numeric" pattern="[0-9]*" disabled>
-
-                                                    <div class="checkbox">
-                                                        <input type="checkbox" data-receipt-operator-selection disabled>
-                                                        <label for=""></label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <label class="receipt-error-calculation-option" for="receiptErrorCalculationToggle">
-                                            <input id="receiptErrorCalculationToggle" type="checkbox" disabled>
-
-                                            <p>Calcular participação no total de erros.</p>
-                                        </label>
                                     </div>
 
                                     <div class="receipt-controls-panel" id="receipt-controls-2" hidden>
