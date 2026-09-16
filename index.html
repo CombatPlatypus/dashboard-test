@@ -237,7 +237,7 @@
 
 
 
-            #receipt-controls #receipt-controls-1 .padding label:last-of-type {
+            #receipt-controls #receipt-controls-1 .padding .erro-checkbox {
                 display: flex;
                 align-items: center;
                 user-select: none;
@@ -248,25 +248,25 @@
                 border-top: 2px solid var(--color-border);
                 cursor: pointer;
             }
-            #receipt-controls #receipt-controls-1 .padding label:last-of-type input {
+            #receipt-controls #receipt-controls-1 .padding .erro-checkbox input {
                 flex: 0 0 auto;
             }
-            #receipt-controls #receipt-controls-1 .padding label:last-of-type span {
+            #receipt-controls #receipt-controls-1 .padding .erro-checkbox span {
                 display: flex;
                 flex-direction: column;
                 gap: 4px;
             }
-            #receipt-controls #receipt-controls-1 .padding label:last-of-type p {
+            #receipt-controls #receipt-controls-1 .padding .erro-checkbox p {
                 color: var(--color-text);
                 margin: 0;
                 font-size: 14px;
             }
-            #receipt-controls #receipt-controls-1 .padding label:last-of-type small {
+            #receipt-controls #receipt-controls-1 .padding .erro-checkbox small {
                 color: var(--color-gray-p);
                 font-size: 12px;
                 line-height: 1.4;
             }
-            #receipt-controls #receipt-controls-1 .padding label:last-of-type :has(input:disabled) {
+            #receipt-controls #receipt-controls-1 .padding .erro-checkbox :has(input:disabled) {
                 opacity: 0.55;
                 cursor: not-allowed;
             }
@@ -1288,7 +1288,7 @@
 
                                             </div>
 
-                                            <label for="receiptErrorCalculationToggle">
+                                            <label class="erro-checkbox" for="receiptErrorCalculationToggle">
                                                 <input id="receiptErrorCalculationToggle" type="checkbox" disabled>
 
                                                 <p>Calcular participação no total de erros.</p>
