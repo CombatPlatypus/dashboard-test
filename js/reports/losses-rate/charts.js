@@ -492,9 +492,9 @@ function createLossesRateCompositionChart(
 
             data: {
                 labels: [
-                    "POSSÍVEIS PERDAS",
                     "LOST",
                     "AVARIA",
+                    "POSSÍVEIS PERDAS",
                 ],
 
                 datasets: [
@@ -506,9 +506,9 @@ function createLossesRateCompositionChart(
                         ],
 
                         backgroundColor: [
-                            "#8b8d91",
                             "#d9534f",
                             "#f0ad4e",
+                            "#8b8d91",
                         ],
 
                         borderColor:
@@ -811,9 +811,9 @@ function updateLossesRateCompositionChart(
         .data
         .datasets[0]
         .data = [
-            possibleLosses,
             lost,
             damage,
+            possibleLosses,
         ];
 
     lossesRateCompositionChart
