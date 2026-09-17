@@ -363,6 +363,10 @@
         width: 30px;
         height: 30px;
     }
+    #reports .report-controls .title > img {
+        width: 35px;
+        height: 35px;
+    }
     #reports .report-controls .padding {
         padding: 30px;
     }
