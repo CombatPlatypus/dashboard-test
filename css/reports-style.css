@@ -460,7 +460,7 @@
     #planning .planning-sheet-sidebar {
         min-width: 0;
     }
-    .planning-sheet-table td {
+    .planning-sheet-table tr td:first-of-type {
         text-align: left !important;
     }
     
@@ -497,9 +497,6 @@
     }
     #planning .planning-cp-summary-table .planning-quantity-column {
         width: 90px;
-    }
-    #planning .planning-cp-summary-table td:last-child {
-        text-align: center;
     }
 
     /* PLANEJAMENTO - DISTRIBUIÇÃO VERTICAL */
@@ -671,8 +668,8 @@
 
     /* PLANEJAMENTO - COLLECTION POOL E INDICADORES */
 
-    #collection-indicators .report-controls .input-group {
-        grid-template-columns: repeat(auto-fit, minmax(159px, 1fr));
+    #collection-indicators .report-controls .operations, #collection-indicators .report-controls .fleet {
+        grid-template-columns: repeat(auto-fit, minmax(162px, 1fr));
     }
     #collection-indicators .padding {
         display: flex;
