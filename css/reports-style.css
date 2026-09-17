@@ -670,7 +670,7 @@
     /* PLANEJAMENTO - COLLECTION POOL E INDICADORES */
 
     #collection-indicators .operations, #collection-indicators .fleet {
-        grid-template-columns: repeat(auto-fit, minmax(162px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(162px, 1fr)) !important;
     }
     #collection-indicators .padding {
         display: flex;
