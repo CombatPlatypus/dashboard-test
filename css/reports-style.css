@@ -420,6 +420,7 @@
         grid-template-columns: repeat(auto-fit, minmax(299px, 1fr));
     }
     #expedition .report-controls .input-group {
+        grid-template-columns: repeat(auto-fit, minmax(162px, 1fr));
         border-bottom: 2px solid var(--color-border);
         padding-bottom: 20px;
         margin-bottom: 20px;
@@ -668,7 +669,7 @@
 
     /* PLANEJAMENTO - COLLECTION POOL E INDICADORES */
 
-    #collection-indicators .report-controls .operations, #collection-indicators .report-controls .fleet {
+    #collection-indicators .operations, #collection-indicators .fleet {
         grid-template-columns: repeat(auto-fit, minmax(162px, 1fr));
     }
     #collection-indicators .padding {
@@ -764,13 +765,13 @@
         justify-content: space-between;
         align-items: center;
         min-height: 40px;
-        padding: 13px 12px;
+        padding: 10px 12px;
         border: 1px solid var(--color-border);
         border-bottom: none;
     }
     #losses-rate .losses-rate-controls-summary > div:last-of-type {
         border-bottom: 1px solid var(--color-border);
-        min-height: 73px;
+        min-height: 72px;
     }
     #losses-rate .losses-rate-controls-summary > p {
         margin: 15px 0 0;
