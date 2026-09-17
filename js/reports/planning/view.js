@@ -1,4 +1,5 @@
 import {
+    MINIMUM_PLANNING_LHS,
     MINIMUM_PLANNING_TOS_PER_LH,
     ensureMinimumPlanningLhs,
     addPlanningLh,
@@ -40,14 +41,16 @@ import {
 
 let planningLhList = null;
 let planningAddLhButton = null;
+let planningRemoveLhButton = null;
 let planningEstimatedVolume = null;
 let planningPreviewLhBody = null;
 let planningPreviewSegregatedBody = null;
 let planningPreviewSegregatedTosBody = null;
 let planningPreviewAverageSpr = null;
 let planningPreviewDailyCapacity = null;
-let planningToGroups = null;
-let planningToEmpty = null;
+let planningToList = null;
+let planningAddToButton = null;
+let planningRemoveToButton = null;
 let planningSegregatedTosTab = null;
 let planningLhTabLink = null;
 let planningPreviewCpBacklog = null;
@@ -208,37 +211,6 @@ function createPlanningLhElement(
         segregateLabel,
     );
 
-    const removeButton =
-        document.createElement(
-            "button",
-        );
-
-    removeButton.type =
-        "button";
-
-    removeButton.className =
-        "planning-lh-remove";
-
-    removeButton.dataset.action =
-        "remove-lh";
-
-    removeButton.textContent =
-        "×";
-
-    removeButton.disabled = true;
-
-    removeButton.title =
-        "A remoção individual será habilitada em uma próxima etapa.";
-
-    removeButton.setAttribute(
-        "aria-label",
-        `Remover LH ${position}`,
-    );
-
-    headerActions.append(
-        removeButton,
-    );
-
     header.append(
         title,
         headerActions,
@@ -304,27 +276,31 @@ function createPlanningLhElement(
 
 function createPlanningToElement(
     to,
+    lhId,
     position,
-    canRemove,
 ) {
+    const ordinalNames = [
+        "Primeira",
+        "Segunda",
+        "Terceira",
+        "Quarta",
+        "Quinta",
+        "Sexta",
+        "Sétima",
+        "Oitava",
+        "Nona",
+    ];
+
     const item =
         document.createElement(
             "div",
         );
 
-    item.className =
-        "planning-to-item";
+    item.dataset.lhId =
+        String(lhId);
 
     item.dataset.toId =
         String(to.id);
-
-    const header =
-        document.createElement(
-            "div",
-        );
-
-    header.className =
-        "planning-to-item-header flex-box-between";
 
     const title =
         document.createElement(
@@ -332,42 +308,7 @@ function createPlanningToElement(
         );
 
     title.textContent =
-        `TO ${position}`;
-
-    const removeButton =
-        document.createElement(
-            "button",
-        );
-
-    removeButton.type =
-        "button";
-
-    removeButton.className =
-        "button planning-to-remove";
-
-    removeButton.dataset.action =
-        "remove-to";
-
-    removeButton.textContent =
-        "Remover";
-
-    removeButton.setAttribute(
-        "aria-label",
-        `Remover TO ${position}`,
-    );
-
-    removeButton.disabled =
-        !canRemove;
-
-    removeButton.title =
-        canRemove
-            ? "Remover TO"
-            : "É necessário manter pelo menos uma TO para este LH.";
-
-    header.append(
-        title,
-        removeButton,
-    );
+        `${ordinalNames[position - 1] ?? `${position}ª`} TO`;
 
     const fields =
         document.createElement(
@@ -381,7 +322,7 @@ function createPlanningToElement(
         createPlanningLhInput({
             field: "code",
             value: to.code,
-            placeholder: "Código da TO",
+            placeholder: "Código",
             ariaLabel:
                 `Código da TO ${position}`,
         });
@@ -408,115 +349,47 @@ function createPlanningToElement(
     );
 
     item.append(
-        header,
+        title,
         fields,
     );
 
     return item;
 }
 
-/* CRIA O GRUPO DE TOS DE UM LH */
+/* RETORNA AS TOS NA ORDEM EM QUE FORAM ADICIONADAS */
 
-function createPlanningToGroup(
-    lh,
-    position,
-) {
-    const group =
-        document.createElement(
-            "div",
-        );
-
-    group.className =
-        "planning-to-group";
-
-    group.dataset.lhId =
-        String(lh.id);
-
-    const header =
-        document.createElement(
-            "div",
-        );
-
-    header.className =
-        "planning-to-group-header flex-box-between";
-
-    const title =
-        document.createElement(
-            "h4",
-        );
-
-    const lhName =
-        String(lh.code).trim() ||
-        `LH ${position}`;
-
-    title.textContent =
-        `TOs do ${lhName}`;
-
-    const addButton =
-        document.createElement(
-            "button",
-        );
-
-    addButton.type =
-        "button";
-
-    addButton.className =
-        "button";
-
-    addButton.dataset.action =
-        "add-to";
-
-    addButton.textContent =
-        "Adicionar TO";
-
-    addButton.setAttribute(
-        "aria-label",
-        `Adicionar TO ao ${lhName}`,
-    );
-
-    header.append(
-        title,
-        addButton,
-    );
-
-    const list =
-        document.createElement(
-            "div",
-        );
-
-    list.className =
-        "planning-to-list flex-box-column";
-
-    const canRemoveTos =
-        lh.tos.length >
-            MINIMUM_PLANNING_TOS_PER_LH;
-
-    const toElements =
-        lh.tos.map(
-            function (to, index) {
-                return createPlanningToElement(
-                    to,
-                    index + 1,
-                    canRemoveTos,
+function getPlanningTosWithLh(lhs) {
+    return lhs
+        .filter(
+            function (lh) {
+                return (
+                    lh.segregate &&
+                    lh.segregateTos
                 );
             },
+        )
+        .flatMap(
+            function (lh) {
+                return lh.tos.map(
+                    function (to) {
+                        return {
+                            lhId: lh.id,
+                            to,
+                        };
+                    },
+                );
+            },
+        )
+        .sort(
+            function (first, second) {
+                return first.to.id - second.to.id;
+            },
         );
-
-    list.replaceChildren(
-        ...toElements,
-    );
-
-    group.append(
-        header,
-        list,
-    );
-
-    return group;
 }
 
-/* RENDERIZA OS GRUPOS DE TOS */
+/* RENDERIZA A LISTA DE TOS */
 
-function renderPlanningToGroups(lhs) {
+function renderPlanningToList(lhs) {
     const lhsWithTos =
         lhs.filter(
             function (lh) {
@@ -542,38 +415,45 @@ function renderPlanningToGroups(lhs) {
     planningSegregatedTosTab.hidden =
         !hasLhsWithTos;
 
-    planningToEmpty.hidden =
-        hasLhsWithTos;
-
-    planningToGroups.hidden =
+    planningAddToButton.disabled =
         !hasLhsWithTos;
 
-    if (!hasLhsWithTos) {
-        planningToGroups.replaceChildren();
+    const tosWithLh =
+        getPlanningTosWithLh(
+            lhs,
+        );
 
-        return;
-    }
-
-    const groups =
-        lhsWithTos.map(
-            function (lh) {
-                const position =
-                    lhs.findIndex(
-                        function (currentLh) {
-                            return currentLh.id === lh.id;
-                        },
-                    ) + 1;
-
-                return createPlanningToGroup(
-                    lh,
-                    position,
+    const toElements =
+        tosWithLh.map(
+            function (entry, index) {
+                return createPlanningToElement(
+                    entry.to,
+                    entry.lhId,
+                    index + 1,
                 );
             },
         );
 
-    planningToGroups.replaceChildren(
-        ...groups,
+    planningToList.replaceChildren(
+        ...toElements,
     );
+
+    const lastEntry =
+        tosWithLh.at(-1);
+
+    const lastEntryLh =
+        lhsWithTos.find(
+            function (lh) {
+                return lh.id ===
+                    lastEntry?.lhId;
+            },
+        );
+
+    planningRemoveToButton.disabled =
+        !lastEntry ||
+        !lastEntryLh ||
+        lastEntryLh.tos.length <=
+            MINIMUM_PLANNING_TOS_PER_LH;
 }
 
 /* FORMATA UM VALOR DA PRÉVIA */
@@ -937,6 +817,10 @@ function renderPlanningLhList(lhs) {
     planningLhList.replaceChildren(
         ...lhElements,
     );
+
+    planningRemoveLhButton.disabled =
+        lhs.length <=
+            MINIMUM_PLANNING_LHS;
 }
 
 /* ATUALIZA UM CAMPO GERAL */
@@ -1146,6 +1030,30 @@ function handleAddPlanningLh() {
             '[data-field="code"]',
         )
         ?.focus();
+}
+
+/* REMOVE O ÚLTIMO LH ADICIONADO */
+
+function handleRemovePlanningLh() {
+    const lastLh =
+        getPlanningState()
+            .lhs
+            .at(-1);
+
+    if (
+        !lastLh ||
+        planningRemoveLhButton.disabled
+    ) {
+        return;
+    }
+
+    if (
+        removePlanningLh(
+            lastLh.id,
+        )
+    ) {
+        planningAddLhButton.focus();
+    }
 }
 
 /* REINICIA TODO O RELATÓRIO */
@@ -1472,14 +1380,9 @@ function handlePlanningToInput(event) {
         return;
     }
 
-    const group =
-        input.closest(
-            ".planning-to-group",
-        );
-
     const item =
         input.closest(
-            ".planning-to-item",
+            "[data-to-id]",
         );
 
     const field =
@@ -1487,7 +1390,7 @@ function handlePlanningToInput(event) {
 
     const lhId =
         Number(
-            group?.dataset.lhId,
+            item?.dataset.lhId,
         );
 
     const toId =
@@ -1496,7 +1399,6 @@ function handlePlanningToInput(event) {
         );
 
     if (
-        !group ||
         !item ||
         !field ||
         !Number.isInteger(lhId) ||
@@ -1528,129 +1430,68 @@ function handlePlanningToInput(event) {
     );
 }
 
-/* ADICIONA OU REMOVE UMA TO */
+/* ADICIONA UMA TO AO ÚLTIMO LH SEGREGADO */
 
-function handlePlanningToClick(event) {
-    const eventTarget =
-        event.target instanceof Element
-            ? event.target
-            : null;
-
-    const actionButton =
-        eventTarget?.closest(
-            "[data-action]",
-        );
-
-    const group =
-        actionButton?.closest(
-            ".planning-to-group",
-        );
-
-    const lhId =
-        Number(
-            group?.dataset.lhId,
-        );
-
-    if (
-        !actionButton ||
-        !group ||
-        !Number.isInteger(lhId)
-    ) {
-        return;
-    }
-
-    if (
-        actionButton.dataset.action ===
-            "add-to"
-    ) {
-        const newTo =
-            addPlanningTo(
-                lhId,
-            );
-
-        if (!newTo) {
-            return;
-        }
-
-        planningToGroups
-            .querySelector(
-                `[data-lh-id="${lhId}"] ` +
-                `[data-to-id="${newTo.id}"] ` +
-                '[data-field="code"]',
+function handleAddPlanningTo() {
+    const targetLh =
+        getPlanningState()
+            .lhs
+            .filter(
+                function (lh) {
+                    return (
+                        lh.segregate &&
+                        lh.segregateTos
+                    );
+                },
             )
-            ?.focus();
+            .at(-1);
 
+    if (!targetLh) {
         return;
     }
 
-    if (
-        actionButton.dataset.action ===
-            "remove-to"
-    ) {
-        const item =
-            actionButton.closest(
-                ".planning-to-item",
-            );
-
-        const toId =
-            Number(
-                item?.dataset.toId,
-            );
-
-        if (
-            !Number.isInteger(toId)
-        ) {
-            return;
-        }
-
-        removePlanningTo(
-            lhId,
-            toId,
+    const newTo =
+        addPlanningTo(
+            targetLh.id,
         );
+
+    if (!newTo) {
+        return;
     }
+
+    planningToList
+        .querySelector(
+            `[data-to-id="${newTo.id}"] ` +
+            '[data-field="code"]',
+        )
+        ?.focus();
 }
 
-/* REMOVE UM LH */
+/* REMOVE A ÚLTIMA TO ADICIONADA */
 
-function handlePlanningLhClick(event) {
-    const eventTarget =
-        event.target instanceof Element
-            ? event.target
-            : null;
-
-    const removeButton =
-        eventTarget?.closest(
-            '[data-action="remove-lh"]',
-        );
-
-    if (
-        !removeButton ||
-        removeButton.disabled
-    ) {
+function handleRemovePlanningTo() {
+    if (planningRemoveToButton.disabled) {
         return;
     }
 
-    const item =
-        removeButton.closest(
-            ".planning-lh-item",
-        );
+    const lastEntry =
+        getPlanningTosWithLh(
+            getPlanningState().lhs,
+        )
+            .at(-1);
 
-    const lhId =
-        Number(
-            item?.dataset.lhId,
-        );
-
-    if (
-        !Number.isInteger(lhId)
-    ) {
+    if (!lastEntry) {
         return;
     }
 
-    removePlanningLh(
-        lhId,
-    );
-
-    planningAddLhButton.focus();
+    if (
+        removePlanningTo(
+            lastEntry.lhId,
+            lastEntry.to.id,
+        )
+    ) {
+        planningAddToButton.focus();
+    }
 }
 
 /* SINCRONIZA A ALTURA DOS CONTROLES COM A PRÉVIA */
@@ -1793,6 +1634,11 @@ function initializePlanningView(
             "planningAddLh",
         );
 
+    planningRemoveLhButton =
+        getPlanningElementById(
+            "planningRemoveLh",
+        );
+
     planningClearReportButton =
         getPlanningElementById(
             "planningClearReportButton",
@@ -1848,14 +1694,19 @@ function initializePlanningView(
             "planningPreviewSegregatedTosBody",
         );
 
-    planningToGroups =
+    planningToList =
         getPlanningElementById(
-            "planningToGroups",
+            "planningToList",
         );
 
-    planningToEmpty =
+    planningAddToButton =
         getPlanningElementById(
-            "planningToEmpty",
+            "planningAddTo",
+        );
+
+    planningRemoveToButton =
+        getPlanningElementById(
+            "planningRemoveTo",
         );
 
     planningSegregatedTosTab =
@@ -1881,6 +1732,7 @@ function initializePlanningView(
     if (
         !planningLhList ||
         !planningAddLhButton ||
+        !planningRemoveLhButton ||
         !planningEstimatedVolume ||
         !planningPreviewLhBody ||
         !planningPreviewCpBacklog ||
@@ -1894,8 +1746,9 @@ function initializePlanningView(
         !planningPreviewSegregatedTosBody ||
         !planningSegregatedSection ||
         !planningSegregatedTosSection ||
-        !planningToGroups ||
-        !planningToEmpty ||
+        !planningToList ||
+        !planningAddToButton ||
+        !planningRemoveToButton ||
         !planningSegregatedTosTab ||
         !planningLhTabLink ||
         !planningPreviewAverageSpr ||
@@ -1984,7 +1837,7 @@ function initializePlanningView(
                     )
                 )
             ) {
-                renderPlanningToGroups(
+                renderPlanningToList(
                     state.lhs,
                 );
             }
@@ -2021,6 +1874,21 @@ function initializePlanningView(
         handleAddPlanningLh,
     );
 
+    planningRemoveLhButton.addEventListener(
+        "click",
+        handleRemovePlanningLh,
+    );
+
+    planningAddToButton.addEventListener(
+        "click",
+        handleAddPlanningTo,
+    );
+
+    planningRemoveToButton.addEventListener(
+        "click",
+        handleRemovePlanningTo,
+    );
+
     planningClearReportButton.addEventListener(
         "click",
         handleResetPlanningReport,
@@ -2041,19 +1909,9 @@ function initializePlanningView(
         handlePlanningLhInput,
     );
 
-    planningLhList.addEventListener(
-        "click",
-        handlePlanningLhClick,
-    );
-
-    planningToGroups.addEventListener(
+    planningToList.addEventListener(
         "input",
         handlePlanningToInput,
-    );
-
-    planningToGroups.addEventListener(
-        "click",
-        handlePlanningToClick,
     );
 
     planningPanel.addEventListener(
@@ -2085,7 +1943,7 @@ function renderPlanningReport(
 ) {
     if (
         !planningLhList ||
-        !planningToGroups
+        !planningToList
     ) {
         return false;
     }
@@ -2098,7 +1956,7 @@ function renderPlanningReport(
         state.lhs,
     );
 
-    renderPlanningToGroups(
+    renderPlanningToList(
         state.lhs,
     );
 

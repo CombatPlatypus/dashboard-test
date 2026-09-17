@@ -652,7 +652,7 @@
                                                         <img src="images/geral-icons/add-icon.svg" alt="">
                                                     </button>
 
-                                                    <button id="" type="button" title="Remover LH" aria-label="Remover LH">
+                                                    <button id="planningRemoveLh" type="button" title="Remover último LH" aria-label="Remover último LH">
                                                         <img src="images/geral-icons/remove-icon.svg" alt="">
                                                     </button>
                                                 </div>
@@ -666,16 +666,20 @@
                                         <div class="tabs-panel" id="segregated-tos">
                                             <div class="title">
                                                 <h4>Defina TOs Para Segregar</h4>
+
+                                                <div class="flex-box-start">
+                                                    <button id="planningAddTo" type="button" title="Adicionar TO" aria-label="Adicionar TO">
+                                                        <img src="images/geral-icons/add-icon.svg" alt="">
+                                                    </button>
+
+                                                    <button id="planningRemoveTo" type="button" title="Remover última TO" aria-label="Remover última TO">
+                                                        <img src="images/geral-icons/remove-icon.svg" alt="">
+                                                    </button>
+                                                </div>
                                             </div>
 
                                             <div class="padding">
-
-                                                <div class="planning-to-empty" id="planningToEmpty">
-                                                    <p>Marque “Segregar” em um LH para adicionar suas TOs.</p>
-                                                </div>
-
-                                                <div class="planning-to-groups flex-box-column" id="planningToGroups" hidden></div>
-
+                                                <div class="to-list" id="planningToList"></div>
                                             </div>
                                         </div>
 

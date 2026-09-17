@@ -363,9 +363,13 @@
         width: 30px;
         height: 30px;
     }
+    #reports .report-controls .title .flex-box-start {
+        column-gap: 10px;
+    }
     #reports .report-controls .title img {
-        width: 35px;
-        height: 35px;
+        width: 30px;
+        height: 30px;
+        cursor: pointer
     }
     #reports .report-controls .padding {
         padding: 30px;
@@ -564,71 +568,13 @@
 
     /* PLANEJAMENTO - LISTA DINÂMICA DE TOS */
 
-    #planning .planning-to-empty {
-        padding: 20px;
-        color: var(--color-gray-p);
-        text-align: center;
-        border: 1px solid var(--color-border);
-        border-radius: 5px;
-    }
-    #planning .planning-to-empty p {
-        margin-bottom: 0;
-    }
-    #planning .planning-to-groups {
+    .to-list {
+        display: flex;
+        flex-direction: column;
         row-gap: 20px;
-        max-height: 664px;
-        padding-right: 15px;
-        overflow: auto;
+        height: auto;
     }
-    #planning .planning-to-groups[hidden],
-    #planning .planning-to-empty[hidden] {
-        display: none;
-    }
-    #planning .planning-to-group {
-        padding-bottom: 20px;
-        border-bottom: 2px solid var(--color-border);
-    }
-    #planning .planning-to-group:last-child {
-        padding-bottom: 0;
-        border-bottom: none;
-    }
-    #planning .planning-to-group-header,
-    #planning .planning-to-item-header {
-        align-items: center;
-        flex-wrap: nowrap;
-        margin-bottom: 15px;
-    }
-    #planning .planning-to-group-header .button,
-    #planning .planning-to-remove {
-        min-height: 38px;
-        padding: 8px 12px;
-        font-size: 12px;
-    }
-    #planning .planning-to-list {
-        row-gap: 15px;
-    }
-    #planning .planning-to-item {
-        padding: 12px;
-        border: 1px solid var(--color-border);
-        border-radius: 5px;
-    }
-    #planning .planning-to-item .flex-box-start {
-        column-gap: 10px;
-    }
-    #planning .planning-to-item .flex-box-start input:first-child {
-        flex: 1 1 0;
-    }
-    #planning .planning-to-item .flex-box-start input:last-child {
-        flex: 0 0 86px;
-        text-align: center;
-    }
-    #planning .planning-to-remove {
-        color: var(--color-text);
-        background-color: var(--color-container);
-        border: 1px solid var(--color-border);
-        border-bottom: 4px solid var(--color-border);
-    }
-
+    
     /* PLANEJAMENTO - SEGREGAÇÃO */
 
     #planning .planning-lh-item-actions {
