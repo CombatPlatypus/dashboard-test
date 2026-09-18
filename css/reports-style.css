@@ -577,6 +577,9 @@
     .to-list {
         column-gap: 10px;
     }
+    .to-list .flex-box-start {
+        column-gap: 10px;
+    }
     .to-list .flex-box-start input:first-of-type {
         flex: 1 1 0;
     }
