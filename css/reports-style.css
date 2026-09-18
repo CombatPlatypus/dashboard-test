@@ -574,7 +574,17 @@
         row-gap: 20px;
         height: auto;
     }
-    
+    .to-list {
+        column-gap: 10px;
+    }
+    .to-list .flex-box-start input:first-of-type {
+        flex: 1 1 0;
+    }
+    .to-list .flex-box-start input:last-of-type {
+        flex: 0 0 86px;
+        text-align: center;
+    }
+
     /* PLANEJAMENTO - SEGREGAÇÃO */
 
     #planning .planning-lh-item-actions {
