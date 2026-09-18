@@ -223,29 +223,17 @@
                 align-items: center;
             }
             .global-inputs > div {
-                flex: 0 0 400px;
-                display: flex;
-                align-items: center;
+                flex: 1 1 0;
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                text-align: center;
                 column-gap: 15px;
             }
-
-            .global-inputs > div img {
-      
-            }
             .global-inputs > div input {
-                min-height: 60px;
+                min-height: 50px;
+                text-align: center;
+                border: 2px solid var(--color-border);
             }
-            .global-inputs > div h3 {
-                margin: 0 0 3px 0;
-            }
-            .global-inputs > div p {
-                margin: 0;
-            }
-            .global-inputs > div:last-of-type {
-                flex: 1 1 0;
-            }
-
-
 
         </style>
     </head>	
@@ -380,27 +368,15 @@
 
                     <div class="global-inputs flex-box-between">
     
-                        <!-- ANALISTA RESPONSAVEL -->
-<!-- 
-                        <div>
-    
-                            <img class="thumbnail" src="images/geral-icons/hub-logo-menu.svg" id="">
-
-                            <div>
-
-                                <h3 id="">Nome do Análista</h3>
-                                <p id="">Janela do PM2</p>
-
-                            </div>
-
-                        </div> -->
-
-                        <!-- INPUTS GLOBAIS -->
-
                         <div>
 
                             <div>
                                 <h4>Janela do Turno</h4>
+                                <input type="text" id="">
+                            </div>
+
+                            <div>
+                                <h4>Cap do Turno</h4>
                                 <input type="text" id="">
                             </div>
 
