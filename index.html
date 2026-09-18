@@ -217,7 +217,24 @@
             /* AJUSTES */
 
             .global-inputs {
-
+                max-width: 1400px;
+                margin: 0 auto 20px auto;
+                column-gap: 15px;
+                align-items: center;
+            }
+            .global-inputs > div {
+                flex: 0 0 300px;
+            }
+            .global-inputs > div img {
+                width: 100px;
+                border-radius: 5px;
+                border: 2px solid var(--color-border);
+            }
+            .global-inputs > div h4, .global-inputs > div p {
+                margin: 0;
+            }
+            .global-inputs > div:last-of-type {
+                flex: 1 1 0;
             }
 
 
@@ -353,12 +370,32 @@
 
                     <!-- INPUTS E INFORMAÇÕES GLOBAIS -->
 
-                    <div class="global-inputs flex-box-start">
+                    <div class="global-inputs flex-box-between">
+    
+                        <!-- ANALISTA RESPONSAVEL -->
 
-                        <input type="text" placeholder="Janela do Turno" id="">
-                        <input type="text" placeholder="Analista Reponsável" id="">
-                        <input type="text" placeholder="Backlog no Piso" id="">
+                        <div class="who-is">
+    
+                            <img src="images/geral-icons/hub-logo-menu.svg">
 
+                            <div>
+
+                                <h4>Nome do Análista</h4>
+                                <p>Turno do Analista</p>
+
+                            </div>
+
+                        </div>
+
+                        <!-- INPUTS GLOBAIS -->
+
+                        <div>
+
+                            <input type="text" placeholder="Janela do Turno" id="">
+                            <input type="text" placeholder="Analista Reponsável" id="">
+                            <input type="text" placeholder="Backlog no Piso" id="">
+
+                        </div>
                     </div>
 
                     <!-- NAVEGAÇÃO ENTRE OS RELATÓRIOS -->
