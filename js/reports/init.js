@@ -30,6 +30,10 @@ import {
     initializeReportSession,
 } from "./session.js";
 
+import {
+    initializeReportGlobalInputs,
+} from "./global-inputs.js";
+
 /* INICIALIZA O PAINEL DE RELATÓRIOS */
 
 function initializeReportsPanel() {
@@ -37,6 +41,10 @@ function initializeReportsPanel() {
     // BARRA DE NOTIFICAÇÕES
 
     initializeReportNotifications();
+
+    // INPUTS COMPARTILHADOS ENTRE OS RELATÓRIOS
+
+    initializeReportGlobalInputs();
 
     // RELATÓRIOS MODULARIZADOS
 

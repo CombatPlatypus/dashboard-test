@@ -1,5 +1,6 @@
 import {
-    FIXED_REPORT_WINDOW,
+    getReportContext,
+    updateReportContextField,
 } from "../core/report-context.js";
 
 /* OUVINTES DO ESTADO */
@@ -359,7 +360,6 @@ function createExpeditionRoute(
 /* ESTADO DA EXPEDIÇÃO */
 
 const expeditionState = {
-    window: FIXED_REPORT_WINDOW,
     sourceFileName: "",
 
     errorSourceFileName: "",
@@ -478,7 +478,8 @@ function getExpeditionDuplicatedOrders(
 function getExpeditionState() {
     return {
         window:
-            expeditionState.window,
+            getReportContext()
+                .window,
 
         sourceFileName:
             expeditionState.sourceFileName,
@@ -1623,23 +1624,12 @@ function subscribeExpeditionState(
 /* ALTERA A JANELA */
 
 function updateExpeditionWindow(
-    _value,
+    value,
 ) {
-    if (
-        expeditionState.window ===
-        FIXED_REPORT_WINDOW
-    ) {
-        return true;
-    }
-
-    expeditionState.window =
-        FIXED_REPORT_WINDOW;
-
-    notifyExpeditionState({
-        type: "window-updated",
-    });
-
-    return true;
+    return updateReportContextField(
+        "window",
+        value,
+    );
 }
 
 /* ALTERA UMA QUANTIDADE MANUAL */
@@ -1960,9 +1950,6 @@ function restoreExpeditionState(
         return false;
     }
 
-    expeditionState.window =
-        FIXED_REPORT_WINDOW;
-
     expeditionState.sourceFileName =
         normalizeExpeditionText(
             sessionState.sourceFileName,
@@ -2119,9 +2106,6 @@ function restoreExpeditionState(
 /* LIMPA O RELATÓRIO */
 
 function resetExpeditionReport() {
-    expeditionState.window =
-        FIXED_REPORT_WINDOW;
-
     expeditionState.floorVolume =
         null;
 

@@ -1,5 +1,6 @@
 import {
-    FIXED_REPORT_WINDOW,
+    getReportContext,
+    updateReportContextField,
 } from "../core/report-context.js";
 
 /* OUVINTES DO ESTADO */
@@ -148,7 +149,6 @@ function createReceiptOperatorRecord(
 /* ESTADO DO RECEBIMENTO */
 
 const receiptState = {
-    window: FIXED_REPORT_WINDOW,
     expectedVolume: null,
 
     useTotalErrorParticipation:
@@ -162,7 +162,8 @@ const receiptState = {
 function getReceiptState() {
     return {
         window:
-            receiptState.window,
+            getReportContext()
+                .window,
 
         expectedVolume:
             receiptState.expectedVolume,
@@ -332,8 +333,10 @@ function updateReceiptGeneralField(
     let normalizedValue;
 
     if (field === "window") {
-        normalizedValue =
-            FIXED_REPORT_WINDOW;
+        return updateReportContextField(
+            field,
+            value,
+        );
     } else if (
         field ===
         "useTotalErrorParticipation"
@@ -580,8 +583,6 @@ function replaceReceiptOperators(
 /* LIMPA O RELATÓRIO */
 
 function resetReceiptReport() {
-    receiptState.window =
-        FIXED_REPORT_WINDOW;
     receiptState.expectedVolume = null;
 
     receiptState
@@ -611,9 +612,6 @@ function restoreReceiptState(
     ) {
         return false;
     }
-
-    receiptState.window =
-        FIXED_REPORT_WINDOW;
 
     receiptState.expectedVolume =
         normalizeReceiptQuantity(

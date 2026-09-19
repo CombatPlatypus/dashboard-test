@@ -39,6 +39,10 @@ import {
     renderReceiptExportStatus,
 } from "./export.js";
 
+import {
+    subscribeReportContext,
+} from "../core/report-context.js";
+
 let receiptControllerInitialized =
     false;
 
@@ -87,6 +91,10 @@ function initializeReceiptController() {
 
     receiptControllerInitialized =
         true;
+
+    subscribeReportContext(
+        renderReceiptController,
+    );
 
     return true;
 }

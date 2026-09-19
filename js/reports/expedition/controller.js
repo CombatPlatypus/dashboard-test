@@ -32,6 +32,10 @@ import {
     initializeExpeditionExport,
 } from "./export.js";
 
+import {
+    subscribeReportContext,
+} from "../core/report-context.js";
+
 let expeditionControllerInitialized =
     false;
 
@@ -77,6 +81,10 @@ function initializeExpeditionController() {
 
     expeditionControllerInitialized =
         true;
+
+    subscribeReportContext(
+        renderExpeditionController,
+    );
 
     return true;
 }

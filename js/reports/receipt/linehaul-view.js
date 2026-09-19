@@ -579,9 +579,9 @@ function renderReceiptLinehaulSummary(
         !hasData;
 
     elements.previewWindow.textContent =
-        hasData
-            ? state.window
-            : "—";
+        String(
+            state.window ?? "",
+        ).trim() || "—";
 
     elements.previewExpected.textContent =
         hasData

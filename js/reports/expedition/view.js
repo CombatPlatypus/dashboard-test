@@ -1255,9 +1255,9 @@ function renderExpeditionReport(
 
     elements.previewWindow
         .textContent =
-            summary.hasData
-                ? state.window
-                : "—";
+            String(
+                state.window ?? "",
+            ).trim() || "—";
 
     elements.previewOperatorCount
         .textContent =

@@ -18,6 +18,11 @@ import {
 } from "./model.js";
 
 import {
+    getReportContext,
+    subscribeReportContext,
+} from "../core/report-context.js";
+
+import {
     initializeOverallAnalysisView,
     renderOverallAnalysisView,
 } from "./view.js";
@@ -37,6 +42,7 @@ function getCurrentOverallAnalysisData() {
         getReceiptState(),
         getExpeditionState(),
         getLossesRateState(),
+        getReportContext(),
     );
 }
 
@@ -98,6 +104,10 @@ function initializeOverallAnalysisController() {
     );
 
     subscribeLossesRateState(
+        renderOverallAnalysisController,
+    );
+
+    subscribeReportContext(
         renderOverallAnalysisController,
     );
 

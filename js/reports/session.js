@@ -10,6 +10,11 @@ import {
     downloadReportBlob,
 } from "./export.js";
 
+import {
+    getReportContext,
+    restoreReportContext,
+} from "./core/report-context.js";
+
 const REPORT_SESSION_SCHEMA =
     "dashboard-report-session";
 
@@ -125,6 +130,9 @@ function createReportSessionPayload() {
         createdAt:
             new Date().toISOString(),
 
+        context:
+            getReportContext(),
+
         reports:
             exportSessionReports(),
     };
@@ -174,6 +182,21 @@ function validateReportSessionPayload(
     if (!isSessionObject(payload.reports)) {
         throw new TypeError(
             "O arquivo não possui os dados dos relatórios.",
+        );
+    }
+
+    if (
+        payload.context !== undefined &&
+        (
+            !isSessionObject(
+                payload.context,
+            ) ||
+            typeof payload.context.window !==
+                "string"
+        )
+    ) {
+        throw new TypeError(
+            "Os dados globais da sessão são inválidos.",
         );
     }
 
@@ -412,7 +435,24 @@ function restoreReportSession(
     const previousReports =
         exportSessionReports();
 
+    const previousContext =
+        getReportContext();
+
+    const sessionContext =
+        payload.context ?? {
+            window:
+                payload.reports.receipt
+                    .window ??
+                payload.reports.expedition
+                    .window ??
+                "",
+        };
+
     try {
+        restoreReportContext(
+            sessionContext,
+        );
+
         reportManager.importSession(
             selectSessionReports(
                 payload.reports,
@@ -422,6 +462,10 @@ function restoreReportSession(
         renderRestoredOverallAnalysis();
     } catch (error) {
         try {
+            restoreReportContext(
+                previousContext,
+            );
+
             reportManager.importSession(
                 previousReports,
             );

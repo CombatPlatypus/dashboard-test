@@ -266,6 +266,11 @@ function getOverallAnalysisViewElements(
                 "overallAnalysisDate",
             ),
 
+        window:
+            getElement(
+                "overallAnalysisWindow",
+            ),
+
         capacityUsage:
             getElement(
                 "overallAnalysisCapacityUsage",
@@ -438,6 +443,9 @@ function renderOverallAnalysisView(
         overallAnalysisViewElements;
 
     renderOverallAnalysisDate();
+
+    elements.window.textContent =
+        data.context?.window || "—";
 
     elements.capacityUsage.textContent =
         formatOverallAnalysisCapacityRate(

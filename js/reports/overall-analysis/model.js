@@ -210,6 +210,7 @@ function createOverallAnalysisData(
     receiptState,
     expeditionState,
     lossesRateState,
+    reportContext = {},
 ) {
     const receiptSummary =
         getReceiptSummary(
@@ -291,6 +292,14 @@ function createOverallAnalysisData(
             : null;
 
     return {
+        context: {
+            window:
+                String(
+                    reportContext.window ??
+                    "",
+                ).trim(),
+        },
+
         cards: {
             capacity: {
                 limit:

@@ -1,5 +1,6 @@
 import {
-    FIXED_REPORT_WINDOW,
+    getReportContext,
+    updateReportContextField,
 } from "../core/report-context.js";
 
 const receiptLinehaulListeners =
@@ -55,12 +56,6 @@ function normalizeReceiptLinehaulQuantity(
         : null;
 }
 
-function normalizeReceiptLinehaulWindow(
-    _value,
-) {
-    return FIXED_REPORT_WINDOW;
-}
-
 function createReceiptLinehaulKey(
     value,
 ) {
@@ -109,7 +104,6 @@ function createReceiptLinehaulRecord(
 }
 
 const receiptLinehaulState = {
-    window: FIXED_REPORT_WINDOW,
     expectedVolume: null,
     reversesSent: null,
     linehauls: [],
@@ -119,7 +113,8 @@ const receiptLinehaulState = {
 function getReceiptLinehaulState() {
     return {
         window:
-            receiptLinehaulState.window,
+            getReportContext()
+                .window,
 
         expectedVolume:
             receiptLinehaulState
@@ -239,10 +234,10 @@ function updateReceiptLinehaulField(
     let normalizedValue;
 
     if (field === "window") {
-        normalizedValue =
-            normalizeReceiptLinehaulWindow(
-                value,
-            );
+        return updateReportContextField(
+            field,
+            value,
+        );
     } else if (
         field === "expectedVolume" ||
         field === "reversesSent"
@@ -264,21 +259,6 @@ function updateReceiptLinehaulField(
 
     receiptLinehaulState[field] =
         normalizedValue;
-
-    if (
-        field === "window" &&
-        receiptLinehaulState
-            .manualEntryEnabled
-    ) {
-        receiptLinehaulState
-            .linehauls
-            .forEach(
-                function (linehaul) {
-                    linehaul.cpt =
-                        normalizedValue;
-                },
-            );
-    }
 
     notifyReceiptLinehaulState({
         type: "linehaul-field-updated",
@@ -485,9 +465,6 @@ function replaceReceiptLinehauls(
             )
             .filter(Boolean);
 
-    receiptLinehaulState.window =
-        FIXED_REPORT_WINDOW;
-
     receiptLinehaulState.expectedVolume =
         receiptLinehaulState
             .linehauls
@@ -518,8 +495,6 @@ function replaceReceiptLinehauls(
 }
 
 function resetReceiptLinehaulState() {
-    receiptLinehaulState.window =
-        FIXED_REPORT_WINDOW;
     receiptLinehaulState.expectedVolume = null;
     receiptLinehaulState.reversesSent = null;
     receiptLinehaulState.linehauls = [];
@@ -543,9 +518,6 @@ function restoreReceiptLinehaulState(
         !Array.isArray(sessionState)
             ? sessionState
             : {};
-
-    receiptLinehaulState.window =
-        FIXED_REPORT_WINDOW;
 
     receiptLinehaulState.expectedVolume =
         normalizeReceiptLinehaulQuantity(
