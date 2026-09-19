@@ -22,6 +22,13 @@ const reportContextQuantityFields =
         "shiftCapacity",
     ]);
 
+const reportWindowValues =
+    new Set([
+        "AM",
+        "PM1",
+        "PM2",
+    ]);
+
 /* NORMALIZA OS TEXTOS COMPARTILHADOS */
 
 function normalizeReportContextText(
@@ -35,6 +42,34 @@ function normalizeReportContextText(
             " ",
         )
         .trim();
+}
+
+function normalizeReportContextWindow(
+    value,
+) {
+    const normalizedValue =
+        normalizeReportContextText(
+            value,
+        ).toUpperCase();
+
+    return reportWindowValues.has(
+        normalizedValue,
+    )
+        ? normalizedValue
+        : "";
+}
+
+function normalizeReportContextAnalyst(
+    value,
+) {
+    return normalizeReportContextText(
+        String(
+            value ?? "",
+        ).replace(
+            /[^\p{L}\s]/gu,
+            "",
+        ),
+    );
 }
 
 function normalizeReportContextQuantity(
@@ -129,16 +164,24 @@ function updateReportContextField(
         return false;
     }
 
-    const normalizedValue =
-        reportContextQuantityFields.has(
-            field,
-        )
-            ? normalizeReportContextQuantity(
-                value,
-            )
-            : normalizeReportContextText(
+    let normalizedValue;
+
+    if (field === "window") {
+        normalizedValue =
+            normalizeReportContextWindow(
                 value,
             );
+    } else if (field === "analyst") {
+        normalizedValue =
+            normalizeReportContextAnalyst(
+                value,
+            );
+    } else {
+        normalizedValue =
+            normalizeReportContextQuantity(
+                value,
+            );
+    }
 
     if (
         reportContext[field] ===
@@ -171,12 +214,12 @@ function restoreReportContext(
             : {};
 
     reportContext.window =
-        normalizeReportContextText(
+        normalizeReportContextWindow(
             receivedContext.window,
         );
 
     reportContext.analyst =
-        normalizeReportContextText(
+        normalizeReportContextAnalyst(
             receivedContext.analyst,
         );
 

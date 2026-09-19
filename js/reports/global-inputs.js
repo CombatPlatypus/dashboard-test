@@ -18,22 +18,27 @@ const reportGlobalInputDefinitions = [
     {
         id: "reportWindowInput",
         field: "window",
+        elementType: "select",
     },
     {
         id: "reportAnalystInput",
         field: "analyst",
+        characterType: "letters",
     },
     {
         id: "reportPlanningInput",
         field: "plannedVolume",
+        characterType: "numbers",
     },
     {
         id: "reportCollaboratorsInput",
         field: "collaboratorCount",
+        characterType: "numbers",
     },
     {
         id: "reportCapacityInput",
         field: "shiftCapacity",
+        characterType: "numbers",
     },
 ];
 
@@ -44,6 +49,61 @@ const reportQuantityFormatter =
             maximumFractionDigits: 0,
         },
     );
+
+function isValidReportGlobalInput(
+    entry,
+) {
+    return entry.elementType === "select"
+        ? entry.input instanceof
+            HTMLSelectElement
+        : entry.input instanceof
+            HTMLInputElement;
+}
+
+function sanitizeReportGlobalInput(
+    entry,
+) {
+    if (
+        entry.characterType ===
+        "letters"
+    ) {
+        entry.input.value =
+            entry.input.value.replace(
+                /[^\p{L}\s]/gu,
+                "",
+            );
+    } else if (
+        entry.characterType ===
+        "numbers"
+    ) {
+        entry.input.value =
+            entry.input.value.replace(
+                /\D/g,
+                "",
+            );
+    }
+}
+
+function synchronizeSelect2Value(
+    select,
+) {
+    if (
+        !select.classList.contains(
+            "select2-hidden-accessible",
+        ) ||
+        !window.jQuery ||
+        typeof window.jQuery.fn
+            ?.select2 !== "function"
+    ) {
+        return;
+    }
+
+    window.jQuery(
+        select,
+    ).trigger(
+        "change.select2",
+    );
+}
 
 /* MANTÉM OS INPUTS GLOBAIS SINCRONIZADOS COM O CONTEXTO */
 
@@ -69,9 +129,8 @@ function initializeReportGlobalInputs() {
     if (
         globalInputs.some(
             function (entry) {
-                return !(
-                    entry.input instanceof
-                    HTMLInputElement
+                return !isValidReportGlobalInput(
+                    entry,
                 );
             },
         )
@@ -95,6 +154,15 @@ function initializeReportGlobalInputs() {
                     entry.input.value =
                         context[entry.field] ??
                         "";
+
+                    if (
+                        entry.elementType ===
+                        "select"
+                    ) {
+                        synchronizeSelect2Value(
+                            entry.input,
+                        );
+                    }
                 }
             },
         );
@@ -146,8 +214,15 @@ function initializeReportGlobalInputs() {
     globalInputs.forEach(
         function (entry) {
             entry.input.addEventListener(
-                "input",
+                entry.elementType ===
+                    "select"
+                    ? "change"
+                    : "input",
                 function () {
+                    sanitizeReportGlobalInput(
+                        entry,
+                    );
+
                     updateReportContextField(
                         entry.field,
                         entry.input.value,
