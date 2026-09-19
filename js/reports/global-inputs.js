@@ -213,11 +213,7 @@ function initializeReportGlobalInputs() {
 
     globalInputs.forEach(
         function (entry) {
-            entry.input.addEventListener(
-                entry.elementType ===
-                    "select"
-                    ? "change"
-                    : "input",
+            const handleInput =
                 function () {
                     sanitizeReportGlobalInput(
                         entry,
@@ -227,8 +223,28 @@ function initializeReportGlobalInputs() {
                         entry.field,
                         entry.input.value,
                     );
-                },
-            );
+                };
+
+            if (
+                entry.elementType ===
+                    "select" &&
+                window.jQuery
+            ) {
+                window.jQuery(
+                    entry.input,
+                ).on(
+                    "change.reportGlobalInputs",
+                    handleInput,
+                );
+            } else {
+                entry.input.addEventListener(
+                    entry.elementType ===
+                        "select"
+                        ? "change"
+                        : "input",
+                    handleInput,
+                );
+            }
 
             entry.input.addEventListener(
                 "blur",

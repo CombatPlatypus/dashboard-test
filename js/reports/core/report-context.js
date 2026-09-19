@@ -2,7 +2,7 @@ const reportContextListeners =
     new Set();
 
 const reportContext = {
-    window: "",
+    window: "AM",
     analyst: "",
     plannedVolume: null,
     collaboratorCount: null,
@@ -56,7 +56,7 @@ function normalizeReportContextWindow(
         normalizedValue,
     )
         ? normalizedValue
-        : "";
+        : "AM";
 }
 
 function normalizeReportContextAnalyst(
