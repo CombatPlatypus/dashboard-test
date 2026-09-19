@@ -3,7 +3,24 @@ const reportContextListeners =
 
 const reportContext = {
     window: "",
+    analyst: "",
+    plannedVolume: null,
+    collaboratorCount: null,
+    shiftCapacity: null,
 };
+
+const reportContextTextFields =
+    new Set([
+        "window",
+        "analyst",
+    ]);
+
+const reportContextQuantityFields =
+    new Set([
+        "plannedVolume",
+        "collaboratorCount",
+        "shiftCapacity",
+    ]);
 
 /* NORMALIZA OS TEXTOS COMPARTILHADOS */
 
@@ -18,6 +35,34 @@ function normalizeReportContextText(
             " ",
         )
         .trim();
+}
+
+function normalizeReportContextQuantity(
+    value,
+) {
+    const digits =
+        String(
+            value ?? "",
+        ).replace(
+            /\D/g,
+            "",
+        );
+
+    if (!digits) {
+        return null;
+    }
+
+    const quantity =
+        Number.parseInt(
+            digits,
+            10,
+        );
+
+    return Number.isSafeInteger(
+        quantity,
+    )
+        ? quantity
+        : null;
 }
 
 /* CRIA UMA CÓPIA DO CONTEXTO */
@@ -73,14 +118,27 @@ function updateReportContextField(
     field,
     value,
 ) {
-    if (field !== "window") {
+    if (
+        !reportContextTextFields.has(
+            field,
+        ) &&
+        !reportContextQuantityFields.has(
+            field,
+        )
+    ) {
         return false;
     }
 
     const normalizedValue =
-        normalizeReportContextText(
-            value,
-        );
+        reportContextQuantityFields.has(
+            field,
+        )
+            ? normalizeReportContextQuantity(
+                value,
+            )
+            : normalizeReportContextText(
+                value,
+            );
 
     if (
         reportContext[field] ===
@@ -115,6 +173,26 @@ function restoreReportContext(
     reportContext.window =
         normalizeReportContextText(
             receivedContext.window,
+        );
+
+    reportContext.analyst =
+        normalizeReportContextText(
+            receivedContext.analyst,
+        );
+
+    reportContext.plannedVolume =
+        normalizeReportContextQuantity(
+            receivedContext.plannedVolume,
+        );
+
+    reportContext.collaboratorCount =
+        normalizeReportContextQuantity(
+            receivedContext.collaboratorCount,
+        );
+
+    reportContext.shiftCapacity =
+        normalizeReportContextQuantity(
+            receivedContext.shiftCapacity,
         );
 
     notifyReportContext({

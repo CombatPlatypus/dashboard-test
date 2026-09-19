@@ -14,6 +14,37 @@ const reportWindowOutputIds = [
     "overallAnalysisWindow",
 ];
 
+const reportGlobalInputDefinitions = [
+    {
+        id: "reportWindowInput",
+        field: "window",
+    },
+    {
+        id: "reportAnalystInput",
+        field: "analyst",
+    },
+    {
+        id: "reportPlanningInput",
+        field: "plannedVolume",
+    },
+    {
+        id: "reportCollaboratorsInput",
+        field: "collaboratorCount",
+    },
+    {
+        id: "reportCapacityInput",
+        field: "shiftCapacity",
+    },
+];
+
+const reportQuantityFormatter =
+    new Intl.NumberFormat(
+        "pt-BR",
+        {
+            maximumFractionDigits: 0,
+        },
+    );
+
 /* MANTÉM OS INPUTS GLOBAIS SINCRONIZADOS COM O CONTEXTO */
 
 function initializeReportGlobalInputs() {
@@ -21,17 +52,32 @@ function initializeReportGlobalInputs() {
         return true;
     }
 
-    const windowInput =
-        document.getElementById(
-            "reportWindowInput",
-        );
+    const globalInputs =
+        reportGlobalInputDefinitions
+            .map(
+                function (definition) {
+                    return {
+                        ...definition,
+                        input:
+                            document.getElementById(
+                                definition.id,
+                            ),
+                    };
+                },
+            );
 
     if (
-        !(windowInput instanceof
-            HTMLInputElement)
+        globalInputs.some(
+            function (entry) {
+                return !(
+                    entry.input instanceof
+                    HTMLInputElement
+                );
+            },
+        )
     ) {
         console.error(
-            "Não foi possível localizar o input global da janela.",
+            "Não foi possível localizar todos os inputs globais dos relatórios.",
         );
 
         return false;
@@ -40,13 +86,18 @@ function initializeReportGlobalInputs() {
     function synchronizeGlobalInputs(
         context,
     ) {
-        if (
-            document.activeElement !==
-            windowInput
-        ) {
-            windowInput.value =
-                context.window;
-        }
+        globalInputs.forEach(
+            function (entry) {
+                if (
+                    document.activeElement !==
+                    entry.input
+                ) {
+                    entry.input.value =
+                        context[entry.field] ??
+                        "";
+                }
+            },
+        );
 
         const displayWindow =
             context.window || "—";
@@ -64,23 +115,53 @@ function initializeReportGlobalInputs() {
                 }
             },
         );
+
+        const analystOutput =
+            document.getElementById(
+                "overallAnalysisAnalyst",
+            );
+
+        if (analystOutput) {
+            analystOutput.textContent =
+                context.analyst || "—";
+        }
+
+        const plannedOutput =
+            document.getElementById(
+                "overallAnalysisPlanned",
+            );
+
+        if (plannedOutput) {
+            plannedOutput.textContent =
+                context.plannedVolume ===
+                    null
+                    ? "—"
+                    : reportQuantityFormatter
+                        .format(
+                            context.plannedVolume,
+                        );
+        }
     }
 
-    windowInput.addEventListener(
-        "input",
-        function () {
-            updateReportContextField(
-                "window",
-                windowInput.value,
+    globalInputs.forEach(
+        function (entry) {
+            entry.input.addEventListener(
+                "input",
+                function () {
+                    updateReportContextField(
+                        entry.field,
+                        entry.input.value,
+                    );
+                },
             );
-        },
-    );
 
-    windowInput.addEventListener(
-        "blur",
-        function () {
-            synchronizeGlobalInputs(
-                getReportContext(),
+            entry.input.addEventListener(
+                "blur",
+                function () {
+                    synchronizeGlobalInputs(
+                        getReportContext(),
+                    );
+                },
             );
         },
     );

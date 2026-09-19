@@ -192,7 +192,33 @@ function validateReportSessionPayload(
                 payload.context,
             ) ||
             typeof payload.context.window !==
-                "string"
+                "string" ||
+            (
+                payload.context.analyst !==
+                    undefined &&
+                typeof payload.context.analyst !==
+                    "string"
+            ) ||
+            [
+                "plannedVolume",
+                "collaboratorCount",
+                "shiftCapacity",
+            ].some(
+                function (field) {
+                    const value =
+                        payload.context[field];
+
+                    return value !==
+                        undefined &&
+                        value !== null &&
+                        !(
+                            Number.isSafeInteger(
+                                value,
+                            ) &&
+                            value >= 0
+                        );
+                },
+            )
         )
     ) {
         throw new TypeError(

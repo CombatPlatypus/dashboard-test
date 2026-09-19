@@ -17,6 +17,16 @@ const OVERALL_ANALYSIS_CAPACITY =
 const OVERALL_ANALYSIS_LOSS_RATE_LIMIT =
     0.0003;
 
+function getOverallAnalysisContextQuantity(
+    value,
+) {
+    return Number.isSafeInteger(
+        value,
+    ) && value >= 0
+        ? value
+        : null;
+}
+
 /* NORMALIZA O NOME EXIBIDO NOS DESTAQUES */
 
 function getOverallAnalysisPersonName(
@@ -256,18 +266,34 @@ function createOverallAnalysisData(
     const floorVolume =
         expeditionSummary.floorVolume;
 
+    const plannedVolume =
+        getOverallAnalysisContextQuantity(
+            reportContext.plannedVolume,
+        );
+
+    const configuredCapacity =
+        getOverallAnalysisContextQuantity(
+            reportContext.shiftCapacity,
+        );
+
+    const capacityLimit =
+        configuredCapacity !== null &&
+        configuredCapacity > 0
+            ? configuredCapacity
+            : OVERALL_ANALYSIS_CAPACITY;
+
     const capacityUsed =
-        expectedVolume;
+        plannedVolume;
 
     const capacityUsageRate =
         capacityUsed !== null
             ? capacityUsed /
-                OVERALL_ANALYSIS_CAPACITY
+                capacityLimit
             : null;
 
     const capacityBalance =
         capacityUsed !== null
-            ? OVERALL_ANALYSIS_CAPACITY -
+            ? capacityLimit -
                 capacityUsed
             : null;
 
@@ -298,12 +324,28 @@ function createOverallAnalysisData(
                     reportContext.window ??
                     "",
                 ).trim(),
+
+            analyst:
+                String(
+                    reportContext.analyst ??
+                    "",
+                ).trim(),
+
+            plannedVolume,
+
+            collaboratorCount:
+                getOverallAnalysisContextQuantity(
+                    reportContext.collaboratorCount,
+                ),
+
+            shiftCapacity:
+                configuredCapacity,
         },
 
         cards: {
             capacity: {
                 limit:
-                    OVERALL_ANALYSIS_CAPACITY,
+                    capacityLimit,
 
                 used:
                     capacityUsed,
@@ -335,7 +377,7 @@ function createOverallAnalysisData(
 
         flow: {
             planned:
-                expectedVolume,
+                plannedVolume,
 
             processed:
                 receivedVolume,

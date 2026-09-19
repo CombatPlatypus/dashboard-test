@@ -271,6 +271,11 @@ function getOverallAnalysisViewElements(
                 "overallAnalysisWindow",
             ),
 
+        analyst:
+            getElement(
+                "overallAnalysisAnalyst",
+            ),
+
         capacityUsage:
             getElement(
                 "overallAnalysisCapacityUsage",
@@ -446,6 +451,9 @@ function renderOverallAnalysisView(
 
     elements.window.textContent =
         data.context?.window || "—";
+
+    elements.analyst.textContent =
+        data.context?.analyst || "—";
 
     elements.capacityUsage.textContent =
         formatOverallAnalysisCapacityRate(
