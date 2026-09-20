@@ -494,7 +494,7 @@ function drawComparisonStructure(chart) {
         "middle";
 
     context.font =
-        '500 10px "Open Sans", sans-serif';
+        '500 14px "Open Sans", sans-serif';
     context.fillStyle =
         "#bfc2c8";
 
@@ -671,6 +671,7 @@ function drawComparisonStructure(chart) {
 
             context.strokeStyle =
                 "rgba(82, 82, 82, 0.4)";
+            context.lineWidth = 1;
             context.beginPath();
             context.moveTo(
                 volumeStart,
@@ -740,7 +741,7 @@ function drawComparisonStructure(chart) {
             }
 
             context.font =
-                '600 13px "Open Sans", sans-serif';
+                '600 14px "Open Sans", sans-serif';
             drawMetricLabel(
                 context,
                 formatQuantity(
@@ -797,7 +798,7 @@ function drawComparisonStructure(chart) {
 
     context.strokeStyle =
         "#d9534f";
-    context.lineWidth = 1.5;
+    context.lineWidth = 1;
     context.setLineDash([
         6,
         5,
@@ -815,7 +816,7 @@ function drawComparisonStructure(chart) {
     context.setLineDash([]);
 
     context.font =
-        '600 11px "Open Sans", sans-serif';
+        '600 14px "Open Sans", sans-serif';
     context.textAlign =
         "right";
     context.textBaseline =
