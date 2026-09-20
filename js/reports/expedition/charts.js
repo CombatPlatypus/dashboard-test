@@ -19,7 +19,23 @@ const ROUTES_SCALE_START = 0;
 const ROUTES_SCALE_END = 42;
 const TIME_SCALE_START = 58;
 const TIME_SCALE_END = 100;
-const SCALE_INTERVALS = 3;
+const ROUTE_SCALE_INTERVALS = 5;
+const TIME_AXIS_MAXIMUM_SECONDS =
+    18 * 60;
+const TIME_MAXIMUM_REFERENCE_SECONDS =
+    10 * 60;
+const TIME_AXIS_TICKS = [
+    0,
+    2 * 60,
+    4 * 60,
+    6 * 60,
+    8 * 60,
+    10 * 60,
+    15 * 60,
+    18 * 60,
+];
+const ROUTES_BAR_COLOR = "#e4e6eb";
+const TIME_BAR_COLOR = "#ffc107";
 
 const quantityFormatter =
     new Intl.NumberFormat(
@@ -242,7 +258,7 @@ function getNiceRouteMaximum(value) {
 
     const roughStep =
         maximum /
-        SCALE_INTERVALS;
+        ROUTE_SCALE_INTERVALS;
 
     const magnitude =
         10 ** Math.floor(
@@ -273,45 +289,7 @@ function getNiceRouteMaximum(value) {
     );
 
     return step *
-        SCALE_INTERVALS;
-}
-
-function getNiceTimeMaximum(value) {
-    const maximum = Math.max(
-        Number(value) || 0,
-        60,
-    );
-
-    const availableSteps = [
-        60,
-        120,
-        180,
-        300,
-        600,
-        900,
-        1200,
-        1800,
-        3600,
-        7200,
-    ];
-
-    const step =
-        availableSteps.find(
-            function (candidate) {
-                return (
-                    candidate *
-                    SCALE_INTERVALS >=
-                    maximum
-                );
-            },
-        ) || Math.ceil(
-            maximum /
-            SCALE_INTERVALS /
-            3600,
-        ) * 3600;
-
-    return step *
-        SCALE_INTERVALS;
+        ROUTE_SCALE_INTERVALS;
 }
 
 function normalizeMetric(
@@ -335,18 +313,120 @@ function normalizeMetric(
         ) * ratio;
 }
 
-function drawCenteredText(
+function drawRoundedBar(
     context,
-    text,
     positionX,
     positionY,
+    width,
+    height,
+    fillStyle,
 ) {
+    const safeWidth = Math.max(
+        Number(width) || 0,
+        0,
+    );
+
+    if (safeWidth === 0) {
+        return;
+    }
+
+    const radius = Math.min(
+        3,
+        safeWidth / 2,
+        height / 2,
+    );
+
+    context.fillStyle =
+        fillStyle;
+    context.beginPath();
+    context.moveTo(
+        positionX + radius,
+        positionY,
+    );
+    context.lineTo(
+        positionX + safeWidth - radius,
+        positionY,
+    );
+    context.quadraticCurveTo(
+        positionX + safeWidth,
+        positionY,
+        positionX + safeWidth,
+        positionY + radius,
+    );
+    context.lineTo(
+        positionX + safeWidth,
+        positionY + height - radius,
+    );
+    context.quadraticCurveTo(
+        positionX + safeWidth,
+        positionY + height,
+        positionX + safeWidth - radius,
+        positionY + height,
+    );
+    context.lineTo(
+        positionX + radius,
+        positionY + height,
+    );
+    context.quadraticCurveTo(
+        positionX,
+        positionY + height,
+        positionX,
+        positionY + height - radius,
+    );
+    context.lineTo(
+        positionX,
+        positionY + radius,
+    );
+    context.quadraticCurveTo(
+        positionX,
+        positionY,
+        positionX + radius,
+        positionY,
+    );
+    context.fill();
+}
+
+function drawMetricLabel(
+    context,
+    label,
+    barEnd,
+    panelEnd,
+    positionY,
+    color = "#e4e6eb",
+) {
+    const labelWidth =
+        context.measureText(
+            label,
+        ).width;
+
+    let positionX =
+        barEnd + 10;
+
     context.textAlign =
-        "center";
-    context.textBaseline =
-        "middle";
+        "left";
+
+    if (
+        positionX + labelWidth >
+        panelEnd - 4
+    ) {
+        positionX =
+            panelEnd - 8;
+        context.textAlign =
+            "right";
+    }
+
+    context.strokeStyle =
+        "#18191a";
+    context.lineWidth = 3;
+    context.fillStyle =
+        color;
+    context.strokeText(
+        label,
+        positionX,
+        positionY,
+    );
     context.fillText(
-        text,
+        label,
         positionX,
         positionY,
     );
@@ -355,16 +435,12 @@ function drawCenteredText(
 function drawComparisonStructure(chart) {
     const rows =
         chart.$expeditionRows || [];
-
     const context =
         chart.ctx;
-
     const chartArea =
         chart.chartArea;
-
     const xScale =
         chart.scales.x;
-
     const yScale =
         chart.scales.y;
 
@@ -380,165 +456,184 @@ function drawComparisonStructure(chart) {
         chart,
     );
 
+    const routeMaximum =
+        chart.$expeditionRouteMaximum ||
+        1;
+    const routeStart =
+        xScale.getPixelForValue(
+            ROUTES_SCALE_START,
+        );
+    const routeEnd =
+        xScale.getPixelForValue(
+            ROUTES_SCALE_END,
+        );
+    const timeStart =
+        xScale.getPixelForValue(
+            TIME_SCALE_START,
+        );
+    const timeEnd =
+        xScale.getPixelForValue(
+            TIME_SCALE_END,
+        );
+    const nameStart =
+        chartArea.left - 156;
+    const headerTitleY =
+        chartArea.top - 57;
+    const headerSubtitleY =
+        chartArea.top - 37;
+    const axisY =
+        chartArea.bottom + 8;
+    const barHeight = 20;
+
     context.save();
+    context.textBaseline =
+        "middle";
 
     context.font =
         '600 15px "Open Sans", sans-serif';
     context.fillStyle =
         "#e4e6eb";
-
-    drawCenteredText(
-        context,
-        "Rotas",
-        (
-            xScale.getPixelForValue(
-                ROUTES_SCALE_START,
-            ) +
-            xScale.getPixelForValue(
-                ROUTES_SCALE_END,
-            )
-        ) / 2,
-        chartArea.top - 52,
+    context.textAlign =
+        "left";
+    context.fillText(
+        "Conferente",
+        nameStart,
+        headerTitleY,
     );
-
-    drawCenteredText(
-        context,
-        "Tempo médio",
-        (
-            xScale.getPixelForValue(
-                TIME_SCALE_START,
-            ) +
-            xScale.getPixelForValue(
-                TIME_SCALE_END,
-            )
-        ) / 2,
-        chartArea.top - 52,
+    context.fillText(
+        "VOLUME",
+        routeStart,
+        headerTitleY,
     );
-
-    const routeMaximum =
-        chart.$expeditionRouteMaximum ||
-        1;
-
-    const timeMaximum =
-        chart.$expeditionTimeMaximum ||
-        60;
+    context.fillText(
+        "TEMPO MÉDIO",
+        timeStart,
+        headerTitleY,
+    );
 
     context.font =
         '500 12px "Open Sans", sans-serif';
     context.fillStyle =
         "#bfc2c8";
+    context.fillText(
+        "rotas conferidas",
+        routeStart,
+        headerSubtitleY,
+    );
+    context.fillText(
+        "menor é melhor",
+        timeStart,
+        headerSubtitleY,
+    );
+
     context.strokeStyle =
         "rgba(82, 82, 82, 0.45)";
     context.lineWidth = 1;
 
     for (
         let index = 0;
-        index <= SCALE_INTERVALS;
+        index <= ROUTE_SCALE_INTERVALS;
         index += 1
     ) {
         const ratio =
             index /
-            SCALE_INTERVALS;
-
-        const routeValue =
-            routeMaximum *
-            ratio;
-
-        const routePosition =
-            ROUTES_SCALE_START +
-            (
-                ROUTES_SCALE_END -
-                ROUTES_SCALE_START
-            ) * ratio;
-
-        const routeX =
-            xScale.getPixelForValue(
-                routePosition,
-            );
+            ROUTE_SCALE_INTERVALS;
+        const positionX =
+            routeStart +
+            (routeEnd - routeStart) *
+                ratio;
 
         context.beginPath();
         context.moveTo(
-            routeX,
-            chartArea.top - 4,
+            positionX,
+            chartArea.top,
         );
         context.lineTo(
-            routeX,
+            positionX,
             chartArea.bottom,
         );
         context.stroke();
 
-        drawCenteredText(
-            context,
+        context.textAlign =
+            "center";
+        context.fillStyle =
+            "#bfc2c8";
+        context.fillText(
             formatQuantity(
-                routeValue,
+                routeMaximum *
+                ratio,
             ),
-            routeX,
-            chartArea.top - 22,
-        );
-
-        const timeValue =
-            timeMaximum *
-            ratio;
-
-        const timePosition =
-            TIME_SCALE_START +
-            (
-                TIME_SCALE_END -
-                TIME_SCALE_START
-            ) * ratio;
-
-        const timeX =
-            xScale.getPixelForValue(
-                timePosition,
-            );
-
-        context.beginPath();
-        context.moveTo(
-            timeX,
-            chartArea.top - 4,
-        );
-        context.lineTo(
-            timeX,
-            chartArea.bottom,
-        );
-        context.stroke();
-
-        drawCenteredText(
-            context,
-            formatDuration(
-                timeValue,
-            ),
-            timeX,
-            chartArea.top - 22,
+            positionX,
+            axisY + 16,
         );
     }
 
-    context.strokeStyle =
-        "rgba(82, 82, 82, 0.65)";
+    TIME_AXIS_TICKS.forEach(
+        function (timeValue) {
+            const positionX =
+                timeStart +
+                (
+                    timeEnd -
+                    timeStart
+                ) *
+                (
+                    timeValue /
+                    TIME_AXIS_MAXIMUM_SECONDS
+                );
 
-    context.beginPath();
-    context.moveTo(
-        xScale.getPixelForValue(
-            50,
-        ),
-        chartArea.top - 12,
+            context.beginPath();
+            context.moveTo(
+                positionX,
+                chartArea.top,
+            );
+            context.lineTo(
+                positionX,
+                chartArea.bottom,
+            );
+            context.stroke();
+
+            context.textAlign =
+                "center";
+            context.fillStyle =
+                "#bfc2c8";
+            context.fillText(
+                formatDuration(
+                    timeValue,
+                ),
+                positionX,
+                axisY + 16,
+            );
+        },
     );
-    context.lineTo(
-        xScale.getPixelForValue(
-            50,
-        ),
+
+    context.strokeStyle =
+        "rgba(82, 82, 82, 0.7)";
+    [
+        chartArea.top,
         chartArea.bottom,
+    ].forEach(
+        function (positionY) {
+            context.beginPath();
+            context.moveTo(
+                nameStart - 10,
+                positionY,
+            );
+            context.lineTo(
+                timeEnd,
+                positionY,
+            );
+            context.stroke();
+        },
     );
-    context.stroke();
 
     if (rows.length === 0) {
         context.font =
             '600 14px "Open Sans", sans-serif';
         context.fillStyle =
             "#bfc2c8";
-
-        drawCenteredText(
-            context,
+        context.textAlign =
+            "center";
+        context.fillText(
             "Importe os dados para comparar os conferentes.",
             (
                 chartArea.left +
@@ -549,19 +644,9 @@ function drawComparisonStructure(chart) {
                 chartArea.bottom
             ) / 2,
         );
-
         context.restore();
         return;
     }
-
-    context.font =
-        '600 14px "Open Sans", sans-serif';
-    context.fillStyle =
-        "#e4e6eb";
-    context.textAlign =
-        "right";
-    context.textBaseline =
-        "middle";
 
     rows.forEach(
         function (operator, index) {
@@ -569,169 +654,203 @@ function drawComparisonStructure(chart) {
                 yScale.getPixelForValue(
                     index,
                 );
+            const rowBottom =
+                yScale.getPixelForValue(
+                    index + 0.5,
+                );
+            const routeBarEnd =
+                routeStart +
+                (
+                    routeEnd -
+                    routeStart
+                ) *
+                Math.min(
+                    operator.routesChecked /
+                        routeMaximum,
+                    1,
+                );
+            const receivedTime =
+                operator
+                    .averageDurationSeconds;
+            const timeBarEnd =
+                receivedTime === null
+                    ? timeStart
+                    : timeStart +
+                        (
+                            timeEnd -
+                            timeStart
+                        ) *
+                        Math.min(
+                            receivedTime /
+                                TIME_AXIS_MAXIMUM_SECONDS,
+                            1,
+                        );
 
             context.strokeStyle =
-                "rgba(82, 82, 82, 0.3)";
+                "rgba(82, 82, 82, 0.4)";
             context.beginPath();
             context.moveTo(
-                xScale.getPixelForValue(
-                    ROUTES_SCALE_START,
-                ),
-                positionY,
+                nameStart - 10,
+                rowBottom,
             );
             context.lineTo(
-                xScale.getPixelForValue(
-                    TIME_SCALE_END,
-                ),
-                positionY,
+                timeEnd,
+                rowBottom,
             );
             context.stroke();
 
+            context.font =
+                '600 14px "Open Sans", sans-serif';
             context.fillStyle =
                 "#e4e6eb";
+            context.textAlign =
+                "left";
             context.fillText(
                 getOperatorName(
                     operator.operator,
                 ),
-                xScale.getPixelForValue(
-                    ROUTES_SCALE_START,
-                ) - 16,
+                nameStart,
                 positionY,
             );
 
-            if (
-                operator
-                    .averageDurationSeconds ===
-                null
-            ) {
-                context.textAlign =
-                    "left";
+            drawRoundedBar(
+                context,
+                routeStart,
+                positionY -
+                    barHeight / 2,
+                routeEnd - routeStart,
+                barHeight,
+                "rgba(228, 230, 235, 0.07)",
+            );
+            drawRoundedBar(
+                context,
+                routeStart,
+                positionY -
+                    barHeight / 2,
+                routeBarEnd -
+                    routeStart,
+                barHeight,
+                ROUTES_BAR_COLOR,
+            );
+
+            drawRoundedBar(
+                context,
+                timeStart,
+                positionY -
+                    barHeight / 2,
+                timeEnd - timeStart,
+                barHeight,
+                "rgba(228, 230, 235, 0.07)",
+            );
+
+            if (receivedTime !== null) {
+                drawRoundedBar(
+                    context,
+                    timeStart,
+                    positionY -
+                        barHeight / 2,
+                    timeBarEnd -
+                        timeStart,
+                    barHeight,
+                    TIME_BAR_COLOR,
+                );
+            }
+
+            context.font =
+                '600 13px "Open Sans", sans-serif';
+            drawMetricLabel(
+                context,
+                formatQuantity(
+                    operator.routesChecked,
+                ) +
+                    (
+                        operator.routesChecked ===
+                        1
+                            ? " rota"
+                            : " rotas"
+                    ),
+                routeBarEnd,
+                routeEnd,
+                positionY,
+            );
+
+            if (receivedTime === null) {
                 context.fillStyle =
                     "#bfc2c8";
+                context.textAlign =
+                    "left";
                 context.fillText(
                     "—",
-                    xScale.getPixelForValue(
-                        TIME_SCALE_START,
-                    ) + 8,
+                    timeStart + 8,
                     positionY,
                 );
-                context.textAlign =
-                    "right";
+            } else {
+                drawMetricLabel(
+                    context,
+                    formatDuration(
+                        receivedTime,
+                    ),
+                    timeBarEnd,
+                    timeEnd,
+                    positionY,
+                    receivedTime >
+                        TIME_MAXIMUM_REFERENCE_SECONDS
+                        ? TIME_BAR_COLOR
+                        : "#e4e6eb",
+                );
             }
         },
     );
 
-    context.restore();
-}
+    const maximumReferenceX =
+        timeStart +
+        (
+            timeEnd - timeStart
+        ) *
+        (
+            TIME_MAXIMUM_REFERENCE_SECONDS /
+            TIME_AXIS_MAXIMUM_SECONDS
+        );
 
-function drawPointValues(chart) {
-    const context =
-        chart.ctx;
-
-    const xScale =
-        chart.scales.x;
-
-    if (!xScale) {
-        return;
-    }
-
-    applyTextSpacing(
-        chart,
-    );
-
-    context.save();
-    context.font =
-        '600 13px "Open Sans", sans-serif';
-    context.textBaseline =
-        "middle";
-    context.fillStyle =
-        "#e4e6eb";
     context.strokeStyle =
-        "#1c1c1c";
+        "#d9534f";
+    context.lineWidth = 1.5;
+    context.setLineDash([
+        6,
+        5,
+    ]);
+    context.beginPath();
+    context.moveTo(
+        maximumReferenceX,
+        chartArea.top - 4,
+    );
+    context.lineTo(
+        maximumReferenceX,
+        chartArea.bottom,
+    );
+    context.stroke();
+    context.setLineDash([]);
+
+    context.font =
+        '600 11px "Open Sans", sans-serif';
+    context.textAlign =
+        "right";
+    context.textBaseline =
+        "bottom";
+    context.strokeStyle =
+        "#18191a";
     context.lineWidth = 3;
-
-    chart.data.datasets.forEach(
-        function (dataset, datasetIndex) {
-            const metadata =
-                chart.getDatasetMeta(
-                    datasetIndex,
-                );
-
-            metadata.data.forEach(
-                function (point, index) {
-                    const receivedValue =
-                        dataset.data[index]
-                            ?.actualValue;
-
-                    if (
-                        !Number.isFinite(
-                            Number(
-                                receivedValue,
-                            ),
-                        )
-                    ) {
-                        return;
-                    }
-
-                    const formattedValue =
-                        dataset
-                            .expeditionMetric ===
-                        "time"
-                            ? formatDuration(
-                                receivedValue,
-                            )
-                            : formatQuantity(
-                                receivedValue,
-                            );
-
-                    const panelLimit =
-                        dataset
-                            .expeditionMetric ===
-                        "time"
-                            ? chart.chartArea
-                                .right
-                            : xScale
-                                .getPixelForValue(
-                                    TIME_SCALE_START,
-                                ) - 10;
-
-                    const textWidth =
-                        context.measureText(
-                            formattedValue,
-                        ).width;
-
-                    let positionX =
-                        point.x + 10;
-
-                    let textAlign =
-                        "left";
-
-                    if (
-                        positionX +
-                            textWidth >
-                        panelLimit
-                    ) {
-                        positionX =
-                            point.x - 10;
-                        textAlign =
-                            "right";
-                    }
-
-                    context.textAlign =
-                        textAlign;
-                    context.strokeText(
-                        formattedValue,
-                        positionX,
-                        point.y,
-                    );
-                    context.fillText(
-                        formattedValue,
-                        positionX,
-                        point.y,
-                    );
-                },
-            );
-        },
+    context.fillStyle =
+        "#d9534f";
+    context.strokeText(
+        "Máximo 10:00",
+        maximumReferenceX - 6,
+        chartArea.top - 7,
+    );
+    context.fillText(
+        "Máximo 10:00",
+        maximumReferenceX - 6,
+        chartArea.top - 7,
     );
 
     context.restore();
@@ -742,12 +861,6 @@ const alignedComparisonPlugin = {
 
     beforeDatasetsDraw(chart) {
         drawComparisonStructure(
-            chart,
-        );
-    },
-
-    afterDatasetsDraw(chart) {
-        drawPointValues(
             chart,
         );
     },
@@ -766,13 +879,12 @@ function createComparisonChart(canvas) {
                         expeditionMetric:
                             "routes",
                         data: [],
-                        pointRadius: 6,
-                        pointHoverRadius: 8,
+                        pointRadius: 0,
+                        pointHoverRadius: 0,
+                        pointHitRadius: 12,
                         pointBackgroundColor:
-                            "#4CAF50",
-                        pointBorderColor:
-                            "#d8f0d9",
-                        pointBorderWidth: 2,
+                            "transparent",
+                        pointBorderWidth: 0,
                     },
                     {
                         label:
@@ -780,13 +892,12 @@ function createComparisonChart(canvas) {
                         expeditionMetric:
                             "time",
                         data: [],
-                        pointRadius: 6,
-                        pointHoverRadius: 8,
+                        pointRadius: 0,
+                        pointHoverRadius: 0,
+                        pointHitRadius: 12,
                         pointBackgroundColor:
-                            "#2196F3",
-                        pointBorderColor:
-                            "#d5ebfd",
-                        pointBorderWidth: 2,
+                            "transparent",
+                        pointBorderWidth: 0,
                     },
                 ],
             },
@@ -804,10 +915,10 @@ function createComparisonChart(canvas) {
 
                 layout: {
                     padding: {
-                        top: 76,
-                        right: 52,
-                        bottom: 16,
-                        left: 112,
+                        top: 88,
+                        right: 16,
+                        bottom: 46,
+                        left: 166,
                     },
                 },
 
@@ -948,26 +1059,12 @@ function updateComparisonChart(
             ),
         );
 
-    const maximumTime =
-        getNiceTimeMaximum(
-            Math.max(
-                0,
-                ...operators.map(
-                    function (operator) {
-                        return operator
-                            .averageDurationSeconds ??
-                            0;
-                    },
-                ),
-            ),
-        );
-
     chart.$expeditionRows =
         operators;
     chart.$expeditionRouteMaximum =
         maximumRoutes;
     chart.$expeditionTimeMaximum =
-        maximumTime;
+        TIME_AXIS_MAXIMUM_SECONDS;
 
     chart.options.scales.y.max =
         Math.max(
@@ -1013,7 +1110,7 @@ function updateComparisonChart(
                         x: normalizeMetric(
                             operator
                                 .averageDurationSeconds,
-                            maximumTime,
+                            TIME_AXIS_MAXIMUM_SECONDS,
                             TIME_SCALE_START,
                             TIME_SCALE_END,
                         ),
@@ -1033,8 +1130,8 @@ function updateComparisonChart(
 
     const chartHeight = Math.max(
         470,
-        operators.length * 48 +
-            110,
+        operators.length * 58 +
+            140,
     );
 
     chart.canvas
