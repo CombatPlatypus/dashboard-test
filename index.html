@@ -244,6 +244,25 @@
                 border: 2px solid var(--color-border) !important;
             }
 
+
+            .receipt-linehaul-controls .flex-box-between {
+                align-items: center;
+                column-gap: 10px;
+                margin: 15px 0;
+            }
+            .receipt-linehaul-controls .flex-box-between input:first-of-type{
+                flex: 1 1 0;
+            }
+            .receipt-linehaul-controls div > div:last-of-type {
+                display: flex;
+                gap: 10px;
+            }
+            .receipt-linehaul-controls div > div:last-of-type input:last-of-type {
+                flex: 0 0 86px;
+                text-align: center;
+            }
+
+
         </style>
     </head>	
 
@@ -830,7 +849,7 @@
                             <ul class="tabs flex-box-start" data-tabs id="receipt-view-tabs">
                                 <li class="tabs-title is-active">
                                     <a href="#linehaul" data-controls-target="receipt-controls-2">
-                                        <h4>Descarregamentos e Reversas</h4>
+                                        <h4>Descarregamento de LH</h4>
                                     </a>
                                 </li>
 
@@ -891,7 +910,7 @@
                                         <div class="tabs-panel is-active" id="linehaul">
                                             <div class="preview-style" id="receiptLinehaulExportArea">
                                                 <div class="title">
-                                                    <h2>Descarregamentos e Reversas</h2>
+                                                    <h2>Descarregamento de LH</h2>
                                                 </div>
 
                                                 <table>
@@ -1204,7 +1223,7 @@
                                 <!-- CONTROLES DO RELATÓRIO -->
 
                                 <div class="report-controls" id="receipt-controls">
-                                    <div class="receipt-controls-panel is-active" id="receipt-controls-1">
+                                    <div class="receipt-controls-panel" id="receipt-controls-1">
                                         <div class="title">
                                             <h4>Defina os Etiquetadores</h4>
                                         </div>
@@ -1247,7 +1266,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="receipt-controls-panel" id="receipt-controls-2" hidden>
+                                    <div class="receipt-controls-panel is-active" id="receipt-controls-2" hidden>
                                         <div class="title">
                                             <h4>Defina os LHs</h4>
                                         </div>
@@ -1255,21 +1274,25 @@
                                         <div class="padding">
                                             <div class="input-group receipt-linehaul-controls" id="receiptLinehaulControls">
                                                 <div>
-                                                    <h4 data-receipt-linehaul-label>Código do LH 1</h4>
+                                                    <h4 data-receipt-linehaul-label>Primeiro LH</h4>
 
-                                                    <div class="flex-box-start">
-                                                        <input type="text" data-receipt-linehaul-field="code" autocomplete="off" readonly disabled>
-                                                        <input type="text" data-receipt-linehaul-field="loadedOrders" maxlength="8" autocomplete="off" inputmode="numeric" pattern="[0-9]*" readonly disabled>
+                                                    <div class="flex-box-between">
+                                                        <input type="text" data-receipt-linehaul-field="" readonly disabled>
 
                                                         <div class="checkbox">
                                                             <input type="checkbox" data-receipt-linehaul-selection disabled>
                                                             <label for=""></label>
                                                         </div>
                                                     </div>
+
+                                                    <div class="flex-box-start">
+                                                        <input type="text" data-receipt-linehaul-field="code" autocomplete="off" readonly disabled>
+                                                        <input type="text" data-receipt-linehaul-field="" placeholder="Origem" aria-label="Origem do LH 1" maxlength="30" autocomplete="off">
+                                                        <input type="text" data-receipt-linehaul-field="loadedOrders" maxlength="8" autocomplete="off" inputmode="numeric" pattern="[0-9]*" readonly disabled>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-
                                     </div>
                                 </div>
                             </div>
