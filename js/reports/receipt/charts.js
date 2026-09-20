@@ -4,6 +4,10 @@ import {
     subscribeReceiptState,
 } from "./state.js";
 
+import {
+    formatReportPersonFirstName,
+} from "../core/person-name.js";
+
 let receiptAlignedComparisonChart =
     null;
 
@@ -90,32 +94,9 @@ function formatReceiptComparisonPercentage(
 function getReceiptComparisonReceiverName(
     value,
 ) {
-    const receivedValue =
-        String(
-            value ?? "",
-        ).trim();
-
-    if (!receivedValue) {
-        return "—";
-    }
-
-    const closingBracketIndex =
-        receivedValue.lastIndexOf(
-            "]",
-        );
-
-    const name =
-        closingBracketIndex !== -1
-            ? receivedValue.slice(
-                closingBracketIndex + 1,
-            )
-            : receivedValue;
-
-    return (
-        name
-            .trim()
-            .split(/\s+/)[0] ||
-        "—"
+    return formatReportPersonFirstName(
+        value,
+        "—",
     );
 }
 
@@ -701,9 +682,13 @@ function createReceiptComparisonChart(
                                     metric ===
                                     "volume"
                                 ) {
-                                    return details.labeler
-                                        ? `Etiquetador: ${details.labeler}`
-                                        : "Etiquetador: —";
+                                    return (
+                                        "Etiquetador: " +
+                                        formatReportPersonFirstName(
+                                            details.labeler,
+                                            "—",
+                                        )
+                                    );
                                 }
 
                                 if (
@@ -795,8 +780,41 @@ const RECEIPT_ALIGNED_COLUMN_GAP = 30;
 const RECEIPT_ALIGNED_VOLUME_INTERVALS = 5;
 const RECEIPT_ALIGNED_ERROR_INTERVAL = 0.2;
 const RECEIPT_ALIGNED_INITIAL_ERROR_MAXIMUM = 1;
-const RECEIPT_ALIGNED_VOLUME_COLOR = "#e4e6eb";
-const RECEIPT_ALIGNED_ERROR_COLOR = "#ffc107";
+const RECEIPT_ALIGNED_VOLUME_COLOR = "#4caf50";
+const RECEIPT_ALIGNED_ERROR_COLOR = "#f44336";
+
+const receiptAlignedVolumeAxisFormatter =
+    new Intl.NumberFormat(
+        "pt-BR",
+        {
+            maximumFractionDigits: 1,
+        },
+    );
+
+function formatReceiptAlignedVolumeAxisTick(
+    value,
+) {
+    const numericValue =
+        Number(value);
+
+    if (!Number.isFinite(numericValue)) {
+        return "—";
+    }
+
+    if (Math.abs(numericValue) >= 1000) {
+        return (
+            receiptAlignedVolumeAxisFormatter
+                .format(
+                    numericValue / 1000,
+                ) +
+            " MIL"
+        );
+    }
+
+    return formatReceiptProgressQuantity(
+        numericValue,
+    );
+}
 
 function getReceiptAlignedVolumeMaximum(
     value,
@@ -1093,7 +1111,7 @@ function drawReceiptAlignedComparison(
                     ? "right"
                     : "center";
         context.fillText(
-            formatReceiptProgressQuantity(
+            formatReceiptAlignedVolumeAxisTick(
                 value,
             ),
             positionX,
@@ -1469,9 +1487,13 @@ function createReceiptAlignedComparisonChart(
                                         .receiptMetric ===
                                     "volume"
                                 ) {
-                                    return details.labeler
-                                        ? `Etiquetador: ${details.labeler}`
-                                        : "Etiquetador: —";
+                                    return (
+                                        "Etiquetador: " +
+                                        formatReportPersonFirstName(
+                                            details.labeler,
+                                            "—",
+                                        )
+                                    );
                                 }
 
                                 return data.useParticipation
@@ -1804,14 +1826,13 @@ function renderReceiptComparison(
         null;
 
     const topErrorOperatorName =
-        topErrorOperator
-            ?.labeler
-            ?.trim() ||
-
-        topErrorOperator
-            ?.receiver ||
-
-        "—";
+        formatReportPersonFirstName(
+            topErrorOperator
+                ?.labeler ||
+                topErrorOperator
+                    ?.receiver,
+            "—",
+        );
 
     elements.topRateLabel.textContent =
         data.useParticipation

@@ -4,6 +4,10 @@ import {
     subscribeExpeditionState,
 } from "./state.js";
 
+import {
+    formatReportPersonFirstName,
+} from "../core/person-name.js";
+
 let comparisonChart = null;
 let visibilityObserver = null;
 let resizeFrame = null;
@@ -113,47 +117,9 @@ function formatTimeAxisTick(value) {
 }
 
 function getOperatorName(value) {
-    const receivedValue =
-        String(value ?? "")
-            .trim();
-
-    if (!receivedValue) {
-        return "—";
-    }
-
-    const closingBracketIndex =
-        receivedValue.lastIndexOf(
-            "]",
-        );
-
-    const name =
-        closingBracketIndex !== -1
-            ? receivedValue.slice(
-                closingBracketIndex + 1,
-            )
-            : receivedValue;
-
-    const normalizedName =
-        name.trim();
-
-    if (!normalizedName) {
-        return "—";
-    }
-
-    const firstName =
-        normalizedName
-            .split(/\s+/)[0]
-            .toLocaleLowerCase(
-                "pt-BR",
-            );
-
-    return (
-        firstName
-            .charAt(0)
-            .toLocaleUpperCase(
-                "pt-BR",
-            ) +
-        firstName.slice(1)
+    return formatReportPersonFirstName(
+        value,
+        "—",
     );
 }
 

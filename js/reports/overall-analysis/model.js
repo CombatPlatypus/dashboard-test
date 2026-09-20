@@ -11,6 +11,10 @@ import {
     getLossesRateMonthSummary,
 } from "../losses-rate/state.js";
 
+import {
+    formatReportPersonFirstName,
+} from "../core/person-name.js";
+
 const OVERALL_ANALYSIS_CAPACITY =
     20000;
 
@@ -32,45 +36,9 @@ function getOverallAnalysisContextQuantity(
 function getOverallAnalysisPersonName(
     value,
 ) {
-    const receivedValue =
-        String(value ?? "")
-            .trim();
-
-    if (!receivedValue) {
-        return null;
-    }
-
-    const closingBracketIndex =
-        receivedValue.lastIndexOf(
-            "]",
-        );
-
-    const name =
-        closingBracketIndex !== -1
-            ? receivedValue.slice(
-                closingBracketIndex + 1,
-            )
-            : receivedValue;
-
-    const firstName =
-        name
-            .trim()
-            .split(/\s+/)[0]
-            ?.toLocaleLowerCase(
-                "pt-BR",
-            ) || "";
-
-    if (!firstName) {
-        return null;
-    }
-
-    return (
-        firstName
-            .charAt(0)
-            .toLocaleUpperCase(
-                "pt-BR",
-            ) +
-        firstName.slice(1)
+    return formatReportPersonFirstName(
+        value,
+        null,
     );
 }
 

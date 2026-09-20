@@ -14,6 +14,10 @@ import {
     setReportNotification,
 } from "../report-notifications.js";
 
+import {
+    formatReportPersonFirstName,
+} from "../core/person-name.js";
+
 /* CONFIGURAÇÕES */
 
 const MINIMUM_EXPEDITION_PREVIEW_ROWS =
@@ -149,56 +153,10 @@ function formatExpeditionDuration(
 function getExpeditionOperatorName(
     value,
 ) {
-    const receivedValue =
-        String(
-            value ?? "",
-        ).trim();
-
-    if (!receivedValue) {
-        return "—";
-    }
-
-    const closingBracketIndex =
-        receivedValue.lastIndexOf(
-            "]",
-        );
-
-    const name =
-        closingBracketIndex !== -1
-            ? receivedValue.slice(
-                closingBracketIndex + 1,
-            )
-            : receivedValue;
-
-    const normalizedName =
-        name
-            .trim()
-            .replace(/\s+/g, " ");
-
-    if (!normalizedName) {
-        return "—";
-    }
-
-    return normalizedName
-        .split(" ")
-        .map(
-            function (word) {
-                const lowercaseWord =
-                    word.toLocaleLowerCase(
-                        "pt-BR",
-                    );
-
-                return (
-                    lowercaseWord
-                        .charAt(0)
-                        .toLocaleUpperCase(
-                            "pt-BR",
-                        ) +
-                    lowercaseWord.slice(1)
-                );
-            },
-        )
-        .join(" ");
+    return formatReportPersonFirstName(
+        value,
+        "—",
+    );
 }
 
 function setExpeditionInputValue(

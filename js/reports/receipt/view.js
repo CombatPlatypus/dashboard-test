@@ -12,6 +12,10 @@ import {
     resetReceiptLinehaulState,
 } from "./linehaul-state.js";
 
+import {
+    formatReportPersonFirstName,
+} from "../core/person-name.js";
+
 /* CONFIGURAÇÕES */
 
 const MINIMUM_RECEIPT_PREVIEW_ROWS = 9;
@@ -140,31 +144,9 @@ function formatReceiptErrorRate(
 function getReceiptReceiverFirstName(
     value,
 ) {
-    const receivedValue =
-        String(value ?? "")
-            .trim();
-
-    if (receivedValue === "") {
-        return "";
-    }
-
-    const closingBracketIndex =
-        receivedValue.lastIndexOf(
-            "]",
-        );
-
-    const name =
-        closingBracketIndex !== -1
-            ? receivedValue.slice(
-                closingBracketIndex + 1,
-            )
-            : receivedValue;
-
-    return (
-        name
-            .trim()
-            .split(/\s+/)[0] ||
-        ""
+    return formatReportPersonFirstName(
+        value,
+        "",
     );
 }
 
@@ -639,8 +621,10 @@ function createReceiptPreviewRow(
         "—";
 
     const labeler =
-        operator?.labeler?.trim() ||
-        "—";
+        formatReportPersonFirstName(
+            operator?.labeler,
+            "—",
+        );
 
     const packagesReceived =
         formatReceiptQuantity(
