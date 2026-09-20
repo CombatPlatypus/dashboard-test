@@ -32,6 +32,8 @@ const REPORT_NOTIFICATION_PREFIXES =
         planning: "planning",
         receipt: "receipt",
         expedition: "expedition",
+        "damage-and-losses":
+            "damageAndLosses",
         "losses-rate": "lossesRate",
         "overall-analysis":
             "overallAnalysis",

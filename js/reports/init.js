@@ -15,6 +15,10 @@ import {
 } from "./expedition/index.js";
 
 import {
+    damageAndLossesReport,
+} from "./damage-and-losses/index.js";
+
+import {
     lossesRateReport,
 } from "./losses-rate/index.js";
 
@@ -58,6 +62,10 @@ function initializeReportsPanel() {
 
     reportManager.register(
         expeditionReport,
+    );
+
+    reportManager.register(
+        damageAndLossesReport,
     );
 
     reportManager.register(

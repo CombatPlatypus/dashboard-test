@@ -1738,26 +1738,28 @@
                             <!-- BARRA DE NOTIFICAÇÕES E BOTÕES DE AÇÃO -->
 
                             <div class="flex-box-start">
-                                <div class="warning" id="" role="status" aria-live="polite" aria-atomic="true" data-notification-type="idle">
+                                <div class="warning" id="damageAndLossesNotification" role="status" aria-live="polite" aria-atomic="true" data-notification-type="idle">
                                     <div class="flex-box-start">
-                                        <img id="" src="images/geral-icons/bell-icon.svg" alt="">
+                                        <img id="damageAndLossesNotificationIcon" src="images/geral-icons/bell-icon.svg" alt="">
 
-                                        <h4 id="">
+                                        <h4 id="damageAndLossesNotificationText">
                                             Tudo em silêncio por enquanto.
                                         </h4>
                                     </div>
                                 </div>
 
                                 <div class="report-actions">
-                                    <button id="" type="button">
+                                    <button id="damageAndLossesCopyReportButton" type="button" title="Clique para copiar; segure por 1,5 s para baixar" aria-label="Copiar relatório de avarias; segure por 1,5 segundo para baixar">
                                         <img src="images/geral-icons/image-icon.svg" alt="">
                                     </button>
 
-                                    <button id="" type="button">
+                                    <button id="damageAndLossesImportButton" type="button" title="Importar planilha de avarias" aria-label="Importar planilha de avarias">
                                         <img src="images/geral-icons/import-icon.svg" alt="">
                                     </button>
 
-                                    <button id="" type="button" title="Limpar relatório">
+                                    <input id="damageAndLossesFileInput" type="file" accept=".xlsx,.xls" hidden>
+
+                                    <button id="damageAndLossesClearButton" type="button" title="Limpar relatório" aria-label="Limpar relatório de avarias">
                                         <img src="images/geral-icons/trash-basket-icon.svg" alt="">
                                     </button>
                                 </div>
@@ -1769,13 +1771,13 @@
 
                                 <!-- PPÉVIA DO RELATÓRIO -->
 
-                                <div class="preview" id="">
+                                <div class="preview" id="damageReportPreview">
                                     <div class="tabs-content" data-tabs-content="damage-and-losses-choice">
 
                                         <!-- AVARIAS DO MÊS -->
 
                                         <div class="tabs-panel is-active" id="damage">
-                                            <div class="preview-style">
+                                            <div class="preview-style" id="damageReportExportArea">
                                                 <div class="title">
                                                     <h2>Avarias do Mês</h2>
                                                 </div>
@@ -1784,7 +1786,7 @@
                                                     <div>
                                                         <div class="flex-box-start">
                                                             <img src="images/geral-icons/star-icon.svg">
-                                                            <h4 id="">—</h4>
+                                                            <h4 id="damageTotalValue">—</h4>
                                                         </div>
 
                                                         <p id="">Total de Avarias</p>
@@ -1793,7 +1795,7 @@
                                                     <div>
                                                         <div class="flex-box-start">
                                                             <img src="images/geral-icons/star-icon.svg">
-                                                            <h4 id="">—</h4>
+                                                            <h4 id="damageHubValue">—</h4>
                                                         </div>
 
                                                         <p id="">Avarias do Hub</p>
@@ -1802,7 +1804,7 @@
                                                     <div>
                                                         <div class="flex-box-start">
                                                             <img src="images/geral-icons/star-icon.svg">
-                                                            <h4 id="">—</h4>
+                                                            <h4 id="damageSocValue">—</h4>
                                                         </div>
 
                                                         <p id="">Avarias do Soc</p>
@@ -1828,10 +1830,8 @@
                                                         </div>
                                                     </div>
 
-                                                    <div>
-
-                                                        <!-- GRAFICO AQUI -->
-
+                                                    <div id="damageLastSevenDaysChartContainer">
+                                                        <canvas id="damageLastSevenDaysChart" role="img" aria-label="Avarias do Soc e do Hub nos últimos sete dias"></canvas>
                                                     </div>
                                                 </div>
                                             </div>
