@@ -27,7 +27,7 @@ const TIME_MAXIMUM_REFERENCE_SECONDS =
     10 * 60;
 const TIME_AXIS_INTERVAL_SECONDS =
     2 * 60;
-const COMPARISON_COLUMN_GAP = 15;
+const COMPARISON_COLUMN_GAP = 30;
 const ROUTES_BAR_COLOR = "#e4e6eb";
 const TIME_BAR_COLOR = "#ffc107";
 
@@ -98,6 +98,17 @@ function formatDuration(value) {
     return (
         `${formattedMinutes}:` +
         formattedSeconds
+    );
+}
+
+function formatTimeAxisTick(value) {
+    const totalSeconds = Math.max(
+        Number(value) || 0,
+        0,
+    );
+
+    return (
+        `${Math.round(totalSeconds / 60)}M`
     );
 }
 
@@ -580,7 +591,7 @@ function drawComparisonStructure(chart) {
             context.fillStyle =
                 "#bfc2c8";
             context.fillText(
-                formatDuration(
+                formatTimeAxisTick(
                     timeValue,
                 ),
                 positionX,
