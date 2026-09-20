@@ -339,11 +339,21 @@ function findReceiptLinehaulColumnByAliasPriority(
         const columnIndex =
             normalizedRow.findIndex(
                 function (value) {
-                    return (
-                        value === alias ||
-                        value.includes(
-                            alias,
-                        )
+                    return value === alias;
+                },
+            );
+
+        if (columnIndex >= 0) {
+            return columnIndex;
+        }
+    }
+
+    for (const alias of aliases) {
+        const columnIndex =
+            normalizedRow.findIndex(
+                function (value) {
+                    return value.includes(
+                        alias,
                     );
                 },
             );
