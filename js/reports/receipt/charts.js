@@ -807,7 +807,7 @@ function formatReceiptAlignedVolumeAxisTick(
                 .format(
                     numericValue / 1000,
                 ) +
-            " MIL"
+            "K"
         );
     }
 
@@ -1055,9 +1055,9 @@ function drawReceiptAlignedComparison(
         errorStart +
         columnWidth;
     const nameStart =
-        volumeStart + 10;
+        volumeStart + 5;
     const volumeBarStart = Math.min(
-        volumeStart + 120,
+        volumeStart + 115,
         volumeEnd - 80,
     );
     const axisY =
