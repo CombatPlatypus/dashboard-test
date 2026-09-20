@@ -272,6 +272,12 @@
             }
 
 
+
+            #reports #damage-and-losses .preview {
+                flex: 1 1 0;
+            }
+
+
         </style>
     </head>	
 
@@ -1765,98 +1771,80 @@
                                 </div>
                             </div>
       
-                            <!-- CONTEÚDO DO RELATÓRIO -->
+                            <!-- PPÉVIA DO RELATÓRIO -->
 
-                            <div class="flex-box-start">
+                            <div class="preview" id="damageReportPreview">
+                                <div class="tabs-content" data-tabs-content="damage-and-losses-choice">
 
-                                <!-- PPÉVIA DO RELATÓRIO -->
+                                    <!-- AVARIAS DO MÊS -->
 
-                                <div class="preview" id="damageReportPreview">
-                                    <div class="tabs-content" data-tabs-content="damage-and-losses-choice">
+                                    <div class="tabs-panel is-active" id="damage">
+                                        <div class="preview-style" id="damageReportExportArea">
+                                            <div class="title">
+                                                <h2>Avarias do Mês</h2>
+                                            </div>
 
-                                        <!-- AVARIAS DO MÊS -->
+                                            <div class="cards">
+                                                <div>
+                                                    <div class="flex-box-start">
+                                                        <img src="images/geral-icons/star-icon.svg">
+                                                        <h4 id="damageTotalValue">—</h4>
+                                                    </div>
 
-                                        <div class="tabs-panel is-active" id="damage">
-                                            <div class="preview-style" id="damageReportExportArea">
-                                                <div class="title">
-                                                    <h2>Avarias do Mês</h2>
+                                                    <p id="">Total de Avarias</p>
                                                 </div>
 
-                                                <div class="cards">
-                                                    <div>
-                                                        <div class="flex-box-start">
-                                                            <img src="images/geral-icons/star-icon.svg">
-                                                            <h4 id="damageTotalValue">—</h4>
-                                                        </div>
-
-                                                        <p id="">Total de Avarias</p>
+                                                <div>
+                                                    <div class="flex-box-start">
+                                                        <img src="images/geral-icons/star-icon.svg">
+                                                        <h4 id="damageHubValue">—</h4>
                                                     </div>
 
-                                                    <div>
-                                                        <div class="flex-box-start">
-                                                            <img src="images/geral-icons/star-icon.svg">
-                                                            <h4 id="damageHubValue">—</h4>
-                                                        </div>
-
-                                                        <p id="">Avarias do Hub</p>
-                                                    </div>
-
-                                                    <div>
-                                                        <div class="flex-box-start">
-                                                            <img src="images/geral-icons/star-icon.svg">
-                                                            <h4 id="damageSocValue">—</h4>
-                                                        </div>
-
-                                                        <p id="">Avarias do Soc</p>
-                                                    </div>
+                                                    <p id="">Avarias do Hub</p>
                                                 </div>
 
-                                                <div class="vertical-bars-chart">
-                                                    <div class="chart-title">
-                                                        <div class="flex-box-between">
-                                                            <h4>Últimos 7 Dias</h4>
+                                                <div>
+                                                    <div class="flex-box-start">
+                                                        <img src="images/geral-icons/star-icon.svg">
+                                                        <h4 id="damageSocValue">—</h4>
+                                                    </div>
 
-                                                            <div class="flex-box-start">
-                                                                <div class="type">
-                                                                    <div style="background-color: #ffc107;"></div>
-                                                                    <p>Avarias do Soc</p>
-                                                                </div>
+                                                    <p id="">Avarias do Soc</p>
+                                                </div>
+                                            </div>
 
-                                                                <div class="type">
-                                                                    <div style="background-color: #F44336;"></div>
-                                                                    <p>Avarias do Hub</p>
-                                                                </div>
+                                            <div class="vertical-bars-chart">
+                                                <div class="chart-title">
+                                                    <div class="flex-box-between">
+                                                        <h4>Últimos 7 Dias</h4>
+
+                                                        <div class="flex-box-start">
+                                                            <div class="type">
+                                                                <div style="background-color: #ffc107;"></div>
+                                                                <p>Avarias do Soc</p>
+                                                            </div>
+
+                                                            <div class="type">
+                                                                <div style="background-color: #F44336;"></div>
+                                                                <p>Avarias do Hub</p>
                                                             </div>
                                                         </div>
                                                     </div>
+                                                </div>
 
-                                                    <div id="damageLastSevenDaysChartContainer">
-                                                        <canvas id="damageLastSevenDaysChart" role="img" aria-label="Avarias do Soc e do Hub nos últimos sete dias"></canvas>
-                                                    </div>
+                                                <div id="damageLastSevenDaysChartContainer">
+                                                    <canvas id="damageLastSevenDaysChart" role="img" aria-label="Avarias do Soc e do Hub nos últimos sete dias"></canvas>
                                                 </div>
                                             </div>
                                         </div>
-
-                                        <!-- PERDAS DO MÊS -->
-
-                                        <div class="tabs-panel" id="losses">
-
-
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- CONTROLES DO RELATÓRIO -->
-
-                                <div class="report-controls">
-                                    <div class="title">
-                                        <h4>AVARIAS</h4>
                                     </div>
 
-                                    <div class="padding">
+                                    <!-- PERDAS DO MÊS -->
+
+                                    <div class="tabs-panel" id="losses">
 
 
-                                    </div>                            
+                                    </div>
                                 </div>
                             </div>
                         </div>
