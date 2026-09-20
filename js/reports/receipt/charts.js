@@ -4,10 +4,7 @@ import {
     subscribeReceiptState,
 } from "./state.js";
 
-let receiptVolumeComparisonChart =
-    null;
-
-let receiptErrorComparisonChart =
+let receiptAlignedComparisonChart =
     null;
 
 let receiptComparisonHeightObserver =
@@ -341,28 +338,16 @@ function getReceiptComparisonElements(
                 "receiptComparisonTopRateDetails",
             ),
 
-        errorChartTitle:
+        chartContainer:
             getReceiptChartElementById(
                 rootElement,
-                "receiptComparisonErrorChartTitle",
+                "receiptAlignedComparisonChartContainer",
             ),
 
-        errorChartSubtitle:
+        comparisonCanvas:
             getReceiptChartElementById(
                 rootElement,
-                "receiptComparisonErrorChartSubtitle",
-            ),
-
-        volumeCanvas:
-            getReceiptChartElementById(
-                rootElement,
-                "receiptVolumeComparisonChart",
-            ),
-
-        errorCanvas:
-            getReceiptChartElementById(
-                rootElement,
-                "receiptErrorComparisonChart",
+                "receiptAlignedComparisonChart",
             ),
     };
 }
@@ -389,16 +374,10 @@ function hasReceiptComparisonElements(
         elements.topRateDetails instanceof
             HTMLElement &&
 
-        elements.errorChartTitle instanceof
+        elements.chartContainer instanceof
             HTMLElement &&
 
-        elements.errorChartSubtitle instanceof
-            HTMLElement &&
-
-        elements.volumeCanvas instanceof
-            HTMLCanvasElement &&
-
-        elements.errorCanvas instanceof
+        elements.comparisonCanvas instanceof
             HTMLCanvasElement
     );
 }
@@ -810,6 +789,846 @@ function createReceiptComparisonChart(
     );
 }
 
+/* COMPARAÇÃO ALINHADA DE RECEBEDORES */
+
+const RECEIPT_ALIGNED_COLUMN_GAP = 30;
+const RECEIPT_ALIGNED_VOLUME_INTERVALS = 5;
+const RECEIPT_ALIGNED_ERROR_INTERVAL = 0.2;
+const RECEIPT_ALIGNED_INITIAL_ERROR_MAXIMUM = 1;
+const RECEIPT_ALIGNED_VOLUME_COLOR = "#e4e6eb";
+const RECEIPT_ALIGNED_ERROR_COLOR = "#ffc107";
+
+function getReceiptAlignedVolumeMaximum(
+    value,
+) {
+    const maximum = Math.max(
+        Math.ceil(Number(value) || 0),
+        1,
+    );
+    const roughStep =
+        maximum /
+        RECEIPT_ALIGNED_VOLUME_INTERVALS;
+    const magnitude =
+        10 ** Math.floor(
+            Math.log10(
+                roughStep,
+            ),
+        );
+    const normalizedStep =
+        roughStep /
+        magnitude;
+    const multiplier =
+        normalizedStep <= 1
+            ? 1
+            : normalizedStep <= 2
+                ? 2
+                : normalizedStep <= 5
+                    ? 5
+                    : 10;
+    const step = Math.max(
+        1,
+        Math.ceil(
+            multiplier *
+            magnitude,
+        ),
+    );
+
+    return (
+        step *
+        RECEIPT_ALIGNED_VOLUME_INTERVALS
+    );
+}
+
+function getReceiptAlignedErrorMaximum(
+    value,
+) {
+    return Math.max(
+        RECEIPT_ALIGNED_INITIAL_ERROR_MAXIMUM,
+        Math.ceil(
+            (Number(value) || 0) /
+            RECEIPT_ALIGNED_ERROR_INTERVAL,
+        ) *
+            RECEIPT_ALIGNED_ERROR_INTERVAL,
+    );
+}
+
+function normalizeReceiptAlignedMetric(
+    value,
+    maximum,
+    start,
+    end,
+) {
+    const ratio = Math.max(
+        0,
+        Math.min(
+            (Number(value) || 0) /
+                maximum,
+            1,
+        ),
+    );
+
+    return start +
+        (end - start) * ratio;
+}
+
+function drawReceiptAlignedRoundedBar(
+    context,
+    positionX,
+    positionY,
+    width,
+    height,
+    fillStyle,
+) {
+    const safeWidth = Math.max(
+        Number(width) || 0,
+        0,
+    );
+
+    if (safeWidth === 0) {
+        return;
+    }
+
+    const radius = Math.min(
+        3,
+        safeWidth / 2,
+        height / 2,
+    );
+
+    context.fillStyle =
+        fillStyle;
+    context.beginPath();
+    context.moveTo(
+        positionX + radius,
+        positionY,
+    );
+    context.lineTo(
+        positionX + safeWidth - radius,
+        positionY,
+    );
+    context.quadraticCurveTo(
+        positionX + safeWidth,
+        positionY,
+        positionX + safeWidth,
+        positionY + radius,
+    );
+    context.lineTo(
+        positionX + safeWidth,
+        positionY + height - radius,
+    );
+    context.quadraticCurveTo(
+        positionX + safeWidth,
+        positionY + height,
+        positionX + safeWidth - radius,
+        positionY + height,
+    );
+    context.lineTo(
+        positionX + radius,
+        positionY + height,
+    );
+    context.quadraticCurveTo(
+        positionX,
+        positionY + height,
+        positionX,
+        positionY + height - radius,
+    );
+    context.lineTo(
+        positionX,
+        positionY + radius,
+    );
+    context.quadraticCurveTo(
+        positionX,
+        positionY,
+        positionX + radius,
+        positionY,
+    );
+    context.fill();
+}
+
+function drawReceiptAlignedMetricLabel(
+    context,
+    label,
+    barEnd,
+    panelEnd,
+    positionY,
+) {
+    const labelWidth =
+        context.measureText(
+            label,
+        ).width;
+    let positionX =
+        barEnd + 10;
+
+    context.textAlign =
+        "left";
+
+    if (
+        positionX + labelWidth >
+        panelEnd - 4
+    ) {
+        positionX =
+            panelEnd - 8;
+        context.textAlign =
+            "right";
+    }
+
+    context.strokeStyle =
+        "#18191a";
+    context.lineWidth = 1;
+    context.fillStyle =
+        "#e4e6eb";
+    context.strokeText(
+        label,
+        positionX,
+        positionY,
+    );
+    context.fillText(
+        label,
+        positionX,
+        positionY,
+    );
+}
+
+function drawReceiptAlignedComparison(
+    chart,
+) {
+    const rows =
+        chart.$receiptAlignedRows || [];
+    const context =
+        chart.ctx;
+    const chartArea =
+        chart.chartArea;
+    const yScale =
+        chart.scales.y;
+
+    if (
+        !chartArea ||
+        !yScale
+    ) {
+        return;
+    }
+
+    applyReceiptCanvasTextSpacing(
+        chart,
+    );
+
+    const volumeMaximum =
+        chart.$receiptAlignedVolumeMaximum ||
+        1;
+    const errorMaximum =
+        chart.$receiptAlignedErrorMaximum ||
+        RECEIPT_ALIGNED_INITIAL_ERROR_MAXIMUM;
+    const comparisonWidth =
+        chartArea.right -
+        chartArea.left;
+    const columnWidth =
+        (
+            comparisonWidth -
+            RECEIPT_ALIGNED_COLUMN_GAP
+        ) / 2;
+    const volumeStart =
+        chartArea.left;
+    const volumeEnd =
+        volumeStart +
+        columnWidth;
+    const errorStart =
+        volumeEnd +
+        RECEIPT_ALIGNED_COLUMN_GAP;
+    const errorEnd =
+        errorStart +
+        columnWidth;
+    const nameStart =
+        volumeStart + 10;
+    const volumeBarStart = Math.min(
+        volumeStart + 120,
+        volumeEnd - 80,
+    );
+    const axisY =
+        chartArea.bottom + 8;
+    const barHeight = 20;
+
+    context.save();
+    context.textBaseline =
+        "middle";
+    context.font =
+        '500 14px "Open Sans", sans-serif';
+    context.fillStyle =
+        "#bfc2c8";
+    context.strokeStyle =
+        "rgba(82, 82, 82, 0.45)";
+    context.lineWidth = 1;
+
+    for (
+        let index = 0;
+        index <= RECEIPT_ALIGNED_VOLUME_INTERVALS;
+        index += 1
+    ) {
+        const ratio =
+            index /
+            RECEIPT_ALIGNED_VOLUME_INTERVALS;
+        const value =
+            volumeMaximum *
+            ratio;
+        const positionX =
+            volumeBarStart +
+            (
+                volumeEnd -
+                volumeBarStart
+            ) * ratio;
+
+        context.beginPath();
+        context.moveTo(
+            positionX,
+            chartArea.top,
+        );
+        context.lineTo(
+            positionX,
+            chartArea.bottom,
+        );
+        context.stroke();
+        context.textAlign =
+            index === 0
+                ? "left"
+                : index ===
+                    RECEIPT_ALIGNED_VOLUME_INTERVALS
+                    ? "right"
+                    : "center";
+        context.fillText(
+            formatReceiptProgressQuantity(
+                value,
+            ),
+            positionX,
+            axisY + 16,
+        );
+    }
+
+    const errorIntervalCount = Math.round(
+        errorMaximum /
+        RECEIPT_ALIGNED_ERROR_INTERVAL,
+    );
+
+    for (
+        let index = 0;
+        index <= errorIntervalCount;
+        index += 1
+    ) {
+        const value = Math.min(
+            index *
+                RECEIPT_ALIGNED_ERROR_INTERVAL,
+            errorMaximum,
+        );
+        const ratio =
+            value /
+            errorMaximum;
+        const positionX =
+            errorStart +
+            (errorEnd - errorStart) *
+                ratio;
+
+        context.beginPath();
+        context.moveTo(
+            positionX,
+            chartArea.top,
+        );
+        context.lineTo(
+            positionX,
+            chartArea.bottom,
+        );
+        context.stroke();
+        context.textAlign =
+            index === 0
+                ? "left"
+                : index ===
+                    errorIntervalCount
+                    ? "right"
+                    : "center";
+        context.fillText(
+            `${Math.round(value * 100)}%`,
+            positionX,
+            axisY + 16,
+        );
+    }
+
+    context.strokeStyle =
+        "rgba(82, 82, 82, 0.7)";
+    [
+        chartArea.top,
+        chartArea.bottom,
+    ].forEach(
+        function (positionY) {
+            context.beginPath();
+            context.moveTo(
+                volumeStart,
+                positionY,
+            );
+            context.lineTo(
+                errorEnd,
+                positionY,
+            );
+            context.stroke();
+        },
+    );
+
+    if (rows.length === 0) {
+        context.font =
+            '600 14px "Open Sans", sans-serif';
+        context.fillStyle =
+            "#bfc2c8";
+        context.textAlign =
+            "center";
+        context.fillText(
+            "Importe os dados para comparar os recebedores.",
+            (
+                chartArea.left +
+                chartArea.right
+            ) / 2,
+            (
+                chartArea.top +
+                chartArea.bottom
+            ) / 2,
+        );
+        context.restore();
+        return;
+    }
+
+    rows.forEach(
+        function (operator, index) {
+            const positionY =
+                yScale.getPixelForValue(
+                    index,
+                );
+            const rowBottom =
+                yScale.getPixelForValue(
+                    index + 0.5,
+                );
+            const volumeValue =
+                operator.packagesReceived ??
+                0;
+            const errorValue =
+                operator.errorMetric;
+            const volumeBarEnd =
+                volumeBarStart +
+                (
+                    volumeEnd -
+                    volumeBarStart
+                ) *
+                Math.min(
+                    volumeValue /
+                        volumeMaximum,
+                    1,
+                );
+            const errorBarEnd =
+                errorValue === null
+                    ? errorStart
+                    : errorStart +
+                        (
+                            errorEnd -
+                            errorStart
+                        ) *
+                        Math.min(
+                            errorValue /
+                                errorMaximum,
+                            1,
+                        );
+
+            context.strokeStyle =
+                "rgba(82, 82, 82, 0.4)";
+            context.lineWidth = 1;
+            context.beginPath();
+            context.moveTo(
+                volumeStart,
+                rowBottom,
+            );
+            context.lineTo(
+                errorEnd,
+                rowBottom,
+            );
+            context.stroke();
+
+            context.font =
+                '600 14px "Open Sans", sans-serif';
+            context.fillStyle =
+                "#e4e6eb";
+            context.textAlign =
+                "left";
+            context.fillText(
+                operator.receiver,
+                nameStart,
+                positionY,
+            );
+
+            drawReceiptAlignedRoundedBar(
+                context,
+                volumeBarStart,
+                positionY -
+                    barHeight / 2,
+                volumeEnd -
+                    volumeBarStart,
+                barHeight,
+                "rgba(228, 230, 235, 0.07)",
+            );
+            drawReceiptAlignedRoundedBar(
+                context,
+                volumeBarStart,
+                positionY -
+                    barHeight / 2,
+                volumeBarEnd -
+                    volumeBarStart,
+                barHeight,
+                RECEIPT_ALIGNED_VOLUME_COLOR,
+            );
+            drawReceiptAlignedRoundedBar(
+                context,
+                errorStart,
+                positionY -
+                    barHeight / 2,
+                errorEnd - errorStart,
+                barHeight,
+                "rgba(228, 230, 235, 0.07)",
+            );
+
+            if (errorValue !== null) {
+                drawReceiptAlignedRoundedBar(
+                    context,
+                    errorStart,
+                    positionY -
+                        barHeight / 2,
+                    errorBarEnd -
+                        errorStart,
+                    barHeight,
+                    RECEIPT_ALIGNED_ERROR_COLOR,
+                );
+            }
+
+            context.font =
+                '600 14px "Open Sans", sans-serif';
+            drawReceiptAlignedMetricLabel(
+                context,
+                formatReceiptProgressQuantity(
+                    volumeValue,
+                ),
+                volumeBarEnd,
+                volumeEnd,
+                positionY,
+            );
+
+            if (errorValue === null) {
+                context.fillStyle =
+                    "#bfc2c8";
+                context.textAlign =
+                    "left";
+                context.fillText(
+                    "—",
+                    errorStart + 8,
+                    positionY,
+                );
+            } else {
+                drawReceiptAlignedMetricLabel(
+                    context,
+                    formatReceiptComparisonPercentage(
+                        errorValue,
+                    ),
+                    errorBarEnd,
+                    errorEnd,
+                    positionY,
+                );
+            }
+        },
+    );
+
+    context.restore();
+}
+
+const receiptAlignedComparisonPlugin = {
+    id: "receiptAlignedComparison",
+
+    beforeDatasetsDraw(chart) {
+        drawReceiptAlignedComparison(
+            chart,
+        );
+    },
+};
+
+function createReceiptAlignedComparisonChart(
+    canvas,
+) {
+    return new window.Chart(
+        canvas,
+        {
+            type: "scatter",
+            data: {
+                datasets: [
+                    {
+                        label: "Volume recebido",
+                        receiptMetric: "volume",
+                        data: [],
+                        pointRadius: 0,
+                        pointHoverRadius: 0,
+                        pointHitRadius: 12,
+                        pointBackgroundColor:
+                            "transparent",
+                        pointBorderWidth: 0,
+                    },
+                    {
+                        label: "Taxa de erros",
+                        receiptMetric: "error",
+                        data: [],
+                        pointRadius: 0,
+                        pointHoverRadius: 0,
+                        pointHitRadius: 12,
+                        pointBackgroundColor:
+                            "transparent",
+                        pointBorderWidth: 0,
+                    },
+                ],
+            },
+            plugins: [
+                receiptAlignedComparisonPlugin,
+            ],
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                devicePixelRatio:
+                    RECEIPT_CHART_PIXEL_RATIO,
+                parsing: false,
+                layout: {
+                    padding: {
+                        top: 16,
+                        right: 16,
+                        bottom: 46,
+                        left: 16,
+                    },
+                },
+                animation: {
+                    duration: 250,
+                },
+                interaction: {
+                    intersect: true,
+                    mode: "nearest",
+                },
+                plugins: {
+                    legend: {
+                        display: false,
+                    },
+                    tooltip: {
+                        titleFont: {
+                            family:
+                                '"Open Sans", sans-serif',
+                            size: 14,
+                            weight: "600",
+                        },
+                        bodyFont: {
+                            family:
+                                '"Open Sans", sans-serif',
+                            size: 14,
+                        },
+                        callbacks: {
+                            title(contexts) {
+                                return contexts[0]
+                                    ?.raw
+                                    ?.receiver ||
+                                    "";
+                            },
+                            label(context) {
+                                const data =
+                                    context.raw;
+
+                                if (
+                                    context
+                                        .dataset
+                                        .receiptMetric ===
+                                    "volume"
+                                ) {
+                                    return (
+                                        "Pacotes recebidos: " +
+                                        formatReceiptProgressQuantity(
+                                            data.actualValue,
+                                        )
+                                    );
+                                }
+
+                                return (
+                                    (
+                                        data.useParticipation
+                                            ? "Participação nos erros: "
+                                            : "Taxa de erros: "
+                                    ) +
+                                    formatReceiptComparisonPercentage(
+                                        data.actualValue,
+                                    )
+                                );
+                            },
+                            afterLabel(context) {
+                                const data =
+                                    context.raw;
+                                const details =
+                                    data.details;
+
+                                if (
+                                    context
+                                        .dataset
+                                        .receiptMetric ===
+                                    "volume"
+                                ) {
+                                    return details.labeler
+                                        ? `Etiquetador: ${details.labeler}`
+                                        : "Etiquetador: —";
+                                }
+
+                                return data.useParticipation
+                                    ? (
+                                        "Erros: " +
+                                        formatReceiptProgressQuantity(
+                                            details.errorQuantity,
+                                        ) +
+                                        " de " +
+                                        formatReceiptProgressQuantity(
+                                            data.totalErrors,
+                                        )
+                                    )
+                                    : (
+                                        "Erros: " +
+                                        formatReceiptProgressQuantity(
+                                            details.errorQuantity,
+                                        ) +
+                                        " de " +
+                                        formatReceiptProgressQuantity(
+                                            details.packagesReceived,
+                                        ) +
+                                        " pacotes"
+                                    );
+                            },
+                        },
+                    },
+                },
+                scales: {
+                    x: {
+                        type: "linear",
+                        display: false,
+                        min: 0,
+                        max: 100,
+                    },
+                    y: {
+                        type: "linear",
+                        display: false,
+                        reverse: true,
+                        min: -0.5,
+                        max: 0.5,
+                    },
+                },
+            },
+        },
+    );
+}
+
+function updateReceiptAlignedComparisonChart(
+    chart,
+    rows,
+    useParticipation,
+    totalErrors,
+) {
+    const volumeMaximum =
+        getReceiptAlignedVolumeMaximum(
+            Math.max(
+                0,
+                ...rows.map(
+                    function (operator) {
+                        return operator
+                            .packagesReceived ??
+                            0;
+                    },
+                ),
+            ),
+        );
+    const errorMaximum =
+        getReceiptAlignedErrorMaximum(
+            Math.max(
+                0,
+                ...rows.map(
+                    function (operator) {
+                        return operator
+                            .errorMetric ??
+                            0;
+                    },
+                ),
+            ),
+        );
+
+    chart.$receiptAlignedRows =
+        rows;
+    chart.$receiptAlignedVolumeMaximum =
+        volumeMaximum;
+    chart.$receiptAlignedErrorMaximum =
+        errorMaximum;
+    chart.options.scales.y.max =
+        Math.max(
+            rows.length - 0.5,
+            0.5,
+        );
+
+    chart.data.datasets[0].data =
+        rows.map(
+            function (operator, index) {
+                return {
+                    x: normalizeReceiptAlignedMetric(
+                        operator.packagesReceived,
+                        volumeMaximum,
+                        0,
+                        49,
+                    ),
+                    y: index,
+                    actualValue:
+                        operator.packagesReceived,
+                    receiver:
+                        operator.receiver,
+                    details: operator,
+                };
+            },
+        );
+    chart.data.datasets[1].data =
+        rows.flatMap(
+            function (operator, index) {
+                if (
+                    operator.errorMetric ===
+                    null
+                ) {
+                    return [];
+                }
+
+                return [
+                    {
+                        x: normalizeReceiptAlignedMetric(
+                            operator.errorMetric,
+                            errorMaximum,
+                            51,
+                            100,
+                        ),
+                        y: index,
+                        actualValue:
+                            operator.errorMetric,
+                        receiver:
+                            operator.receiver,
+                        details: operator,
+                        useParticipation,
+                        totalErrors,
+                    },
+                ];
+            },
+        );
+
+    const chartHeight = Math.max(
+        470,
+        rows.length * 58 +
+            85,
+    );
+
+    chart.canvas
+        .parentElement
+        .style.height =
+            `${chartHeight}px`;
+    chart.resize();
+    chart.update();
+}
+
 function createReceiptComparisonData(
     state,
 ) {
@@ -1046,109 +1865,12 @@ function renderReceiptComparison(
                     );
         }
 
-    elements
-        .errorChartTitle
-        .textContent =
-            data.useParticipation
-                ? "Participação nos Erros por Recebedor"
-                : "Taxa de Erros por Recebedor";
-
-    elements
-        .errorChartSubtitle
-        .textContent =
-            data.useParticipation
-                ? (
-                    "Erros do Recebedor ÷ Total de Erros"
-                )
-                : (
-                    "Erros de Etiqueta ÷ Pacotes Recebidos"
-                );
-
-
-    const volumeDataset =
-        receiptVolumeComparisonChart
-            .data
-            .datasets[0];
-
-    receiptVolumeComparisonChart
-        .data
-        .labels =
-            volumeRanking.map(
-                function (
-                    operator,
-                ) {
-                    return operator.receiver;
-                },
-            );
-
-    volumeDataset.data =
-        volumeRanking.map(
-            function (
-                operator,
-            ) {
-                return (
-                    operator
-                        .packagesReceived
-                );
-            },
-        );
-
-    volumeDataset.receiptDetails =
-        volumeRanking;
-
-    receiptVolumeComparisonChart
-        .update();
-
-    const errorDataset =
-        receiptErrorComparisonChart
-            .data
-            .datasets[0];
-
-    receiptErrorComparisonChart
-        .data
-        .labels =
-            errorRanking.map(
-                function (
-                    operator,
-                ) {
-                    return operator.receiver;
-                },
-            );
-
-    errorDataset.data =
-        errorRanking.map(
-            function (
-                operator,
-            ) {
-                return operator.errorMetric;
-            },
-        );
-
-    errorDataset.receiptMode =
-        data.useParticipation
-            ? "participation"
-            : "rate";
-
-    errorDataset.receiptDetails =
-        errorRanking.map(
-            function (
-                operator,
-            ) {
-                return {
-                    ...operator,
-
-                    totalErrors:
-                        data.summary
-                            .totalErrors,
-                };
-            },
-        );
-
-    errorDataset.backgroundColor =
-        "#F44336";
-
-    receiptErrorComparisonChart
-        .update();
+    updateReceiptAlignedComparisonChart(
+        receiptAlignedComparisonChart,
+        volumeRanking,
+        data.useParticipation,
+        data.summary.totalErrors,
+    );
 }
 
 function observeReceiptComparisonVisibility(
@@ -1172,8 +1894,7 @@ function observeReceiptComparisonVisibility(
                 window.requestAnimationFrame(
                     function () {
                         [
-                            receiptVolumeComparisonChart,
-                            receiptErrorComparisonChart,
+                            receiptAlignedComparisonChart,
                         ].forEach(
                             function (
                                 chart,
@@ -1309,8 +2030,7 @@ function initializeReceiptComparisonHeight(
                     window.requestAnimationFrame(
                         function () {
                             [
-                                receiptVolumeComparisonChart,
-                                receiptErrorComparisonChart,
+                                receiptAlignedComparisonChart,
                             ].forEach(
                                 function (
                                     chart,
@@ -1387,16 +2107,9 @@ function initializeReceiptComparisonCharts(
         .receiptComparisonInitialized =
             "true";
 
-    receiptVolumeComparisonChart =
-        createReceiptComparisonChart(
-            elements.volumeCanvas,
-            "volume",
-        );
-
-    receiptErrorComparisonChart =
-        createReceiptComparisonChart(
-            elements.errorCanvas,
-            "error",
+    receiptAlignedComparisonChart =
+        createReceiptAlignedComparisonChart(
+            elements.comparisonCanvas,
         );
 
     subscribeReceiptState(
