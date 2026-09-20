@@ -485,6 +485,10 @@
         text-align: center;
     }
 
+    #damage-and-losses .tabs {
+        grid-template-columns: repeat(auto-fit, minmax(299px, 1fr));
+    }
+
 /* ESTILOS ÚNICOS DE CADA RELATÓRIO */
 
     /* PLANEJAMENTO - ESTRUTURA DA PLANILHA */
