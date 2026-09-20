@@ -16,8 +16,8 @@ const CHART_PIXEL_RATIO = Math.max(
 );
 
 const ROUTES_SCALE_START = 0;
-const ROUTES_SCALE_END = 42;
-const TIME_SCALE_START = 58;
+const ROUTES_SCALE_END = 48;
+const TIME_SCALE_START = 52;
 const TIME_SCALE_END = 100;
 const ROUTE_SCALE_INTERVALS = 5;
 const TIME_AXIS_MAXIMUM_SECONDS =
@@ -31,7 +31,9 @@ const TIME_AXIS_TICKS = [
     6 * 60,
     8 * 60,
     10 * 60,
-    15 * 60,
+    12 * 60,
+    14 * 60,
+    16 * 60,
     18 * 60,
 ];
 const ROUTES_BAR_COLOR = "#e4e6eb";
@@ -477,10 +479,6 @@ function drawComparisonStructure(chart) {
         );
     const nameStart =
         chartArea.left - 156;
-    const headerTitleY =
-        chartArea.top - 57;
-    const headerSubtitleY =
-        chartArea.top - 37;
     const axisY =
         chartArea.bottom + 8;
     const barHeight = 20;
@@ -490,41 +488,9 @@ function drawComparisonStructure(chart) {
         "middle";
 
     context.font =
-        '600 15px "Open Sans", sans-serif';
-    context.fillStyle =
-        "#e4e6eb";
-    context.textAlign =
-        "left";
-    context.fillText(
-        "Conferente",
-        nameStart,
-        headerTitleY,
-    );
-    context.fillText(
-        "VOLUME",
-        routeStart,
-        headerTitleY,
-    );
-    context.fillText(
-        "TEMPO MÉDIO",
-        timeStart,
-        headerTitleY,
-    );
-
-    context.font =
-        '500 12px "Open Sans", sans-serif';
+        '500 10px "Open Sans", sans-serif';
     context.fillStyle =
         "#bfc2c8";
-    context.fillText(
-        "rotas conferidas",
-        routeStart,
-        headerSubtitleY,
-    );
-    context.fillText(
-        "menor é melhor",
-        timeStart,
-        headerSubtitleY,
-    );
 
     context.strokeStyle =
         "rgba(82, 82, 82, 0.45)";
@@ -915,7 +881,7 @@ function createComparisonChart(canvas) {
 
                 layout: {
                     padding: {
-                        top: 88,
+                        top: 38,
                         right: 16,
                         bottom: 46,
                         left: 166,
@@ -1131,7 +1097,7 @@ function updateComparisonChart(
     const chartHeight = Math.max(
         470,
         operators.length * 58 +
-            140,
+            105,
     );
 
     chart.canvas
