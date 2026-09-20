@@ -271,6 +271,22 @@ function createOverallAnalysisData(
             reportContext.plannedVolume,
         );
 
+    const expeditedVolume =
+        hasExpeditionData
+            ? expeditionSummary
+                .volumeChecked
+            : null;
+
+    const planningGap =
+        plannedVolume !== null &&
+        expeditedVolume !== null
+            ? Math.max(
+                plannedVolume -
+                    expeditedVolume,
+                0,
+            )
+            : null;
+
     const configuredCapacity =
         getOverallAnalysisContextQuantity(
             reportContext.shiftCapacity,
@@ -383,13 +399,13 @@ function createOverallAnalysisData(
                 receivedVolume,
 
             expedited:
-                hasExpeditionData
-                    ? expeditionSummary
-                        .volumeChecked
-                    : null,
+                expeditedVolume,
 
             floor:
-                floorVolume,
+                planningGap,
+
+            gap:
+                planningGap,
         },
 
         processing: {

@@ -16,6 +16,8 @@ let receiptComparisonHeightObserver =
 let receiptComparisonHeightFrame =
     null;
 
+let receiptProgressElements = null;
+
 /* FORMATADORES */
 
 const receiptProgressQuantityFormatter =
@@ -280,6 +282,21 @@ function renderReceiptProgress(
         "aria-valuetext",
         `${formattedPercentage} do volume esperado foi recebido.`,
     );
+}
+
+function renderReceiptCharts(
+    state = getReceiptState(),
+) {
+    if (!receiptProgressElements) {
+        return false;
+    }
+
+    renderReceiptProgress(
+        receiptProgressElements,
+        state,
+    );
+
+    return true;
 }
 
 /* COMPARAÇÃO DE RECEBEDORES */
@@ -1462,25 +1479,19 @@ function initializeReceiptCharts(
         .receiptProgressInitialized =
             "true";
 
+    receiptProgressElements =
+        elements;
+
     subscribeReceiptState(
-        function (
-            state,
-        ) {
-            renderReceiptProgress(
-                elements,
-                state,
-            );
-        },
+        renderReceiptCharts,
     );
 
-    renderReceiptProgress(
-        elements,
-        getReceiptState(),
-    );
+    renderReceiptCharts();
 
     return true;
 }
 
 export {
     initializeReceiptCharts,
+    renderReceiptCharts,
 };

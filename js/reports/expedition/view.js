@@ -459,7 +459,7 @@ function setExpeditionGeneralControlsAvailability(
         disabled;
 
     elements.floorVolumeInput.readOnly =
-        hasImportedFile;
+        false;
 
     elements.unknownInput.disabled =
         disabled;
@@ -1416,6 +1416,11 @@ function bindExpeditionEvents(
             },
         );
     }
+
+    bindManualQuantityInput(
+        elements.floorVolumeInput,
+        "floorVolume",
+    );
 
     bindManualQuantityInput(
         elements.unknownInput,

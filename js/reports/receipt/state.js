@@ -149,8 +149,6 @@ function createReceiptOperatorRecord(
 /* ESTADO DO RECEBIMENTO */
 
 const receiptState = {
-    expectedVolume: null,
-
     useTotalErrorParticipation:
         false,
 
@@ -160,13 +158,16 @@ const receiptState = {
 /* CRIA UMA CÓPIA DO ESTADO */
 
 function getReceiptState() {
+    const reportContext =
+        getReportContext();
+
     return {
         window:
-            getReportContext()
-                .window,
+            reportContext.window,
 
         expectedVolume:
-            receiptState.expectedVolume,
+            reportContext
+                .plannedVolume,
 
         useTotalErrorParticipation:
             receiptState
@@ -335,6 +336,14 @@ function updateReceiptGeneralField(
     if (field === "window") {
         return updateReportContextField(
             field,
+            value,
+        );
+    } else if (
+        field ===
+        "expectedVolume"
+    ) {
+        return updateReportContextField(
+            "plannedVolume",
             value,
         );
     } else if (
@@ -583,8 +592,6 @@ function replaceReceiptOperators(
 /* LIMPA O RELATÓRIO */
 
 function resetReceiptReport() {
-    receiptState.expectedVolume = null;
-
     receiptState
         .useTotalErrorParticipation =
             false;
@@ -613,10 +620,21 @@ function restoreReceiptState(
         return false;
     }
 
-    receiptState.expectedVolume =
+    const legacyExpectedVolume =
         normalizeReceiptQuantity(
             sessionState.expectedVolume,
         );
+
+    if (
+        getReportContext()
+            .plannedVolume === null &&
+        legacyExpectedVolume !== null
+    ) {
+        updateReportContextField(
+            "plannedVolume",
+            legacyExpectedVolume,
+        );
+    }
 
     receiptState
         .useTotalErrorParticipation =

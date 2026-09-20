@@ -1639,6 +1639,7 @@ function updateExpeditionManualQuantity(
     value,
 ) {
     if (
+        field !== "floorVolume" &&
         field !== "unknownOrders" &&
         field !== "exceptionOrders" &&
         field !== "revertedErrors"

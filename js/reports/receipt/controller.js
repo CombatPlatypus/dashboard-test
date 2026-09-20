@@ -12,6 +12,7 @@ import {
 
 import {
     initializeReceiptCharts,
+    renderReceiptCharts,
 } from "./charts.js";
 
 import {
@@ -108,6 +109,11 @@ function renderReceiptController() {
             state,
         );
 
+    const chartsRendered =
+        renderReceiptCharts(
+            state,
+        );
+
     const linehaulRendered =
         renderReceiptLinehaulView(
             getReceiptLinehaulState(),
@@ -118,6 +124,7 @@ function renderReceiptController() {
     );
 
     return receiptRendered &&
+        chartsRendered &&
         linehaulRendered;
 }
 

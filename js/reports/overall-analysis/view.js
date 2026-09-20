@@ -316,6 +316,11 @@ function getOverallAnalysisViewElements(
                 "overallAnalysisFloor",
             ),
 
+        flowStatus:
+            getElement(
+                "overallAnalysisFlowStatus",
+            ),
+
         fastestReceiver:
             getElement(
                 "overallAnalysisFastestReceiver",
@@ -529,6 +534,19 @@ function renderOverallAnalysisView(
         formatOverallAnalysisQuantity(
             data.flow.floor,
         );
+
+    elements.flowStatus.textContent =
+        data.flow.gap === null
+            ? "—"
+            : data.flow.gap === 0
+                ? "Piso Zerado"
+                : (
+                    "Gap de " +
+                    formatOverallAnalysisQuantity(
+                        data.flow.gap,
+                    ) +
+                    " Em Relação ao Planejamento"
+                );
 
     elements.fastestReceiver.textContent =
         data.highlights.fastestReceiver ||

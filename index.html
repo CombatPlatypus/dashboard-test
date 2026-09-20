@@ -243,10 +243,6 @@
                 height: 50px !important;
                 border: 2px solid var(--color-border) !important;
             }
-            .global-inputs .select2-container{
-                width: 100%  !important;
-            }
-
 
         </style>
     </head>	
@@ -384,7 +380,7 @@
                             <div>
                                 <h4>Janela do Turno</h4>
 
-                                <select id="reportWindowInput" class="standard-select" aria-label="Janela do Turno">
+                                <select id="reportWindowInput" class="standard-select" aria-label="Janela do Turno" style="width: 100%">
                                     <option value="AM">AM</option>
                                     <option value="PM1">PM1</option>
                                     <option value="PM2">PM2</option>
@@ -1413,7 +1409,7 @@
                                                             <th>Rotas Conferidas</th>
                                                             <th>Volume Conferido</th>
                                                             <th>Volume no Piso</th>
-                                                            <th>Tempo de Expedição</th>
+                                                            <th>Duração</th>
                                                         </tr>
                                                     </thead>
 
@@ -2085,7 +2081,7 @@
                                                         <img src="images/geral-icons/forklift-icon.svg">
 
                                                         <div>
-                                                            <h4>No Piso</h4>
+                                                            <h4>Backlog no Piso</h4>
                                                             <p id="overallAnalysisFloor">—</p>
                                                         </div>
                                                     </div>
@@ -2093,7 +2089,7 @@
 
                                                 <div class="dashed-border"></div>
 
-                                                <h5 id="">- Saldo Final de Pacotes</h5>
+                                                <h5 id="overallAnalysisFlowStatus">—</h5>
                                             </div>
                                         </div>
 
@@ -2177,7 +2173,7 @@
                                                         <th>Rotas Conferidas</th>
                                                         <th>Volume Conferido</th>
                                                         <th>Volume no Piso</th>
-                                                        <th>Tempo de Expedição</th>
+                                                        <th>Duração</th>
                                                     </tr>
                                                 </thead>
 
