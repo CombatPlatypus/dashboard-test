@@ -271,7 +271,16 @@
                 border: 1px solid var(--color-border);
                 border-radius: 0 0 5px 5px;
             }
-            
+            .aligned-comparison-chart > h3 {
+                margin: 0 0 5px;
+                text-align: center;
+            }
+            .aligned-comparison-chart > p {
+                margin: 0 0 15px 0;
+                color: var(--color-gray-p);
+                font-size: 14px;
+                text-align: center;
+            }
             .aligned-comparison-chart > div {
                 min-height: 1269px;
             }
@@ -1527,6 +1536,8 @@
 
 
                                                 <div class="aligned-comparison-chart">
+                                                    <h3>Volume Recebido por Recebedor</h3>
+                                                    <p>Distribuição dos pacotes processados.</p>
 
                                                     <div id="expeditionAlignedComparisonChartContainer">
                                                         <canvas id="expeditionAlignedComparisonChart" role="img" aria-label="Comparação alinhada entre rotas conferidas e tempo médio por conferente"></canvas>
