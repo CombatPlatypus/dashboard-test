@@ -16,26 +16,18 @@ const CHART_PIXEL_RATIO = Math.max(
 );
 
 const ROUTES_SCALE_START = 0;
-const ROUTES_SCALE_END = 48;
-const TIME_SCALE_START = 52;
+const ROUTES_SCALE_END = 49;
+const TIME_SCALE_START = 51;
 const TIME_SCALE_END = 100;
-const ROUTE_SCALE_INTERVALS = 5;
-const TIME_AXIS_MAXIMUM_SECONDS =
-    18 * 60;
+const INITIAL_ROUTE_AXIS_MAXIMUM = 12;
+const ROUTE_AXIS_INTERVAL = 2;
+const INITIAL_TIME_AXIS_MAXIMUM_SECONDS =
+    12 * 60;
 const TIME_MAXIMUM_REFERENCE_SECONDS =
     10 * 60;
-const TIME_AXIS_TICKS = [
-    0,
-    2 * 60,
-    4 * 60,
-    6 * 60,
-    8 * 60,
-    10 * 60,
-    12 * 60,
-    14 * 60,
-    16 * 60,
-    18 * 60,
-];
+const TIME_AXIS_INTERVAL_SECONDS =
+    2 * 60;
+const COMPARISON_COLUMN_GAP = 15;
 const ROUTES_BAR_COLOR = "#e4e6eb";
 const TIME_BAR_COLOR = "#ffc107";
 
@@ -255,43 +247,45 @@ function applyTextSpacing(chart) {
 function getNiceRouteMaximum(value) {
     const maximum = Math.max(
         Math.ceil(Number(value) || 0),
-        1,
+        INITIAL_ROUTE_AXIS_MAXIMUM,
     );
 
-    const roughStep =
+    return Math.ceil(
         maximum /
-        ROUTE_SCALE_INTERVALS;
+        ROUTE_AXIS_INTERVAL,
+    ) * ROUTE_AXIS_INTERVAL;
+}
 
-    const magnitude =
-        10 ** Math.floor(
-            Math.log10(
-                roughStep,
-            ),
-        );
-
-    const normalizedStep =
-        roughStep /
-        magnitude;
-
-    const multiplier =
-        normalizedStep <= 1
-            ? 1
-            : normalizedStep <= 2
-                ? 2
-                : normalizedStep <= 5
-                    ? 5
-                    : 10;
-
-    const step = Math.max(
-        1,
-        Math.ceil(
-            multiplier *
-            magnitude,
-        ),
+function getTimeMaximum(value) {
+    const receivedValue = Math.max(
+        Number(value) || 0,
+        INITIAL_TIME_AXIS_MAXIMUM_SECONDS,
     );
 
-    return step *
-        ROUTE_SCALE_INTERVALS;
+    return Math.ceil(
+        receivedValue /
+        TIME_AXIS_INTERVAL_SECONDS,
+    ) * TIME_AXIS_INTERVAL_SECONDS;
+}
+
+function getTimeAxisTicks(maximum) {
+    const intervalCount = Math.round(
+        maximum /
+        TIME_AXIS_INTERVAL_SECONDS,
+    );
+
+    return Array.from(
+        {
+            length:
+                intervalCount + 1,
+        },
+        function (_, index) {
+            return (
+                index *
+                TIME_AXIS_INTERVAL_SECONDS
+            );
+        },
+    );
 }
 
 function normalizeMetric(
@@ -460,25 +454,37 @@ function drawComparisonStructure(chart) {
 
     const routeMaximum =
         chart.$expeditionRouteMaximum ||
-        1;
-    const routeStart =
-        xScale.getPixelForValue(
-            ROUTES_SCALE_START,
-        );
-    const routeEnd =
-        xScale.getPixelForValue(
-            ROUTES_SCALE_END,
-        );
+        INITIAL_ROUTE_AXIS_MAXIMUM;
+    const timeMaximum =
+        chart.$expeditionTimeMaximum ||
+        INITIAL_TIME_AXIS_MAXIMUM_SECONDS;
+    const comparisonWidth =
+        chartArea.right -
+        chartArea.left;
+    const columnWidth =
+        (
+            comparisonWidth -
+            COMPARISON_COLUMN_GAP
+        ) / 2;
+    const volumeStart =
+        chartArea.left;
+    const volumeEnd =
+        volumeStart +
+        columnWidth;
     const timeStart =
-        xScale.getPixelForValue(
-            TIME_SCALE_START,
-        );
+        volumeEnd +
+        COMPARISON_COLUMN_GAP;
     const timeEnd =
-        xScale.getPixelForValue(
-            TIME_SCALE_END,
-        );
+        timeStart +
+        columnWidth;
     const nameStart =
-        chartArea.left - 156;
+        volumeStart + 10;
+    const routeStart = Math.min(
+        volumeStart + 120,
+        volumeEnd - 80,
+    );
+    const routeEnd =
+        volumeEnd;
     const axisY =
         chartArea.bottom + 8;
     const barHeight = 20;
@@ -497,13 +503,13 @@ function drawComparisonStructure(chart) {
     context.lineWidth = 1;
 
     for (
-        let index = 0;
-        index <= ROUTE_SCALE_INTERVALS;
-        index += 1
+        let routeValue = 0;
+        routeValue <= routeMaximum;
+        routeValue += ROUTE_AXIS_INTERVAL
     ) {
         const ratio =
-            index /
-            ROUTE_SCALE_INTERVALS;
+            routeValue /
+            routeMaximum;
         const positionX =
             routeStart +
             (routeEnd - routeStart) *
@@ -521,20 +527,26 @@ function drawComparisonStructure(chart) {
         context.stroke();
 
         context.textAlign =
-            "center";
+            routeValue === 0
+                ? "left"
+                : routeValue ===
+                    routeMaximum
+                    ? "right"
+                    : "center";
         context.fillStyle =
             "#bfc2c8";
         context.fillText(
             formatQuantity(
-                routeMaximum *
-                ratio,
+                routeValue,
             ),
             positionX,
             axisY + 16,
         );
     }
 
-    TIME_AXIS_TICKS.forEach(
+    getTimeAxisTicks(
+        timeMaximum,
+    ).forEach(
         function (timeValue) {
             const positionX =
                 timeStart +
@@ -544,7 +556,7 @@ function drawComparisonStructure(chart) {
                 ) *
                 (
                     timeValue /
-                    TIME_AXIS_MAXIMUM_SECONDS
+                    timeMaximum
                 );
 
             context.beginPath();
@@ -559,7 +571,12 @@ function drawComparisonStructure(chart) {
             context.stroke();
 
             context.textAlign =
-                "center";
+                timeValue === 0
+                    ? "left"
+                    : timeValue ===
+                        timeMaximum
+                        ? "right"
+                        : "center";
             context.fillStyle =
                 "#bfc2c8";
             context.fillText(
@@ -581,7 +598,7 @@ function drawComparisonStructure(chart) {
         function (positionY) {
             context.beginPath();
             context.moveTo(
-                nameStart - 10,
+                volumeStart,
                 positionY,
             );
             context.lineTo(
@@ -648,7 +665,7 @@ function drawComparisonStructure(chart) {
                         ) *
                         Math.min(
                             receivedTime /
-                                TIME_AXIS_MAXIMUM_SECONDS,
+                                timeMaximum,
                             1,
                         );
 
@@ -656,7 +673,7 @@ function drawComparisonStructure(chart) {
                 "rgba(82, 82, 82, 0.4)";
             context.beginPath();
             context.moveTo(
-                nameStart - 10,
+                volumeStart,
                 rowBottom,
             );
             context.lineTo(
@@ -775,7 +792,7 @@ function drawComparisonStructure(chart) {
         ) *
         (
             TIME_MAXIMUM_REFERENCE_SECONDS /
-            TIME_AXIS_MAXIMUM_SECONDS
+            timeMaximum
         );
 
     context.strokeStyle =
@@ -884,7 +901,7 @@ function createComparisonChart(canvas) {
                         top: 38,
                         right: 16,
                         bottom: 46,
-                        left: 166,
+                        left: 16,
                     },
                 },
 
@@ -1025,12 +1042,26 @@ function updateComparisonChart(
             ),
         );
 
+    const maximumTime =
+        getTimeMaximum(
+            Math.max(
+                0,
+                ...operators.map(
+                    function (operator) {
+                        return operator
+                            .averageDurationSeconds ??
+                            0;
+                    },
+                ),
+            ),
+        );
+
     chart.$expeditionRows =
         operators;
     chart.$expeditionRouteMaximum =
         maximumRoutes;
     chart.$expeditionTimeMaximum =
-        TIME_AXIS_MAXIMUM_SECONDS;
+        maximumTime;
 
     chart.options.scales.y.max =
         Math.max(
@@ -1076,7 +1107,7 @@ function updateComparisonChart(
                         x: normalizeMetric(
                             operator
                                 .averageDurationSeconds,
-                            TIME_AXIS_MAXIMUM_SECONDS,
+                            maximumTime,
                             TIME_SCALE_START,
                             TIME_SCALE_END,
                         ),
