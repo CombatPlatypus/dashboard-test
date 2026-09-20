@@ -278,6 +278,25 @@
             }
 
 
+            .damage-and-losses-charts {
+                gap: 15px;
+            }
+            .damage-and-losses-charts > div {
+                flex: 1 1 0;
+            }
+            .doughnut-chart .chart-title .type {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            .doughnut-chart .chart-title .type > div {
+                width: 20px;
+                height: 20px;
+                border-radius: 3px;
+            }
+
+            
+
         </style>
     </head>	
 
@@ -1842,16 +1861,29 @@
                                                 <div class="doughnut-chart">
                                                     <h3>Composição das Avarias</h3>
 
-                                                    <div>
-                                                        <canvas id="" height="642" style="display: block; box-sizing: border-box; height: 321px; width: 342.4px;" width="684">
-                                                            Seu navegador não suporta gráficos em canvas.
-                                                        </canvas>
-                                                    </div>
+                                                    <div class="flex-box-start">
+                                                        <div>
+                                                            <canvas id="" height="642" style="display: block; box-sizing: border-box; height: 321px; width: 342.4px;" width="684">
+                                                                Seu navegador não suporta gráficos em canvas.
+                                                            </canvas>
+                                                        </div>
 
-                                                    <div>
-                                                        <h4>Avaria Sólida <span id=""></span></h4>
-                                                        <h4>Avaria Líquida <span id=""></span></h4>
-                                                        <h4>Avaria de Vidro <span id=""></span></h4>
+                                                        <div>
+                                                            <div class="type">
+                                                                <div style="background-color: #F44336;"></div>
+                                                                <p>Avaria Sólida <span id=""></span></p>
+                                                            </div>
+
+                                                            <div class="type">
+                                                                <div style="background-color: #F44336;"></div>
+                                                                <p>Avaria Líquida <span id=""></span></p>
+                                                            </div>
+
+                                                            <div class="type">
+                                                                <div style="background-color: #F44336;"></div>
+                                                                <p>Avaria de Vidro <span id=""></span></p>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
 
