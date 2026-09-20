@@ -197,6 +197,44 @@ function getReceiptLinehaulVehiclePlate(
         ?.toUpperCase() || "";
 }
 
+function getReceiptLinehaulPlainDriver(
+    values,
+) {
+    return values
+        .flatMap(
+            splitReceiptLinehaulImportValues,
+        )
+        .find(
+            function (value) {
+                const normalizedValue =
+                    String(
+                        value ?? "",
+                    )
+                        .replace(
+                            /\s+/g,
+                            " ",
+                        )
+                        .trim();
+
+                const name =
+                    normalizedValue.replace(
+                        /^\[\d+\]\s*/,
+                        "",
+                    );
+
+                return (
+                    /^\[\d+\]\s*\p{L}/u.test(
+                        normalizedValue,
+                    ) &&
+                    !name.includes("_") &&
+                    !/^(?:soc|lm hub|fm hub|am hub|cd|warehouse)\b/i.test(
+                        name,
+                    )
+                );
+            },
+        ) || "";
+}
+
 function getReceiptLinehaulElementText(
     element,
 ) {
@@ -819,6 +857,11 @@ function parseReceiptLinehaulSpXPlainText(
 
                     origin,
 
+                    driver:
+                        getReceiptLinehaulPlainDriver(
+                            values,
+                        ),
+
                     cpt,
 
                     window: cpt,
@@ -849,6 +892,100 @@ function parseReceiptLinehaulSpXPlainText(
         );
 
     return records;
+}
+
+function mergeReceiptLinehaulComplementaryRecords(
+    recordGroups,
+) {
+    const loadedOrdersByCode =
+        new Map();
+
+    const driversByCode =
+        new Map();
+
+    recordGroups
+        .flat()
+        .forEach(
+            function (record) {
+                const code =
+                    getReceiptLinehaulImportCode(
+                        record.code,
+                    );
+
+                const loadedOrders =
+                    parseReceiptLinehaulImportQuantity(
+                        record.loadedOrders,
+                    );
+
+                if (
+                    code &&
+                    loadedOrders !== null
+                ) {
+                    loadedOrdersByCode.set(
+                        code,
+                        loadedOrders,
+                    );
+                }
+
+                const driver =
+                    String(
+                        record.driver ?? "",
+                    ).trim();
+
+                if (
+                    code &&
+                    driver
+                ) {
+                    driversByCode.set(
+                        code,
+                        driver,
+                    );
+                }
+            },
+        );
+
+    recordGroups.forEach(
+        function (records) {
+            records.forEach(
+                function (record) {
+                    const code =
+                        getReceiptLinehaulImportCode(
+                            record.code,
+                        );
+
+                    if (
+                        !String(
+                            record.driver ?? "",
+                        ).trim()
+                    ) {
+                        const driver =
+                            driversByCode.get(
+                                code,
+                            );
+
+                        if (driver) {
+                            record.driver =
+                                driver;
+                        }
+                    }
+
+                    if (
+                        parseReceiptLinehaulImportQuantity(
+                            record.loadedOrders,
+                        ) === null &&
+                        loadedOrdersByCode.has(
+                            code,
+                        )
+                    ) {
+                        record.loadedOrders =
+                            loadedOrdersByCode.get(
+                                code,
+                            );
+                    }
+                },
+            );
+        },
+    );
 }
 
 function getReceiptLinehaulImportWindowModalElements() {
@@ -1285,69 +1422,11 @@ async function handleReceiptLinehaulClipboardImport(
                 clipboard.text,
             );
 
-        const loadedOrdersByCode =
-            new Map();
-
-        [
-            ...htmlRecords,
-            ...plainTextRecords,
-        ].forEach(
-            function (record) {
-                const code =
-                    getReceiptLinehaulImportCode(
-                        record.code,
-                    );
-
-                const loadedOrders =
-                    parseReceiptLinehaulImportQuantity(
-                        record.loadedOrders,
-                    );
-
-                if (
-                    code &&
-                    loadedOrders !== null
-                ) {
-                    loadedOrdersByCode.set(
-                        code,
-                        loadedOrders,
-                    );
-                }
-            },
-        );
-
-        [
-            htmlRecords,
-            plainTextRecords,
-        ].forEach(
-            function (records) {
-                records.forEach(
-                    function (record) {
-                        if (
-                            parseReceiptLinehaulImportQuantity(
-                                record.loadedOrders,
-                            ) !== null
-                        ) {
-                            return;
-                        }
-
-                        const code =
-                            getReceiptLinehaulImportCode(
-                                record.code,
-                            );
-
-                        if (
-                            loadedOrdersByCode.has(
-                                code,
-                            )
-                        ) {
-                            record.loadedOrders =
-                                loadedOrdersByCode.get(
-                                    code,
-                                );
-                        }
-                    },
-                );
-            },
+        mergeReceiptLinehaulComplementaryRecords(
+            [
+                htmlRecords,
+                plainTextRecords,
+            ],
         );
 
         const importCandidates = [
@@ -1629,6 +1708,7 @@ function initializeReceiptLinehaulImport(
 
 export {
     initializeReceiptLinehaulImport,
+    mergeReceiptLinehaulComplementaryRecords,
     parseReceiptLinehaulSpXHtml,
     parseReceiptLinehaulSpXPlainText,
 };

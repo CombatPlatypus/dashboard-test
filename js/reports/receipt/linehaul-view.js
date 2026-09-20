@@ -460,13 +460,13 @@ function createReceiptLinehaulPreviewRow(
         ),
 
         createReceiptLinehaulPreviewCell(
-            formatReceiptLinehaulQuantity(
-                linehaul?.loadedOrders,
-            ),
+            linehaul?.origin,
         ),
 
         createReceiptLinehaulPreviewCell(
-            linehaul?.origin,
+            formatReceiptLinehaulQuantity(
+                linehaul?.loadedOrders,
+            ),
         ),
     );
 
