@@ -9,6 +9,7 @@ import {
 } from "./linehaul-state.js";
 
 import {
+    bindReportImageExportButton,
     createReportImageBlob,
     copyReportBlob,
     downloadReportBlob,
@@ -670,9 +671,7 @@ function initializeReceiptExport(
         );
 
     receiptExportElements.downloadButton =
-        receiptExportElements.panel.querySelector(
-            "#receiptDownloadReportButton",
-        );
+        receiptExportElements.copyButton;
 
     receiptExportElements.mainArea =
         receiptExportElements.panel.querySelector(
@@ -753,29 +752,24 @@ function initializeReceiptExport(
         },
     );
 
-    receiptExportElements
-        .copyButton
-        .addEventListener(
-            "click",
-
-            function () {
-                runReceiptExport(
-                    "copy",
-                );
-            },
-        );
-
-    receiptExportElements
-        .downloadButton
-        .addEventListener(
-            "click",
-
-            function () {
-                runReceiptExport(
-                    "download",
-                );
-            },
-        );
+    bindReportImageExportButton(
+        receiptExportElements
+            .copyButton,
+        {
+            onCopy:
+                function () {
+                    runReceiptExport(
+                        "copy",
+                    );
+                },
+            onDownload:
+                function () {
+                    runReceiptExport(
+                        "download",
+                    );
+                },
+        },
+    );
 
     subscribeReceiptState(
         function (state) {

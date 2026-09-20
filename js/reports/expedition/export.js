@@ -4,6 +4,7 @@ import {
 } from "./state.js";
 
 import {
+    bindReportImageExportButton,
     createReportImageBlob,
     copyReportBlob,
     downloadReportBlob,
@@ -229,9 +230,7 @@ function initializeExpeditionExport(
         );
 
     const downloadButton =
-        panel?.querySelector(
-            "#expeditionDownloadReportButton",
-        );
+        copyButton;
 
     const tabs =
         panel?.querySelector(
@@ -259,27 +258,27 @@ function initializeExpeditionExport(
         .expeditionExportInitialized =
             "true";
 
-    copyButton.addEventListener(
-        "click",
-        function () {
-            runExpeditionExport({
-                panel,
-                copyButton,
-                downloadButton,
-                mode: "copy",
-            });
-        },
-    );
-
-    downloadButton.addEventListener(
-        "click",
-        function () {
-            runExpeditionExport({
-                panel,
-                copyButton,
-                downloadButton,
-                mode: "download",
-            });
+    bindReportImageExportButton(
+        copyButton,
+        {
+            onCopy:
+                function () {
+                    runExpeditionExport({
+                        panel,
+                        copyButton,
+                        downloadButton,
+                        mode: "copy",
+                    });
+                },
+            onDownload:
+                function () {
+                    runExpeditionExport({
+                        panel,
+                        copyButton,
+                        downloadButton,
+                        mode: "download",
+                    });
+                },
         },
     );
 

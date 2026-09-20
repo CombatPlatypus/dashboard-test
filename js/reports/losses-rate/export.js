@@ -6,6 +6,7 @@ import {
 } from "./state.js";
 
 import {
+    bindReportImageExportButton,
     createReportImageBlob,
     copyReportBlob,
     downloadReportBlob,
@@ -478,9 +479,7 @@ function initializeLossesRateExport(
         );
 
     lossesRateDownloadReportButton =
-        rootElement.querySelector(
-            "#lossesRateDownloadReportButton",
-        );
+        lossesRateCopyReportButton;
 
     lossesRateClearReportButton =
         rootElement.querySelector(
@@ -557,14 +556,14 @@ function initializeLossesRateExport(
         },
     );
 
-    lossesRateCopyReportButton.addEventListener(
-        "click",
-        handleCopyLossesRateReport,
-    );
-
-    lossesRateDownloadReportButton.addEventListener(
-        "click",
-        handleDownloadLossesRateReport,
+    bindReportImageExportButton(
+        lossesRateCopyReportButton,
+        {
+            onCopy:
+                handleCopyLossesRateReport,
+            onDownload:
+                handleDownloadLossesRateReport,
+        },
     );
 
     lossesRateClearReportButton.addEventListener(

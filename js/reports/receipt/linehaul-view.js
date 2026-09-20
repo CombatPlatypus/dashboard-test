@@ -485,7 +485,7 @@ function createReceiptLinehaulPreviewRow(
         ),
 
         createReceiptLinehaulPreviewCell(
-            linehaul?.cpt,
+            linehaul?.driver,
         ),
 
         createReceiptLinehaulPreviewCell(

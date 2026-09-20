@@ -24,6 +24,40 @@ function normalizeReceiptLinehaulText(
         .trim();
 }
 
+function normalizeReceiptLinehaulDriver(
+    value,
+) {
+    const firstName =
+        normalizeReceiptLinehaulText(
+            value,
+        )
+            .replace(
+                /^\[[^\]]+\]\s*/,
+                "",
+            )
+            .split(
+                /\s+/,
+            )[0] || "";
+
+    if (!firstName) {
+        return "";
+    }
+
+    const normalizedName =
+        firstName.toLocaleLowerCase(
+            "pt-BR",
+        );
+
+    return (
+        normalizedName
+            .charAt(0)
+            .toLocaleUpperCase(
+                "pt-BR",
+            ) +
+        normalizedName.slice(1)
+    );
+}
+
 function normalizeReceiptLinehaulQuantity(
     value,
 ) {
@@ -81,6 +115,11 @@ function createReceiptLinehaulRecord(
         origin:
             normalizeReceiptLinehaulText(
                 values.origin,
+            ),
+
+        driver:
+            normalizeReceiptLinehaulDriver(
+                values.driver,
             ),
 
         cpt:

@@ -331,6 +331,31 @@ function findReceiptLinehaulColumn(
     );
 }
 
+function findReceiptLinehaulColumnByAliasPriority(
+    normalizedRow,
+    aliases,
+) {
+    for (const alias of aliases) {
+        const columnIndex =
+            normalizedRow.findIndex(
+                function (value) {
+                    return (
+                        value === alias ||
+                        value.includes(
+                            alias,
+                        )
+                    );
+                },
+            );
+
+        if (columnIndex >= 0) {
+            return columnIndex;
+        }
+    }
+
+    return -1;
+}
+
 function getReceiptLinehaulColumns(
     row,
 ) {
@@ -351,6 +376,19 @@ function getReceiptLinehaulColumns(
             findReceiptLinehaulColumn(
                 normalizedRow,
                 ["station"],
+            ),
+
+        driver:
+            findReceiptLinehaulColumnByAliasPriority(
+                normalizedRow,
+                [
+                    "nome do motorista",
+                    "nome motorista",
+                    "driver name",
+                    "driver full name",
+                    "motorista",
+                    "driver",
+                ],
             ),
 
         cpt:
@@ -386,8 +424,12 @@ function getReceiptLinehaulColumns(
     )
         .filter(
             function ([key]) {
-                return key !==
-                    "loadedOrders";
+                return ![
+                    "driver",
+                    "loadedOrders",
+                ].includes(
+                    key,
+                );
             },
         )
         .every(
@@ -420,6 +462,17 @@ function createReceiptLinehaulRecord(
             receivedRecord.cpt,
         );
 
+    const driver =
+        receivedRecord.driver
+            .flatMap(
+                splitReceiptLinehaulImportValues,
+            )
+            .find(
+                function (value) {
+                    return value !== "-";
+                },
+            ) || "";
+
     const punctualityValues =
         receivedRecord.punctuality
             .flatMap(
@@ -431,6 +484,8 @@ function createReceiptLinehaulRecord(
             receivedRecord.code,
 
         origin,
+
+        driver,
 
         cpt,
 
@@ -531,6 +586,7 @@ function parseReceiptLinehaulMatrix(
                     currentRecord = {
                         code,
                         origin: [],
+                        driver: [],
                         cpt: [],
                         punctuality: [],
                         loadedOrders: [],
@@ -544,6 +600,12 @@ function parseReceiptLinehaulMatrix(
 
                 currentRecord.origin.push(
                     row[columns.origin] ?? "",
+                );
+
+                currentRecord.driver.push(
+                    columns.driver >= 0
+                        ? row[columns.driver] ?? ""
+                        : "",
                 );
 
                 currentRecord.cpt.push(

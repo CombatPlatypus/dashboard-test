@@ -28,6 +28,7 @@ import {
 } from "./calculations.js";
 
 import {
+    bindReportImageExportButton,
     createReportImageBlob,
     copyReportBlob,
     downloadReportBlob,
@@ -1615,9 +1616,7 @@ function initializePlanningView(
         );
 
     planningDownloadReportButton =
-        getPlanningElementById(
-            "planningDownloadReportButton",
-        );
+        planningCopyReportButton;
 
     planningReportExportArea =
         getPlanningElementById(
@@ -1894,14 +1893,14 @@ function initializePlanningView(
         handleResetPlanningReport,
     );
 
-    planningCopyReportButton.addEventListener(
-        "click",
-        handleCopyPlanningReport,
-    );
-
-    planningDownloadReportButton.addEventListener(
-        "click",
-        handleDownloadPlanningReport,
+    bindReportImageExportButton(
+        planningCopyReportButton,
+        {
+            onCopy:
+                handleCopyPlanningReport,
+            onDownload:
+                handleDownloadPlanningReport,
+        },
     );
 
     planningLhList.addEventListener(

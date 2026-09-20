@@ -137,7 +137,107 @@ function downloadReportBlob(
     );
 }
 
+/* UNE CÓPIA E DOWNLOAD EM UM ÚNICO BOTÃO */
+
+function bindReportImageExportButton(
+    button,
+    {
+        onCopy,
+        onDownload,
+        holdDuration = 1500,
+    } = {},
+) {
+    if (
+        !(button instanceof HTMLButtonElement) ||
+        typeof onCopy !== "function" ||
+        typeof onDownload !== "function"
+    ) {
+        return false;
+    }
+
+    let holdTimer = null;
+    let downloadTriggered = false;
+
+    function clearHoldTimer() {
+        if (holdTimer !== null) {
+            window.clearTimeout(
+                holdTimer,
+            );
+
+            holdTimer = null;
+        }
+    }
+
+    button.addEventListener(
+        "pointerdown",
+        function (event) {
+            if (
+                event.button !== 0 ||
+                button.disabled
+            ) {
+                return;
+            }
+
+            clearHoldTimer();
+            downloadTriggered = false;
+
+            holdTimer = window.setTimeout(
+                function () {
+                    holdTimer = null;
+                    downloadTriggered = true;
+                    onDownload();
+                },
+                holdDuration,
+            );
+        },
+    );
+
+    button.addEventListener(
+        "pointerup",
+        clearHoldTimer,
+    );
+
+    button.addEventListener(
+        "pointercancel",
+        clearHoldTimer,
+    );
+
+    button.addEventListener(
+        "pointerleave",
+        clearHoldTimer,
+    );
+
+    button.addEventListener(
+        "contextmenu",
+        function (event) {
+            if (
+                holdTimer !== null ||
+                downloadTriggered
+            ) {
+                event.preventDefault();
+            }
+        },
+    );
+
+    button.addEventListener(
+        "click",
+        function (event) {
+            if (downloadTriggered) {
+                event.preventDefault();
+                downloadTriggered = false;
+
+                return;
+            }
+
+            onCopy();
+        },
+    );
+
+    return true;
+}
+
 export {
+    bindReportImageExportButton,
     createReportImageBlob,
     copyReportBlob,
     downloadReportBlob,
