@@ -1271,11 +1271,11 @@
                                             <h4>Defina os LHs</h4>
 
                                             <div class="flex-box-start">
-                                                <button id="" type="button" title="Adicionar LH" aria-label="Adicionar LH">
+                                                <button id="receiptLinehaulAddButton" type="button" title="Adicionar LH" aria-label="Adicionar LH">
                                                     <img src="images/geral-icons/add-icon.svg" alt="">
                                                 </button>
 
-                                                <button id="" type="button" title="Remover último LH" aria-label="Remover último LH">
+                                                <button id="receiptLinehaulRemoveButton" type="button" title="Remover último LH" aria-label="Remover último LH">
                                                     <img src="images/geral-icons/remove-icon.svg" alt="">
                                                 </button>
                                             </div>
@@ -1287,7 +1287,7 @@
                                                     <h4 data-receipt-linehaul-label>Primeiro LH</h4>
 
                                                     <div class="flex-box-between">
-                                                        <input type="text" data-receipt-linehaul-field=""  placeholder="Motorista" readonly disabled>
+                                                        <input type="text" data-receipt-linehaul-field="driver" placeholder="Motorista" maxlength="80" autocomplete="off" readonly disabled>
 
                                                         <div class="checkbox">
                                                             <input type="checkbox" data-receipt-linehaul-selection disabled>
@@ -1297,7 +1297,7 @@
 
                                                     <div>
                                                         <input type="text" data-receipt-linehaul-field="code" placeholder="Código" autocomplete="off" readonly disabled>
-                                                        <input type="text" data-receipt-linehaul-field="" placeholder="Origem" aria-label="Origem do LH 1" maxlength="30" autocomplete="off" readonly disabled>
+                                                        <input type="text" data-receipt-linehaul-field="origin" placeholder="Origem" aria-label="Origem do LH 1" maxlength="30" autocomplete="off" readonly disabled>
                                                         <input type="text" data-receipt-linehaul-field="loadedOrders" placeholder="Qtd" maxlength="8" autocomplete="off" inputmode="numeric" pattern="[0-9]*" readonly disabled>
                                                     </div>
                                                 </div>

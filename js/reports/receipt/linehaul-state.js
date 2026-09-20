@@ -6,7 +6,7 @@ const receiptLinehaulListeners =
     new Set();
 
 const MINIMUM_RECEIPT_LINEHAUL_MANUAL_ROWS =
-    9;
+    8;
 
 let nextReceiptLinehaulId = 1;
 
@@ -331,6 +331,16 @@ function updateReceiptLinehaulRecord(
             createReceiptLinehaulKey(
                 value,
             );
+    } else if (field === "driver") {
+        normalizedValue =
+            normalizeReceiptLinehaulDriver(
+                value,
+            );
+    } else if (field === "origin") {
+        normalizedValue =
+            normalizeReceiptLinehaulText(
+                value,
+            );
     } else if (field === "loadedOrders") {
         normalizedValue =
             normalizeReceiptLinehaulQuantity(
@@ -385,6 +395,76 @@ function enableReceiptLinehaulManualEntry() {
 
     notifyReceiptLinehaulState({
         type: "linehaul-manual-entry-enabled",
+    });
+
+    return true;
+}
+
+function addReceiptLinehaul(
+    values = {},
+) {
+    receiptLinehaulState
+        .manualEntryEnabled = true;
+
+    ensureReceiptLinehaulManualRows();
+
+    const linehaul =
+        createReceiptLinehaulRecord(
+            values,
+        );
+
+    receiptLinehaulState
+        .linehauls
+        .push(
+            linehaul,
+        );
+
+    notifyReceiptLinehaulState({
+        type: "linehaul-added",
+        linehaulId: linehaul.id,
+    });
+
+    return {
+        ...linehaul,
+    };
+}
+
+function removeReceiptLinehaul(
+    linehaulId,
+) {
+    if (
+        receiptLinehaulState
+            .linehauls
+            .length <=
+        MINIMUM_RECEIPT_LINEHAUL_MANUAL_ROWS
+    ) {
+        return false;
+    }
+
+    const linehaulIndex =
+        receiptLinehaulState
+            .linehauls
+            .findIndex(
+                function (linehaul) {
+                    return linehaul.id ===
+                        linehaulId;
+                },
+            );
+
+    if (linehaulIndex < 0) {
+        return false;
+    }
+
+    receiptLinehaulState
+        .linehauls
+        .splice(
+            linehaulIndex,
+            1,
+        );
+
+    notifyReceiptLinehaulState({
+        type: "linehaul-removed",
+        linehaulId,
     });
 
     return true;
@@ -571,10 +651,12 @@ function restoreReceiptLinehaulState(
 }
 
 export {
+    addReceiptLinehaul,
     enableReceiptLinehaulManualEntry,
     getReceiptLinehaulState,
     getReceiptLinehaulSummary,
     replaceReceiptLinehauls,
+    removeReceiptLinehaul,
     resetReceiptLinehaulState,
     restoreReceiptLinehaulState,
     subscribeReceiptLinehaulState,

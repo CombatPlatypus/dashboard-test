@@ -862,7 +862,7 @@
         cursor: not-allowed;
     }
     #receipt-controls #receipt-controls-2 .input-group:last-of-type {
-        max-height: 499px;
+        max-height: 559px;
         overflow-y: auto;
         padding-right: 15px;
         grid-template-columns: repeat(auto-fit, minmax(100%, 1fr)) !important;

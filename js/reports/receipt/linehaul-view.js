@@ -1,12 +1,26 @@
 import {
+    addReceiptLinehaul,
     getReceiptLinehaulState,
     getReceiptLinehaulSummary,
+    removeReceiptLinehaul,
     subscribeReceiptLinehaulState,
     updateReceiptLinehaulRecord,
     updateReceiptLinehaulSelection,
 } from "./linehaul-state.js";
 
-const MINIMUM_RECEIPT_LINEHAUL_ROWS = 9;
+const MINIMUM_RECEIPT_LINEHAUL_ROWS = 8;
+
+const RECEIPT_LINEHAUL_ORDINAL_NAMES = [
+    "Primeiro",
+    "Segundo",
+    "Terceiro",
+    "Quarto",
+    "Quinto",
+    "Sexto",
+    "Sétimo",
+    "Oitavo",
+    "Nono",
+];
 
 const receiptLinehaulNumberFormatter =
     new Intl.NumberFormat(
@@ -45,6 +59,18 @@ function getReceiptLinehaulElements(
             getReceiptLinehaulElement(
                 rootElement,
                 "receiptLinehaulControls",
+            ),
+
+        addButton:
+            getReceiptLinehaulElement(
+                rootElement,
+                "receiptLinehaulAddButton",
+            ),
+
+        removeButton:
+            getReceiptLinehaulElement(
+                rootElement,
+                "receiptLinehaulRemoveButton",
             ),
 
         previewWindow:
@@ -136,6 +162,16 @@ function getReceiptLinehaulControlInputs(
                 '[data-receipt-linehaul-field="code"]',
             ),
 
+        driver:
+            row.querySelector(
+                '[data-receipt-linehaul-field="driver"]',
+            ),
+
+        origin:
+            row.querySelector(
+                '[data-receipt-linehaul-field="origin"]',
+            ),
+
         loadedOrders:
             row.querySelector(
                 '[data-receipt-linehaul-field="loadedOrders"]',
@@ -186,6 +222,16 @@ function formatReceiptLinehaulQuantity(
             );
 }
 
+function getReceiptLinehaulOrdinalLabel(
+    position,
+) {
+    return `${
+        RECEIPT_LINEHAUL_ORDINAL_NAMES[
+            position - 1
+        ] ?? `${position}º`
+    } LH`;
+}
+
 function createReceiptLinehaulControl(
     template,
     linehaul,
@@ -208,7 +254,22 @@ function createReceiptLinehaulControl(
         );
 
     inputs.title.textContent =
-        `Código do LH ${position}`;
+        getReceiptLinehaulOrdinalLabel(
+            position,
+        );
+
+    setReceiptLinehaulInputValue(
+        inputs.driver,
+        linehaul.driver,
+    );
+
+    inputs.driver.disabled = false;
+    inputs.driver.readOnly =
+        !manualEntryEnabled;
+    inputs.driver.setAttribute(
+        "aria-label",
+        `Motorista do LH ${position}`,
+    );
 
     setReceiptLinehaulInputValue(
         inputs.code,
@@ -220,6 +281,23 @@ function createReceiptLinehaulControl(
         !manualEntryEnabled;
     inputs.code.title =
         linehaul.code;
+    inputs.code.setAttribute(
+        "aria-label",
+        `Código do LH ${position}`,
+    );
+
+    setReceiptLinehaulInputValue(
+        inputs.origin,
+        linehaul.origin,
+    );
+
+    inputs.origin.disabled = false;
+    inputs.origin.readOnly =
+        !manualEntryEnabled;
+    inputs.origin.setAttribute(
+        "aria-label",
+        `Origem do LH ${position}`,
+    );
 
     setReceiptLinehaulInputValue(
         inputs.loadedOrders,
@@ -231,6 +309,10 @@ function createReceiptLinehaulControl(
 
     inputs.loadedOrders.readOnly =
         !manualEntryEnabled;
+    inputs.loadedOrders.setAttribute(
+        "aria-label",
+        `Quantidade do LH ${position}`,
+    );
 
     const selectionId =
         `receiptLinehaulSelection${linehaul.id}`;
@@ -273,13 +355,37 @@ function createEmptyReceiptLinehaulControl(
         .receiptLinehaulId;
 
     inputs.title.textContent =
-        `Código do LH ${position}`;
+        getReceiptLinehaulOrdinalLabel(
+            position,
+        );
+
+    inputs.driver.value = "";
+    inputs.driver.disabled = true;
+    inputs.driver.setAttribute(
+        "aria-label",
+        `Motorista do LH ${position}`,
+    );
 
     inputs.code.value = "";
     inputs.code.disabled = true;
+    inputs.code.setAttribute(
+        "aria-label",
+        `Código do LH ${position}`,
+    );
+
+    inputs.origin.value = "";
+    inputs.origin.disabled = true;
+    inputs.origin.setAttribute(
+        "aria-label",
+        `Origem do LH ${position}`,
+    );
 
     inputs.loadedOrders.value = "";
     inputs.loadedOrders.disabled = true;
+    inputs.loadedOrders.setAttribute(
+        "aria-label",
+        `Quantidade do LH ${position}`,
+    );
 
     const selectionId =
         `receiptLinehaulEmpty${position}`;
@@ -341,8 +447,18 @@ function synchronizeReceiptLinehaulControls(
                 );
 
             setReceiptLinehaulInputValue(
+                inputs.driver,
+                linehaul.driver,
+            );
+
+            setReceiptLinehaulInputValue(
                 inputs.code,
                 linehaul.code,
+            );
+
+            setReceiptLinehaulInputValue(
+                inputs.origin,
+                linehaul.origin,
             );
 
             setReceiptLinehaulInputValue(
@@ -351,6 +467,12 @@ function synchronizeReceiptLinehaulControls(
             );
 
             inputs.code.readOnly =
+                !manualEntryEnabled;
+
+            inputs.driver.readOnly =
+                !manualEntryEnabled;
+
+            inputs.origin.readOnly =
                 !manualEntryEnabled;
 
             inputs.loadedOrders.readOnly =
@@ -426,6 +548,10 @@ function renderReceiptLinehaulControls(
     elements.controls.replaceChildren(
         fragment,
     );
+
+    elements.removeButton.disabled =
+        linehauls.length <=
+            MINIMUM_RECEIPT_LINEHAUL_ROWS;
 }
 
 function createReceiptLinehaulPreviewCell(
@@ -476,12 +602,14 @@ function createReceiptLinehaulPreviewRow(
 function renderReceiptLinehaulPreview(
     elements,
     selectedLinehauls,
+    totalLinehauls,
 ) {
     const fragment =
         document.createDocumentFragment();
 
     const visibleRows =
         Math.max(
+            totalLinehauls,
             selectedLinehauls.length,
             MINIMUM_RECEIPT_LINEHAUL_ROWS,
         );
@@ -635,6 +763,7 @@ function renderReceiptLinehaulView(
     renderReceiptLinehaulPreview(
         receiptLinehaulElements,
         summary.selectedLinehauls,
+        state.linehauls.length,
     );
 
     return true;
@@ -759,6 +888,47 @@ function bindReceiptLinehaulInputs(
     );
 }
 
+function handleAddReceiptLinehaul() {
+    const linehaul =
+        addReceiptLinehaul();
+
+    receiptLinehaulElements
+        ?.controls
+        .querySelector(
+            `[data-receipt-linehaul-id="${linehaul.id}"]`,
+        )
+        ?.querySelector(
+            '[data-receipt-linehaul-field="driver"]',
+        )
+        ?.focus();
+}
+
+function handleRemoveReceiptLinehaul() {
+    const lastLinehaul =
+        getReceiptLinehaulState()
+            .linehauls
+            .at(-1);
+
+    if (
+        !lastLinehaul ||
+        receiptLinehaulElements
+            ?.removeButton
+            .disabled
+    ) {
+        return;
+    }
+
+    if (
+        removeReceiptLinehaul(
+            lastLinehaul.id,
+        )
+    ) {
+        receiptLinehaulElements
+            ?.addButton
+            .focus();
+    }
+}
+
 function initializeReceiptLinehaulView(
     rootElement =
         document.getElementById(
@@ -817,6 +987,14 @@ function initializeReceiptLinehaulView(
             HTMLInputElement
         ) ||
         !(
+            templateInputs.driver instanceof
+            HTMLInputElement
+        ) ||
+        !(
+            templateInputs.origin instanceof
+            HTMLInputElement
+        ) ||
+        !(
             templateInputs.loadedOrders instanceof
             HTMLInputElement
         ) ||
@@ -846,6 +1024,16 @@ function initializeReceiptLinehaulView(
 
     bindReceiptLinehaulInputs(
         elements,
+    );
+
+    elements.addButton.addEventListener(
+        "click",
+        handleAddReceiptLinehaul,
+    );
+
+    elements.removeButton.addEventListener(
+        "click",
+        handleRemoveReceiptLinehaul,
     );
 
     subscribeReceiptLinehaulState(
