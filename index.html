@@ -263,6 +263,22 @@
             }
 
 
+            .aligned-comparison-chart {
+                display: flex;
+                flex-direction: column;
+                padding: 20px;
+                background-color: var(--color-container);
+                border: 1px solid var(--color-border);
+                border-radius: 0 0 5px 5px;
+            }
+            
+            .aligned-comparison-chart > div {
+                min-height: 470px;
+            }
+            
+
+
+
         </style>
     </head>	
 
@@ -1192,7 +1208,18 @@
                                                     </div>
                                                 </div>
 
-                                                <div class="two-horizontal-bars-chart">
+                                                <div class="aligned-comparison-chart">
+
+                                                    <div>
+
+                                                        <!-- GRAFICO AQUI -->
+
+                                                    </div>
+
+                                                </div>
+
+
+                                                <div class="two-horizontal-bars-chart" style="display: none;">
                                                     <div class="chart-panel">
                                                         <h3>Volume Recebido por Recebedor</h3>
                                                         <p>Distribuição dos pacotes processados.</p>
@@ -1215,6 +1242,8 @@
                                                         </div>
                                                     </div>
                                                 </div>
+
+
                                             </div>
                                         </div>
                                     </div>
@@ -1496,7 +1525,19 @@
                                                     </div>
                                                 </div>
 
-                                                <div class="two-horizontal-bars-chart">
+
+                                                <div class="aligned-comparison-chart">
+
+                                                    <div>
+
+                                                        <!-- GRAFICO AQUI -->
+
+                                                    </div>
+
+                                                </div>
+
+
+                                                <div class="two-horizontal-bars-chart" style="display: none;">
                                                     <div class="chart-panel">
                                                         <h3>Rotas Conferidas por Conferente</h3>
                                                         <p>Distribuição das rotas conferidas.</p>
