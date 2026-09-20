@@ -1,6 +1,5 @@
 import {
     getReportContext,
-    updateReportContextField,
 } from "../core/report-context.js";
 
 const receiptLinehaulListeners =
@@ -143,40 +142,65 @@ function createReceiptLinehaulRecord(
 }
 
 const receiptLinehaulState = {
-    expectedVolume: null,
-    reversesSent: null,
     linehauls: [],
     manualEntryEnabled: false,
 };
 
+function getReceiptLinehaulExpectedVolume(
+    linehauls,
+) {
+    const hasQuantity =
+        linehauls.some(
+            function (linehaul) {
+                return linehaul.loadedOrders !==
+                    null;
+            },
+        );
+
+    if (!hasQuantity) {
+        return null;
+    }
+
+    return linehauls.reduce(
+        function (
+            total,
+            linehaul,
+        ) {
+            return total +
+                (linehaul.loadedOrders ?? 0);
+        },
+        0,
+    );
+}
+
 function getReceiptLinehaulState() {
+    const linehauls =
+        receiptLinehaulState
+            .linehauls
+            .map(
+                function (linehaul) {
+                    return {
+                        ...linehaul,
+                    };
+                },
+            );
+
     return {
         window:
             getReportContext()
                 .window,
 
         expectedVolume:
-            receiptLinehaulState
-                .expectedVolume,
-
-        reversesSent:
-            receiptLinehaulState
-                .reversesSent,
+            getReceiptLinehaulExpectedVolume(
+                linehauls,
+            ),
 
         manualEntryEnabled:
             receiptLinehaulState
                 .manualEntryEnabled,
 
         linehauls:
-            receiptLinehaulState
-                .linehauls
-                .map(
-                    function (linehaul) {
-                        return {
-                            ...linehaul,
-                        };
-                    },
-                ),
+            linehauls,
     };
 }
 
@@ -200,9 +224,17 @@ function getReceiptLinehaulSummary(
 
     return {
         hasData:
-            state.manualEntryEnabled ===
-                true ||
-            linehauls.length > 0,
+            linehauls.some(
+                function (linehaul) {
+                    return (
+                        Boolean(
+                            linehaul.code,
+                        ) ||
+                        linehaul.loadedOrders !==
+                            null
+                    );
+                },
+            ),
 
         selectedLinehauls,
 
@@ -264,47 +296,6 @@ function subscribeReceiptLinehaulState(
             listener,
         );
     };
-}
-
-function updateReceiptLinehaulField(
-    field,
-    value,
-) {
-    let normalizedValue;
-
-    if (field === "window") {
-        return updateReportContextField(
-            field,
-            value,
-        );
-    } else if (
-        field === "expectedVolume" ||
-        field === "reversesSent"
-    ) {
-        normalizedValue =
-            normalizeReceiptLinehaulQuantity(
-                value,
-            );
-    } else {
-        return false;
-    }
-
-    if (
-        receiptLinehaulState[field] ===
-        normalizedValue
-    ) {
-        return true;
-    }
-
-    receiptLinehaulState[field] =
-        normalizedValue;
-
-    notifyReceiptLinehaulState({
-        type: "linehaul-field-updated",
-        field,
-    });
-
-    return true;
 }
 
 function updateReceiptLinehaulRecord(
@@ -504,26 +495,6 @@ function replaceReceiptLinehauls(
             )
             .filter(Boolean);
 
-    receiptLinehaulState.expectedVolume =
-        receiptLinehaulState
-            .linehauls
-            .reduce(
-                function (
-                    total,
-                    linehaul,
-                ) {
-                    return (
-                        total +
-                        (
-                            linehaul
-                                .loadedOrders ??
-                            0
-                        )
-                    );
-                },
-                0,
-            ) || null;
-
     ensureReceiptLinehaulManualRows();
 
     notifyReceiptLinehaulState({
@@ -534,8 +505,6 @@ function replaceReceiptLinehauls(
 }
 
 function resetReceiptLinehaulState() {
-    receiptLinehaulState.expectedVolume = null;
-    receiptLinehaulState.reversesSent = null;
     receiptLinehaulState.linehauls = [];
     receiptLinehaulState.manualEntryEnabled =
         false;
@@ -557,16 +526,6 @@ function restoreReceiptLinehaulState(
         !Array.isArray(sessionState)
             ? sessionState
             : {};
-
-    receiptLinehaulState.expectedVolume =
-        normalizeReceiptLinehaulQuantity(
-            receivedState.expectedVolume,
-        );
-
-    receiptLinehaulState.reversesSent =
-        normalizeReceiptLinehaulQuantity(
-            receivedState.reversesSent,
-        );
 
     receiptLinehaulState.manualEntryEnabled =
         receivedState.manualEntryEnabled ===
@@ -619,7 +578,6 @@ export {
     resetReceiptLinehaulState,
     restoreReceiptLinehaulState,
     subscribeReceiptLinehaulState,
-    updateReceiptLinehaulField,
     updateReceiptLinehaulRecord,
     updateReceiptLinehaulSelection,
 };

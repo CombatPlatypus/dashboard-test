@@ -2,7 +2,6 @@ import {
     getReceiptLinehaulState,
     getReceiptLinehaulSummary,
     subscribeReceiptLinehaulState,
-    updateReceiptLinehaulField,
     updateReceiptLinehaulRecord,
     updateReceiptLinehaulSelection,
 } from "./linehaul-state.js";
@@ -48,18 +47,6 @@ function getReceiptLinehaulElements(
                 "receiptLinehaulControls",
             ),
 
-        expectedInput:
-            getReceiptLinehaulElement(
-                rootElement,
-                "receiptLinehaulExpectedInput",
-            ),
-
-        reversesInput:
-            getReceiptLinehaulElement(
-                rootElement,
-                "receiptLinehaulReversesInput",
-            ),
-
         previewWindow:
             getReceiptLinehaulElement(
                 rootElement,
@@ -82,12 +69,6 @@ function getReceiptLinehaulElements(
             getReceiptLinehaulElement(
                 rootElement,
                 "receiptLinehaulPreviewUnloadedCount",
-            ),
-
-        previewReversesSent:
-            getReceiptLinehaulElement(
-                rootElement,
-                "receiptLinehaulPreviewReversesSent",
             ),
 
         progressUnloaded:
@@ -475,6 +456,10 @@ function createReceiptLinehaulPreviewRow(
         ),
 
         createReceiptLinehaulPreviewCell(
+            linehaul?.driver,
+        ),
+
+        createReceiptLinehaulPreviewCell(
             formatReceiptLinehaulQuantity(
                 linehaul?.loadedOrders,
             ),
@@ -482,14 +467,6 @@ function createReceiptLinehaulPreviewRow(
 
         createReceiptLinehaulPreviewCell(
             linehaul?.origin,
-        ),
-
-        createReceiptLinehaulPreviewCell(
-            linehaul?.driver,
-        ),
-
-        createReceiptLinehaulPreviewCell(
-            linehaul?.vehiclePlate,
         ),
     );
 
@@ -562,22 +539,6 @@ function renderReceiptLinehaulSummary(
                 ),
             );
 
-    setReceiptLinehaulInputValue(
-        elements.expectedInput,
-        expectedVolume,
-    );
-
-    setReceiptLinehaulInputValue(
-        elements.reversesInput,
-        state.reversesSent,
-    );
-
-    elements.expectedInput.disabled =
-        !hasData;
-
-    elements.reversesInput.disabled =
-        !hasData;
-
     elements.previewWindow.textContent =
         String(
             state.window ?? "",
@@ -603,14 +564,6 @@ function renderReceiptLinehaulSummary(
             hasData
                 ? formatReceiptLinehaulQuantity(
                     summary.unloadedCount,
-                )
-                : "—";
-
-    elements.previewReversesSent
-        .textContent =
-            hasData
-                ? formatReceiptLinehaulQuantity(
-                    state.reversesSent,
                 )
                 : "—";
 
@@ -706,30 +659,6 @@ function sanitizeReceiptLinehaulInput(
 function bindReceiptLinehaulInputs(
     elements,
 ) {
-    elements.expectedInput.addEventListener(
-        "input",
-        function () {
-            updateReceiptLinehaulField(
-                "expectedVolume",
-                sanitizeReceiptLinehaulInput(
-                    elements.expectedInput,
-                ),
-            );
-        },
-    );
-
-    elements.reversesInput.addEventListener(
-        "input",
-        function () {
-            updateReceiptLinehaulField(
-                "reversesSent",
-                sanitizeReceiptLinehaulInput(
-                    elements.reversesInput,
-                ),
-            );
-        },
-    );
-
     elements.controls.addEventListener(
         "input",
         function (event) {
