@@ -216,53 +216,6 @@
 
             /* AJUSTES */
 
-            .global-inputs {
-                max-width: 1400px;
-                margin: 0 auto 20px auto;
-                column-gap: 15px;
-                align-items: center;
-            }
-            .global-inputs > div {
-                flex: 1 1 0;
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-                text-align: center;
-                column-gap: 15px;
-            }
-            .global-inputs > div input {
-                min-height: 50px;
-                text-align: center;
-                border: 2px solid var(--color-border);
-            }
-
-            .global-inputs .select2-container--default .select2-selection--single .select2-selection__rendered {
-                font-size: 14px !important;
-                line-height: 48px !important;
-            }
-            .global-inputs .select2-container--default .select2-selection--single {
-                height: 50px !important;
-                border: 2px solid var(--color-border) !important;
-            }
-
-
-            .receipt-linehaul-controls .flex-box-between {
-                align-items: center;
-                column-gap: 10px;
-                margin: 15px 0;
-            }
-            .receipt-linehaul-controls .flex-box-between input:first-of-type{
-                flex: 1 1 0;
-            }
-            .receipt-linehaul-controls div > div:last-of-type {
-                display: flex;
-                gap: 10px;
-            }
-            .receipt-linehaul-controls div > div:last-of-type input:last-of-type {
-                flex: 0 0 86px;
-                text-align: center;
-            }
-
-
             .aligned-comparison-chart {
                 display: flex;
                 flex-direction: column;
@@ -278,6 +231,9 @@
                 min-height: 1269px;
             }
         
+
+
+
 
         </style>
     </head>	
@@ -473,7 +429,7 @@
                             </li> 
 
                             <li class="tabs-title">
-                                <a href="#h">
+                                <a href="#damage-and-losses">
                                     <div class="flex-box-full-center">
                                         <h4>Avarias e Perdas</h4>
                                     </div>
@@ -501,360 +457,6 @@
                     <!-- CONTEÚDO DOS RELATÓRIOS -->
 
                     <div class="tabs-content" data-tabs-content="report-choice">
-
-                        <!-- RELATÓRIO DO PLANEJAMENTO -->
-
-                        <div class="tabs-panel" id="planning">
-
-                            <!-- TABS DE NAVEGAÇÃO -->
-
-                            <ul class="tabs flex-box-start" data-tabs id="planningTabs">
-                                <li class="tabs-title is-active">
-                                    <a href="#lhs-list">
-                                        <h4>Lista de LHs</h4>
-                                    </a>
-                                </li> 
-
-                                <li class="tabs-title" id="planningSegregatedTosTab" hidden>
-                                    <a href="#segregated-tos">
-                                        <h4>TOs a Segregar</h4>
-                                    </a>
-                                </li>
-
-                                <li class="tabs-title">
-                                    <a href="#collection-indicators">
-                                        <h4>Collection Pool e Indicadores</h4>
-                                    </a>
-                                </li> 
-                            </ul> 
-
-                            <!-- BARRA DE NOTIFICAÇÕES E BOTÕES DE AÇÃO -->
-
-                            <div class="flex-box-start">
-                                <div class="warning" id="planningNotification" role="status" aria-live="polite" aria-atomic="true" data-notification-type="idle">
-                                    <div class="flex-box-start">
-                                        <img id="planningNotificationIcon" src="images/geral-icons/bell-icon.svg" alt="">
-
-                                        <h4 id="planningNotificationText">
-                                            Tudo em silêncio por enquanto.
-                                        </h4>
-                                    </div>
-                                </div>
-
-                                <div class="report-actions">
-                                    <button id="planningCopyReportButton" type="button" title="Clique para copiar; segure por 1,5 s para baixar" aria-label="Copiar relatório de planejamento; segure por 1,5 segundo para baixar">
-                                        <img src="images/geral-icons/image-icon.svg" alt="">
-                                    </button>
-
-                                    <button id="planningImportClipboardButton" type="button" title="Importar LHs da área de transferência" aria-label="Importar LHs da área de transferência">
-                                        <img src="images/geral-icons/import-icon.svg" alt="">
-                                    </button>
-
-                                    <button id="planningClearReportButton" type="button" title="Limpar relatório" aria-label="Limpar relatório de planejamento">
-                                        <img src="images/geral-icons/trash-basket-icon.svg" alt="">
-                                    </button>
-                                </div>
-                            </div>
-      
-                            <!-- CONTEÚDO DO RELATÓRIO -->
-
-                            <div class="flex-box-start planning-report-layout">
-
-                                <!-- PPÉVIA DO RELATÓRIO -->
-
-                                <div class="preview" id="planningSheetPreview">
-                                    <div class="preview-style" id="planningReportExportArea">
-                                        <div class="title">
-                                            <h2>Relatório de Planejamento</h2>
-                                        </div>
-
-                                        <table>
-                                            <thead>
-                                                <tr>
-                                                    <th>Volume Estimado</th>
-                                                    <th>SPR Médio</th>
-                                                    <th>Cap do Dia</th>
-                                                </tr>
-                                            </thead>
-
-                                            <tbody>
-                                                <tr>
-                                                    <td id="planningEstimatedVolume">—</td>
-                                                    <td id="planningPreviewAverageSpr">—</td>
-                                                    <td id="planningPreviewDailyCapacity">—</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-
-                                        <div class="planning-sheet-layout">
-                                            <div class="planning-sheet-main">
-
-                                                <!-- LISTA DE LHS PARA ROTEIRIZAR -->
-
-                                                <table>
-                                                    <thead>
-                                                        <tr>
-                                                            <th>LHs Programados</th>
-                                                            <th>Origem</th>
-                                                            <th style="width: 100px;">QTD</th>
-                                                        </tr>
-                                                    </thead>
-
-                                                    <tbody id="planningPreviewLhBody">
-                                                        <tr>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                        </tr>
-
-                                                        <tr>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                        </tr>
-
-                                                        <tr>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                        </tr>
-
-                                                        <tr>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-
-                                                <!-- LHS PARA SEGREGAR -->
-
-                                                <table class="planning-segregated-table" id="planningSegregatedSection" hidden>
-                                                    <thead>
-                                                        <tr>
-                                                            <th>LHs a Segregar</th>
-                                                            <th>Origem</th>
-                                                            <th>QTD</th>
-                                                            <th>Segregar</th>
-                                                        </tr>
-                                                    </thead>
-
-                                                    <tbody id="planningPreviewSegregatedBody">
-                                                        <tr class="planning-empty-row">
-                                                            <td colspan="4">Nenhum LH para segregar.</td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-
-                                                <!-- TOS PARA SEGREGAR -->
-
-                                                <table class="planning-segregated-tos-table" id="planningSegregatedTosSection" hidden>
-                                                    <thead>
-                                                        <tr>
-                                                            <th>TOs para Segregar</th>
-                                                            <th>LH</th>
-                                                            <th>QTD</th>
-                                                        </tr>
-                                                    </thead>
-
-                                                    <tbody id="planningPreviewSegregatedTosBody">
-                                                        <tr class="planning-empty-row">
-                                                            <td colspan="3">Nenhuma TO para segregar.</td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-
-                                            <div class="planning-sheet-sidebar">
-
-                                                <!-- COLLECTION POOL -->
-
-                                                <table class="planning-sheet-table planning-cp-summary-table">
-                                                    <colgroup>
-                                                        <col>
-                                                        <col class="planning-quantity-column">
-                                                    </colgroup>
-
-                                                    <thead>
-                                                        <tr>
-                                                            <th colspan="2">Valores da Collection Pool</th>
-                                                        </tr>
-                                                    </thead>
-
-                                                    <tbody>
-                                                        <tr>
-                                                            <td>Qtd Backlog Pacotes</td>
-                                                            <td id="planningPreviewCpBacklog">0</td>
-                                                        </tr>
-
-                                                        <tr>
-                                                            <td>Qtd Backlog Volumosos</td>
-                                                            <td id="planningPreviewCpBulky">0</td>
-                                                        </tr>
-
-                                                        <tr>
-                                                            <td>Qtd dentro dos LHs</td>
-                                                            <td id="planningPreviewCpLhPool">0</td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-
-                                                <table class="planning-sheet-table planning-cp-summary-table">
-                                                    <colgroup>
-                                                        <col>
-                                                        <col class="planning-quantity-column">
-                                                    </colgroup>
-
-                                                    <thead>
-                                                        <tr>
-                                                            <th colspan="2">Operações na Collection Pool</th>
-                                                        </tr>
-                                                    </thead>
-
-                                                    <tbody>
-                                                        <tr>
-                                                            <td>Qtd Pacotes Inseridos</td>
-                                                            <td id="planningPreviewCpAdded">0</td>
-                                                        </tr>
-
-                                                        <tr>
-                                                            <td>Qtd Pacotes Retirados</td>
-                                                            <td id="planningPreviewCpRemoved">0</td>
-                                                        </tr>
-
-                                                        <tr>
-                                                            <td>Qtd Pacotes com Erros</td>
-                                                            <td id="planningPreviewCpErrors">0</td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- CONTROLES DO RELATÓRIO -->
-
-                                <div class="report-controls">
-                                    <div class="tabs-content" data-tabs-content="planningTabs">
-                                        <div class="tabs-panel is-active" id="lhs-list">
-                                            <div class="title">
-                                                <h4>Lista de LHs</h4>
-
-                                                <div class="flex-box-start">
-                                                    <button id="planningAddLh" type="button" title="Adicionar LH" aria-label="Adicionar LH">
-                                                        <img src="images/geral-icons/add-icon.svg" alt="">
-                                                    </button>
-
-                                                    <button id="planningRemoveLh" type="button" title="Remover último LH" aria-label="Remover último LH">
-                                                        <img src="images/geral-icons/remove-icon.svg" alt="">
-                                                    </button>
-                                                </div>
-                                            </div>
-
-                                            <div class="padding">
-                                                <div class="lhs-list planning-lh-list" id="planningLhList"></div>
-                                            </div>
-                                        </div>
-
-                                        <div class="tabs-panel" id="segregated-tos">
-                                            <div class="title">
-                                                <h4>Defina TOs Para Segregar</h4>
-
-                                                <div class="flex-box-start">
-                                                    <button id="planningAddTo" type="button" title="Adicionar TO" aria-label="Adicionar TO">
-                                                        <img src="images/geral-icons/add-icon.svg" alt="">
-                                                    </button>
-
-                                                    <button id="planningRemoveTo" type="button" title="Remover última TO" aria-label="Remover última TO">
-                                                        <img src="images/geral-icons/remove-icon.svg" alt="">
-                                                    </button>
-                                                </div>
-                                            </div>
-
-                                            <div class="padding">
-                                                <div class="to-list" id="planningToList"></div>
-                                            </div>
-                                        </div>
-
-                                        <div class="tabs-panel" id="collection-indicators">
-                                            <div class="title">
-                                                <h4>Collection Pool e Indicadores</h4>
-                                            </div>
-
-                                            <div class="padding">
-                                                <div class="input-group">
-                                                    <div>
-                                                        <h4>Cap do Dia</h4>
-
-                                                        <input type="text" inputmode="numeric" maxlength="6" data-planning-field="dailyCapacity">
-                                                    </div>
-
-                                                    <div>
-                                                        <h4>SPR Médio</h4>
-
-                                                        <input type="text" inputmode="numeric" maxlength="5" data-planning-field="averageSpr">
-                                                    </div>
-                                                </div>
-
-                                                <div class="input-group">
-                                                    <div>
-                                                        <h4>Pacotes</h4>
-                                                        <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="backlogPackages">
-                                                    </div>
-
-                                                    <div>
-                                                        <h4>Volumosos</h4>
-                                                        <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="backlogBulky">
-                                                    </div>
-                                                </div>
-
-                                                <div class="input-group operations">
-                                                    <div>
-                                                        <h4>Adicionados</h4>
-                                                        <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="added">
-                                                    </div>
-
-                                                    <div>
-                                                        <h4>Retirados</h4>
-                                                        <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="removed">
-                                                    </div>
-
-                                                    <div>
-                                                        <h4>Erros</h4>
-                                                        <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="errors">
-                                                    </div>
-                                                </div>
-
-                                                <div class="input-group fleet">
-                                                    <div>
-                                                        <h4>Carros</h4>
-
-                                                        <input type="text" inputmode="numeric" maxlength="4" data-planning-vehicle-field="cars">
-                                                    </div>
-
-                                                    <div>
-                                                        <h4>Motos</h4>
-
-                                                        <input type="text" inputmode="numeric" maxlength="4" data-planning-vehicle-field="motorcycles">
-                                                    </div>
-
-                                                    <div>
-                                                        <h4>Fiorinos</h4>
-
-                                                        <input type="text" inputmode="numeric" maxlength="4" data-planning-vehicle-field="fiorinos">
-                                                    </div>
-                                                </div>
-
-                                                <p>Os valores da frota afetarão o cálculo do indicador SPR Médio, preencher a composição da frota é opcional.</p>
-                                                <a href="#">Consultar Frota ➚</a>
-
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
 
                         <!-- RELATÓRIO DE PROCESSAMENTO -->
 
@@ -1718,6 +1320,439 @@
                                         </div>
 
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- RELATÓRIO DO PLANEJAMENTO -->
+
+                        <div class="tabs-panel" id="planning">
+
+                            <!-- TABS DE NAVEGAÇÃO -->
+
+                            <ul class="tabs flex-box-start" data-tabs id="planningTabs">
+                                <li class="tabs-title is-active">
+                                    <a href="#lhs-list">
+                                        <h4>Lista de LHs</h4>
+                                    </a>
+                                </li> 
+
+                                <li class="tabs-title" id="planningSegregatedTosTab" hidden>
+                                    <a href="#segregated-tos">
+                                        <h4>TOs a Segregar</h4>
+                                    </a>
+                                </li>
+
+                                <li class="tabs-title">
+                                    <a href="#collection-indicators">
+                                        <h4>Collection Pool e Indicadores</h4>
+                                    </a>
+                                </li> 
+                            </ul> 
+
+                            <!-- BARRA DE NOTIFICAÇÕES E BOTÕES DE AÇÃO -->
+
+                            <div class="flex-box-start">
+                                <div class="warning" id="planningNotification" role="status" aria-live="polite" aria-atomic="true" data-notification-type="idle">
+                                    <div class="flex-box-start">
+                                        <img id="planningNotificationIcon" src="images/geral-icons/bell-icon.svg" alt="">
+
+                                        <h4 id="planningNotificationText">
+                                            Tudo em silêncio por enquanto.
+                                        </h4>
+                                    </div>
+                                </div>
+
+                                <div class="report-actions">
+                                    <button id="planningCopyReportButton" type="button" title="Clique para copiar; segure por 1,5 s para baixar" aria-label="Copiar relatório de planejamento; segure por 1,5 segundo para baixar">
+                                        <img src="images/geral-icons/image-icon.svg" alt="">
+                                    </button>
+
+                                    <button id="planningImportClipboardButton" type="button" title="Importar LHs da área de transferência" aria-label="Importar LHs da área de transferência">
+                                        <img src="images/geral-icons/import-icon.svg" alt="">
+                                    </button>
+
+                                    <button id="planningClearReportButton" type="button" title="Limpar relatório" aria-label="Limpar relatório de planejamento">
+                                        <img src="images/geral-icons/trash-basket-icon.svg" alt="">
+                                    </button>
+                                </div>
+                            </div>
+      
+                            <!-- CONTEÚDO DO RELATÓRIO -->
+
+                            <div class="flex-box-start planning-report-layout">
+
+                                <!-- PPÉVIA DO RELATÓRIO -->
+
+                                <div class="preview" id="planningSheetPreview">
+                                    <div class="preview-style" id="planningReportExportArea">
+                                        <div class="title">
+                                            <h2>Relatório de Planejamento</h2>
+                                        </div>
+
+                                        <table>
+                                            <thead>
+                                                <tr>
+                                                    <th>Volume Estimado</th>
+                                                    <th>SPR Médio</th>
+                                                    <th>Cap do Dia</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                <tr>
+                                                    <td id="planningEstimatedVolume">—</td>
+                                                    <td id="planningPreviewAverageSpr">—</td>
+                                                    <td id="planningPreviewDailyCapacity">—</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+
+                                        <div class="planning-sheet-layout">
+                                            <div class="planning-sheet-main">
+
+                                                <!-- LISTA DE LHS PARA ROTEIRIZAR -->
+
+                                                <table>
+                                                    <thead>
+                                                        <tr>
+                                                            <th>LHs Programados</th>
+                                                            <th>Origem</th>
+                                                            <th style="width: 100px;">QTD</th>
+                                                        </tr>
+                                                    </thead>
+
+                                                    <tbody id="planningPreviewLhBody">
+                                                        <tr>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                            <td>—</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+
+                                                <!-- LHS PARA SEGREGAR -->
+
+                                                <table class="planning-segregated-table" id="planningSegregatedSection" hidden>
+                                                    <thead>
+                                                        <tr>
+                                                            <th>LHs a Segregar</th>
+                                                            <th>Origem</th>
+                                                            <th>QTD</th>
+                                                            <th>Segregar</th>
+                                                        </tr>
+                                                    </thead>
+
+                                                    <tbody id="planningPreviewSegregatedBody">
+                                                        <tr class="planning-empty-row">
+                                                            <td colspan="4">Nenhum LH para segregar.</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+
+                                                <!-- TOS PARA SEGREGAR -->
+
+                                                <table class="planning-segregated-tos-table" id="planningSegregatedTosSection" hidden>
+                                                    <thead>
+                                                        <tr>
+                                                            <th>TOs para Segregar</th>
+                                                            <th>LH</th>
+                                                            <th>QTD</th>
+                                                        </tr>
+                                                    </thead>
+
+                                                    <tbody id="planningPreviewSegregatedTosBody">
+                                                        <tr class="planning-empty-row">
+                                                            <td colspan="3">Nenhuma TO para segregar.</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+
+                                            <div class="planning-sheet-sidebar">
+
+                                                <!-- COLLECTION POOL -->
+
+                                                <table class="planning-sheet-table planning-cp-summary-table">
+                                                    <colgroup>
+                                                        <col>
+                                                        <col class="planning-quantity-column">
+                                                    </colgroup>
+
+                                                    <thead>
+                                                        <tr>
+                                                            <th colspan="2">Valores da Collection Pool</th>
+                                                        </tr>
+                                                    </thead>
+
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>Qtd Backlog Pacotes</td>
+                                                            <td id="planningPreviewCpBacklog">0</td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>Qtd Backlog Volumosos</td>
+                                                            <td id="planningPreviewCpBulky">0</td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>Qtd dentro dos LHs</td>
+                                                            <td id="planningPreviewCpLhPool">0</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+
+                                                <table class="planning-sheet-table planning-cp-summary-table">
+                                                    <colgroup>
+                                                        <col>
+                                                        <col class="planning-quantity-column">
+                                                    </colgroup>
+
+                                                    <thead>
+                                                        <tr>
+                                                            <th colspan="2">Operações na Collection Pool</th>
+                                                        </tr>
+                                                    </thead>
+
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>Qtd Pacotes Inseridos</td>
+                                                            <td id="planningPreviewCpAdded">0</td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>Qtd Pacotes Retirados</td>
+                                                            <td id="planningPreviewCpRemoved">0</td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>Qtd Pacotes com Erros</td>
+                                                            <td id="planningPreviewCpErrors">0</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- CONTROLES DO RELATÓRIO -->
+
+                                <div class="report-controls">
+                                    <div class="tabs-content" data-tabs-content="planningTabs">
+                                        <div class="tabs-panel is-active" id="lhs-list">
+                                            <div class="title">
+                                                <h4>Lista de LHs</h4>
+
+                                                <div class="flex-box-start">
+                                                    <button id="planningAddLh" type="button" title="Adicionar LH" aria-label="Adicionar LH">
+                                                        <img src="images/geral-icons/add-icon.svg" alt="">
+                                                    </button>
+
+                                                    <button id="planningRemoveLh" type="button" title="Remover último LH" aria-label="Remover último LH">
+                                                        <img src="images/geral-icons/remove-icon.svg" alt="">
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <div class="padding">
+                                                <div class="lhs-list planning-lh-list" id="planningLhList"></div>
+                                            </div>
+                                        </div>
+
+                                        <div class="tabs-panel" id="segregated-tos">
+                                            <div class="title">
+                                                <h4>Defina TOs Para Segregar</h4>
+
+                                                <div class="flex-box-start">
+                                                    <button id="planningAddTo" type="button" title="Adicionar TO" aria-label="Adicionar TO">
+                                                        <img src="images/geral-icons/add-icon.svg" alt="">
+                                                    </button>
+
+                                                    <button id="planningRemoveTo" type="button" title="Remover última TO" aria-label="Remover última TO">
+                                                        <img src="images/geral-icons/remove-icon.svg" alt="">
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <div class="padding">
+                                                <div class="to-list" id="planningToList"></div>
+                                            </div>
+                                        </div>
+
+                                        <div class="tabs-panel" id="collection-indicators">
+                                            <div class="title">
+                                                <h4>Collection Pool e Indicadores</h4>
+                                            </div>
+
+                                            <div class="padding">
+                                                <div class="input-group">
+                                                    <div>
+                                                        <h4>Cap do Dia</h4>
+
+                                                        <input type="text" inputmode="numeric" maxlength="6" data-planning-field="dailyCapacity">
+                                                    </div>
+
+                                                    <div>
+                                                        <h4>SPR Médio</h4>
+
+                                                        <input type="text" inputmode="numeric" maxlength="5" data-planning-field="averageSpr">
+                                                    </div>
+                                                </div>
+
+                                                <div class="input-group">
+                                                    <div>
+                                                        <h4>Pacotes</h4>
+                                                        <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="backlogPackages">
+                                                    </div>
+
+                                                    <div>
+                                                        <h4>Volumosos</h4>
+                                                        <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="backlogBulky">
+                                                    </div>
+                                                </div>
+
+                                                <div class="input-group operations">
+                                                    <div>
+                                                        <h4>Adicionados</h4>
+                                                        <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="added">
+                                                    </div>
+
+                                                    <div>
+                                                        <h4>Retirados</h4>
+                                                        <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="removed">
+                                                    </div>
+
+                                                    <div>
+                                                        <h4>Erros</h4>
+                                                        <input type="text" inputmode="numeric" maxlength="6" data-planning-pool-field="errors">
+                                                    </div>
+                                                </div>
+
+                                                <div class="input-group fleet">
+                                                    <div>
+                                                        <h4>Carros</h4>
+
+                                                        <input type="text" inputmode="numeric" maxlength="4" data-planning-vehicle-field="cars">
+                                                    </div>
+
+                                                    <div>
+                                                        <h4>Motos</h4>
+
+                                                        <input type="text" inputmode="numeric" maxlength="4" data-planning-vehicle-field="motorcycles">
+                                                    </div>
+
+                                                    <div>
+                                                        <h4>Fiorinos</h4>
+
+                                                        <input type="text" inputmode="numeric" maxlength="4" data-planning-vehicle-field="fiorinos">
+                                                    </div>
+                                                </div>
+
+                                                <p>Os valores da frota afetarão o cálculo do indicador SPR Médio, preencher a composição da frota é opcional.</p>
+                                                <a href="#">Consultar Frota ➚</a>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- AVARIAS E PERDAS -->
+
+                        <div class="tabs-panel" id="damage-and-losses">
+
+                            <!-- TABS DE NAVEGAÇÃO -->
+
+                            <ul class="tabs flex-box-start" data-tabs id="damage-and-losses-choice">
+                                <li class="tabs-title is-active">
+                                    <a href="#damage">
+                                        <h4>Avarias</h4>
+                                    </a>
+                                </li> 
+
+                                <li class="tabs-title">
+                                    <a href="#losses">
+                                        <h4>Perdas</h4>
+                                    </a>
+                                </li>
+                            </ul> 
+
+                            <!-- BARRA DE NOTIFICAÇÕES E BOTÕES DE AÇÃO -->
+
+                            <div class="flex-box-start">
+                                <div class="warning" id="" role="status" aria-live="polite" aria-atomic="true" data-notification-type="idle">
+                                    <div class="flex-box-start">
+                                        <img id="" src="images/geral-icons/bell-icon.svg" alt="">
+
+                                        <h4 id="">
+                                            Tudo em silêncio por enquanto.
+                                        </h4>
+                                    </div>
+                                </div>
+
+                                <div class="report-actions">
+                                    <button id="" type="button">
+                                        <img src="images/geral-icons/image-icon.svg" alt="">
+                                    </button>
+
+                                    <button id="" type="button">
+                                        <img src="images/geral-icons/import-icon.svg" alt="">
+                                    </button>
+
+                                    <button id="" type="button" title="Limpar relatório">
+                                        <img src="images/geral-icons/trash-basket-icon.svg" alt="">
+                                    </button>
+                                </div>
+                            </div>
+      
+                            <!-- CONTEÚDO DO RELATÓRIO -->
+
+                            <div class="flex-box-start planning-report-layout">
+
+                                <!-- PPÉVIA DO RELATÓRIO -->
+
+                                <div class="preview" id="damage">
+                                    <div class="preview-style">
+                                        <div class="title">
+                                            <h2>Avarias do Mês</h2>
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                                
+                                <!-- CONTROLES DO RELATÓRIO -->
+
+                                <div class="report-controls">
+                                    <div class="title">
+                                        <h4>AVARIAS</h4>
+                                    </div>
+
+                                    <div class="padding">
+
+
+                                    </div>                            
                                 </div>
                             </div>
                         </div>
