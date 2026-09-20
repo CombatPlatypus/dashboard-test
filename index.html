@@ -232,7 +232,42 @@
             }
         
 
-
+            #reports .vertical-bars-chart {
+                width: 100%;
+                padding: 20px;
+                background-color: var(--color-container);
+                border: 1px solid var(--color-border);
+            }
+            #reports .vertical-bars-chart .chart-title {
+                margin-bottom: 20px;
+            }
+            #reports .vertical-bars-chart h4, #reports .vertical-bars-chart p {
+                margin: 0;
+            }
+            #reports .vertical-bars-chart .chart-title .flex-box-start {
+                column-gap: 15px;
+            }
+            #reports .vertical-bars-chart .chart-title .type {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            #reports .vertical-bars-chart .chart-title .type > div {
+                width: 20px;
+                height: 20px;
+                border-radius: 3px;
+            }
+            #reports .vertical-bars-chart p {
+                font-size: 14px;
+                color: var(--color-gray-p);
+                line-height: 1;
+            }
+            #reports .vertical-bars-chart div:last-of-type {
+                width: 100%;
+                min-height: 300px;
+                height: auto;
+                position: relative;
+            }
 
 
         </style>
@@ -1764,6 +1799,33 @@
                                                 </div>
 
                                                 <p id="">Avarias do Soc</p>
+                                            </div>
+                                        </div>
+
+
+                                        <div class="">
+                                            <div class="chart-title">
+                                                <div class="flex-box-between">
+                                                    <h4>Últimos 7 Dias</h4>
+
+                                                    <div class="flex-box-start">
+                                                        <div class="type">
+                                                            <div style="background-color: #ffc107;"></div>
+                                                            <p>Avarias do Soc</p>
+                                                        </div>
+
+                                                        <div class="type">
+                                                            <div style="background-color: #F44336;"></div>
+                                                            <p>Avarias do Hub</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div>
+
+                                                <!-- GRAFICO AQUI -->
+
                                             </div>
                                         </div>
 
