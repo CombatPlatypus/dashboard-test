@@ -170,10 +170,11 @@
     }
     #reports .cards > div > .flex-box-start {
         align-items: center;
-        column-gap: 6px;
+        column-gap: 10px;
     }
     #reports .cards > div > .flex-box-start > h4 {
         margin: 0;
+        line-height: 1;
     }
     #reports .cards > div > .flex-box-start > img {
         width: 25px;
