@@ -678,6 +678,7 @@
         row-gap: 20px;
         overflow: auto;
         padding-right: 15px;
+        max-height: 420px !important;
     }
     .lhs-list label {
         display: flex;
@@ -788,7 +789,7 @@
         gap: 20px;
     }
     #collection-indicators p {
-        margin: 0 0 4px 0;
+        margin: 0 0 3px 0;
         color: var(--color-gray-p);
         font-size: 14px;
     }
@@ -1086,7 +1087,7 @@
     }
     #expedition #expeditionOperatorControls {
         grid-template-columns: repeat(auto-fit, minmax(100%, 1fr)) !important;
-        height: 1187px;
+        height: 1255px;
         overflow: auto;
         padding-right: 15px;
     }
@@ -1106,25 +1107,25 @@
         grid-template-columns: repeat(auto-fit, minmax(100%, 1fr)) !important;
     }
     #expedition #expeditionStreetGuardianControls {
-        max-height: 864px;
+        max-height: 770px;
         overflow-y: auto;
         padding-right: 15px;
     }
-    #expedition #expeditionStreetGuardianControls.is-errors-tab-active {
-        max-height: 472px;
-    }
-    #expedition #expeditionStreetGuardianControls.is-errors-tab-active::-webkit-scrollbar-track {
+    #expedition #expeditionStreetGuardianControls::-webkit-scrollbar-track {
         background-color: transparent;
     }
-    #expedition #expeditionStreetGuardianControls.is-errors-tab-active::-webkit-scrollbar {
+    #expedition #expeditionStreetGuardianControls::-webkit-scrollbar {
         width: 5px;
         height: 5px;
         background-color: transparent;
     }
-    #expedition #expeditionStreetGuardianControls.is-errors-tab-active::-webkit-scrollbar-thumb {
+    #expedition #expeditionStreetGuardianControls::-webkit-scrollbar-thumb {
         border-radius: 5px;
         background-color: var(--color-border);
     }
     #expeditionStreetGuardianControls input {
-        text-transform: uppercase;
+      text-transform: capitalize;
+    }
+    #expedition #expeditionStreetGuardianControls.is-errors-tab-active {
+        max-height: 459px;
     }
