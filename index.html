@@ -33,7 +33,23 @@
 
         <style>
 
+            #docs {
+            }
 
+            #docs > div:first-of-type {
+                flex: 1 1 0;
+                display: flex;
+                flex-direction: column;
+                row-gap: 20px;
+                padding: 20px;
+                background-color: var(--color-container);
+                border: 2px solid var(--color-border);
+                border-radius: 5px;
+            }
+                    
+            #docs > div:last-of-type {
+                flex: 0 0 500px;
+            }
 
 
         </style>
@@ -2976,7 +2992,78 @@
 
                 <!-- PAINEL - MANUAL -->
 
-                <div class="tabs-panel" id="docs"></div>
+                <div class="tabs-panel" id="docs">
+                    <div class="flex-box-start">
+
+                        <!-- DOCUMENTAÇÃO -->
+
+                        <div>
+
+                            <div class="tabs-content" data-tabs-content="docs-tabs">
+
+                                <!-- DOCUMENTAÇÃO DO PAINEL PLANILHAS -->
+
+                                <div class="tabs-panel is-active" id="docs-spreadsheets">
+                                    <div class="title">
+                                        <h3>O que é esse painel</h3>
+                                    </div>
+
+                                    <div class="flex-box-start">
+                                        <div>
+                                            <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library in London, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software like Aldus PageMaker and Microsoft Word including versions of Lore</p>
+                                        </div>
+
+                                        <div></div>
+                                    </div>
+                                </div>
+
+                                <!-- DOCUMENTAÇÃO DO PAINEL RELATÓRIOS -->
+
+                                <div class="tabs-panel" id="docs-reports">
+                                    <div class="title">
+                                        <h3>O que é esse painel</h3>
+                                    </div>
+                                </div>
+
+                                <!-- DOCUMENTAÇÃO DO PAINEL DE ANÁLISES -->
+
+                                <div class="tabs-panel" id="docs-analysis">
+                                    <div class="title">
+                                        <h3>O que é esse painel</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TABS DA DOCUMENTAÇÃO -->
+
+                        <ul class="tabs" data-tabs id="docs-tabs">
+                            <li class="tabs-title">
+                                <a href="#docs-spreadsheets">Painel Planilhas</a>
+                            </li> 
+
+                            <li class="tabs-title">
+                                <a href="#docs-reports">Painel Relatórios</a>
+                            </li> 
+
+                            <li class="tabs-title">
+                                <a href="#docs-analysis">Painel Análise</a>
+                            </li> 
+
+                            <li class="tabs-title">
+                                <a href="#docs-dashboard-spreadsheets">Planilhas do Dashboard</a>
+                            </li> 
+
+                            <li class="tabs-title">
+                                <a href="#docs-security">Segurança</a>
+                            </li> 
+
+                            <li class="tabs-title">
+                                <a href="#docs-doubts">Dúvidas</a>
+                            </li> 
+                        </ul> 
+                    </div>
+                </div>
             </div>
         </div>
 
