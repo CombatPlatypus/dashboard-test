@@ -2038,8 +2038,198 @@
                                     <!-- PERDAS DO MÊS -->
 
                                     <div class="tabs-panel" id="losses">
+                                        <div class="preview-style" id="lossesReportExportArea">
+                                            <div class="title">
+                                                <h2>Perdas do Mês</h2>
+                                            </div>
 
+                                            <div class="cards">
+                                                <div>
+                                                    <div class="flex-box-start">
+                                                        <img src="images/geral-icons/register-icon.svg">
+                                                        <h4 id="lossesTotalValue">—</h4>
+                                                    </div>
 
+                                                    <p>Total de Registros</p>
+                                                </div>
+
+                                                <div>
+                                                    <div class="flex-box-start">
+                                                        <img src="images/geral-icons/clock-icon.svg">
+                                                        <h4 id="PackagesUnderReview">—</h4>
+                                                    </div>
+
+                                                    <p>Pacotes em Análise</p>
+                                                </div>
+
+                                                <div>
+                                                    <div class="flex-box-start">
+                                                        <img src="images/geral-icons/alert-icon.svg">
+                                                        <h4 id="confirmedLosses">—</h4>
+                                                    </div>
+
+                                                    <p>Perdas Confirmadas</p>
+                                                </div>
+
+                                                <div>
+                                                    <div class="flex-box-start">
+                                                        <img src="images/geral-icons/money-icon.svg">
+                                                        <h4 id="lossesMonetaryValue">—</h4>
+                                                    </div>
+
+                                                    <p>Prejuízo Estimado</p>
+                                                </div>
+                                            </div>
+
+                                            <div class="damage-chart-period-selector" id="lossesChartPeriodSelector" role="tablist" aria-label="Período exibido no gráfico de perdas.">
+                                                <button class="is-active" type="button" role="tab" aria-selected="true" data-losses-chart-period="last7">
+                                                    <span>Últimos 7 Dias</span>
+                                                </button>
+
+                                                <button type="button" role="tab" aria-selected="false" data-losses-chart-period="days8to14">
+                                                    <span>De 8 a 14</span>
+                                                    <span>Dias Atrás</span>
+                                                </button>
+
+                                                <button type="button" role="tab" aria-selected="false" data-losses-chart-period="monthStart">
+                                                    <span>De 15 Dias Atrás</span>
+                                                    <span>Até o Começo do Mês</span>
+                                                </button>
+
+                                                <button type="button" role="tab" aria-selected="false" data-losses-chart-period="totalMonth">
+                                                    <span>Total do Mês</span>
+                                                </button>
+                                            </div>
+
+                                            <div class="vertical-bars-chart">
+                                                <div class="chart-title">
+                                                    <div class="flex-box-between">
+                                                        <h4 id="lossesChartPeriodTitle">Últimos 7 Dias</h4>
+
+                                                        <div class="flex-box-start">
+                                                            <div class="type">
+                                                                <div style="background-color: #ffc107;"></div>
+                                                                <p>Avarias do Soc</p>
+                                                            </div>
+
+                                                            <div class="type">
+                                                                <div style="background-color: #F44336;"></div>
+                                                                <p>Avarias do Hub</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div id="lossesLastSevenDaysChartContainer">
+                                                    <div class="losses-period-chart-canvas">
+                                                        <canvas id="lossesLastSevenDaysChart" role="img" aria-label="Perdas do Hub nos últimos sete dias"></canvas>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="damage-and-losses-charts flex-box-start">
+                                                <div class="doughnut-chart">
+                                                    <h4>Composição das Avarias</h4>
+
+                                                    <div class="flex-box-start">
+                                                        <div>
+                                                            <canvas id="lossesCompositionChart" role="img" aria-label=""></canvas>
+                                                        </div>
+
+                                                        <div>
+                                                            <div class="type">
+                                                                <div style="background-color: #F44336;"></div>
+                                                                <p>Perdas Confirmadas <span id="">—</span></p>
+                                                            </div>
+
+                                                            <div class="type">
+                                                                <div style="background-color: #ff9800;"></div>
+                                                                <p>Pacotes Em Análise <span id="">—</span></p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="horizontal-bars-chart">
+                                                    <div class="chart-title">
+                                                        <h4>Pack Recover</h4>
+                                                    </div>
+
+                                                    <div id="" class="">
+                                                        <canvas id="" role="img" aria-label=""></canvas>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <table id="lossesTraditionalAnalysisTable">
+                                                <caption>Análise Tradicional</caption>
+
+                                                <thead>
+                                                    <tr>
+                                                        <th scope="col" style="width: 230px;">Ocorrência</th>
+                                                        <th scope="col">Hoje</th>
+                                                        <th scope="col">Ontem</th>
+                                                        <th scope="col">Anteontem</th>
+                                                        <th scope="col">Dê 3 a 7<br>Dias Atrás</th>
+                                                        <th scope="col">Dê 8 a 14<br>Dias Atrás</th>
+                                                        <th scope="col">Dê 15 Dias Atrás<br>Até o Começo do Mês</th>
+                                                        <th scope="col">Total do Mês</th>
+                                                    </tr>
+                                                </thead>
+
+                                                <tbody>
+                                                    <tr>
+                                                        <th scope="row">Pacotes Em Análise</th>
+                                                        <td>-</td>
+                                                        <td>-</td>
+                                                        <td>-</td>
+                                                        <td>-</td>
+                                                        <td>-</td>
+                                                        <td>-</td>
+                                                        <td>-</td>
+                                                    </tr>
+                                                </tbody>
+
+                                                <tbody>
+                                                    <tr>
+                                                        <th scope="row">Perdas Confirmadas</th>
+                                                        <td>-</td>
+                                                        <td>-</td>
+                                                        <td>-</td>
+                                                        <td>-</td>
+                                                        <td>-</td>
+                                                        <td>-</td>
+                                                        <td>-</td>
+                                                    </tr>
+                                                </tbody>
+
+                                                <tbody>
+                                                    <tr>
+                                                        <th scope="row">Salvos Aguardando Ticket</th>
+                                                        <td>-</td>
+                                                        <td>-</td>
+                                                        <td>-</td>
+                                                        <td>-</td>
+                                                        <td>-</td>
+                                                        <td>-</td>
+                                                        <td>-</td>
+                                                    </tr>
+                                                </tbody>
+
+                                                <tbody>
+                                                    <tr>
+                                                        <th scope="row">Vazios Aguardando Ticket</th>
+                                                        <td>-</td>
+                                                        <td>-</td>
+                                                        <td>-</td>
+                                                        <td>-</td>
+                                                        <td>-</td>
+                                                        <td>-</td>
+                                                        <td>-</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -2332,7 +2522,6 @@
                                                 </div>
                                             </div>
                                         </div>
-
                                     </div>
 
                                     <!-- FLUXO DO DIA E DASTAQUES DA OPERAÇÃO -->
