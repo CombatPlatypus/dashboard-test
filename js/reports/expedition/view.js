@@ -1029,7 +1029,7 @@ function renderExpeditionGuardianControls(
                 `expeditionStreetGuardianInput${index}`;
 
             input.type = "text";
-            input.maxLength = 60;
+            input.maxLength = 22;
             input.autocomplete = "off";
             input.setAttribute(
                 "aria-label",
@@ -1408,10 +1408,29 @@ function bindExpeditionEvents(
                     return;
                 }
 
+                const sanitizedValue =
+                    input.value
+                        .replace(
+                            /[^\p{L}\s]/gu,
+                            "",
+                        )
+                        .slice(
+                            0,
+                            22,
+                        );
+
+                if (
+                    input.value !==
+                    sanitizedValue
+                ) {
+                    input.value =
+                        sanitizedValue;
+                }
+
                 updateExpeditionStreetGuardian(
                     input.dataset
                         .expeditionStreet,
-                    input.value,
+                    sanitizedValue,
                 );
             },
         );

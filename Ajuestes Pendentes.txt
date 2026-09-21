@@ -1,0 +1,42 @@
+Ajuestes Pendentes
+
+    Processamento
+
+    1 Ajustar o nome de São Bernardo do Campo na lista de controles, mais precisamente na aparição dentro do input, deixar apenas: São Bernardo.
+
+    2  Em Mesa de Recebimento, nos controles, nos input de erro de etiqueta, hoje é permitido colocar um valor maior do que a pessoa recebeu, isso não pode acontecer, a pessoa não ter mais erros do que pacotes recebidos, solução, trocar o campo de input por um select, com valores de 0 até o maximo de pacotes que pessoa recebeu.
+
+    3 Hoje o botão de Baixar/Copiar Relatório Salva somente o conteudo da Mesa de Recebimento e Rank de Recebedores, vamos mudar isso para o tabs que estiver ativo no momento, ou seja, se o tabs da Mesa de Recebimento estiver aberto, somente a imagem dele será exportada, e esse comportamento vai valer para todos os relatórios, não só para o processamento.
+
+    Expedição
+
+    1 No tabs de Análise de Ruas, os inputs de ruas pemitir no máximo 22 caracteres e somente letras e vamos aplicar um text-transform: capitalize; no nome que é exibido na previa, no caso o respectivo guardião da rua.
+
+    Planejamento
+
+    1 Atualmente o JS altera dimanicamente a altura de container <div class="lhs-list planning-lh-list" id="planningLhList"> este comportamento será removido.
+
+    2 A regra de importação dos LHs agora pode considerar um LH sem CTP, desde que esteja enconstado em uma janela valida, não precisa mais estar a uma linha de distancia, igual era na regra anterior
+
+    Avarias e Perdas
+
+    1 Nos graficos de Pack Recovery e Composição dos Valores Informados, o texto dos indicadores não está formatado para text-transform: capitalize e está com letter-spacing: 1px; aplicado, temos que ajustar isso.
+
+    2 Quando um arquivo é importado, um aviso gigante como esse aparece 
+
+    "310 avarias importadas da aba Histórico de Avarias: 84 do Hub e 226 do Soc. 141 registros de perdas importados da aba Histórico de Análises. 2 linha(s) fora do mês atual, com situação desconhecida ou sem data válida foram ignoradas."
+
+    vamos mudar isso para algo simples, como "Histórico de Avarias e Perdas Importado." ou se o importador encontrar só um, "Histórico de Avarias Importado" ou Histórico de Perdas Importado", caso não ache nenhum dos dois, "Não foi possível localizar o Histórico de Avarias ou Perdas, em nenhuma das abas da planilha."
+
+    3 Como o relatório de Taxa de Perdas na pratica usa as mesmas informações de que o relatório de Avarias e Perdas usa, ele pode ser atualizado automaticamente se houver uma importação bem sucedida em Avarias e Perdas, os campos de Descrição, Código do Hub e Sub Regional, que vinham da importação de Taxa de Perdas, ainda podem ser importados da aba de Taxa de Perdas.
+
+    Taxa de Perdas, Histórico de Avarias e Histórico de Análises, sempre estarão juntos na mesma planilha, caso os campos Descrição, Código do Hub e Sub Regional não sejam encontrados, seu preenchimento será manual.
+
+    Por hora, ainda mantermos os controles de Taxa de Perdas funcionando, mas editar algo nos controles de Taxa de Perdas, não deve interverir em nada no relatório de Avarias e Perdas, futuramente esses controles serão removidos, mas por hora esse será o comportamento.
+
+    Análise Geral
+
+    1 Em Destaques da Janela <h5>Recebeu Mais Pacotes: <span id="overallAnalysisMostPackages">—</span></h5> está trazendo a quantide de pacotes que essa pessoa recebeu, não o nome da pessoa que recebeu mais pacotes.
+
+    2 Este novo icone do card pacotes em análise images/geral-icons/clock-icon.svg no relatório de análise geral.
+

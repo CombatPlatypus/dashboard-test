@@ -58,6 +58,12 @@ function drawLossesChartText(
         outline = true,
     } = {},
 ) {
+    if (
+        "letterSpacing" in context
+    ) {
+        context.letterSpacing = "0px";
+    }
+
     context.font = font;
     context.textAlign = align;
     context.textBaseline = "middle";
@@ -253,6 +259,19 @@ const lossesHorizontalTrackPlugin = {
         );
 
         context.restore();
+    },
+};
+
+const lossesHorizontalTextStylePlugin = {
+    id: "lossesHorizontalTextStyle",
+
+    beforeDraw(chart) {
+        if (
+            "letterSpacing" in chart.ctx
+        ) {
+            chart.ctx.letterSpacing =
+                "0px";
+        }
     },
 };
 
@@ -452,7 +471,7 @@ function createLossesPackRecoveryChart(canvas) {
     return new window.Chart(canvas, {
         type: "bar",
         data: {
-            labels: ["Sim", "Não", "Não informado"],
+            labels: ["Sim", "Não", "Não Informado"],
             datasets: [
                 {
                     data: [0, 0, 0],
@@ -504,6 +523,7 @@ function createLossesPackRecoveryChart(canvas) {
             },
         },
         plugins: [
+            lossesHorizontalTextStylePlugin,
             lossesHorizontalTrackPlugin,
             lossesRecoveryLabelsPlugin,
         ],
@@ -515,8 +535,8 @@ function createLossesValueCompositionChart(canvas) {
         type: "bar",
         data: {
             labels: [
-                "Perdas confirmadas",
-                "Em análise",
+                "Perdas Confirmadas",
+                "Em Análise",
             ],
             datasets: [
                 {
@@ -577,6 +597,7 @@ function createLossesValueCompositionChart(canvas) {
             },
         },
         plugins: [
+            lossesHorizontalTextStylePlugin,
             lossesHorizontalTrackPlugin,
             lossesValueLabelsPlugin,
         ],

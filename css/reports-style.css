@@ -452,6 +452,15 @@
         margin-bottom: 0;
         border-bottom: none;
     }
+    #reports #receipt .report-controls .input-group .flex-box-start input[data-receipt-operator-field="labeler"] {
+        flex: 1 1 0;
+    }
+    #receipt select[data-receipt-operator-field="errorQuantity"] {
+        width: 86px;
+        flex: 0 0 86px;
+        padding-left: 12px;
+        text-align: center;
+    }
     #receipt td {
         text-align: center;
     }
@@ -473,7 +482,7 @@
         text-align: center;
     }
     #expedition .expedition-guardian-name {
-        text-transform: uppercase;
+        text-transform: capitalize;
     }
     #expedition .two-horizontal-bars-chart .chart-panel {
         height: auto !important;

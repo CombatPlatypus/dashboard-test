@@ -39,10 +39,15 @@ function formatSpXLinehaulOrigin(
         );
 
     if (stateIndex === -1) {
-        return origin;
+        return /^s(?:a|ã)o bernardo do campo$/i.test(
+            origin,
+        )
+            ? "São Bernardo"
+            : origin;
     }
 
-    return originParts
+    const formattedOrigin =
+        originParts
         .slice(
             stateIndex + 1,
         )
@@ -50,6 +55,12 @@ function formatSpXLinehaulOrigin(
             " ",
         )
         .trim();
+
+    return /^s(?:a|ã)o bernardo do campo$/i.test(
+        formattedOrigin,
+    )
+        ? "São Bernardo"
+        : formattedOrigin;
 }
 
 function getSpXLinehaulCode(
@@ -510,14 +521,6 @@ function selectSpXLinehaulRecords(
         );
     }
 
-    const firstGroupedIndex =
-        blockWindowIndexes[0];
-
-    const lastGroupedIndex =
-        blockWindowIndexes[
-            blockWindowIndexes.length - 1
-        ];
-
     const selectedIndexes =
         new Set(
             blockWindowIndexes,
@@ -537,23 +540,7 @@ function selectSpXLinehaulRecords(
             continue;
         }
 
-        const insideBlock =
-            index >= firstGroupedIndex &&
-            index <= lastGroupedIndex;
-
-        const immediatelyBefore =
-            index === firstGroupedIndex - 1;
-
-        const immediatelyAfter =
-            index === lastGroupedIndex + 1;
-
-        if (
-            insideBlock ||
-            immediatelyBefore ||
-            immediatelyAfter
-        ) {
-            selectedIndexes.add(index);
-        }
+        selectedIndexes.add(index);
     }
 
     const orderedIndexes =

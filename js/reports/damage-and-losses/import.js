@@ -11,6 +11,15 @@ import {
     setReportNotification,
 } from "../report-notifications.js";
 
+import {
+    getLossesRateState,
+    replaceLossesRateHistory,
+} from "../losses-rate/state.js";
+
+import {
+    findLossesRateWorkbookHistory,
+} from "../losses-rate/import.js";
+
 const MAX_DAMAGE_FILE_SIZE =
     10 * 1024 * 1024;
 
@@ -224,6 +233,9 @@ function findDamageColumns(
 
 function findDamageMonthSource(
     workbook,
+    {
+        required = true,
+    } = {},
 ) {
     const sheetName =
         workbook.SheetNames.find(
@@ -235,6 +247,10 @@ function findDamageMonthSource(
         );
 
     if (!sheetName) {
+        if (!required) {
+            return null;
+        }
+
         throw new Error(
             "O arquivo não possui a aba Histórico de Avarias.",
         );
@@ -567,7 +583,12 @@ function findEmptyPackagesColumns(row) {
         : null;
 }
 
-function findLossesMonthSource(workbook) {
+function findLossesMonthSource(
+    workbook,
+    {
+        required = true,
+    } = {},
+) {
     const sheetName =
         workbook.SheetNames.find(
             function (receivedSheetName) {
@@ -578,6 +599,10 @@ function findLossesMonthSource(workbook) {
         );
 
     if (!sheetName) {
+        if (!required) {
+            return null;
+        }
+
         throw new Error(
             "O arquivo não possui a aba Histórico de Análises.",
         );
@@ -1196,41 +1221,218 @@ async function readDamageAndLossesFile(
     const source =
         findDamageMonthSource(
             workbook,
-            date,
+            {
+                required: false,
+            },
         );
 
     const lossesSource =
         findLossesMonthSource(
             workbook,
+            {
+                required: false,
+            },
         );
 
-    const losses = {
-        ...createLossesMonthData(
-            lossesSource,
-            date,
-        ),
+    if (
+        !source &&
+        !lossesSource
+    ) {
+        throw new Error(
+            "Não foi possível localizar o Histórico de Avarias ou Perdas, em nenhuma das abas da planilha.",
+        );
+    }
 
-        sourceFileName:
-            file.name,
+    const damage =
+        source
+            ? {
+                ...createDamageMonthData(
+                    source,
+                    date,
+                ),
 
-        sourceSheetName:
-            lossesSource.sheetName,
-    };
+                sourceFileName:
+                    file.name,
+
+                sourceSheetName:
+                    source.sheetName,
+            }
+            : null;
+
+    const losses =
+        lossesSource
+            ? {
+                ...createLossesMonthData(
+                    lossesSource,
+                    date,
+                ),
+
+                sourceFileName:
+                    file.name,
+
+                sourceSheetName:
+                    lossesSource.sheetName,
+            }
+            : null;
+
+    let lossesRate = null;
+
+    try {
+        lossesRate =
+            findLossesRateWorkbookHistory(
+                workbook,
+            );
+    } catch (error) {
+        console.warn(
+            "A base da Taxa de Perdas não pôde ser lida; os campos manuais serão preservados.",
+            error,
+        );
+    }
 
     return {
-        ...createDamageMonthData(
-            source,
-            date,
-        ),
-
+        ...(damage || {}),
         sourceFileName:
+            damage?.sourceFileName ||
             file.name,
-
         sourceSheetName:
-            source.sheetName,
-
+            damage?.sourceSheetName ||
+            "",
+        damage,
         losses,
+        lossesRate,
     };
+}
+
+function sumLossesMonthField(
+    losses,
+    field,
+) {
+    return losses.days.reduce(
+        function (total, day) {
+            return total +
+                Number(
+                    day[field] || 0,
+                );
+        },
+        0,
+    );
+}
+
+function synchronizeLossesRateReport(
+    result,
+) {
+    const currentState =
+        getLossesRateState();
+
+    const importedHistory =
+        result.lossesRate?.history;
+
+    const months =
+        currentState.months.map(
+            function (
+                currentMonth,
+                monthIndex,
+            ) {
+                return {
+                    ...currentMonth,
+                    ...(
+                        importedHistory?.[
+                            monthIndex
+                        ] || {}
+                    ),
+                };
+            },
+        );
+
+    const monthIndex =
+        result.damage?.monthIndex ??
+        result.losses?.monthIndex;
+
+    if (
+        Number.isInteger(
+            monthIndex,
+        )
+    ) {
+        const month = {
+            ...months[monthIndex],
+        };
+
+        if (result.damage) {
+            month.damage =
+                result.damage
+                    .importedRows;
+        }
+
+        if (result.losses) {
+            month.possibleLosses =
+                sumLossesMonthField(
+                    result.losses,
+                    "underReview",
+                );
+
+            month.lost =
+                sumLossesMonthField(
+                    result.losses,
+                    "confirmedLosses",
+                );
+        }
+
+        months[monthIndex] =
+            month;
+    }
+
+    const importedIdentification =
+        result.lossesRate
+            ?.identification || {};
+
+    const identification = {};
+
+    [
+        "description",
+        "hubCode",
+        "subRegional",
+    ].forEach(
+        function (field) {
+            identification[field] =
+                String(
+                    importedIdentification[
+                        field
+                    ] ?? "",
+                ).trim() ||
+                currentState
+                    .identification[field];
+        },
+    );
+
+    replaceLossesRateHistory(
+        months,
+        identification,
+    );
+
+    setReportNotification({
+        reportId:
+            "losses-rate",
+        type: "success",
+        message:
+            "Taxa de Perdas atualizada pela importação de Avarias e Perdas.",
+    });
+}
+
+function getDamageAndLossesImportMessage(
+    result,
+) {
+    if (
+        result.damage &&
+        result.losses
+    ) {
+        return "Histórico de Avarias e Perdas Importado.";
+    }
+
+    if (result.damage) {
+        return "Histórico de Avarias Importado.";
+    }
+
+    return "Histórico de Perdas Importado.";
 }
 
 async function importDamageAndLossesFile(
@@ -1263,47 +1465,29 @@ async function importDamageAndLossesFile(
                 file,
             );
 
-        replaceDamageAndLossesData(
+        if (result.damage) {
+            replaceDamageAndLossesData(
+                result.damage,
+            );
+        }
+
+        if (result.losses) {
+            replaceLossesData(
+                result.losses,
+            );
+        }
+
+        synchronizeLossesRateReport(
             result,
         );
-
-        replaceLossesData(
-            result.losses,
-        );
-
-        const hub =
-            result.days.reduce(
-                function (total, day) {
-                    return total +
-                        day.hub;
-                },
-                0,
-            );
-
-        const soc =
-            result.importedRows - hub;
-
-        const ignoredRows =
-            result.ignoredRows +
-            result.losses.ignoredRows;
 
         setReportNotification({
             reportId:
                 "damage-and-losses",
-
-            type:
-                ignoredRows > 0
-                    ? "warning"
-                    : "success",
-
+            type: "success",
             message:
-                `${result.importedRows.toLocaleString("pt-BR")} avarias importadas da aba ${result.sourceSheetName}: ` +
-                `${hub.toLocaleString("pt-BR")} do Hub e ${soc.toLocaleString("pt-BR")} do Soc. ` +
-                `${result.losses.importedRows.toLocaleString("pt-BR")} registros de perdas importados da aba ${result.losses.sourceSheetName}.` +
-                (
-                    ignoredRows > 0
-                        ? ` ${ignoredRows.toLocaleString("pt-BR")} linha(s) fora do mês atual, com situação desconhecida ou sem data válida foram ignoradas.`
-                        : ""
+                getDamageAndLossesImportMessage(
+                    result,
                 ),
         });
     } catch (error) {

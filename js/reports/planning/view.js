@@ -63,7 +63,6 @@ let planningClearReportButton = null;
 let planningPreviewCpErrors = null;
 let planningPreviewCpAdded = null;
 let planningPreviewCpRemoved = null;
-let planningHeightResizeObserver = null;
 let planningCopyReportButton = null;
 let planningDownloadReportButton = null;
 let planningReportExportArea = null;
@@ -1504,89 +1503,6 @@ function getPlanningElementById(id) {
         ) || null;
 }
 
-function initializePlanningHeightSynchronization() {
-    const planningControls =
-        planningPanel.querySelector(
-            ".report-controls",
-        );
-
-    const planningSheet =
-        getPlanningElementById(
-            "planningSheetPreview",
-        );
-
-    const planningLhListElement =
-        getPlanningElementById(
-            "planningLhList",
-        );
-
-    if (
-        !planningControls ||
-        !planningSheet ||
-        !planningLhListElement
-    ) {
-        console.error(
-            "Não foi possível sincronizar as alturas.",
-            {
-                planningControls,
-                planningSheet,
-                planningLhListElement,
-            },
-        );
-
-        return;
-    }
-
-    requestAnimationFrame(
-        function () {
-            const controlsHeight =
-                planningControls
-                    .getBoundingClientRect()
-                    .height;
-
-            const listHeight =
-                planningLhListElement
-                    .getBoundingClientRect()
-                    .height;
-
-            const fixedControlsHeight =
-                controlsHeight -
-                listHeight;
-
-            function synchronizePlanningHeight() {
-                const previewHeight =
-                    planningSheet
-                        .getBoundingClientRect()
-                        .height;
-
-                const newListMaxHeight =
-                    Math.max(
-                        0,
-                        previewHeight -
-                        fixedControlsHeight,
-                    );
-
-                planningLhListElement.style.maxHeight =
-                    `${Math.round(newListMaxHeight)}px`;
-            }
-
-            planningHeightResizeObserver
-                ?.disconnect();
-
-            planningHeightResizeObserver =
-                new ResizeObserver(
-                    synchronizePlanningHeight,
-                );
-
-            planningHeightResizeObserver.observe(
-                planningSheet,
-            );
-
-            synchronizePlanningHeight();
-        },
-    );
-}
-
 /* INICIALIZA A LISTA DE LHS */
 
 function initializePlanningView(
@@ -1929,8 +1845,6 @@ function initializePlanningView(
     );
 
     renderPlanningReport();
-
-    initializePlanningHeightSynchronization();
 
     return true;
 }

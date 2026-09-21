@@ -58,6 +58,16 @@ const lossesRateColumnAliases = {
     ],
 };
 
+const LOSSES_RATE_WORKBOOK_SHEET_NAME =
+    "taxa de perdas";
+
+const LOSSES_RATE_IDENTIFICATION_FIELDS =
+    new Set([
+        "description",
+        "hubCode",
+        "subRegional",
+    ]);
+
 /* NORMALIZA O NOME DE UMA COLUNA */
 
 function normalizeLossesRateColumnName(
@@ -99,6 +109,9 @@ function findLossesRateColumnIndex(
 
 function getLossesRateColumnIndexes(
     headerRow,
+    {
+        requireIdentification = true,
+    } = {},
 ) {
     const headers =
         headerRow.map(
@@ -135,7 +148,12 @@ function getLossesRateColumnIndexes(
                         index,
                     ],
                 ) {
-                    return index === -1;
+                    return index === -1 &&
+                        (
+                            requireIdentification ||
+                            !LOSSES_RATE_IDENTIFICATION_FIELDS
+                                .has(field)
+                        );
                 },
             )
             .map(
@@ -164,6 +182,9 @@ function getLossesRateColumnIndexes(
 function getLossesRateIdentification(
     rows,
     columnIndexes,
+    {
+        required = true,
+    } = {},
 ) {
     const fields = [
         {
@@ -185,6 +206,18 @@ function getLossesRateIdentification(
             identification,
             field,
         ) {
+            if (
+                columnIndexes[
+                    field.key
+                ] === -1
+            ) {
+                identification[
+                    field.key
+                ] = "";
+
+                return identification;
+            }
+
             const receivedValues =
                 new Set();
 
@@ -216,9 +249,17 @@ function getLossesRateIdentification(
             if (
                 receivedValues.size === 0
             ) {
-                throw new Error(
-                    `O campo ${field.label} não foi informado na base.`,
-                );
+                if (required) {
+                    throw new Error(
+                        `O campo ${field.label} não foi informado na base.`,
+                    );
+                }
+
+                identification[
+                    field.key
+                ] = "";
+
+                return identification;
             }
 
             if (
@@ -419,6 +460,9 @@ function isLossesRateRowEmpty(
 
 function createLossesRateHistory(
     rows,
+    {
+        requireIdentification = true,
+    } = {},
 ) {
     if (
         rows.length === 0
@@ -431,12 +475,19 @@ function createLossesRateHistory(
     const columnIndexes =
         getLossesRateColumnIndexes(
             rows[0],
+            {
+                requireIdentification,
+            },
         );
 
     const identification =
         getLossesRateIdentification(
             rows,
             columnIndexes,
+            {
+                required:
+                    requireIdentification,
+            },
         );
 
     const history =
@@ -545,6 +596,90 @@ function createLossesRateHistory(
         history,
         identification,
         importedRows,
+    };
+}
+
+function findLossesRateWorkbookHistory(
+    workbook,
+) {
+    const sheetName =
+        workbook?.SheetNames?.find(
+            function (receivedSheetName) {
+                return normalizeLossesRateColumnName(
+                    receivedSheetName,
+                ) ===
+                    LOSSES_RATE_WORKBOOK_SHEET_NAME;
+            },
+        );
+
+    if (!sheetName) {
+        return null;
+    }
+
+    const worksheet =
+        workbook.Sheets[
+            sheetName
+        ];
+
+    const rows =
+        window.XLSX.utils
+            .sheet_to_json(
+                worksheet,
+                {
+                    header: 1,
+                    defval: "",
+                    raw: true,
+                    blankrows: false,
+                },
+            );
+
+    const searchLimit =
+        Math.min(
+            rows.length,
+            50,
+        );
+
+    let headerRowIndex = -1;
+
+    for (
+        let rowIndex = 0;
+        rowIndex < searchLimit;
+        rowIndex += 1
+    ) {
+        try {
+            getLossesRateColumnIndexes(
+                rows[rowIndex],
+                {
+                    requireIdentification:
+                        false,
+                },
+            );
+
+            headerRowIndex = rowIndex;
+            break;
+        } catch (error) {
+            // Continua procurando o cabeçalho dentro da aba.
+        }
+    }
+
+    if (headerRowIndex === -1) {
+        throw new Error(
+            `A aba ${sheetName} não possui as colunas necessárias para a Taxa de Perdas.`,
+        );
+    }
+
+    return {
+        ...createLossesRateHistory(
+            rows.slice(
+                headerRowIndex,
+            ),
+            {
+                requireIdentification:
+                    false,
+            },
+        ),
+        sourceSheetName:
+            sheetName,
     };
 }
 
@@ -1017,5 +1152,7 @@ function initializeLossesRateImport(
 }
 
 export {
+    createLossesRateHistory,
+    findLossesRateWorkbookHistory,
     initializeLossesRateImport,
 };

@@ -26,6 +26,7 @@ const receiptExportElements = {
     clearButton: null,
     copyButton: null,
     downloadButton: null,
+    linehaulArea: null,
     mainArea: null,
     comparisonArea: null,
 };
@@ -107,6 +108,28 @@ function canExportReceiptReport(
     );
 }
 
+function getActiveReceiptExportPendingMessage(
+    state,
+    linehaulState =
+        getReceiptLinehaulState(),
+) {
+    if (
+        getActiveReceiptViewId() ===
+        "linehaul"
+    ) {
+        return Array.isArray(
+            linehaulState.linehauls,
+        ) &&
+        linehaulState.linehauls.length > 0
+            ? ""
+            : "Importe ou defina ao menos um LH.";
+    }
+
+    return getReceiptExportPendingMessage(
+        state,
+    );
+}
+
 /* ATUALIZA O RODAPÉ */
 
 function renderReceiptClearStatus(
@@ -141,7 +164,7 @@ function renderReceiptExportStatus(
     state,
 ) {
     const pendingMessage =
-        getReceiptExportPendingMessage(
+        getActiveReceiptExportPendingMessage(
             state,
         );
 
@@ -211,10 +234,15 @@ function getActiveReceiptViewId() {
                 1,
             );
 
-    return panelId ===
-        "receipt-charts"
-            ? "receipt-charts"
-            : "receipt-tables";
+    return [
+        "linehaul",
+        "receipt-tables",
+        "receipt-charts",
+    ].includes(
+        panelId,
+    )
+        ? panelId
+        : "linehaul";
 }
 
 /* AGUARDA A RENDERIZAÇÃO DA GUIA */
@@ -435,41 +463,25 @@ async function combineReceiptReportBlobs(
 /* CAPTURA AS DUAS GUIAS */
 
 async function createReceiptReportBlob() {
-    const originalViewId =
+    const activeViewId =
         getActiveReceiptViewId();
 
-    let mainBlob;
-    let comparisonBlob;
+    const exportArea = {
+        linehaul:
+            receiptExportElements
+                .linehaulArea,
 
-    try {
-        await activateReceiptView(
-            "receipt-tables",
-        );
+        "receipt-tables":
+            receiptExportElements
+                .mainArea,
 
-        mainBlob =
-            await createReportImageBlob(
-                receiptExportElements
-                    .mainArea,
-            );
+        "receipt-charts":
+            receiptExportElements
+                .comparisonArea,
+    }[activeViewId];
 
-        await activateReceiptView(
-            "receipt-charts",
-        );
-
-        comparisonBlob =
-            await createReportImageBlob(
-                receiptExportElements
-                    .comparisonArea,
-            );
-    } finally {
-        await activateReceiptView(
-            originalViewId,
-        );
-    }
-
-    return combineReceiptReportBlobs(
-        mainBlob,
-        comparisonBlob,
+    return createReportImageBlob(
+        exportArea,
     );
 }
 
@@ -673,6 +685,11 @@ function initializeReceiptExport(
     receiptExportElements.downloadButton =
         receiptExportElements.copyButton;
 
+    receiptExportElements.linehaulArea =
+        receiptExportElements.panel.querySelector(
+            "#receiptLinehaulExportArea",
+        );
+
     receiptExportElements.mainArea =
         receiptExportElements.panel.querySelector(
             "#receiptReportExportArea",
@@ -783,10 +800,45 @@ function initializeReceiptExport(
     );
 
     subscribeReceiptLinehaulState(
-        function (linehaulState) {
-            renderReceiptClearStatus(
+        function () {
+            renderReceiptExportStatus(
                 getReceiptState(),
-                linehaulState,
+            );
+        },
+    );
+
+    const viewTabs =
+        receiptExportElements.panel
+            .querySelector(
+                "#receipt-view-tabs",
+            );
+
+    const renderAfterTabChange =
+        function () {
+            renderReceiptExportStatus(
+                getReceiptState(),
+            );
+        };
+
+    if (
+        typeof window.jQuery ===
+            "function" &&
+        viewTabs
+    ) {
+        window.jQuery(
+            viewTabs,
+        ).on(
+            "change.zf.tabs",
+            renderAfterTabChange,
+        );
+    }
+
+    viewTabs?.addEventListener(
+        "click",
+        function () {
+            window.setTimeout(
+                renderAfterTabChange,
+                0,
             );
         },
     );

@@ -117,6 +117,16 @@ function createReceiptReceiverKey(
 function createReceiptOperatorRecord(
     values = {},
 ) {
+    const packagesReceived =
+        normalizeReceiptQuantity(
+            values.packagesReceived,
+        );
+
+    const receivedErrors =
+        normalizeReceiptQuantity(
+            values.errorQuantity,
+        );
+
     return {
         id:
             nextReceiptOperatorId++,
@@ -132,14 +142,15 @@ function createReceiptOperatorRecord(
             ),
 
         packagesReceived:
-            normalizeReceiptQuantity(
-                values.packagesReceived,
-            ),
+            packagesReceived,
 
         errorQuantity:
-            normalizeReceiptQuantity(
-                values.errorQuantity,
-            ),
+            receivedErrors === null
+                ? null
+                : Math.min(
+                    receivedErrors,
+                    packagesReceived || 0,
+                ),
 
         selected:
             values.selected !== false,
@@ -408,7 +419,7 @@ function updateReceiptOperator(
         return false;
     }
 
-    const normalizedValue =
+    let normalizedValue =
         field === "labeler"
             ? normalizeReceiptText(
                 value,
@@ -416,6 +427,17 @@ function updateReceiptOperator(
             : normalizeReceiptQuantity(
                 value,
             );
+
+    if (
+        field === "errorQuantity" &&
+        normalizedValue !== null
+    ) {
+        normalizedValue =
+            Math.min(
+                normalizedValue,
+                operator.packagesReceived || 0,
+            );
+    }
 
     if (
         operator[field] ===

@@ -310,6 +310,67 @@ function getReceiptOperatorInputs(
     };
 }
 
+function configureReceiptErrorSelect(
+    select,
+    operator,
+) {
+    const maximum =
+        Math.max(
+            Number(
+                operator?.packagesReceived,
+            ) || 0,
+            0,
+        );
+
+    if (
+        select.dataset
+            .receiptErrorMaximum !==
+        String(maximum)
+    ) {
+        const fragment =
+            document.createDocumentFragment();
+
+        const emptyOption =
+            document.createElement(
+                "option",
+            );
+
+        emptyOption.value = "";
+        emptyOption.textContent = "—";
+        fragment.appendChild(
+            emptyOption,
+        );
+
+        for (
+            let value = 0;
+            value <= maximum;
+            value += 1
+        ) {
+            const option =
+                document.createElement(
+                    "option",
+                );
+
+            option.value = String(value);
+            option.textContent = String(value);
+            fragment.appendChild(option);
+        }
+
+        select.replaceChildren(
+            fragment,
+        );
+
+        select.dataset
+            .receiptErrorMaximum =
+                String(maximum);
+    }
+
+    setReceiptInputValue(
+        select,
+        operator?.errorQuantity,
+    );
+}
+
 function createReceiptOperatorControl(
     template,
     operator,
@@ -355,19 +416,13 @@ function createReceiptOperatorControl(
             : "Etiquetador",
     );
 
-    setReceiptInputValue(
+    configureReceiptErrorSelect(
         inputs.errorQuantity,
-        operator.errorQuantity,
+        operator,
     );
 
     inputs.errorQuantity.disabled =
         false;
-
-    inputs.errorQuantity.inputMode =
-        "numeric";
-
-    inputs.errorQuantity.pattern =
-        "[0-9]*";
 
     inputs.errorQuantity.setAttribute(
         "aria-label",
@@ -432,8 +487,10 @@ function createEmptyReceiptOperatorControl(
         `Etiquetador ${position}`,
     );
 
-    inputs.errorQuantity.value =
-        "";
+    configureReceiptErrorSelect(
+        inputs.errorQuantity,
+        null,
+    );
 
     inputs.errorQuantity.disabled =
         true;
@@ -475,6 +532,7 @@ function getReceiptOperatorStructureSignature(
                 return [
                     operator.id,
                     operator.receiver,
+                    operator.packagesReceived,
                 ];
             },
         ),
@@ -507,9 +565,9 @@ function synchronizeReceiptOperatorControls(
                 operator.labeler,
             );
 
-            setReceiptInputValue(
+            configureReceiptErrorSelect(
                 inputs.errorQuantity,
-                operator.errorQuantity,
+                operator,
             );
 
             inputs.selection.checked =
@@ -938,7 +996,9 @@ function bindReceiptOperatorControls(
                 if (
                     !(
                         input instanceof
-                        HTMLInputElement
+                            HTMLInputElement ||
+                        input instanceof
+                            HTMLSelectElement
                     ) ||
                     !elements.operatorControls
                         .contains(
@@ -987,9 +1047,7 @@ function bindReceiptOperatorControls(
                 const value =
                     field ===
                     "errorQuantity"
-                        ? sanitizeReceiptIntegerInput(
-                            input,
-                        )
+                        ? input.value
                         : input.value;
 
                 updateReceiptOperator(
@@ -1229,7 +1287,7 @@ function initializeReceiptView(
         ) ||
         !(
             templateInputs.errorQuantity instanceof
-            HTMLInputElement
+            HTMLSelectElement
         ) ||
         !(
             templateInputs.selection instanceof

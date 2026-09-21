@@ -178,7 +178,7 @@
             .final-report-highlights ul {
                 display: flex;
                 min-height: 237px;
-                row-gap: 17px;
+                row-gap: 21px;
                 padding: 25px;
                 border: 1px solid var(--color-border);
                 flex-direction: column;
@@ -936,7 +936,9 @@
 
                                                     <div class="flex-box-start">
                                                         <input type="text" data-receipt-operator-field="labeler" autocomplete="off" disabled>
-                                                        <input type="text" data-receipt-operator-field="errorQuantity" maxlength="5" autocomplete="off" inputmode="numeric" pattern="[0-9]*" disabled>
+                                                        <select data-receipt-operator-field="errorQuantity" autocomplete="off" disabled>
+                                                            <option value="">—</option>
+                                                        </select>
 
                                                         <div class="checkbox">
                                                             <input type="checkbox" data-receipt-operator-selection disabled>
@@ -2478,7 +2480,7 @@
                                                             Seu navegador não suporta gráficos em canvas.
                                                         </canvas>
 
-                                                        <img src="images/geral-icons/alert-icon.svg" alt="" aria-hidden="true">
+                                                        <img src="images/geral-icons/clock-icon.svg" alt="" aria-hidden="true">
                                                     </div>
 
                                                     <div>

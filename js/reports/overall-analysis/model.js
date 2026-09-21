@@ -113,8 +113,10 @@ function getReceiptHighlights(
 
         mostPackages:
             topVolumeOperator
-                ?.packagesReceived ??
-            null,
+                ? getOverallAnalysisPersonName(
+                    topVolumeOperator.receiver,
+                )
+                : null,
     };
 }
 
