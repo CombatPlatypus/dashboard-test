@@ -287,6 +287,18 @@ function getOverallDamageAndLossesAnalysis(
 
         damageHasData,
         lossesHasData,
+
+        lossesTotal:
+            lossesHasData
+                ? lossesSummary.total
+                : null,
+
+        packagesUnderReview:
+            lossesHasData
+                ? lossesSummary
+                    .underReview
+                : null,
+
         traditionalAnalysis,
     };
 }
@@ -412,6 +424,23 @@ function createOverallAnalysisData(
             ) * 100
             : null;
 
+    const damageAndLossesAnalysis =
+        getOverallDamageAndLossesAnalysis(
+            damageState,
+            lossesState,
+        );
+
+    const packagesAnalysisRate =
+        damageAndLossesAnalysis
+            .packagesUnderReview !== null &&
+        damageAndLossesAnalysis
+            .lossesTotal > 0
+            ? damageAndLossesAnalysis
+                .packagesUnderReview /
+                damageAndLossesAnalysis
+                    .lossesTotal
+            : null;
+
     return {
         context: {
             window:
@@ -450,6 +479,19 @@ function createOverallAnalysisData(
 
                 balance:
                     capacityBalance,
+            },
+
+            packagesAnalysis: {
+                value:
+                    damageAndLossesAnalysis
+                        .packagesUnderReview,
+
+                total:
+                    damageAndLossesAnalysis
+                        .lossesTotal,
+
+                rate:
+                    packagesAnalysisRate,
             },
 
             lossesRate: {
@@ -527,10 +569,7 @@ function createOverallAnalysisData(
         },
 
         damageAndLosses:
-            getOverallDamageAndLossesAnalysis(
-                damageState,
-                lossesState,
-            ),
+            damageAndLossesAnalysis,
     };
 }
 

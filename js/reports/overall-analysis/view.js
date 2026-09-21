@@ -297,6 +297,16 @@ function getOverallAnalysisViewElements(
                 "overallAnalysisCapacityStatus",
             ),
 
+        packagesAnalysisValue:
+            getElement(
+                "overallAnalysisPackagesAnalysisValue",
+            ),
+
+        packagesAnalysisStatus:
+            getElement(
+                "overallAnalysisPackagesAnalysisStatus",
+            ),
+
         lossRate:
             getElement(
                 "overallAnalysisLossRate",
@@ -551,6 +561,25 @@ function renderOverallAnalysisView(
             ) +
             " Pacotes";
     }
+
+    elements.packagesAnalysisValue.textContent =
+        formatOverallAnalysisQuantity(
+            data.cards.packagesAnalysis
+                .value,
+        );
+
+    elements.packagesAnalysisStatus.textContent =
+        data.cards.packagesAnalysis.rate ===
+            null
+            ? "—"
+            : (
+                formatOverallAnalysisCapacityRate(
+                    data.cards
+                        .packagesAnalysis
+                        .rate,
+                ) +
+                " dos Registros"
+            );
 
     elements.lossRate.textContent =
         formatOverallAnalysisLossRate(

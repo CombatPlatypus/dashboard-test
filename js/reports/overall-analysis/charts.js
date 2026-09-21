@@ -574,6 +574,9 @@ function renderOverallAnalysisCharts(
     const capacityProgress =
         data.cards.capacity.usageRate;
 
+    const packagesAnalysisProgress =
+        data.cards.packagesAnalysis.rate;
+
     const lossRateProgress =
         data.cards.lossesRate.rate !==
             null &&
@@ -588,6 +591,36 @@ function renderOverallAnalysisCharts(
         "#e4e6eb",
         updateMode,
     );
+
+    updateOverallAnalysisMiniChart(
+        overallAnalysisPackagesAnalysisChart,
+        packagesAnalysisProgress,
+        "#d9534f",
+        updateMode,
+    );
+
+    overallAnalysisPackagesAnalysisChart
+        .canvas
+        .setAttribute(
+            "aria-label",
+            data.cards.packagesAnalysis
+                .value === null
+                ? "Pacotes em análise, sem dados importados"
+                : (
+                    formatOverallAnalysisQuantity(
+                        data.cards
+                            .packagesAnalysis
+                            .value,
+                    ) +
+                    " pacotes em análise de " +
+                    formatOverallAnalysisQuantity(
+                        data.cards
+                            .packagesAnalysis
+                            .total,
+                    ) +
+                    " registros"
+                ),
+        );
 
     updateOverallAnalysisMiniChart(
         overallAnalysisLossRateChart,
@@ -673,13 +706,6 @@ function initializeOverallAnalysisCharts(
             packagesAnalysisCanvas,
             "#d9534f",
         );
-
-    updateOverallAnalysisMiniChart(
-        overallAnalysisPackagesAnalysisChart,
-        0.08,
-        "#d9534f",
-        "none",
-    );
 
     overallAnalysisLossRateChart =
         createOverallAnalysisMiniChart(
