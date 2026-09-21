@@ -460,7 +460,7 @@ async function combineReceiptReportBlobs(
     );
 }
 
-/* CAPTURA AS DUAS GUIAS */
+/* CAPTURA SOMENTE A GUIA ATIVA */
 
 async function createReceiptReportBlob() {
     const activeViewId =
