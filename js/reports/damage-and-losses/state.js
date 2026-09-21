@@ -97,6 +97,21 @@ function createDamageDayRecord(
             normalizeDamageQuantity(
                 values.soc,
             ),
+
+        solid:
+            normalizeDamageQuantity(
+                values.solid,
+            ),
+
+        liquid:
+            normalizeDamageQuantity(
+                values.liquid,
+            ),
+
+        glass:
+            normalizeDamageQuantity(
+                values.glass,
+            ),
     };
 }
 
@@ -261,10 +276,16 @@ function replaceDamageAndLossesData(
                     date: day.date,
                     hub: 0,
                     soc: 0,
+                    solid: 0,
+                    liquid: 0,
+                    glass: 0,
                 };
 
             current.hub += day.hub;
             current.soc += day.soc;
+            current.solid += day.solid;
+            current.liquid += day.liquid;
+            current.glass += day.glass;
 
             daysByDate.set(
                 day.date,
@@ -351,6 +372,39 @@ function getDamageAndLossesSummary(
             0,
         );
 
+    const solid =
+        days.reduce(
+            function (total, day) {
+                return total +
+                    normalizeDamageQuantity(
+                        day.solid,
+                    );
+            },
+            0,
+        );
+
+    const liquid =
+        days.reduce(
+            function (total, day) {
+                return total +
+                    normalizeDamageQuantity(
+                        day.liquid,
+                    );
+            },
+            0,
+        );
+
+    const glass =
+        days.reduce(
+            function (total, day) {
+                return total +
+                    normalizeDamageQuantity(
+                        day.glass,
+                    );
+            },
+            0,
+        );
+
     const daysByDate =
         new Map(
             days.map(
@@ -428,6 +482,15 @@ function getDamageAndLossesSummary(
 
         hub,
         soc,
+        solid,
+        liquid,
+        glass,
+
+        compositionTotal:
+            solid +
+            liquid +
+            glass,
+
         chartDays,
 
         dailyAverage:

@@ -488,6 +488,20 @@
     #damage-and-losses .tabs {
         grid-template-columns: repeat(auto-fit, minmax(299px, 1fr));
     }
+    #damage-and-losses .doughnut-chart > div > div:first-child {
+        flex: 1 1 0;
+        min-width: 0;
+        height: 270px;
+    }
+    #damage-and-losses .doughnut-chart canvas {
+        display: block;
+        width: 100% !important;
+        height: 100% !important;
+    }
+    #damage-and-losses .doughnut-chart .type span {
+        color: var(--color-text);
+        font-weight: 600;
+    }
 
 /* ESTILOS ÚNICOS DE CADA RELATÓRIO */
 

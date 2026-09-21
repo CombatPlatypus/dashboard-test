@@ -16,6 +16,9 @@ const MAX_DAMAGE_HEADER_SEARCH_ROWS =
 const DAMAGE_HUB_STATION =
     "LM Hub_SP_Santos_PraiaGrande_02";
 
+const DAMAGE_HISTORY_SHEET_NAME =
+    "historico de avarias";
+
 const damageFileExtensions =
     new Set([
         "xlsx",
@@ -33,6 +36,13 @@ const damageColumnAliases =
             "current station",
             "estacao atual",
             "estacao corrente",
+            "estacao da avaria",
+        ],
+
+        productType: [
+            "tipo de produto",
+            "tipo produto",
+            "product type",
         ],
     });
 
@@ -64,20 +74,6 @@ function normalizeDamageSearchText(
         )
         .trim();
 }
-
-const damageMonthIndexes =
-    new Map(
-        DAMAGE_MONTH_NAMES.map(
-            function (monthName, index) {
-                return [
-                    normalizeDamageSearchText(
-                        monthName,
-                    ),
-                    index,
-                ];
-            },
-        ),
-    );
 
 function findDamageColumns(
     row,
@@ -123,33 +119,19 @@ function findDamageColumns(
 
 function findDamageMonthSource(
     workbook,
-    date = new Date(),
 ) {
-    const currentMonthIndex =
-        date.getMonth();
-
-    const currentMonthName =
-        DAMAGE_MONTH_NAMES[
-            currentMonthIndex
-        ];
-
     const sheetName =
         workbook.SheetNames.find(
             function (receivedSheetName) {
-                const normalizedSheetName =
-                    normalizeDamageSearchText(
-                        receivedSheetName,
-                    );
-
-                return damageMonthIndexes.get(
-                    normalizedSheetName,
-                ) === currentMonthIndex;
+                return normalizeDamageSearchText(
+                    receivedSheetName,
+                ) === DAMAGE_HISTORY_SHEET_NAME;
             },
         );
 
     if (!sheetName) {
         throw new Error(
-            `O arquivo não possui a aba ${currentMonthName.toUpperCase()} do mês atual.`,
+            "O arquivo não possui a aba Histórico de Avarias.",
         );
     }
 
@@ -198,8 +180,49 @@ function findDamageMonthSource(
     }
 
     throw new Error(
-        `A aba ${sheetName} não possui as colunas DATA e Current station.`,
+        `A aba ${sheetName} não possui as colunas Data, Estação da Avaria e Tipo de Produto.`,
     );
+}
+
+function classifyDamageProductType(
+    value,
+) {
+    const normalizedValue =
+        normalizeDamageSearchText(
+            value,
+        );
+
+    if (
+        normalizedValue.includes(
+            "liquid",
+        )
+    ) {
+        return "liquid";
+    }
+
+    if (
+        normalizedValue.includes(
+            "vidro",
+        ) ||
+        normalizedValue.includes(
+            "espelho",
+        )
+    ) {
+        return "glass";
+    }
+
+    if (
+        normalizedValue.includes(
+            "solid",
+        ) ||
+        normalizedValue.includes(
+            "outro",
+        )
+    ) {
+        return "solid";
+    }
+
+    return "";
 }
 
 function createDamageDateParts(
@@ -385,6 +408,9 @@ function createDamageMonthData(
                 date: parsedDate.key,
                 hub: 0,
                 soc: 0,
+                solid: 0,
+                liquid: 0,
+                glass: 0,
             };
 
         const currentStation =
@@ -402,6 +428,18 @@ function createDamageMonthData(
             day.hub += 1;
         } else {
             day.soc += 1;
+        }
+
+        const productType =
+            classifyDamageProductType(
+                row?.[
+                    source.columns
+                        .productType
+                ],
+            );
+
+        if (productType) {
+            day[productType] += 1;
         }
 
         daysByDate.set(
@@ -700,6 +738,8 @@ function initializeDamageAndLossesImport(
 
 export {
     DAMAGE_HUB_STATION,
+    DAMAGE_HISTORY_SHEET_NAME,
+    classifyDamageProductType,
     createDamageMonthData,
     findDamageMonthSource,
     initializeDamageAndLossesImport,

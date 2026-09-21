@@ -10,6 +10,15 @@ const DAMAGE_SOC_COLOR =
 const DAMAGE_HUB_COLOR =
     "#F44336";
 
+const DAMAGE_SOLID_COLOR =
+    "#F44336";
+
+const DAMAGE_LIQUID_COLOR =
+    "#ff9800";
+
+const DAMAGE_GLASS_COLOR =
+    "#3F51B5";
+
 const damageChartQuantityFormatter =
     new Intl.NumberFormat(
         "pt-BR",
@@ -19,6 +28,7 @@ const damageChartQuantityFormatter =
     );
 
 let damageLastSevenDaysChart = null;
+let damageCompositionChart = null;
 
 function formatDamageChartDate(
     dateKey,
@@ -268,6 +278,174 @@ const damageChartLabelsPlugin = {
     },
 };
 
+const damageCompositionCenterPlugin = {
+    id: "damageCompositionCenter",
+
+    afterDatasetsDraw(chart) {
+        const total =
+            Number(
+                chart.$damageCompositionTotal,
+            ) || 0;
+
+        const chartArea =
+            chart.chartArea;
+
+        if (!chartArea) {
+            return;
+        }
+
+        const context = chart.ctx;
+        const positionX =
+            (
+                chartArea.left +
+                chartArea.right
+            ) / 2;
+        const positionY =
+            (
+                chartArea.top +
+                chartArea.bottom
+            ) / 2;
+
+        context.save();
+        context.textAlign = "center";
+        context.textBaseline = "middle";
+        context.fillStyle = "#e4e6eb";
+        context.font =
+            '700 24px "Open Sans", sans-serif';
+        context.fillText(
+            total > 0
+                ? damageChartQuantityFormatter
+                    .format(total)
+                : "—",
+            positionX,
+            positionY - 8,
+        );
+
+        context.fillStyle = "#bfc2c8";
+        context.font =
+            '500 12px "Open Sans", sans-serif';
+        context.fillText(
+            "classificadas",
+            positionX,
+            positionY + 15,
+        );
+        context.restore();
+    },
+};
+
+function createDamageCompositionChart(
+    canvas,
+) {
+    return new window.Chart(
+        canvas,
+        {
+            type: "doughnut",
+
+            data: {
+                labels: [
+                    "Avaria Sólida",
+                    "Avaria Líquida",
+                    "Avaria de Vidro",
+                ],
+
+                datasets: [
+                    {
+                        data: [0, 0, 0],
+
+                        backgroundColor: [
+                            DAMAGE_SOLID_COLOR,
+                            DAMAGE_LIQUID_COLOR,
+                            DAMAGE_GLASS_COLOR,
+                        ],
+
+                        borderColor:
+                            "transparent",
+
+                        borderWidth: 0,
+                        hoverOffset: 5,
+                    },
+                ],
+            },
+
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+
+                devicePixelRatio:
+                    Math.max(
+                        window.devicePixelRatio || 1,
+                        2,
+                    ),
+
+                cutout: "64%",
+
+                layout: {
+                    padding: 12,
+                },
+
+                animation: {
+                    duration: 350,
+                },
+
+                plugins: {
+                    legend: {
+                        display: false,
+                    },
+
+                    tooltip: {
+                        callbacks: {
+                            label(context) {
+                                const value =
+                                    Number(
+                                        context.raw,
+                                    ) || 0;
+
+                                const total =
+                                    context.dataset
+                                        .data
+                                        .reduce(
+                                            function (
+                                                sum,
+                                                item,
+                                            ) {
+                                                return sum +
+                                                    (
+                                                        Number(
+                                                            item,
+                                                        ) || 0
+                                                    );
+                                            },
+                                            0,
+                                        );
+
+                                const percentage =
+                                    total > 0
+                                        ? value /
+                                            total *
+                                            100
+                                        : 0;
+
+                                return (
+                                    `${context.label}: ` +
+                                    `${damageChartQuantityFormatter.format(value)} ` +
+                                    `(${percentage.toLocaleString("pt-BR", {
+                                        minimumFractionDigits: 1,
+                                        maximumFractionDigits: 1,
+                                    })}%)`
+                                );
+                            },
+                        },
+                    },
+                },
+            },
+
+            plugins: [
+                damageCompositionCenterPlugin,
+            ],
+        },
+    );
+}
+
 function createDamageLastSevenDaysChart(
     canvas,
 ) {
@@ -404,7 +582,10 @@ function createDamageLastSevenDaysChart(
 function renderDamageAndLossesCharts(
     state = getDamageAndLossesState(),
 ) {
-    if (!damageLastSevenDaysChart) {
+    if (
+        !damageLastSevenDaysChart ||
+        !damageCompositionChart
+    ) {
         return false;
     }
 
@@ -471,6 +652,20 @@ function renderDamageAndLossesCharts(
 
     damageLastSevenDaysChart.update();
 
+    damageCompositionChart
+        .$damageCompositionTotal =
+            summary.compositionTotal;
+
+    damageCompositionChart
+        .data.datasets[0]
+        .data = [
+            summary.solid,
+            summary.liquid,
+            summary.glass,
+        ];
+
+    damageCompositionChart.update();
+
     return true;
 }
 
@@ -496,6 +691,12 @@ function observeDamageChartVisibility(
                             ?.resize();
 
                         damageLastSevenDaysChart
+                            ?.update("none");
+
+                        damageCompositionChart
+                            ?.resize();
+
+                        damageCompositionChart
                             ?.update("none");
                     },
                 );
@@ -524,34 +725,49 @@ function initializeDamageAndLossesCharts(
             ? rootElement
             : null;
 
-    const canvas =
+    const lastSevenDaysCanvas =
         panel?.querySelector(
             "#damageLastSevenDaysChart",
         );
 
+    const compositionCanvas =
+        panel?.querySelector(
+            "#damageCompositionChart",
+        );
+
     if (
         !(panel instanceof HTMLElement) ||
-        !(canvas instanceof HTMLCanvasElement) ||
+        !(lastSevenDaysCanvas instanceof HTMLCanvasElement) ||
+        !(compositionCanvas instanceof HTMLCanvasElement) ||
         typeof window.Chart !== "function"
     ) {
         return false;
     }
 
     if (
-        canvas.dataset
+        lastSevenDaysCanvas.dataset
             .damageChartInitialized ===
         "true"
     ) {
         return true;
     }
 
-    canvas.dataset
+    lastSevenDaysCanvas.dataset
+        .damageChartInitialized =
+            "true";
+
+    compositionCanvas.dataset
         .damageChartInitialized =
             "true";
 
     damageLastSevenDaysChart =
         createDamageLastSevenDaysChart(
-            canvas,
+            lastSevenDaysCanvas,
+        );
+
+    damageCompositionChart =
+        createDamageCompositionChart(
+            compositionCanvas,
         );
 
     subscribeDamageAndLossesState(

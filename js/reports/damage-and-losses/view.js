@@ -29,6 +29,21 @@ function getDamageViewElements(
             rootElement.querySelector(
                 "#damageSocValue",
             ),
+
+        solid:
+            rootElement.querySelector(
+                "#damageSolidValue",
+            ),
+
+        liquid:
+            rootElement.querySelector(
+                "#damageLiquidValue",
+            ),
+
+        glass:
+            rootElement.querySelector(
+                "#damageGlassValue",
+            ),
     };
 }
 
@@ -86,6 +101,30 @@ function renderDamageAndLossesView(
             formatDamageQuantity(
                 summary.soc,
                 summary.hasData,
+            );
+
+    const hasComposition =
+        summary.compositionTotal > 0;
+
+    damageViewElements.solid
+        .textContent =
+            formatDamageQuantity(
+                summary.solid,
+                hasComposition,
+            );
+
+    damageViewElements.liquid
+        .textContent =
+            formatDamageQuantity(
+                summary.liquid,
+                hasComposition,
+            );
+
+    damageViewElements.glass
+        .textContent =
+            formatDamageQuantity(
+                summary.glass,
+                hasComposition,
             );
 
     return true;
