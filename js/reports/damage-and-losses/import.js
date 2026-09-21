@@ -362,6 +362,9 @@ function createDamageMonthData(
     const daysByDate =
         new Map();
 
+    const socStationsByName =
+        new Map();
+
     let ignoredRows = 0;
 
     for (
@@ -421,6 +424,11 @@ function createDamageMonthData(
                 ],
             );
 
+        const currentStationSearch =
+            normalizeDamageSearchText(
+                currentStation,
+            );
+
         if (
             currentStation ===
             DAMAGE_HUB_STATION
@@ -428,6 +436,31 @@ function createDamageMonthData(
             day.hub += 1;
         } else {
             day.soc += 1;
+        }
+
+        if (
+            currentStationSearch
+                .startsWith(
+                    "soc sp ",
+                )
+        ) {
+            const station =
+                socStationsByName.get(
+                    currentStationSearch,
+                );
+
+            if (station) {
+                station.count += 1;
+            } else {
+                socStationsByName.set(
+                    currentStationSearch,
+                    {
+                        name:
+                            currentStation,
+                        count: 1,
+                    },
+                );
+            }
         }
 
         const productType =
@@ -469,6 +502,20 @@ function createDamageMonthData(
             0,
         );
 
+    const socStations =
+        Array.from(
+            socStationsByName.values(),
+        ).sort(
+            function (first, second) {
+                return second.count -
+                    first.count ||
+                    first.name.localeCompare(
+                        second.name,
+                        "pt-BR",
+                    );
+            },
+        );
+
     if (importedRows === 0) {
         throw new Error(
             `Nenhuma avaria de ${DAMAGE_MONTH_NAMES[monthIndex]} de ${year} foi encontrada.`,
@@ -479,6 +526,7 @@ function createDamageMonthData(
         monthIndex,
         year,
         days,
+        socStations,
         importedRows,
         ignoredRows,
     };

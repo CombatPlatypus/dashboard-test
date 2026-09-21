@@ -39,6 +39,21 @@ const damageCompositionPercentageFormatter =
 
 let damageLastSevenDaysChart = null;
 let damageCompositionChart = null;
+let damageSocChart = null;
+
+function formatDamageSocName(
+    value,
+) {
+    return String(value ?? "")
+        .trim()
+        .replace(
+            /^soc[\s_]+sp[\s_]+/i,
+            "",
+        )
+        .replace(/_+/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+}
 
 function formatDamageChartDate(
     dateKey,
@@ -471,6 +486,71 @@ const damageCompositionLabelsPlugin = {
     },
 };
 
+const damageSocLabelsPlugin = {
+    id: "damageSocLabels",
+
+    afterDatasetsDraw(chart) {
+        const values =
+            chart.data.datasets[0]
+                ?.data || [];
+
+        const bars =
+            chart.getDatasetMeta(0)
+                .data;
+
+        const chartArea =
+            chart.chartArea;
+
+        if (!chartArea) {
+            return;
+        }
+
+        const context = chart.ctx;
+
+        context.save();
+
+        bars.forEach(
+            function (bar, index) {
+                const value =
+                    Number(values[index]) ||
+                    0;
+
+                if (value <= 0) {
+                    return;
+                }
+
+                const properties =
+                    bar.getProps(
+                        ["x", "y"],
+                        true,
+                    );
+
+                const hasSpaceAfterBar =
+                    properties.x + 42 <
+                    chartArea.right;
+
+                drawDamageChartText(
+                    context,
+                    damageChartQuantityFormatter
+                        .format(value),
+                    hasSpaceAfterBar
+                        ? properties.x + 9
+                        : chartArea.right - 4,
+                    properties.y,
+                    {
+                        align:
+                            hasSpaceAfterBar
+                                ? "left"
+                                : "right",
+                    },
+                );
+            },
+        );
+
+        context.restore();
+    },
+};
+
 function createDamageCompositionChart(
     canvas,
 ) {
@@ -723,12 +803,112 @@ function createDamageLastSevenDaysChart(
     );
 }
 
+function createDamageSocChart(
+    canvas,
+) {
+    return new window.Chart(
+        canvas,
+        {
+            type: "bar",
+
+            data: {
+                labels: [],
+
+                datasets: [
+                    {
+                        data: [],
+                        backgroundColor: [],
+                        borderWidth: 0,
+                        borderSkipped: false,
+                        barThickness: 24,
+                    },
+                ],
+            },
+
+            options: {
+                indexAxis: "y",
+                responsive: true,
+                maintainAspectRatio: false,
+
+                animation: {
+                    duration: 350,
+                },
+
+                layout: {
+                    padding: {
+                        right: 38,
+                    },
+                },
+
+                plugins: {
+                    legend: {
+                        display: false,
+                    },
+
+                    tooltip: {
+                        callbacks: {
+                            label(context) {
+                                return `Avarias: ${damageChartQuantityFormatter.format(context.raw)}`;
+                            },
+                        },
+                    },
+                },
+
+                scales: {
+                    x: {
+                        beginAtZero: true,
+
+                        ticks: {
+                            color: "#bfc2c8",
+                            precision: 0,
+                            font: {
+                                size: 14,
+                            },
+                        },
+
+                        grid: {
+                            color:
+                                "rgba(82, 82, 82, 0.35)",
+                        },
+
+                        border: {
+                            color: "#525252",
+                        },
+                    },
+
+                    y: {
+                        ticks: {
+                            color: "#e4e6eb",
+                            font: {
+                                size: 14,
+                            },
+                        },
+
+                        grid: {
+                            display: false,
+                        },
+
+                        border: {
+                            color: "#525252",
+                        },
+                    },
+                },
+            },
+
+            plugins: [
+                damageSocLabelsPlugin,
+            ],
+        },
+    );
+}
+
 function renderDamageAndLossesCharts(
     state = getDamageAndLossesState(),
 ) {
     if (
         !damageLastSevenDaysChart ||
-        !damageCompositionChart
+        !damageCompositionChart ||
+        !damageSocChart
     ) {
         return false;
     }
@@ -817,6 +997,69 @@ function renderDamageAndLossesCharts(
 
     damageCompositionChart.update();
 
+    const socStations =
+        summary.socStations;
+
+    const maximumSocCount =
+        Math.max(
+            ...socStations.map(
+                function (station) {
+                    return station.count;
+                },
+            ),
+            0,
+        );
+
+    const socChartContainer =
+        damageSocChart.canvas
+            .parentElement;
+
+    if (socChartContainer) {
+        socChartContainer.style.height =
+            `${Math.max(270, socStations.length * 52 + 45)}px`;
+    }
+
+    damageSocChart.data.labels =
+        socStations.map(
+            function (station) {
+                return formatDamageSocName(
+                    station.name,
+                );
+            },
+        );
+
+    damageSocChart
+        .data.datasets[0]
+        .data =
+            socStations.map(
+                function (station) {
+                    return station.count;
+                },
+            );
+
+    damageSocChart
+        .data.datasets[0]
+        .backgroundColor =
+            socStations.map(
+                function (_, index) {
+                    return index === 0
+                        ? DAMAGE_SOC_COLOR
+                        : "#e4e6eb";
+                },
+            );
+
+    damageSocChart
+        .options.scales.x
+        .suggestedMax =
+            maximumSocCount > 0
+                ? Math.ceil(
+                    maximumSocCount * 1.15,
+                )
+                : 5;
+
+    damageSocChart.resize();
+    damageSocChart.update();
+
     return true;
 }
 
@@ -848,6 +1091,12 @@ function observeDamageChartVisibility(
                             ?.resize();
 
                         damageCompositionChart
+                            ?.update("none");
+
+                        damageSocChart
+                            ?.resize();
+
+                        damageSocChart
                             ?.update("none");
                     },
                 );
@@ -886,10 +1135,16 @@ function initializeDamageAndLossesCharts(
             "#damageCompositionChart",
         );
 
+    const socCanvas =
+        panel?.querySelector(
+            "#damageSocChart",
+        );
+
     if (
         !(panel instanceof HTMLElement) ||
         !(lastSevenDaysCanvas instanceof HTMLCanvasElement) ||
         !(compositionCanvas instanceof HTMLCanvasElement) ||
+        !(socCanvas instanceof HTMLCanvasElement) ||
         typeof window.Chart !== "function"
     ) {
         return false;
@@ -911,6 +1166,10 @@ function initializeDamageAndLossesCharts(
         .damageChartInitialized =
             "true";
 
+    socCanvas.dataset
+        .damageChartInitialized =
+            "true";
+
     damageLastSevenDaysChart =
         createDamageLastSevenDaysChart(
             lastSevenDaysCanvas,
@@ -919,6 +1178,11 @@ function initializeDamageAndLossesCharts(
     damageCompositionChart =
         createDamageCompositionChart(
             compositionCanvas,
+        );
+
+    damageSocChart =
+        createDamageSocChart(
+            socCanvas,
         );
 
     subscribeDamageAndLossesState(
@@ -934,6 +1198,7 @@ function initializeDamageAndLossesCharts(
 }
 
 export {
+    formatDamageSocName,
     initializeDamageAndLossesCharts,
     renderDamageAndLossesCharts,
 };

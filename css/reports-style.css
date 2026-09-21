@@ -502,6 +502,16 @@
         color: var(--color-text);
         font-weight: 600;
     }
+    #damage-and-losses .damage-soc-chart-container {
+        position: relative;
+        width: 100%;
+        min-height: 270px;
+    }
+    #damage-and-losses .damage-soc-chart-container canvas {
+        display: block;
+        width: 100% !important;
+        height: 100% !important;
+    }
 
 /* ESTILOS ÚNICOS DE CADA RELATÓRIO */
 
