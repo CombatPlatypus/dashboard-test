@@ -34,29 +34,30 @@
         <style>
 
             #docs {
-
+                max-width: 1600px;
+                margin: 0 auto;
             }
-
             #docs .title {
                 border-bottom: 2px solid var(--color-border);
                 padding: 20px;
             }
-            
+            #docs .title h3 {
+                margin: 0;
+            }
+            #docs > .flex-box-start {
+                gap: 15px;
+            }
             #docs .padding {
                 padding: 20px;
             }
-
             #docs > .flex-box-start > div:first-of-type {
                 flex: 1 1 0;
                 display: flex;
                 flex-direction: column;
-                row-gap: 20px;
                 background-color: var(--color-container);
                 border: 2px solid var(--color-border);
                 border-radius: 5px;
-                gap: 15px;
             }
-                    
             #docs > .flex-box-start > ul:last-of-type {
                 flex: 0 0 300px;
                 display: flex;
@@ -98,7 +99,7 @@
                         </a>
                     </li> 
 
-                    <li class="tabs-title is-active">
+                    <li class="tabs-title">
                         <a href="#reports">
                             <div class="flex-box-center">
                                 <img src="images/geral-icons/reports-icon.svg">
@@ -116,7 +117,7 @@
                         </a>
                     </li> 
 
-                    <li class="tabs-title">
+                    <li class="tabs-title is-active">
                         <a href="#docs">
                             <div class="flex-box-center">
                                 <img src="images/menu-icons/docs-icon.svg">
