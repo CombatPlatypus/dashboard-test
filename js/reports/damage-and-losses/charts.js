@@ -27,6 +27,16 @@ const damageChartQuantityFormatter =
         },
     );
 
+const damageCompositionPercentageFormatter =
+    new Intl.NumberFormat(
+        "pt-BR",
+        {
+            style: "percent",
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        },
+    );
+
 let damageLastSevenDaysChart = null;
 let damageCompositionChart = null;
 
@@ -281,12 +291,11 @@ const damageChartLabelsPlugin = {
 const damageCompositionCenterPlugin = {
     id: "damageCompositionCenter",
 
-    afterDatasetsDraw(chart) {
-        const total =
-            Number(
-                chart.$damageCompositionTotal,
-            ) || 0;
-
+    afterDraw(
+        chart,
+        args,
+        options,
+    ) {
         const chartArea =
             chart.chartArea;
 
@@ -294,41 +303,170 @@ const damageCompositionCenterPlugin = {
             return;
         }
 
-        const context = chart.ctx;
-        const positionX =
+        const centerX =
             (
                 chartArea.left +
                 chartArea.right
             ) / 2;
-        const positionY =
+
+        const centerY =
             (
                 chartArea.top +
                 chartArea.bottom
             ) / 2;
 
+        const context =
+            chart.ctx;
+
+        const fontFamily =
+            window
+                .getComputedStyle(
+                    chart.canvas,
+                )
+                .fontFamily ||
+            "sans-serif";
+
         context.save();
-        context.textAlign = "center";
-        context.textBaseline = "middle";
-        context.fillStyle = "#e4e6eb";
+
+        context.textAlign =
+            "center";
+
+        context.textBaseline =
+            "middle";
+
+        context.fillStyle =
+            "#e4e6eb";
+
         context.font =
-            '700 24px "Open Sans", sans-serif';
+            `600 22px ${fontFamily}`;
+
         context.fillText(
-            total > 0
-                ? damageChartQuantityFormatter
-                    .format(total)
-                : "—",
-            positionX,
-            positionY - 8,
+            options.text || "—",
+            centerX,
+            centerY - 8,
         );
 
-        context.fillStyle = "#bfc2c8";
+        context.fillStyle =
+            "#8b8d91";
+
         context.font =
-            '500 12px "Open Sans", sans-serif';
+            `12px ${fontFamily}`;
+
         context.fillText(
-            "classificadas",
-            positionX,
-            positionY + 15,
+            options.label ||
+                "Classificadas",
+            centerX,
+            centerY + 16,
         );
+
+        context.restore();
+    },
+};
+
+const damageCompositionLabelsPlugin = {
+    id: "damageCompositionLabels",
+
+    afterDatasetsDraw(chart) {
+        const dataset =
+            chart.data.datasets[0];
+
+        const metadata =
+            chart.getDatasetMeta(0);
+
+        const total =
+            dataset.data.reduce(
+                function (sum, item) {
+                    return sum +
+                        (
+                            Number(item) ||
+                            0
+                        );
+                },
+                0,
+            );
+
+        if (total <= 0) {
+            return;
+        }
+
+        const context = chart.ctx;
+
+        context.save();
+        context.font =
+            '400 12px "Open Sans", sans-serif';
+        context.textBaseline = "middle";
+        context.textAlign = "center";
+        context.lineWidth = 3;
+
+        metadata.data.forEach(
+            function (arc, index) {
+                if (
+                    !chart.getDataVisibility(
+                        index,
+                    )
+                ) {
+                    return;
+                }
+
+                const value =
+                    Number(
+                        dataset.data[index],
+                    );
+
+                if (
+                    !Number.isFinite(value) ||
+                    value <= 0
+                ) {
+                    return;
+                }
+
+                const angle =
+                    (
+                        arc.startAngle +
+                        arc.endAngle
+                    ) / 2;
+
+                const radius =
+                    (
+                        arc.innerRadius +
+                        arc.outerRadius
+                    ) / 2;
+
+                const positionX =
+                    arc.x +
+                    Math.cos(angle) *
+                        radius;
+
+                const positionY =
+                    arc.y +
+                    Math.sin(angle) *
+                        radius;
+
+                const text =
+                    damageCompositionPercentageFormatter
+                        .format(
+                            value / total,
+                        );
+
+                context.strokeStyle =
+                    "#18191a";
+                context.fillStyle =
+                    "#e4e6eb";
+
+                context.strokeText(
+                    text,
+                    positionX,
+                    positionY,
+                );
+
+                context.fillText(
+                    text,
+                    positionX,
+                    positionY,
+                );
+            },
+        );
+
         context.restore();
     },
 };
@@ -436,11 +574,17 @@ function createDamageCompositionChart(
                             },
                         },
                     },
+
+                    damageCompositionCenter: {
+                        text: "—",
+                        label: "Classificadas",
+                    },
                 },
             },
 
             plugins: [
                 damageCompositionCenterPlugin,
+                damageCompositionLabelsPlugin,
             ],
         },
     );
@@ -653,8 +797,15 @@ function renderDamageAndLossesCharts(
     damageLastSevenDaysChart.update();
 
     damageCompositionChart
-        .$damageCompositionTotal =
-            summary.compositionTotal;
+        .options.plugins
+        .damageCompositionCenter
+        .text =
+            summary.compositionTotal > 0
+                ? damageChartQuantityFormatter
+                    .format(
+                        summary.compositionTotal,
+                    )
+                : "—";
 
     damageCompositionChart
         .data.datasets[0]
