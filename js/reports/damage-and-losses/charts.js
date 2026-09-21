@@ -939,6 +939,14 @@ function getActiveDamageChartPeriod(
             id: "last7",
             title: "Últimos 7 Dias",
             days: [],
+            hub: 0,
+            soc: 0,
+            solid: 0,
+            liquid: 0,
+            glass: 0,
+            total: 0,
+            compositionTotal: 0,
+            socStations: [],
             dailyAverage: 0,
         };
 
@@ -1000,6 +1008,44 @@ function renderDamageChartPeriodSelector(
                     period.days.length === 0;
             },
         );
+}
+
+function renderDamageCompositionValues(
+    selectedPeriod,
+) {
+    const hasComposition =
+        selectedPeriod
+            .compositionTotal > 0;
+
+    [
+        [
+            "damageSolidValue",
+            selectedPeriod.solid,
+        ],
+        [
+            "damageLiquidValue",
+            selectedPeriod.liquid,
+        ],
+        [
+            "damageGlassValue",
+            selectedPeriod.glass,
+        ],
+    ].forEach(
+        function ([elementId, value]) {
+            const element =
+                document.getElementById(
+                    elementId,
+                );
+
+            if (element) {
+                element.textContent =
+                    hasComposition
+                        ? damageChartQuantityFormatter
+                            .format(value)
+                        : "—";
+            }
+        },
+    );
 }
 
 function renderDamageAndLossesCharts(
@@ -1100,25 +1146,37 @@ function renderDamageAndLossesCharts(
         .options.plugins
         .damageCompositionCenter
         .text =
-            summary.compositionTotal > 0
+            selectedPeriod
+                .compositionTotal > 0
                 ? damageChartQuantityFormatter
                     .format(
-                        summary.compositionTotal,
+                        selectedPeriod
+                            .compositionTotal,
                     )
                 : "—";
 
     damageCompositionChart
         .data.datasets[0]
         .data = [
-            summary.solid,
-            summary.liquid,
-            summary.glass,
+            selectedPeriod.solid,
+            selectedPeriod.liquid,
+            selectedPeriod.glass,
         ];
+
+    damageCompositionChart.canvas
+        .setAttribute(
+            "aria-label",
+            `Composição das avarias: ${selectedPeriod.title}`,
+        );
 
     damageCompositionChart.update();
 
+    renderDamageCompositionValues(
+        selectedPeriod,
+    );
+
     const socStations =
-        summary.socStations;
+        selectedPeriod.socStations;
 
     const maximumSocCount =
         Math.max(
@@ -1176,6 +1234,12 @@ function renderDamageAndLossesCharts(
                     maximumSocCount * 1.15,
                 )
                 : 5;
+
+    damageSocChart.canvas
+        .setAttribute(
+            "aria-label",
+            `Quantidade de avarias por Soc: ${selectedPeriod.title}`,
+        );
 
     damageSocChart.resize();
     damageSocChart.update();

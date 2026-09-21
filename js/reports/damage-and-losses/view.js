@@ -44,6 +44,11 @@ function getDamageViewElements(
             rootElement.querySelector(
                 "#damageGlassValue",
             ),
+
+        traditionalAnalysisTable:
+            rootElement.querySelector(
+                "#damageTraditionalAnalysisTable",
+            ),
     };
 }
 
@@ -68,6 +73,62 @@ function formatDamageQuantity(
         ? damageQuantityFormatter
             .format(value)
         : "—";
+}
+
+function renderDamageTraditionalAnalysis(
+    summary,
+) {
+    const table =
+        damageViewElements
+            .traditionalAnalysisTable;
+
+    const periods = [
+        "today",
+        "yesterday",
+        "dayBeforeYesterday",
+        "days3to7",
+        "days8to14",
+        "days15toMonthStart",
+        "totalMonth",
+    ];
+
+    table.querySelectorAll(
+        "[data-damage-analysis-field]",
+    ).forEach(
+        function (row) {
+            const field =
+                row.dataset
+                    .damageAnalysisField;
+
+            const cells =
+                row.querySelectorAll(
+                    "td",
+                );
+
+            periods.forEach(
+                function (period, index) {
+                    const cell =
+                        cells[index];
+
+                    if (!cell) {
+                        return;
+                    }
+
+                    const value =
+                        summary
+                            .traditionalAnalysis
+                            ?.[period]
+                            ?.[field];
+
+                    cell.textContent =
+                        formatDamageQuantity(
+                            value || 0,
+                            summary.hasData,
+                        );
+                },
+            );
+        },
+    );
 }
 
 function renderDamageAndLossesView(
@@ -126,6 +187,10 @@ function renderDamageAndLossesView(
                 summary.glass,
                 hasComposition,
             );
+
+    renderDamageTraditionalAnalysis(
+        summary,
+    );
 
     return true;
 }

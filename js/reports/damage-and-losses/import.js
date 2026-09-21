@@ -75,6 +75,30 @@ function normalizeDamageSearchText(
         .trim();
 }
 
+function incrementDamageSocStation(
+    stationsByName,
+    stationKey,
+    stationName,
+) {
+    const station =
+        stationsByName.get(
+            stationKey,
+        );
+
+    if (station) {
+        station.count += 1;
+        return;
+    }
+
+    stationsByName.set(
+        stationKey,
+        {
+            name: stationName,
+            count: 1,
+        },
+    );
+}
+
 function findDamageColumns(
     row,
 ) {
@@ -365,6 +389,9 @@ function createDamageMonthData(
     const socStationsByName =
         new Map();
 
+    const socStationsByDate =
+        new Map();
+
     let ignoredRows = 0;
 
     for (
@@ -444,23 +471,27 @@ function createDamageMonthData(
                     "soc sp ",
                 )
         ) {
-            const station =
-                socStationsByName.get(
-                    currentStationSearch,
-                );
+            incrementDamageSocStation(
+                socStationsByName,
+                currentStationSearch,
+                currentStation,
+            );
 
-            if (station) {
-                station.count += 1;
-            } else {
-                socStationsByName.set(
-                    currentStationSearch,
-                    {
-                        name:
-                            currentStation,
-                        count: 1,
-                    },
-                );
-            }
+            const stationsForDay =
+                socStationsByDate.get(
+                    parsedDate.key,
+                ) || new Map();
+
+            incrementDamageSocStation(
+                stationsForDay,
+                currentStationSearch,
+                currentStation,
+            );
+
+            socStationsByDate.set(
+                parsedDate.key,
+                stationsForDay,
+            );
         }
 
         const productType =
@@ -484,7 +515,38 @@ function createDamageMonthData(
     const days =
         Array.from(
             daysByDate.values(),
-        ).sort(
+        )
+            .map(
+                function (day) {
+                    return {
+                        ...day,
+
+                        socStations:
+                            Array.from(
+                                (
+                                    socStationsByDate
+                                        .get(
+                                            day.date,
+                                        ) ||
+                                    new Map()
+                                ).values(),
+                            ).sort(
+                                function (
+                                    first,
+                                    second,
+                                ) {
+                                    return second.count -
+                                        first.count ||
+                                        first.name.localeCompare(
+                                            second.name,
+                                            "pt-BR",
+                                        );
+                                },
+                            ),
+                    };
+                },
+            )
+            .sort(
             function (first, second) {
                 return first.date.localeCompare(
                     second.date,

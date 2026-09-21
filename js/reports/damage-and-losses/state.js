@@ -112,6 +112,11 @@ function createDamageDayRecord(
             normalizeDamageQuantity(
                 values.glass,
             ),
+
+        socStations:
+            mergeDamageSocStationRecords(
+                values.socStations,
+            ),
     };
 }
 
@@ -138,6 +143,69 @@ function createDamageSocStationRecord(
             count,
         }
         : null;
+}
+
+function mergeDamageSocStationRecords(
+    ...collections
+) {
+    const stationsByName =
+        new Map();
+
+    collections.forEach(
+        function (collection) {
+            if (!Array.isArray(collection)) {
+                return;
+            }
+
+            collection.forEach(
+                function (receivedStation) {
+                    const station =
+                        createDamageSocStationRecord(
+                            receivedStation,
+                        );
+
+                    if (!station) {
+                        return;
+                    }
+
+                    const stationKey =
+                        station.name
+                            .toLocaleLowerCase(
+                                "pt-BR",
+                            );
+
+                    const current =
+                        stationsByName.get(
+                            stationKey,
+                        );
+
+                    if (current) {
+                        current.count +=
+                            station.count;
+                        return;
+                    }
+
+                    stationsByName.set(
+                        stationKey,
+                        station,
+                    );
+                },
+            );
+        },
+    );
+
+    return Array.from(
+        stationsByName.values(),
+    ).sort(
+        function (first, second) {
+            return second.count -
+                first.count ||
+                first.name.localeCompare(
+                    second.name,
+                    "pt-BR",
+                );
+        },
+    );
 }
 
 function createInitialDamageState() {
@@ -194,6 +262,18 @@ function getDamageAndLossesState() {
                     function (day) {
                         return {
                             ...day,
+
+                            socStations:
+                                day.socStations
+                                    .map(
+                                        function (
+                                            station,
+                                        ) {
+                                            return {
+                                                ...station,
+                                            };
+                                        },
+                                    ),
                         };
                     },
                 ),
@@ -319,6 +399,7 @@ function replaceDamageAndLossesData(
                     solid: 0,
                     liquid: 0,
                     glass: 0,
+                    socStations: [],
                 };
 
             current.hub += day.hub;
@@ -326,6 +407,11 @@ function replaceDamageAndLossesData(
             current.solid += day.solid;
             current.liquid += day.liquid;
             current.glass += day.glass;
+            current.socStations =
+                mergeDamageSocStationRecords(
+                    current.socStations,
+                    day.socStations,
+                );
 
             daysByDate.set(
                 day.date,
@@ -403,17 +489,31 @@ function replaceDamageAndLossesData(
             },
         );
     damageAndLossesState.socStations =
-        Array.from(
-            socStationsByName.values(),
-        ).sort(
-            function (first, second) {
-                return second.count -
-                    first.count ||
-                    first.name.localeCompare(
-                        second.name,
-                        "pt-BR",
-                    );
-            },
+        mergeDamageSocStationRecords(
+            ...(
+                damageAndLossesState.days
+                    .some(
+                        function (day) {
+                            return day
+                                .socStations
+                                .length > 0;
+                        },
+                    )
+                    ? damageAndLossesState
+                        .days
+                        .map(
+                            function (day) {
+                                return day
+                                    .socStations;
+                            },
+                        )
+                    : [
+                        Array.from(
+                            socStationsByName
+                                .values(),
+                        ),
+                    ]
+            ),
         );
 
     notifyDamageAndLossesState({
@@ -469,6 +569,15 @@ function createDamageChartDateRange(
             date: dateKey,
             hub: receivedDay?.hub || 0,
             soc: receivedDay?.soc || 0,
+            solid: receivedDay?.solid || 0,
+            liquid: receivedDay?.liquid || 0,
+            glass: receivedDay?.glass || 0,
+
+            socStations:
+                mergeDamageSocStationRecords(
+                    receivedDay
+                        ?.socStations,
+                ),
         });
 
         currentDate.setDate(
@@ -477,6 +586,74 @@ function createDamageChartDateRange(
     }
 
     return days;
+}
+
+function createDamageMetrics(
+    days,
+) {
+    const metrics =
+        (
+            Array.isArray(days)
+                ? days
+                : []
+        ).reduce(
+            function (totals, day) {
+                totals.hub +=
+                    normalizeDamageQuantity(
+                        day.hub,
+                    );
+                totals.soc +=
+                    normalizeDamageQuantity(
+                        day.soc,
+                    );
+                totals.solid +=
+                    normalizeDamageQuantity(
+                        day.solid,
+                    );
+                totals.liquid +=
+                    normalizeDamageQuantity(
+                        day.liquid,
+                    );
+                totals.glass +=
+                    normalizeDamageQuantity(
+                        day.glass,
+                    );
+
+                return totals;
+            },
+            {
+                hub: 0,
+                soc: 0,
+                solid: 0,
+                liquid: 0,
+                glass: 0,
+            },
+        );
+
+    metrics.total =
+        metrics.hub +
+        metrics.soc;
+
+    metrics.compositionTotal =
+        metrics.solid +
+        metrics.liquid +
+        metrics.glass;
+
+    metrics.socStations =
+        mergeDamageSocStationRecords(
+            ...(
+                Array.isArray(days)
+                    ? days.map(
+                        function (day) {
+                            return day
+                                .socStations;
+                        },
+                    )
+                    : []
+            ),
+        );
+
+    return metrics;
 }
 
 function createDamageChartPeriod(
@@ -493,23 +670,22 @@ function createDamageChartPeriod(
             endDate,
         );
 
-    const total =
-        days.reduce(
-            function (sum, day) {
-                return sum +
-                    day.hub +
-                    day.soc;
-            },
-            0,
+    const metrics =
+        createDamageMetrics(
+            days,
         );
 
     return {
         id,
         title,
         days,
+
+        ...metrics,
+
         dailyAverage:
             days.length > 0
-                ? total / days.length
+                ? metrics.total /
+                    days.length
                 : 0,
     };
 }
@@ -595,6 +771,7 @@ function getDamageAndLossesSummary(
             : null;
 
     const chartPeriods = [];
+    let traditionalAnalysis = null;
 
     if (latestDay) {
         const latestDate =
@@ -659,6 +836,65 @@ function getDamageAndLossesSummary(
                 createOffsetDate(14),
             ),
         );
+
+        const createTraditionalMetrics =
+            function (
+                startDate,
+                endDate,
+            ) {
+                return createDamageMetrics(
+                    createDamageChartDateRange(
+                        daysByDate,
+                        clampToMonthStart(
+                            startDate,
+                        ),
+                        endDate,
+                    ),
+                );
+            };
+
+        traditionalAnalysis = {
+            today:
+                createTraditionalMetrics(
+                    latestDate,
+                    latestDate,
+                ),
+
+            yesterday:
+                createTraditionalMetrics(
+                    createOffsetDate(1),
+                    createOffsetDate(1),
+                ),
+
+            dayBeforeYesterday:
+                createTraditionalMetrics(
+                    createOffsetDate(2),
+                    createOffsetDate(2),
+                ),
+
+            days3to7:
+                createTraditionalMetrics(
+                    createOffsetDate(7),
+                    createOffsetDate(3),
+                ),
+
+            days8to14:
+                createTraditionalMetrics(
+                    createOffsetDate(14),
+                    createOffsetDate(8),
+                ),
+
+            days15toMonthStart:
+                createTraditionalMetrics(
+                    monthStart,
+                    createOffsetDate(15),
+                ),
+
+            totalMonth:
+                createDamageMetrics(
+                    days,
+                ),
+        };
     }
 
     const chartDays =
@@ -710,6 +946,8 @@ function getDamageAndLossesSummary(
         chartDays,
 
         chartPeriods,
+
+        traditionalAnalysis,
 
         dailyAverage:
             chartPeriods[0]
