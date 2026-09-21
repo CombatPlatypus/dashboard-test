@@ -489,7 +489,7 @@
         grid-template-columns: repeat(auto-fit, minmax(299px, 1fr));
     }
     #damage-and-losses .doughnut-chart > div > div:first-child {
-        flex: 1 1 0;
+        flex: 0 0 300px;
         min-width: 0;
         height: 270px;
     }
