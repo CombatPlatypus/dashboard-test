@@ -36,7 +36,7 @@
             #docs {
             }
 
-            #docs > div:first-of-type {
+            #docs .flex-box-start > div:first-of-type {
                 flex: 1 1 0;
                 display: flex;
                 flex-direction: column;
@@ -47,8 +47,11 @@
                 border-radius: 5px;
             }
                     
-            #docs > div:last-of-type {
+            #docs .flex-box-start > ul:last-of-type {
                 flex: 0 0 500px;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
             }
 
 
