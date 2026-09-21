@@ -437,6 +437,83 @@ function createDateKey(
     ].join("-");
 }
 
+function createDamageChartDateRange(
+    daysByDate,
+    startDate,
+    endDate,
+) {
+    if (
+        !(startDate instanceof Date) ||
+        !(endDate instanceof Date) ||
+        startDate > endDate
+    ) {
+        return [];
+    }
+
+    const days = [];
+    const currentDate =
+        new Date(startDate);
+
+    while (currentDate <= endDate) {
+        const dateKey =
+            createDateKey(
+                currentDate,
+            );
+
+        const receivedDay =
+            daysByDate.get(
+                dateKey,
+            );
+
+        days.push({
+            date: dateKey,
+            hub: receivedDay?.hub || 0,
+            soc: receivedDay?.soc || 0,
+        });
+
+        currentDate.setDate(
+            currentDate.getDate() + 1,
+        );
+    }
+
+    return days;
+}
+
+function createDamageChartPeriod(
+    id,
+    title,
+    daysByDate,
+    startDate,
+    endDate,
+) {
+    const days =
+        createDamageChartDateRange(
+            daysByDate,
+            startDate,
+            endDate,
+        );
+
+    const total =
+        days.reduce(
+            function (sum, day) {
+                return sum +
+                    day.hub +
+                    day.soc;
+            },
+            0,
+        );
+
+    return {
+        id,
+        title,
+        days,
+        dailyAverage:
+            days.length > 0
+                ? total / days.length
+                : 0,
+    };
+}
+
 function getDamageAndLossesSummary(
     state = getDamageAndLossesState(),
 ) {
@@ -517,7 +594,7 @@ function getDamageAndLossesSummary(
             ? days[days.length - 1]
             : null;
 
-    const chartDays = [];
+    const chartPeriods = [];
 
     if (latestDay) {
         const latestDate =
@@ -525,48 +602,67 @@ function getDamageAndLossesSummary(
                 `${latestDay.date}T12:00:00`,
             );
 
-        for (
-            let offset = 6;
-            offset >= 0;
-            offset -= 1
-        ) {
-            const date =
-                new Date(latestDate);
-
-            date.setDate(
-                latestDate.getDate() -
-                    offset,
+        const monthStart =
+            new Date(
+                latestDate.getFullYear(),
+                latestDate.getMonth(),
+                1,
+                12,
             );
 
-            const dateKey =
-                createDateKey(date);
+        const createOffsetDate =
+            function (offset) {
+                const date =
+                    new Date(latestDate);
 
-            const receivedDay =
-                daysByDate.get(
-                    dateKey,
+                date.setDate(
+                    latestDate.getDate() -
+                        offset,
                 );
 
-            chartDays.push({
-                date: dateKey,
+                return date;
+            };
 
-                hub:
-                    receivedDay?.hub || 0,
+        const clampToMonthStart =
+            function (date) {
+                return date < monthStart
+                    ? new Date(monthStart)
+                    : date;
+            };
 
-                soc:
-                    receivedDay?.soc || 0,
-            });
-        }
+        chartPeriods.push(
+            createDamageChartPeriod(
+                "last7",
+                "Últimos 7 Dias",
+                daysByDate,
+                clampToMonthStart(
+                    createOffsetDate(6),
+                ),
+                latestDate,
+            ),
+
+            createDamageChartPeriod(
+                "days8to14",
+                "De 8 a 14 Dias Atrás",
+                daysByDate,
+                clampToMonthStart(
+                    createOffsetDate(13),
+                ),
+                createOffsetDate(7),
+            ),
+
+            createDamageChartPeriod(
+                "monthStart",
+                "De 15 Dias Atrás Até o Começo do Mês",
+                daysByDate,
+                monthStart,
+                createOffsetDate(14),
+            ),
+        );
     }
 
-    const chartTotal =
-        chartDays.reduce(
-            function (total, day) {
-                return total +
-                    day.hub +
-                    day.soc;
-            },
-            0,
-        );
+    const chartDays =
+        chartPeriods[0]?.days || [];
 
     const socStations =
         (
@@ -613,11 +709,11 @@ function getDamageAndLossesSummary(
 
         chartDays,
 
+        chartPeriods,
+
         dailyAverage:
-            chartDays.length > 0
-                ? chartTotal /
-                    chartDays.length
-                : 0,
+            chartPeriods[0]
+                ?.dailyAverage || 0,
     };
 }
 

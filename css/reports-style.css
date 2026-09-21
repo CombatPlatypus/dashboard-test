@@ -502,6 +502,78 @@
         color: var(--color-text);
         font-weight: 600;
     }
+    #damage-and-losses #damageLastSevenDaysChartContainer {
+        min-height: 0;
+        height: auto;
+    }
+    #damage-and-losses .damage-period-chart-canvas {
+        position: relative;
+        width: 100%;
+        height: 300px;
+    }
+    #damage-and-losses .damage-period-chart-canvas canvas {
+        display: block;
+        width: 100% !important;
+        height: 100% !important;
+    }
+    #damage-and-losses .damage-chart-period-selector {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: 15px;
+    }
+    #damage-and-losses .damage-chart-period-selector button {
+        position: relative;
+        display: flex;
+        min-height: 58px;
+        padding: 10px 12px;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        color: var(--color-gray-p);
+        background-color: var(--color-container);
+        border: 1px solid var(--color-border);
+        border-radius: 3px;
+        font: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.7px;
+        line-height: 1.35;
+        text-align: center;
+        cursor: pointer;
+        transition:
+            color 160ms ease,
+            background-color 160ms ease,
+            border-color 160ms ease;
+    }
+    #damage-and-losses .damage-chart-period-selector button::before {
+        position: absolute;
+        top: -1px;
+        right: -1px;
+        left: -1px;
+        height: 3px;
+        background-color: transparent;
+        border-radius: 3px 3px 0 0;
+        content: "";
+    }
+    #damage-and-losses .damage-chart-period-selector button:hover,
+    #damage-and-losses .damage-chart-period-selector button:focus-visible {
+        color: var(--color-text);
+        background-color: var(--color-container-houver);
+        border-color: var(--color-gray-p);
+    }
+    #damage-and-losses .damage-chart-period-selector button.is-active {
+        color: var(--color-text);
+        background-color: var(--color-container-houver);
+        border-color: #ffc107;
+    }
+    #damage-and-losses .damage-chart-period-selector button.is-active::before {
+        background-color: #ffc107;
+    }
+    #damage-and-losses .damage-chart-period-selector button:disabled {
+        opacity: 0.45;
+        cursor: default;
+    }
     #damage-and-losses .damage-soc-chart-container {
         position: relative;
         width: 100%;

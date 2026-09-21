@@ -40,6 +40,10 @@ const damageCompositionPercentageFormatter =
 let damageLastSevenDaysChart = null;
 let damageCompositionChart = null;
 let damageSocChart = null;
+let damageChartPeriodTitle = null;
+let damageChartPeriodSelector = null;
+let activeDamageChartPeriod =
+    "last7";
 
 function formatDamageSocName(
     value,
@@ -902,6 +906,102 @@ function createDamageSocChart(
     );
 }
 
+function getActiveDamageChartPeriod(
+    summary,
+) {
+    const periods =
+        Array.isArray(
+            summary.chartPeriods,
+        )
+            ? summary.chartPeriods
+            : [];
+
+    const preferredPeriod =
+        periods.find(
+            function (period) {
+                return period.id ===
+                    activeDamageChartPeriod;
+            },
+        );
+
+    const selectedPeriod =
+        (
+            preferredPeriod
+                ?.days.length > 0
+                ? preferredPeriod
+                : periods.find(
+                    function (period) {
+                        return period.days.length >
+                            0;
+                    },
+                )
+        ) || preferredPeriod || {
+            id: "last7",
+            title: "Últimos 7 Dias",
+            days: [],
+            dailyAverage: 0,
+        };
+
+    activeDamageChartPeriod =
+        selectedPeriod.id;
+
+    return selectedPeriod;
+}
+
+function renderDamageChartPeriodSelector(
+    summary,
+    selectedPeriod,
+) {
+    if (
+        !damageChartPeriodSelector ||
+        !damageChartPeriodTitle
+    ) {
+        return;
+    }
+
+    damageChartPeriodTitle.textContent =
+        selectedPeriod.title;
+
+    damageChartPeriodSelector
+        .querySelectorAll(
+            "[data-damage-chart-period]",
+        )
+        .forEach(
+            function (button) {
+                const period =
+                    summary.chartPeriods
+                        ?.find(
+                            function (
+                                receivedPeriod,
+                            ) {
+                                return receivedPeriod.id ===
+                                    button.dataset
+                                        .damageChartPeriod;
+                            },
+                        );
+
+                const isSelected =
+                    button.dataset
+                        .damageChartPeriod ===
+                    selectedPeriod.id;
+
+                button.classList.toggle(
+                    "is-active",
+                    isSelected,
+                );
+
+                button.setAttribute(
+                    "aria-selected",
+                    String(isSelected),
+                );
+
+                button.disabled =
+                    !period ||
+                    period.days.length === 0;
+            },
+        );
+}
+
 function renderDamageAndLossesCharts(
     state = getDamageAndLossesState(),
 ) {
@@ -918,9 +1018,22 @@ function renderDamageAndLossesCharts(
             state,
         );
 
+    const selectedPeriod =
+        getActiveDamageChartPeriod(
+            summary,
+        );
+
+    const chartDays =
+        selectedPeriod.days;
+
+    renderDamageChartPeriodSelector(
+        summary,
+        selectedPeriod,
+    );
+
     const maximumTotal =
         Math.max(
-            ...summary.chartDays.map(
+            ...chartDays.map(
                 function (day) {
                     return day.soc +
                         day.hub;
@@ -931,15 +1044,16 @@ function renderDamageAndLossesCharts(
 
     damageLastSevenDaysChart
         .$damageChartDays =
-            summary.chartDays;
+            chartDays;
 
     damageLastSevenDaysChart
         .$damageDailyAverage =
-            summary.dailyAverage;
+            selectedPeriod
+                .dailyAverage;
 
     damageLastSevenDaysChart
         .data.labels =
-            summary.chartDays.map(
+            chartDays.map(
                 function (day) {
                     return formatDamageChartDate(
                         day.date,
@@ -950,7 +1064,7 @@ function renderDamageAndLossesCharts(
     damageLastSevenDaysChart
         .data.datasets[0]
         .data =
-            summary.chartDays.map(
+            chartDays.map(
                 function (day) {
                     return day.soc;
                 },
@@ -959,7 +1073,7 @@ function renderDamageAndLossesCharts(
     damageLastSevenDaysChart
         .data.datasets[1]
         .data =
-            summary.chartDays.map(
+            chartDays.map(
                 function (day) {
                     return day.hub;
                 },
@@ -973,6 +1087,12 @@ function renderDamageAndLossesCharts(
                     maximumTotal * 1.2,
                 )
                 : 5;
+
+    damageLastSevenDaysChart.canvas
+        .setAttribute(
+            "aria-label",
+            `Avarias do Soc e do Hub: ${selectedPeriod.title}`,
+        );
 
     damageLastSevenDaysChart.update();
 
@@ -1140,11 +1260,23 @@ function initializeDamageAndLossesCharts(
             "#damageSocChart",
         );
 
+    damageChartPeriodTitle =
+        panel?.querySelector(
+            "#damageChartPeriodTitle",
+        );
+
+    damageChartPeriodSelector =
+        panel?.querySelector(
+            "#damageChartPeriodSelector",
+        );
+
     if (
         !(panel instanceof HTMLElement) ||
         !(lastSevenDaysCanvas instanceof HTMLCanvasElement) ||
         !(compositionCanvas instanceof HTMLCanvasElement) ||
         !(socCanvas instanceof HTMLCanvasElement) ||
+        !(damageChartPeriodTitle instanceof HTMLElement) ||
+        !(damageChartPeriodSelector instanceof HTMLElement) ||
         typeof window.Chart !== "function"
     ) {
         return false;
@@ -1183,6 +1315,32 @@ function initializeDamageAndLossesCharts(
     damageSocChart =
         createDamageSocChart(
             socCanvas,
+        );
+
+    damageChartPeriodSelector
+        .addEventListener(
+            "click",
+            function (event) {
+                const button =
+                    event.target.closest(
+                        "[data-damage-chart-period]",
+                    );
+
+                if (
+                    !(button instanceof HTMLButtonElement) ||
+                    button.disabled
+                ) {
+                    return;
+                }
+
+                activeDamageChartPeriod =
+                    button.dataset
+                        .damageChartPeriod;
+
+                renderDamageAndLossesCharts(
+                    getDamageAndLossesState(),
+                );
+            },
         );
 
     subscribeDamageAndLossesState(
