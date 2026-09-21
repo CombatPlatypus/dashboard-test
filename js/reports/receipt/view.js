@@ -1039,6 +1039,29 @@ function bindReceiptOperatorControls(
             },
         );
 
+    if (
+        typeof window.jQuery ===
+            "function"
+    ) {
+        window.jQuery(
+            elements.operatorControls,
+        )
+            .off(
+                "change.receiptErrorSelect2",
+                'select[data-receipt-operator-field="errorQuantity"]',
+            )
+            .on(
+                "change.receiptErrorSelect2",
+                'select[data-receipt-operator-field="errorQuantity"]',
+                function (event) {
+                    handleReceiptOperatorFieldEvent(
+                        elements,
+                        event,
+                    );
+                },
+            );
+    }
+
     elements.operatorControls
         .addEventListener(
             "change",
