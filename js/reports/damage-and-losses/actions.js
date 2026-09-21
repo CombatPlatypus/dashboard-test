@@ -6,6 +6,13 @@ import {
 } from "./state.js";
 
 import {
+    getLossesState,
+    getLossesSummary,
+    resetLossesState,
+    subscribeLossesState,
+} from "./losses-state.js";
+
+import {
     bindReportImageExportButton,
     copyReportBlob,
     createReportImageBlob,
@@ -18,18 +25,30 @@ import {
 
 let damageExportBusy = false;
 
-function canExportDamageReport() {
-    return getDamageAndLossesSummary(
-        getDamageAndLossesState(),
-    ).hasData;
+function isLossesReportActive(panel) {
+    return panel
+        ?.querySelector("#losses")
+        ?.classList.contains("is-active") ===
+        true;
+}
+
+function canExportDamageReport(panel) {
+    return isLossesReportActive(panel)
+        ? getLossesSummary(
+            getLossesState(),
+        ).hasData
+        : getDamageAndLossesSummary(
+            getDamageAndLossesState(),
+        ).hasData;
 }
 
 function renderDamageActionButtons(
+    panel,
     copyButton,
     clearButton,
 ) {
     const hasData =
-        canExportDamageReport();
+        canExportDamageReport(panel);
 
     copyButton.disabled =
         damageExportBusy ||
@@ -40,7 +59,9 @@ function renderDamageActionButtons(
         !hasData;
 }
 
-function createDamageReportFileName() {
+function createDamageReportFileName(
+    isLossesReport,
+) {
     const date =
         new Intl.DateTimeFormat(
             "pt-BR",
@@ -48,24 +69,34 @@ function createDamageReportFileName() {
             .format(new Date())
             .replace(/\//g, "-");
 
-    return `relatorio-de-avarias-${date}.png`;
+    return `relatorio-de-${isLossesReport ? "perdas" : "avarias"}-${date}.png`;
 }
 
 async function runDamageReportExport({
-    exportArea,
+    panel,
+    damageExportArea,
+    lossesExportArea,
     copyButton,
     clearButton,
     mode,
 }) {
     if (
         damageExportBusy ||
-        !canExportDamageReport()
+        !canExportDamageReport(panel)
     ) {
         return;
     }
 
     const isCopy =
         mode === "copy";
+
+    const isLossesReport =
+        isLossesReportActive(panel);
+
+    const exportArea =
+        isLossesReport
+            ? lossesExportArea
+            : damageExportArea;
 
     const originalTitle =
         copyButton.title;
@@ -77,6 +108,7 @@ async function runDamageReportExport({
 
     damageExportBusy = true;
     renderDamageActionButtons(
+        panel,
         copyButton,
         clearButton,
     );
@@ -104,7 +136,9 @@ async function runDamageReportExport({
         } else {
             downloadReportBlob(
                 blob,
-                createDamageReportFileName(),
+                createDamageReportFileName(
+                    isLossesReport,
+                ),
             );
         }
 
@@ -114,12 +148,12 @@ async function runDamageReportExport({
             type: "success",
             message:
                 isCopy
-                    ? "Relatório de avarias copiado."
-                    : "Relatório de avarias baixado.",
+                    ? `Relatório de ${isLossesReport ? "perdas" : "avarias"} copiado.`
+                    : `Relatório de ${isLossesReport ? "perdas" : "avarias"} baixado.`,
         });
     } catch (error) {
         console.error(
-            "Não foi possível exportar o relatório de avarias:",
+            "Não foi possível exportar o relatório:",
             error,
         );
 
@@ -128,7 +162,7 @@ async function runDamageReportExport({
                 "damage-and-losses",
             type: "error",
             message:
-                "Não foi possível exportar o relatório de avarias.",
+                `Não foi possível exportar o relatório de ${isLossesReport ? "perdas" : "avarias"}.`,
         });
     } finally {
         damageExportBusy = false;
@@ -146,6 +180,7 @@ async function runDamageReportExport({
         }
 
         renderDamageActionButtons(
+            panel,
             copyButton,
             clearButton,
         );
@@ -173,16 +208,22 @@ function initializeDamageAndLossesActions(
             "#damageAndLossesClearButton",
         );
 
-    const exportArea =
+    const damageExportArea =
         panel?.querySelector(
             "#damageReportExportArea",
+        );
+
+    const lossesExportArea =
+        panel?.querySelector(
+            "#lossesReportExportArea",
         );
 
     if (
         !(panel instanceof HTMLElement) ||
         !(copyButton instanceof HTMLButtonElement) ||
         !(clearButton instanceof HTMLButtonElement) ||
-        !(exportArea instanceof HTMLElement)
+        !(damageExportArea instanceof HTMLElement) ||
+        !(lossesExportArea instanceof HTMLElement)
     ) {
         return false;
     }
@@ -205,7 +246,9 @@ function initializeDamageAndLossesActions(
             onCopy:
                 function () {
                     runDamageReportExport({
-                        exportArea,
+                        panel,
+                        damageExportArea,
+                        lossesExportArea,
                         copyButton,
                         clearButton,
                         mode: "copy",
@@ -215,7 +258,9 @@ function initializeDamageAndLossesActions(
             onDownload:
                 function () {
                     runDamageReportExport({
-                        exportArea,
+                        panel,
+                        damageExportArea,
+                        lossesExportArea,
                         copyButton,
                         clearButton,
                         mode: "download",
@@ -228,13 +273,14 @@ function initializeDamageAndLossesActions(
         "click",
         function () {
             resetDamageAndLossesState();
+            resetLossesState();
 
             setReportNotification({
                 reportId:
                     "damage-and-losses",
                 type: "info",
                 message:
-                    "Relatório de avarias limpo.",
+                    "Relatório de avarias e perdas limpo.",
             });
         },
     );
@@ -242,13 +288,42 @@ function initializeDamageAndLossesActions(
     subscribeDamageAndLossesState(
         function () {
             renderDamageActionButtons(
+                panel,
                 copyButton,
                 clearButton,
             );
         },
     );
 
+    subscribeLossesState(
+        function () {
+            renderDamageActionButtons(
+                panel,
+                copyButton,
+                clearButton,
+            );
+        },
+    );
+
+    panel.querySelector(
+        "#damage-and-losses-choice",
+    )?.addEventListener(
+        "click",
+        function () {
+            window.requestAnimationFrame(
+                function () {
+                    renderDamageActionButtons(
+                        panel,
+                        copyButton,
+                        clearButton,
+                    );
+                },
+            );
+        },
+    );
+
     renderDamageActionButtons(
+        panel,
         copyButton,
         clearButton,
     );

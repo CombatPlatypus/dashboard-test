@@ -1808,17 +1808,17 @@
                                 </div>
 
                                 <div class="report-actions">
-                                    <button id="damageAndLossesCopyReportButton" type="button" title="Clique para copiar; segure por 1,5 s para baixar" aria-label="Copiar relatório de avarias; segure por 1,5 segundo para baixar">
+                                    <button id="damageAndLossesCopyReportButton" type="button" title="Clique para copiar; segure por 1,5 s para baixar" aria-label="Copiar relatório de avarias ou perdas; segure por 1,5 segundo para baixar">
                                         <img src="images/geral-icons/image-icon.svg" alt="">
                                     </button>
 
-                                    <button id="damageAndLossesImportButton" type="button" title="Importar planilha de avarias" aria-label="Importar planilha de avarias">
+                                    <button id="damageAndLossesImportButton" type="button" title="Importar planilha de avarias e perdas" aria-label="Importar planilha de avarias e perdas">
                                         <img src="images/geral-icons/import-icon.svg" alt="">
                                     </button>
 
                                     <input id="damageAndLossesFileInput" type="file" accept=".xlsx,.xls" hidden>
 
-                                    <button id="damageAndLossesClearButton" type="button" title="Limpar relatório" aria-label="Limpar relatório de avarias">
+                                    <button id="damageAndLossesClearButton" type="button" title="Limpar relatório" aria-label="Limpar relatório de avarias e perdas">
                                         <img src="images/geral-icons/trash-basket-icon.svg" alt="">
                                     </button>
                                 </div>
@@ -2122,7 +2122,7 @@
 
                                                 <div id="lossesLastSevenDaysChartContainer">
                                                     <div class="losses-period-chart-canvas">
-                                                        <canvas id="lossesLastSevenDaysChart" role="img" aria-label="Perdas do Hub nos últimos sete dias"></canvas>
+                                                        <canvas id="lossesLastSevenDaysChart" role="img" aria-label="Pacotes em análise e perdas confirmadas nos últimos sete dias"></canvas>
                                                     </div>
                                                 </div>
                                             </div>
@@ -2133,8 +2133,8 @@
                                                         <h4>Pack Recover</h4>
                                                     </div>
 
-                                                    <div id="" class="">
-                                                        <canvas id="" role="img" aria-label=""></canvas>
+                                                    <div id="lossesPackRecoveryChartContainer" class="losses-horizontal-chart-canvas">
+                                                        <canvas id="lossesPackRecoveryChart" role="img" aria-label="Pack Recovery"></canvas>
                                                     </div>
                                                 </div>
 
@@ -2143,8 +2143,8 @@
                                                         <h4>Composição dos Valores Informados</h4>
                                                     </div>
 
-                                                    <div id="" class="">
-                                                        <canvas id="" role="img" aria-label=""></canvas>
+                                                    <div id="lossesValueCompositionChartContainer" class="losses-horizontal-chart-canvas">
+                                                        <canvas id="lossesValueCompositionChart" role="img" aria-label="Composição dos valores informados"></canvas>
                                                     </div>
                                                 </div>
                                             </div>
@@ -2166,7 +2166,7 @@
                                                 </thead>
 
                                                 <tbody>
-                                                    <tr>
+                                                    <tr data-losses-analysis-field="underReview">
                                                         <th scope="row">Pacotes Em Análise</th>
                                                         <td>-</td>
                                                         <td>-</td>
@@ -2179,7 +2179,7 @@
                                                 </tbody>
 
                                                 <tbody>
-                                                    <tr>
+                                                    <tr data-losses-analysis-field="confirmedLosses">
                                                         <th scope="row">Perdas Confirmadas</th>
                                                         <td>-</td>
                                                         <td>-</td>
@@ -2192,7 +2192,7 @@
                                                 </tbody>
 
                                                 <tbody>
-                                                    <tr>
+                                                    <tr data-losses-analysis-field="savedAwaitingTicket">
                                                         <th scope="row">Salvos Aguardando Ticket</th>
                                                         <td>-</td>
                                                         <td>-</td>
@@ -2205,7 +2205,7 @@
                                                 </tbody>
 
                                                 <tbody>
-                                                    <tr>
+                                                    <tr data-losses-analysis-field="emptyAwaitingTicket">
                                                         <th scope="row">Vazios Aguardando Ticket</th>
                                                         <td>-</td>
                                                         <td>-</td>

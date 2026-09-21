@@ -12,9 +12,27 @@ import {
 } from "./view.js";
 
 import {
+    getLossesState,
+    getLossesSummary,
+    replaceLossesData,
+    resetLossesState,
+    restoreLossesState,
+} from "./losses-state.js";
+
+import {
+    initializeLossesView,
+    renderLossesView,
+} from "./losses-view.js";
+
+import {
     initializeDamageAndLossesCharts,
     renderDamageAndLossesCharts,
 } from "./charts.js";
+
+import {
+    initializeLossesCharts,
+    renderLossesCharts,
+} from "./losses-charts.js";
 
 import {
     initializeDamageAndLossesImport,
@@ -49,6 +67,8 @@ function initializeDamageAndLossesController() {
         [
             initializeDamageAndLossesView,
             initializeDamageAndLossesCharts,
+            initializeLossesView,
+            initializeLossesCharts,
             initializeDamageAndLossesImport,
             initializeDamageAndLossesActions,
         ]
@@ -81,24 +101,46 @@ function renderDamageAndLossesController() {
         ) &&
         renderDamageAndLossesCharts(
             state,
+        ) &&
+        renderLossesView(
+            getLossesState(),
+        ) &&
+        renderLossesCharts(
+            getLossesState(),
         )
     );
 }
 
 function resetDamageAndLossesController() {
-    return resetDamageAndLossesState();
+    return (
+        resetDamageAndLossesState() &&
+        resetLossesState()
+    );
 }
 
 function importDamageAndLossesData(
     data,
 ) {
-    return replaceDamageAndLossesData(
-        data,
-    );
+    const damageImported =
+        replaceDamageAndLossesData(
+            data?.damage || data,
+        );
+
+    const lossesImported =
+        data?.losses
+            ? replaceLossesData(
+                data.losses,
+            )
+            : true;
+
+    return damageImported && lossesImported;
 }
 
 function exportDamageAndLossesSession() {
-    return getDamageAndLossesState();
+    return {
+        ...getDamageAndLossesState(),
+        losses: getLossesState(),
+    };
 }
 
 function importDamageAndLossesSession(
@@ -106,12 +148,20 @@ function importDamageAndLossesSession(
 ) {
     const imported =
         restoreDamageAndLossesState(
-            sessionState,
+            sessionState?.damage ||
+                sessionState,
         );
 
-    if (!imported) {
+    const lossesImported =
+        sessionState?.losses
+            ? restoreLossesState(
+                sessionState.losses,
+            )
+            : resetLossesState();
+
+    if (!imported || !lossesImported) {
         throw new TypeError(
-            "Os dados da sessão de avarias são inválidos.",
+            "Os dados da sessão de avarias e perdas são inválidos.",
         );
     }
 
@@ -119,9 +169,14 @@ function importDamageAndLossesSession(
 }
 
 function canExportDamageAndLossesController() {
-    return getDamageAndLossesSummary(
-        getDamageAndLossesState(),
-    ).hasData;
+    return (
+        getDamageAndLossesSummary(
+            getDamageAndLossesState(),
+        ).hasData ||
+        getLossesSummary(
+            getLossesState(),
+        ).hasData
+    );
 }
 
 export {

@@ -4,6 +4,10 @@ import {
 } from "./state.js";
 
 import {
+    replaceLossesData,
+} from "./losses-state.js";
+
+import {
     setReportNotification,
 } from "../report-notifications.js";
 
@@ -18,6 +22,9 @@ const DAMAGE_HUB_STATION =
 
 const DAMAGE_HISTORY_SHEET_NAME =
     "historico de avarias";
+
+const LOSSES_HISTORY_SHEET_NAME =
+    "historico de analises";
 
 const damageFileExtensions =
     new Set([
@@ -43,6 +50,30 @@ const damageColumnAliases =
             "tipo de produto",
             "tipo produto",
             "product type",
+        ],
+    });
+
+const lossesColumnAliases =
+    Object.freeze({
+        date: [
+            "data",
+            "date",
+        ],
+
+        situation: [
+            "situacao",
+            "status",
+        ],
+
+        packRecovery: [
+            "pack recovery",
+            "pack recover",
+        ],
+
+        monetaryValue: [
+            "valor r",
+            "valor",
+            "value",
         ],
     });
 
@@ -73,6 +104,54 @@ function normalizeDamageSearchText(
             " ",
         )
         .trim();
+}
+
+function damageHeaderMatches(
+    header,
+    field,
+    aliases,
+) {
+    if (aliases.includes(header)) {
+        return true;
+    }
+
+    if (field === "currentStation") {
+        return (
+            header === "current station" ||
+            /^esta.*(?:atual|corrente|avaria)$/.test(
+                header,
+            )
+        );
+    }
+
+    if (field === "productType") {
+        return /^tipo.*produto$/.test(header);
+    }
+
+    return field === "date" &&
+        /^(?:data|date)$/.test(header);
+}
+
+function isDamageHistorySheetName(value) {
+    const normalizedValue =
+        normalizeDamageSearchText(value);
+
+    return normalizedValue ===
+        DAMAGE_HISTORY_SHEET_NAME ||
+        /^hist.*avarias$/.test(
+            normalizedValue,
+        );
+}
+
+function isLossesHistorySheetName(value) {
+    const normalizedValue =
+        normalizeDamageSearchText(value);
+
+    return normalizedValue ===
+        LOSSES_HISTORY_SHEET_NAME ||
+        /^hist.*an.*lises$/.test(
+            normalizedValue,
+        );
 }
 
 function incrementDamageSocStation(
@@ -124,8 +203,10 @@ function findDamageColumns(
         const columnIndex =
             headers.findIndex(
                 function (header) {
-                    return aliases.includes(
+                    return damageHeaderMatches(
                         header,
+                        field,
+                        aliases,
                     );
                 },
             );
@@ -147,9 +228,9 @@ function findDamageMonthSource(
     const sheetName =
         workbook.SheetNames.find(
             function (receivedSheetName) {
-                return normalizeDamageSearchText(
+                return isDamageHistorySheetName(
                     receivedSheetName,
-                ) === DAMAGE_HISTORY_SHEET_NAME;
+                );
             },
         );
 
@@ -219,6 +300,9 @@ function classifyDamageProductType(
     if (
         normalizedValue.includes(
             "liquid",
+        ) ||
+        /^l.*quido$/.test(
+            normalizedValue,
         )
     ) {
         return "liquid";
@@ -238,6 +322,9 @@ function classifyDamageProductType(
     if (
         normalizedValue.includes(
             "solid",
+        ) ||
+        /^s.*lido$/.test(
+            normalizedValue,
         ) ||
         normalizedValue.includes(
             "outro",
@@ -371,6 +458,457 @@ function parseDamageDate(
             isoDateMatch[3],
         )
         : null;
+}
+
+function lossesHeaderMatches(
+    header,
+    field,
+    aliases,
+) {
+    if (aliases.includes(header)) {
+        return true;
+    }
+
+    if (field === "situation") {
+        return /^situa.*o$/.test(header);
+    }
+
+    if (field === "monetaryValue") {
+        return /^valor(?: r)?$/.test(header);
+    }
+
+    return false;
+}
+
+function findLossesColumns(row) {
+    if (!Array.isArray(row)) {
+        return null;
+    }
+
+    const headers =
+        row.map(normalizeDamageSearchText);
+    const columns = {};
+
+    for (
+        const [field, aliases] of
+        Object.entries(lossesColumnAliases)
+    ) {
+        const columnIndex =
+            headers.findIndex(
+                function (header) {
+                    return lossesHeaderMatches(
+                        header,
+                        field,
+                        aliases,
+                    );
+                },
+            );
+
+        if (columnIndex === -1) {
+            return null;
+        }
+
+        columns[field] = columnIndex;
+    }
+
+    return columns;
+}
+
+function findEmptyPackagesColumns(row) {
+    if (!Array.isArray(row)) {
+        return null;
+    }
+
+    const headers =
+        row.map(normalizeDamageSearchText);
+    const date =
+        headers.findIndex(
+            function (header) {
+                return header === "data";
+            },
+        );
+    const packageCode =
+        headers.findIndex(
+            function (header) {
+                return header === "codigo br" ||
+                    /^c.*digo br$/.test(header);
+            },
+        );
+    const ticketOpened =
+        headers.findIndex(
+            function (header) {
+                return header === "abertura de ticket";
+            },
+        );
+    const ticketResolved =
+        headers.findIndex(
+            function (header) {
+                return header === "resolucao de ticket" ||
+                    /^resolu.*de ticket$/.test(header);
+            },
+        );
+
+    return [
+        date,
+        packageCode,
+        ticketOpened,
+        ticketResolved,
+    ].every(
+        function (columnIndex) {
+            return columnIndex >= 0;
+        },
+    )
+        ? {
+            date,
+            packageCode,
+            ticketOpened,
+            ticketResolved,
+        }
+        : null;
+}
+
+function findLossesMonthSource(workbook) {
+    const sheetName =
+        workbook.SheetNames.find(
+            function (receivedSheetName) {
+                return isLossesHistorySheetName(
+                    receivedSheetName,
+                );
+            },
+        );
+
+    if (!sheetName) {
+        throw new Error(
+            "O arquivo não possui a aba Histórico de Análises.",
+        );
+    }
+
+    const worksheet =
+        workbook.Sheets[sheetName];
+    const rows =
+        window.XLSX.utils.sheet_to_json(
+            worksheet,
+            {
+                header: 1,
+                defval: "",
+                raw: true,
+                blankrows: false,
+            },
+        );
+    const searchLimit =
+        Math.min(
+            rows.length,
+            MAX_DAMAGE_HEADER_SEARCH_ROWS,
+        );
+    let columns = null;
+    let headerRowIndex = -1;
+    let emptyPackagesColumns = null;
+    let emptyPackagesHeaderRowIndex = -1;
+
+    for (
+        let rowIndex = 0;
+        rowIndex < searchLimit;
+        rowIndex += 1
+    ) {
+        if (!columns) {
+            columns =
+                findLossesColumns(rows[rowIndex]);
+
+            if (columns) {
+                headerRowIndex = rowIndex;
+            }
+        }
+
+        if (!emptyPackagesColumns) {
+            emptyPackagesColumns =
+                findEmptyPackagesColumns(
+                    rows[rowIndex],
+                );
+
+            if (emptyPackagesColumns) {
+                emptyPackagesHeaderRowIndex =
+                    rowIndex;
+            }
+        }
+    }
+
+    if (!columns) {
+        throw new Error(
+            `A aba ${sheetName} não possui as colunas Data, Situação, Pack Recovery e Valor R$.`,
+        );
+    }
+
+    return {
+        sheetName,
+        rows,
+        columns,
+        headerRowIndex,
+        emptyPackagesColumns,
+        emptyPackagesHeaderRowIndex,
+    };
+}
+
+function parseLossesBoolean(value) {
+    if (typeof value === "boolean") {
+        return value;
+    }
+
+    if (value === 1) {
+        return true;
+    }
+
+    if (value === 0) {
+        return false;
+    }
+
+    const normalizedValue =
+        normalizeDamageSearchText(value);
+
+    if (
+        ["sim", "true", "yes", "s"].includes(
+            normalizedValue,
+        )
+    ) {
+        return true;
+    }
+
+    if (
+        ["nao", "false", "no", "n"].includes(
+            normalizedValue,
+        )
+    ) {
+        return false;
+    }
+
+    return null;
+}
+
+function parseLossesMonetaryValue(value) {
+    if (
+        typeof value === "number" &&
+        Number.isFinite(value) &&
+        value >= 0
+    ) {
+        return value;
+    }
+
+    const receivedValue =
+        normalizeDamageText(value);
+
+    if (!receivedValue) {
+        return null;
+    }
+
+    const numericText =
+        receivedValue
+            .replace(/[^\d,.-]/g, "")
+            .replace(/\.(?=.*[,])/g, "")
+            .replace(",", ".");
+    const numericValue =
+        Number(numericText);
+
+    return Number.isFinite(numericValue) &&
+        numericValue >= 0
+        ? numericValue
+        : null;
+}
+
+function classifyLossesSituation(value) {
+    const normalizedValue =
+        normalizeDamageSearchText(value);
+
+    if (
+        normalizedValue === "lost" ||
+        normalizedValue.includes("perda confirmada")
+    ) {
+        return "confirmedLosses";
+    }
+
+    if (
+        normalizedValue.includes("analise") ||
+        /^em an.*lise$/.test(normalizedValue) ||
+        normalizedValue === "pending"
+    ) {
+        return "underReview";
+    }
+
+    return "";
+}
+
+function createLossesMonthData(
+    source,
+    date = new Date(),
+) {
+    const monthIndex = date.getMonth();
+    const year = date.getFullYear();
+    const daysByDate = new Map();
+    let importedRows = 0;
+    let ignoredRows = 0;
+
+    const getDay =
+        function (dateKey) {
+            const current =
+                daysByDate.get(dateKey);
+
+            if (current) {
+                return current;
+            }
+
+            const day = {
+                date: dateKey,
+                underReview: 0,
+                confirmedLosses: 0,
+                savedAwaitingTicket: 0,
+                emptyAwaitingTicket: 0,
+                recoveryYes: 0,
+                recoveryNo: 0,
+                recoveryUnknown: 0,
+                confirmedValue: 0,
+                underReviewValue: 0,
+                confirmedValueRecords: 0,
+                underReviewValueRecords: 0,
+            };
+
+            daysByDate.set(dateKey, day);
+            return day;
+        };
+
+    for (
+        let rowIndex = source.headerRowIndex + 1;
+        rowIndex < source.rows.length;
+        rowIndex += 1
+    ) {
+        const row = source.rows[rowIndex];
+        const receivedDate =
+            row?.[source.columns.date];
+        const receivedSituation =
+            row?.[source.columns.situation];
+
+        if (
+            normalizeDamageText(receivedDate) === "" &&
+            normalizeDamageText(receivedSituation) === ""
+        ) {
+            continue;
+        }
+
+        const parsedDate =
+            parseDamageDate(receivedDate);
+        const situation =
+            classifyLossesSituation(receivedSituation);
+
+        if (
+            !parsedDate ||
+            parsedDate.month - 1 !== monthIndex ||
+            parsedDate.year !== year ||
+            !situation
+        ) {
+            ignoredRows += 1;
+            continue;
+        }
+
+        const day = getDay(parsedDate.key);
+        day[situation] += 1;
+        importedRows += 1;
+
+        const recovery =
+            parseLossesBoolean(
+                row?.[source.columns.packRecovery],
+            );
+
+        if (recovery === true) {
+            day.recoveryYes += 1;
+            day.savedAwaitingTicket += 1;
+        } else if (recovery === false) {
+            day.recoveryNo += 1;
+        } else {
+            day.recoveryUnknown += 1;
+        }
+
+        const monetaryValue =
+            parseLossesMonetaryValue(
+                row?.[source.columns.monetaryValue],
+            );
+
+        if (monetaryValue !== null) {
+            const valueField =
+                situation === "confirmedLosses"
+                    ? "confirmedValue"
+                    : "underReviewValue";
+            const recordsField =
+                situation === "confirmedLosses"
+                    ? "confirmedValueRecords"
+                    : "underReviewValueRecords";
+
+            day[valueField] += monetaryValue;
+            day[recordsField] += 1;
+        }
+    }
+
+    if (
+        source.emptyPackagesColumns &&
+        source.emptyPackagesHeaderRowIndex >= 0
+    ) {
+        for (
+            let rowIndex =
+                source.emptyPackagesHeaderRowIndex + 1;
+            rowIndex < source.rows.length;
+            rowIndex += 1
+        ) {
+            const row = source.rows[rowIndex];
+            const columns =
+                source.emptyPackagesColumns;
+            const packageCode =
+                normalizeDamageText(
+                    row?.[columns.packageCode],
+                );
+
+            if (!packageCode) {
+                continue;
+            }
+
+            const parsedDate =
+                parseDamageDate(row?.[columns.date]);
+
+            if (
+                !parsedDate ||
+                parsedDate.month - 1 !== monthIndex ||
+                parsedDate.year !== year
+            ) {
+                continue;
+            }
+
+            const ticketOpened =
+                parseLossesBoolean(
+                    row?.[columns.ticketOpened],
+                );
+
+            if (ticketOpened !== true) {
+                getDay(parsedDate.key)
+                    .emptyAwaitingTicket += 1;
+            }
+        }
+    }
+
+    if (importedRows === 0) {
+        throw new Error(
+            `Nenhum registro de perdas de ${DAMAGE_MONTH_NAMES[monthIndex]} de ${year} foi encontrado.`,
+        );
+    }
+
+    return {
+        monthIndex,
+        year,
+        days:
+            Array.from(daysByDate.values()).sort(
+                function (first, second) {
+                    return first.date.localeCompare(
+                        second.date,
+                    );
+                },
+            ),
+        importedRows,
+        ignoredRows,
+    };
 }
 
 function createDamageMonthData(
@@ -661,6 +1199,24 @@ async function readDamageAndLossesFile(
             date,
         );
 
+    const lossesSource =
+        findLossesMonthSource(
+            workbook,
+        );
+
+    const losses = {
+        ...createLossesMonthData(
+            lossesSource,
+            date,
+        ),
+
+        sourceFileName:
+            file.name,
+
+        sourceSheetName:
+            lossesSource.sheetName,
+    };
+
     return {
         ...createDamageMonthData(
             source,
@@ -672,6 +1228,8 @@ async function readDamageAndLossesFile(
 
         sourceSheetName:
             source.sheetName,
+
+        losses,
     };
 }
 
@@ -689,10 +1247,10 @@ async function importDamageAndLossesFile(
 
     importButton.disabled = true;
     importButton.title =
-        "Importando avarias...";
+        "Importando avarias e perdas...";
     importButton.setAttribute(
         "aria-label",
-        "Importando avarias",
+        "Importando avarias e perdas",
     );
     importButton.setAttribute(
         "aria-busy",
@@ -709,6 +1267,10 @@ async function importDamageAndLossesFile(
             result,
         );
 
+        replaceLossesData(
+            result.losses,
+        );
+
         const hub =
             result.days.reduce(
                 function (total, day) {
@@ -721,27 +1283,32 @@ async function importDamageAndLossesFile(
         const soc =
             result.importedRows - hub;
 
+        const ignoredRows =
+            result.ignoredRows +
+            result.losses.ignoredRows;
+
         setReportNotification({
             reportId:
                 "damage-and-losses",
 
             type:
-                result.ignoredRows > 0
+                ignoredRows > 0
                     ? "warning"
                     : "success",
 
             message:
                 `${result.importedRows.toLocaleString("pt-BR")} avarias importadas da aba ${result.sourceSheetName}: ` +
-                `${hub.toLocaleString("pt-BR")} do Hub e ${soc.toLocaleString("pt-BR")} do Soc.` +
+                `${hub.toLocaleString("pt-BR")} do Hub e ${soc.toLocaleString("pt-BR")} do Soc. ` +
+                `${result.losses.importedRows.toLocaleString("pt-BR")} registros de perdas importados da aba ${result.losses.sourceSheetName}.` +
                 (
-                    result.ignoredRows > 0
-                        ? ` ${result.ignoredRows.toLocaleString("pt-BR")} linha(s) fora do mês atual ou sem data válida foram ignoradas.`
+                    ignoredRows > 0
+                        ? ` ${ignoredRows.toLocaleString("pt-BR")} linha(s) fora do mês atual, com situação desconhecida ou sem data válida foram ignoradas.`
                         : ""
                 ),
         });
     } catch (error) {
         console.error(
-            "Não foi possível importar as avarias:",
+            "Não foi possível importar as avarias e perdas:",
             error,
         );
 
@@ -754,7 +1321,7 @@ async function importDamageAndLossesFile(
             message:
                 error instanceof Error
                     ? error.message
-                    : "Não foi possível importar a planilha de avarias.",
+                    : "Não foi possível importar a planilha de avarias e perdas.",
         });
     } finally {
         importButton.title =
@@ -851,7 +1418,9 @@ export {
     DAMAGE_HISTORY_SHEET_NAME,
     classifyDamageProductType,
     createDamageMonthData,
+    createLossesMonthData,
     findDamageMonthSource,
+    findLossesMonthSource,
     initializeDamageAndLossesImport,
     parseDamageDate,
     readDamageAndLossesFile,

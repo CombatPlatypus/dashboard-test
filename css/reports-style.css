@@ -517,6 +517,26 @@
         width: 100% !important;
         height: 100% !important;
     }
+    #damage-and-losses #lossesLastSevenDaysChartContainer {
+        min-height: 0;
+        height: auto;
+    }
+    #damage-and-losses .losses-period-chart-canvas {
+        position: relative;
+        width: 100%;
+        height: 300px;
+    }
+    #damage-and-losses .losses-period-chart-canvas canvas,
+    #damage-and-losses .losses-horizontal-chart-canvas canvas {
+        display: block;
+        width: 100% !important;
+        height: 100% !important;
+    }
+    #damage-and-losses .losses-horizontal-chart-canvas {
+        position: relative;
+        width: 100%;
+        height: 220px;
+    }
     #damage-and-losses .damage-chart-period-selector {
         display: grid;
         grid-template-columns: repeat(4, minmax(0, 1fr));
