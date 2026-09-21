@@ -12,6 +12,14 @@ import {
 } from "../losses-rate/state.js";
 
 import {
+    getDamageAndLossesSummary,
+} from "../damage-and-losses/state.js";
+
+import {
+    getLossesSummary,
+} from "../damage-and-losses/losses-state.js";
+
+import {
     formatReportPersonFirstName,
 } from "../core/person-name.js";
 
@@ -20,6 +28,17 @@ const OVERALL_ANALYSIS_CAPACITY =
 
 const OVERALL_ANALYSIS_LOSS_RATE_LIMIT =
     0.0003;
+
+const OVERALL_ANALYSIS_PERIOD_KEYS =
+    Object.freeze([
+        "today",
+        "yesterday",
+        "dayBeforeYesterday",
+        "days3to7",
+        "days8to14",
+        "days15toMonthStart",
+        "totalMonth",
+    ]);
 
 function getOverallAnalysisContextQuantity(
     value,
@@ -182,6 +201,96 @@ function getExpeditionHighlights(
     };
 }
 
+/* REÚNE AVARIAS E PERDAS NOS MESMOS PERÍODOS DA TABELA */
+
+function getOverallDamageAndLossesAnalysis(
+    damageState,
+    lossesState,
+) {
+    const damageSummary =
+        getDamageAndLossesSummary(
+            damageState,
+        );
+
+    const lossesSummary =
+        getLossesSummary(
+            lossesState,
+        );
+
+    const damageHasData =
+        damageSummary.hasData;
+
+    const lossesHasData =
+        lossesSummary.hasData;
+
+    const traditionalAnalysis = {};
+
+    OVERALL_ANALYSIS_PERIOD_KEYS
+        .forEach(
+            function (periodKey) {
+                const damagePeriod =
+                    damageSummary
+                        .traditionalAnalysis
+                        ?.[periodKey];
+
+                const lossesPeriod =
+                    lossesSummary
+                        .traditionalAnalysis
+                        ?.[periodKey];
+
+                traditionalAnalysis[
+                    periodKey
+                ] = {
+                    hub:
+                        damageHasData
+                            ? damagePeriod
+                                ?.hub ?? 0
+                            : null,
+
+                    soc:
+                        damageHasData
+                            ? damagePeriod
+                                ?.soc ?? 0
+                            : null,
+
+                    underReview:
+                        lossesHasData
+                            ? lossesPeriod
+                                ?.underReview ?? 0
+                            : null,
+
+                    confirmedLosses:
+                        lossesHasData
+                            ? lossesPeriod
+                                ?.confirmedLosses ?? 0
+                            : null,
+
+                    savedAwaitingTicket:
+                        lossesHasData
+                            ? lossesPeriod
+                                ?.savedAwaitingTicket ?? 0
+                            : null,
+
+                    emptyAwaitingTicket:
+                        lossesHasData
+                            ? lossesPeriod
+                                ?.emptyAwaitingTicket ?? 0
+                            : null,
+                };
+            },
+        );
+
+    return {
+        hasData:
+            damageHasData ||
+            lossesHasData,
+
+        damageHasData,
+        lossesHasData,
+        traditionalAnalysis,
+    };
+}
+
 /* CRIA UMA VISÃO DERIVADA DOS RELATÓRIOS DE ORIGEM */
 
 function createOverallAnalysisData(
@@ -189,6 +298,8 @@ function createOverallAnalysisData(
     expeditionState,
     lossesRateState,
     reportContext = {},
+    damageState = null,
+    lossesState = null,
 ) {
     const receiptSummary =
         getReceiptSummary(
@@ -414,6 +525,12 @@ function createOverallAnalysisData(
                 expeditionState,
             ),
         },
+
+        damageAndLosses:
+            getOverallDamageAndLossesAnalysis(
+                damageState,
+                lossesState,
+            ),
     };
 }
 

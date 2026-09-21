@@ -53,6 +53,17 @@ const overallAnalysisWeekdays =
         "Sábado",
     ]);
 
+const overallAnalysisTraditionalPeriodKeys =
+    Object.freeze([
+        "today",
+        "yesterday",
+        "dayBeforeYesterday",
+        "days3to7",
+        "days8to14",
+        "days15toMonthStart",
+        "totalMonth",
+    ]);
+
 let overallAnalysisViewElements =
     null;
 
@@ -380,6 +391,11 @@ function getOverallAnalysisViewElements(
             getElement(
                 "overallAnalysisExpeditionTime",
             ),
+
+        damageAndLossesTable:
+            getElement(
+                "overallAnalysisDamageAndLossesTable",
+            ),
     };
 }
 
@@ -437,6 +453,51 @@ function scheduleOverallAnalysisDateUpdate() {
             nextDay.getTime() -
                 now.getTime() +
                 1000,
+        );
+}
+
+function renderOverallDamageAndLossesTable(
+    tableElement,
+    analysis,
+) {
+    tableElement
+        .querySelectorAll(
+            "[data-overall-damage-losses-field]",
+        )
+        .forEach(
+            function (rowElement) {
+                const field =
+                    rowElement.dataset
+                        .overallDamageLossesField;
+
+                const cells =
+                    rowElement.querySelectorAll(
+                        "td",
+                    );
+
+                overallAnalysisTraditionalPeriodKeys
+                    .forEach(
+                        function (
+                            periodKey,
+                            index,
+                        ) {
+                            const cell =
+                                cells[index];
+
+                            if (!cell) {
+                                return;
+                            }
+
+                            cell.textContent =
+                                formatOverallAnalysisQuantity(
+                                    analysis
+                                        ?.traditionalAnalysis
+                                        ?.[periodKey]
+                                        ?.[field],
+                                );
+                        },
+                    );
+            },
         );
 }
 
@@ -612,6 +673,11 @@ function renderOverallAnalysisView(
         formatOverallAnalysisDuration(
             data.expedition.durationSeconds,
         );
+
+    renderOverallDamageAndLossesTable(
+        elements.damageAndLossesTable,
+        data.damageAndLosses,
+    );
 
     return true;
 }

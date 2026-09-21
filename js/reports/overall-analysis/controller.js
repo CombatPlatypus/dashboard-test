@@ -14,6 +14,16 @@ import {
 } from "../losses-rate/state.js";
 
 import {
+    getDamageAndLossesState,
+    subscribeDamageAndLossesState,
+} from "../damage-and-losses/state.js";
+
+import {
+    getLossesState,
+    subscribeLossesState,
+} from "../damage-and-losses/losses-state.js";
+
+import {
     createOverallAnalysisData,
 } from "./model.js";
 
@@ -43,6 +53,8 @@ function getCurrentOverallAnalysisData() {
         getExpeditionState(),
         getLossesRateState(),
         getReportContext(),
+        getDamageAndLossesState(),
+        getLossesState(),
     );
 }
 
@@ -107,6 +119,14 @@ function initializeOverallAnalysisController() {
         renderOverallAnalysisController,
     );
 
+    subscribeDamageAndLossesState(
+        renderOverallAnalysisController,
+    );
+
+    subscribeLossesState(
+        renderOverallAnalysisController,
+    );
+
     subscribeReportContext(
         renderOverallAnalysisController,
     );
@@ -143,6 +163,10 @@ function canExportOverallAnalysisController() {
         data.flow.expedited,
         data.flow.floor,
         data.cards.lossesRate.rate,
+        data.damageAndLosses
+            .hasData
+            ? 1
+            : null,
     ].some(
         function (value) {
             return value !== null;
