@@ -44,26 +44,6 @@ let receiptOperatorTemplate = null;
 
 /* FORMATAÇÃO */
 
-function sanitizeReceiptIntegerInput(
-    input,
-) {
-    const sanitizedValue =
-        input.value.replace(
-            /\D/g,
-            "",
-        );
-
-    if (
-        input.value !==
-        sanitizedValue
-    ) {
-        input.value =
-            sanitizedValue;
-    }
-
-    return sanitizedValue;
-}
-
 function formatReceiptQuantity(
     value,
 ) {
@@ -187,12 +167,6 @@ function getReceiptElements(rootElement) {
             getReceiptElementById(
                 rootElement,
                 "receiptClearReportButton",
-            ),
-
-        expectedInput:
-            getReceiptElementById(
-                rootElement,
-                "receiptExpectedInput",
             ),
 
         operatorControls:
@@ -369,6 +343,20 @@ function configureReceiptErrorSelect(
         select,
         operator?.errorQuantity,
     );
+
+    if (
+        select.classList.contains(
+            "select2-hidden-accessible",
+        ) &&
+        typeof window.jQuery ===
+            "function"
+    ) {
+        window.jQuery(
+            select,
+        ).trigger(
+            "change.select2",
+        );
+    }
 }
 
 function createReceiptOperatorControl(
@@ -601,6 +589,15 @@ function renderReceiptOperatorControls(
     receiptOperatorStructureSignature =
         currentSignature;
 
+    if (
+        typeof window.destroySelect2Fields ===
+            "function"
+    ) {
+        window.destroySelect2Fields(
+            elements.operatorControls,
+        );
+    }
+
     const fragment =
         document.createDocumentFragment();
 
@@ -644,6 +641,15 @@ function renderReceiptOperatorControls(
         .replaceChildren(
             fragment,
         );
+
+    if (
+        typeof window.initializeSelect2Fields ===
+            "function"
+    ) {
+        window.initializeSelect2Fields(
+            elements.operatorControls,
+        );
+    }
 }
 
 /* PRÉVIA DOS OPERADORES */
@@ -793,9 +799,6 @@ function setReceiptGeneralControlsAvailability(
     const disabled =
         !hasImportedFile;
 
-    elements.expectedInput.disabled =
-        disabled;
-
     elements.errorCalculationToggle.disabled =
         disabled;
 
@@ -831,11 +834,6 @@ function renderReceiptSummary(
             totalErrors,
             receivedVolume,
         );
-
-    setReceiptInputValue(
-        elements.expectedInput,
-        state.expectedVolume,
-    );
 
     elements.previewWindow.textContent =
         state.window.trim() ||
@@ -952,21 +950,6 @@ function handleResetReceiptReport() {
 function bindReceiptGeneralInputs(
     elements,
 ) {
-    elements.expectedInput.addEventListener(
-        "input",
-        function () {
-            const sanitizedValue =
-                sanitizeReceiptIntegerInput(
-                    elements.expectedInput,
-                );
-
-            updateReceiptGeneralField(
-                "expectedVolume",
-                sanitizedValue,
-            );
-        },
-    );
-
     elements.errorCalculationToggle
         .addEventListener(
             "change",
@@ -981,6 +964,67 @@ function bindReceiptGeneralInputs(
         );
 }
 
+function handleReceiptOperatorFieldEvent(
+    elements,
+    event,
+) {
+    const input =
+        event.target instanceof Element
+            ? event.target.closest(
+                "[data-receipt-operator-field]",
+            )
+            : null;
+
+    if (
+        !(
+            input instanceof
+                HTMLInputElement ||
+            input instanceof
+                HTMLSelectElement
+        ) ||
+        !elements.operatorControls
+            .contains(input)
+    ) {
+        return;
+    }
+
+    const field =
+        input.dataset
+            .receiptOperatorField;
+
+    if (
+        field !== "labeler" &&
+        field !== "errorQuantity"
+    ) {
+        return;
+    }
+
+    const row =
+        input.closest(
+            "[data-receipt-operator-id]",
+        );
+
+    const operatorId =
+        Number(
+            row?.dataset
+                .receiptOperatorId,
+        );
+
+    if (
+        !Number.isInteger(
+            operatorId,
+        )
+    ) {
+        return;
+    }
+
+    updateReceiptOperator(
+        operatorId,
+        field,
+        input.value,
+    );
+}
+
 function bindReceiptOperatorControls(
     elements,
 ) {
@@ -988,72 +1032,9 @@ function bindReceiptOperatorControls(
         .addEventListener(
             "input",
             function (event) {
-                const input =
-                    event.target.closest(
-                        "[data-receipt-operator-field]",
-                    );
-
-                if (
-                    !(
-                        input instanceof
-                            HTMLInputElement ||
-                        input instanceof
-                            HTMLSelectElement
-                    ) ||
-                    !elements.operatorControls
-                        .contains(
-                            input,
-                        )
-                ) {
-                    return;
-                }
-
-                const field =
-                    input.dataset
-                        .receiptOperatorField;
-
-                if (
-                    field !==
-                        "labeler" &&
-                    field !==
-                        "errorQuantity"
-                ) {
-                    return;
-                }
-
-                const row =
-                    input.closest(
-                        "[data-receipt-operator-id]",
-                    );
-
-                if (!row) {
-                    return;
-                }
-
-                const operatorId =
-                    Number(
-                        row.dataset
-                            .receiptOperatorId,
-                    );
-
-                if (
-                    !Number.isInteger(
-                        operatorId,
-                    )
-                ) {
-                    return;
-                }
-
-                const value =
-                    field ===
-                    "errorQuantity"
-                        ? input.value
-                        : input.value;
-
-                updateReceiptOperator(
-                    operatorId,
-                    field,
-                    value,
+                handleReceiptOperatorFieldEvent(
+                    elements,
+                    event,
                 );
             },
         );
@@ -1062,10 +1043,18 @@ function bindReceiptOperatorControls(
         .addEventListener(
             "change",
             function (event) {
+                handleReceiptOperatorFieldEvent(
+                    elements,
+                    event,
+                );
+
                 const checkbox =
-                    event.target.closest(
-                        "[data-receipt-operator-selection]",
-                    );
+                    event.target instanceof
+                        Element
+                        ? event.target.closest(
+                            "[data-receipt-operator-selection]",
+                        )
+                        : null;
 
                 if (
                     !(
