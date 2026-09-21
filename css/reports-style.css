@@ -565,11 +565,8 @@
     #damage-and-losses .damage-chart-period-selector button.is-active {
         color: var(--color-text);
         background-color: var(--color-container-houver);
-        border-color: #ffc107;
     }
-    #damage-and-losses .damage-chart-period-selector button.is-active::before {
-        background-color: #ffc107;
-    }
+
     #damage-and-losses .damage-chart-period-selector button:disabled {
         opacity: 0.45;
         cursor: default;
