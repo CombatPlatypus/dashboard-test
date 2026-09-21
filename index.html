@@ -281,6 +281,9 @@
             .damage-and-losses-charts {
                 gap: 15px;
             }
+            .damage-and-losses-charts > div:first-of-type {
+                flex: 0 0 550px;
+            }
             .damage-and-losses-charts > div {
                 flex: 1 1 0;
             }
@@ -292,7 +295,7 @@
                 height: 320px;
                 position: relative;
                 align-items: center;
-                gap: 70px;
+                gap: 20px;
             }
 
             #reports .doughnut-chart > div > div:last-of-type {
@@ -1896,17 +1899,17 @@
                                                         <div>
                                                             <div class="type">
                                                                 <div style="background-color: #F44336;"></div>
-                                                                <p>Avaria Sólida <span id="damageSolidValue">—</span></p>
+                                                                <p>Avarias Sólidas <span id="damageSolidValue">—</span></p>
                                                             </div>
 
                                                             <div class="type">
                                                                 <div style="background-color: #ff9800;"></div>
-                                                                <p>Avaria Líquida <span id="damageLiquidValue">—</span></p>
+                                                                <p>Avarias Líquidas <span id="damageLiquidValue">—</span></p>
                                                             </div>
 
                                                             <div class="type">
                                                                 <div style="background-color: #3F51B5;"></div>
-                                                                <p>Avaria de Vidro <span id="damageGlassValue">—</span></p>
+                                                                <p>Avarias de Vidro <span id="damageGlassValue">—</span></p>
                                                             </div>
                                                         </div>
                                                     </div>
