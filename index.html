@@ -1865,6 +1865,22 @@
                                                     <p id="">Avarias do Soc</p>
                                                 </div>
                                             </div>
+                                            
+                                            <div class="damage-chart-period-selector" id="damageChartPeriodSelector" role="tablist" aria-label="Período exibido no gráfico de avarias">
+                                                <button class="is-active" type="button" role="tab" aria-selected="true" data-damage-chart-period="last7">
+                                                    <span>Últimos 7 Dias</span>
+                                                </button>
+
+                                                <button type="button" role="tab" aria-selected="false" data-damage-chart-period="days8to14">
+                                                    <span>De 8 a 14</span>
+                                                    <span>Dias Atrás</span>
+                                                </button>
+
+                                                <button type="button" role="tab" aria-selected="false" data-damage-chart-period="monthStart">
+                                                    <span>De 15 Dias Atrás</span>
+                                                    <span>Até o Começo do Mês</span>
+                                                </button>
+                                            </div>
 
                                             <div class="vertical-bars-chart">
                                                 <div class="chart-title">
@@ -1889,27 +1905,10 @@
                                                     <div class="damage-period-chart-canvas">
                                                         <canvas id="damageLastSevenDaysChart" role="img" aria-label="Avarias do Soc e do Hub nos últimos sete dias"></canvas>
                                                     </div>
-
-                                                    <div class="damage-chart-period-selector" id="damageChartPeriodSelector" role="tablist" aria-label="Período exibido no gráfico de avarias">
-                                                        <button class="is-active" type="button" role="tab" aria-selected="true" data-damage-chart-period="last7">
-                                                            <span>Últimos 7 Dias</span>
-                                                        </button>
-
-                                                        <button type="button" role="tab" aria-selected="false" data-damage-chart-period="days8to14">
-                                                            <span>De 8 a 14</span>
-                                                            <span>Dias Atrás</span>
-                                                        </button>
-
-                                                        <button type="button" role="tab" aria-selected="false" data-damage-chart-period="monthStart">
-                                                            <span>De 15 Dias Atrás</span>
-                                                            <span>Até o Começo do Mês</span>
-                                                        </button>
-                                                    </div>
                                                 </div>
                                             </div>
 
                                             <div class="damage-and-losses-charts flex-box-start">
-                                                    
                                                 <div class="doughnut-chart">
                                                     <h4>Composição das Avarias</h4>
 
