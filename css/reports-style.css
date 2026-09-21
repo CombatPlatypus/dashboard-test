@@ -521,7 +521,6 @@
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 10px;
-        margin-top: 15px;
     }
     #damage-and-losses .damage-chart-period-selector button {
         position: relative;
