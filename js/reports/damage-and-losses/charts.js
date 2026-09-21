@@ -153,15 +153,30 @@ const damageChartAveragePlugin = {
         context.stroke();
         context.setLineDash([]);
 
+        const labelPositionX =
+            chartArea.right + 52;
+
         drawDamageChartText(
             context,
-            `Média diária: ${damageChartQuantityFormatter.format(average)}`,
-            chartArea.right + 10,
-            positionY,
+            "Média Diária",
+            labelPositionX,
+            positionY - 9,
             {
-                align: "left",
+                align: "center",
                 font:
                     '500 13px "Open Sans", sans-serif',
+            },
+        );
+
+        drawDamageChartText(
+            context,
+            damageChartQuantityFormatter.format(average),
+            labelPositionX,
+            positionY + 10,
+            {
+                align: "center",
+                font:
+                    '600 14px "Open Sans", sans-serif',
             },
         );
 

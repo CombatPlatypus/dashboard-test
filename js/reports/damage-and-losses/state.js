@@ -835,6 +835,14 @@ function getDamageAndLossesSummary(
                 monthStart,
                 createOffsetDate(14),
             ),
+
+            createDamageChartPeriod(
+                "totalMonth",
+                "Total do Mês",
+                daysByDate,
+                monthStart,
+                latestDate,
+            ),
         );
 
         const createTraditionalMetrics =
