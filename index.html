@@ -295,6 +295,12 @@
                 gap: 70px;
             }
 
+            #reports .doughnut-chart > div > div:last-of-type {
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+            }
+
 
             #reports .type {
                 display: flex;
@@ -313,6 +319,7 @@
                 font-size: 14px;
                 color: var(--color-gray-p);
                 line-height: 1;
+                margin: 0;
             }
                         
 
@@ -1883,9 +1890,9 @@
 
                                                     <div class="flex-box-start">
                                                         <div>
-                                                            <canvas id="" height="642" style="display: block; box-sizing: border-box; height: 321px; width: 342.4px;" width="684">
-                                                                Seu navegador não suporta gráficos em canvas.
-                                                            </canvas>
+                                                            
+                                                            <!-- GRAFICO AQUI -->
+
                                                         </div>
 
                                                         <div>
@@ -1895,12 +1902,12 @@
                                                             </div>
 
                                                             <div class="type">
-                                                                <div style="background-color: #F44336;"></div>
+                                                                <div style="background-color: #ff9800;"></div>
                                                                 <p>Avaria Líquida <span id=""></span></p>
                                                             </div>
 
                                                             <div class="type">
-                                                                <div style="background-color: #F44336;"></div>
+                                                                <div style="background-color: #3F51B5;"></div>
                                                                 <p>Avaria de Vidro <span id=""></span></p>
                                                             </div>
                                                         </div>
