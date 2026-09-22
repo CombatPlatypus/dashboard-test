@@ -127,18 +127,8 @@
         a:hover, a:focus {
             color: var(--color-text);
         }
-        .link {
-            color: #27a1f3;
-            font-size: 14px;
-            font-family: 'Open Sans', sans-serif;
-            font-weight: 600;
-            text-decoration: none;
-            cursor: pointer;
-            letter-spacing: 1px;
-            line-height: inherit;
-        }
-        .link:hover, .link:focus{
-            color: #2284c5;
+        .link:hover, .link:focus {
+            color: #2284c5 !important;
         }
 
     /* LISTAS E DIVISORES */
