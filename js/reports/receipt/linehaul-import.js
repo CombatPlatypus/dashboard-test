@@ -8,6 +8,7 @@ import {
     createSpXLinehaulWindowCandidates,
     formatSpXLinehaulOrigin,
     getSpXLinehaulPlainLoadedOrders,
+    getSpXLinehaulWindow,
     parseSpXLinehaulQuantity,
 } from "../core/spx-linehaul-rules.js";
 
@@ -29,9 +30,6 @@ const RECEIPT_LINEHAUL_IMPORT_EXPECTED_MAXIMUM =
 
 const RECEIPT_LINEHAUL_CODE_PATTERN =
     /\bLT[A-Z0-9]{8,24}\b/i;
-
-const RECEIPT_LINEHAUL_WINDOW_PATTERN =
-    /^(AM|PM1|PM2)$/i;
 
 const RECEIPT_LINEHAUL_PLATE_PATTERN =
     /\b[A-Z]{3}[0-9][A-Z0-9][0-9]{2}\b/i;
@@ -137,32 +135,11 @@ function getReceiptLinehaulLoadedOrders(
 function getReceiptLinehaulCpt(
     values,
 ) {
-    const receivedValues =
-        values
-            .flatMap(
-                splitReceiptLinehaulImportValues,
-            )
-            .filter(
-                function (value) {
-                    return value !== "-";
-                },
-            );
-
-    const windowValue =
-        receivedValues.find(
-            function (value) {
-                return RECEIPT_LINEHAUL_WINDOW_PATTERN
-                    .test(
-                        value,
-                    );
-            },
-        );
-
-    return (
-        windowValue ||
-        receivedValues[0] ||
-        ""
-    ).toUpperCase();
+    return getSpXLinehaulWindow(
+        values.flatMap(
+            splitReceiptLinehaulImportValues,
+        ),
+    );
 }
 
 function getReceiptLinehaulVehiclePlate(
