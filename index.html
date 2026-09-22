@@ -3038,29 +3038,34 @@
                                         <div>
                                             <h4>Visão Geral</h4>
 
-                                            <p>O Dashboard do Inventário é uma ferramenta de apoio à operação criada para reunir planilhas, relatórios e análises em um único ambiente. Ele transforma bases operacionais em indicadores, tabelas e gráficos que facilitam o acompanhamento da janela, a identificação de desvios e a comunicação dos resultados.</p>
+                                            <p>O Dashboard do Inventário é uma ferramenta de apoio à operação criada para reunir planilhas, relatórios e análises em um único ambiente. Ele transforma bases operacionais em indicadores, tabelas e gráficos que facilitam o acompanhamento da janela, a identificação de desvios e a comunicação dos resultados. Ele tem como publico alvo os analistas de inventário, mas também pode ajudar outras áreas da operação.</p>
                                         </div>
 
                                         <hr>
 
                                         <div>
-                                            <h4>Como Usar</h4>
+                                            <h4>Como Usar - Painel Relatórios</h4>
 
-                                            <p>Comece preenchendo as informações gerais da janela, como turno, analista responsável, planejamento, quantidade de colaboradores e capacidade. Depois, acesse o relatório desejado e importe a base correspondente. Confira a notificação de importação, revise os dados exibidos na prévia e complete os campos manuais que forem necessários. Os indicadores e gráficos são atualizados conforme os dados do relatório são alterados.</p>
+                                            <p>Comece preenchendo as informações gerais da janela, como o turno atual, analista responsável, planejamento, quantidade de colaboradores e capacidade. Depois, acesse o relatório desejado e importe a base de dados correspondente. <br><br> Confira a notificação de importação, revise os dados exibidos na prévia e se necessário, complete os campos manuais. <br> Os indicadores e gráficos são atualizados automaticamente conforme os dados do relatório são alterados.</p>
                                         </div>
 
                                         <hr>
                                         <div>
                                             <h4>Recomendações</h4>
 
-                                            <p>Utilize sempre a base oficial mais recente, confirme se o arquivo pertence à janela ou ao mês analisado e compare o volume importado com a fonte antes de divulgar o resultado. Revise também nomes, filtros, períodos e valores preenchidos manualmente. Para continuar o trabalho em outro momento, salve uma sessão antes de limpar o relatório, atualizar a página ou fechar o navegador.</p>
+                                            <p>Utilize sempre a base oficial mais recente, confirme se o arquivo pertence à janela ou ao mês analisado e compare o volume importado com a fonte antes de divulgar o resultado. Revise também nomes, filtros, períodos e valores preenchidos manualmente.
+
+                                            <br><br>
+
+                                            Para continuar o trabalho em outro momento, salve uma sessão antes de limpar o relatório, atualizar a página ou fechar o navegador.</p>
                                         </div>
 
                                         <hr>
+
                                         <div>
                                             <h4>Peculiaridades</h4>
 
-                                            <p>Cada importador procura colunas, abas e formatos específicos. Alterações no nome de um cabeçalho ou na estrutura da planilha podem impedir a leitura correta. Um traço (—) representa uma informação ainda não disponível ou não aplicável e não deve ser interpretado automaticamente como zero. Os resultados apresentados são calculados a partir das bases importadas e dos dados informados pelo usuário.</p>
+                                            <p>O importador de cada relatório procura colunas, abas e formatos específicos. Por isso, alterações no nome de um cabeçalho ou na estrutura da planilha podem impedir a leitura correta. Um traço (—) representa uma informação ainda não disponível ou não aplicável e não deve ser interpretado automaticamente como zero. Os resultados apresentados são calculados a partir das bases e dos dados importados.</p>
                                         </div>
                                     </div>
                                 </div>
@@ -3073,18 +3078,64 @@
                                     </div>
 
                                     <div class="padding">
-                                        <div>
-                                            <h4>Planilhas</h4>
+                                        <p>Reúne atalhos para planilhas operacionais utilizadas no dia a dia, o painel permite visulizar o conteúdo de uma planilhas e fazer pequenas alterações simples, e também conta com links que direcionam para suas respectivas fontes externas no google planilhas. <br><br>O conteúdo dessas planilhas não é de nenhuma forma alterado pelo dashboard, ele apenas abre uma janela do google planilhas no painel, utilizando o link da planilha em tags HTML conhecidas como &lt;IFRAME&gt;, toda alteração de planilhas é feita através da plataforma do google.
 
-                                            <p>Reúne atalhos para planilhas operacionais utilizadas no dia a dia, como as bases de avarias e coletas. Os links direcionam para suas respectivas fontes externas e servem como ponto rápido de acesso; o conteúdo dessas planilhas não é alterado pelo dashboard.</p>
-                                        </div>
+                                        <br><br>
+
+                                        É de responsabilidade do usuário do dashboard inventário, manter o link de suas respectivas planilhas sempre atualizado, o inventário de cada operação shopee possui suas prórias planilhas, por isso, cada operação deve mapear as suas, para que consiga utilizar este painel.
+                                        </p>
 
                                         <hr>
 
                                         <div>
                                             <h4>Relatórios</h4>
 
-                                            <p>É o núcleo operacional do dashboard. O painel de Processamento acompanha descarregamentos de LHs, a mesa de recebimento e o desempenho dos recebedores. Expedição apresenta o resumo da operação, o rank de conferentes, a análise de erros e as ocorrências por rua. Planejamento organiza LHs, TOs para segregação, Collection Pool e indicadores de capacidade. Avarias e Perdas consolida ocorrências por período, origem, composição, situação e valores. Taxa de Perdas acompanha a composição mensal e o histórico do indicador. Análise Geral combina os principais dados dos demais relatórios em uma visão executiva da janela.</p>
+                                            <p>É o núcleo operacional do dashboard, dividio em seis relatórios: Processamento, Expedição, Planejamento, Avarias e Perdas, Taxa de Perdas e Análise Geral, cada um com suas respectivas funções, atribuções e bases específicas de dados para importar, seja do SPX ou Planilhas. 
+
+                                            <br><br>
+
+                                            Processamento
+
+                                            <br><br>
+
+                                            Acompanha descarregamentos de LHs, a mesa de recebimento e o desempenho dos recebedores, permitindo uma análise completa de todo cliclo do processamento, desde o descarregamento do primeiro LH até o último pacote recebido pela operação, usando dados do SPX.
+
+                                            <br><br>
+
+                                            Expedição 
+
+                                            <br><br>
+
+                                            Uma análise precisa de todo o processo de expedição, acompanha o resumo da expedição, o rank de conferentes e também uma a análise de erros juntamente com e as ocorrências categorizadas por rua, permitindo analisar no detalhe o desempenho de cada rua. 
+
+                                            <br><br>
+
+                                            Planejamento
+
+                                            <br><br>
+
+                                            Organiza LHs, TOs para segregação, operações na collection pool e indicadores de capacidade, desenhado para planejar volume da proxima janela de precessamento, carregamento infomrações precisas da quantidade de pacotes em cada LH, e o total de backlog da janela anterior.
+
+                                            <br><br>
+
+                                            Avarias e Perdas
+
+                                            <br><br>Reaproveita a base de dados mantida pelos analistas de inventário para criar paineis visuais, consolidando ocorrências por período, origem, composição, situação e valores. o relatório gera gráficos e organiza os dados a respeito das avarias e perdas para uma análise superior.
+
+                                            <br><br>
+
+                                            Taxa de Perdas
+                                                
+                                            <br><br>
+
+                                            Acompanha a composição mensal de avarias e perdas, permitindo uma análise mais ampla do desempenho do Hub.
+
+                                            <br><br>
+
+                                            Análise Geral
+                                                
+                                            <br><br>
+                                            Combina os principais dados dos demais relatórios em uma visão geral da janela, sendo um grande resumo de como foi os acontecimentos daquela janela em questão, gerado dinamicamente pelo preenchimento dos relatórios anteriores.</p>
                                         </div>
 
                                         <hr>
@@ -3092,7 +3143,11 @@
                                         <div>
                                             <h4>Análises</h4>
 
-                                            <p>Permite explorar arquivos XLSX, XLS e CSV sem depender de um relatório predefinido. É possível visualizar a planilha, controlar as colunas exibidas, comparar dados, aplicar condições, calcular estatísticas e montar gráficos de colunas, linhas ou pizza. As tabelas e os gráficos gerados também podem ser baixados para uso em outras análises.</p>
+                                            <p>Permite explorar arquivos XLSX, XLS e CSV sem depender de um relatório predefinido. É possível visualizar a planilha, controlar as colunas exibidas, comparar dados, aplicar condições, calcular estatísticas e montar gráficos de colunas, linhas ou pizza.
+
+                                            <br><br>
+
+                                            As tabelas e os gráficos gerados também podem ser baixados para uso em outras análises.</p>
                                         </div>
 
                                         <hr>
@@ -3100,7 +3155,7 @@
                                         <div>
                                             <h4>Documentação</h4>
 
-                                            <p>Apresenta orientações sobre o funcionamento do dashboard, suas áreas, limitações e cuidados de uso. Este conteúdo acompanha a evolução da ferramenta e deve ser consultado quando houver dúvidas sobre importação, interpretação dos indicadores ou preparação de uma solicitação de suporte.</p>
+                                            <p>Apresenta orientações sobre o funcionamento do dashboard, suas áreas, limitações e cuidados de uso. Este conteúdo acompanha a evolução da ferramenta e deve ser sempre consultado quando houver dúvidas sobre importações, interpretações ou de como usar uma função.</p>
                                         </div>
                                     </div>
                                 </div>
@@ -3116,7 +3171,11 @@
                                         <div>
                                             <h4>Versão Atual</h4>
 
-                                            <p>Esta documentação descreve a versão atual em desenvolvimento. Ela reúne os fluxos de Processamento, Expedição, Planejamento, Avarias e Perdas, Taxa de Perdas, Análise Geral e análise livre de planilhas. Como o projeto continua evoluindo, nomes, regras de cálculo e formatos aceitos podem receber ajustes.</p>
+                                            <p>Esta documentação descreve o funcionamento completo do dashboard de inventário em sua primeira versão, 1.0.<br> Ela reúne os fluxos de Processamento, Expedição, Planejamento, Avarias e Perdas, Taxa de Perdas, Análise Geral e análise livre de planilhas.
+
+                                            <br><br>
+
+                                            Como o projeto continua evoluindo, nomes, regras de cálculo e formatos de arquivos aceitos podem receber ajustes.</p>
                                         </div>
 
                                         <hr>
@@ -3124,7 +3183,7 @@
                                         <div>
                                             <h4>Principais Funcionalidades</h4>
 
-                                            <p>Entre as funções disponíveis estão a importação de bases operacionais, preenchimentos complementares, atualização automática de prévias, indicadores e rankings, filtros por período, tabelas analíticas, gráficos interativos, cópia ou download de relatórios e salvamento da sessão de trabalho para uso posterior.</p>
+                                            <p>Entre as funções disponíveis estão a importação de bases operacionais para preenchimento automático de relatórios, atualizando prévias, indicadores e rankings. Opções filtros por período, tabelas analíticas, gráficos interativos, cópia ou download de relatórios e salvamento da sessão de trabalho para uso posterior no proximo turno, ou para consultas pontuais de determinadas janelas.</p>
                                         </div>
 
                                         <hr>
@@ -3132,15 +3191,7 @@
                                         <div>
                                             <h4>Compatibilidade das Bases</h4>
 
-                                            <p>Os formatos aceitos dependem do painel. Em geral, o dashboard trabalha com arquivos XLSX, XLS e CSV, mas cada importador possui regras próprias para localizar abas, cabeçalhos e colunas. Uma planilha pode abrir normalmente no Excel e ainda assim não ser reconhecida se sua estrutura não corresponder ao modelo esperado.</p>
-                                        </div>
-
-                                        <hr>
-
-                                        <div>
-                                            <h4>Evolução da Ferramenta</h4>
-
-                                            <p>Novas funcionalidades são incorporadas conforme as necessidades da operação. Antes de utilizar uma base antiga ou uma sessão salva em outra versão, confirme se os campos e resultados continuam compatíveis. Alterações relevantes devem ser registradas nesta seção para que os usuários saibam o que mudou e quais validações precisam ser refeitas.</p>
+                                            <p>Os formatos aceitos dependem do painel. Em geral, o dashboard trabalha com arquivos XLSX, XLS e CSV, mas cada importador possui regras próprias para localizar abas, cabeçalhos e colunas. Uma planilha pode abrir normalmente no Excel e ainda assim não ser reconhecida se sua estrutura não corresponder ao modelo esperado, para a determinada função que você está tentando utlizar.</p>
                                         </div>
                                     </div>
                                 </div>
@@ -3156,7 +3207,7 @@
                                         <div>
                                             <h4>Processamento dos Dados</h4>
 
-                                            <p>As bases importadas nos relatórios e nas análises são lidas pelo navegador para produzir as visualizações exibidas na página. O dashboard não deve ser tratado como um banco de dados permanente: mantenha os arquivos oficiais em seus locais autorizados e utilize o salvamento de sessão apenas quando precisar preservar o trabalho realizado.</p>
+                                            <p>As bases importadas nos relatórios e nas análises são lidas pelo navegador para produzir as visualizações exibidas na página. O dashboard não deve ser tratado como um banco de dados permanente: mantenha os arquivos oficiais em seus locais autorizados, utilize o salvamento de sessão apenas quando precisar preservar o trabalho realizado, e mantenha o arquivo do salvamento somente nas maquinas corporativas da empresa ou nos drives das contas corporativas, a opção de salvar sessão é opcional, e o arquivo gerado pela função deve ser tratado como dado potencialmente sensivel, mesmo que sua leitura não seja fácil fora do dashboard, tenha responsabilidade com o arquivo salvo.</p>
                                         </div>
 
                                         <hr>
@@ -3164,7 +3215,18 @@
                                         <div>
                                             <h4>Informações Sensíveis</h4>
 
-                                            <p>Importe somente arquivos necessários para a análise e aos quais você tenha acesso autorizado. Evite compartilhar sessões, imagens ou relatórios que contenham nomes, identificadores, rastreios ou informações operacionais com pessoas que não participem do processo. Quando um arquivo for utilizado para suporte, remova ou oculte dados que não sejam essenciais para reproduzir o problema.</p>
+                                            <p>Importe somente arquivos necessários para a análise e aos quais você tenha acesso autorizado. NÃO compartilhe sessões, imagens ou relatórios que contenham nomes, identificadores, rastreios ou informações operacionais com pessoas que não participem do processo, ou que não possuam autorização para consultar tais informações. 
+
+                                            <br><br>
+
+                                            O dashboard não envia, salva ou armazena nenhum tipo de informação para quaisquer servidores externos, e também não possui um banco de dados conectado ao sistema, absolutamente nenhuma informação sensivel da empresa é enviada para quaisquer lugares, que não sejam a prória maquina corporativa do usuário, e tais informações só são baixadas para maquina local, com as ações do usuário. 
+
+
+
+                                            <br><br>
+                                            As planilhas que aparecem no painel planilhas estão protegidas pela login google, é preciso estar conectado a conta corporativa para puder visualizar as informações das respectivas planilhas, e o que dashboard faz é como se abrir uma nova aba do navegador dentro do painel planilhas, mas somente para aquela determinada planilha, cujo o link foi fornecido pelo próprio usuário, e que devemos lembrar, não guarda nenhum tipo de informação sensível, mesmo que uma pessoa sem autorização obtenha um link, sem o acesso da conta corporativa, são apenas letras e números que não informam ou representam qualquer tipo de informação a respeito da operação.
+
+                                            </p>
                                         </div>
 
                                         <hr>
@@ -3172,15 +3234,20 @@
                                         <div>
                                             <h4>Permissões do Navegador</h4>
 
-                                            <p>Algumas ações podem solicitar acesso à área de transferência ou iniciar downloads. Essas permissões são usadas para importar dados copiados, copiar relatórios e salvar arquivos gerados. Autorize apenas quando reconhecer a ação executada e confira o conteúdo antes de compartilhá-lo.</p>
+                                            <p>Algumas ações no dashboard podem solicitar acesso à área de transferência ou iniciar downloads. 
+
+                                            <br><br>
+                                            Essas permissões são usadas para importar dados copiados, copiar relatórios e salvar arquivos gerados. Autorize apenas quando reconhecer a ação executada e confira o conteúdo antes de compartilhá-lo.</p>
                                         </div>
 
                                         <hr>
 
                                         <div>
                                             <h4>Serviços Externos</h4>
+                                            <p>Os atalhos de planilhas abrem serviços externos, esses serviços possuem suas próprias regras de acesso, armazenamento e privacidade.
 
-                                            <p>Os atalhos de planilhas abrem serviços externos, que possuem suas próprias regras de acesso, armazenamento e privacidade. O dashboard não controla as permissões desses serviços. Utilize sempre sua conta corporativa autorizada e não solicite acesso por canais não oficiais.</p>
+                                            <br><br>
+                                            O dashboard não controla as permissões desses serviços. Utilize sempre sua conta corporativa autorizada.</p>
                                         </div>
                                     </div>
                                 </div>
@@ -3220,7 +3287,7 @@
                                         <div>
                                             <h4>Os dados podem ser recuperados depois de fechar a página?</h4>
 
-                                            <p>Somente se uma sessão tiver sido salva antes do fechamento. A atualização da página, a limpeza de um relatório ou o encerramento do navegador podem descartar informações que ainda não foram exportadas. Salve a sessão sempre que precisar interromper e continuar o trabalho posteriormente.</p>
+                                            <p>Apenas se sessão tiver sido salva antes do fechamento. A atualização da página, a limpeza de um relatório ou o encerramento do navegador podem descartar informações que ainda não foram exportadas. Salve a sessão sempre que precisar interromper e continuar o trabalho.</p>
                                         </div>
 
                                         <hr>
@@ -3230,48 +3297,6 @@
 
                                             <p>Nos painéis com filtros temporais, a seleção atualiza os cards, gráficos e tabelas relacionados ao mesmo conjunto de dados. Essa sincronização permite comparar períodos sem misturar informações de intervalos diferentes.</p>
                                         </div>
-                                    </div>
-                                </div>
-
-                                <!-- DOCUMENTAÇÃO SUPORTE -->
-
-                                <div class="tabs-panel" id="docs-support">
-                                    <div class="title">
-                                        <h3>Suporte</h3>
-                                    </div>
-
-                                    <div class="padding">
-                                        <div>
-                                            <h4>Antes de Solicitar Ajuda</h4>
-
-                                            <p>Confirme se está no painel correto, tente importar novamente a base oficial e revise a mensagem da barra de notificações. Verifique também se os cabeçalhos e as abas da planilha continuam iguais ao modelo esperado. Quando possível, repita o processo após atualizar a página, preservando antes qualquer sessão importante.</p>
-                                        </div>
-
-                                        <hr>
-
-                                        <div>
-                                            <h4>Como Relatar um Problema</h4>
-
-                                            <p>Informe qual painel e qual aba estavam em uso, o resultado esperado, o que ocorreu e as etapas necessárias para reproduzir o problema. Inclua a mensagem exibida pelo dashboard, uma captura de tela e o tipo de arquivo importado. Esses detalhes reduzem o tempo necessário para localizar a causa.</p>
-                                        </div>
-
-                                        <hr>
-
-                                        <div>
-                                            <h4>Envio de Arquivos para Análise</h4>
-
-                                            <p>Compartilhe uma base de exemplo somente quando ela for indispensável para reproduzir a falha. Prefira uma cópia reduzida e anonimizada, mantendo apenas as colunas e linhas relacionadas ao problema. Nunca envie arquivos operacionais por canais pessoais ou não autorizados.</p>
-                                        </div>
-
-                                        <hr>
-
-                                        <div>
-                                            <h4>Sugestões de Melhoria</h4>
-
-                                            <p>Ao sugerir uma funcionalidade, descreva o problema operacional que ela resolveria, onde deveria aparecer e qual seria o resultado esperado. Exemplos de bases, cálculos e representações visuais ajudam a transformar a necessidade em uma alteração clara e verificável.</p>
-                                        </div>
-
-
                                     </div>
                                 </div>
                             </div>
@@ -3298,10 +3323,6 @@
 
                             <li class="tabs-title">
                                 <a href="#docs-doubts">Dúvidas Comuns</a>
-                            </li>
-
-                            <li class="tabs-title">
-                                <a href="#docs-support">Suporte</a>
                             </li>
                         </ul>
                     </div>
