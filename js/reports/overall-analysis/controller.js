@@ -42,6 +42,11 @@ import {
     renderOverallAnalysisCharts,
 } from "./charts.js";
 
+import {
+    initializeOverallAnalysisActions,
+    renderOverallAnalysisActions,
+} from "./actions.js";
+
 let overallAnalysisControllerInitialized =
     false;
 
@@ -72,8 +77,14 @@ function renderOverallAnalysisController() {
             data,
         );
 
+    const actionsRendered =
+        renderOverallAnalysisActions(
+            canExportOverallAnalysisController(),
+        );
+
     return viewRendered &&
-        chartsRendered;
+        chartsRendered &&
+        actionsRendered;
 }
 
 function initializeOverallAnalysisController() {
@@ -100,6 +111,9 @@ function initializeOverallAnalysisController() {
             rootElement,
         ) &&
         initializeOverallAnalysisCharts(
+            rootElement,
+        ) &&
+        initializeOverallAnalysisActions(
             rootElement,
         );
 
