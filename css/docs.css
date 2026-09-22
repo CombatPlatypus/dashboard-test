@@ -1,0 +1,44 @@
+#docs {
+    max-width: 1600px;
+    margin: 0 auto;
+}
+#docs .title {
+    border-bottom: 2px solid var(--color-border);
+    padding: 20px;
+}
+#docs .title h3 {
+    margin: 0;
+}
+#docs h4 {
+    margin: 0;
+}
+#docs p {
+    margin: 15px 25px 0 25px;
+    text-align: justify;
+}
+#docs hr {
+    max-width: 100%;;
+}
+#docs > .flex-box-start {
+    gap: 15px;
+}
+#docs .padding {
+    padding: 20px;
+}
+#docs > .flex-box-start > div:first-of-type {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--color-container);
+    border: 2px solid var(--color-border);
+    border-radius: 5px;
+}
+#docs > .flex-box-start > ul:last-of-type {
+    flex: 0 0 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+#docs > .flex-box-start > ul:last-of-type > .tabs-title {
+    width: 100%;
+}

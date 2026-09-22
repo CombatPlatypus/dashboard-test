@@ -28,58 +28,11 @@
         <link rel="stylesheet" href="css/reports-style.css">
         <link rel="stylesheet" href="css/hub-spreadsheets.css">
         <link rel="stylesheet" href="css/data-analysis.css">
+        <link rel="stylesheet" href="css/docs.css">
 
         <!-- ESTILOS TEMPORARIOS NÃO FINALIZADOS -->
 
-        <style>
-
-            #docs {
-                max-width: 1600px;
-                margin: 0 auto;
-            }
-            #docs .title {
-                border-bottom: 2px solid var(--color-border);
-                padding: 20px;
-            }
-            #docs .title h3 {
-                margin: 0;
-            }
-            #docs h4 {
-                margin: 0;
-            }
-            #docs p {
-                margin: 15px 25px 0 25px;
-                text-align: justify;
-            }
-            #docs hr {
-                max-width: 100%;;
-            }
-            #docs > .flex-box-start {
-                gap: 15px;
-            }
-            #docs .padding {
-                padding: 20px;
-            }
-            #docs > .flex-box-start > div:first-of-type {
-                flex: 1 1 0;
-                display: flex;
-                flex-direction: column;
-                background-color: var(--color-container);
-                border: 2px solid var(--color-border);
-                border-radius: 5px;
-            }
-            #docs > .flex-box-start > ul:last-of-type {
-                flex: 0 0 300px;
-                display: flex;
-                flex-direction: column;
-                gap: 10px;
-            }
-            #docs > .flex-box-start > ul:last-of-type > .tabs-title {
-                width: 100%;
-            }
-
-
-        </style>
+        <style></style>
     </head>	
 
     <!-- CONTEÚDO DA PÁGINA -->
@@ -100,7 +53,7 @@
                 </div>
 
                 <ul class="flex-box-start tabs" data-tabs id="switch-1">
-                    <li class="tabs-title">
+                    <li class="tabs-title is-active">
                         <a href="#spreadsheets">
                             <div class="flex-box-center">
                                 <img src="images/geral-icons/sheets-icon.svg">
@@ -127,7 +80,7 @@
                         </a>
                     </li> 
 
-                    <li class="tabs-title is-active">
+                    <li class="tabs-title">
                         <a href="#docs">
                             <div class="flex-box-center">
                                 <img src="images/menu-icons/docs-icon.svg">
@@ -190,7 +143,7 @@
 
                 <!-- PAINEL - PLANILHAS -->
 
-                <div class="tabs-panel" id="spreadsheets">
+                <div class="tabs-panel is-active" id="spreadsheets">
                     <div class="spreadsheets-layout">
 
                         <!-- MENU DE NAVEGAÇÃO DAS PLANILHAS -->
@@ -200,7 +153,6 @@
                         <!-- PLANILHAS -->
 
                         <div class="tabs-content" data-tabs-content="switch-spreadsheet" id="spreadsheetPanels"></div>
-                        
                     </div>
                 </div>
 
@@ -3036,7 +2988,7 @@
 
                 <!-- PAINEL - MANUAL -->
 
-                <div class="tabs-panel is-active" id="docs">
+                <div class="tabs-panel" id="docs">
                     <div class="flex-box-start">
 
                         <!-- DOCUMENTAÇÃO -->
