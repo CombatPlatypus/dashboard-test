@@ -16,9 +16,23 @@ import {
     formatReportPersonFirstName,
 } from "../core/person-name.js";
 
+import {
+    resetReportNotification,
+    setReportNotification,
+} from "../report-notifications.js";
+
 /* CONFIGURAÇÕES */
 
 const MINIMUM_RECEIPT_PREVIEW_ROWS = 9;
+
+const RECEIPT_IMPORT_TAB_TARGETS =
+    new Set([
+        "#receipt-tables",
+        "#receipt-charts",
+    ]);
+
+const RECEIPT_IMPORT_MESSAGE =
+    "No SPX, acesse Entrada / Gestão de Recebimento, e exporte somente recebimento da Janela que deseja, então volte aqui e clique em importar.";
 
 const receiptNumberFormatter =
     new Intl.NumberFormat(
@@ -1125,6 +1139,36 @@ function bindReceiptOperatorControls(
 
 /* SINCRONIZA AS ABAS COM OS PAINÉIS DE CONTROLE */
 
+function renderReceiptTabNotification(
+    elements,
+) {
+    const activeTarget =
+        elements.viewTabs.querySelector(
+            ".tabs-title.is-active > a",
+        )?.getAttribute(
+            "href",
+        );
+
+    if (
+        RECEIPT_IMPORT_TAB_TARGETS.has(
+            activeTarget,
+        )
+    ) {
+        setReportNotification({
+            reportId: "receipt",
+            type: "idle",
+            message:
+                RECEIPT_IMPORT_MESSAGE,
+        });
+
+        return;
+    }
+
+    resetReportNotification(
+        "receipt",
+    );
+}
+
 function synchronizeReceiptControlPanel(
     elements,
 ) {
@@ -1156,6 +1200,10 @@ function synchronizeReceiptControlPanel(
                     !isActive;
             },
         );
+
+    renderReceiptTabNotification(
+        elements,
+    );
 }
 
 function initializeReceiptControlPanels(

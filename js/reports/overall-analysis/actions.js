@@ -15,6 +15,7 @@ import {
 } from "../export.js";
 
 import {
+    resetReportNotification,
     setReportNotification,
 } from "../report-notifications.js";
 
@@ -246,12 +247,9 @@ function resetOverallAnalysisSources() {
                     reportId,
                 );
 
-                setReportNotification({
+                resetReportNotification(
                     reportId,
-                    type: "idle",
-                    message:
-                        "Tudo em silêncio por enquanto.",
-                });
+                );
             },
         );
 

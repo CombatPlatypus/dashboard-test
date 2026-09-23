@@ -24,6 +24,67 @@ const IDLE_REPORT_NOTIFICATION =
         "Tudo em silêncio por enquanto.",
     });
 
+const SPX_LINEHAUL_IMPORT_NOTIFICATION =
+    Object.freeze({
+        type: "idle",
+
+        message:
+            "No SPX, acesse Transporte Principal / Viagens de Carga Direta, escolha Inbound e aperte Crtl A, depois Crtl C, então volte aqui e clique em importar.",
+    });
+
+const DAMAGE_AND_LOSSES_IMPORT_NOTIFICATION =
+    Object.freeze({
+        type: "idle",
+
+        message:
+            "Importe uma planilha com a aba Histórico de Avarias e Histórico de Análises, seguindo exatamente o modelo fornecido no footer do dashboard.",
+    });
+
+const LOSSES_RATE_IMPORT_NOTIFICATION =
+    Object.freeze({
+        type: "idle",
+
+        message:
+            "Importe uma planilha com a aba Taxa de Perdas, seguindo exatamente o modelo fornecido no footer do dashboard.",
+    });
+
+const EXPEDITION_IMPORT_NOTIFICATION =
+    Object.freeze({
+        type: "idle",
+
+        message:
+            "No SPX, acesse Gestão Audit / Conferencia: LM Hub AT/TO, escolha uma tarefa para exportar, então volte aqui e clique em importar.",
+    });
+
+const OVERALL_ANALYSIS_NOTIFICATION =
+    Object.freeze({
+        type: "idle",
+
+        message:
+            "Preencha os relatórios para completar a análise geral, tudo aqui vai se atualizar automaticamente.",
+    });
+
+const DEFAULT_REPORT_NOTIFICATIONS =
+    Object.freeze({
+        receipt:
+            SPX_LINEHAUL_IMPORT_NOTIFICATION,
+
+        planning:
+            SPX_LINEHAUL_IMPORT_NOTIFICATION,
+
+        expedition:
+            EXPEDITION_IMPORT_NOTIFICATION,
+
+        "damage-and-losses":
+            DAMAGE_AND_LOSSES_IMPORT_NOTIFICATION,
+
+        "losses-rate":
+            LOSSES_RATE_IMPORT_NOTIFICATION,
+
+        "overall-analysis":
+            OVERALL_ANALYSIS_NOTIFICATION,
+    });
+
 const reportNotifications =
     new Map();
 
@@ -69,12 +130,18 @@ function getActiveReportId() {
 function getReportNotification(
     reportId,
 ) {
+    const normalizedReportId =
+        normalizeReportId(
+            reportId,
+        );
+
     return (
         reportNotifications.get(
-            normalizeReportId(
-                reportId,
-            ),
+            normalizedReportId,
         ) ||
+        DEFAULT_REPORT_NOTIFICATIONS[
+            normalizedReportId
+        ] ||
         IDLE_REPORT_NOTIFICATION
     );
 }
@@ -210,6 +277,26 @@ function setReportNotification({
     );
 }
 
+/* RESTAURA A MENSAGEM PADRÃO DE UM RELATÓRIO */
+
+function resetReportNotification(
+    reportId,
+) {
+    const normalizedReportId =
+        normalizeReportId(
+            reportId,
+        ) ||
+        getActiveReportId();
+
+    reportNotifications.delete(
+        normalizedReportId,
+    );
+
+    return renderReportNotification(
+        normalizedReportId,
+    );
+}
+
 /* INICIALIZAÇÃO */
 
 function initializeReportNotifications() {
@@ -226,5 +313,6 @@ function initializeReportNotifications() {
 
 export {
     initializeReportNotifications,
+    resetReportNotification,
     setReportNotification,
 };

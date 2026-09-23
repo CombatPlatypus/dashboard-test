@@ -11,6 +11,7 @@ import {
 } from "./state.js";
 
 import {
+    resetReportNotification,
     setReportNotification,
 } from "../report-notifications.js";
 
@@ -28,6 +29,15 @@ const MINIMUM_EXPEDITION_STREET_ROWS =
 
 const MINIMUM_FASTEST_OPERATOR_ROUTES =
     3;
+
+const EXPEDITION_ERROR_TAB_TARGETS =
+    new Set([
+        "#expedition-mistakes",
+        "#expedition-streets",
+    ]);
+
+const EXPEDITION_ERROR_IMPORT_MESSAGE =
+    "Importe uma planilha com a aba Bipagem de Erros, seguindo exatamente o modelo fornecido no footer do dashboard.";
 
 let expeditionViewElements =
     null;
@@ -201,6 +211,11 @@ function getExpeditionElements(
         panel:
             getElementById(
                 "expedition",
+            ),
+
+        tabs:
+            getElementById(
+                "expedition-view-tabs",
             ),
 
         floorVolumeInput:
@@ -1334,9 +1349,68 @@ function renderExpeditionReport(
 
 /* EVENTOS */
 
+function renderExpeditionTabNotification(
+    elements,
+) {
+    const activeTarget =
+        elements.tabs.querySelector(
+            ".tabs-title.is-active > a",
+        )?.getAttribute(
+            "href",
+        );
+
+    if (
+        EXPEDITION_ERROR_TAB_TARGETS.has(
+            activeTarget,
+        )
+    ) {
+        setReportNotification({
+            reportId: "expedition",
+            type: "idle",
+            message:
+                EXPEDITION_ERROR_IMPORT_MESSAGE,
+        });
+
+        return;
+    }
+
+    resetReportNotification(
+        "expedition",
+    );
+}
+
 function bindExpeditionEvents(
     elements,
 ) {
+    const renderNotificationAfterTabChange =
+        function () {
+            window.setTimeout(
+                function () {
+                    renderExpeditionTabNotification(
+                        elements,
+                    );
+                },
+                0,
+            );
+        };
+
+    if (
+        typeof window.jQuery ===
+        "function"
+    ) {
+        window.jQuery(
+            elements.tabs,
+        ).on(
+            "change.zf.tabs",
+            renderNotificationAfterTabChange,
+        );
+    }
+
+    elements.tabs.addEventListener(
+        "click",
+        renderNotificationAfterTabChange,
+    );
+
     function bindManualQuantityInput(
         input,
         field,
@@ -1496,6 +1570,10 @@ function initializeExpeditionView(
             "true";
 
     bindExpeditionEvents(
+        elements,
+    );
+
+    renderExpeditionTabNotification(
         elements,
     );
 

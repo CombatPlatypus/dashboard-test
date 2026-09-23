@@ -15,7 +15,7 @@
         display: flex;
         overflow: hidden;
         height: calc(100dvh - 162px - 30px);
-        max-height: calc(100dvh - 162px - 30px);
+        max-height: calc(100dvh - 162px - 117px);
     }
     .main-structure  #spreadsheets .tabs-content .tabs-panel {
         width: 100%;
@@ -27,7 +27,7 @@
     .main-structure #spreadsheets .tabs {
         flex: 0 0 220px;
         height: calc(100dvh - 162px - 30px);
-        max-height: calc(100dvh - 162px - 30px);
+        max-height: calc(100dvh - 162px - 117px);
         overflow: auto;
         padding-right: 15px;
         margin: 0;
