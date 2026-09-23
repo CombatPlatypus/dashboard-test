@@ -34,12 +34,22 @@
 
         <style>
 
+            #settings .reveal {
+                padding: 0px !important;
+            }
             .reveal .title {
                 display: flex;
                 justify-content: space-between;
                 border-bottom: 2px solid var(--color-border);
                 padding: 20px;
                 align-items: center;
+            }
+            .reveal .tabs {
+                flex: 1 1 0;
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 15px;
+                margin: 0 0 30px 0;
             }
             .reveal .title > h4 {
                 margin: 0;
@@ -3355,7 +3365,7 @@
             </div>
 
             <div class="padding">
-                <ul class="flex-box-start tabs" data-tabs id="settings-tabs">
+                <ul class="tabs" data-tabs id="settings-tabs">
                     <li class="tabs-title is-active">
                         <a href="#settings-links">Link das Planilhas</a>
                     </li> 
