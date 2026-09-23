@@ -1466,3 +1466,81 @@ footer > div > div {
         position: fixed;
     }
 
+    /*  */
+
+    #settings {
+        padding: 0px !important;
+        overflow-y: hidden !important;
+    }
+    .reveal .title {
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 2px solid var(--color-border);
+        padding: 20px;
+        align-items: center;
+    }
+    .reveal .tabs {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+        margin: 0 0 30px 0;
+    }
+    .reveal .tabs .tabs-title {
+        width: 100% !important;
+    }
+    .reveal .title > h4 {
+        margin: 0;
+    }
+    .reveal .padding {
+        padding: 35px;
+    }
+    .reveal .spreadsheets-links {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        max-height: 600px;
+        overflow-y: auto;
+        padding-right: 15px;
+    }
+    .reveal .spreadsheets-links::-webkit-scrollbar-track {
+        background-color: transparent;
+    }
+    .reveal .spreadsheets-links::-webkit-scrollbar {
+        width: 5px;
+        height: 5px;
+        background-color: transparent;
+    }
+    .reveal .spreadsheets-links::-webkit-scrollbar-thumb {
+        border-radius: 5px;
+        background-color: var(--color-border);
+    }
+    .reveal .spreadsheets-links > div {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        row-gap: 10px;
+    }
+    .reveal .spreadsheets-links > div > h4 {
+        margin: 0;
+    }
+    .reveal .spreadsheets-links > div > [data-dashboard-spreadsheet-row] {
+        display: flex;
+        align-items: center;
+        column-gap: 15px;
+    }
+    .reveal .spreadsheets-links > div > [data-dashboard-spreadsheet-row] input {
+        flex: 1 1 0;
+    }
+    .reveal .spreadsheets-links > div > [data-dashboard-spreadsheet-row] > div {
+        flex: 0 0 100px;
+    }
+    .reveal #another-links > div {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+    .reveal #another-links > div > div {
+        width: 100%;
+    }
