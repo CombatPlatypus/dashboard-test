@@ -13,6 +13,19 @@ const EMPTY_SPREADSHEET_URL =
 const GOOGLE_SPREADSHEETS_URL_PREFIX =
     "https://docs.google.com/spreadsheets/";
 
+const DEFAULT_DAMAGE_APP_URL =
+    "https://www.appsheet.com/start/9898e1c7-28cc-4bcc-9e15-b13a73533544?platform=desktop" +
+    "#appName=AVARIASLSP-63-957299733-25-10-22" +
+    "&vss=H4sIAAAAAAAAA6WRzU7CQBDHX4XMuREoWGBPihhjjB8BwoUSM7ZT2dh2m90tSJo-jM_iiznLR_TgBbjtzsxv5v-fqWAlaT2xGH2AmFe_vwfagIAqhOmmoBBECDcqt1qlIXghPGG2C758f73LHNsh1OCBIdTRcko6Y3Y49oPu4LLd6wwGfvuZ0xbfUnLoVE22lVx1vUIt0UDtnT78dUQWZeo01Avv0MaSAVEdZ0GcuwEZU25lIkm7Xo7kHnuO047iwIFh15CV27VsBTNTc-gU42co_9PlWAN79B8fMFbrnQ6M-v2g0_NFo9VttoKm3_ID0VhJq_SFkRmqK7NUBdFFpDKecKdVWQwZnPMpJ0rbw3tECZapnWFausvOF7XbVaKi0lA8Y--nezb3-e1ngXn8qGIWn2BqqP4BMXkggBsDAAA=" +
+    "&row=ac886372:%2004/06/2026:%20vitor.simao@shopee.com" +
+    "&view=P%C3%A1gina1_Detail";
+
+const DEFAULT_COLLECTION_APP_URL =
+    "https://www.appsheet.com/start/e90438ea-37a9-47f7-a28f-1499b53fbd35" +
+    "#appName=ColetasLMHub-510641030" +
+    "&page=gallery&sort=%5B%5D" +
+    "&table=MenuInicial&view=Menu";
+
 const DEFAULT_SPREADSHEET_SETTINGS =
     Object.freeze([
         {
@@ -120,8 +133,10 @@ const dashboardSettingsState = {
     spreadsheets: [],
 
     externalLinks: {
-        damageApp: "",
-        collectionApp: "",
+        damageApp:
+            DEFAULT_DAMAGE_APP_URL,
+        collectionApp:
+            DEFAULT_COLLECTION_APP_URL,
         fleet: "",
     },
 };
@@ -176,8 +191,10 @@ function createDefaultDashboardSettings() {
             ),
 
         externalLinks: {
-            damageApp: "",
-            collectionApp: "",
+            damageApp:
+                DEFAULT_DAMAGE_APP_URL,
+            collectionApp:
+                DEFAULT_COLLECTION_APP_URL,
             fleet: "",
         },
     };
