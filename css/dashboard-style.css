@@ -17,6 +17,7 @@
         --color-button-text: #000000;
         --color-gray-p: #a8a9ad;
         --color-progress-bar: #3e3e3e;
+        --color-close-button: #8f8d8d;
     }
 
     /* DOCUMENTO */
@@ -1397,7 +1398,7 @@ footer > div > div {
         top: 15px;
         right: 30px;
         z-index: 10;
-        color: #F44336;
+        color: var(--color-close-button);
         cursor: pointer;
         font-size: 2em;
         line-height: 1;
