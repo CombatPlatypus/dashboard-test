@@ -34,9 +34,20 @@
 
         <style>
 
-
-
-
+            .reveal .title {
+                display: flex;
+                justify-content: space-between;
+                border-bottom: 2px solid var(--color-border);
+                padding: 20px;
+                align-items: center;
+            }
+            .reveal .title > h4 {
+                margin: 0;
+            }
+            .reveal .padding {
+                padding: 20px;
+            }
+                        
         </style>
     </head>	
 
@@ -105,7 +116,7 @@
 
                         <input id="reportSessionFileInput" type="file" accept=".js,text/javascript,application/javascript" hidden>
 
-                        <a href="https://docs.google.com/spreadsheets/d/1IS4QDnMenXTi07FhiL-nFINrEjLppAfZhSlogZq22hY/edit?gid=0#gid=0" target="_blank">
+                        <a data-open="settings">
                             <img src="images/menu-icons/settings-icon.svg">
                         </a>
                     </div>
@@ -3321,6 +3332,23 @@
                 </div>
             </div>
         </footer>
+
+        <!-- REVEAL - CONFIGURAÇÕES -->
+
+        <div class="reveal" id="settings" data-reveal data-close-on-click="true">
+            <div class="title">
+                <h4>Configurações</h4>
+            </div>
+
+            <div class="padding">
+                <input type="text">
+
+            </div>
+
+            <button class="close-button" data-close aria-label="Close modal" type="button">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
 
         <!-- REVEAL - SELEÇÃO DA JANELA DO PLANEJAMENTO -->
 
