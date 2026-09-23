@@ -36,6 +36,7 @@
 
             #settings {
                 padding: 0px !important;
+                overflow-y: hidden !important;
             }
             .reveal .title {
                 display: flex;
@@ -64,7 +65,7 @@
                 display: flex;
                 flex-direction: column;
                 gap: 15px;
-                max-height: 300px;
+                max-height: 600px;
                 overflow-y: auto;
                 padding-right: 15px;
             }
@@ -3447,7 +3448,7 @@
                         <a href="#another-links">Outros Links do Dashboard</a>
                     </li> 
                                     
-                    <li class="tabs-title">
+                    <li class="tabs-title" style="display: none;">
                         <a href="#settings-themes">Temas do Dashboard</a>
                     </li> 
                 </ul> 
@@ -3462,7 +3463,7 @@
                                 <h4>Primeira Planilha</h4>
 
                                 <div data-dashboard-spreadsheet-row="0">
-                                    <input type="url" placeholder="Link da Planilha" id="settingsSpreadsheetLink1" data-dashboard-spreadsheet-field="link" aria-label="Link da planilha 1">
+                                    <input type="url" inputmode="none" autocomplete="off" placeholder="Cole o Link da Planilha" id="settingsSpreadsheetLink1" data-dashboard-spreadsheet-field="link" aria-label="Link da planilha 1">
                                     <input type="text" placeholder="Nome no Menu" maxlength="22" id="settingsSpreadsheetName1" data-dashboard-spreadsheet-field="menuName" aria-label="Nome da planilha 1 no menu">
 
                                     <div>

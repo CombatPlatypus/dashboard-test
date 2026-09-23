@@ -1,4 +1,6 @@
-const DASHBOARD_SPREADSHEET_LIMIT = 30;
+const DASHBOARD_SPREADSHEET_LIMIT = 20;
+
+const DASHBOARD_SPREADSHEET_IMPORT_LIMIT = 30;
 
 const EMPTY_SPREADSHEET_COUNT = 8;
 
@@ -7,6 +9,9 @@ const EMPTY_SPREADSHEET_LABEL =
 
 const EMPTY_SPREADSHEET_URL =
     "https://docs.google.com/spreadsheets/d/1ZVWMVaT3bCAPxZbZgKfMqZUIBif3pr8cnnpc4Lx8lkA/edit?gid=0#gid=0";
+
+const GOOGLE_SPREADSHEETS_URL_PREFIX =
+    "https://docs.google.com/spreadsheets/";
 
 const SPREADSHEET_POSITION_NAMES =
     Object.freeze([
@@ -30,16 +35,6 @@ const SPREADSHEET_POSITION_NAMES =
         "Décima Oitava",
         "Décima Nona",
         "Vigésima",
-        "Vigésima Primeira",
-        "Vigésima Segunda",
-        "Vigésima Terceira",
-        "Vigésima Quarta",
-        "Vigésima Quinta",
-        "Vigésima Sexta",
-        "Vigésima Sétima",
-        "Vigésima Oitava",
-        "Vigésima Nona",
-        "Trigésima",
     ]);
 
 const DASHBOARD_EXTERNAL_LINK_KEYS =
@@ -141,6 +136,27 @@ function normalizeDashboardUrl(
     }
 }
 
+function normalizeSpreadsheetUrl(
+    value,
+) {
+    const normalizedValue =
+        normalizeSettingsText(
+            value,
+        );
+
+    if (
+        !normalizedValue.startsWith(
+            GOOGLE_SPREADSHEETS_URL_PREFIX,
+        )
+    ) {
+        return "";
+    }
+
+    return normalizeDashboardUrl(
+        normalizedValue,
+    );
+}
+
 function normalizeSpreadsheetSetting(
     value = {},
 ) {
@@ -239,7 +255,7 @@ function validateDashboardSettings(
             value.spreadsheets,
         ) ||
         value.spreadsheets.length >
-            DASHBOARD_SPREADSHEET_LIMIT
+            DASHBOARD_SPREADSHEET_IMPORT_LIMIT
     ) {
         throw new TypeError(
             "A lista de planilhas da sessão é inválida.",
@@ -399,7 +415,7 @@ function getVisibleSpreadsheetConfigurations() {
                     index,
                 ) {
                     const url =
-                        normalizeDashboardUrl(
+                        normalizeSpreadsheetUrl(
                             spreadsheet.link,
                         );
 
@@ -719,6 +735,83 @@ function renderSpreadsheetInterface() {
     return true;
 }
 
+/* ATUALIZA SOMENTE O NOME DA ABA, SEM RECRIAR O IFRAME */
+
+function renderSpreadsheetMenuName(
+    index,
+) {
+    if (!dashboardSettingsElements) {
+        return false;
+    }
+
+    const spreadsheet =
+        dashboardSettingsState
+            .spreadsheets[index];
+
+    const tabItem =
+        dashboardSettingsElements
+            .tabs
+            .querySelector(
+                `[data-spreadsheet-key="configured-${index + 1}"]`,
+            );
+
+    if (!spreadsheet || !tabItem) {
+        return false;
+    }
+
+    const menuName =
+        spreadsheet.menuName ||
+        `Planilha ${index + 1}`;
+
+    const tabLink =
+        tabItem.querySelector(
+            "a",
+        );
+
+    const externalButton =
+        tabItem.querySelector(
+            "button.spreadsheets-links",
+        );
+
+    if (!tabLink) {
+        return false;
+    }
+
+    tabLink.textContent =
+        menuName;
+
+    externalButton?.setAttribute(
+        "aria-label",
+        `Abrir ${menuName} em uma nova aba`,
+    );
+
+    const panelId =
+        tabLink
+            .getAttribute(
+                "href",
+            )
+            ?.replace(
+                /^#/,
+                "",
+            );
+
+    const iframe =
+        panelId
+            ? dashboardSettingsElements
+                .panels
+                .querySelector(
+                    `[id="${panelId}"] iframe`,
+                )
+            : null;
+
+    if (iframe) {
+        iframe.title =
+            menuName;
+    }
+
+    return true;
+}
+
 /* CARREGA SOMENTE A PLANILHA VISÍVEL */
 
 function initializeSpreadsheetNavigation(
@@ -832,7 +925,7 @@ function initializeSpreadsheetNavigation(
     return true;
 }
 
-/* CRIA AS 30 LINHAS DO REVEAL */
+/* CRIA AS 20 LINHAS DO REVEAL */
 
 function createSpreadsheetSettingsRow(
     index,
@@ -867,6 +960,8 @@ function createSpreadsheetSettingsRow(
         );
 
     linkInput.type = "url";
+    linkInput.inputMode = "none";
+    linkInput.autocomplete = "off";
     linkInput.id =
         `settingsSpreadsheetLink${position}`;
     linkInput.placeholder =
@@ -981,6 +1076,10 @@ function createSpreadsheetSettingsRows(
 
 function renderUrlInputValidity(
     input,
+    normalizeUrl =
+        normalizeDashboardUrl,
+    invalidMessage =
+        "Informe um endereço HTTP ou HTTPS válido.",
 ) {
     const hasValue =
         normalizeSettingsText(
@@ -989,7 +1088,7 @@ function renderUrlInputValidity(
 
     const isInvalid =
         hasValue &&
-        !normalizeDashboardUrl(
+        !normalizeUrl(
             input.value,
         );
 
@@ -1002,7 +1101,7 @@ function renderUrlInputValidity(
 
     input.title =
         isInvalid
-            ? "Informe um endereço HTTP ou HTTPS válido."
+            ? invalidMessage
             : "";
 }
 
@@ -1075,6 +1174,8 @@ function renderSettingsInputs() {
 
                 renderUrlInputValidity(
                     linkInput,
+                    normalizeSpreadsheetUrl,
+                    `Informe um link iniciado por ${GOOGLE_SPREADSHEETS_URL_PREFIX}`,
                 );
             },
         );
@@ -1243,6 +1344,93 @@ function bindDashboardSettingsEvents() {
         fleetLink,
     } = dashboardSettingsElements;
 
+    const getSpreadsheetLinkInput =
+        function (target) {
+            return target.closest(
+                '[data-dashboard-spreadsheet-field="link"]',
+            );
+        };
+
+    spreadsheetRows.addEventListener(
+        "beforeinput",
+        function (event) {
+            const input =
+                getSpreadsheetLinkInput(
+                    event.target,
+                );
+
+            if (!input) {
+                return;
+            }
+
+            const isPaste =
+                event.inputType ===
+                "insertFromPaste";
+
+            const isDeletion =
+                event.inputType.startsWith(
+                    "delete",
+                );
+
+            if (!isPaste && !isDeletion) {
+                event.preventDefault();
+            }
+        },
+    );
+
+    spreadsheetRows.addEventListener(
+        "keydown",
+        function (event) {
+            const input =
+                getSpreadsheetLinkInput(
+                    event.target,
+                );
+
+            if (!input) {
+                return;
+            }
+
+            const normalizedKey =
+                event.key.toLowerCase();
+
+            const hasShortcutModifier =
+                event.ctrlKey ||
+                event.metaKey;
+
+            const isAllowedShortcut =
+                hasShortcutModifier &&
+                [
+                    "a",
+                    "c",
+                    "v",
+                    "x",
+                ].includes(
+                    normalizedKey,
+                );
+
+            const isAllowedControlKey =
+                [
+                    "backspace",
+                    "delete",
+                    "tab",
+                    "arrowleft",
+                    "arrowright",
+                    "home",
+                    "end",
+                    "escape",
+                ].includes(
+                    normalizedKey,
+                );
+
+            if (
+                !isAllowedShortcut &&
+                !isAllowedControlKey
+            ) {
+                event.preventDefault();
+            }
+        },
+    );
+
     spreadsheetRows.addEventListener(
         "input",
         function (event) {
@@ -1291,10 +1479,18 @@ function bindDashboardSettingsEvents() {
             if (field === "link") {
                 renderUrlInputValidity(
                     input,
+                    normalizeSpreadsheetUrl,
+                    `Informe um link iniciado por ${GOOGLE_SPREADSHEETS_URL_PREFIX}`,
                 );
+
+                scheduleSpreadsheetRender();
+
+                return;
             }
 
-            scheduleSpreadsheetRender();
+            renderSpreadsheetMenuName(
+                index,
+            );
         },
     );
 
