@@ -15,6 +15,12 @@ import {
     restoreReportContext,
 } from "./core/report-context.js";
 
+import {
+    exportDashboardSettings,
+    importDashboardSettings,
+    validateDashboardSettings,
+} from "../spreadsheets/load-spreadsheets.js";
+
 const REPORT_SESSION_SCHEMA =
     "dashboard-report-session";
 
@@ -133,6 +139,9 @@ function createReportSessionPayload() {
         context:
             getReportContext(),
 
+        settings:
+            exportDashboardSettings(),
+
         reports:
             exportSessionReports(),
     };
@@ -182,6 +191,14 @@ function validateReportSessionPayload(
     if (!isSessionObject(payload.reports)) {
         throw new TypeError(
             "O arquivo não possui os dados dos relatórios.",
+        );
+    }
+
+    if (
+        payload.settings !== undefined
+    ) {
+        validateDashboardSettings(
+            payload.settings,
         );
     }
 
@@ -464,6 +481,9 @@ function restoreReportSession(
     const previousContext =
         getReportContext();
 
+    const previousSettings =
+        exportDashboardSettings();
+
     const sessionContext =
         payload.context ?? {
             window:
@@ -485,6 +505,14 @@ function restoreReportSession(
             ),
         );
 
+        if (
+            payload.settings !== undefined
+        ) {
+            importDashboardSettings(
+                payload.settings,
+            );
+        }
+
         renderRestoredOverallAnalysis();
     } catch (error) {
         try {
@@ -494,6 +522,10 @@ function restoreReportSession(
 
             reportManager.importSession(
                 previousReports,
+            );
+
+            importDashboardSettings(
+                previousSettings,
             );
 
             renderRestoredOverallAnalysis();

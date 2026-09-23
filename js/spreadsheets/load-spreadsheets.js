@@ -1,575 +1,555 @@
-import {
-    CONFIG
-} from "./config.js";
+const DASHBOARD_SPREADSHEET_LIMIT = 30;
 
-/* PADRÕES DE VALIDAÇÃO */
+const EMPTY_SPREADSHEET_COUNT = 8;
 
-const KEY_PATTERN =
-    /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const EMPTY_SPREADSHEET_LABEL =
+    "Esperando uma Planilha";
 
-const SPREADSHEET_ID_PATTERN =
-    /^[A-Za-z0-9_-]+$/;
+const EMPTY_SPREADSHEET_URL =
+    "https://docs.google.com/spreadsheets/d/1ZVWMVaT3bCAPxZbZgKfMqZUIBif3pr8cnnpc4Lx8lkA/edit?gid=0#gid=0";
 
-const GID_PATTERN =
-    /^\d+$/;
-
-const VISIBLE_VALUES =
-    new Set([
-        "sim",
-        "true",
-        "1",
-        "yes"
+const DASHBOARD_EXTERNAL_LINK_KEYS =
+    Object.freeze([
+        "damageApp",
+        "collectionApp",
+        "fleet",
     ]);
 
+const dashboardSettingsState = {
+    spreadsheets: [],
 
-/* NORMALIZA OS TEXTOS DA CONFIGURAÇÃO */
+    externalLinks: {
+        damageApp: "",
+        collectionApp: "",
+        fleet: "",
+    },
+};
 
-function normalizeText(
-    value
+let dashboardSettingsElements = null;
+
+let spreadsheetRenderTimer = null;
+
+let updateSpreadsheetIframes = null;
+
+/* CRIA UMA CONFIGURAÇÃO VAZIA */
+
+function createEmptySpreadsheetSetting() {
+    return {
+        link: "",
+        menuName: "",
+        visible: true,
+    };
+}
+
+function createEmptyDashboardSettings() {
+    return {
+        spreadsheets:
+            Array.from(
+                {
+                    length:
+                        DASHBOARD_SPREADSHEET_LIMIT,
+                },
+                createEmptySpreadsheetSetting,
+            ),
+
+        externalLinks: {
+            damageApp: "",
+            collectionApp: "",
+            fleet: "",
+        },
+    };
+}
+
+/* NORMALIZA OS VALORES RECEBIDOS */
+
+function normalizeSettingsText(
+    value,
+    maximumLength = 4096,
 ) {
-
     return String(
-        value ?? ""
-    ).trim();
+        value ?? "",
+    )
+        .trim()
+        .slice(
+            0,
+            maximumLength,
+        );
 }
 
-
-/* VERIFICA SE A PLANILHA DEVE APARECER */
-
-function shouldDisplaySpreadsheet(
-    value
+function normalizeDashboardUrl(
+    value,
 ) {
-
     const normalizedValue =
-        normalizeText(
-            value
-        )
-            .normalize(
-                "NFD"
-            )
-            .replace(
-                /[\u0300-\u036f]/g,
-                ""
-            )
-            .toLowerCase();
-
-
-    return VISIBLE_VALUES.has(
-        normalizedValue
-    );
-}
-
-
-/* MONTA O LINK DA PLANILHA */
-
-function createSpreadsheetUrl(
-    spreadsheetId,
-    gid
-) {
-
-    return (
-        "https://docs.google.com/spreadsheets/d/" +
-        encodeURIComponent(
-            spreadsheetId
-        ) +
-        "/edit?gid=" +
-        encodeURIComponent(
-            gid
-        ) +
-        "#gid=" +
-        encodeURIComponent(
-            gid
-        )
-    );
-}
-
-
-/* CONSULTA A PLANILHA DE CONFIGURAÇÃO */
-
-async function getSpreadsheetConfigurations() {
-
-    const spreadsheetId =
-        encodeURIComponent(
-            CONFIG.google.linksSpreadsheetId
+        normalizeSettingsText(
+            value,
         );
 
-    const spreadsheetRange =
-        encodeURIComponent(
-            CONFIG.google.linksSpreadsheetRange
-        );
-
-    const requestUrl =
-        `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}` +
-        `/values/${spreadsheetRange}?majorDimension=ROWS`;
-
-
-    const response =
-        await fetch(
-            requestUrl,
-            {
-                cache:
-                    "no-store",
-
-                headers: {
-                    "x-goog-api-key":
-                        CONFIG.google.sheetsApiKey
-                }
-            }
-        );
-
-
-    if (!response.ok) {
-
-        let errorMessage =
-            `Erro ao consultar configuração: ${response.status}`;
-
-        try {
-
-            const errorData =
-                await response.json();
-
-            errorMessage =
-                errorData.error?.message ??
-                errorMessage;
-
-        }
-        catch {
-
-            // MANTÉM A MENSAGEM PADRÃO
-
-        }
-
-
-        throw new Error(
-            errorMessage
-        );
+    if (!normalizedValue) {
+        return "";
     }
 
-
-    const responseData =
-        await response.json();
-
-    const rows =
-        responseData.values ??
-        [];
-
-    const configurations =
-        [];
-
-    const registeredKeys =
-        new Set();
-
-
-    /*
-     * AS LINHAS SÃO PERCORRIDAS DE CIMA PARA BAIXO.
-     * ESSA SERÁ TAMBÉM A ORDEM DO MENU.
-     */
-
-    rows.forEach(
-        function (
-            row,
-            rowIndex
-        ) {
-
-            const sheetRowNumber =
-                rowIndex + 2;
-
-
-            // COLUNA F — APARECE NO DASH
-
-            if (
-                !shouldDisplaySpreadsheet(
-                    row[5]
-                )
-            ) {
-
-                return;
-            }
-
-
-            // COLUNAS A ATÉ E
-
-            const key =
-                normalizeText(
-                    row[0]
-                );
-
-            const targetSpreadsheetId =
-                normalizeText(
-                    row[1]
-                );
-
-            const gid =
-                normalizeText(
-                    row[2]
-                ) || "0";
-
-            const spreadsheetName =
-                normalizeText(
-                    row[3]
-                );
-
-            const menuName =
-                normalizeText(
-                    row[4]
-                ) || spreadsheetName;
-
-
-            // VALIDA A CHAVE
-
-            if (
-                !KEY_PATTERN.test(
-                    key
-                )
-            ) {
-
-                console.warn(
-                    `Linha ${sheetRowNumber} ignorada: chave inválida.`
-                );
-
-                return;
-            }
-
-
-            // IMPEDE CHAVES DUPLICADAS
-
-            if (
-                registeredKeys.has(
-                    key
-                )
-            ) {
-
-                console.warn(
-                    `Linha ${sheetRowNumber} ignorada: chave "${key}" duplicada.`
-                );
-
-                return;
-            }
-
-
-            // VALIDA O ID DA PLANILHA
-
-            if (
-                !SPREADSHEET_ID_PATTERN.test(
-                    targetSpreadsheetId
-                )
-            ) {
-
-                console.warn(
-                    `Linha ${sheetRowNumber} ignorada: ID inválido para "${key}".`
-                );
-
-                return;
-            }
-
-
-            // VALIDA O GID
-
-            if (
-                !GID_PATTERN.test(
-                    gid
-                )
-            ) {
-
-                console.warn(
-                    `Linha ${sheetRowNumber} ignorada: GID inválido para "${key}".`
-                );
-
-                return;
-            }
-
-
-            // VALIDA O NOME MOSTRADO NO MENU
-
-            if (!menuName) {
-
-                console.warn(
-                    `Linha ${sheetRowNumber} ignorada: nome do menu não informado.`
-                );
-
-                return;
-            }
-
-
-            registeredKeys.add(
-                key
+    try {
+        const url =
+            new URL(
+                normalizedValue,
             );
 
-
-            configurations.push({
-
-                key,
-
-                spreadsheetId:
-                    targetSpreadsheetId,
-
-                gid,
-
-                spreadsheetName:
-                    spreadsheetName ||
-                    menuName,
-
-                menuName,
-
-                url:
-                    createSpreadsheetUrl(
-                        targetSpreadsheetId,
-                        gid
-                    )
-            });
+        if (
+            url.protocol !== "https:" &&
+            url.protocol !== "http:"
+        ) {
+            return "";
         }
-    );
 
+        return url.href;
+    } catch {
+        return "";
+    }
+}
 
+function normalizeSpreadsheetSetting(
+    value = {},
+) {
+    return {
+        link:
+            normalizeSettingsText(
+                value.link,
+            ),
+
+        menuName:
+            normalizeSettingsText(
+                value.menuName,
+                22,
+            ),
+
+        visible:
+            value.visible !== false &&
+            value.visible !== "hide",
+    };
+}
+
+function normalizeDashboardSettings(
+    value = {},
+) {
+    const receivedSpreadsheets =
+        Array.isArray(
+            value.spreadsheets,
+        )
+            ? value.spreadsheets
+            : [];
+
+    const receivedExternalLinks =
+        value.externalLinks &&
+        typeof value.externalLinks ===
+            "object" &&
+        !Array.isArray(
+            value.externalLinks,
+        )
+            ? value.externalLinks
+            : {};
+
+    return {
+        spreadsheets:
+            Array.from(
+                {
+                    length:
+                        DASHBOARD_SPREADSHEET_LIMIT,
+                },
+                function (
+                    unused,
+                    index,
+                ) {
+                    return normalizeSpreadsheetSetting(
+                        receivedSpreadsheets[
+                            index
+                        ],
+                    );
+                },
+            ),
+
+        externalLinks:
+            Object.fromEntries(
+                DASHBOARD_EXTERNAL_LINK_KEYS.map(
+                    function (key) {
+                        return [
+                            key,
+                            normalizeSettingsText(
+                                receivedExternalLinks[
+                                    key
+                                ],
+                            ),
+                        ];
+                    },
+                ),
+            ),
+    };
+}
+
+/* VALIDA AS CONFIGURAÇÕES DE UMA SESSÃO */
+
+function validateDashboardSettings(
+    value,
+) {
     if (
-        configurations.length ===
-        0
+        !value ||
+        typeof value !== "object" ||
+        Array.isArray(value)
     ) {
-
-        throw new Error(
-            "A configuração não retornou nenhuma planilha visível e válida."
+        throw new TypeError(
+            "As configurações do dashboard são inválidas.",
         );
     }
 
+    if (
+        !Array.isArray(
+            value.spreadsheets,
+        ) ||
+        value.spreadsheets.length >
+            DASHBOARD_SPREADSHEET_LIMIT
+    ) {
+        throw new TypeError(
+            "A lista de planilhas da sessão é inválida.",
+        );
+    }
 
-    return configurations;
+    value.spreadsheets.forEach(
+        function (
+            spreadsheet,
+            index,
+        ) {
+            if (
+                !spreadsheet ||
+                typeof spreadsheet !==
+                    "object" ||
+                Array.isArray(
+                    spreadsheet,
+                ) ||
+                typeof spreadsheet.link !==
+                    "string" ||
+                typeof spreadsheet.menuName !==
+                    "string" ||
+                typeof spreadsheet.visible !==
+                    "boolean"
+            ) {
+                throw new TypeError(
+                    `A configuração da planilha ${index + 1} é inválida.`,
+                );
+            }
+        },
+    );
+
+    if (
+        !value.externalLinks ||
+        typeof value.externalLinks !==
+            "object" ||
+        Array.isArray(
+            value.externalLinks,
+        ) ||
+        DASHBOARD_EXTERNAL_LINK_KEYS.some(
+            function (key) {
+                return typeof value
+                    .externalLinks[
+                        key
+                    ] !== "string";
+            },
+        )
+    ) {
+        throw new TypeError(
+            "Os links adicionais da sessão são inválidos.",
+        );
+    }
+
+    return true;
 }
 
+/* EXPÕE UMA CÓPIA SEGURA PARA A SESSÃO */
+
+function exportDashboardSettings() {
+    return {
+        spreadsheets:
+            dashboardSettingsState
+                .spreadsheets
+                .map(
+                    function (spreadsheet) {
+                        return {
+                            ...spreadsheet,
+                        };
+                    },
+                ),
+
+        externalLinks: {
+            ...dashboardSettingsState
+                .externalLinks,
+        },
+    };
+}
 
 /* CRIA O ÍCONE DO BOTÃO EXTERNO */
 
 function createSpreadsheetLinkIcon() {
-
     const svgNamespace =
         "http://www.w3.org/2000/svg";
 
     const icon =
         document.createElementNS(
             svgNamespace,
-            "svg"
+            "svg",
         );
 
     const path =
         document.createElementNS(
             svgNamespace,
-            "path"
+            "path",
         );
 
-
     icon.classList.add(
-        "spreadsheets-link-icon"
+        "spreadsheets-link-icon",
     );
 
     icon.setAttribute(
         "viewBox",
-        "0 0 24 24"
+        "0 0 24 24",
     );
 
     icon.setAttribute(
         "aria-hidden",
-        "true"
+        "true",
     );
-
 
     path.setAttribute(
         "d",
-        "M7 17L17 7M9 7H17V15"
+        "M7 17L17 7M9 7H17V15",
     );
 
     path.setAttribute(
         "fill",
-        "none"
+        "none",
     );
 
     path.setAttribute(
         "stroke",
-        "currentColor"
+        "currentColor",
     );
 
     path.setAttribute(
         "stroke-width",
-        "2.5"
+        "2.5",
     );
 
     path.setAttribute(
         "stroke-linecap",
-        "round"
+        "round",
     );
 
     path.setAttribute(
         "stroke-linejoin",
-        "round"
+        "round",
     );
-
 
     icon.appendChild(
-        path
+        path,
     );
-
 
     return icon;
 }
 
+/* MONTA AS CONFIGURAÇÕES VISÍVEIS */
+
+function getVisibleSpreadsheetConfigurations() {
+    const configurations =
+        dashboardSettingsState
+            .spreadsheets
+            .map(
+                function (
+                    spreadsheet,
+                    index,
+                ) {
+                    const url =
+                        normalizeDashboardUrl(
+                            spreadsheet.link,
+                        );
+
+                    if (
+                        !spreadsheet.visible ||
+                        !url
+                    ) {
+                        return null;
+                    }
+
+                    const menuName =
+                        spreadsheet.menuName ||
+                        `Planilha ${index + 1}`;
+
+                    return {
+                        key:
+                            `configured-${index + 1}`,
+                        menuName,
+                        spreadsheetName:
+                            menuName,
+                        url,
+                    };
+                },
+            )
+            .filter(Boolean);
+
+    if (configurations.length > 0) {
+        return configurations;
+    }
+
+    return Array.from(
+        {
+            length:
+                EMPTY_SPREADSHEET_COUNT,
+        },
+        function (
+            unused,
+            index,
+        ) {
+            return {
+                key:
+                    `empty-${index + 1}`,
+                menuName:
+                    EMPTY_SPREADSHEET_LABEL,
+                spreadsheetName:
+                    EMPTY_SPREADSHEET_LABEL,
+                url:
+                    EMPTY_SPREADSHEET_URL,
+            };
+        },
+    );
+}
 
 /* CRIA UMA OPÇÃO DO MENU */
 
 function createSpreadsheetTab(
     configuration,
     index,
-    panelId
+    panelId,
+    activeKey,
 ) {
-
     const isInitialSpreadsheet =
-        index === 0;
+        configuration.key ===
+            activeKey ||
+        (
+            !activeKey &&
+            index === 0
+        );
 
     const tabItem =
         document.createElement(
-            "li"
+            "li",
         );
 
     const tabLink =
         document.createElement(
-            "a"
+            "a",
         );
-
 
     tabItem.classList.add(
         "tabs-title",
-        "flex-box-center"
+        "flex-box-center",
     );
 
     tabItem.classList.toggle(
         "is-active",
-        isInitialSpreadsheet
+        isInitialSpreadsheet,
     );
 
-
-    // PRESERVA AS CLASSES DO LAYOUT ATUAL
-
-    if (index === 1) {
-
-        tabItem.classList.add(
-            "horizontal-first-item"
-        );
-    }
-
-    if (index === 2) {
-
-        tabItem.classList.add(
-            "horizontal-second-item"
-        );
-    }
-
+    tabItem.dataset.spreadsheetKey =
+        configuration.key;
 
     tabLink.setAttribute(
         "href",
-        `#${panelId}`
+        `#${panelId}`,
     );
 
     tabLink.textContent =
         configuration.menuName;
 
-
     tabItem.appendChild(
-        tabLink
+        tabLink,
     );
-
-
-    // TODAS AS PLANILHAS DESTE MENU POSSUEM BOTÃO EXTERNO
 
     const spreadsheetButton =
         document.createElement(
-            "button"
+            "button",
         );
 
     spreadsheetButton.type =
         "button";
 
     spreadsheetButton.classList.add(
-        "spreadsheets-links"
+        "spreadsheets-links",
     );
-
-    spreadsheetButton.dataset.spreadsheetKey =
-        configuration.key;
 
     spreadsheetButton.dataset.url =
         configuration.url;
 
     spreadsheetButton.setAttribute(
         "aria-label",
-        `Abrir ${configuration.menuName} em uma nova aba`
+        `Abrir ${configuration.menuName} em uma nova aba`,
     );
-
 
     spreadsheetButton.appendChild(
-        createSpreadsheetLinkIcon()
+        createSpreadsheetLinkIcon(),
     );
-
 
     spreadsheetButton.addEventListener(
         "click",
         function (event) {
-
             event.stopPropagation();
 
             window.open(
                 configuration.url,
                 "_blank",
-                "noopener,noreferrer"
+                "noopener,noreferrer",
             );
-        }
+        },
     );
-
 
     tabItem.appendChild(
-        spreadsheetButton
+        spreadsheetButton,
     );
-
 
     return tabItem;
 }
-
 
 /* CRIA O PAINEL E O IFRAME */
 
 function createSpreadsheetPanel(
     configuration,
     index,
-    panelId
+    panelId,
+    activeKey,
 ) {
-
     const isInitialSpreadsheet =
-        index === 0;
+        configuration.key ===
+            activeKey ||
+        (
+            !activeKey &&
+            index === 0
+        );
 
     const panel =
         document.createElement(
-            "div"
+            "div",
         );
+
+    panel.id = panelId;
+
+    panel.classList.add(
+        "tabs-panel",
+    );
+
+    panel.classList.toggle(
+        "is-active",
+        isInitialSpreadsheet,
+    );
 
     const iframe =
         document.createElement(
-            "iframe"
+            "iframe",
         );
-
-
-    panel.id =
-        panelId;
-
-    panel.classList.add(
-        "tabs-panel"
-    );
-
-
-    if (isInitialSpreadsheet) {
-
-        panel.classList.add(
-            "is-active"
-        );
-    }
-
-
-    iframe.dataset.spreadsheetKey =
-        configuration.key;
 
     iframe.dataset.src =
         configuration.url;
@@ -579,26 +559,80 @@ function createSpreadsheetPanel(
 
     iframe.setAttribute(
         "loading",
-        "lazy"
+        "lazy",
     );
-
 
     panel.appendChild(
-        iframe
+        iframe,
     );
-
 
     return panel;
 }
 
+/* ATUALIZA O FOUNDATION APÓS CRIAR AS ABAS */
 
-/* MONTA TODO O HTML DAS PLANILHAS */
-
-function renderSpreadsheetInterface(
-    configurations,
+function initializeFoundationTabs(
     tabsElement,
-    panelsElement
 ) {
+    if (
+        typeof window.jQuery !==
+            "function" ||
+        !window.Foundation
+    ) {
+        return false;
+    }
+
+    const foundationTabs =
+        window.jQuery(
+            tabsElement,
+        );
+
+    if (
+        foundationTabs.data(
+            "zfPlugin",
+        )
+    ) {
+        window.Foundation.reInit(
+            foundationTabs,
+        );
+
+        return true;
+    }
+
+    return false;
+}
+
+/* MONTA TODO O PAINEL DE PLANILHAS */
+
+function renderSpreadsheetInterface() {
+    if (!dashboardSettingsElements) {
+        return false;
+    }
+
+    const {
+        tabs,
+        panels,
+    } = dashboardSettingsElements;
+
+    const activeKey =
+        tabs.querySelector(
+            ".tabs-title.is-active",
+        )?.dataset.spreadsheetKey ||
+        "";
+
+    const configurations =
+        getVisibleSpreadsheetConfigurations();
+
+    const nextActiveKey =
+        configurations.some(
+            function (configuration) {
+                return configuration.key ===
+                    activeKey;
+            },
+        )
+            ? activeKey
+            : configurations[0]?.key ||
+              "";
 
     const tabsFragment =
         document.createDocumentFragment();
@@ -606,411 +640,861 @@ function renderSpreadsheetInterface(
     const panelsFragment =
         document.createDocumentFragment();
 
-
     configurations.forEach(
         function (
             configuration,
-            index
+            index,
         ) {
-
             const panelId =
                 `spreadsheet-${index + 1}`;
-
 
             tabsFragment.appendChild(
                 createSpreadsheetTab(
                     configuration,
                     index,
-                    panelId
-                )
+                    panelId,
+                    nextActiveKey,
+                ),
             );
-
 
             panelsFragment.appendChild(
                 createSpreadsheetPanel(
                     configuration,
                     index,
-                    panelId
-                )
+                    panelId,
+                    nextActiveKey,
+                ),
             );
-        }
+        },
     );
 
-
-    tabsElement.replaceChildren(
-        tabsFragment
+    tabs.replaceChildren(
+        tabsFragment,
     );
 
-    panelsElement.replaceChildren(
-        panelsFragment
+    panels.replaceChildren(
+        panelsFragment,
     );
+
+    initializeFoundationTabs(
+        tabs,
+    );
+
+    updateSpreadsheetIframes?.();
+
+    return true;
 }
 
-
-/* ATUALIZA O FOUNDATION APÓS CRIAR AS ABAS */
-
-function initializeFoundationTabs(
-    tabsElement
-) {
-
-    const foundationTabs =
-        $(
-            tabsElement
-        );
-
-
-    if (
-        foundationTabs.data(
-            "zfPlugin"
-        )
-    ) {
-
-        Foundation.reInit(
-            foundationTabs
-        );
-
-        return;
-    }
-
-
-    foundationTabs.foundation();
-}
-
-/* CONFIGURA O CARREGAMENTO SELETIVO DAS PLANILHAS */
-/* CONFIGURA O CARREGAMENTO SELETIVO DAS PLANILHAS */
+/* CARREGA SOMENTE A PLANILHA VISÍVEL */
 
 function initializeSpreadsheetNavigation(
     tabsElement,
-    panelsElement
+    panelsElement,
 ) {
-
-    const panels =
-        panelsElement.querySelectorAll(
-            ".tabs-panel"
-        );
-
     const spreadsheetsPanel =
         document.getElementById(
-            "spreadsheets"
+            "spreadsheets",
         );
 
     const mainTabs =
         document.getElementById(
-            "switch-1"
+            "switch-1",
         );
-
 
     if (
-        !spreadsheetsPanel ||
-        !mainTabs
+        !(spreadsheetsPanel instanceof
+            HTMLElement) ||
+        !(mainTabs instanceof
+            HTMLElement)
     ) {
-
-        console.error(
-            "Elementos do painel principal de planilhas não foram encontrados."
-        );
-
-        return;
+        return false;
     }
 
-
-    /* DESCARREGA UMA PLANILHA */
-
-    function unloadSpreadsheet(
-        panel
-    ) {
-
-        const iframe =
-            panel.querySelector(
-                "iframe[src]"
-            );
-
-
-        if (iframe) {
-
-            iframe.removeAttribute(
-                "src"
-            );
-        }
-    }
-
-
-    /* CARREGA UMA PLANILHA */
-
-    function loadSpreadsheet(
-        panel
-    ) {
-
-        const iframe =
-            panel.querySelector(
-                "iframe[data-src]"
-            );
-
-
-        if (
-            !iframe ||
-            iframe.hasAttribute(
-                "src"
-            )
-        ) {
-
-            return;
-        }
-
-
-        requestAnimationFrame(
-            function () {
-
-                setTimeout(
-                    function () {
-
-                        if (
-                            !panel.classList.contains(
-                                "is-active"
-                            ) ||
-                            !spreadsheetsPanel.classList.contains(
-                                "is-active"
-                            )
-                        ) {
-
-                            return;
-                        }
-
-
-                        iframe.src =
-                            iframe.dataset.src;
-
-                    },
-                    80
+    const update =
+        function () {
+            const panels =
+                panelsElement.querySelectorAll(
+                    ".tabs-panel",
                 );
-            }
-        );
-    }
 
-
-    /* ATUALIZA OS IFRAMES */
-
-    function updateSpreadsheetIframes() {
-
-        // PAINEL PLANILHAS NÃO ESTÁ ABERTO:
-        // DESCARREGA TODAS AS PLANILHAS
-
-        if (
-            !spreadsheetsPanel.classList.contains(
-                "is-active"
-            )
-        ) {
+            const activePanel =
+                panelsElement.querySelector(
+                    ".tabs-panel.is-active",
+                );
 
             panels.forEach(
                 function (panel) {
+                    const iframe =
+                        panel.querySelector(
+                            "iframe[data-src]",
+                        );
 
-                    unloadSpreadsheet(
-                        panel
-                    );
-                }
+                    if (!iframe) {
+                        return;
+                    }
+
+                    const shouldLoad =
+                        spreadsheetsPanel.classList
+                            .contains(
+                                "is-active",
+                            ) &&
+                        panel === activePanel;
+
+                    if (!shouldLoad) {
+                        iframe.removeAttribute(
+                            "src",
+                        );
+
+                        return;
+                    }
+
+                    if (
+                        !iframe.hasAttribute(
+                            "src",
+                        )
+                    ) {
+                        iframe.src =
+                            iframe.dataset.src;
+                    }
+                },
             );
+        };
 
-            return;
-        }
-
-
-        // LOCALIZA A PLANILHA ATIVA
-
-        const activePanel =
-            panelsElement.querySelector(
-                ".tabs-panel.is-active"
-            );
-
-
-        if (!activePanel) {
-
-            return;
-        }
-
-
-        // DESCARREGA TODAS AS OUTRAS
-
-        panels.forEach(
-            function (panel) {
-
-                if (
-                    panel !==
-                    activePanel
-                ) {
-
-                    unloadSpreadsheet(
-                        panel
-                    );
-                }
-            }
-        );
-
-
-        // CARREGA SOMENTE A ATIVA
-
-        loadSpreadsheet(
-            activePanel
-        );
-    }
-
-
-    /* OBSERVA A TROCA ENTRE PLANILHAS */
-
-    $(
-        tabsElement
-    ).on(
-        "change.zf.tabs",
-        function () {
-
-            requestAnimationFrame(
-                updateSpreadsheetIframes
-            );
-        }
-    );
-
-
-    /* OBSERVA A TROCA ENTRE OS PAINÉIS PRINCIPAIS */
-
-    $(
-        mainTabs
-    ).on(
-        "change.zf.tabs",
-        function () {
-
-            requestAnimationFrame(
-                updateSpreadsheetIframes
-            );
-        }
-    );
-
-
-    updateSpreadsheetIframes();
-}
-
-/* EXIBE UMA MENSAGEM DE ERRO */
-
-function showSpreadsheetConfigurationError(
-    tabsElement,
-    panelsElement
-) {
-
-    const errorMessage =
-        document.createElement(
-            "p"
-        );
-
-
-    errorMessage.classList.add(
-        "spreadsheet-configuration-error"
-    );
-
-    errorMessage.textContent =
-        "Não foi possível carregar as planilhas do dashboard.";
-
-
-    tabsElement.replaceChildren();
-
-    panelsElement.replaceChildren(
-        errorMessage
-    );
-}
-
-/* INICIALIZA AS PLANILHAS */
-
-async function initializeSpreadsheets() {
-
-    const tabsElement =
-        document.getElementById(
-            "switch-spreadsheet"
-        );
-
-    const panelsElement =
-        document.getElementById(
-            "spreadsheetPanels"
-        );
-
+    updateSpreadsheetIframes =
+        update;
 
     if (
-        !tabsElement ||
-        !panelsElement
+        tabsElement.dataset
+            .spreadsheetNavigationInitialized !==
+        "true"
     ) {
+        tabsElement.dataset
+            .spreadsheetNavigationInitialized =
+                "true";
 
-        throw new Error(
-            "Os elementos do menu de planilhas não foram encontrados."
+        tabsElement.addEventListener(
+            "click",
+            function () {
+                window.setTimeout(
+                    update,
+                    0,
+                );
+            },
+        );
+
+        mainTabs.addEventListener(
+            "click",
+            function () {
+                window.setTimeout(
+                    update,
+                    0,
+                );
+            },
         );
     }
 
+    update();
 
-    tabsElement.setAttribute(
-        "aria-busy",
-        "true"
+    return true;
+}
+
+/* CRIA AS 30 LINHAS DO REVEAL */
+
+function createSpreadsheetSettingsRow(
+    index,
+) {
+    const position =
+        index + 1;
+
+    const row =
+        document.createElement(
+            "div",
+        );
+
+    row.dataset.dashboardSpreadsheetRow =
+        String(index);
+
+    const linkInput =
+        document.createElement(
+            "input",
+        );
+
+    linkInput.type = "url";
+    linkInput.id =
+        `settingsSpreadsheetLink${position}`;
+    linkInput.placeholder =
+        "Link da Planilha";
+    linkInput.dataset.dashboardSpreadsheetField =
+        "link";
+    linkInput.setAttribute(
+        "aria-label",
+        `Link da planilha ${position}`,
     );
 
-    panelsElement.setAttribute(
-        "aria-busy",
-        "true"
+    const nameInput =
+        document.createElement(
+            "input",
+        );
+
+    nameInput.type = "text";
+    nameInput.id =
+        `settingsSpreadsheetName${position}`;
+    nameInput.placeholder =
+        "Nome no Menu";
+    nameInput.maxLength = 22;
+    nameInput.dataset.dashboardSpreadsheetField =
+        "menuName";
+    nameInput.setAttribute(
+        "aria-label",
+        `Nome da planilha ${position} no menu`,
     );
 
-
-    try {
-
-        const configurations =
-            await getSpreadsheetConfigurations();
-
-        /* MONTA O PAINEL PLANILHAS */
-
-        renderSpreadsheetInterface(
-            configurations,
-            tabsElement,
-            panelsElement
+    const selectContainer =
+        document.createElement(
+            "div",
         );
 
-        /* INICIALIZA AS ABAS DAS PLANILHAS */
-
-        initializeFoundationTabs(
-            tabsElement
+    const visibilitySelect =
+        document.createElement(
+            "select",
         );
 
+    visibilitySelect.id =
+        `settingsSpreadsheetVisibility${position}`;
+    visibilitySelect.classList.add(
+        "standard-select",
+    );
+    visibilitySelect.style.width =
+        "100%";
+    visibilitySelect.dataset.dashboardSpreadsheetField =
+        "visible";
+    visibilitySelect.setAttribute(
+        "aria-label",
+        `Visibilidade da planilha ${position}`,
+    );
 
-        /* INICIALIZA O CARREGAMENTO SELETIVO */
+    visibilitySelect.append(
+        new Option(
+            "Visível",
+            "show",
+        ),
+        new Option(
+            "Oculta",
+            "hide",
+        ),
+    );
 
-        initializeSpreadsheetNavigation(
-            tabsElement,
-            panelsElement
+    selectContainer.appendChild(
+        visibilitySelect,
+    );
+
+    row.append(
+        linkInput,
+        nameInput,
+        selectContainer,
+    );
+
+    return row;
+}
+
+function createSpreadsheetSettingsRows(
+    container,
+) {
+    const fragment =
+        document.createDocumentFragment();
+
+    for (
+        let index = 0;
+        index <
+            DASHBOARD_SPREADSHEET_LIMIT;
+        index += 1
+    ) {
+        fragment.appendChild(
+            createSpreadsheetSettingsRow(
+                index,
+            ),
         );
-
     }
-    catch (error) {
 
-        showSpreadsheetConfigurationError(
-            tabsElement,
-            panelsElement
+    container.replaceChildren(
+        fragment,
+    );
+
+    window.initializeSelect2Fields?.(
+        container,
+    );
+}
+
+/* VALIDA VISUALMENTE UM INPUT DE URL */
+
+function renderUrlInputValidity(
+    input,
+) {
+    const hasValue =
+        normalizeSettingsText(
+            input.value,
+        ) !== "";
+
+    const isInvalid =
+        hasValue &&
+        !normalizeDashboardUrl(
+            input.value,
         );
 
-        throw error;
+    input.setAttribute(
+        "aria-invalid",
+        isInvalid
+            ? "true"
+            : "false",
+    );
 
+    input.title =
+        isInvalid
+            ? "Informe um endereço HTTP ou HTTPS válido."
+            : "";
+}
+
+/* RENDERIZA OS VALORES NOS INPUTS */
+
+function renderSettingsInputs() {
+    if (!dashboardSettingsElements) {
+        return;
     }
-    finally {
 
-        tabsElement.setAttribute(
-            "aria-busy",
-            "false"
+    dashboardSettingsElements
+        .spreadsheetRows
+        .querySelectorAll(
+            "[data-dashboard-spreadsheet-row]",
+        )
+        .forEach(
+            function (row) {
+                const index =
+                    Number(
+                        row.dataset
+                            .dashboardSpreadsheetRow,
+                    );
+
+                const spreadsheet =
+                    dashboardSettingsState
+                        .spreadsheets[
+                            index
+                        ];
+
+                if (!spreadsheet) {
+                    return;
+                }
+
+                const linkInput =
+                    row.querySelector(
+                        '[data-dashboard-spreadsheet-field="link"]',
+                    );
+
+                const nameInput =
+                    row.querySelector(
+                        '[data-dashboard-spreadsheet-field="menuName"]',
+                    );
+
+                const visibilitySelect =
+                    row.querySelector(
+                        '[data-dashboard-spreadsheet-field="visible"]',
+                    );
+
+                linkInput.value =
+                    spreadsheet.link;
+
+                nameInput.value =
+                    spreadsheet.menuName;
+
+                visibilitySelect.value =
+                    spreadsheet.visible
+                        ? "show"
+                        : "hide";
+
+                if (
+                    typeof window.jQuery ===
+                    "function"
+                ) {
+                    window.jQuery(
+                        visibilitySelect,
+                    ).trigger(
+                        "change.select2",
+                    );
+                }
+
+                renderUrlInputValidity(
+                    linkInput,
+                );
+            },
         );
 
-        panelsElement.setAttribute(
-            "aria-busy",
-            "false"
+    dashboardSettingsElements
+        .externalLinkInputs
+        .forEach(
+            function (input) {
+                const key =
+                    input.dataset
+                        .dashboardExternalLink;
+
+                input.value =
+                    dashboardSettingsState
+                        .externalLinks[
+                            key
+                        ] || "";
+
+                renderUrlInputValidity(
+                    input,
+                );
+            },
         );
+}
+
+/* ATUALIZA OS TRÊS LINKS FORA DO PAINEL */
+
+function renderExternalLinks() {
+    if (!dashboardSettingsElements) {
+        return;
+    }
+
+    const damageAppUrl =
+        normalizeDashboardUrl(
+            dashboardSettingsState
+                .externalLinks
+                .damageApp,
+        );
+
+    const collectionAppUrl =
+        normalizeDashboardUrl(
+            dashboardSettingsState
+                .externalLinks
+                .collectionApp,
+        );
+
+    const fleetUrl =
+        normalizeDashboardUrl(
+            dashboardSettingsState
+                .externalLinks
+                .fleet,
+        );
+
+    const {
+        damageAppButton,
+        collectionAppButton,
+        fleetLink,
+    } = dashboardSettingsElements;
+
+    damageAppButton.dataset.url =
+        damageAppUrl;
+    damageAppButton.disabled =
+        !damageAppUrl;
+    damageAppButton.setAttribute(
+        "aria-disabled",
+        damageAppUrl
+            ? "false"
+            : "true",
+    );
+
+    collectionAppButton.dataset.url =
+        collectionAppUrl;
+    collectionAppButton.disabled =
+        !collectionAppUrl;
+    collectionAppButton.setAttribute(
+        "aria-disabled",
+        collectionAppUrl
+            ? "false"
+            : "true",
+    );
+
+    if (fleetUrl) {
+        fleetLink.href = fleetUrl;
+        fleetLink.target = "_blank";
+        fleetLink.rel =
+            "noopener noreferrer";
+        fleetLink.setAttribute(
+            "aria-disabled",
+            "false",
+        );
+        fleetLink.removeAttribute(
+            "tabindex",
+        );
+    } else {
+        fleetLink.href = "#";
+        fleetLink.removeAttribute(
+            "target",
+        );
+        fleetLink.removeAttribute(
+            "rel",
+        );
+        fleetLink.setAttribute(
+            "aria-disabled",
+            "true",
+        );
+        fleetLink.tabIndex = -1;
     }
 }
 
-/* EXECUTA A INICIALIZAÇÃO */
+/* APLICA AS CONFIGURAÇÕES IMPORTADAS */
 
-initializeSpreadsheets().catch(
-    function (error) {
+function renderDashboardSettings() {
+    renderSettingsInputs();
+    renderExternalLinks();
+    renderSpreadsheetInterface();
+}
 
-        console.error(
-            "Erro ao inicializar o controle das planilhas:",
-            error
+function importDashboardSettings(
+    value,
+) {
+    validateDashboardSettings(
+        value,
+    );
+
+    const normalizedSettings =
+        normalizeDashboardSettings(
+            value,
         );
+
+    dashboardSettingsState.spreadsheets =
+        normalizedSettings.spreadsheets;
+
+    dashboardSettingsState.externalLinks =
+        normalizedSettings.externalLinks;
+
+    renderDashboardSettings();
+
+    return true;
+}
+
+/* AGENDA A ATUALIZAÇÃO DO PAINEL */
+
+function scheduleSpreadsheetRender() {
+    window.clearTimeout(
+        spreadsheetRenderTimer,
+    );
+
+    spreadsheetRenderTimer =
+        window.setTimeout(
+            function () {
+                spreadsheetRenderTimer =
+                    null;
+
+                renderSpreadsheetInterface();
+            },
+            180,
+        );
+}
+
+/* CONECTA OS INPUTS DO REVEAL */
+
+function bindDashboardSettingsEvents() {
+    const {
+        spreadsheetRows,
+        anotherLinks,
+        fleetLink,
+    } = dashboardSettingsElements;
+
+    spreadsheetRows.addEventListener(
+        "input",
+        function (event) {
+            const input =
+                event.target.closest(
+                    "[data-dashboard-spreadsheet-field]",
+                );
+
+            const row =
+                input?.closest(
+                    "[data-dashboard-spreadsheet-row]",
+                );
+
+            if (!input || !row) {
+                return;
+            }
+
+            const index =
+                Number(
+                    row.dataset
+                        .dashboardSpreadsheetRow,
+                );
+
+            const field =
+                input.dataset
+                    .dashboardSpreadsheetField;
+
+            if (
+                !Number.isInteger(index) ||
+                !dashboardSettingsState
+                    .spreadsheets[index] ||
+                field === "visible"
+            ) {
+                return;
+            }
+
+            dashboardSettingsState
+                .spreadsheets[index][field] =
+                    field === "menuName"
+                        ? normalizeSettingsText(
+                            input.value,
+                            22,
+                        )
+                        : input.value;
+
+            if (field === "link") {
+                renderUrlInputValidity(
+                    input,
+                );
+            }
+
+            scheduleSpreadsheetRender();
+        },
+    );
+
+    const handleSpreadsheetVisibilityChange =
+        function (target) {
+            const select =
+                target.closest(
+                    'select[data-dashboard-spreadsheet-field="visible"]',
+                );
+
+            const row =
+                select?.closest(
+                    "[data-dashboard-spreadsheet-row]",
+                );
+
+            if (!select || !row) {
+                return;
+            }
+
+            const index =
+                Number(
+                    row.dataset
+                        .dashboardSpreadsheetRow,
+                );
+
+            if (
+                !Number.isInteger(index) ||
+                !dashboardSettingsState
+                    .spreadsheets[index]
+            ) {
+                return;
+            }
+
+            dashboardSettingsState
+                .spreadsheets[index]
+                .visible =
+                    select.value ===
+                    "show";
+
+            renderSpreadsheetInterface();
+        };
+
+    spreadsheetRows.addEventListener(
+        "change",
+        function (event) {
+            handleSpreadsheetVisibilityChange(
+                event.target,
+            );
+        },
+    );
+
+    if (
+        typeof window.jQuery ===
+        "function"
+    ) {
+        const visibilitySelector =
+            'select[data-dashboard-spreadsheet-field="visible"]';
+
+        window.jQuery(
+            spreadsheetRows,
+        )
+            .off(
+                "select2:select.dashboardSettings",
+                visibilitySelector,
+            )
+            .on(
+                "select2:select.dashboardSettings",
+                visibilitySelector,
+                function () {
+                    handleSpreadsheetVisibilityChange(
+                        this,
+                    );
+                },
+            );
     }
-);
+
+    anotherLinks.addEventListener(
+        "input",
+        function (event) {
+            const input =
+                event.target.closest(
+                    "[data-dashboard-external-link]",
+                );
+
+            if (!input) {
+                return;
+            }
+
+            const key =
+                input.dataset
+                    .dashboardExternalLink;
+
+            if (
+                !DASHBOARD_EXTERNAL_LINK_KEYS
+                    .includes(key)
+            ) {
+                return;
+            }
+
+            dashboardSettingsState
+                .externalLinks[key] =
+                    input.value;
+
+            renderUrlInputValidity(
+                input,
+            );
+
+            renderExternalLinks();
+        },
+    );
+
+    fleetLink.addEventListener(
+        "click",
+        function (event) {
+            if (
+                fleetLink.getAttribute(
+                    "aria-disabled",
+                ) === "true"
+            ) {
+                event.preventDefault();
+            }
+        },
+    );
+}
+
+/* LOCALIZA E VALIDA OS ELEMENTOS */
+
+function getDashboardSettingsElements() {
+    return {
+        tabs:
+            document.getElementById(
+                "switch-spreadsheet",
+            ),
+
+        panels:
+            document.getElementById(
+                "spreadsheetPanels",
+            ),
+
+        spreadsheetRows:
+            document.getElementById(
+                "settingsSpreadsheetRows",
+            ),
+
+        anotherLinks:
+            document.getElementById(
+                "another-links",
+            ),
+
+        externalLinkInputs: [
+            ...document.querySelectorAll(
+                "[data-dashboard-external-link]",
+            ),
+        ],
+
+        damageAppButton:
+            document.getElementById(
+                "footerDamageAppLink",
+            ),
+
+        collectionAppButton:
+            document.getElementById(
+                "footerCollectionAppLink",
+            ),
+
+        fleetLink:
+            document.getElementById(
+                "planningFleetLink",
+            ),
+    };
+}
+
+function hasDashboardSettingsElements(
+    elements,
+) {
+    return (
+        elements.tabs instanceof
+            HTMLElement &&
+        elements.panels instanceof
+            HTMLElement &&
+        elements.spreadsheetRows instanceof
+            HTMLElement &&
+        elements.anotherLinks instanceof
+            HTMLElement &&
+        elements.externalLinkInputs.length ===
+            DASHBOARD_EXTERNAL_LINK_KEYS.length &&
+        elements.externalLinkInputs.every(
+            function (input) {
+                return input instanceof
+                    HTMLInputElement;
+            },
+        ) &&
+        elements.damageAppButton instanceof
+            HTMLButtonElement &&
+        elements.collectionAppButton instanceof
+            HTMLButtonElement &&
+        elements.fleetLink instanceof
+            HTMLAnchorElement
+    );
+}
+
+/* INICIALIZA AS CONFIGURAÇÕES E O PAINEL */
+
+function initializeDashboardSettings() {
+    const elements =
+        getDashboardSettingsElements();
+
+    if (
+        !hasDashboardSettingsElements(
+            elements,
+        )
+    ) {
+        console.error(
+            "Os elementos das configurações do dashboard não foram encontrados.",
+        );
+
+        return false;
+    }
+
+    dashboardSettingsElements =
+        elements;
+
+    const initialSettings =
+        createEmptyDashboardSettings();
+
+    dashboardSettingsState.spreadsheets =
+        initialSettings.spreadsheets;
+
+    dashboardSettingsState.externalLinks =
+        initialSettings.externalLinks;
+
+    createSpreadsheetSettingsRows(
+        elements.spreadsheetRows,
+    );
+
+    initializeSpreadsheetNavigation(
+        elements.tabs,
+        elements.panels,
+    );
+
+    bindDashboardSettingsEvents();
+
+    renderDashboardSettings();
+
+    return true;
+}
+
+initializeDashboardSettings();
+
+export {
+    exportDashboardSettings,
+    importDashboardSettings,
+    initializeDashboardSettings,
+    validateDashboardSettings,
+};
