@@ -13,6 +13,78 @@ const EMPTY_SPREADSHEET_URL =
 const GOOGLE_SPREADSHEETS_URL_PREFIX =
     "https://docs.google.com/spreadsheets/";
 
+const DEFAULT_SPREADSHEET_SETTINGS =
+    Object.freeze([
+        {
+            spreadsheetId: "1SGoeFt_aVK0sZ5Ivz3ORD1Hd75sxH-A-HYqHX8wWXKY",
+            menuName: "Checklist Operacional",
+        },
+        {
+            spreadsheetId: "1dwR1_8HdG3dR2UTU9cpjb8yCNufvA-kU",
+            menuName: "Insucesso",
+        },
+        {
+            spreadsheetId: "1Kw7h5nDUxjdpzmR4mY3oPH2oTfYP3P7Z",
+            menuName: "Pacotes em Análise",
+        },
+        {
+            spreadsheetId: "1BjOehuyFzjWAMIA-90lQRKmxvCdmCcOm",
+            menuName: "Pacotes Retornados",
+        },
+        {
+            spreadsheetId: "1385sakCqF4Es4swDn3evACaHRWAks2THNJkgJP2TUT4",
+            menuName: "Backlogs e Logs",
+        },
+        {
+            spreadsheetId: "1MJFZlrUrcZXve4WOYYLjCrKeUkD0QgSshCfZdWxNMZA",
+            menuName: "Erros de Etiquetagem",
+        },
+        {
+            spreadsheetId: "15ycLVugBymQR63SivMIvwRMce4dTe5XV",
+            menuName: "Controle Geral",
+        },
+        {
+            spreadsheetId: "1sh3TgSwLOt8EhoDhji2CHivbrEQiuhIpoBw0VHe2JoE",
+            menuName: "Controle Operacional",
+        },
+        {
+            spreadsheetId: "19mhzxy8xih2yPfxX6f8ILQJWTgRMhSXv",
+            menuName: "Stuck Orders",
+        },
+        {
+            spreadsheetId: "1pmKMyhiQdRU787MHdKFZEjwVqG6IIeLB6glOK3m-uMc",
+            menuName: "Controle de Endereços",
+        },
+        {
+            spreadsheetId: "1sOzs3lgS6dO0WluGRQR2B8kmFTDUR5VC",
+            menuName: "Justificativas",
+        },
+        {
+            spreadsheetId: "1FojFYpuisveWci0pivDfWf_KEHQVcnY7",
+            menuName: "Avarias",
+        },
+        {
+            spreadsheetId: "1SpChx2r8HHeqWQAYDELewvKzQM8eRLIgknT2EiMjPnU",
+            menuName: "Avarias AppSheet",
+        },
+        {
+            spreadsheetId: "1wtALHYfXyFm9nfkV9TP1idnVV12oBwa-",
+            menuName: "Reversa",
+        },
+        {
+            spreadsheetId: "1PnKEGQtfETj0ptk7xAIPG3dcrZgbBunWFUJp18O_XDE",
+            menuName: "Pacotes Full",
+        },
+        {
+            spreadsheetId: "1UWlOQfVw-eD1ZkD5gxCo2MHZ4CEyJUd4osungKFTfwA",
+            menuName: "Gerenciamento de Rotas",
+        },
+        {
+            spreadsheetId: "1FpcZuJboPyMKUGZwYHGHRYg4Pr_Phs4-ycqg-u7qGSU",
+            menuName: "Erros de Processo",
+        },
+    ]);
+
 const SPREADSHEET_POSITION_NAMES =
     Object.freeze([
         "Primeira",
@@ -60,17 +132,36 @@ let spreadsheetRenderTimer = null;
 
 let updateSpreadsheetIframes = null;
 
-/* CRIA UMA CONFIGURAÇÃO VAZIA */
+/* CRIA A CONFIGURAÇÃO INICIAL */
 
-function createEmptySpreadsheetSetting() {
+function createDefaultSpreadsheetSetting(
+    index,
+) {
+    const defaultSetting =
+        DEFAULT_SPREADSHEET_SETTINGS[
+            index
+        ];
+
+    if (!defaultSetting) {
+        return {
+            link: "",
+            menuName: "",
+            visible: true,
+        };
+    }
+
     return {
-        link: "",
-        menuName: "",
+        link:
+            `${GOOGLE_SPREADSHEETS_URL_PREFIX}` +
+            `d/${defaultSetting.spreadsheetId}/` +
+            "edit?gid=0#gid=0",
+        menuName:
+            defaultSetting.menuName,
         visible: true,
     };
 }
 
-function createEmptyDashboardSettings() {
+function createDefaultDashboardSettings() {
     return {
         spreadsheets:
             Array.from(
@@ -78,7 +169,10 @@ function createEmptyDashboardSettings() {
                     length:
                         DASHBOARD_SPREADSHEET_LIMIT,
                 },
-                createEmptySpreadsheetSetting,
+                (_, index) =>
+                    createDefaultSpreadsheetSetting(
+                        index,
+                    ),
             ),
 
         externalLinks: {
@@ -1714,7 +1808,7 @@ function initializeDashboardSettings() {
         elements;
 
     const initialSettings =
-        createEmptyDashboardSettings();
+        createDefaultDashboardSettings();
 
     dashboardSettingsState.spreadsheets =
         initialSettings.spreadsheets;
