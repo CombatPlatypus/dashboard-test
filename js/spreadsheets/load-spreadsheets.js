@@ -8,6 +8,40 @@ const EMPTY_SPREADSHEET_LABEL =
 const EMPTY_SPREADSHEET_URL =
     "https://docs.google.com/spreadsheets/d/1ZVWMVaT3bCAPxZbZgKfMqZUIBif3pr8cnnpc4Lx8lkA/edit?gid=0#gid=0";
 
+const SPREADSHEET_POSITION_NAMES =
+    Object.freeze([
+        "Primeira",
+        "Segunda",
+        "Terceira",
+        "Quarta",
+        "Quinta",
+        "Sexta",
+        "Sétima",
+        "Oitava",
+        "Nona",
+        "Décima",
+        "Décima Primeira",
+        "Décima Segunda",
+        "Décima Terceira",
+        "Décima Quarta",
+        "Décima Quinta",
+        "Décima Sexta",
+        "Décima Sétima",
+        "Décima Oitava",
+        "Décima Nona",
+        "Vigésima",
+        "Vigésima Primeira",
+        "Vigésima Segunda",
+        "Vigésima Terceira",
+        "Vigésima Quarta",
+        "Vigésima Quinta",
+        "Vigésima Sexta",
+        "Vigésima Sétima",
+        "Vigésima Oitava",
+        "Vigésima Nona",
+        "Trigésima",
+    ]);
+
 const DASHBOARD_EXTERNAL_LINK_KEYS =
     Object.freeze([
         "damageApp",
@@ -806,6 +840,19 @@ function createSpreadsheetSettingsRow(
     const position =
         index + 1;
 
+    const group =
+        document.createElement(
+            "div",
+        );
+
+    const title =
+        document.createElement(
+            "h4",
+        );
+
+    title.textContent =
+        `${SPREADSHEET_POSITION_NAMES[index]} Planilha`;
+
     const row =
         document.createElement(
             "div",
@@ -894,7 +941,12 @@ function createSpreadsheetSettingsRow(
         selectContainer,
     );
 
-    return row;
+    group.append(
+        title,
+        row,
+    );
+
+    return group;
 }
 
 function createSpreadsheetSettingsRows(

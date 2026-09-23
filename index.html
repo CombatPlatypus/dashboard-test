@@ -64,7 +64,7 @@
                 display: flex;
                 flex-direction: column;
                 gap: 15px;
-                max-height: min(60vh, 650px);
+                max-height: 300px;
                 overflow-y: auto;
                 padding-right: 15px;
             }
@@ -82,13 +82,22 @@
             }
             .reveal .spreadsheets-links > div {
                 display: flex;
+                flex-direction: column;
+                align-items: stretch;
+                row-gap: 10px;
+            }
+            .reveal .spreadsheets-links > div > h4 {
+                margin: 0;
+            }
+            .reveal .spreadsheets-links > div > [data-dashboard-spreadsheet-row] {
+                display: flex;
                 align-items: center;
                 column-gap: 15px;
             }
-            .reveal .spreadsheets-links > div input {
+            .reveal .spreadsheets-links > div > [data-dashboard-spreadsheet-row] input {
                 flex: 1 1 0;
             }
-            .reveal .spreadsheets-links > div div {
+            .reveal .spreadsheets-links > div > [data-dashboard-spreadsheet-row] > div {
                 flex: 0 0 100px;
             }
             .reveal #another-links > div {
@@ -3449,18 +3458,21 @@
                         <!-- LISTA DINÂMICA DE LINKS -->
 
                         <div class="spreadsheets-links" id="settingsSpreadsheetRows">
-                            <div data-dashboard-spreadsheet-row="0">
-                                <input type="url" placeholder="Link da Planilha" id="settingsSpreadsheetLink1" data-dashboard-spreadsheet-field="link" aria-label="Link da planilha 1">
-                                <input type="text" placeholder="Nome no Menu" maxlength="22" id="settingsSpreadsheetName1" data-dashboard-spreadsheet-field="menuName" aria-label="Nome da planilha 1 no menu">
+                            <div>
+                                <h4>Primeira Planilha</h4>
 
-                                <div>
-                                    <select class="standard-select" style="width: 100%;" id="settingsSpreadsheetVisibility1" data-dashboard-spreadsheet-field="visible" aria-label="Visibilidade da planilha 1">
-                                        <option value="show">Visível</option>
-                                        <option value="hide">Oculta</option>
-                                    </select>
+                                <div data-dashboard-spreadsheet-row="0">
+                                    <input type="url" placeholder="Link da Planilha" id="settingsSpreadsheetLink1" data-dashboard-spreadsheet-field="link" aria-label="Link da planilha 1">
+                                    <input type="text" placeholder="Nome no Menu" maxlength="22" id="settingsSpreadsheetName1" data-dashboard-spreadsheet-field="menuName" aria-label="Nome da planilha 1 no menu">
+
+                                    <div>
+                                        <select class="standard-select" style="width: 100%;" id="settingsSpreadsheetVisibility1" data-dashboard-spreadsheet-field="visible" aria-label="Visibilidade da planilha 1">
+                                            <option value="show">Visível</option>
+                                            <option value="hide">Oculta</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
-
                         </div>
                     </div>
 
