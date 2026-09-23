@@ -47,6 +47,20 @@
             .reveal .padding {
                 padding: 20px;
             }
+            .reveal .spreadsheets-links {
+                gap: 15px;
+            }
+            .reveal .spreadsheets-links > div {
+                display: flex;
+                align-items: center;
+                column-gap: 15px;
+            }
+            .reveal .spreadsheets-links > div input {
+                flex: 1 1 0;
+            }
+            .reveal .spreadsheets-links > div div {
+                flex: 0 0 100px;
+            }
                         
         </style>
     </head>	
@@ -3335,14 +3349,45 @@
 
         <!-- REVEAL - CONFIGURAÇÕES -->
 
-        <div class="reveal" id="settings" data-reveal data-close-on-click="true">
+        <div class="reveal small" id="settings" data-reveal data-close-on-click="true">
             <div class="title">
-                <h4>Configurações</h4>
+                <h4>Configurações do Dashboard</h4>
             </div>
 
             <div class="padding">
-                <input type="text">
+                <ul class="flex-box-start tabs" data-tabs id="settings-tabs">
+                    <li class="tabs-title is-active">
+                        <a href="#settings-links">Link das Planilhas</a>
+                    </li> 
 
+                    <li class="tabs-title">
+                        <a href="#settings-themes">Temas do Dashboard</a>
+                    </li> 
+                </ul> 
+
+                <div class="tabs-content" data-tabs-content="settings-tabs">
+                    <div class="tabs-panel is-active" id="settings-links">
+
+                        <!-- LISTA DINÂMICA DE LINKS -->
+
+                        <div class="spreadsheets-links">
+                            <div>
+                                <input type="text" placeholder="Link da Planilha" id="">
+                                <input type="text" placeholder="Nome no Menu" maxlength="22" id="">
+
+                                <div>
+                                    <select class="standard-select" style="width: 100%;" id="">
+                                        <option value="show">Visível</option>
+                                        <option value="hide">Oculta</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="tabs-panel is-active" id="settings-themes"></div>
+                </div>
             </div>
 
             <button class="close-button" data-close aria-label="Close modal" type="button">
