@@ -99,6 +99,35 @@ function splitPlanningImportValues(
         );
 }
 
+/* VERIFICA SE A AÇÃO É APENAS VISUALIZAR */
+
+function hasPlanningImportVisualizeAction(
+    values,
+) {
+    const receivedValues =
+        Array.isArray(
+            values,
+        )
+            ? values
+            : [
+                values,
+            ];
+
+    return receivedValues
+        .flatMap(
+            splitPlanningImportValues,
+        )
+        .some(
+            function (value) {
+                return (
+                    normalizePlanningImportText(
+                        value,
+                    ) === "visualizar"
+                );
+            },
+        );
+}
+
 /* LOCALIZA O CÓDIGO DE UM LH */
 
 function getPlanningImportLhCode(
@@ -322,6 +351,11 @@ function getPlanningImportColumns(
             findColumn(
                 "pedido carregado",
             ),
+
+        action:
+            findColumn(
+                "acao",
+            ),
     };
 
     const hasAllColumns =
@@ -330,8 +364,12 @@ function getPlanningImportColumns(
         )
             .filter(
                 function ([key]) {
-                    return key !==
-                        "quantity";
+                    return ![
+                        "quantity",
+                        "action",
+                    ].includes(
+                        key,
+                    );
                 },
             )
             .every(
@@ -375,19 +413,26 @@ function createPlanningImportHtmlRecord(
                 splitPlanningImportValues,
             );
 
+    const hideQuantity =
+        hasPlanningImportVisualizeAction(
+            receivedRecord.action,
+        );
+
     const quantity =
-        receivedRecord.quantity
-            .flatMap(
-                splitPlanningImportValues,
-            )
-            .map(
-                parsePlanningImportQuantity,
-            )
-            .find(
-                function (value) {
-                    return value !== null;
-                },
-            ) ?? null;
+        hideQuantity
+            ? null
+            : receivedRecord.quantity
+                .flatMap(
+                    splitPlanningImportValues,
+                )
+                .map(
+                    parsePlanningImportQuantity,
+                )
+                .find(
+                    function (value) {
+                        return value !== null;
+                    },
+                ) ?? null;
 
     return {
         code:
@@ -396,6 +441,7 @@ function createPlanningImportHtmlRecord(
         origin,
 
         quantity,
+        hideQuantity,
 
         window:
             getPlanningImportWindow(
@@ -495,6 +541,7 @@ function parsePlanningImportMatrix(
                         punctuality: [],
                         cpt: [],
                         quantity: [],
+                        action: [],
                     };
                 }
 
@@ -517,6 +564,12 @@ function parsePlanningImportMatrix(
 
                 currentRecord.quantity.push(
                     row[columns.quantity] ?? "",
+                );
+
+                currentRecord.action.push(
+                    columns.action >= 0
+                        ? row[columns.action] ?? ""
+                        : "",
                 );
             },
         );
@@ -572,6 +625,14 @@ function parsePlanningSpXHtml(
 function getPlanningImportPlainQuantity(
     values,
 ) {
+    if (
+        hasPlanningImportVisualizeAction(
+            values,
+        )
+    ) {
+        return null;
+    }
+
     return getSpXLinehaulPlainLoadedOrders(
         values,
     );
@@ -718,6 +779,11 @@ function parsePlanningSpXPlainText(
 
                 quantity:
                     getPlanningImportPlainQuantity(
+                        values,
+                    ),
+
+                hideQuantity:
+                    hasPlanningImportVisualizeAction(
                         values,
                     ),
 
@@ -1812,6 +1878,10 @@ async function handlePlanningClipboardImport(
             ...plainTextRecords,
         ].forEach(
             function (record) {
+                if (record.hideQuantity) {
+                    return;
+                }
+
                 const code =
                     getPlanningImportLhCode(
                         record.code,
@@ -1842,6 +1912,7 @@ async function handlePlanningClipboardImport(
                 records.forEach(
                     function (record) {
                         if (
+                            record.hideQuantity ||
                             parsePlanningImportQuantity(
                                 record.quantity,
                             ) !== null
