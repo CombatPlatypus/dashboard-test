@@ -13,6 +13,17 @@ const EMPTY_SPREADSHEET_URL =
 const GOOGLE_SPREADSHEETS_URL_PREFIX =
     "https://docs.google.com/spreadsheets/";
 
+const DEFAULT_REVERSE_FORM_URL =
+    "https://docs.google.com/forms/d/e/1FAIpQLSdD3VRRIrvWhUQc5-IOjqMKdL6bIuGemyUeH2SJPv5l2qcnaQ/viewform";
+
+const DEFAULT_PACK_RECOVERY_URL =
+    "https://www.appsheet.com/Account/Login?" +
+    "appName=Pack%20Recovery&FullScope=False&provider=google" +
+    "&returnUrl=https%3A%2F%2Fwww.appsheet.com%2Fstart%2Fb80b7b1a-f8dc-42f5-a596-082252124ffb%3Fplatform%3Ddesktop" +
+    "#appName=PackRecover-51650155" +
+    "&vss=H4sIAAAAAAAAA6XOsQ7CIBgE4He5mSdg1Q6NUYeaLuKA5W9CbKEpVG0I7y5ojXPjyJHv_gu4a3pUXjY38HP4vXY0gyMInOaBBLjAxho_2k6ACRxk_wm3RVWXx0ogIl7Yl3ty4GGV5n_dZtCKjNetpjFXZZgqFpa-M0rBQhAZ-snLa0fvtYnEmLLWNpMjVach6we40hTPQRq1tyo1trJzFF-JXWqEYAEAAA==" +
+    "&view=DESVIOS";
+
 const DEFAULT_DAMAGE_APP_URL =
     "https://www.appsheet.com/start/9898e1c7-28cc-4bcc-9e15-b13a73533544?platform=desktop" +
     "#appName=AVARIASLSP-63-957299733-25-10-22" +
@@ -124,20 +135,38 @@ const SPREADSHEET_POSITION_NAMES =
 
 const DASHBOARD_EXTERNAL_LINK_KEYS =
     Object.freeze([
+        "reverseForm",
+        "packRecovery",
         "damageApp",
         "collectionApp",
         "fleet",
     ]);
 
-const dashboardSettingsState = {
-    spreadsheets: [],
+const LEGACY_DASHBOARD_EXTERNAL_LINK_KEYS =
+    Object.freeze([
+        "damageApp",
+        "collectionApp",
+        "fleet",
+    ]);
 
-    externalLinks: {
+const DEFAULT_DASHBOARD_EXTERNAL_LINKS =
+    Object.freeze({
+        reverseForm:
+            DEFAULT_REVERSE_FORM_URL,
+        packRecovery:
+            DEFAULT_PACK_RECOVERY_URL,
         damageApp:
             DEFAULT_DAMAGE_APP_URL,
         collectionApp:
             DEFAULT_COLLECTION_APP_URL,
         fleet: "",
+    });
+
+const dashboardSettingsState = {
+    spreadsheets: [],
+
+    externalLinks: {
+        ...DEFAULT_DASHBOARD_EXTERNAL_LINKS,
     },
 };
 
@@ -191,11 +220,7 @@ function createDefaultDashboardSettings() {
             ),
 
         externalLinks: {
-            damageApp:
-                DEFAULT_DAMAGE_APP_URL,
-            collectionApp:
-                DEFAULT_COLLECTION_APP_URL,
-            fleet: "",
+            ...DEFAULT_DASHBOARD_EXTERNAL_LINKS,
         },
     };
 }
@@ -335,9 +360,17 @@ function normalizeDashboardSettings(
                         return [
                             key,
                             normalizeSettingsText(
-                                receivedExternalLinks[
-                                    key
-                                ],
+                                Object.prototype
+                                    .hasOwnProperty.call(
+                                        receivedExternalLinks,
+                                        key,
+                                    )
+                                    ? receivedExternalLinks[
+                                        key
+                                    ]
+                                    : DEFAULT_DASHBOARD_EXTERNAL_LINKS[
+                                        key
+                                    ],
                             ),
                         ];
                     },
@@ -406,10 +439,23 @@ function validateDashboardSettings(
         Array.isArray(
             value.externalLinks,
         ) ||
+        LEGACY_DASHBOARD_EXTERNAL_LINK_KEYS
+            .some(
+                function (key) {
+                    return typeof value
+                        .externalLinks[
+                            key
+                        ] !== "string";
+                },
+            ) ||
         DASHBOARD_EXTERNAL_LINK_KEYS.some(
             function (key) {
-                return typeof value
-                    .externalLinks[
+                return Object.prototype
+                    .hasOwnProperty.call(
+                        value.externalLinks,
+                        key,
+                    ) &&
+                    typeof value.externalLinks[
                         key
                     ] !== "string";
             },
@@ -1312,7 +1358,7 @@ function renderSettingsInputs() {
         );
 }
 
-/* ATUALIZA OS TRÊS LINKS FORA DO PAINEL */
+/* ATUALIZA OS LINKS FORA DO PAINEL */
 
 function renderExternalLinks() {
     if (!dashboardSettingsElements) {
@@ -1324,6 +1370,20 @@ function renderExternalLinks() {
             dashboardSettingsState
                 .externalLinks
                 .damageApp,
+        );
+
+    const reverseFormUrl =
+        normalizeDashboardUrl(
+            dashboardSettingsState
+                .externalLinks
+                .reverseForm,
+        );
+
+    const packRecoveryUrl =
+        normalizeDashboardUrl(
+            dashboardSettingsState
+                .externalLinks
+                .packRecovery,
         );
 
     const collectionAppUrl =
@@ -1341,31 +1401,46 @@ function renderExternalLinks() {
         );
 
     const {
+        reverseFormButton,
+        packRecoveryButton,
         damageAppButton,
         collectionAppButton,
         fleetLink,
     } = dashboardSettingsElements;
 
-    damageAppButton.dataset.url =
-        damageAppUrl;
-    damageAppButton.disabled =
-        !damageAppUrl;
-    damageAppButton.setAttribute(
-        "aria-disabled",
-        damageAppUrl
-            ? "false"
-            : "true",
-    );
-
-    collectionAppButton.dataset.url =
-        collectionAppUrl;
-    collectionAppButton.disabled =
-        !collectionAppUrl;
-    collectionAppButton.setAttribute(
-        "aria-disabled",
-        collectionAppUrl
-            ? "false"
-            : "true",
+    [
+        [
+            reverseFormButton,
+            reverseFormUrl,
+        ],
+        [
+            packRecoveryButton,
+            packRecoveryUrl,
+        ],
+        [
+            damageAppButton,
+            damageAppUrl,
+        ],
+        [
+            collectionAppButton,
+            collectionAppUrl,
+        ],
+    ].forEach(
+        function (
+            [
+                button,
+                url,
+            ],
+        ) {
+            button.dataset.url = url;
+            button.disabled = !url;
+            button.setAttribute(
+                "aria-disabled",
+                url
+                    ? "false"
+                    : "true",
+            );
+        },
     );
 
     if (fleetUrl) {
@@ -1757,6 +1832,16 @@ function getDashboardSettingsElements() {
             ),
         ],
 
+        reverseFormButton:
+            document.getElementById(
+                "footerReverseFormLink",
+            ),
+
+        packRecoveryButton:
+            document.getElementById(
+                "footerPackRecoveryLink",
+            ),
+
         damageAppButton:
             document.getElementById(
                 "footerDamageAppLink",
@@ -1794,6 +1879,10 @@ function hasDashboardSettingsElements(
                     HTMLInputElement;
             },
         ) &&
+        elements.reverseFormButton instanceof
+            HTMLButtonElement &&
+        elements.packRecoveryButton instanceof
+            HTMLButtonElement &&
         elements.damageAppButton instanceof
             HTMLButtonElement &&
         elements.collectionAppButton instanceof
