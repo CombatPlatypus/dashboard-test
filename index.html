@@ -34,7 +34,6 @@
 
         <style>
 
-
             #filter {
                 max-width: 1600px;
                 margin: 0 auto;
@@ -78,8 +77,19 @@
             #filter .padding {
                 padding: 20px;
             }
-
-
+            #filter .filter-controls .padding > div:last-of-type {
+                display: flex;
+                overflow: auto;
+            }
+            #filter .filter-controls .padding > div:last-of-type div {
+                flex: 1 1 0;
+            }
+            #filter .filter-controls .padding > div:last-of-type button {
+                flex: 1 1 0;
+            }
+            #filter .filter-controls .padding > div:last-of-type button img {
+                width: 35px;
+            }
 
         </style>
     </head>	
