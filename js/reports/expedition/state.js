@@ -381,7 +381,7 @@ const expeditionState = {
     floorVolume:
         null,
 
-    unknownOrders: 0,
+    duplicatedOrders: 0,
     exceptionOrders: 0,
 
     excludedOperatorKeys:
@@ -440,39 +440,6 @@ function getExpeditionExcludedOperatorKeys(
     );
 }
 
-/* CALCULA OS PACOTES DUPLICADOS DE UMA ROTA */
-
-function getExpeditionDuplicatedOrders(
-    route,
-) {
-    const scannedOrders =
-        route?.scannedOrders;
-
-    const finalOrders =
-        route?.finalOrders;
-
-    const missortedOrders =
-        route?.missortedOrders;
-
-    if (
-        scannedOrders === null ||
-        scannedOrders === undefined ||
-        finalOrders === null ||
-        finalOrders === undefined ||
-        missortedOrders === null ||
-        missortedOrders === undefined
-    ) {
-        return 0;
-    }
-
-    return Math.max(
-        scannedOrders -
-            finalOrders -
-            missortedOrders,
-        0,
-    );
-}
-
 /* CRIA UMA CÓPIA DO ESTADO */
 
 function getExpeditionState() {
@@ -523,8 +490,8 @@ function getExpeditionState() {
         floorVolume:
             expeditionState.floorVolume,
 
-        unknownOrders:
-            expeditionState.unknownOrders,
+        duplicatedOrders:
+            expeditionState.duplicatedOrders,
 
         exceptionOrders:
             expeditionState.exceptionOrders,
@@ -629,16 +596,10 @@ function getExpeditionSummary(
             summary.missortedOrders +=
                 route.missortedOrders ?? 0;
 
-            summary.duplicatedOrders +=
-                getExpeditionDuplicatedOrders(
-                    route,
-                );
-
             return summary;
         },
         {
             missingOrders: 0,
-            duplicatedOrders: 0,
             missortedOrders: 0,
         },
     );
@@ -744,8 +705,8 @@ function getExpeditionSummary(
                 )
                 : null,
 
-        unknownOrders:
-            state.unknownOrders ??
+        duplicatedOrders:
+            state.duplicatedOrders ??
             0,
 
         exceptionOrders:
@@ -820,7 +781,6 @@ function getExpeditionOperatorRanking(
                             bestDurationSeconds: null,
                             worstDurationSeconds: null,
                             missingOrders: 0,
-                            duplicatedOrders: 0,
                             missortedOrders: 0,
                         },
                     );
@@ -841,11 +801,6 @@ function getExpeditionOperatorRanking(
 
                 summary.missortedOrders +=
                     route.missortedOrders ?? 0;
-
-                summary.duplicatedOrders +=
-                    getExpeditionDuplicatedOrders(
-                        route,
-                    );
 
                 const duration =
                     route.validationDurationSeconds;
@@ -1640,7 +1595,7 @@ function updateExpeditionManualQuantity(
 ) {
     if (
         field !== "floorVolume" &&
-        field !== "unknownOrders" &&
+        field !== "duplicatedOrders" &&
         field !== "exceptionOrders" &&
         field !== "revertedErrors"
     ) {
@@ -1864,7 +1819,7 @@ function replaceExpeditionRoutes(
             sourceFileName,
         );
 
-    expeditionState.unknownOrders =
+    expeditionState.duplicatedOrders =
         0;
 
     expeditionState.exceptionOrders =
@@ -2034,7 +1989,7 @@ function restoreExpeditionState(
         "revertedErrors",
         "revertedSortingErrors",
         "revertedLabelingErrors",
-        "unknownOrders",
+        "duplicatedOrders",
         "exceptionOrders",
     ].forEach(
         function (field) {
@@ -2139,7 +2094,7 @@ function resetExpeditionReport() {
     expeditionState.revertedLabelingErrors =
         0;
 
-    expeditionState.unknownOrders =
+    expeditionState.duplicatedOrders =
         0;
 
     expeditionState.exceptionOrders =
@@ -2162,7 +2117,6 @@ function resetExpeditionReport() {
 
 export {
     getExpeditionErrorAnalysis,
-    getExpeditionDuplicatedOrders,
     getExpeditionOperatorRanking,
     getExpeditionState,
     getExpeditionSummary,

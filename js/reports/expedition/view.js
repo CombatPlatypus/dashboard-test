@@ -223,9 +223,9 @@ function getExpeditionElements(
                 "expeditionFloorRoutesInput",
             ),
 
-        unknownInput:
+        duplicatedInput:
             getElementById(
-                "expeditionUnknownInput",
+                "expeditionDuplicatedInput",
             ),
 
         exceptionInput:
@@ -289,10 +289,6 @@ function getExpeditionElements(
         previewMissorted:
             getElementById(
                 "expeditionPreviewMissorted",
-            ),
-        previewUnknown:
-            getElementById(
-                "expeditionPreviewUnknown",
             ),
         previewException:
             getElementById(
@@ -434,7 +430,7 @@ function setExpeditionGeneralControlsAvailability(
     elements.floorVolumeInput.readOnly =
         false;
 
-    elements.unknownInput.disabled =
+    elements.duplicatedInput.disabled =
         disabled;
 
     elements.exceptionInput.disabled =
@@ -1284,14 +1280,6 @@ function renderExpeditionReport(
                 summary.missortedOrders,
             );
             
-    elements.previewUnknown
-        .textContent =
-            summary.hasData
-                ? formatExpeditionQuantity(
-                    summary.unknownOrders,
-                )
-                : "—";
-
     elements.previewException
         .textContent =
             summary.hasData
@@ -1308,8 +1296,8 @@ function renderExpeditionReport(
     );
 
     setExpeditionInputValue(
-        elements.unknownInput,
-        summary.unknownOrders,
+        elements.duplicatedInput,
+        summary.duplicatedOrders,
     );
 
     setExpeditionInputValue(
@@ -1455,8 +1443,8 @@ function bindExpeditionEvents(
     );
 
     bindManualQuantityInput(
-        elements.unknownInput,
-        "unknownOrders",
+        elements.duplicatedInput,
+        "duplicatedOrders",
     );
 
     bindManualQuantityInput(
