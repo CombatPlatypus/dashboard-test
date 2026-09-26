@@ -462,6 +462,7 @@ function createLossesRateHistory(
     rows,
     {
         requireIdentification = true,
+        parseIdentification = true,
     } = {},
 ) {
     if (
@@ -481,14 +482,20 @@ function createLossesRateHistory(
         );
 
     const identification =
-        getLossesRateIdentification(
-            rows,
-            columnIndexes,
-            {
-                required:
-                    requireIdentification,
-            },
-        );
+        parseIdentification
+            ? getLossesRateIdentification(
+                rows,
+                columnIndexes,
+                {
+                    required:
+                        requireIdentification,
+                },
+            )
+            : {
+                description: "",
+                hubCode: "",
+                subRegional: "",
+            };
 
     const history =
         new Array(
@@ -599,6 +606,115 @@ function createLossesRateHistory(
     };
 }
 
+function getLossesRateBlockIdentification(
+    rows,
+) {
+    const identificationAliases =
+        new Map(
+            [
+                "description",
+                "hubCode",
+                "subRegional",
+            ].flatMap(
+                function (field) {
+                    return lossesRateColumnAliases[
+                        field
+                    ].map(
+                        function (alias) {
+                            return [
+                                alias,
+                                field,
+                            ];
+                        },
+                    );
+                },
+            ),
+        );
+    const identification = {
+        description: "",
+        hubCode: "",
+        subRegional: "",
+    };
+    const searchLimit =
+        Math.min(
+            rows.length,
+            50,
+        );
+
+    for (
+        let rowIndex = 0;
+        rowIndex < searchLimit;
+        rowIndex += 1
+    ) {
+        rows[rowIndex].forEach(
+            function (
+                value,
+                columnIndex,
+            ) {
+                const normalizedValue =
+                    normalizeLossesRateColumnName(
+                        value,
+                    );
+                const field =
+                    identificationAliases.get(
+                        normalizedValue,
+                    );
+
+                if (
+                    !field ||
+                    identification[field]
+                ) {
+                    return;
+                }
+
+                for (
+                    let valueRowIndex =
+                        rowIndex + 1;
+                    valueRowIndex <
+                        searchLimit;
+                    valueRowIndex += 1
+                ) {
+                    const receivedValue =
+                        String(
+                            rows[valueRowIndex]?.[
+                                columnIndex
+                            ] ?? "",
+                        ).trim();
+
+                    if (!receivedValue) {
+                        continue;
+                    }
+
+                    const normalizedReceivedValue =
+                        normalizeLossesRateColumnName(
+                            receivedValue,
+                        );
+
+                    if (
+                        identificationAliases.has(
+                            normalizedReceivedValue,
+                        )
+                    ) {
+                        break;
+                    }
+
+                    if (
+                        receivedValue !== "-" &&
+                        receivedValue !== "—"
+                    ) {
+                        identification[field] =
+                            receivedValue;
+                    }
+
+                    break;
+                }
+            },
+        );
+    }
+
+    return identification;
+}
+
 function findLossesRateWorkbookHistory(
     workbook,
 ) {
@@ -668,16 +784,25 @@ function findLossesRateWorkbookHistory(
         );
     }
 
-    return {
-        ...createLossesRateHistory(
+    const result =
+        createLossesRateHistory(
             rows.slice(
                 headerRowIndex,
             ),
             {
                 requireIdentification:
                     false,
+                parseIdentification:
+                    false,
             },
-        ),
+        );
+
+    return {
+        ...result,
+        identification:
+            getLossesRateBlockIdentification(
+                rows,
+            ),
         sourceSheetName:
             sheetName,
     };
@@ -783,9 +908,85 @@ function parseLossesRateClipboardText(
                 },
             );
 
-    return createLossesRateHistory(
-        rows,
-    );
+    try {
+        return createLossesRateHistory(
+            rows,
+        );
+    } catch (error) {
+        let headerRowIndex = -1;
+
+        for (
+            let rowIndex = 0;
+            rowIndex <
+                Math.min(rows.length, 50);
+            rowIndex += 1
+        ) {
+            try {
+                getLossesRateColumnIndexes(
+                    rows[rowIndex],
+                    {
+                        requireIdentification:
+                            false,
+                    },
+                );
+
+                headerRowIndex = rowIndex;
+                break;
+            } catch (headerError) {
+                // Continua procurando o cabeçalho copiado.
+            }
+        }
+
+        if (headerRowIndex === -1) {
+            throw error;
+        }
+
+        const identification =
+            getLossesRateBlockIdentification(
+                rows,
+            );
+
+        for (
+            const {
+                key,
+                label,
+            } of [
+                {
+                    key: "description",
+                    label: "Descrição",
+                },
+                {
+                    key: "hubCode",
+                    label: "Código do Hub",
+                },
+                {
+                    key: "subRegional",
+                    label: "Sub Regional",
+                },
+            ]
+        ) {
+            if (!identification[key]) {
+                throw new Error(
+                    `O campo ${label} não foi informado na base.`,
+                );
+            }
+        }
+
+        return {
+            ...createLossesRateHistory(
+                rows.slice(
+                    headerRowIndex,
+                ),
+                {
+                    requireIdentification:
+                        false,
+                    parseIdentification:
+                        false,
+                },
+            ),
+            identification,
+        };
+    }
 }
 
 /* FORMATA UMA CÉLULA DA BASE */

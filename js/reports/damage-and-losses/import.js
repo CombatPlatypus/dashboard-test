@@ -32,8 +32,14 @@ const DAMAGE_HUB_STATION =
 const DAMAGE_HISTORY_SHEET_NAME =
     "historico de avarias";
 
+const DAMAGE_PRODUCT_SHEET_NAME =
+    "avarias recebidas";
+
 const LOSSES_HISTORY_SHEET_NAME =
     "historico de analises";
+
+const LOSSES_RECOVERY_SHEET_NAME =
+    "pack recovery";
 
 const damageFileExtensions =
     new Set([
@@ -77,6 +83,13 @@ const lossesColumnAliases =
         packRecovery: [
             "pack recovery",
             "pack recover",
+        ],
+
+        packageCode: [
+            "codigo br",
+            "codigo do pacote",
+            "package code",
+            "tracking number",
         ],
 
         monetaryValue: [
@@ -163,6 +176,18 @@ function isLossesHistorySheetName(value) {
         );
 }
 
+function isDamageProductSheetName(value) {
+    return normalizeDamageSearchText(
+        value,
+    ) === DAMAGE_PRODUCT_SHEET_NAME;
+}
+
+function isLossesRecoverySheetName(value) {
+    return normalizeDamageSearchText(
+        value,
+    ) === LOSSES_RECOVERY_SHEET_NAME;
+}
+
 function incrementDamageSocStation(
     stationsByName,
     stationKey,
@@ -220,7 +245,10 @@ function findDamageColumns(
                 },
             );
 
-        if (columnIndex === -1) {
+        if (
+            columnIndex === -1 &&
+            field !== "productType"
+        ) {
             return null;
         }
 
@@ -229,6 +257,92 @@ function findDamageColumns(
     }
 
     return columns;
+}
+
+function findDamageProductColumns(row) {
+    if (!Array.isArray(row)) {
+        return null;
+    }
+
+    const headers =
+        row.map(
+            normalizeDamageSearchText,
+        );
+    const date =
+        headers.findIndex(
+            function (header) {
+                return /^(?:data|date)$/.test(
+                    header,
+                );
+            },
+        );
+    const productType =
+        headers.findIndex(
+            function (header) {
+                return /^tipo.*produto$/.test(
+                    header,
+                );
+            },
+        );
+
+    return date >= 0 && productType >= 0
+        ? {
+            date,
+            productType,
+        }
+        : null;
+}
+
+function findDamageProductSource(
+    workbook,
+) {
+    const sheetName =
+        workbook.SheetNames.find(
+            isDamageProductSheetName,
+        );
+
+    if (!sheetName) {
+        return null;
+    }
+
+    const rows =
+        window.XLSX.utils.sheet_to_json(
+            workbook.Sheets[sheetName],
+            {
+                header: 1,
+                defval: "",
+                raw: true,
+                blankrows: false,
+            },
+        );
+    const searchLimit =
+        Math.min(
+            rows.length,
+            MAX_DAMAGE_HEADER_SEARCH_ROWS,
+        );
+
+    for (
+        let rowIndex = 0;
+        rowIndex < searchLimit;
+        rowIndex += 1
+    ) {
+        const columns =
+            findDamageProductColumns(
+                rows[rowIndex],
+            );
+
+        if (columns) {
+            return {
+                sheetName,
+                rows,
+                columns,
+                headerRowIndex:
+                    rowIndex,
+            };
+        }
+    }
+
+    return null;
 }
 
 function findDamageMonthSource(
@@ -296,12 +410,18 @@ function findDamageMonthSource(
                 columns,
                 headerRowIndex:
                     rowIndex,
+                productSource:
+                    columns.productType >= 0
+                        ? null
+                        : findDamageProductSource(
+                            workbook,
+                        ),
             };
         }
     }
 
     throw new Error(
-        `A aba ${sheetName} não possui as colunas Data, Estação da Avaria e Tipo de Produto.`,
+        `A aba ${sheetName} não possui as colunas Data e Estação da Avaria.`,
     );
 }
 
@@ -520,7 +640,14 @@ function findLossesColumns(row) {
                 },
             );
 
-        if (columnIndex === -1) {
+        if (
+            columnIndex === -1 &&
+            [
+                "date",
+                "situation",
+                "monetaryValue",
+            ].includes(field)
+        ) {
             return null;
         }
 
@@ -528,6 +655,133 @@ function findLossesColumns(row) {
     }
 
     return columns;
+}
+
+function findLossesRecoveryColumns(row) {
+    if (!Array.isArray(row)) {
+        return null;
+    }
+
+    const headers =
+        row.map(normalizeDamageSearchText);
+    const packageCode =
+        headers.findIndex(
+            function (header) {
+                return lossesColumnAliases
+                    .packageCode.includes(
+                        header,
+                    );
+            },
+        );
+    const recovery =
+        headers.findIndex(
+            function (header) {
+                return [
+                    "situacao",
+                    "pack recovery",
+                    "pack recover",
+                ].includes(header);
+            },
+        );
+
+    return packageCode >= 0 && recovery >= 0
+        ? {
+            packageCode,
+            recovery,
+        }
+        : null;
+}
+
+function normalizeDamagePackageCode(value) {
+    return normalizeDamageText(value)
+        .replace(/\s+/g, "")
+        .toLocaleUpperCase(
+            "pt-BR",
+        );
+}
+
+function findLossesRecoverySource(
+    workbook,
+) {
+    const sheetName =
+        workbook.SheetNames.find(
+            isLossesRecoverySheetName,
+        );
+
+    if (!sheetName) {
+        return null;
+    }
+
+    const rows =
+        window.XLSX.utils.sheet_to_json(
+            workbook.Sheets[sheetName],
+            {
+                header: 1,
+                defval: "",
+                raw: true,
+                blankrows: false,
+            },
+        );
+    const searchLimit =
+        Math.min(
+            rows.length,
+            MAX_DAMAGE_HEADER_SEARCH_ROWS,
+        );
+
+    for (
+        let rowIndex = 0;
+        rowIndex < searchLimit;
+        rowIndex += 1
+    ) {
+        const columns =
+            findLossesRecoveryColumns(
+                rows[rowIndex],
+            );
+
+        if (!columns) {
+            continue;
+        }
+
+        const valuesByPackageCode =
+            new Map();
+
+        rows
+            .slice(rowIndex + 1)
+            .forEach(
+                function (row) {
+                    const packageCode =
+                        normalizeDamagePackageCode(
+                            row?.[
+                                columns
+                                    .packageCode
+                            ],
+                        );
+                    const recovery =
+                        parseLossesBoolean(
+                            row?.[
+                                columns.recovery
+                            ],
+                        );
+
+                    if (
+                        packageCode &&
+                        recovery !== null
+                    ) {
+                        valuesByPackageCode.set(
+                            packageCode,
+                            recovery,
+                        );
+                    }
+                },
+            );
+
+        return {
+            sheetName,
+            valuesByPackageCode,
+        };
+    }
+
+    return null;
 }
 
 function findEmptyPackagesColumns(row) {
@@ -659,9 +913,16 @@ function findLossesMonthSource(
 
     if (!columns) {
         throw new Error(
-            `A aba ${sheetName} não possui as colunas Data, Situação, Pack Recovery e Valor R$.`,
+            `A aba ${sheetName} não possui as colunas Data, Situação e Valor R$.`,
         );
     }
+
+    const recoverySource =
+        columns.packRecovery >= 0
+            ? null
+            : findLossesRecoverySource(
+                workbook,
+            );
 
     return {
         sheetName,
@@ -670,6 +931,7 @@ function findLossesMonthSource(
         headerRowIndex,
         emptyPackagesColumns,
         emptyPackagesHeaderRowIndex,
+        recoverySource,
     };
 }
 
@@ -729,6 +991,11 @@ function parseLossesMonetaryValue(value) {
             .replace(/[^\d,.-]/g, "")
             .replace(/\.(?=.*[,])/g, "")
             .replace(",", ".");
+
+    if (!/\d/.test(numericText)) {
+        return null;
+    }
+
     const numericValue =
         Number(numericText);
 
@@ -835,10 +1102,39 @@ function createLossesMonthData(
         day[situation] += 1;
         importedRows += 1;
 
-        const recovery =
-            parseLossesBoolean(
-                row?.[source.columns.packRecovery],
-            );
+        let recovery =
+            source.columns.packRecovery >= 0
+                ? parseLossesBoolean(
+                    row?.[
+                        source.columns
+                            .packRecovery
+                    ],
+                )
+                : null;
+
+        if (
+            recovery === null &&
+            source.columns.packageCode >= 0
+        ) {
+            const packageCode =
+                normalizeDamagePackageCode(
+                    row?.[
+                        source.columns
+                            .packageCode
+                    ],
+                );
+
+            if (
+                source.recoverySource
+                    ?.valuesByPackageCode
+                    .has(packageCode)
+            ) {
+                recovery =
+                    source.recoverySource
+                        .valuesByPackageCode
+                        .get(packageCode);
+            }
+        }
 
         if (recovery === true) {
             day.recoveryYes += 1;
@@ -955,6 +1251,11 @@ function createDamageMonthData(
     const socStationsByDate =
         new Map();
 
+    const usesSeparateProductSource =
+        Boolean(
+            source.productSource,
+        );
+
     let ignoredRows = 0;
 
     for (
@@ -1057,22 +1358,76 @@ function createDamageMonthData(
             );
         }
 
-        const productType =
-            classifyDamageProductType(
-                row?.[
-                    source.columns
-                        .productType
-                ],
-            );
+        if (!usesSeparateProductSource) {
+            const productType =
+                classifyDamageProductType(
+                    row?.[
+                        source.columns
+                            .productType
+                    ],
+                );
 
-        if (productType) {
-            day[productType] += 1;
+            if (productType) {
+                day[productType] += 1;
+            }
         }
 
         daysByDate.set(
             parsedDate.key,
             day,
         );
+    }
+
+    if (usesSeparateProductSource) {
+        const productSource =
+            source.productSource;
+
+        for (
+            let rowIndex =
+                productSource
+                    .headerRowIndex + 1;
+            rowIndex <
+                productSource.rows.length;
+            rowIndex += 1
+        ) {
+            const row =
+                productSource.rows[
+                    rowIndex
+                ];
+            const parsedDate =
+                parseDamageDate(
+                    row?.[
+                        productSource
+                            .columns.date
+                    ],
+                );
+
+            if (
+                !parsedDate ||
+                parsedDate.month - 1 !==
+                    monthIndex ||
+                parsedDate.year !== year
+            ) {
+                continue;
+            }
+
+            const day =
+                daysByDate.get(
+                    parsedDate.key,
+                );
+            const productType =
+                classifyDamageProductType(
+                    row?.[
+                        productSource
+                            .columns
+                            .productType
+                    ],
+                );
+
+            if (day && productType) {
+                day[productType] += 1;
+            }
+        }
     }
 
     const days =
