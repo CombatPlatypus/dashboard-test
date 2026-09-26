@@ -32,7 +32,55 @@
 
         <!-- ESTILOS TEMPORARIOS NÃO FINALIZADOS -->
 
-        <style></style>
+        <style>
+
+
+            #filter {
+                max-width: 1600px;
+                margin: 0 auto;
+            }
+            #filter .title {
+                border-bottom: 2px solid var(--color-border);
+                padding: 20px;
+            }
+            #filter .title h3 {
+                margin: 0;
+            }
+            #filter h4 {
+                margin: 0;
+            }
+            #filter p {
+                margin: 15px 25px 0 25px;
+                text-align: justify;
+            }
+            #filter hr {
+                max-width: 100%;;
+            }
+            #filter > .flex-box-start {
+                gap: 15px;
+            }
+            #filter .filter-controls {
+                flex: 0 0 480px;
+                height: auto;
+                background-color: var(--color-container);
+                border: 2px solid var(--color-border);
+                border-radius: 5px;
+                overflow: hidden;
+            }
+            #filter .filter-preview {
+                flex: 1 1 0;
+                display: flex;
+                background-color: var(--color-container);
+                border: 2px solid var(--color-border);
+                border-radius: 5px;
+            }
+            #filter .padding {
+                padding: 20px;
+            }
+
+
+
+        </style>
     </head>	
 
     <!-- CONTEÚDO DA PÁGINA -->
@@ -81,13 +129,22 @@
                     </li> 
 
                     <li class="tabs-title">
+                        <a href="#filter">
+                            <div class="flex-box-center">
+                                <img src="images/geral-icons/filter-icon.svg">
+                                <h4>Filtragem</h4>
+                            </div>
+                        </a>
+                    </li> 
+
+                    <!-- <li class="tabs-title">
                         <a href="#docs">
                             <div class="flex-box-center">
                                 <img src="images/menu-icons/docs-icon.svg">
                                 <h4>Documentação</h4>
                             </div>
                         </a>
-                    </li> 
+                    </li>  -->
 
                     <div class="nav-actions">
                         <button id="reportDownloadButton" type="button" title="Salvar sessão" aria-label="Salvar sessão dos relatórios">
@@ -3318,6 +3375,57 @@
                             </li>
                         </ul>
                     </div>
+                </div>
+
+                <!-- PAINEL FILTRAGEM -->
+
+                <div class="tabs-panel" id="filter">
+
+                    <div class="flex-box-start">
+
+                        <!-- CONTROLES -->
+
+                        <div class="filter-controls">
+
+                            <div class="title">
+                                <h4>Filtragem de Dados</h4>
+                            </div>
+
+                            <h4>Finalidade?</h4>
+
+                            <select class="standard-select" style="width: 100%;">
+                                <option value="">Export Análises</option>
+                                <option value="">Export Avaria</option>
+                                <option value="">Não Listada</option>
+                            </select>
+
+                            <div class="comparison-textarea-title flex-box-between">
+                                <label for="">Valores para filtrar</label>
+                                <span id="">0 linhas</span>
+                            </div>
+
+                            <textarea id="" rows="14" placeholder="Cole um valor por linha." disabled></textarea>
+
+                            <div>
+                                <div>
+                                    <button class="button" id="">Filtrar</button>
+                                </div>
+
+                                <button id="" type="button">
+                                    <img src="images/geral-icons/import-icon.svg" alt="">
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- PREVIA -->
+
+                        <div class="filter-preview">
+
+
+
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
