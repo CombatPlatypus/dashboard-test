@@ -95,6 +95,11 @@ const elements = {
             "filterNotificationText",
         ),
 
+    copyButton:
+        document.getElementById(
+            "filterCopyButton",
+        ),
+
     saveButton:
         document.getElementById(
             "filterSaveButton",
@@ -436,6 +441,9 @@ function clearPreview() {
 
     filterState.resultRows = [];
     filterState.unmatchedValues = [];
+
+    elements.copyButton.disabled =
+        true;
 
     elements.saveButton.disabled =
         true;
@@ -939,8 +947,14 @@ function filterRows() {
         unmatchedValues,
     );
 
+    const hasResults =
+        resultRows.length > 0;
+
+    elements.copyButton.disabled =
+        !hasResults;
+
     elements.saveButton.disabled =
-        resultRows.length === 0;
+        !hasResults;
 
     const duplicateCount =
         values.length -
@@ -953,7 +967,7 @@ function filterRows() {
 
     if (resultRows.length === 0) {
         setNotification(
-            "Nenhum Shipment_id informado foi encontrado no arquivo.",
+            "Nenhum valor informado foi encontrado no arquivo.",
             "warning",
         );
 
@@ -1015,6 +1029,95 @@ function downloadBlob(
     );
 }
 
+function createFilteredWorksheet(
+    purpose,
+    includeHeaders = true,
+) {
+    const matrix =
+        includeHeaders
+            ? [
+                [...purpose.columns],
+                ...filterState.resultRows,
+            ]
+            : filterState.resultRows;
+
+    return window.XLSX.utils
+        .aoa_to_sheet(
+            matrix,
+        );
+}
+
+async function copyFilteredData() {
+    const purpose =
+        FILTER_PURPOSES[
+            elements.purpose.value
+        ];
+
+    if (
+        !purpose ||
+        filterState.resultRows.length === 0
+    ) {
+        setNotification(
+            "Aplique uma filtragem com resultados antes de copiar.",
+            "warning",
+        );
+
+        return;
+    }
+
+    if (
+        !window.XLSX ||
+        !navigator.clipboard ||
+        typeof navigator.clipboard
+            .writeText !== "function"
+    ) {
+        setNotification(
+            "O navegador não permitiu copiar os dados filtrados.",
+            "error",
+        );
+
+        return;
+    }
+
+    const worksheet =
+        createFilteredWorksheet(
+            purpose,
+            false,
+        );
+
+    const clipboardContent =
+        window.XLSX.utils
+            .sheet_to_csv(
+                worksheet,
+                {
+                    FS: "\t",
+                    RS: "\n",
+                },
+            );
+
+    try {
+        await navigator.clipboard
+            .writeText(
+                clipboardContent,
+            );
+
+        setNotification(
+            `${filterState.resultRows.length} linha(s) filtrada(s) copiada(s) para a área de transferência.`,
+            "success",
+        );
+    } catch (error) {
+        console.error(
+            "Não foi possível copiar os dados filtrados:",
+            error,
+        );
+
+        setNotification(
+            "Não foi possível copiar os dados filtrados.",
+            "error",
+        );
+    }
+}
+
 function saveFilteredFile() {
     const purpose =
         FILTER_PURPOSES[
@@ -1042,16 +1145,10 @@ function saveFilteredFile() {
         return;
     }
 
-    const matrix = [
-        [...purpose.columns],
-        ...filterState.resultRows,
-    ];
-
     const worksheet =
-        window.XLSX.utils
-            .aoa_to_sheet(
-                matrix,
-            );
+        createFilteredWorksheet(
+            purpose,
+        );
 
     const csvContent =
         window.XLSX.utils
@@ -1154,6 +1251,11 @@ elements.values.addEventListener(
 elements.applyButton.addEventListener(
     "click",
     filterRows,
+);
+
+elements.copyButton.addEventListener(
+    "click",
+    copyFilteredData,
 );
 
 elements.saveButton.addEventListener(
