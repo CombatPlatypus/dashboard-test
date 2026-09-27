@@ -76,13 +76,15 @@
             }
             #filter .filter-controls .padding > div:last-of-type {
                 display: flex;
-                overflow: auto;
+                overflow: hidden;
+                gap: 15px;
             }
             #filter .filter-controls .padding > div:last-of-type div {
                 flex: 1 1 0;
             }
             #filter .filter-controls .padding > div:last-of-type button {
-                flex: 1 1 0;
+                flex: 0 0 max-content;
+                width: 100%;
             }
             #filter .filter-controls .padding > div:last-of-type button img {
                 width: 35px;
@@ -3409,7 +3411,7 @@
                                 </select>
 
                                 <div class="comparison-textarea-title flex-box-between">
-                                    <label for="">Valores para filtrar</label>
+                                    <label for="">Filtrar Linhas Por Valores</label>
                                     <span id="">0 linhas</span>
                                 </div>
 
@@ -3417,7 +3419,7 @@
 
                                 <div>
                                     <div>
-                                        <button class="button" id="">Filtrar</button>
+                                        <button class="button" id="">Filtrar Linhas</button>
                                     </div>
 
                                     <button id="" type="button">
