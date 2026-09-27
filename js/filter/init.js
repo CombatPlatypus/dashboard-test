@@ -1018,10 +1018,21 @@ elements.clearButton.addEventListener(
     },
 );
 
-elements.purpose.addEventListener(
-    "change",
-    handlePurposeChange,
-);
+if (window.jQuery) {
+    window
+        .jQuery(
+            elements.purpose,
+        )
+        .on(
+            "change.filterPanel",
+            handlePurposeChange,
+        );
+} else {
+    elements.purpose.addEventListener(
+        "change",
+        handlePurposeChange,
+    );
+}
 
 elements.values.addEventListener(
     "input",
