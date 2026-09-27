@@ -51,6 +51,11 @@ const FILTER_PURPOSES =
                         "item_names",
                         "valor_produto",
                     ]),
+
+                previewHiddenColumns:
+                    Object.freeze([
+                        "item_names",
+                    ]),
             }),
     });
 
@@ -319,6 +324,8 @@ function findCompatibleSheet(
     workbook,
     purpose,
 ) {
+    let closestSheet = null;
+
     for (
         const sheetName
         of workbook.SheetNames
@@ -360,18 +367,30 @@ function findCompatibleSheet(
                 },
             );
 
+        const sheetCandidate = {
+            sheetName,
+            rows,
+            headerIndexes,
+            missingColumns,
+        };
+
+        if (missingColumns.length === 0) {
+            return sheetCandidate;
+        }
+
         if (
-            missingColumns.length === 0
+            !closestSheet ||
+            missingColumns.length <
+                closestSheet
+                    .missingColumns
+                    .length
         ) {
-            return {
-                sheetName,
-                rows,
-                headerIndexes,
-            };
+            closestSheet =
+                sheetCandidate;
         }
     }
 
-    return null;
+    return closestSheet;
 }
 
 function clearPreview() {
@@ -567,7 +586,20 @@ function handlePurposeChange() {
 
     if (!compatibleSheet) {
         setNotification(
-            `O arquivo não contém uma aba compatível com ${purpose.label}. Verifique as colunas obrigatórias: ${purpose.columns.join(", ")}.`,
+            `O arquivo não possui uma aba com cabeçalhos legíveis para ${purpose.label}. A filtragem permanece bloqueada.`,
+            "error",
+        );
+
+        return;
+    }
+
+    if (
+        compatibleSheet
+            .missingColumns
+            .length > 0
+    ) {
+        setNotification(
+            "Colunas obrigatórias ausentes.",
             "error",
         );
 
@@ -623,12 +655,48 @@ function renderPreview(
     const headerRow =
         document.createElement("tr");
 
-    purpose.columns.forEach(
-        function (column) {
+    const hiddenPreviewColumns =
+        new Set(
+            (
+                purpose.previewHiddenColumns ??
+                []
+            ).map(
+                normalizeText,
+            ),
+        );
+
+    const previewColumnIndexes =
+        purpose.columns.reduce(
+            function (
+                columnIndexes,
+                column,
+                columnIndex,
+            ) {
+                if (
+                    !hiddenPreviewColumns.has(
+                        normalizeText(
+                            column,
+                        ),
+                    )
+                ) {
+                    columnIndexes.push(
+                        columnIndex,
+                    );
+                }
+
+                return columnIndexes;
+            },
+            [],
+        );
+
+    previewColumnIndexes.forEach(
+        function (columnIndex) {
             headerRow.appendChild(
                 createTableCell(
                     "th",
-                    column,
+                    purpose.columns[
+                        columnIndex
+                    ],
                 ),
             );
         },
@@ -652,7 +720,7 @@ function renderPreview(
             );
 
         emptyCell.colSpan =
-            purpose.columns.length;
+            previewColumnIndexes.length;
 
         emptyCell.classList.add(
             "filter-empty-row",
@@ -673,12 +741,16 @@ function renderPreview(
                         "tr",
                     );
 
-                row.forEach(
-                    function (value) {
+                previewColumnIndexes.forEach(
+                    function (
+                        columnIndex,
+                    ) {
                         tableRow.appendChild(
                             createTableCell(
                                 "td",
-                                value,
+                                row[
+                                    columnIndex
+                                ],
                             ),
                         );
                     },
@@ -766,10 +838,8 @@ function filterRows() {
             },
         );
 
-    const matchedValues =
-        new Set();
-
-    const resultRows = [];
+    const lastResultRowByValue =
+        new Map();
 
     filterState.sourceRows.forEach(
         function (sourceRow) {
@@ -788,11 +858,8 @@ function filterRows() {
                 return;
             }
 
-            matchedValues.add(
+            lastResultRowByValue.set(
                 filterValue,
-            );
-
-            resultRows.push(
                 outputColumnIndexes.map(
                     function (
                         columnIndex,
@@ -805,6 +872,31 @@ function filterRows() {
             );
         },
     );
+
+    /*
+     * Mantém uma única linha para cada valor colado.
+     * Como o Map é atualizado durante toda a leitura,
+     * prevalece a última ocorrência encontrada na base.
+     * A montagem abaixo preserva a ordem da textarea.
+     */
+
+    const resultRows =
+        uniqueValues
+            .map(
+                function (value) {
+                    return lastResultRowByValue.get(
+                        normalizeText(
+                            value,
+                        ),
+                    );
+                },
+            )
+            .filter(Boolean);
+
+    const matchedValues =
+        new Set(
+            lastResultRowByValue.keys(),
+        );
 
     const unmatchedValues =
         uniqueValues.filter(
