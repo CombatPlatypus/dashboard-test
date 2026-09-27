@@ -2,20 +2,22 @@
     max-width: 1600px;
     margin: 0 auto;
 }
-
 #filter > .flex-box-start {
     gap: 15px;
 }
-
 #filter .title {
     padding: 20px;
     border-bottom: 2px solid var(--color-border);
 }
-
 #filter .title h4 {
     margin: 0;
 }
-
+#filter .padding {
+    min-height: 526px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
 #filter .report-actions {
     display: flex;
     flex: 0 0 max-content;
@@ -27,21 +29,17 @@
     border-radius: 5px;
     background-color: var(--color-container);
 }
-
 #filter .report-actions > button:hover:not(:disabled) {
     opacity: 0.61;
     transition: opacity 0.5s ease;
 }
-
 #filter .report-actions > button > img {
     width: 35px;
     cursor: pointer;
 }
-
 #filter .report-actions > button:disabled > img {
     cursor: not-allowed;
 }
-
 #filter .filter-controls {
     flex: 0 0 480px;
     height: auto;
@@ -50,7 +48,19 @@
     border-radius: 5px;
     background-color: var(--color-container);
 }
-
+#filter .padding > label {
+    margin-bottom: 8px;
+}
+#filter .select2-container--default .select2-selection--single .select2-selection__rendered {
+    font-size: 13px;
+}
+#filter .filter-submit {
+    margin-top: 20px;
+    overflow: hidden;
+}
+#filter .filter-submit button {
+    width: 100%;
+}
 #filter .filter-preview {
     min-width: 0;
     flex: 1 1 0;
@@ -59,128 +69,70 @@
     border-radius: 5px;
     background-color: var(--color-container);
 }
-
-#filter .padding {
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-}
-
-#filter .filter-purpose-label {
-    display: block;
-    margin-bottom: 8px;
-    font-family: "Open Sans", sans-serif;
-    font-weight: 600;
-    color: var(--color-text);
-}
-
-#filter .select2-container--default .select2-selection--single .select2-selection__rendered {
-    font-size: 13px;
-}
-
-#filter .comparison-textarea-title {
-    margin-top: 20px;
-}
-
-#filter .filter-submit {
-    display: flex;
-    gap: 20px;
-    margin-top: 20px;
-    overflow: hidden;
-}
-
-#filter .filter-submit button {
-    width: 100%;
-}
-
 #filter .filter-preview-content {
     min-height: 491px;
 }
-
-#filter .filter-preview-empty {
+#filter .filter-preview .padding > p {
     margin: auto 0;
     color: var(--color-gray-p);
     text-align: center;
 }
-
-#filter .filter-preview-summary {
+#filter .filter-preview #filterPreviewResult > p {
     margin: 0 0 12px;
     color: var(--color-text);
     font-size: 13px;
 }
-
-#filter .filter-table-container {
+#filter .filter-preview #filterPreviewResult > div {
     width: 100%;
     max-height: 445px;
     overflow: auto;
     border: 2px solid var(--color-border);
     border-radius: 5px;
 }
-
-#filter .filter-table {
+#filter .filter-preview #filterPreviewResult > div > table {
     width: 100%;
     min-width: 920px;
     color: var(--color-text);
     background-color: var(--color-container);
 }
-
-#filter .filter-table thead {
+#filter .filter-preview #filterPreviewResult > div > table thead {
     position: sticky;
     top: 0;
     z-index: 1;
     background-color: var(--color-table-th);
 }
-
-#filter .filter-table th,
-#filter .filter-table td {
+#filter .filter-preview #filterPreviewResult > div > table thead th,
+#filter .filter-preview #filterPreviewResult > div > table thead td {
     padding: 9px 12px;
     border-right: 1px solid var(--color-border);
     font-size: 12px;
     text-align: left;
     white-space: nowrap;
 }
-
-#filter .filter-table th:last-child,
-#filter .filter-table td:last-child {
+#filter .filter-preview #filterPreviewResult > div > table th:last-child,
+#filter .filter-preview #filterPreviewResult > div > table td:last-child {
     border-right: none;
 }
-
-#filter .filter-table tbody tr {
+#filter .filter-preview #filterPreviewResult > div > table tbody tr {
     border-top: 1px solid var(--color-border);
 }
-
-#filter .filter-table tbody tr:nth-child(even) {
+#filter .filter-preview #filterPreviewResult > div > table tbody tr:nth-child(even) {
     background-color: var(--color-table-tr);
 }
-
-#filter .filter-table .filter-empty-row {
+#filter .filter-preview #filterPreviewResult > div > table .filter-empty-row {
     padding: 30px 12px;
     color: var(--color-gray-p);
     text-align: center;
 }
-
-@media screen and (max-width: 1050px) {
-    #filter > .flex-box-start:last-child {
-        flex-wrap: wrap;
-    }
-
-    #filter .filter-controls,
-    #filter .filter-preview {
-        flex: 1 1 100%;
-    }
+#filter .filter-preview #filterPreviewResult > div::-webkit-scrollbar-track {
+    background-color: transparent;
 }
-
-@media screen and (max-width: 640px) {
-    #filter > .flex-box-start:first-child {
-        flex-wrap: wrap;
-    }
-
-    #filter .warning,
-    #filter .report-actions {
-        flex: 1 1 100%;
-    }
-
-    #filter .report-actions {
-        margin-top: -5px;
-    }
+#filter .filter-preview #filterPreviewResult > div::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+    background-color: transparent;
+}
+#filter .filter-preview #filterPreviewResult > div::-webkit-scrollbar-thumb {
+    border-radius: 5px;
+    background-color: var(--color-border);
 }

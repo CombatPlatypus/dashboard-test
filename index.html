@@ -3329,7 +3329,6 @@
                 <!-- PAINEL FILTRAGEM -->
 
                 <div class="tabs-panel" id="filter">
-
                     <div class="flex-box-start">
                         <div class="warning" id="filterNotification" role="status" aria-live="polite" aria-atomic="true" data-notification-type="idle">
                             <div class="flex-box-start">
@@ -3355,20 +3354,18 @@
                             </button>
                         </div>
                     </div>
-                    
 
                     <div class="flex-box-start">
 
                         <!-- CONTROLES -->
 
                         <div class="filter-controls">
-
                             <div class="title">
                                 <h4>Filtragem de Dados</h4>
                             </div>
 
                             <div class="padding">
-                                <label class="filter-purpose-label" for="filterPurpose">Finalidade?</label>
+                                <label class="x" for="filterPurpose">Finalidade?</label>
 
                                 <select class="standard-select" id="filterPurpose" style="width: 100%;" disabled>
                                     <option value="">Selecione uma finalidade</option>
@@ -3382,7 +3379,7 @@
                                     <span id="filterLineCount">0 linhas</span>
                                 </div>
 
-                                <textarea id="filterValues" rows="14" placeholder="Cole um Shipment_id por linha." aria-describedby="filterLineCount" disabled></textarea>
+                                <textarea id="filterValues" rows="14" placeholder="Cole um valor por linha." aria-describedby="filterLineCount" disabled></textarea>
 
                                 <div class="filter-submit">
                                     <button class="button" id="filterApplyButton" type="button" disabled>Filtrar Linhas</button>
@@ -3398,7 +3395,7 @@
                             </div>
 
                             <div class="padding filter-preview-content">
-                                <p class="filter-preview-empty" id="filterPreviewEmpty">A prévia será exibida depois que a filtragem for aplicada.</p>
+                                <p id="filterPreviewEmpty">A prévia será exibida depois que a filtragem for aplicada.</p>
 
                                 <div id="filterPreviewResult" hidden>
                                     <p class="filter-preview-summary" id="filterPreviewSummary"></p>
@@ -3409,6 +3406,7 @@
                                             <tbody></tbody>
                                         </table>
                                     </div>
+
                                 </div>
                             </div>
                         </div>
