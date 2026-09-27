@@ -57,6 +57,26 @@ const FILTER_PURPOSES =
                         "item_names",
                     ]),
             }),
+
+        "export-damage":
+            Object.freeze({
+                label:
+                    "Export Avaria",
+
+                filterColumn:
+                    "Order ID",
+
+                outputSuffix:
+                    "export-avaria",
+
+                columns:
+                    Object.freeze([
+                        "Order ID",
+                        "SLS Tracking Number",
+                        "Status",
+                        "Current Station",
+                    ]),
+            }),
     });
 
 const elements = {
@@ -811,7 +831,7 @@ function filterRows() {
 
     if (uniqueValues.length === 0) {
         setNotification(
-            "Informe ao menos um Shipment_id para filtrar.",
+            `Informe ao menos um ${purpose.filterColumn} para filtrar.`,
             "warning",
         );
 
