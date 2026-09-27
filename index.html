@@ -29,80 +29,7 @@
         <link rel="stylesheet" href="css/hub-spreadsheets.css">
         <link rel="stylesheet" href="css/data-analysis.css">
         <link rel="stylesheet" href="css/docs.css">
-
-        <!-- ESTILOS TEMPORARIOS NÃO FINALIZADOS -->
-
-        <style>
-
-            #filter {
-                max-width: 1600px;
-                margin: 0 auto;
-            }
-            #filter .title {
-                border-bottom: 2px solid var(--color-border);
-                padding: 20px;
-            }
-            #filter .title h4 {
-                margin: 0;
-            }
-            #filter hr {
-                max-width: 100%;
-            }
-            #filter .select2-container--default .select2-selection--single .select2-selection__rendered {
-               font-size: 13px;
-            }
-            #filter > .flex-box-start {
-                gap: 15px;
-            }
-            #filter .filter-controls {
-                flex: 0 0 480px;
-                height: auto;
-                background-color: var(--color-container);
-                border: 2px solid var(--color-border);
-                border-radius: 5px;
-                overflow: hidden;
-            }
-            #filter .filter-preview {
-                flex: 1 1 0;
-                background-color: var(--color-container);
-                border: 2px solid var(--color-border);
-                border-radius: 5px;
-            }
-            #filter .padding {
-                padding: 20px;
-            }
-            #filter .filter-controls .padding > div:last-of-type {
-                display: flex;
-                overflow: hidden;
-                margin-top: 20px;
-                gap: 20px;
-            }
-            #filter .filter-controls .padding > div:last-of-type button {
-                width: 100%;
-            }
-            #filter .filter-controls .padding > div:last-of-type button img {
-                width: 35px;
-            }
-
-            #filter .report-actions {
-                display: flex;
-                margin: 0 0 20px 0;
-                padding: 20px;
-                border-radius: 5px;
-                gap: 15px;
-                justify-content: center;
-                flex: 0 0 max-content;
-                background-color: var(--color-container);
-                border: 2px solid var(--color-border);
-            }
-            #filter .report-actions > button > img {
-                width: 35px;
-                cursor: pointer;
-            }
-
-
-
-        </style>
+        <link rel="stylesheet" href="css/filter.css">
     </head>	
 
     <!-- CONTEÚDO DA PÁGINA -->
@@ -3404,27 +3331,27 @@
                 <div class="tabs-panel" id="filter">
 
                     <div class="flex-box-start">
-                        <div class="warning" id="filterNotification">
+                        <div class="warning" id="filterNotification" role="status" aria-live="polite" aria-atomic="true" data-notification-type="idle">
                             <div class="flex-box-start">
-                                <img id="filterNotificationIcon" src="images/geral-icons/bell-icon.svg" alt="">
+                                <img id="filterNotificationIcon" src="images/geral-icons/bell-icon.svg" alt="" aria-hidden="true">
 
                                 <h4 id="filterNotificationText">Importe uma base de dados para começar.</h4>
                             </div>
                         </div>
 
                         <div class="report-actions">
-                            <button id="" type="button" title="Salvar Arquivo" aria-label="">
+                            <button id="filterSaveButton" type="button" title="Salvar arquivo filtrado em CSV" aria-label="Salvar arquivo filtrado em CSV" disabled>
                                 <img src="images/geral-icons/save-icon.svg" alt="" aria-hidden="true">
                             </button>
 
-                            <button id="" type="button">
-                                <img src="images/geral-icons/import-icon.svg" alt="">
+                            <button id="filterImportButton" type="button" title="Importar base de dados" aria-label="Importar base de dados">
+                                <img src="images/geral-icons/import-icon.svg" alt="" aria-hidden="true">
                             </button>
 
-                            <input id="receiptFileInput" type="file" accept=".csv,.xlsx,.xls" hidden="" data-receipt-import-initialized="true">
+                            <input id="filterFileInput" type="file" accept=".csv,.xlsx,.xls" hidden>
 
-                            <button id="filterClearButton" type="button">
-                                <img src="images/geral-icons/trash-basket-icon.svg" alt="">
+                            <button id="filterClearButton" type="button" title="Descartar arquivo importado" aria-label="Descartar arquivo importado" disabled>
+                                <img src="images/geral-icons/trash-basket-icon.svg" alt="" aria-hidden="true">
                             </button>
                         </div>
                     </div>
@@ -3441,23 +3368,24 @@
                             </div>
 
                             <div class="padding">
-                                <h4>Finalidade?</h4>
+                                <label class="filter-purpose-label" for="filterPurpose">Finalidade?</label>
 
-                                <select class="standard-select" style="width: 100%;">
-                                    <option value="">Export Análises</option>
-                                    <option value="">Export Avaria</option>
-                                    <option value="">Não Listada</option>
+                                <select class="standard-select" id="filterPurpose" style="width: 100%;" disabled>
+                                    <option value="">Selecione uma finalidade</option>
+                                    <option value="export-analysis">Export Análises</option>
+                                    <option value="export-damage" disabled>Export Avaria (em breve)</option>
+                                    <option value="not-listed" disabled>Não Listada (em breve)</option>
                                 </select>
 
                                 <div class="comparison-textarea-title flex-box-between">
-                                    <label for="">Filtrar Linhas Por Valores</label>
-                                    <span id="">0 linhas</span>
+                                    <label for="filterValues">Filtrar Linhas Por Valores</label>
+                                    <span id="filterLineCount">0 linhas</span>
                                 </div>
 
-                                <textarea id="" rows="14" placeholder="Cole um valor por linha." disabled></textarea>
+                                <textarea id="filterValues" rows="14" placeholder="Cole um Shipment_id por linha." aria-describedby="filterLineCount" disabled></textarea>
 
-                                <div>
-                                    <button class="button" id="">Filtrar Linhas</button>
+                                <div class="filter-submit">
+                                    <button class="button" id="filterApplyButton" type="button" disabled>Filtrar Linhas</button>
                                 </div>
                             </div>
                         </div>
@@ -3469,12 +3397,19 @@
                                 <h4>Prévia da Filtragem</h4>
                             </div>
 
-                            <div class="padding">
+                            <div class="padding filter-preview-content">
+                                <p class="filter-preview-empty" id="filterPreviewEmpty">A prévia será exibida depois que a filtragem for aplicada.</p>
 
-                                
-                                <!-- TABELA DE PREVIA AQUI -->
-                                
+                                <div id="filterPreviewResult" hidden>
+                                    <p class="filter-preview-summary" id="filterPreviewSummary"></p>
 
+                                    <div class="filter-table-container">
+                                        <table class="filter-table" id="filterPreviewTable">
+                                            <thead></thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -3704,6 +3639,10 @@
         <script src="js/data-analysis/charts.js" defer></script>
         <script src="js/data-analysis/comparison.js" defer></script>
         <script src="js/data-analysis/init.js" defer></script>
+
+        <!-- JS - PAINEL DE FILTRAGEM -->
+
+        <script type="module" src="js/filter/init.js"></script>
 
         <!-- AJUSTES TABS -->
 

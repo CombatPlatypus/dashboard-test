@@ -1,0 +1,1041 @@
+const SUPPORTED_EXTENSIONS =
+    new Set([
+        "xlsx",
+        "xls",
+        "csv",
+    ]);
+
+const NOTIFICATION_ICONS =
+    Object.freeze({
+        idle:
+            "images/geral-icons/bell-icon.svg",
+
+        info:
+            "images/geral-icons/bell-icon.svg",
+
+        success:
+            "images/geral-icons/success-icon.svg",
+
+        warning:
+            "images/geral-icons/alert-icon.svg",
+
+        error:
+            "images/geral-icons/error-icon.svg",
+    });
+
+/*
+ * Cada finalidade concentra as regras de leitura,
+ * filtragem, projeção de colunas e nome do arquivo.
+ */
+
+const FILTER_PURPOSES =
+    Object.freeze({
+        "export-analysis":
+            Object.freeze({
+                label:
+                    "Export Análises",
+
+                filterColumn:
+                    "Shipment_id",
+
+                outputSuffix:
+                    "export-analises",
+
+                columns:
+                    Object.freeze([
+                        "Shipment_id",
+                        "binding_entity",
+                        "AT_Number",
+                        "driver_id",
+                        "motorista",
+                        "item_names",
+                        "valor_produto",
+                    ]),
+            }),
+    });
+
+const elements = {
+    notification:
+        document.getElementById(
+            "filterNotification",
+        ),
+
+    notificationIcon:
+        document.getElementById(
+            "filterNotificationIcon",
+        ),
+
+    notificationText:
+        document.getElementById(
+            "filterNotificationText",
+        ),
+
+    saveButton:
+        document.getElementById(
+            "filterSaveButton",
+        ),
+
+    importButton:
+        document.getElementById(
+            "filterImportButton",
+        ),
+
+    fileInput:
+        document.getElementById(
+            "filterFileInput",
+        ),
+
+    clearButton:
+        document.getElementById(
+            "filterClearButton",
+        ),
+
+    purpose:
+        document.getElementById(
+            "filterPurpose",
+        ),
+
+    values:
+        document.getElementById(
+            "filterValues",
+        ),
+
+    lineCount:
+        document.getElementById(
+            "filterLineCount",
+        ),
+
+    applyButton:
+        document.getElementById(
+            "filterApplyButton",
+        ),
+
+    previewEmpty:
+        document.getElementById(
+            "filterPreviewEmpty",
+        ),
+
+    previewResult:
+        document.getElementById(
+            "filterPreviewResult",
+        ),
+
+    previewSummary:
+        document.getElementById(
+            "filterPreviewSummary",
+        ),
+
+    previewTable:
+        document.getElementById(
+            "filterPreviewTable",
+        ),
+};
+
+const filterState = {
+    sourceFileName: "",
+
+    workbook: null,
+
+    sourceSheetName: "",
+
+    sourceRows: [],
+
+    headerIndexes: new Map(),
+
+    resultRows: [],
+
+    unmatchedValues: [],
+};
+
+function normalizeText(value) {
+    return String(
+        value ?? "",
+    )
+        .trim()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLocaleLowerCase("pt-BR");
+}
+
+function formatCellValue(value) {
+    if (
+        value === null ||
+        value === undefined
+    ) {
+        return "";
+    }
+
+    return String(value);
+}
+
+function setNotification(
+    message,
+    type = "info",
+) {
+    const normalizedType =
+        Object.prototype.hasOwnProperty.call(
+            NOTIFICATION_ICONS,
+            type,
+        )
+            ? type
+            : "info";
+
+    elements.notification.dataset
+        .notificationType =
+            normalizedType;
+
+    elements.notificationIcon.src =
+        NOTIFICATION_ICONS[
+            normalizedType
+        ];
+
+    elements.notificationText.textContent =
+        message;
+}
+
+function syncPurposeSelect() {
+    if (
+        window.jQuery &&
+        typeof window.jQuery.fn
+            .select2 === "function"
+    ) {
+        window
+            .jQuery(
+                elements.purpose,
+            )
+            .trigger(
+                "change.select2",
+            );
+    }
+}
+
+function parseFilterValues() {
+    const values =
+        elements.values.value
+            .split(/\r?\n/)
+            .map(function (value) {
+                return value.trim();
+            })
+            .filter(Boolean);
+
+    const uniqueValues = [];
+    const normalizedValues =
+        new Set();
+
+    values.forEach(
+        function (value) {
+            const normalizedValue =
+                normalizeText(value);
+
+            if (
+                !normalizedValue ||
+                normalizedValues.has(
+                    normalizedValue,
+                )
+            ) {
+                return;
+            }
+
+            normalizedValues.add(
+                normalizedValue,
+            );
+
+            uniqueValues.push(value);
+        },
+    );
+
+    return {
+        values,
+        uniqueValues,
+        normalizedValues,
+    };
+}
+
+function updateLineCount() {
+    const {
+        values,
+        uniqueValues,
+    } = parseFilterValues();
+
+    const lineLabel =
+        values.length === 1
+            ? "linha"
+            : "linhas";
+
+    elements.lineCount.textContent =
+        `${values.length} ${lineLabel}`;
+
+    elements.applyButton.disabled =
+        elements.values.disabled ||
+        uniqueValues.length === 0;
+}
+
+function getFileExtension(fileName) {
+    return String(fileName)
+        .split(".")
+        .pop()
+        ?.toLocaleLowerCase("pt-BR") ?? "";
+}
+
+function isSupportedFile(file) {
+    return Boolean(file) &&
+        SUPPORTED_EXTENSIONS.has(
+            getFileExtension(
+                file.name,
+            ),
+        );
+}
+
+function createHeaderIndex(headers) {
+    const headerIndexes =
+        new Map();
+
+    headers.forEach(
+        function (
+            header,
+            columnIndex,
+        ) {
+            const normalizedHeader =
+                normalizeText(header);
+
+            if (
+                normalizedHeader &&
+                !headerIndexes.has(
+                    normalizedHeader,
+                )
+            ) {
+                headerIndexes.set(
+                    normalizedHeader,
+                    columnIndex,
+                );
+            }
+        },
+    );
+
+    return headerIndexes;
+}
+
+function findCompatibleSheet(
+    workbook,
+    purpose,
+) {
+    for (
+        const sheetName
+        of workbook.SheetNames
+    ) {
+        const worksheet =
+            workbook.Sheets[
+                sheetName
+            ];
+
+        const rows =
+            window.XLSX.utils
+                .sheet_to_json(
+                    worksheet,
+                    {
+                        header: 1,
+                        defval: "",
+                        raw: false,
+                        blankrows: false,
+                    },
+                );
+
+        if (rows.length === 0) {
+            continue;
+        }
+
+        const headerIndexes =
+            createHeaderIndex(
+                rows[0],
+            );
+
+        const missingColumns =
+            purpose.columns.filter(
+                function (column) {
+                    return !headerIndexes.has(
+                        normalizeText(
+                            column,
+                        ),
+                    );
+                },
+            );
+
+        if (
+            missingColumns.length === 0
+        ) {
+            return {
+                sheetName,
+                rows,
+                headerIndexes,
+            };
+        }
+    }
+
+    return null;
+}
+
+function clearPreview() {
+    const tableHead =
+        elements.previewTable
+            .querySelector("thead");
+
+    const tableBody =
+        elements.previewTable
+            .querySelector("tbody");
+
+    tableHead.replaceChildren();
+    tableBody.replaceChildren();
+
+    elements.previewSummary.textContent =
+        "";
+
+    elements.previewResult.hidden =
+        true;
+
+    elements.previewEmpty.hidden =
+        false;
+
+    filterState.resultRows = [];
+    filterState.unmatchedValues = [];
+
+    elements.saveButton.disabled =
+        true;
+}
+
+function resetSelectedPurpose() {
+    filterState.sourceSheetName = "";
+    filterState.sourceRows = [];
+    filterState.headerIndexes =
+        new Map();
+
+    elements.values.value = "";
+    elements.values.disabled = true;
+    elements.applyButton.disabled =
+        true;
+
+    updateLineCount();
+    clearPreview();
+}
+
+function resetPanel({
+    notification = true,
+} = {}) {
+    filterState.sourceFileName = "";
+    filterState.workbook = null;
+
+    elements.fileInput.value = "";
+    elements.purpose.value = "";
+    elements.purpose.disabled = true;
+    elements.clearButton.disabled = true;
+
+    resetSelectedPurpose();
+    syncPurposeSelect();
+
+    if (notification) {
+        setNotification(
+            "Importe uma base de dados para começar.",
+            "idle",
+        );
+    }
+}
+
+async function readWorkbook(file) {
+    if (!isSupportedFile(file)) {
+        throw new Error(
+            "Formato não suportado. Selecione um arquivo XLSX, XLS ou CSV.",
+        );
+    }
+
+    if (
+        !window.XLSX ||
+        typeof window.XLSX.read !==
+            "function"
+    ) {
+        throw new Error(
+            "A biblioteca de leitura de planilhas não foi carregada.",
+        );
+    }
+
+    const fileData =
+        await file.arrayBuffer();
+
+    const workbook =
+        window.XLSX.read(
+            fileData,
+            {
+                cellDates: true,
+                cellFormula: false,
+            },
+        );
+
+    if (
+        !Array.isArray(
+            workbook.SheetNames,
+        ) ||
+        workbook.SheetNames.length === 0
+    ) {
+        throw new Error(
+            "O arquivo não possui nenhuma aba legível.",
+        );
+    }
+
+    return workbook;
+}
+
+async function importFile(file) {
+    if (!file) {
+        return;
+    }
+
+    setNotification(
+        `Lendo "${file.name}"...`,
+        "info",
+    );
+
+    elements.importButton.disabled =
+        true;
+
+    try {
+        const workbook =
+            await readWorkbook(file);
+
+        resetPanel({
+            notification: false,
+        });
+
+        filterState.sourceFileName =
+            file.name;
+
+        filterState.workbook =
+            workbook;
+
+        elements.purpose.disabled =
+            false;
+
+        elements.clearButton.disabled =
+            false;
+
+        syncPurposeSelect();
+
+        setNotification(
+            `Arquivo "${file.name}" importado. Selecione a finalidade da filtragem.`,
+            "success",
+        );
+    } catch (error) {
+        resetPanel({
+            notification: false,
+        });
+
+        setNotification(
+            error instanceof Error
+                ? error.message
+                : "Não foi possível ler o arquivo selecionado.",
+            "error",
+        );
+    } finally {
+        elements.importButton.disabled =
+            false;
+    }
+}
+
+function handlePurposeChange() {
+    resetSelectedPurpose();
+
+    if (!filterState.workbook) {
+        return;
+    }
+
+    const purpose =
+        FILTER_PURPOSES[
+            elements.purpose.value
+        ];
+
+    if (!purpose) {
+        setNotification(
+            "Selecione uma finalidade para continuar.",
+            "info",
+        );
+
+        return;
+    }
+
+    const compatibleSheet =
+        findCompatibleSheet(
+            filterState.workbook,
+            purpose,
+        );
+
+    if (!compatibleSheet) {
+        setNotification(
+            `O arquivo não contém uma aba compatível com ${purpose.label}. Verifique as colunas obrigatórias: ${purpose.columns.join(", ")}.`,
+            "error",
+        );
+
+        return;
+    }
+
+    filterState.sourceSheetName =
+        compatibleSheet.sheetName;
+
+    filterState.sourceRows =
+        compatibleSheet.rows.slice(1);
+
+    filterState.headerIndexes =
+        compatibleSheet.headerIndexes;
+
+    elements.values.disabled = false;
+    elements.values.focus();
+
+    setNotification(
+        `Finalidade ${purpose.label} pronta. Cole um Shipment_id por linha para filtrar a aba "${compatibleSheet.sheetName}".`,
+        "success",
+    );
+}
+
+function createTableCell(
+    tagName,
+    value,
+) {
+    const cell =
+        document.createElement(
+            tagName,
+        );
+
+    cell.textContent =
+        formatCellValue(value);
+
+    return cell;
+}
+
+function renderPreview(
+    purpose,
+    resultRows,
+    unmatchedValues,
+) {
+    const tableHead =
+        elements.previewTable
+            .querySelector("thead");
+
+    const tableBody =
+        elements.previewTable
+            .querySelector("tbody");
+
+    const headerRow =
+        document.createElement("tr");
+
+    purpose.columns.forEach(
+        function (column) {
+            headerRow.appendChild(
+                createTableCell(
+                    "th",
+                    column,
+                ),
+            );
+        },
+    );
+
+    tableHead.replaceChildren(
+        headerRow,
+    );
+
+    const bodyFragment =
+        document.createDocumentFragment();
+
+    if (resultRows.length === 0) {
+        const emptyRow =
+            document.createElement("tr");
+
+        const emptyCell =
+            createTableCell(
+                "td",
+                "Nenhuma linha corresponde aos valores informados.",
+            );
+
+        emptyCell.colSpan =
+            purpose.columns.length;
+
+        emptyCell.classList.add(
+            "filter-empty-row",
+        );
+
+        emptyRow.appendChild(
+            emptyCell,
+        );
+
+        bodyFragment.appendChild(
+            emptyRow,
+        );
+    } else {
+        resultRows.forEach(
+            function (row) {
+                const tableRow =
+                    document.createElement(
+                        "tr",
+                    );
+
+                row.forEach(
+                    function (value) {
+                        tableRow.appendChild(
+                            createTableCell(
+                                "td",
+                                value,
+                            ),
+                        );
+                    },
+                );
+
+                bodyFragment.appendChild(
+                    tableRow,
+                );
+            },
+        );
+    }
+
+    tableBody.replaceChildren(
+        bodyFragment,
+    );
+
+    const rowLabel =
+        resultRows.length === 1
+            ? "linha encontrada"
+            : "linhas encontradas";
+
+    const unmatchedMessage =
+        unmatchedValues.length > 0
+            ? ` ${unmatchedValues.length} valor(es) não encontrado(s).`
+            : "";
+
+    elements.previewSummary.textContent =
+        `${resultRows.length} ${rowLabel} na aba "${filterState.sourceSheetName}".${unmatchedMessage}`;
+
+    elements.previewEmpty.hidden = true;
+    elements.previewResult.hidden =
+        false;
+}
+
+function filterRows() {
+    const purpose =
+        FILTER_PURPOSES[
+            elements.purpose.value
+        ];
+
+    if (
+        !purpose ||
+        filterState.sourceRows.length === 0
+    ) {
+        setNotification(
+            "Selecione uma finalidade válida antes de filtrar.",
+            "error",
+        );
+
+        return;
+    }
+
+    const {
+        values,
+        uniqueValues,
+        normalizedValues,
+    } = parseFilterValues();
+
+    if (uniqueValues.length === 0) {
+        setNotification(
+            "Informe ao menos um Shipment_id para filtrar.",
+            "warning",
+        );
+
+        return;
+    }
+
+    const filterColumnIndex =
+        filterState.headerIndexes.get(
+            normalizeText(
+                purpose.filterColumn,
+            ),
+        );
+
+    const outputColumnIndexes =
+        purpose.columns.map(
+            function (column) {
+                return filterState
+                    .headerIndexes
+                    .get(
+                        normalizeText(
+                            column,
+                        ),
+                    );
+            },
+        );
+
+    const matchedValues =
+        new Set();
+
+    const resultRows = [];
+
+    filterState.sourceRows.forEach(
+        function (sourceRow) {
+            const filterValue =
+                normalizeText(
+                    sourceRow[
+                        filterColumnIndex
+                    ],
+                );
+
+            if (
+                !normalizedValues.has(
+                    filterValue,
+                )
+            ) {
+                return;
+            }
+
+            matchedValues.add(
+                filterValue,
+            );
+
+            resultRows.push(
+                outputColumnIndexes.map(
+                    function (
+                        columnIndex,
+                    ) {
+                        return sourceRow[
+                            columnIndex
+                        ] ?? "";
+                    },
+                ),
+            );
+        },
+    );
+
+    const unmatchedValues =
+        uniqueValues.filter(
+            function (value) {
+                return !matchedValues.has(
+                    normalizeText(value),
+                );
+            },
+        );
+
+    filterState.resultRows =
+        resultRows;
+
+    filterState.unmatchedValues =
+        unmatchedValues;
+
+    renderPreview(
+        purpose,
+        resultRows,
+        unmatchedValues,
+    );
+
+    elements.saveButton.disabled =
+        resultRows.length === 0;
+
+    const duplicateCount =
+        values.length -
+        uniqueValues.length;
+
+    const duplicateMessage =
+        duplicateCount > 0
+            ? ` ${duplicateCount} valor(es) repetido(s) foram considerados uma única vez.`
+            : "";
+
+    if (resultRows.length === 0) {
+        setNotification(
+            "Nenhum Shipment_id informado foi encontrado no arquivo.",
+            "warning",
+        );
+
+        return;
+    }
+
+    const unmatchedMessage =
+        unmatchedValues.length > 0
+            ? ` ${unmatchedValues.length} valor(es) não foram encontrados.`
+            : "";
+
+    setNotification(
+        `Filtragem concluída com ${resultRows.length} linha(s).${unmatchedMessage}${duplicateMessage}`,
+        unmatchedValues.length > 0
+            ? "warning"
+            : "success",
+    );
+}
+
+function createSafeFileBaseName(
+    fileName,
+) {
+    return String(fileName)
+        .replace(/\.[^.]+$/, "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-zA-Z0-9_-]+/g, "-")
+        .replace(/^-+|-+$/g, "") ||
+        "arquivo-filtrado";
+}
+
+function downloadBlob(
+    blob,
+    fileName,
+) {
+    const downloadUrl =
+        URL.createObjectURL(blob);
+
+    const downloadLink =
+        document.createElement("a");
+
+    downloadLink.href = downloadUrl;
+    downloadLink.download = fileName;
+
+    document.body.appendChild(
+        downloadLink,
+    );
+
+    downloadLink.click();
+    downloadLink.remove();
+
+    window.setTimeout(
+        function () {
+            URL.revokeObjectURL(
+                downloadUrl,
+            );
+        },
+        0,
+    );
+}
+
+function saveFilteredFile() {
+    const purpose =
+        FILTER_PURPOSES[
+            elements.purpose.value
+        ];
+
+    if (
+        !purpose ||
+        filterState.resultRows.length === 0
+    ) {
+        setNotification(
+            "Aplique uma filtragem com resultados antes de salvar.",
+            "warning",
+        );
+
+        return;
+    }
+
+    if (!window.XLSX) {
+        setNotification(
+            "A biblioteca de exportação não foi carregada.",
+            "error",
+        );
+
+        return;
+    }
+
+    const matrix = [
+        [...purpose.columns],
+        ...filterState.resultRows,
+    ];
+
+    const worksheet =
+        window.XLSX.utils
+            .aoa_to_sheet(
+                matrix,
+            );
+
+    const csvContent =
+        window.XLSX.utils
+            .sheet_to_csv(
+                worksheet,
+            );
+
+    const csvBlob =
+        new Blob(
+            [
+                "\uFEFF",
+                csvContent,
+            ],
+            {
+                type:
+                    "text/csv;charset=utf-8",
+            },
+        );
+
+    const fileName =
+        `${createSafeFileBaseName(filterState.sourceFileName)}_${purpose.outputSuffix}.csv`;
+
+    downloadBlob(
+        csvBlob,
+        fileName,
+    );
+
+    setNotification(
+        `Arquivo "${fileName}" salvo com ${filterState.resultRows.length} linha(s) filtrada(s).`,
+        "success",
+    );
+}
+
+function handleValuesInput() {
+    updateLineCount();
+
+    if (
+        filterState.resultRows.length > 0 ||
+        !elements.previewResult.hidden
+    ) {
+        clearPreview();
+
+        setNotification(
+            "Os valores foram alterados. Aplique a filtragem novamente para atualizar a prévia.",
+            "info",
+        );
+    }
+}
+
+elements.importButton.addEventListener(
+    "click",
+    function () {
+        elements.fileInput.click();
+    },
+);
+
+elements.fileInput.addEventListener(
+    "change",
+    async function () {
+        const [file] =
+            elements.fileInput.files;
+
+        await importFile(file);
+    },
+);
+
+elements.clearButton.addEventListener(
+    "click",
+    function () {
+        resetPanel();
+
+        setNotification(
+            "O arquivo importado e a filtragem foram descartados.",
+            "success",
+        );
+    },
+);
+
+elements.purpose.addEventListener(
+    "change",
+    handlePurposeChange,
+);
+
+elements.values.addEventListener(
+    "input",
+    handleValuesInput,
+);
+
+elements.applyButton.addEventListener(
+    "click",
+    filterRows,
+);
+
+elements.saveButton.addEventListener(
+    "click",
+    saveFilteredFile,
+);
+
+resetPanel();
