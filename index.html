@@ -51,8 +51,6 @@
             #filter .select2-container--default .select2-selection--single .select2-selection__rendered {
                font-size: 13px;
             }
-
-
             #filter > .flex-box-start {
                 gap: 15px;
             }
@@ -78,7 +76,7 @@
                 display: flex;
                 overflow: hidden;
                 margin-top: 20px;
-                gap: 15px;
+                gap: 20px;
             }
             #filter .filter-controls .padding > div:last-of-type div {
                 flex: 1 1 0;
@@ -89,6 +87,18 @@
             }
             #filter .filter-controls .padding > div:last-of-type button img {
                 width: 35px;
+            }
+
+            #filter .report-actions {
+                display: flex;
+                margin: 0 0 20px 0;
+                padding: 20px;
+                border-radius: 5px;
+                gap: 15px;
+                justify-content: center;
+                flex: 0 0 max-content;
+                background-color: var(--color-container);
+                border: 2px solid var(--color-border);
             }
 
         </style>
@@ -3391,6 +3401,29 @@
                 <!-- PAINEL FILTRAGEM -->
 
                 <div class="tabs-panel" id="filter">
+
+                    <div class="flex-box-start">
+                        <div class="warning" id="filterNotification">
+                            <div class="flex-box-start">
+                                <img id="filterNotificationIcon" src="images/geral-icons/bell-icon.svg" alt="">
+
+                                <h4 id="filterNotificationText">Importe uma base de dados para começar.</h4>
+                            </div>
+                        </div>
+
+                        <div class="report-actions">
+                            <button id="" type="button">
+                                <img src="images/geral-icons/import-icon.svg" alt="">
+                            </button>
+
+                            <input id="receiptFileInput" type="file" accept=".csv,.xlsx,.xls" hidden="" data-receipt-import-initialized="true">
+
+                            <button id="filterClearButton" type="button">
+                                <img src="images/geral-icons/trash-basket-icon.svg" alt="">
+                            </button>
+                        </div>
+                    </div>
+                    
 
                     <div class="flex-box-start">
 
