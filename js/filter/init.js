@@ -537,7 +537,7 @@ async function importFile(file) {
         syncPurposeSelect();
 
         setNotification(
-            `Arquivo "${file.name}" importado. Selecione a finalidade da filtragem.`,
+            `Arquivo "${file.name}" importado, agora selecione a finalidade da filtragem.`,
             "success",
         );
     } catch (error) {
@@ -619,7 +619,7 @@ function handlePurposeChange() {
     elements.values.focus();
 
     setNotification(
-        `Finalidade ${purpose.label} pronta. Cole um Shipment_id por linha para filtrar a aba "${compatibleSheet.sheetName}".`,
+        `Finalidade "${purpose.label}" escolhida, agora cole um valor por linha para filtrar a aba "${compatibleSheet.sheetName}".`,
         "success",
     );
 }
