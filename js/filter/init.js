@@ -72,7 +72,6 @@ const FILTER_PURPOSES =
                 columns:
                     Object.freeze([
                         "Order ID",
-                        "SLS Tracking Number",
                         "Status",
                         "Current Station",
                     ]),
