@@ -472,7 +472,7 @@ function resetPanel({
 
     if (notification) {
         setNotification(
-            "Importe uma base de dados para começar.",
+            "Importe uma base de dados vinda do SPX para começar.",
             "idle",
         );
     }
