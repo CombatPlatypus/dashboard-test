@@ -46,11 +46,17 @@ const FILTER_PURPOSES =
                         "Shipment_id",
                         "binding_entity",
                         "AT_Number",
+                        "valor_produto",
                         "driver_id",
                         "motorista",
                         "item_names",
-                        "valor_produto",
                     ]),
+
+                columnFormatters:
+                    Object.freeze({
+                        valor_produto:
+                            formatDecimalWithComma,
+                    }),
 
                 previewHiddenColumns:
                     Object.freeze([
@@ -195,6 +201,37 @@ function formatCellValue(value) {
     }
 
     return String(value);
+}
+
+function formatDecimalWithComma(value) {
+    const formattedValue =
+        formatCellValue(value)
+            .trim();
+
+    return formattedValue.replace(
+        /^([+-]?\d+)\.(\d+)$/,
+        "$1,$2",
+    );
+}
+
+function formatPurposeColumnValue(
+    purpose,
+    column,
+    value,
+) {
+    const formatter =
+        purpose.columnFormatters?.[
+            column
+        ];
+
+    if (
+        typeof formatter ===
+        "function"
+    ) {
+        return formatter(value);
+    }
+
+    return value ?? "";
 }
 
 function setNotification(
@@ -890,10 +927,17 @@ function filterRows() {
                 outputColumnIndexes.map(
                     function (
                         columnIndex,
+                        outputColumnIndex,
                     ) {
-                        return sourceRow[
-                            columnIndex
-                        ] ?? "";
+                        return formatPurposeColumnValue(
+                            purpose,
+                            purpose.columns[
+                                outputColumnIndex
+                            ],
+                            sourceRow[
+                                columnIndex
+                            ],
+                        );
                     },
                 ),
             );
