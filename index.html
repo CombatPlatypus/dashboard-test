@@ -381,12 +381,13 @@
             }
             #analysis .cards > div > hr {
                 width: 100%;
+                max-width: 85rem;
                 margin: 0px 0 10px 0;
             }
             #analysis .cards .summary-block {
                 width: 100%;
                 overflow-y: auto;
-                max-height: 250px;
+                max-height: 240px;
                 padding: 0 15px;
             }
             #analysis .cards .summary-block:-webkit-scrollbar-track {
@@ -465,7 +466,6 @@
             }
 
             #analysis .conditional-comparison {
-                margin-top: 15px;
                 display: grid;
                 grid-template-columns: repeat(2, minmax(146px, 1fr));
                 gap: 15px;
@@ -493,7 +493,7 @@
                 border-color: var(--color-gray-p);
             }
             #analysis .textarea-results {
-                margin: 20px 0;
+                margin: 10px 0;
                 gap: 10px;
                 align-items: center;
             }
@@ -3180,7 +3180,7 @@
                                     </div>
 
                                     <div class="padding">
-<h4>Localize Em:</h4>
+                                        <h4>Localize Em:</h4>
 
                                         <select id="analysisComparisonColumn" class="standard-select">
                                             <option value="">Selecione uma coluna</option>
@@ -3240,7 +3240,52 @@
                                     </div>
 
                                     <div class="padding">
-                                        
+                                        <div class="analysis-empty" id="analysisComparisonEmpty" hidden>
+                                            <h3>Selecione ao menos uma coluna na comparação da planilha para gerar a análise.</h3>
+                                        </div>
+
+                                        <div class="comparison-cards">
+                                            <div class="card">
+                                                <h3 id="statisticsComparisonFoundTitle">Encontrados</h3>
+
+                                                <div class="flex-box-start">
+                                                    <img src="images/geral-icons/success-icon.svg">
+                                                    <h3 id="statisticsComparisonFoundCount">0</h3>
+                                                </div>
+                                            </div>
+
+                                            <div class="card" id="statisticsComparisonOutsideCard" hidden>
+                                                <h3>Fora da Condição</h3>
+
+                                                <div class="flex-box-start">
+                                                    <img src="images/geral-icons/alert-icon.svg">
+                                                    <h3 id="statisticsComparisonOutsideCount">0</h3>
+                                                </div>
+                                            </div>
+
+                                            <div class="card">
+                                                <h3>Não Encontrados</h3>
+
+                                                <div class="flex-box-start">
+                                                    <img src="images/geral-icons/error-icon.svg">
+                                                    <h3 id="statisticsComparisonNotFoundCount">0</h3>
+                                                </div>
+                                            </div>
+
+                                            <div class="card">
+                                                <h3>Correspondência</h3>
+
+                                                <div class="flex-box-start">
+                                                    <img src="images/geral-icons/chart-pizza-icon.svg">
+                                                    <h3 id="statisticsComparisonRate">0%</h3>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <input id="analysisComparisonSearch" type="search" placeholder="Buscar nos resultados">
+
+                                        <!-- GERE A TABELA AQUI -->
+
                                     </div>
                                 </div>
                             </div>
