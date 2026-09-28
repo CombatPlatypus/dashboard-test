@@ -6,6 +6,67 @@ import {
     parseNumericValue,
 } from "../core/value-utils.js";
 
+const PS_TASK_ORDER_FILE_PREFIX =
+    "ps_task_order_";
+
+const PS_TASK_ORDER_INITIAL_COLUMNS =
+    new Set([
+        "final status",
+        "next step action",
+        "count type",
+        "operator",
+    ]);
+
+function getInitialVisibleColumns(
+    dataset,
+) {
+    const sourceFileName =
+        normalizeSearchValue(
+            dataset.sourceFileName ?? "",
+        ).trim();
+
+    if (
+        !sourceFileName.startsWith(
+            PS_TASK_ORDER_FILE_PREFIX,
+        )
+    ) {
+        return dataset.headers.map(
+            function (
+                unusedHeader,
+                columnIndex,
+            ) {
+                return columnIndex;
+            },
+        );
+    }
+
+    return dataset.headers.reduce(
+        function (
+            selectedColumns,
+            header,
+            columnIndex,
+        ) {
+            const normalizedHeader =
+                normalizeSearchValue(
+                    header,
+                ).trim();
+
+            if (
+                PS_TASK_ORDER_INITIAL_COLUMNS.has(
+                    normalizedHeader,
+                )
+            ) {
+                selectedColumns.push(
+                    columnIndex,
+                );
+            }
+
+            return selectedColumns;
+        },
+        [],
+    );
+}
+
 function createEmptyFilter() {
     return {
         text: "",
@@ -161,13 +222,8 @@ function createPreviewModel({
 
         visibleColumns =
             new Set(
-                dataset.headers.map(
-                    function (
-                        unusedHeader,
-                        columnIndex,
-                    ) {
-                        return columnIndex;
-                    },
+                getInitialVisibleColumns(
+                    dataset,
                 ),
             );
 
