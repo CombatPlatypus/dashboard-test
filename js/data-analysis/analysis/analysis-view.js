@@ -233,22 +233,6 @@ function createAnalysisCard(cardData) {
             "div",
         );
 
-    const cardHeader =
-        document.createElement(
-            "div",
-        );
-
-    const cardSource =
-        document.createElement(
-            "p",
-        );
-
-    const columnName =
-        createTextElement(
-            "span",
-            cardData.columnName,
-        );
-
     const summaryBlock =
         document.createElement(
             "div",
@@ -263,28 +247,6 @@ function createAnalysisCard(cardData) {
         );
     card.dataset.analysisType =
         cardData.type;
-
-    cardHeader.classList.add(
-        "flex-box-start",
-    );
-    cardHeader.append(
-        createTextElement(
-            "h4",
-            cardData.headlineLabel,
-        ),
-        createTextElement(
-            "span",
-            cardData.typeLabel,
-            "analysis-type",
-        ),
-    );
-
-    cardSource.append(
-        document.createTextNode(
-            "De: ",
-        ),
-        columnName,
-    );
 
     summaryBlock.classList.add(
         "summary-block",
@@ -327,8 +289,14 @@ function createAnalysisCard(cardData) {
     }
 
     card.append(
-        cardHeader,
-        cardSource,
+        createTextElement(
+            "h4",
+            cardData.columnName,
+        ),
+        createTextElement(
+            "p",
+            cardData.headlineLabel,
+        ),
         createTextElement(
             "h4",
             cardData.headlineValue,

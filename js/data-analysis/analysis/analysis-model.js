@@ -9,15 +9,6 @@ import {
 
 const MAX_FREQUENCY_ROWS = 25;
 
-const TYPE_LABELS =
-    Object.freeze({
-        category: "Categoria",
-        datetime: "Data/hora",
-        empty: "Vazia",
-        identifier: "Identificador",
-        number: "Número",
-    });
-
 function formatAnalysisNumber(value) {
     if (!Number.isFinite(value)) {
         return "—";
@@ -222,10 +213,6 @@ function createColumnAnalysis(
         metrics: [],
         note: "",
         type: profile.type,
-        typeLabel:
-            TYPE_LABELS[
-                profile.type
-            ] ?? "Texto",
     };
 
     if (profile.type === "number") {
