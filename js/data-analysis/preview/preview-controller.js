@@ -38,29 +38,94 @@ function initializePreviewModule({
             elements,
         );
 
+    const listeners =
+        new Set();
+
     function getSnapshot() {
         return model.getSnapshot();
     }
 
-    function renderAll() {
-        view.renderAll(
-            getSnapshot(),
+    function notifySubscribers(
+        snapshot,
+        changeType,
+    ) {
+        listeners.forEach(
+            function (listener) {
+                try {
+                    listener(
+                        snapshot,
+                        {
+                            type: changeType,
+                        },
+                    );
+                } catch (error) {
+                    console.error(
+                        "Não foi possível atualizar um módulo dependente da prévia:",
+                        error,
+                    );
+                }
+            },
         );
     }
 
-    function renderResults() {
-        view.renderResults(
-            getSnapshot(),
+    function renderAll(
+        changeType =
+            "preview-structure-changed",
+    ) {
+        const snapshot =
+            getSnapshot();
+
+        view.renderAll(snapshot);
+
+        notifySubscribers(
+            snapshot,
+            changeType,
+        );
+    }
+
+    function renderResults(
+        changeType =
+            "preview-results-changed",
+    ) {
+        const snapshot =
+            getSnapshot();
+
+        view.renderResults(snapshot);
+
+        notifySubscribers(
+            snapshot,
+            changeType,
+        );
+    }
+
+    function renderTable(
+        changeType =
+            "preview-order-changed",
+    ) {
+        const snapshot =
+            getSnapshot();
+
+        view.renderTable(snapshot);
+
+        notifySubscribers(
+            snapshot,
+            changeType,
         );
     }
 
     store.subscribe(
-        function (snapshot) {
+        function (
+            snapshot,
+            change,
+        ) {
             model.setDataset(
                 snapshot.dataset,
             );
 
-            renderAll();
+            renderAll(
+                change?.type ??
+                    "dataset-synchronized",
+            );
         },
     );
 
@@ -73,7 +138,9 @@ function initializePreviewModule({
                     .value,
             );
 
-            renderResults();
+            renderResults(
+                "preview-limit-changed",
+            );
         },
     );
 
@@ -82,7 +149,9 @@ function initializePreviewModule({
             "click",
             function () {
                 model.showAllColumns();
-                renderAll();
+                renderAll(
+                    "visible-columns-changed",
+                );
             },
         );
 
@@ -91,7 +160,9 @@ function initializePreviewModule({
             "click",
             function () {
                 model.hideAllColumns();
-                renderAll();
+                renderAll(
+                    "visible-columns-changed",
+                );
             },
         );
 
@@ -125,7 +196,9 @@ function initializePreviewModule({
                     checkbox.checked,
                 );
 
-                renderAll();
+                renderAll(
+                    "visible-columns-changed",
+                );
             },
         );
 
@@ -162,7 +235,9 @@ function initializePreviewModule({
                         .value,
                 );
 
-                renderResults();
+                renderResults(
+                    "filters-changed",
+                );
             },
         );
 
@@ -176,7 +251,9 @@ function initializePreviewModule({
                     .value,
             );
 
-            renderResults();
+            renderResults(
+                "filters-changed",
+            );
         },
     );
 
@@ -189,7 +266,9 @@ function initializePreviewModule({
                     .value,
             );
 
-            renderResults();
+            renderResults(
+                "filters-changed",
+            );
         },
     );
 
@@ -202,7 +281,9 @@ function initializePreviewModule({
                         .value,
                 );
 
-                renderResults();
+                renderResults(
+                    "filters-changed",
+                );
             },
         );
 
@@ -249,8 +330,8 @@ function initializePreviewModule({
                     columnIndex,
                 );
 
-                view.renderTable(
-                    getSnapshot(),
+                renderTable(
+                    "preview-order-changed",
                 );
             },
         );
@@ -322,10 +403,36 @@ function initializePreviewModule({
             },
         );
 
+    function subscribe(listener) {
+        if (
+            typeof listener !==
+            "function"
+        ) {
+            return function () {};
+        }
+
+        listeners.add(listener);
+
+        listener(
+            getSnapshot(),
+            {
+                type:
+                    "initial-state",
+            },
+        );
+
+        return function () {
+            listeners.delete(
+                listener,
+            );
+        };
+    }
+
     return Object.freeze({
         createExportData:
             model.createExportData,
         getSnapshot,
+        subscribe,
     });
 }
 

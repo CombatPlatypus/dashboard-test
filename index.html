@@ -334,6 +334,9 @@
                 gap: 15px;
                 width: 100%;
             }
+            #analysis .cards[hidden] {
+                display: none;
+            }
             #analysis .cards > div {
                 display: flex;
                 flex-direction: column;
@@ -363,10 +366,91 @@
             #analysis .cards > div > p:last-of-type {
                 margin: 0;
             }
+            #analysis .cards > div > hr {
+                width: 100%;
+                margin: 0;
+            }
             #analysis .cards .summary-block {
+                width: 100%;
                 overflow-y: auto;
                 max-height: 350px;
                 margin-top: auto;
+            }
+            #analysis .cards .analysis-type {
+                padding: 4px 7px;
+                border: 1px solid var(--color-border);
+                border-radius: 3px;
+                color: var(--color-gray-p);
+                font-size: 11px;
+                line-height: 1;
+            }
+            #analysis .cards .analysis-card-value {
+                font-size: 26px;
+            }
+            #analysis .cards .analysis-metrics {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 8px;
+            }
+            #analysis .cards .analysis-metric {
+                min-width: 0;
+                padding: 10px;
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+                border: 1px solid var(--color-border);
+                border-radius: 3px;
+            }
+            #analysis .cards .analysis-metric > span {
+                color: var(--color-gray-p);
+                font-size: 11px;
+            }
+            #analysis .cards .analysis-metric > strong {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+            #analysis .cards .analysis-summary-table {
+                width: 100%;
+                table-layout: fixed;
+                border: 1px solid var(--color-border);
+            }
+            #analysis .cards .analysis-summary-table th,
+            #analysis .cards .analysis-summary-table td {
+                padding: 9px;
+                border-right: 1px solid var(--color-border);
+                text-align: left;
+                vertical-align: middle;
+            }
+            #analysis .cards .analysis-summary-table th {
+                background-color: var(--color-table-th);
+                font-size: 11px;
+            }
+            #analysis .cards .analysis-summary-table td {
+                font-size: 12px;
+                overflow-wrap: anywhere;
+                white-space: normal;
+            }
+            #analysis .cards .analysis-summary-table th:last-child,
+            #analysis .cards .analysis-summary-table td:last-child {
+                border-right: none;
+            }
+            #analysis .cards .analysis-summary-table tbody tr {
+                border-top: 1px solid var(--color-border);
+            }
+            #analysis .cards .analysis-summary-table .analysis-summary-number {
+                width: 25%;
+                text-align: right;
+            }
+            #analysis .cards .analysis-summary-table .analysis-summary-empty {
+                color: var(--color-gray-p);
+                text-align: center;
+            }
+            #analysis .cards .analysis-card-note {
+                margin: 10px 0 0;
+                color: var(--color-gray-p);
+                font-size: 11px;
+                text-align: center;
             }
 
             @media only screen and (max-width: 1100px) {
@@ -3015,22 +3099,10 @@
 
                                     <div class="padding">
 
-                                        <div class="cards" id="">
+                                        <div class="cards" id="analysisCards" hidden></div>
 
-                                            <!-- CARD GERADO DINAMICAMENTE DE ACORDO COM AS COLUNAS -->
-
-                                            <div id="">
-                                                <h4>Valores Diferentes</h4>
-                                                <p>Dê: <span id="">Nome da Coluna</span></p>
-                                                <h4 id="">-</h4>
-
-                                                <hr>
-
-                                                <div class="summary-block">
-
-
-                                                </div>
-                                            </div>
+                                        <div class="analysis-empty" id="analysisCardsEmpty" hidden>
+                                            <h3>Selecione ao menos uma coluna na visualização da planilha para gerar a análise.</h3>
                                         </div>
                                     </div>
                                 </div>

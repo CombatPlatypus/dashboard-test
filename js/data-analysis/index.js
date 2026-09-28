@@ -7,6 +7,10 @@ import {
 } from "./core/data-availability.js";
 
 import {
+    initializeDataAnalysisModule,
+} from "./analysis/analysis-controller.js";
+
+import {
     createNotificationController,
 } from "./core/notification.js";
 
@@ -42,10 +46,16 @@ function initializeAnalysisPanel() {
             analysisStore,
         );
 
-        initializePreviewModule({
+        const previewSource =
+            initializePreviewModule({
+                rootElement,
+                store: analysisStore,
+                notification,
+            });
+
+        initializeDataAnalysisModule({
             rootElement,
-            store: analysisStore,
-            notification,
+            previewSource,
         });
 
         initializeImportModule({
