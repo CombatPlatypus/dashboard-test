@@ -37,8 +37,13 @@
                 max-width: 1600px;
                 margin: 0 auto;
             }
-            #analysis > .flex-box-start {
+            #analysis > #analysis-tabs {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
                 gap: 15px;
+            }
+            #analysis > #analysis-tabs .tabs-title {
+                width: 100%;
             }
             #analysis .report-actions {
                 display: flex;
@@ -50,6 +55,17 @@
                 border: 2px solid var(--color-border);
                 border-radius: 5px;
                 background-color: var(--color-container);
+            }
+            #analysis .report-actions > button:hover:not(:disabled) {
+                opacity: 0.61;
+                transition: opacity 0.5s ease;
+            }
+            #analysis .report-actions > button > img {
+                width: 35px;
+                cursor: pointer;
+            }
+            #analysis .report-actions > button:disabled > img {
+                cursor: not-allowed;
             }
             #analysis .controls {
                 flex: 0 0 480px;
