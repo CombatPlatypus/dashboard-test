@@ -67,6 +67,9 @@
             #analysis .report-actions > button:disabled > img {
                 cursor: not-allowed;
             }
+            #analysis .flex-box-start {
+                gap: 15px;;
+            }
             #analysis .controls {
                 flex: 0 0 480px;
                 height: auto;
@@ -2604,102 +2607,109 @@
                         <!-- VISUALIZAÇÃO DA PLANILHA -->
 
                         <div class="tabs-panel is-active" id="spreadsheets-mode">
+                            <div class="flex-box-start">
 
-                            <!-- CONTROLES DO MODULO -->
+                                <!-- CONTROLES DO MODULO -->
 
-                            <div class="controls">
-                                <div class="title">
-                                    <h4>Controles de Visualização</h4>
-                                </div>
+                                <div class="controls">
+                                    <div class="title">
+                                        <h4>Controles de Visualização</h4>
+                                    </div>
 
-                                <div class="columns">
-                                    <div>
-                                        <h4>Controle de Colunas</h4>
+                                    <div class="columns">
+                                        <div>
+                                            <h4>Controle de Colunas</h4>
+
+                                            <div>
+                                                <button class="button" id="analysisShowAllColumns">Marcar todas</button>
+                                                <button class="button" id="analysisHideAllColumns">Desmarcar todas</button>
+                                                <button class="button" id="analysisHideEmptyColumns">Ocultar vazias</button>
+                                            </div>
+                                        </div>
+
+                                        <div id="analysisVisibleColumns"></div>
+                                    </div>
+
+                                    <div class="filters">
+
+                                        <!-- SELETOR DE COLUNAS -->
+
+                                        <select class="standard-select" style="width: 100%;">
+                                            <option value="">Selecione uma coluna</option>
+
+                                            <!-- OPÇÕES DE COLUNAS GERADAS DINAMICAMENTE DE ACORDO COM O ARQUIVO -->
+
+                                        </select>
+                                        
+                                        <!-- FILTROS DA COLUNA SELECIONADA -->
 
                                         <div>
-                                            <button class="button" id="analysisShowAllColumns">Marcar todas</button>
-                                            <button class="button" id="analysisHideAllColumns">Desmarcar todas</button>
-                                            <button class="button" id="analysisHideEmptyColumns">Ocultar vazias</button>
+
+                                            <!-- AQUI VAI OS INPUTS QUE HOJE FICAVAM DENTRO DAS COLUNAS -->
+
                                         </div>
                                     </div>
-
-                                    <div id="analysisVisibleColumns"></div>
                                 </div>
 
-                                <div class="filters">
+                                <!-- PREVIA DO MODULO -->
 
-                                    <!-- SELETOR DE COLUNAS -->
+                                <div class="preview">
+                                    <div class="title">
+                                        <h4>Prévia da Planilha</h4>
+                                    </div>
 
-                                    <select class="standard-select" style="width: 100%;">
-                                        <option value="">Selecione uma coluna</option>
+                                    <div class="padding">
+                                        
+                                        <!-- TABELA GERADA DE ACORDO COM O ARQUIVO -->
 
-                                        <!-- OPÇÕES DE COLUNAS GERADAS DINAMICAMENTE DE ACORDO COM O ARQUIVO -->
-
-                                    </select>
-                                    
-                                    <!-- FILTROS DA COLUNA SELECIONADA -->
-
-                                    <div>
-
-                                        <!-- AQUI VAI OS INPUTS QUE HOJE FICAVAM DENTRO DAS COLUNAS -->
+                                        <div>
+                                            <table id="analysis-table">
+                                                <thead></thead>
+                                                <tbody></tbody>
+                                            </table>
+                                        </div>
 
                                     </div>
                                 </div>
-                            </div>
 
-                            <!-- PREVIA DO MODULO -->
-
-                            <div class="preview">
-                                <div class="title">
-                                    <h4>Prévia da Planilha</h4>
-                                </div>
-
-                                <div class="padding">
-                                    
-                                    <!-- TABELA GERADA DE ACORDO COM O ARQUIVO -->
-
-                                    <div>
-                                        <table id="analysis-table">
-                                            <thead></thead>
-                                            <tbody></tbody>
-                                        </table>
-                                    </div>
-
-                                </div>
                             </div>
                         </div>
 
                         <!-- COMPARAÇÃO DE DADOS -->
 
                         <div class="tabs-panel" id="comparison-module">
+                            <div class="flex-box-start">
 
-                            <!-- CONTROLES DO MODULO -->
+                                <!-- CONTROLES DO MODULO -->
 
-                            <div class="controls">
+                                <div class="controls">
 
-                            </div>
+                                </div>
 
-                            <!-- PREVIA DO MODULO -->
+                                <!-- PREVIA DO MODULO -->
 
-                            <div class="preview">
+                                <div class="preview">
 
+                                </div>
                             </div>
                         </div>
 
                         <!-- MONTAGEM DE GRÁFICOS-->
 
                         <div class="tabs-panel" id="graphics-module">
+                            <div class="flex-box-start">
 
-                            <!-- CONTROLES DO MODULO -->
+                                <!-- CONTROLES DO MODULO -->
 
-                            <div class="controls">
+                                <div class="controls">
 
-                            </div>
+                                </div>
 
-                            <!-- PREVIA DO MODULO -->
+                                <!-- PREVIA DO MODULO -->
 
-                            <div class="preview">
+                                <div class="preview">
 
+                                </div>
                             </div>
                         </div>
                     </div>
