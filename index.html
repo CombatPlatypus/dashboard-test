@@ -88,9 +88,12 @@
                 border-radius: 5px;
                 background-color: var(--color-container);
             }
-            #analysis .padding > label {
+            #analysis .padding {
+                min-height: 526px;
+                padding: 20px;
+                display: flex;
+                flex-direction: column;
             }
-
 
         </style>
     </head>	
@@ -2618,39 +2621,41 @@
                                         <h4>Controles de Visualização</h4>
                                     </div>
 
-                                    <div class="columns">
-                                        <div>
-                                            <h4>Controle de Colunas</h4>
-
+                                    <div class="padding">
+                                        <div class="columns">
                                             <div>
-                                                <button class="button" id="analysisShowAllColumns">Marcar todas</button>
-                                                <button class="button" id="analysisHideAllColumns">Desmarcar todas</button>
-                                                <button class="button" id="analysisHideEmptyColumns">Ocultar vazias</button>
+                                                <h4>Controle de Colunas</h4>
+
+                                                <div>
+                                                    <button class="button" id="analysisShowAllColumns">Marcar todas</button>
+                                                    <button class="button" id="analysisHideAllColumns">Desmarcar todas</button>
+                                                    <button class="button" id="analysisHideEmptyColumns">Ocultar vazias</button>
+                                                </div>
                                             </div>
+
+                                            <div id="analysisVisibleColumns"></div>
                                         </div>
 
-                                        <div id="analysisVisibleColumns"></div>
-                                    </div>
+                                        <div class="filters">
 
-                                    <div class="filters">
+                                            <!-- SELETOR DE COLUNAS -->
 
-                                        <!-- SELETOR DE COLUNAS -->
+                                            <h4>Filtro de Colunas</h4>
 
-                                        <h4>Filtro de Colunas</h4>
+                                            <select class="standard-select" style="width: 100%;">
+                                                <option value="">Selecione uma coluna</option>
 
-                                        <select class="standard-select" style="width: 100%;">
-                                            <option value="">Selecione uma coluna</option>
+                                                <!-- OPÇÕES DE COLUNAS GERADAS DINAMICAMENTE DE ACORDO COM O ARQUIVO -->
 
-                                            <!-- OPÇÕES DE COLUNAS GERADAS DINAMICAMENTE DE ACORDO COM O ARQUIVO -->
+                                            </select>
+                                            
+                                            <!-- FILTROS DA COLUNA SELECIONADA -->
 
-                                        </select>
-                                        
-                                        <!-- FILTROS DA COLUNA SELECIONADA -->
+                                            <div>
 
-                                        <div>
+                                                <!-- AQUI VAI OS INPUTS QUE HOJE FICAVAM DENTRO DAS COLUNAS -->
 
-                                            <!-- AQUI VAI OS INPUTS QUE HOJE FICAVAM DENTRO DAS COLUNAS -->
-
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -2683,16 +2688,19 @@
 
                         <div class="tabs-panel" id="comparison-module">
                             <div class="flex-box-start">
+                                <div class="padding">
 
-                                <!-- CONTROLES DO MODULO -->
+                                    <!-- CONTROLES DO MODULO -->
 
-                                <div class="controls">
+                                    <div class="controls">
 
-                                </div>
+                                    </div>
 
-                                <!-- PREVIA DO MODULO -->
+                                    <!-- PREVIA DO MODULO -->
 
-                                <div class="preview">
+                                    <div class="preview">
+
+                                    </div>
 
                                 </div>
                             </div>
@@ -2702,17 +2710,20 @@
 
                         <div class="tabs-panel" id="graphics-module">
                             <div class="flex-box-start">
+                                <div class="padding">
 
-                                <!-- CONTROLES DO MODULO -->
+                                    <!-- CONTROLES DO MODULO -->
 
-                                <div class="controls">
+                                    <div class="controls">
 
-                                </div>
+                                    </div>
 
-                                <!-- PREVIA DO MODULO -->
+                                    <!-- PREVIA DO MODULO -->
 
-                                <div class="preview">
+                                    <div class="preview">
 
+                                    </div>
+                                    
                                 </div>
                             </div>
                         </div>
