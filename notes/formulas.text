@@ -1,0 +1,114 @@
+
+Planilha Avarias e Perdas
+
+    Aba Histórico de Avarias
+
+        Coluna A
+
+            =QUERY(ARRAYFORMULA(SE(B2:B="";"";"W"&NÚMSEMANA(B2:B;21)));"SELECT Col1 LABEL Col1 'Semana'";0)
+
+            Ou
+
+            =ARRAYFORMULA(SE(B2:B="";"";"W"&NÚMSEMANA(B2:B;21)))
+
+        Coluna C
+
+            =QUERY(UNIQUE(FILTER('Base de Avarias'!A2:A;'Base de Avarias'!A2:A<>""));"SELECT Col1 LABEL Col1 'Código BR'";0)
+
+            Ou
+
+            =UNIQUE(FILTER('Base de Avarias'!A2:A;'Base de Avarias'!A2:A<>""))
+
+        Coluna D
+
+            =QUERY(ARRAYFORMULA(SE(C2:C="";"";PROCX(C2:C;'Base de Avarias'!A2:A;'Base de Avarias'!B2:B;"")));"SELECT Col1 LABEL Col1 'Status'";0)
+
+            Ou
+
+            =ARRAYFORMULA(SE(C2:C="";"";PROCX(C2:C;'Base de Avarias'!A2:A;'Base de Avarias'!B2:B;"")))
+
+        Coluna E
+
+            =QUERY(ARRAYFORMULA(SE(C2:C="";"";PROCX(C2:C;'Base de Avarias'!A2:A;'Base de Avarias'!C2:C;"")));"SELECT Col1 LABEL Col1 'Status'";0)
+
+            Ou
+
+            =ARRAYFORMULA(SE(C2:C="";"";PROCX(C2:C;'Base de Avarias'!A2:A;'Base de Avarias'!C2:C;"")))
+
+    Aba Avarais Recebidas
+
+        Coluna A
+
+            =QUERY(ARRAYFORMULA(SE(B2:B="";"";"W"&NÚMSEMANA(B2:B;21)));"SELECT Col1 LABEL Col1 'Semana'";0)
+
+            Ou
+
+            =ARRAYFORMULA(SE(B2:B="";"";"W"&NÚMSEMANA(B2:B;21)))
+
+        Coluna B
+
+            =QUERY(ARRAYFORMULA(SE(C2:C="";"";PROCX(C2:C;'Histórico de Avarias'!C2:C;'Histórico de Avarias'!B2:B;"")));"SELECT Col1 LABEL Col1 'Data'";0)
+
+        Coluna C
+
+            =QUERY(UNIQUE(FILTER('Base de Avarias'!A2:A;'Base de Avarias'!A2:A<>"";'Base de Avarias'!A2:A<>"Order ID";'Base de Avarias'!C2:C="LM Hub_SP_Santos_PraiaGrande_02"));"SELECT Col1 LABEL Col1 'Código BR'";0)
+
+            Ou
+
+            =UNIQUE(FILTER('Base de Avarias'!A2:A;'Base de Avarias'!A2:A<>"";'Base de Avarias'!A2:A<>"Order ID";'Base de Avarias'!C2:C="LM Hub_SP_Santos_PraiaGrande_02"))
+
+    Aba Avarais Histórico de Análises
+
+        Coluna A
+
+            =QUERY(ARRAYFORMULA(SE(B2:B="";"";"W"&NÚMSEMANA(B2:B;21)));"SELECT Col1 LABEL Col1 'Semana'";0)
+
+            Ou
+
+            =ARRAYFORMULA(SE(B2:B="";"";"W"&NÚMSEMANA(B2:B;21)))
+
+        Coluna C
+
+            ={"Rota";ARRAYFORMULA(SE(C2:C="";"";PROCX(C2:C;'Base de Análises'!A2:A;'Base de Análises'!B2:B;"-")))}
+
+        Coluna E
+
+            ={"AT";ARRAYFORMULA(SE(C2:C="";"";PROCX(C2:C;'Base de Análises'!A2:A;'Base de Análises'!C2:C;"-")))}
+
+        Coluna G
+
+            ={"Valor R$";ARRAYFORMULA(SE(C2:C="";"";PROCX(C2:C;'Base de Análises'!A2:A;'Base de Análises'!D2:D;"-")))}
+
+    Aba Pack Recovery
+
+        Coluna A
+
+            =QUERY(FILTER('Histórico de Análises'!C2:C;'Histórico de Análises'!A2:A<>"");"SELECT Col1 LABEL Col1 'Código BR'";0)
+
+            Ou
+
+            =FILTER('Histórico de Análises'!C2:C;'Histórico de Análises'!A2:A<>"")
+
+        Coluna C
+
+            =QUERY(ARRAYFORMULA(SE(A2:A="";"";PROCX(A2:A;'Base de Análises'!A2:A;'Base de Análises'!E2:E;"")));"SELECT Col1 LABEL Col1 'ID do Motorista'";0)
+
+            Ou
+
+            =ARRAYFORMULA(SE(A2:A="";"";PROCX(A2:A;'Base de Análises'!A2:A;'Base de Análises'!E2:E;"")))
+
+        Coluna D
+
+            =QUERY(ARRAYFORMULA(SE(A2:A="";"";PROCX(A2:A;'Base de Análises'!A2:A;'Base de Análises'!F2:F;"")));"SELECT Col1 LABEL Col1 'Motorista'";0)
+
+            Ou
+
+            =ARRAYFORMULA(SE(A2:A="";"";PROCX(A2:A;'Base de Análises'!A2:A;'Base de Análises'!F2:F;"")))
+
+        Coluna E
+
+            =QUERY(ARRAYFORMULA(SE(A2:A="";"";PROCX(A2:A;'Base de Análises'!A2:A;'Base de Análises'!G2:G;"")));"SELECT Col1 LABEL Col1 'Tipo de Produto'";0)
+
+            Ou
+
+            =ARRAYFORMULA(SE(A2:A="";"";PROCX(A2:A;'Base de Análises'!A2:A;'Base de Análises'!G2:G;"")))
