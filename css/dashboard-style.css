@@ -1239,7 +1239,7 @@ footer > div {
     max-width: 1600px;
     margin: 0 auto;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(264px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(228px, 1fr));
     align-items: center;
 }
 footer > div > div {
@@ -1247,6 +1247,10 @@ footer > div > div {
     gap: 10px;
     align-items: center;
     justify-content: center;
+    border-right: 2px solid var(--color-border);
+}
+footer > div > div:last-of-type {
+    border-right: none;
 }
 
 /* PAINEL DROPDOWN */
