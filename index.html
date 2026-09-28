@@ -359,12 +359,15 @@
                 line-height: 1;
                 margin: 0;
             }
-            #analysis .cards > div > p:last-child {
+            #analysis .cards > div > h4:last-of-type,
+            #analysis .cards > div > p:last-of-type {
                 margin: 0;
             }
-
-
-
+            #analysis .cards .summary-block {
+                overflow-y: auto;
+                max-height: 350px;
+                margin-top: auto;
+            }
 
             @media only screen and (max-width: 1100px) {
                 #analysis .tabs-panel > .flex-box-start {
@@ -3012,13 +3015,22 @@
 
                                     <div class="padding">
 
-                                        <div class="cards">
-                                            <div>
+                                        <div class="cards" id="">
+
+                                            <!-- CARD GERADO DINAMICAMENTE DE ACORDO COM AS COLUNAS -->
+
+                                            <div id="">
                                                 <h4>Valores Diferentes</h4>
                                                 <p>Dê: <span id="">Nome da Coluna</span></p>
                                                 <h4 id="">-</h4>
-                                            </div>
 
+                                                <hr>
+
+                                                <div class="summary-block">
+
+
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
