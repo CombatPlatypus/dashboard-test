@@ -1156,68 +1156,9 @@
                 font-size: 13px;
                 font-weight: 600;
             }
-            .conditional-comparison {
-                margin-top: 15px;
-                display: grid;
-                grid-template-columns: repeat(2, minmax(146px, 1fr));
-                gap: 15px;
-            }
-            .comparison-choice select:not(.select2-hidden-accessible),
-            .comparison-choice .select2-container {
-                width: 100% !important;
-                min-width: 0 !important;
-                max-width: 100% !important;
-            }
-            .comparison-choice > .select2-hidden-accessible {
-                width: 1px !important;
-                min-width: 1px !important;
-                max-width: 1px !important;
-                height: 1px !important;
-            }
-            .comparison-textarea-title {
-                margin-top: 20px;
-                margin-bottom: 8px;
-                align-items: center;
-            }
-            .comparison-textarea-title label {
-                margin: 0;
-                font-weight: 600;
-            }
-            .comparison-textarea-title span {
-                color: var(--color-gray-p);
-                font-size: 13px;
-            }
-            .comparison-choice textarea {
-                width: 100%;
-                min-height: 330px;
-                padding: 15px;
-                color: var(--color-text);
-                background-color: var(--color-container);
-                border: 1px solid var(--color-border);
-                border-radius: 5px;
-                resize: vertical;
-            }
-            .comparison-choice textarea:focus {
-                outline: none;
-                border-color: var(--color-gray-p);
-            }
-            .textarea-results {
-                margin: 20px 0;
-                gap: 10px;
-                align-items: center;
-            }
-            .textarea-results div {
-                gap: 8px;
-                align-items: center;
-            }
-            .textarea-results img {
-                width: 15px;
-            }
-            .textarea-results p {
-                width: max-content;
-                margin-bottom: 0;
-                font-size: 13px;
-            }
+
+            
+           
             .comparison-actions {
                 height: 49px;
                 overflow: hidden;
