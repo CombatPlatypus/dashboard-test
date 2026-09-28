@@ -28,6 +28,11 @@ function getPreviewElements(
     rootElement,
 ) {
     return Object.freeze({
+        columnsContainer:
+            requireElement(
+                rootElement,
+                "#spreadsheets-mode .columns",
+            ),
         copyButton:
             requireElement(
                 rootElement,
@@ -127,6 +132,12 @@ function createPreviewView(
     function renderVisibleColumns(
         snapshot,
     ) {
+        elements.columnsContainer
+            .classList.toggle(
+                "no-file",
+                !snapshot.dataset,
+            );
+
         elements.visibleColumns
             .replaceChildren();
 
