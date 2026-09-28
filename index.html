@@ -91,7 +91,7 @@
             }
             #analysis .padding {
                 min-height: 526px;
-                padding: 20px;
+                padding: 30px;
                 display: flex;
                 flex-direction: column;
                 gap: 15px;
@@ -106,6 +106,9 @@
             #analysis .columns > div:first-of-type > div {
                 display: flex;
                 gap: 5px;
+            }
+            #analysis .columns h4 {
+                margin-bottom: 12px;
             }
             #analysis .columns button {
                 flex: 1 1 0;
@@ -166,6 +169,16 @@
             #analysis .columns #analysisVisibleColumns > div > label > span {
                 font-size: 12px;
                 margin: 0;
+            }
+            #analysis .filters .type-of-filters {
+
+                
+            }
+            #analysis .filters .numeric-filter > div {
+                flex: 1 1 0;
+            }
+            #analysis .filters .numeric-filter > input {
+                flex: 0 0 65px;
             }
 
         </style>
@@ -2697,7 +2710,7 @@
                                     <div class="padding">
                                         <div class="columns">
                                             <div>
-                                                <h4>Controle de Colunas</h4>
+                                                <h4>Lista de Colunas</h4>
 
                                                 <div>
                                                     <button class="button" id="analysisShowAllColumns">Marcar todas</button>
@@ -2706,14 +2719,15 @@
                                             </div>
 
                                             <div id="analysisVisibleColumns">
+
+                                                <!-- LISTA DINAMICA DE COLUNAS -->
+
                                                 <div>
                                                     <label>
                                                         <input type="checkbox" aria-label="">
                                                         <span title="">Nome da Coluna</span>
                                                     </label>
                                                 </div>
-
-
                                             </div>
                                         </div>
 
@@ -2732,10 +2746,31 @@
                                             
                                             <!-- FILTROS DA COLUNA SELECIONADA -->
 
-                                            <div>
+                                            <div class="type-of-filters">
+                                                <input type="search" class="statistics-column-filter" placeholder="Filtrar...">
 
-                                                <!-- AQUI VAI OS INPUTS QUE HOJE FICAVAM DENTRO DAS COLUNAS -->
+                                                <select class="standard-select" style="width: 100%;">
+                                                    <option value="all">Todos os Valores</option>
+                                                    <option value="duplicates">Somente Duplicados</option>
+                                                    <option value="unique">Somente Únicos</option>
+                                                    <option value="empty">Somente Células Vazias</option>
+                                                </select>
+                        
+                                                <div class="numeric-filter flex-box-start">
+                                                    <div>
+                                                        <select class="standard-select" style="width: 100%;" id="">
+                                                            <option value="">Comparar...</option>
+                                                            <option value="">Maior que</option>
+                                                            <option value="">Maior ou igual</option>
+                                                            <option value="">Menor que</option>
+                                                            <option value="">Menor ou igual</option>
+                                                            <option value="">Diferente de</option>
+                                                            <option value="">Igual a</option>
+                                                        </select>
+                                                    </div>
 
+                                                    <input type="text" id="" placeholder="Valor" maxlength="5" autocomplete="off" inputmode="numeric" pattern="[0-9]*">
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
