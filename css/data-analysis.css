@@ -1,90 +1,89 @@
-/* PAINEL ANÁLISES */
 
-    /* ESTRUTURA DO PAINEL */
+/* ESTRUTURA DO PAINEL */
 
-        .main-structure #statistics .tabs {
-            flex: 1 1 0;
-            margin: 0;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-        }
-        .main-structure #statistics #statistics-margin {
-            max-width: 1300px;
-            margin: 0 auto 30px auto;
-            column-gap: 15px;
-            align-items: center;
-        }
-        .main-structure #statistics .tabs .tabs-title {
-            width: 100%;
-        }
-        .main-structure #statistics .tabs-content {
-            display: flex;
-            max-width: 1600px;
-            margin: 0 auto;
-        }
-        .main-structure #statistics .tabs-panel.is-active {
-            flex: 1 1 0;
-            width: 100%;
-            min-width: 0;
-            max-width: 100%;
-            overflow: hidden;
-        }
-        .main-structure #statistics.no-file #statistics-margin, .main-structure #statistics.no-file .tabs, .main-structure #statistics.no-file .action-buttons {
-            margin-bottom: 0;
-            display: none;
-        }
-        .main-structure #statistics.no-file .import-panel {
-            height: calc(100dvh - 162px - 30px);
-            max-height: calc(100dvh - 162px - 30px);
-            background-color: transparent;
-            border: none;
-            padding: 0;
-            border-radius: 0;
-        }
-        .main-structure #statistics .action-buttons {
-            flex: 0 0 135px;
-            column-gap: 15px;
-            overflow: hidden;
-        }
-        .main-structure #statistics .action-buttons #statisticsDownloadCsv {
-            min-height: 45px;
-            font-size: 14px;
-            padding: 10px 15px;
-        }
-        .main-structure #statistics .action-buttons #statisticsClearFile {
-            background-color: transparent;
-            border-bottom: none;
-            cursor: pointer;
-        }
-        .main-structure #statistics .action-buttons #statisticsClearFile img {
-            width: 30px;
-        }
-        .module-header.flex-box-between {
-            width: 100%;
-            padding: 25px;
-            background-color: var(--color-container);
-            border: 2px solid var(--color-border);
-            border-radius: 5px;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .module-header.flex-box-between div {
-            gap: 10px;
-            align-items: center;
-        }
-        .module-header.flex-box-between img {
-            width: 35px;
-        }
-        .module-header.flex-box-between h3,
-        .module-header.flex-box-between p {
-            margin-bottom: 0;
-        }
-        .module-header.flex-box-between p {
-            width: max-content;
-            height: auto;
-            font-size: 13px;
-        }
+.main-structure #statistics .tabs {
+    flex: 1 1 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+}
+.main-structure #statistics #statistics-margin {
+    max-width: 1300px;
+    margin: 0 auto 30px auto;
+    column-gap: 15px;
+    align-items: center;
+}
+.main-structure #statistics .tabs .tabs-title {
+    width: 100%;
+}
+.main-structure #statistics .tabs-content {
+    display: flex;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+.main-structure #statistics .tabs-panel.is-active {
+    flex: 1 1 0;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+}
+.main-structure #statistics.no-file #statistics-margin, .main-structure #statistics.no-file .tabs, .main-structure #statistics.no-file .action-buttons {
+    margin-bottom: 0;
+    display: none;
+}
+.main-structure #statistics.no-file .import-panel {
+    height: calc(100dvh - 162px - 30px);
+    max-height: calc(100dvh - 162px - 30px);
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    border-radius: 0;
+}
+.main-structure #statistics .action-buttons {
+    flex: 0 0 135px;
+    column-gap: 15px;
+    overflow: hidden;
+}
+.main-structure #statistics .action-buttons #statisticsDownloadCsv {
+    min-height: 45px;
+    font-size: 14px;
+    padding: 10px 15px;
+}
+.main-structure #statistics .action-buttons #statisticsClearFile {
+    background-color: transparent;
+    border-bottom: none;
+    cursor: pointer;
+}
+.main-structure #statistics .action-buttons #statisticsClearFile img {
+    width: 30px;
+}
+.module-header.flex-box-between {
+    width: 100%;
+    padding: 25px;
+    background-color: var(--color-container);
+    border: 2px solid var(--color-border);
+    border-radius: 5px;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.module-header.flex-box-between div {
+    gap: 10px;
+    align-items: center;
+}
+.module-header.flex-box-between img {
+    width: 35px;
+}
+.module-header.flex-box-between h3,
+.module-header.flex-box-between p {
+    margin-bottom: 0;
+}
+.module-header.flex-box-between p {
+    width: max-content;
+    height: auto;
+    font-size: 13px;
+}
 
     /* MÓDULO DE IMPORTAÇÃO */
 

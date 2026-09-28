@@ -30,6 +30,48 @@
         <link rel="stylesheet" href="css/data-analysis.css">
         <link rel="stylesheet" href="css/docs.css">
         <link rel="stylesheet" href="css/filter.css">
+
+        <style>
+
+            #analysis {
+                max-width: 1600px;
+                margin: 0 auto;
+            }
+            #analysis > .flex-box-start {
+                gap: 15px;
+            }
+            #analysis .report-actions {
+                display: flex;
+                flex: 0 0 max-content;
+                justify-content: center;
+                gap: 15px;
+                margin: 0 0 20px;
+                padding: 20px;
+                border: 2px solid var(--color-border);
+                border-radius: 5px;
+                background-color: var(--color-container);
+            }
+            #analysis .controls {
+                flex: 0 0 480px;
+                height: auto;
+                overflow: hidden;
+                border: 2px solid var(--color-border);
+                border-radius: 5px;
+                background-color: var(--color-container);
+            }
+            #analysis .preview {
+                min-width: 0;
+                flex: 1 1 0;
+                overflow: hidden;
+                border: 2px solid var(--color-border);
+                border-radius: 5px;
+                background-color: var(--color-container);
+            }
+            #analysis .padding > label {
+            }
+
+
+        </style>
     </head>	
 
     <!-- CONTEÚDO DA PÁGINA -->
@@ -40,6 +82,9 @@
 
         <nav class="main-menu">
             <div class="flex-box-between">
+
+                <!-- NOME DO SISTEMA E VERSÃO -->
+
                 <div class="flex-box-start">
                     <img src="images/geral-icons/hub-logo-menu.svg">
 
@@ -50,7 +95,10 @@
                 </div>
 
                 <ul class="flex-box-start tabs" data-tabs id="switch-1">
-                    <li class="tabs-title is-active">
+
+                    <!-- PAINEL - PLANILHAS -->
+
+                    <li class="tabs-title">
                         <a href="#spreadsheets">
                             <div class="flex-box-center">
                                 <img src="images/geral-icons/sheets-icon.svg">
@@ -58,6 +106,8 @@
                             </div>
                         </a>
                     </li> 
+
+                    <!-- PAINEL - REPORTS -->
 
                     <li class="tabs-title">
                         <a href="#reports">
@@ -68,14 +118,18 @@
                         </a>
                     </li> 
 
-                    <li class="tabs-title">
-                        <a href="#statistics">
+                    <!-- PAINEL - ANÁLISE -->
+
+                    <li class="tabs-title is-active">
+                        <a href="#analysis">
                             <div class="flex-box-center">
                                 <img src="images/geral-icons/magnifier-icon.svg">
                                 <h4>Análises</h4>
                             </div>
                         </a>
                     </li> 
+
+                    <!-- PAINEL FILTRAGEM -->
 
                     <li class="tabs-title">
                         <a href="#filter">
@@ -85,6 +139,8 @@
                             </div>
                         </a>
                     </li> 
+
+                    <!-- LISTA DE BOTÕES PRINCIPAIS DO MENU -->
 
                     <div class="nav-actions">
                         <button id="reportDownloadButton" type="button" title="Salvar sessão" aria-label="Salvar sessão dos relatórios">
@@ -124,7 +180,7 @@
 
                 <!-- PAINEL - PLANILHAS -->
 
-                <div class="tabs-panel is-active" id="spreadsheets">
+                <div class="tabs-panel" id="spreadsheets">
                     <div class="spreadsheets-layout">
 
                         <!-- MENU DE NAVEGAÇÃO DAS PLANILHAS -->
@@ -2469,498 +2525,166 @@
 
                 <!-- PAINEL - ANÁLISE -->
 
-                <div class="tabs-panel no-file" id="statistics">
+                <div class="tabs-panel is-active no-file" id="analysis">
 
-                    <!-- IMPORTAÇÃO LOCAL -->
+                    <!-- TABS DE NAVEGAÇÃO -->
 
-                    <section class="import-panel">
-                        <div class="flex-box-start">
-                            <img src="images/geral-icons/sheets-icon.svg">
-                            <h3>Exporte do SPX ou uma Planilha.</h3>
-                        </div>
+                    <ul class="tabs" data-tabs id="analysis-tabs">
+                        <li class="tabs-title is-active">
+                            <a href="#spreadsheets-module">
+                                <h4>Visualização de Planilhas</h4>
+                            </a>
+                        </li> 
 
-                        <div class="statistics-drop-zone" id="statisticsDropZone">
-                            <img src="images/geral-icons/import-icon.svg">
-                            <h3>Importe os dados para começar.</h3>
-                            <p>Arraste uma planilha ou escolha um arquivo do computador.</p>
+                        <li class="tabs-title">
+                            <a href="#comparison-module">
+                                <h4>Comparação de Dados</h4>
+                            </a>
+                        </li> 
 
-                            <div class="flex-box-center">
-                                <h5>.xlsx</h5>
-                                <h5>.xls</h5>
-                                <h5>.csv</h5>
+                        <li class="tabs-title">
+                            <a href="#graphics-module">
+                                <h4>Montagem de Gráficos</h4>
+                            </a>
+                        </li> 
+                    </ul> 
+
+                    <!-- BARRA DE NOTIFCAÇÕES E BOTÕES -->
+
+                    <div class="flex-box-start">
+                        <div class="warning" id="analysisNotification" role="status" aria-live="polite" aria-atomic="true" data-notification-type="idle">
+                            <div class="flex-box-start">
+                                <img id="analysisNotificationIcon" src="images/geral-icons/bell-icon.svg" alt="" aria-hidden="true">
+
+                                <h4 id="analysisNotificationText">Importe uma base de dados vinda do SPX para começar.</h4>
                             </div>
                         </div>
 
-                        <p id="statisticsFileStatus">Nenhum arquivo selecionado, escolha um arquivo para começar.</p>
-
-                        <div>
-                            <label class="button statistics-file-button" for="statisticsFileInput">Procurar Arquivo</label>
-                            <input id="statisticsFileInput" type="file" accept=".xlsx,.xls,.csv" style="display: none;">
-                        </div>
-                    </section>
-
-                    <div class="flex-box-start" id="statistics-margin">
-
-                        <!-- MENU DE NAVEGAÇÃO DO PAINEL -->
-
-                        <ul class="tabs" data-tabs id="statistics-tabs">
-                            <li class="tabs-title is-active">
-                                <a href="#statistics-1">
-                                    <h4>Prévia da Planilha</h4>
-                                </a>
-                            </li> 
-
-                            <li class="tabs-title">
-                                <a href="#statistics-2">
-                                    <h4>Comparação de Dados</h4>
-                                </a>
-                            </li> 
-
-                            <li class="tabs-title">
-                                <a href="#statistics-3">
-                                    <h4>Análise da Planilha</h4>
-                                </a>
-                            </li> 
-
-                            <li class="tabs-title">
-                                <a href="#statistics-4">
-                                    <h4>Montagem de Gráficos</h4>
-                                </a>
-                            </li> 
-                        </ul> 
-
-                        <!-- BOTÕES DE AÇÃO -->
-
-                        <div class="action-buttons flex-box-start">
-                            <button class="button" id="statisticsDownloadCsv" type="button" disabled>
-                                Baixar
+                        <div class="report-actions">
+                            <button id="analysisCopyButton" type="button" title="Copia os dados filtrados" aria-label="Copia os dados filtrados" disabled>
+                                <img src="images/geral-icons/copy-icon.svg" alt="" aria-hidden="true">
                             </button>
 
-                            <button id="statisticsClearFile" disabled>
-                                <img src="images/geral-icons/trash-basket-icon.svg">
+                            <button id="analysisSaveButton" type="button" title="Salvar arquivo filtrado em CSV" aria-label="Salvar arquivo filtrado em CSV" disabled>
+                                <img src="images/geral-icons/save-icon.svg" alt="" aria-hidden="true">
                             </button>
-                            
-                            <button id="statisticsDownloadXlsx" type="button" disabled style="display: none;">
-                                <img src="images/geral-icons/file-xlsx-icon.svg">
+
+                            <button id="analysisImportButton" type="button" title="Importar base de dados" aria-label="Importar base de dados">
+                                <img src="images/geral-icons/import-icon.svg" alt="" aria-hidden="true">
+                            </button>
+
+                            <input id="analysisFileInput" type="file" accept=".csv,.xlsx,.xls" hidden>
+
+                            <button id="analysisClearButton" type="button" title="Descartar arquivo importado" aria-label="Descartar arquivo importado" disabled>
+                                <img src="images/geral-icons/trash-basket-icon.svg" alt="" aria-hidden="true">
                             </button>
                         </div>
                     </div>
 
-                    <!-- SEM TITULO POR ENQUANTO -->
+                    <!-- CONTEÚDO DOS TABS -->
 
-                    <div class="tabs-content" data-tabs-content="statistics-tabs">
+                    <div class="tabs-content" data-tabs-content="analysis-tabs">
 
-                        <!-- PRÉVIA DA PLANILHA -->
+                        <!-- VISUALIZAÇÃO DA PLANILHA -->
 
-                        <div class="tabs-panel is-active" id="statistics-1">
-                            <section id="statisticsLocalPreview" hidden>
+                        <div class="tabs-panel is-active" id="spreadsheets-mode">
 
-                                <!-- HEADER -->
+                            <!-- CONTROLES DO MODULO -->
 
-                                <div class="module-header flex-box-between">
-                                    <div class="flex-box-start">
-                                        <img src="images/geral-icons/table-icon.svg">
-                                        <h3>Prévia da Planilha</h3>
-                                    </div>
-
-                                    <div class="statistics-visible-columns-title statistics-preview-controls">
-                                        <h4 id="statisticsPreviewSummary"></h4>
-
-                                        <label for="statisticsPreviewLimit">
-                                            Exibir até
-                                        </label>
-
-                                        <select id="statisticsPreviewLimit" class="standard-select">
-                                            <option value="50">50 linhas</option>
-                                            <option value="100">100 linhas</option>
-                                            <option value="250">250 linhas</option>
-                                            <option value="500">500 linhas</option>
-                                            <option value="all" selected>Todas as linhas</option>
-                                        </select>
-
-                                        <button class="statistics-visible-columns-toggle" data-toggle="statisticsVisibleColumnSelector">
-                                            <span>Colunas</span>
-
-                                            <span id="statisticsVisibleColumnCount">
-                                                0 de 0
-                                            </span>
-
-                                            <span aria-hidden="true">▾</span>
-                                        </button>
-
-                                        <button id="statisticsClearFilters" class="statistics-visible-columns-action" disabled>
-                                            <img src="images/geral-icons/clean-filter-icon.svg">
-                                        </button>
-                                    </div>
+                            <div class="controls">
+                                <div class="title">
+                                    <h4>Controles de Visualização</h4>
                                 </div>
 
-                                <!-- PAINEL DROPDOWN DAS COLUNAS -->
-
-                                <div class="dropdown-pane statistics-visible-columns-dropdown" id="statisticsVisibleColumnSelector" data-dropdown data-position="bottom" data-alignment="center" data-auto-focus="true" data-close-on-click="true">
-                                    <div class="statistics-visible-columns-header">
+                                <div class="columns">
+                                    <div>
                                         <h4>Controle de Colunas</h4>
 
-                                        <div class="statistics-visible-columns-actions">
-                                            <button id="statisticsShowAllColumns" class="statistics-visible-columns-action">Marcar todas</button>
-                                            <button id="statisticsHideAllColumns" class="statistics-visible-columns-action">Desmarcar todas</button>
-                                            <button id="statisticsHideEmptyColumns" class="statistics-visible-columns-action">Ocultar vazias</button>
+                                        <div>
+                                            <button class="button" id="analysisShowAllColumns">Marcar todas</button>
+                                            <button class="button" id="analysisHideAllColumns">Desmarcar todas</button>
+                                            <button class="button" id="analysisHideEmptyColumns">Ocultar vazias</button>
                                         </div>
                                     </div>
 
-                                    <div id="statisticsVisibleColumns"></div>
+                                    <div id="analysisVisibleColumns"></div>
                                 </div>
 
-                                <!-- TABELA GERADA DE ACORDO COM A PLANILHA -->
+                                <div class="filters">
 
-                                <div class="statistics-table-container">
-                                    <table id="statisticsLocalTable" class="statistics-local-table">
-                                        <thead></thead>
-                                        <tbody></tbody>
-                                    </table>
+                                    <!-- SELETOR DE COLUNAS -->
+
+                                    <select class="standard-select" style="width: 100%;">
+                                        <option value="">Selecione uma coluna</option>
+
+                                        <!-- OPÇÕES DE COLUNAS GERADAS DINAMICAMENTE DE ACORDO COM O ARQUIVO -->
+
+                                    </select>
+                                    
+                                    <!-- FILTROS DA COLUNA SELECIONADA -->
+
+                                    <div>
+
+                                        <!-- AQUI VAI OS INPUTS QUE HOJE FICAVAM DENTRO DAS COLUNAS -->
+
+                                    </div>
                                 </div>
-                            </section>
+                            </div>
+
+                            <!-- PREVIA DO MODULO -->
+
+                            <div class="preview">
+                                <div class="title">
+                                    <h4>Prévia da Planilha</h4>
+                                </div>
+
+                                <div class="padding">
+                                    
+                                    <!-- TABELA GERADA DE ACORDO COM O ARQUIVO -->
+
+                                    <div>
+                                        <table id="analysis-table">
+                                            <thead></thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
+
+                                </div>
+                            </div>
                         </div>
 
                         <!-- COMPARAÇÃO DE DADOS -->
 
-                        <div class="tabs-panel" id="statistics-2">
-                            <section class="comparison" id="statisticsComparisonPanel" hidden>
+                        <div class="tabs-panel" id="comparison-module">
 
-                                <!-- HEADER -->
+                            <!-- CONTROLES DO MODULO -->
 
-                                <div class="flex-box-between">
-                                    <div class="flex-box-start">
-                                        <img src="images/geral-icons/comparison-icon.svg">
-                                        <h3>Comparação de Dados</h3>
-                                    </div>
+                            <div class="controls">
 
-                                    <p id="statisticsComparisonSummary">Nenhuma planilha carregada.</p>
-                                </div>
+                            </div>
 
-                                <!-- CONTEÚDO -->
+                            <!-- PREVIA DO MODULO -->
 
-                                <div class="comparison-body flex-box-start">
+                            <div class="preview">
 
-                                    <!-- DADOS PARA COMPARAÇÃO -->
-
-                                    <div class="comparison-choice">
-                                        <h4>Dados para Comparar</h4>
-                                        <p>Escolha a coluna e cole os valores para localizar.</p>
-
-                                        <h4>Localize Em:</h4>
-
-                                        <select id="statisticsComparisonColumn" class="standard-select">
-                                            <option value="">Selecione uma coluna</option>
-                                        </select>
-
-                                        <div class="conditional-comparison">
-                                            <div>
-                                                <h4>Se a Coluna:</h4>
-                                                <select id="statisticsComparisonConditionColumn" class="standard-select" style="width: 100%;" disabled>
-                                                    <option value="">Nenhuma condição</option>
-                                                </select>
-                                            </div>
-
-                                            <div>
-                                                <h4>Tiver o Valor:</h4>
-                                                <select id="statisticsComparisonConditionValue" class="standard-select" style="width: 100%;" disabled>
-                                                    <option value="">Selecione um valor</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-
-                                        <div class="comparison-textarea-title flex-box-between">
-                                            <label for="statisticsComparisonInput">Valores para comparar</label>
-                                            <span id="statisticsComparisonLineCount">0 linhas</span>
-                                        </div>
-
-                                        <textarea id="statisticsComparisonInput" rows="14" placeholder="Cole um valor por linha" disabled></textarea>
-
-                                        <div class="textarea-results flex-box-between">
-                                            <div class="flex-box-start">
-                                                <img src="images/geral-icons/circle-green-icon.svg">
-                                                <p><span id="statisticsComparisonValidCount">0</span> Válidos</p>
-                                            </div>
-
-                                            <div class="flex-box-start">
-                                                <img src="images/geral-icons/circle-yellow-icon.svg">
-                                                <p><span id="statisticsComparisonDuplicateCount">0</span> Repetidos</p>
-                                            </div>
-
-                                            <div class="flex-box-start">
-                                                <img src="images/geral-icons/circle-red-icon.svg">
-                                                <p><span id="statisticsComparisonInvalidCount">0</span> Inválidos</p>
-                                            </div>
-                                        </div>
-
-                                        <div class="comparison-actions">
-                                            <button id="statisticsComparisonClear" class="button" type="button" disabled>Limpar Lista</button>
-                                        </div>
-                                    </div>
-
-                                    <!-- RESULTADOS -->
-
-                                    <div class="comparison-results">
-
-                                        <!-- CARDS -->
-
-                                        <div class="comparison-cards">
-                                            <div class="card">
-                                                <h3 id="statisticsComparisonFoundTitle">Encontrados</h3>
-
-                                                <div class="flex-box-start">
-                                                    <img src="images/geral-icons/success-icon.svg">
-                                                    <h3 id="statisticsComparisonFoundCount">0</h3>
-                                                </div>
-                                            </div>
-
-                                            <div class="card" id="statisticsComparisonOutsideCard" hidden>
-                                                <h3>Fora da Condição</h3>
-
-                                                <div class="flex-box-start">
-                                                    <img src="images/geral-icons/alert-icon.svg">
-                                                    <h3 id="statisticsComparisonOutsideCount">0</h3>
-                                                </div>
-                                            </div>
-
-                                            <div class="card">
-                                                <h3>Não Encontrados</h3>
-
-                                                <div class="flex-box-start">
-                                                    <img src="images/geral-icons/error-icon.svg">
-                                                    <h3 id="statisticsComparisonNotFoundCount">0</h3>
-                                                </div>
-                                            </div>
-
-                                            <div class="card">
-                                                <h3>Correspondência</h3>
-
-                                                <div class="flex-box-start">
-                                                    <img src="images/geral-icons/chart-pizza-icon.svg">
-                                                    <h3 id="statisticsComparisonRate">0%</h3>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- ESTADO INICIAL -->
-
-                                        <div class="comparison-empty" id="statisticsComparisonEmpty">
-                                            <h4>Esperando por uma comparação...</h4>
-                                        </div>
-
-                                        <!-- PRÉVIA DOS RESULTADOS -->
-
-                                        <div class="comparison-preview" id="statisticsComparisonPreview" hidden>
-                                            <div class="comparison-preview-header flex-box-between">
-                                                <input id="statisticsComparisonSearch" type="search" placeholder="Buscar nos resultados">
-
-                                                <button id="statisticsComparisonExport" class="button" type="button" disabled>Baixar Resultado</button>
-                                            </div>
-
-                                            <div class="comparison-table">
-                                                <div class="statistics-table-container">
-                                                    <table class="statistics-local-table" id="statisticsComparisonTable">
-                                                        <thead>
-                                                            <tr>
-                                                                <th>Valor Informado</th>
-                                                                <th>Status</th>
-                                                                <th>Valor da Condição</th>
-                                                                <th>Ocorrências</th>
-                                                                <th>Linhas</th>
-                                                            </tr>
-                                                        </thead>
-
-                                                        <tbody></tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                </div>
-                            </section>
+                            </div>
                         </div>
 
-                        <!-- ANÁLISE PLANILHA -->
+                        <!-- MONTAGEM DE GRÁFICOS-->
 
-                        <div class="tabs-panel" id="statistics-3">
-                            <section id="statisticsQuickAnalysis" hidden>
+                        <div class="tabs-panel" id="graphics-module">
 
-                                <!-- HEADER -->
+                            <!-- CONTROLES DO MODULO -->
 
-                                <div class="module-header flex-box-between">
-                                    <div class="flex-box-start">
-                                        <img src="images/geral-icons/magnifier-icon.svg">
-                                        <h3>Análise da Planilha</h3>
-                                    </div>
+                            <div class="controls">
 
-                                    <p>Linhas Analisadas - <span id="statisticsTotalRecords">0</span></p>
-                                </div>
+                            </div>
 
-                                <!-- CONTEÚDO DO MODULO -->
+                            <!-- PREVIA DO MODULO -->
 
-                                <div id="standard-container">
-                                    <div class="statistics-analysis-top">
-                                        <div id="statisticsAnalysisColumnSelector">
-                                            <div class="flex-box-between">
+                            <div class="preview">
 
-                                                <div>
-                                                    <h4>Colunas para análise</h4>
-                                                    <p>Escolha quais colunas da planilha devem ser analisadas.</p>
-                                                </div>
-
-                                                <div class="statistics-column-actions">
-                                                    <button id="statisticsSelectAllColumns" class="statistics-analysis-action" type="button">Analisar Tudo</button>
-
-                                                    <button id="statisticsClearColumns" class="statistics-analysis-action" type="button">Limpar Seleção</button>
-                                                </div>
-                                            </div>
-
-                                            <div id="statisticsAnalysisColumns" class="statistics-column-options"></div>
-                                        </div>
-                                    </div>
-
-                                    <div class="statistics-summary-cards">
-                                        <div id="statisticsAnalysisCards" style="display: contents;"></div>
-                                    </div>
-
-                                    <p id="statisticsAnalysisEmpty" class="statistics-analysis-empty">Selecione ao menos uma coluna para visualizar a análise.</p>
-
-                                    <div id="statisticsAnalysisResults" class="statistics-summary-tables"></div>
-                                </div>
-                            </section>
-                        </div>
-
-                        <!-- GERAÇÃO DE GRÁFICOS -->
-
-                        <div class="tabs-panel" id="statistics-4">
-                            <section id="statisticsChartPanel" class="charts-panel" hidden>
-
-                                <!-- HEADER -->
-
-                                <div class="flex-box-between">
-
-                                    <div class="flex-box-start">
-                                        <img src="images/geral-icons/statistics-icon.svg" alt="">
-                                        <h3>Montagem de Gráficos</h3>
-                                    </div>
-
-                                    <p id="statisticsChartSummary">Nenhuma planilha carregada.</p>
-                                </div>
-
-                                <!-- CONTEÚDO -->
-
-                                <div class="charts-body flex-box-start">
-
-                                    <!-- CONTROLES -->
-
-                                    <div class="charts-control">
-
-                                        <h4>Configure os Dados</h4>
-                                        <p>Escolha como as informações da planilha serão organizadas e calculadas.</p>
-
-                                        <div class="operation-choice">
-                                            <h4>Agrupar Por</h4>
-
-                                            <select id="statisticsChartCategory" class="standard-select">
-                                                <option value="">Selecione uma coluna</option>
-                                            </select>
-
-                                            <h4>Calcular Usando</h4>
-
-                                            <select id="statisticsChartValue" class="standard-select">
-                                                <option value="">Selecione uma coluna</option>
-                                            </select>
-
-                                            <h4>Tipo de Cálculo</h4>
-
-                                            <select id="statisticsChartOperation" class="standard-select">
-                                                <option value="count">Contar Registros</option>
-                                                <option value="sum">Somar Valores</option>
-                                                <option value="average">Calcular Média</option>
-                                            </select>
-                                        </div>
-
-                                        <hr>
-
-                                        <h4>Tipos de Gráfico</h4>
-
-                                        <div id="statisticsChartTypes" class="types-of-charts flex-box-between">
-
-                                            <div>
-                                                <button type="button" data-chart-type="bar" aria-label="Gráfico de colunas" aria-pressed="true">
-                                                    <img src="images/geral-icons/chart-columns-icon.svg" alt="">
-                                                </button>
-
-                                                <h4>Colunas</h4>
-                                            </div>
-
-                                            <div>
-                                                <button type="button" data-chart-type="line" aria-label="Gráfico de linhas" aria-pressed="false">
-                                                    <img src="images/geral-icons/chart-lines-icon.svg" alt="">
-                                                </button>
-
-                                                <h4>Linhas</h4>
-                                            </div>
-
-                                            <div>
-                                                <button type="button" data-chart-type="pie" aria-label="Gráfico de pizza" aria-pressed="false">
-                                                    <img src="images/geral-icons/chart-pizza-icon.svg" alt="">
-                                                </button>
-
-                                                <h4>Pizza</h4>
-                                            </div>
-
-                                        </div>
-
-                                        <hr>
-
-                                        <h4>Aparência</h4>
-
-                                        <div class="colors-change flex-box-start">
-
-                                            <h4>Cores</h4>
-
-                                            <div id="statisticsChartColors" class="flex-box-start">
-                                                <button type="button" data-chart-color="#ff5533" aria-label="Cor coral" aria-pressed="true"></button>
-                                                <button type="button" data-chart-color="#dfe3e8" aria-label="Cor cinza claro" aria-pressed="false"></button>
-                                                <button type="button" data-chart-color="#f2a900" aria-label="Cor amarela" aria-pressed="false"></button>
-                                                <button type="button" data-chart-color="#3478d4" aria-label="Cor azul" aria-pressed="false"></button>
-                                                <button type="button" data-chart-color="#1abc9c" aria-label="Cor turquesa" aria-pressed="false"></button>
-                                                <button type="button" data-chart-color="#8e5cd9" aria-label="Cor roxa" aria-pressed="false"></button>
-                                                <button type="button" data-chart-color="#e85d9e" aria-label="Cor rosa" aria-pressed="false"></button>
-                                                <button type="button" data-chart-color="#3dbfd9" aria-label="Cor ciano" aria-pressed="false"></button>
-                                                <button type="button" data-chart-color="#62b44b" aria-label="Cor verde" aria-pressed="false"></button>
-                                                <button type="button" data-chart-color="#9c755f" aria-label="Cor marrom" aria-pressed="false"></button>
-                                            </div>
-                                        </div>
-
-                                        <label class="flex-box-start"><input id="statisticsChartShowValues" type="checkbox" checked><span>Exibir valores nos gráficos barra e linhas.</span></label>
-                                    </div>
-
-                                    <!-- ÁREA DO GRÁFICO -->
-
-                                    <div class="chart-view">
-                                        <div class="flex-box-between">
-                                            <h3>Prévia do Gráfico</h3>
-                                            <div>
-                                                <button class="button" id="statisticsChartDownload" type="button" disabled>Baixar PNG</button>
-                                            </div>
-                                        </div>
-
-                                        <div class="chart-box">
-                                            <div class="chart-empty" id="statisticsChartEmpty">
-                                                <h4>Nenhum gráfico gerado</h4>
-                                                <p>Configure os dados para visualizar o gráfico.</p>
-                                            </div>
-
-                                            <canvas id="statisticsChartCanvas">Seu navegador não suporta gráficos em canvas.</canvas>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </section>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -3279,13 +3003,13 @@
 
         <!-- JS - PAINEL DE ANÁLISE -->  
 
-        <script src="js/data-analysis/core.js" defer></script>
+        <!-- <script src="js/data-analysis/core.js" defer></script>
         <script src="js/data-analysis/import.js" defer></script>
         <script src="js/data-analysis/table.js" defer></script>
         <script src="js/data-analysis/analysis.js" defer></script>
         <script src="js/data-analysis/charts.js" defer></script>
         <script src="js/data-analysis/comparison.js" defer></script>
-        <script src="js/data-analysis/init.js" defer></script>
+        <script src="js/data-analysis/init.js" defer></script> -->
 
         <!-- JS - PAINEL DE FILTRAGEM -->
 
