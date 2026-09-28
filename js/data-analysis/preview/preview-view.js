@@ -33,6 +33,11 @@ function getPreviewElements(
                 rootElement,
                 "#analysisCopyButton",
             ),
+        emptyState:
+            requireElement(
+                rootElement,
+                "#analysisEmptyState",
+            ),
         filterColumn:
             requireElement(
                 rootElement,
@@ -72,6 +77,11 @@ function getPreviewElements(
             requireElement(
                 rootElement,
                 "#analysisPreviewSummary",
+            ),
+        tableContainer:
+            requireElement(
+                rootElement,
+                "#analysisTableContainer",
             ),
         previewTable:
             requireElement(
@@ -138,7 +148,17 @@ function createPreviewView(
                             "div",
                         );
 
-                    const label =
+                    const checkboxControl =
+                        document.createElement(
+                            "div",
+                        );
+
+                    const checkboxLabel =
+                        document.createElement(
+                            "label",
+                        );
+
+                    const columnLabel =
                         document.createElement(
                             "label",
                         );
@@ -155,6 +175,8 @@ function createPreviewView(
 
                     checkbox.type =
                         "checkbox";
+                    checkbox.id =
+                        `analysisColumnToggle-${columnIndex}`;
                     checkbox.checked =
                         snapshot
                             .visibleColumnIndexes
@@ -171,18 +193,37 @@ function createPreviewView(
                         `Exibir coluna ${header}`,
                     );
 
+                    checkboxControl.classList
+                        .add(
+                            "checkbox",
+                        );
+
+                    checkboxLabel.htmlFor =
+                        checkbox.id;
+
+                    columnLabel.htmlFor =
+                        checkbox.id;
+                    columnLabel.classList.add(
+                        "analysis-column-label",
+                    );
+
                     columnName.textContent =
                         header;
                     columnName.title =
                         header;
 
-                    label.append(
+                    checkboxControl.append(
                         checkbox,
+                        checkboxLabel,
+                    );
+
+                    columnLabel.append(
                         columnName,
                     );
 
-                    option.appendChild(
-                        label,
+                    option.append(
+                        checkboxControl,
+                        columnLabel,
                     );
 
                     fragment.appendChild(
@@ -398,32 +439,25 @@ function createPreviewView(
         tableBody.replaceChildren();
 
         if (!snapshot.dataset) {
+            elements.tableContainer.hidden =
+                true;
+            elements.emptyState.hidden =
+                true;
+
             return;
         }
 
-        if (
+        const hasVisibleColumns =
             snapshot
                 .visibleColumnIndexes
-                .length === 0
-        ) {
-            const row =
-                document.createElement(
-                    "tr",
-                );
+                .length > 0;
 
-            const cell = createCell(
-                "td",
-                "Selecione ao menos uma coluna para visualizar a planilha.",
-            );
+        elements.tableContainer.hidden =
+            !hasVisibleColumns;
+        elements.emptyState.hidden =
+            hasVisibleColumns;
 
-            cell.classList.add(
-                "analysis-empty-row",
-            );
-            cell.colSpan = 1;
-
-            row.appendChild(cell);
-            tableBody.appendChild(row);
-
+        if (!hasVisibleColumns) {
             return;
         }
 

@@ -155,22 +155,25 @@
             }
             #analysis .columns #analysisVisibleColumns > div {
                 padding: 7px 9px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
                 background-color: var(--color-container);
                 border: 1px solid var(--color-border);
                 border-radius: 3px;
             }
-            #analysis .columns #analysisVisibleColumns > div > label {
+            #analysis .columns #analysisVisibleColumns > div > .checkbox {
+                flex: 0 0 40px;
+                margin: 0;
+            }
+            #analysis .columns #analysisVisibleColumns > div > .analysis-column-label {
+                flex: 1 1 auto;
                 margin: 0;
                 display: flex;
                 align-items: center;
-                gap: 8px;
                 cursor: pointer;
             }
-            #analysis .columns #analysisVisibleColumns > div > label > input {
-                flex: 0 0 max-content;
-                margin: 0;
-            }
-            #analysis .columns #analysisVisibleColumns > div > label > span {
+            #analysis .columns #analysisVisibleColumns > div > .analysis-column-label > span {
                 font-size: 12px;
                 margin: 0;
             }
@@ -281,6 +284,24 @@
                 padding: 45px 20px;
                 color: var(--color-gray-p);
                 text-align: center;
+            }
+            #analysis .analysis-empty {
+                min-height: 180px;
+                padding: 30px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border: 1px solid var(--color-border);
+                border-radius: 4px;
+                color: var(--color-gray-p);
+                background-color: var(--color-container);
+                text-align: center;
+            }
+            #analysis .analysis-empty[hidden] {
+                display: none;
+            }
+            #analysis .analysis-empty > h3 {
+                margin: 0;
             }
             #analysis .analysis-table-container::-webkit-scrollbar {
                 width: 7px;
@@ -2915,13 +2936,16 @@
 
                                         <!-- TABELA GERADA DE ACORDO COM O ARQUIVO -->
 
-                                        <div class="analysis-table-container">
+                                        <div class="analysis-empty" id="analysisEmptyState" hidden>
+                                            <h3>Selecione ao menos uma coluna para visualizar a planilha.</h3>
+                                        </div>
+
+                                        <div class="analysis-table-container" id="analysisTableContainer" hidden>
                                             <table id="analysisPreviewTable">
                                                 <thead></thead>
                                                 <tbody></tbody>
                                             </table>
                                         </div>
-
                                     </div>
                                 </div>
                             </div>
