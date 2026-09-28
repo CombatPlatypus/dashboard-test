@@ -109,6 +109,8 @@
             #analysis .columns > div:first-of-type > div {
                 display: flex;
                 gap: 5px;
+                padding-bottom: 15px;
+                border-bottom: 2px solid var(--color-border);
             }
             #analysis .columns h4 {
                 margin-bottom: 12px;
@@ -130,9 +132,8 @@
                 top: 0 !important;
             }
             #analysis .columns #analysisVisibleColumns {
-                border-top: 2px solid var(--color-border);
-                max-height: 128px;
-                padding: 15px 15px 0 0;
+                max-height: 347px;
+                padding-right: 15px;
                 margin: 15px 0 0 0;
                 display: flex;
                 flex-direction: column;
@@ -187,6 +188,7 @@
             }
             #analysis .filters .numeric-filter > input {
                 flex: 0 0 69px;
+                text-align: center;
                 height: 40px;
             }
             #analysis #analysis-tabs .tabs-title.is-disabled > a,
@@ -201,10 +203,23 @@
             }
             #analysis .analysis-table-container {
                 width: 100%;
-                max-height: 550px;
+                max-height: 760px;
                 overflow: auto;
                 border: 1px solid var(--color-border);
                 border-radius: 4px;
+            }
+            #analysis .analysis-table-container::-webkit-scrollbar-track {
+                background-color: transparent;
+            }
+            #analysis .analysis-table-container::-webkit-scrollbar {
+                width: 7px;
+                height: 5px;
+                background-color: var(--color-container-focus);
+                border-left: 1px solid var(--color-border);
+            }
+            #analysis .analysis-table-container::-webkit-scrollbar-thumb {
+                border-radius: 0px 3px 3px 0px;
+                background-color: var(--color-text);
             }
             #analysis #analysisPreviewTable {
                 width: max-content;
@@ -2820,7 +2835,6 @@
                                     </div>
 
                                     <div class="padding">
-
                                         <h4>Exibir Até</h4>
 
                                         <select class="standard-select" id="analysisPreviewLimit" style="width: 100%;" data-analysis-requires-data disabled>
@@ -2830,19 +2844,6 @@
                                             <option value="500">500 Linhas</option>
                                             <option value="all">Todas as Linhas</option>
                                         </select>
-
-                                        <div class="columns">
-                                            <div>
-                                                <h4>Lista de Colunas</h4>
-
-                                                <div>
-                                                    <button class="button" id="analysisShowAllColumns" type="button" data-analysis-requires-data disabled>Marcar todas</button>
-                                                    <button class="button" id="analysisHideAllColumns" type="button" data-analysis-requires-data disabled>Desmarcar todas</button>
-                                                </div>
-                                            </div>
-
-                                            <div id="analysisVisibleColumns" aria-live="polite"></div>
-                                        </div>
 
                                         <div class="filters">
 
@@ -2885,6 +2886,19 @@
                                                     <input type="text" id="analysisNumericValue" placeholder="Valor" autocomplete="off" inputmode="decimal" disabled>
                                                 </div>
                                             </div>
+                                        </div>
+
+                                        <div class="columns">
+                                            <div>
+                                                <h4>Lista de Colunas</h4>
+
+                                                <div>
+                                                    <button class="button" id="analysisShowAllColumns" type="button" data-analysis-requires-data disabled>Marcar todas</button>
+                                                    <button class="button" id="analysisHideAllColumns" type="button" data-analysis-requires-data disabled>Desmarcar todas</button>
+                                                </div>
+                                            </div>
+
+                                            <div id="analysisVisibleColumns" aria-live="polite"></div>
                                         </div>
                                     </div>
                                 </div>
