@@ -11,6 +11,10 @@ import {
 } from "./analysis/analysis-controller.js";
 
 import {
+    initializeComparisonModule,
+} from "./comparison/comparison-controller.js";
+
+import {
     createNotificationController,
 } from "./core/notification.js";
 
@@ -54,6 +58,11 @@ function initializeAnalysisPanel() {
             });
 
         initializeDataAnalysisModule({
+            rootElement,
+            previewSource,
+        });
+
+        initializeComparisonModule({
             rootElement,
             previewSource,
         });

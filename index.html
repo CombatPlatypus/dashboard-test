@@ -470,17 +470,17 @@
                 grid-template-columns: repeat(2, minmax(146px, 1fr));
                 gap: 15px;
             }
-            .comparison-textarea-title label {
+            #analysis .comparison-textarea-title label {
                 margin: 0;
                 font-weight: 600;
             }
-            .comparison-textarea-title span {
+            #analysis .comparison-textarea-title span {
                 color: var(--color-gray-p);
                 font-size: 13px;
             }
-            .comparison-choice textarea {
+            #analysis #comparison-module textarea {
                 width: 100%;
-                min-height: 330px;
+                min-height: 250px;
                 padding: 15px;
                 color: var(--color-text);
                 background-color: var(--color-container);
@@ -488,7 +488,7 @@
                 border-radius: 5px;
                 resize: vertical;
             }
-            .comparison-choice textarea:focus {
+            #analysis #comparison-module textarea:focus {
                 outline: none;
                 border-color: var(--color-gray-p);
             }
@@ -508,6 +508,71 @@
                 width: max-content;
                 margin-bottom: 0;
                 font-size: 13px;
+            }
+            #analysis #comparison-module .comparison-actions button {
+                width: 100%;
+            }
+            #analysis #comparison-module .comparison-cards[hidden],
+            #analysis #comparison-module .comparison-cards [hidden],
+            #analysis #analysisComparisonSearch[hidden],
+            #analysis #analysisComparisonResults[hidden] {
+                display: none;
+            }
+            #analysis #analysisComparisonSearch {
+                width: 100%;
+                min-height: 40px;
+            }
+            #analysis .analysis-comparison-table-container {
+                max-height: 425px;
+            }
+            #analysis .analysis-comparison-table {
+                width: max-content;
+                min-width: 100%;
+                color: var(--color-text);
+                background-color: var(--color-container);
+            }
+            #analysis .analysis-comparison-table thead {
+                position: sticky;
+                top: 0;
+                z-index: 1;
+                background-color: var(--color-table-th);
+            }
+            #analysis .analysis-comparison-table th,
+            #analysis .analysis-comparison-table td {
+                min-width: 150px;
+                padding: 10px 12px;
+                border-right: 1px solid var(--color-border);
+                font-size: 12px;
+                text-align: left;
+                vertical-align: middle;
+            }
+            #analysis .analysis-comparison-table th:first-child,
+            #analysis .analysis-comparison-table td:first-child {
+                min-width: 230px;
+            }
+            #analysis .analysis-comparison-table th:last-child,
+            #analysis .analysis-comparison-table td:last-child {
+                border-right: none;
+            }
+            #analysis .analysis-comparison-table tbody tr {
+                border-top: 1px solid var(--color-border);
+            }
+            #analysis .analysis-comparison-table tbody tr:nth-child(even) {
+                background-color: var(--color-table-tr);
+            }
+            #analysis .analysis-comparison-table .analysis-comparison-number {
+                text-align: right;
+            }
+            #analysis .analysis-comparison-table .analysis-comparison-empty-row {
+                padding: 45px 20px;
+                color: var(--color-gray-p);
+                text-align: center;
+            }
+            #analysis #comparison-module select:disabled,
+            #analysis #comparison-module textarea:disabled,
+            #analysis #analysisComparisonSearch:disabled {
+                cursor: not-allowed;
+                opacity: 0.5;
             }
 
             @media only screen and (max-width: 1100px) {
@@ -3182,7 +3247,7 @@
                                     <div class="padding">
                                         <h4>Localize Em:</h4>
 
-                                        <select id="analysisComparisonColumn" class="standard-select">
+                                        <select id="analysisComparisonColumn" class="standard-select" data-analysis-requires-data disabled>
                                             <option value="">Selecione uma coluna</option>
                                         </select>
 
@@ -3244,7 +3309,7 @@
                                             <h3>Selecione ao menos uma coluna na comparação da planilha para gerar a análise.</h3>
                                         </div>
 
-                                        <div class="comparison-cards">
+                                        <div class="comparison-cards" id="analysisComparisonCards" hidden>
                                             <div class="card">
                                                 <h3 id="statisticsComparisonFoundTitle">Encontrados</h3>
 
@@ -3282,9 +3347,11 @@
                                             </div>
                                         </div>
 
-                                        <input id="analysisComparisonSearch" type="search" placeholder="Buscar nos resultados">
+                                        <input id="analysisComparisonSearch" type="search" placeholder="Buscar nos resultados" disabled hidden>
 
                                         <!-- GERE A TABELA AQUI -->
+
+                                        <div class="analysis-comparison-results" id="analysisComparisonResults" hidden></div>
 
                                     </div>
                                 </div>
