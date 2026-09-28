@@ -174,9 +174,10 @@
                 display: flex;
                 flex-direction: column;
                 gap: 15px;
+                margin: 15px 0 0 0;
             }
             #analysis .filters .numeric-filter  {
-                flex: 1 1 0;
+                gap: 10px;
             }
             #analysis .filters .numeric-filter > div {
                 flex: 1 1 0;
@@ -2713,6 +2714,17 @@
                                     </div>
 
                                     <div class="padding">
+
+                                        <h4>Exbir Até</h4>
+
+                                        <select class="standard-select" style="width: 100%;">
+                                            <option value="50">50 Linhas</option>
+                                            <option value="100">100 Linhas</option>
+                                            <option value="250">250 Linhas</option>
+                                            <option value="500">500 Linhas</option>
+                                            <option value="all">Todas as Linhas</option>
+                                        </select>
+
                                         <div class="columns">
                                             <div>
                                                 <h4>Lista de Colunas</h4>
