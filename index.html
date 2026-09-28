@@ -90,7 +90,7 @@
                 background-color: var(--color-container);
             }
             #analysis .padding {
-                min-height: 526px;
+                min-height: 450px;
                 padding: 30px;
                 display: flex;
                 flex-direction: column;
@@ -171,14 +171,19 @@
                 margin: 0;
             }
             #analysis .filters .type-of-filters {
-
-                
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+            }
+            #analysis .filters .numeric-filter  {
+                flex: 1 1 0;
             }
             #analysis .filters .numeric-filter > div {
                 flex: 1 1 0;
             }
             #analysis .filters .numeric-filter > input {
-                flex: 0 0 65px;
+                flex: 0 0 69px;
+                height: 40px;
             }
 
         </style>
@@ -2747,7 +2752,7 @@
                                             <!-- FILTROS DA COLUNA SELECIONADA -->
 
                                             <div class="type-of-filters">
-                                                <input type="search" class="statistics-column-filter" placeholder="Filtrar...">
+                                                <input type="search" placeholder="Filtrar...">
 
                                                 <select class="standard-select" style="width: 100%;">
                                                     <option value="all">Todos os Valores</option>
