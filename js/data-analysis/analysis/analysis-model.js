@@ -152,11 +152,6 @@ function createFrequencySummary({
                         ),
                 };
             }),
-        note:
-            groups.length >
-            MAX_FREQUENCY_ROWS
-                ? `Exibindo ${MAX_FREQUENCY_ROWS} de ${groups.length} valores.`
-                : "",
     };
 }
 
@@ -211,7 +206,6 @@ function createColumnAnalysis(
                 filledValues.length,
             ),
         metrics: [],
-        note: "",
         type: profile.type,
     };
 
@@ -482,9 +476,6 @@ function createColumnAnalysis(
                         emptyMessage:
                             "Nenhum valor repetido.",
                     });
-            } else {
-                card.note =
-                    "Nenhum valor repetido.";
             }
 
             return card;

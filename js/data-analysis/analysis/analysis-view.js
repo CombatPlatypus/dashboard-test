@@ -266,26 +266,6 @@ function createAnalysisCard(cardData) {
                 cardData.frequency,
             ),
         );
-
-        if (cardData.frequency.note) {
-            summaryBlock.appendChild(
-                createTextElement(
-                    "p",
-                    cardData.frequency.note,
-                    "analysis-card-note",
-                ),
-            );
-        }
-    }
-
-    if (cardData.note) {
-        summaryBlock.appendChild(
-            createTextElement(
-                "p",
-                cardData.note,
-                "analysis-card-note",
-            ),
-        );
     }
 
     card.append(
