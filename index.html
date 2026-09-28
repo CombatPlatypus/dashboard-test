@@ -328,7 +328,7 @@
                 grid-template-columns: repeat(auto-fit, minmax(490px, 1fr));
                 gap: 15px;
                 width: 100%;
-                max-height: 848px;
+                max-height: 797px;
                 overflow: auto;
                 padding-right: 15px;
             }
@@ -362,7 +362,7 @@
                 align-items: center;
                 column-gap: 10px;
             }
-            #analysis .cards > div > .flex-box-start > h4 {
+            #analysis .cards > div > h4 {
                 margin: 0;
                 line-height: 1;
             }
@@ -384,6 +384,18 @@
                 width: 100%;
                 overflow-y: auto;
                 max-height: 250px;
+            }
+            #analysis .cards .summary-block:-webkit-scrollbar-track {
+                background-color: transparent;
+            }
+            #analysis .cards .summary-block::-webkit-scrollbar {
+                width: 5px;
+                height: 5px;
+                background-color: transparent;
+            }
+            #analysis .cards .summary-block::-webkit-scrollbar-thumb {
+                border-radius: 5px;
+                background-color: var(--color-border);
             }
             #analysis .cards .analysis-card-value {
                 font-size: 26px;
