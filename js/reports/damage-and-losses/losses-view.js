@@ -117,7 +117,7 @@ function renderLossesView(
             summary.hasData,
         );
     lossesViewElements.monetaryValue.textContent =
-        summary.confirmedValueRecords > 0
+        summary.informedValueRecords > 0
             ? lossesCurrencyFormatter.format(
                 summary.estimatedLoss,
             )

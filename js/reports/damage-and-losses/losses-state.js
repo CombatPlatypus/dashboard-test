@@ -503,7 +503,7 @@ function getLossesSummary(
         hasData: monthMetrics.total > 0,
         ...monthMetrics,
         estimatedLoss:
-            monthMetrics.confirmedValue,
+            monthMetrics.valueCompositionTotal,
         chartDays:
             chartPeriods[0]?.days || [],
         chartPeriods,
