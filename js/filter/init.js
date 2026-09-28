@@ -81,6 +81,17 @@ const FILTER_PURPOSES =
                         "Status",
                         "Current Station",
                     ]),
+
+                requiredColumns:
+                    Object.freeze([
+                        "Order ID",
+                        "Status",
+                        "Current Station",
+                        "Current Station Received Time",
+                    ]),
+
+                latestByColumn:
+                    "Current Station Received Time",
             }),
     });
 
@@ -232,6 +243,138 @@ function formatPurposeColumnValue(
     }
 
     return value ?? "";
+}
+
+function createUtcTimestamp(
+    year,
+    month,
+    day,
+    hour = 0,
+    minute = 0,
+    second = 0,
+    millisecond = 0,
+) {
+    const timestamp =
+        Date.UTC(
+            year,
+            month - 1,
+            day,
+            hour,
+            minute,
+            second,
+            millisecond,
+        );
+
+    const parsedDate =
+        new Date(timestamp);
+
+    if (
+        parsedDate.getUTCFullYear() !== year ||
+        parsedDate.getUTCMonth() !== month - 1 ||
+        parsedDate.getUTCDate() !== day ||
+        parsedDate.getUTCHours() !== hour ||
+        parsedDate.getUTCMinutes() !== minute ||
+        parsedDate.getUTCSeconds() !== second
+    ) {
+        return Number.NaN;
+    }
+
+    return timestamp;
+}
+
+function parseComparableDateTime(value) {
+    if (value instanceof Date) {
+        return value.getTime();
+    }
+
+    if (
+        typeof value === "number" &&
+        Number.isFinite(value)
+    ) {
+        return Date.UTC(
+            1899,
+            11,
+            30,
+        ) + value * 86400000;
+    }
+
+    const formattedValue =
+        formatCellValue(value)
+            .trim();
+
+    if (!formattedValue) {
+        return Number.NaN;
+    }
+
+    const excelSerialMatch =
+        formattedValue.match(
+            /^\d+(?:\.\d+)?$/,
+        );
+
+    if (excelSerialMatch) {
+        const excelSerial =
+            Number(formattedValue);
+
+        if (
+            excelSerial > 0 &&
+            excelSerial < 2958466
+        ) {
+            return Date.UTC(
+                1899,
+                11,
+                30,
+            ) + excelSerial * 86400000;
+        }
+    }
+
+    const isoMatch =
+        formattedValue.match(
+            /^(\d{4})[-/](\d{1,2})[-/](\d{1,2})(?:[ T](\d{1,2}):(\d{1,2})(?::(\d{1,2})(?:[.,](\d{1,3}))?)?)?$/,
+        );
+
+    if (isoMatch) {
+        return createUtcTimestamp(
+            Number(isoMatch[1]),
+            Number(isoMatch[2]),
+            Number(isoMatch[3]),
+            Number(isoMatch[4] ?? 0),
+            Number(isoMatch[5] ?? 0),
+            Number(isoMatch[6] ?? 0),
+            Number(
+                (isoMatch[7] ?? "0")
+                    .padEnd(3, "0"),
+            ),
+        );
+    }
+
+    const dayFirstMatch =
+        formattedValue.match(
+            /^(\d{1,2})[/-](\d{1,2})[/-](\d{4})(?:[ T](\d{1,2}):(\d{1,2})(?::(\d{1,2})(?:[.,](\d{1,3}))?)?)?$/,
+        );
+
+    if (dayFirstMatch) {
+        return createUtcTimestamp(
+            Number(dayFirstMatch[3]),
+            Number(dayFirstMatch[2]),
+            Number(dayFirstMatch[1]),
+            Number(dayFirstMatch[4] ?? 0),
+            Number(dayFirstMatch[5] ?? 0),
+            Number(dayFirstMatch[6] ?? 0),
+            Number(
+                (dayFirstMatch[7] ?? "0")
+                    .padEnd(3, "0"),
+            ),
+        );
+    }
+
+    const parsedTimestamp =
+        Date.parse(formattedValue);
+
+    return Number.isNaN(
+        parsedTimestamp,
+    )
+        ? Number.NaN
+        : parsedTimestamp;
 }
 
 function setNotification(
@@ -417,8 +560,12 @@ function findCompatibleSheet(
                 rows[0],
             );
 
+        const requiredColumns =
+            purpose.requiredColumns ??
+            purpose.columns;
+
         const missingColumns =
-            purpose.columns.filter(
+            requiredColumns.filter(
                 function (column) {
                     return !headerIndexes.has(
                         normalizeText(
@@ -902,7 +1049,18 @@ function filterRows() {
             },
         );
 
-    const lastResultRowByValue =
+    const latestColumnIndex =
+        purpose.latestByColumn
+            ? filterState
+                .headerIndexes
+                .get(
+                    normalizeText(
+                        purpose.latestByColumn,
+                    ),
+                )
+            : undefined;
+
+    const selectedResultByValue =
         new Map();
 
     filterState.sourceRows.forEach(
@@ -922,8 +1080,7 @@ function filterRows() {
                 return;
             }
 
-            lastResultRowByValue.set(
-                filterValue,
+            const resultRow =
                 outputColumnIndexes.map(
                     function (
                         columnIndex,
@@ -939,15 +1096,67 @@ function filterRows() {
                             ],
                         );
                     },
-                ),
-            );
+                );
+
+            const priorityTimestamp =
+                latestColumnIndex ===
+                    undefined
+                    ? Number.NaN
+                    : parseComparableDateTime(
+                        sourceRow[
+                            latestColumnIndex
+                        ],
+                    );
+
+            const selectedResult =
+                selectedResultByValue.get(
+                    filterValue,
+                );
+
+            const shouldReplace =
+                !selectedResult ||
+                latestColumnIndex ===
+                    undefined ||
+                (
+                    Number.isFinite(
+                        priorityTimestamp,
+                    ) &&
+                    (
+                        !Number.isFinite(
+                            selectedResult
+                                .priorityTimestamp,
+                        ) ||
+                        priorityTimestamp >=
+                            selectedResult
+                                .priorityTimestamp
+                    )
+                ) ||
+                (
+                    !Number.isFinite(
+                        priorityTimestamp,
+                    ) &&
+                    !Number.isFinite(
+                        selectedResult
+                            .priorityTimestamp,
+                    )
+                );
+
+            if (shouldReplace) {
+                selectedResultByValue.set(
+                    filterValue,
+                    {
+                        resultRow,
+                        priorityTimestamp,
+                    },
+                );
+            }
         },
     );
 
     /*
      * Mantém uma única linha para cada valor colado.
-     * Como o Map é atualizado durante toda a leitura,
-     * prevalece a última ocorrência encontrada na base.
+     * Finalidades com latestByColumn usam a data mais
+     * recente; as demais mantêm a última ocorrência.
      * A montagem abaixo preserva a ordem da textarea.
      */
 
@@ -955,18 +1164,20 @@ function filterRows() {
         uniqueValues
             .map(
                 function (value) {
-                    return lastResultRowByValue.get(
-                        normalizeText(
-                            value,
-                        ),
-                    );
+                    return selectedResultByValue
+                        .get(
+                            normalizeText(
+                                value,
+                            ),
+                        )
+                        ?.resultRow;
                 },
             )
             .filter(Boolean);
 
     const matchedValues =
         new Set(
-            lastResultRowByValue.keys(),
+            selectedResultByValue.keys(),
         );
 
     const unmatchedValues =
