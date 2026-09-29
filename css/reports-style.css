@@ -689,12 +689,14 @@
         width: 100% !important;
         height: 100% !important;
     }
-
     #reports  #receipt .aligned-comparison-chart > div {
         min-height: 428px;
     }
     #reports  #expedition .aligned-comparison-chart > div {
         min-height: 1184px;
+    }
+    #reports #losses-rate .preview {
+        flex: 1 1 0 !important;
     }
         
 /* ESTILOS ÚNICOS DE CADA RELATÓRIO */
