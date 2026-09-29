@@ -93,7 +93,7 @@ const FILTER_PURPOSES =
                         "Current Station Received Time",
                     ]),
 
-                latestByColumn:
+                oldestByColumn:
                     "Current Station Received Time",
             }),
     });
@@ -1057,13 +1057,13 @@ function filterRows() {
             },
         );
 
-    const latestColumnIndex =
-        purpose.latestByColumn
+    const oldestColumnIndex =
+        purpose.oldestByColumn
             ? filterState
                 .headerIndexes
                 .get(
                     normalizeText(
-                        purpose.latestByColumn,
+                        purpose.oldestByColumn,
                     ),
                 )
             : undefined;
@@ -1107,12 +1107,12 @@ function filterRows() {
                 );
 
             const priorityTimestamp =
-                latestColumnIndex ===
+                oldestColumnIndex ===
                     undefined
                     ? Number.NaN
                     : parseComparableDateTime(
                         sourceRow[
-                            latestColumnIndex
+                            oldestColumnIndex
                         ],
                     );
 
@@ -1123,7 +1123,7 @@ function filterRows() {
 
             const shouldReplace =
                 !selectedResult ||
-                latestColumnIndex ===
+                oldestColumnIndex ===
                     undefined ||
                 (
                     Number.isFinite(
@@ -1134,18 +1134,9 @@ function filterRows() {
                             selectedResult
                                 .priorityTimestamp,
                         ) ||
-                        priorityTimestamp >=
+                        priorityTimestamp <
                             selectedResult
                                 .priorityTimestamp
-                    )
-                ) ||
-                (
-                    !Number.isFinite(
-                        priorityTimestamp,
-                    ) &&
-                    !Number.isFinite(
-                        selectedResult
-                            .priorityTimestamp,
                     )
                 );
 
@@ -1163,8 +1154,8 @@ function filterRows() {
 
     /*
      * Mantém uma única linha para cada valor colado.
-     * Finalidades com latestByColumn usam a data mais
-     * recente; as demais mantêm a última ocorrência.
+     * Finalidades com oldestByColumn usam a data mais
+     * antiga; as demais mantêm a última ocorrência.
      * A montagem abaixo preserva a ordem da textarea.
      */
 
