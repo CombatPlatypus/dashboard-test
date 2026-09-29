@@ -1,0 +1,126 @@
+<section id="statisticsChartPanel" class="charts-panel" hidden>
+
+    <!-- HEADER -->
+
+    <div class="flex-box-between">
+
+        <div class="flex-box-start">
+            <img src="images/geral-icons/statistics-icon.svg" alt="">
+            <h3>Montagem de Gráficos</h3>
+        </div>
+
+        <p id="statisticsChartSummary">Nenhuma planilha carregada.</p>
+    </div>
+
+    <!-- CONTEÚDO -->
+
+    <div class="charts-body flex-box-start">
+
+        <!-- CONTROLES -->
+
+        <div class="charts-control">
+
+            <h4>Configure os Dados</h4>
+            <p>Escolha como as informações da planilha serão organizadas e calculadas.</p>
+
+            <div class="operation-choice">
+                <h4>Agrupar Por</h4>
+
+                <select id="statisticsChartCategory" class="standard-select">
+                    <option value="">Selecione uma coluna</option>
+                </select>
+
+                <h4>Calcular Usando</h4>
+
+                <select id="statisticsChartValue" class="standard-select">
+                    <option value="">Selecione uma coluna</option>
+                </select>
+
+                <h4>Tipo de Cálculo</h4>
+
+                <select id="statisticsChartOperation" class="standard-select">
+                    <option value="count">Contar Registros</option>
+                    <option value="sum">Somar Valores</option>
+                    <option value="average">Calcular Média</option>
+                </select>
+            </div>
+
+            <hr>
+
+            <h4>Tipos de Gráfico</h4>
+
+            <div id="statisticsChartTypes" class="types-of-charts flex-box-between">
+
+                <div>
+                    <button type="button" data-chart-type="bar" aria-label="Gráfico de colunas" aria-pressed="true">
+                        <img src="images/geral-icons/chart-columns-icon.svg" alt="">
+                    </button>
+
+                    <h4>Colunas</h4>
+                </div>
+
+                <div>
+                    <button type="button" data-chart-type="line" aria-label="Gráfico de linhas" aria-pressed="false">
+                        <img src="images/geral-icons/chart-lines-icon.svg" alt="">
+                    </button>
+
+                    <h4>Linhas</h4>
+                </div>
+
+                <div>
+                    <button type="button" data-chart-type="pie" aria-label="Gráfico de pizza" aria-pressed="false">
+                        <img src="images/geral-icons/chart-pizza-icon.svg" alt="">
+                    </button>
+
+                    <h4>Pizza</h4>
+                </div>
+
+            </div>
+
+            <hr>
+
+            <h4>Aparência</h4>
+
+            <div class="colors-change flex-box-start">
+
+                <h4>Cores</h4>
+
+                <div id="statisticsChartColors" class="flex-box-start">
+                    <button type="button" data-chart-color="#ff5533" aria-label="Cor coral" aria-pressed="true"></button>
+                    <button type="button" data-chart-color="#dfe3e8" aria-label="Cor cinza claro" aria-pressed="false"></button>
+                    <button type="button" data-chart-color="#f2a900" aria-label="Cor amarela" aria-pressed="false"></button>
+                    <button type="button" data-chart-color="#3478d4" aria-label="Cor azul" aria-pressed="false"></button>
+                    <button type="button" data-chart-color="#1abc9c" aria-label="Cor turquesa" aria-pressed="false"></button>
+                    <button type="button" data-chart-color="#8e5cd9" aria-label="Cor roxa" aria-pressed="false"></button>
+                    <button type="button" data-chart-color="#e85d9e" aria-label="Cor rosa" aria-pressed="false"></button>
+                    <button type="button" data-chart-color="#3dbfd9" aria-label="Cor ciano" aria-pressed="false"></button>
+                    <button type="button" data-chart-color="#62b44b" aria-label="Cor verde" aria-pressed="false"></button>
+                    <button type="button" data-chart-color="#9c755f" aria-label="Cor marrom" aria-pressed="false"></button>
+                </div>
+            </div>
+
+            <label class="flex-box-start"><input id="statisticsChartShowValues" type="checkbox" checked><span>Exibir valores nos gráficos barra e linhas.</span></label>
+        </div>
+
+        <!-- ÁREA DO GRÁFICO -->
+
+        <div class="chart-view">
+            <div class="flex-box-between">
+                <h3>Prévia do Gráfico</h3>
+                <div>
+                    <button class="button" id="statisticsChartDownload" type="button" disabled>Baixar PNG</button>
+                </div>
+            </div>
+
+            <div class="chart-box">
+                <div class="chart-empty" id="statisticsChartEmpty">
+                    <h4>Nenhum gráfico gerado</h4>
+                    <p>Configure os dados para visualizar o gráfico.</p>
+                </div>
+
+                <canvas id="statisticsChartCanvas">Seu navegador não suporta gráficos em canvas.</canvas>
+            </div>
+        </div>
+    </div>
+
+</section>
