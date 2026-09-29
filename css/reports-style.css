@@ -1227,6 +1227,16 @@
         max-height: 459px;
     }
 
+    /* EXPEDIÇÃO - REVEAL */
+
+    .process-errors {
+        display: flex;
+        gap: 15px;
+    }
+    .process-errors > div {
+        flex: 1 1 0;
+    }
+
     /* RELATÓRIO AVARIAS E PERDAS */
 
     #reports #damage-and-losses .preview {
