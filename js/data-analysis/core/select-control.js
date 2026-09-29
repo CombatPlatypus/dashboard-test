@@ -45,11 +45,29 @@ function refreshSelectControl(select) {
             "select2-hidden-accessible",
         )
     ) {
-        window
-            .jQuery(selectElement)
-            .trigger(
-                "change.select2",
+        const selectControl =
+            window.jQuery(
+                selectElement,
             );
+
+        const select2Instance =
+            selectControl.data(
+                "select2",
+            );
+
+        if (
+            select2Instance &&
+            typeof select2Instance
+                ._syncAttributes ===
+                "function"
+        ) {
+            select2Instance
+                ._syncAttributes();
+        }
+
+        selectControl.trigger(
+            "change.select2",
+        );
     }
 }
 

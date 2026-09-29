@@ -8,6 +8,7 @@ import {
     getComparableColumnIndexes,
     getConditionValueOptions,
     parseComparisonInput,
+    sortComparisonResults,
 } from "./comparison-model.js";
 
 import {
@@ -62,6 +63,8 @@ function initializeComparisonModule({
     let conditionValue = "";
     let inputValue = "";
     let searchValue = "";
+    let sortColumn = "status";
+    let sortDirection = "asc";
 
     function synchronizeSelections() {
         const comparableColumnIndexes =
@@ -152,6 +155,22 @@ function initializeComparisonModule({
                 previewSnapshot,
             });
 
+        if (
+            sortColumn ===
+                "condition" &&
+            !comparison
+                .conditionActive
+        ) {
+            sortColumn = "status";
+            sortDirection = "asc";
+        }
+
+        const filteredResults =
+            filterComparisonResults(
+                comparison.results,
+                searchValue,
+            );
+
         view.render({
             comparableColumnIndexes,
             conditionActive:
@@ -168,10 +187,13 @@ function initializeComparisonModule({
             selectedColumnIndex,
             summary:
                 comparison.summary,
+            sortColumn,
+            sortDirection,
             visibleResults:
-                filterComparisonResults(
-                    comparison.results,
-                    searchValue,
+                sortComparisonResults(
+                    filteredResults,
+                    sortColumn,
+                    sortDirection,
                 ),
         });
     }
@@ -190,6 +212,10 @@ function initializeComparisonModule({
                     conditionValue = "";
                     inputValue = "";
                     searchValue = "";
+                    sortColumn =
+                        "status";
+                    sortDirection =
+                        "asc";
 
                     elements.input.value =
                         "";
@@ -216,6 +242,8 @@ function initializeComparisonModule({
                 null;
             conditionValue = "";
             searchValue = "";
+            sortColumn = "status";
+            sortDirection = "asc";
 
             elements.search.value =
                 "";
@@ -278,6 +306,57 @@ function initializeComparisonModule({
         function () {
             searchValue =
                 elements.search.value;
+
+            render();
+        },
+    );
+
+    elements.results.addEventListener(
+        "click",
+        function (event) {
+            const eventTarget =
+                event.target instanceof
+                    Element
+                    ? event.target
+                    : null;
+
+            const sortButton =
+                eventTarget?.closest(
+                    ".analysis-sort-button[data-comparison-sort-column]",
+                );
+
+            if (
+                !sortButton ||
+                !elements.results
+                    .contains(
+                        sortButton,
+                    )
+            ) {
+                return;
+            }
+
+            const selectedSortColumn =
+                sortButton.dataset
+                    .comparisonSortColumn;
+
+            if (!selectedSortColumn) {
+                return;
+            }
+
+            if (
+                sortColumn ===
+                selectedSortColumn
+            ) {
+                sortDirection =
+                    sortDirection ===
+                        "asc"
+                        ? "desc"
+                        : "asc";
+            } else {
+                sortColumn =
+                    selectedSortColumn;
+                sortDirection = "asc";
+            }
 
             render();
         },

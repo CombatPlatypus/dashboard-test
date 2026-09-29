@@ -623,6 +623,83 @@ function filterComparisonResults(
     );
 }
 
+function sortComparisonResults(
+    results,
+    sortColumn = "status",
+    sortDirection = "asc",
+) {
+    const statusOrder = {
+        found: 0,
+        outside: 1,
+        notFound: 2,
+    };
+
+    function getSortValue(result) {
+        switch (sortColumn) {
+            case "value":
+                return result.value;
+
+            case "condition":
+                return result
+                    .conditionValues
+                    .join(", ");
+
+            case "occurrences":
+                return result.occurrences;
+
+            case "lines":
+                return (
+                    result.lines[0] ??
+                    Number.MAX_SAFE_INTEGER
+                );
+
+            default:
+                return statusOrder[
+                    result.status
+                ];
+        }
+    }
+
+    return [...results].sort(
+        function (
+            firstResult,
+            secondResult,
+        ) {
+            const firstValue =
+                getSortValue(
+                    firstResult,
+                );
+
+            const secondValue =
+                getSortValue(
+                    secondResult,
+                );
+
+            const comparison =
+                typeof firstValue ===
+                    "number" &&
+                typeof secondValue ===
+                    "number"
+                    ? firstValue -
+                        secondValue
+                    : naturalCollator
+                        .compare(
+                            String(
+                                firstValue,
+                            ),
+                            String(
+                                secondValue,
+                            ),
+                        );
+
+            return sortDirection ===
+                "desc"
+                ? -comparison
+                : comparison;
+        },
+    );
+}
+
 export {
     buildComparisonResults,
     filterComparisonResults,
@@ -630,4 +707,5 @@ export {
     getComparisonStatusLabel,
     getConditionValueOptions,
     parseComparisonInput,
+    sortComparisonResults,
 };

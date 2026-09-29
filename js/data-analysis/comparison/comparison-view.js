@@ -221,10 +221,6 @@ function replaceSelectOptions({
         selectedOptionExists
             ? normalizedSelection
             : "";
-
-    refreshSelectControl(
-        select,
-    );
 }
 
 function formatPercentage(value) {
@@ -239,6 +235,8 @@ function formatPercentage(value) {
 
 function createComparisonTable({
     conditionActive,
+    sortColumn,
+    sortDirection,
     visibleResults,
 }) {
     const container =
@@ -267,28 +265,104 @@ function createComparisonTable({
         );
 
     const headers = [
-        "Valor Informado",
-        "Status da Busca",
+        {
+            key: "value",
+            label: "Valor Informado",
+        },
+        {
+            key: "status",
+            label: "Status da Busca",
+        },
     ];
 
     if (conditionActive) {
         headers.push(
-            "Valor da Condição",
+            {
+                key: "condition",
+                label:
+                    "Valor da Condição",
+            },
         );
     }
 
     headers.push(
-        "Ocorrências",
-        "Linhas",
+        {
+            key: "occurrences",
+            label: "Ocorrências",
+        },
+        {
+            key: "lines",
+            label: "Linhas",
+        },
     );
 
     headers.forEach(
         function (header) {
-            headerRow.appendChild(
-                createTextElement(
+            const headerCell =
+                document.createElement(
                     "th",
-                    header,
+                );
+
+            const sortButton =
+                document.createElement(
+                    "button",
+                );
+
+            const indicator =
+                createTextElement(
+                    "span",
+                    sortColumn ===
+                        header.key
+                        ? sortDirection ===
+                            "asc"
+                            ? "↑"
+                            : "↓"
+                        : "↕",
+                    "analysis-sort-indicator",
+                );
+
+            sortButton.type =
+                "button";
+
+            sortButton.classList.add(
+                "analysis-sort-button",
+            );
+
+            sortButton.dataset
+                .comparisonSortColumn =
+                    header.key;
+
+            sortButton.setAttribute(
+                "aria-label",
+                `Ordenar por ${header.label}`,
+            );
+
+            sortButton.append(
+                document.createTextNode(
+                    header.label,
                 ),
+                indicator,
+            );
+
+            if (
+                sortColumn ===
+                header.key
+            ) {
+                headerCell.setAttribute(
+                    "aria-sort",
+                    sortDirection ===
+                        "asc"
+                        ? "ascending"
+                        : "descending",
+                );
+            }
+
+            headerCell.appendChild(
+                sortButton,
+            );
+
+            headerRow.appendChild(
+                headerCell,
             );
         },
     );
@@ -707,6 +781,12 @@ function createComparisonView(
                         conditionActive:
                             viewState
                                 .conditionActive,
+                        sortColumn:
+                            viewState
+                                .sortColumn,
+                        sortDirection:
+                            viewState
+                                .sortDirection,
                         visibleResults:
                             viewState
                                 .visibleResults,
