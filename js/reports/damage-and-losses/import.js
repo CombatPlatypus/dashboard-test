@@ -12,13 +12,12 @@ import {
 } from "../report-notifications.js";
 
 import {
-    getLossesRateState,
     replaceLossesRateHistory,
 } from "../losses-rate/state.js";
 
 import {
     findLossesRateWorkbookHistory,
-} from "../losses-rate/import.js";
+} from "../losses-rate/workbook.js";
 
 const MAX_DAMAGE_FILE_SIZE =
     10 * 1024 * 1024;
@@ -1576,81 +1575,53 @@ async function readDamageAndLossesFile(
     const source =
         findDamageMonthSource(
             workbook,
-            {
-                required: false,
-            },
         );
 
     const lossesSource =
         findLossesMonthSource(
             workbook,
-            {
-                required: false,
-            },
         );
-
-    if (
-        !source &&
-        !lossesSource
-    ) {
-        throw new Error(
-            "Não foi possível localizar o Histórico de Avarias ou Perdas, em nenhuma das abas da planilha.",
-        );
-    }
 
     const damage =
-        source
-            ? {
-                ...createDamageMonthData(
-                    source,
-                    date,
-                ),
+        {
+            ...createDamageMonthData(
+                source,
+                date,
+            ),
 
-                sourceFileName:
-                    file.name,
+            sourceFileName:
+                file.name,
 
-                sourceSheetName:
-                    source.sheetName,
-            }
-            : null;
+            sourceSheetName:
+                source.sheetName,
+        };
 
     const losses =
-        lossesSource
-            ? {
-                ...createLossesMonthData(
-                    lossesSource,
-                    date,
-                ),
+        {
+            ...createLossesMonthData(
+                lossesSource,
+                date,
+            ),
 
-                sourceFileName:
-                    file.name,
+            sourceFileName:
+                file.name,
 
-                sourceSheetName:
-                    lossesSource.sheetName,
-            }
-            : null;
+            sourceSheetName:
+                lossesSource.sheetName,
+        };
 
-    let lossesRate = null;
-
-    try {
-        lossesRate =
-            findLossesRateWorkbookHistory(
-                workbook,
-            );
-    } catch (error) {
-        console.warn(
-            "A base da Taxa de Perdas não pôde ser lida; os campos manuais serão preservados.",
-            error,
+    const lossesRate =
+        findLossesRateWorkbookHistory(
+            workbook,
         );
-    }
 
     return {
         ...(damage || {}),
         sourceFileName:
-            damage?.sourceFileName ||
+            damage.sourceFileName ||
             file.name,
         sourceSheetName:
-            damage?.sourceSheetName ||
+            damage.sourceSheetName ||
             "",
         damage,
         losses,
@@ -1658,136 +1629,31 @@ async function readDamageAndLossesFile(
     };
 }
 
-function sumLossesMonthField(
-    losses,
-    field,
-) {
-    return losses.days.reduce(
-        function (total, day) {
-            return total +
-                Number(
-                    day[field] || 0,
-                );
-        },
-        0,
-    );
-}
-
 function synchronizeLossesRateReport(
     result,
 ) {
-    const currentState =
-        getLossesRateState();
-
-    const importedHistory =
-        result.lossesRate?.history;
-
-    const months =
-        currentState.months.map(
-            function (
-                currentMonth,
-                monthIndex,
-            ) {
-                return {
-                    ...currentMonth,
-                    ...(
-                        importedHistory?.[
-                            monthIndex
-                        ] || {}
-                    ),
-                };
-            },
-        );
-
-    const monthIndex =
-        result.damage?.monthIndex ??
-        result.losses?.monthIndex;
-
-    if (
-        Number.isInteger(
-            monthIndex,
-        )
-    ) {
-        const month = {
-            ...months[monthIndex],
-        };
-
-        if (result.damage) {
-            month.damage =
-                result.damage
-                    .importedRows;
-        }
-
-        if (result.losses) {
-            month.possibleLosses =
-                sumLossesMonthField(
-                    result.losses,
-                    "underReview",
-                );
-
-            month.lost =
-                sumLossesMonthField(
-                    result.losses,
-                    "confirmedLosses",
-                );
-        }
-
-        months[monthIndex] =
-            month;
-    }
-
-    const importedIdentification =
-        result.lossesRate
-            ?.identification || {};
-
-    const identification = {};
-
-    [
-        "description",
-        "hubCode",
-        "subRegional",
-    ].forEach(
-        function (field) {
-            identification[field] =
-                String(
-                    importedIdentification[
-                        field
-                    ] ?? "",
-                ).trim() ||
-                currentState
-                    .identification[field];
-        },
+    return replaceLossesRateHistory(
+        result.lossesRate.history,
+        result.lossesRate.identification,
     );
-
-    replaceLossesRateHistory(
-        months,
-        identification,
-    );
-
-    setReportNotification({
-        reportId:
-            "losses-rate",
-        type: "success",
-        message:
-            "Taxa de Perdas atualizada pela importação de Avarias e Perdas.",
-    });
 }
 
-function getDamageAndLossesImportMessage(
-    result,
+function setDamageAndLossesImportNotification(
+    type,
+    message,
 ) {
-    if (
-        result.damage &&
-        result.losses
-    ) {
-        return "Histórico de Avarias e Perdas Importado.";
-    }
-
-    if (result.damage) {
-        return "Histórico de Avarias Importado.";
-    }
-
-    return "Histórico de Perdas Importado.";
+    [
+        "damage-and-losses",
+        "losses-rate",
+    ].forEach(
+        function (reportId) {
+            setReportNotification({
+                reportId,
+                type,
+                message,
+            });
+        },
+    );
 }
 
 async function importDamageAndLossesFile(
@@ -1820,48 +1686,38 @@ async function importDamageAndLossesFile(
                 file,
             );
 
-        if (result.damage) {
-            replaceDamageAndLossesData(
-                result.damage,
-            );
-        }
+        replaceDamageAndLossesData(
+            result.damage,
+        );
 
-        if (result.losses) {
-            replaceLossesData(
-                result.losses,
-            );
-        }
+        replaceLossesData(
+            result.losses,
+        );
 
         synchronizeLossesRateReport(
             result,
         );
 
-        setReportNotification({
-            reportId:
-                "damage-and-losses",
-            type: "success",
-            message:
-                getDamageAndLossesImportMessage(
-                    result,
-                ),
-        });
+        setDamageAndLossesImportNotification(
+            "success",
+            "Relatórios de Avarias e Perdas e Taxa de Perdas atualizados.",
+        );
+
+        return true;
     } catch (error) {
         console.error(
             "Não foi possível importar as avarias e perdas:",
             error,
         );
 
-        setReportNotification({
-            reportId:
-                "damage-and-losses",
+        setDamageAndLossesImportNotification(
+            "error",
+            error instanceof Error
+                ? error.message
+                : "Não foi possível importar a planilha de avarias e perdas.",
+        );
 
-            type: "error",
-
-            message:
-                error instanceof Error
-                    ? error.message
-                    : "Não foi possível importar a planilha de avarias e perdas.",
-        });
+        return false;
     } finally {
         importButton.title =
             originalTitle;
@@ -1961,6 +1817,7 @@ export {
     findDamageMonthSource,
     findLossesMonthSource,
     initializeDamageAndLossesImport,
+    importDamageAndLossesFile,
     parseDamageDate,
     readDamageAndLossesFile,
 };

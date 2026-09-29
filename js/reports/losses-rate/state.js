@@ -16,16 +16,6 @@ const LOSSES_RATE_MONTHS =
         "Dezembro",
     ]);
 
-/* CAMPOS MENSAIS ACEITOS */
-
-const lossesRateMonthFields =
-    new Set([
-        "moved",
-        "possibleLosses",
-        "lost",
-        "damage",
-    ]);
-
 /* OUVINTES DO ESTADO */
 
 const lossesRateStateListeners =
@@ -273,50 +263,6 @@ function setActiveLossesRateMonth(
     return true;
 }
 
-/* ATUALIZA UM CAMPO MENSAL */
-
-function updateLossesRateMonthField(
-    monthIndex,
-    field,
-    value,
-) {
-    if (
-        !isValidLossesRateMonthIndex(
-            monthIndex,
-        ) ||
-        !lossesRateMonthFields.has(
-            field,
-        )
-    ) {
-        return false;
-    }
-
-    const normalizedValue =
-        normalizeLossesRateQuantity(
-            value,
-        );
-
-    if (
-        lossesRateState
-            .months[monthIndex][field] ===
-        normalizedValue
-    ) {
-        return true;
-    }
-
-    lossesRateState
-        .months[monthIndex][field] =
-            normalizedValue;
-
-    notifyLossesRateState({
-        type: "month-field-updated",
-        monthIndex,
-        field,
-    });
-
-    return true;
-}
-
 /* CALCULA OS RESULTADOS DE UM MÊS */
 
 function getLossesRateMonthSummary(
@@ -524,5 +470,4 @@ export {
     restoreLossesRateState,
     setActiveLossesRateMonth,
     subscribeLossesRateState,
-    updateLossesRateMonthField,
 };

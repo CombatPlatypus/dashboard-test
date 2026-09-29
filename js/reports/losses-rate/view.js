@@ -4,7 +4,6 @@ import {
     getLossesRateState,
     setActiveLossesRateMonth,
     subscribeLossesRateState,
-    updateLossesRateMonthField,
 } from "./state.js";
 
 let lossesRateViewElements =
@@ -26,28 +25,6 @@ const lossesRatePercentageFormatter =
             maximumFractionDigits: 3,
         },
     );
-
-/* NORMALIZA O VALOR DIGITADO */
-
-function sanitizeLossesRateInput(
-    input,
-) {
-    const sanitizedValue =
-        input.value.replace(
-            /\D/g,
-            "",
-        );
-
-    if (
-        input.value !==
-        sanitizedValue
-    ) {
-        input.value =
-            sanitizedValue;
-    }
-
-    return sanitizedValue;
-}
 
 /* FORMATA UMA QUANTIDADE */
 
@@ -83,27 +60,6 @@ function formatLossesRatePercentage(
     );
 }
 
-/* DEFINE O VALOR DE UM INPUT */
-
-function setLossesRateInputValue(
-    input,
-    value,
-) {
-    const receivedValue =
-        value === null ||
-        value === undefined
-            ? ""
-            : String(value);
-
-    if (
-        input.value !==
-        receivedValue
-    ) {
-        input.value =
-            receivedValue;
-    }
-}
-
 /* LOCALIZA OS ELEMENTOS DO RELATÓRIO */
 
 function getLossesRateElements(
@@ -127,41 +83,6 @@ function getLossesRateElements(
         monthTabs:
             getElementById(
                 "lossesRateMonthTabs",
-            ),
-
-        descriptionInput:
-            getElementById(
-                "lossesRateDescriptionInput",
-            ),
-
-        hubCodeInput:
-            getElementById(
-                "lossesRateHubCodeInput",
-            ),
-
-        subRegionalInput:
-            getElementById(
-                "lossesRateSubRegionalInput",
-            ),
-
-        movedInput:
-            getElementById(
-                "lossesRateMovedInput",
-            ),
-
-        possibleLossesInput:
-            getElementById(
-                "lossesRatePossibleLossesInput",
-            ),
-
-        lostInput:
-            getElementById(
-                "lossesRateLostInput",
-            ),
-
-        damageInput:
-            getElementById(
-                "lossesRateDamageInput",
             ),
 
         previewDescription:
@@ -208,16 +129,6 @@ function getLossesRateElements(
             getElementById(
                 "lossesRatePreviewRate",
             ),
-
-        controlsTotal:
-            getElementById(
-                "lossesRateControlsTotal",
-            ),
-
-        controlsRate:
-            getElementById(
-                "lossesRateControlsRate",
-            ),  
     };
 }
 
@@ -369,72 +280,6 @@ function renderLossesRateMonthTabs(
     );
 }
 
-/* ATUALIZA OS INPUTS DO MÊS */
-
-function renderLossesRateInputs(
-    elements,
-    summary,
-) {
-    setLossesRateInputValue(
-        elements.movedInput,
-        summary.moved,
-    );
-
-    setLossesRateInputValue(
-        elements.possibleLossesInput,
-        summary.possibleLosses,
-    );
-
-    setLossesRateInputValue(
-        elements.lostInput,
-        summary.lost,
-    );
-
-    setLossesRateInputValue(
-        elements.damageInput,
-        summary.damage,
-    );
-}
-
-/* ATUALIZA OS INPUTS DE IDENTIFICAÇÃO */
-
-function renderLossesRateIdentification(
-    elements,
-    identification,
-) {
-    setLossesRateInputValue(
-        elements.descriptionInput,
-        identification.description,
-    );
-
-    setLossesRateInputValue(
-        elements.hubCodeInput,
-        identification.hubCode,
-    );
-
-    setLossesRateInputValue(
-        elements.subRegionalInput,
-        identification.subRegional,
-    );
-}
-
-/* ATUALIZA O RESUMO DOS CONTROLES */
-
-function renderLossesRateControlsSummary(
-    elements,
-    summary,
-) {
-    elements.controlsTotal.textContent =
-        formatLossesRateQuantity(
-            summary.totalLosses,
-        );
-
-    elements.controlsRate.textContent =
-        formatLossesRatePercentage(
-            summary.lossRate,
-        );
-}
-
 /* ATUALIZA A PRÉVIA */
 
 function renderLossesRatePreview(
@@ -508,77 +353,10 @@ function renderLossesRateReport(
         state,
     );
 
-    renderLossesRateIdentification(
-        elements,
-        state.identification,
-    );
-
-    renderLossesRateInputs(
-        elements,
-        summary,
-    );
-
-    renderLossesRateControlsSummary(
-        elements,
-        summary,
-    );
-
     renderLossesRatePreview(
         elements,
         state,
         summary,
-    );
-}
-
-/* CONECTA UM INPUT MENSAL */
-
-function bindLossesRateMonthInput(
-    input,
-    field,
-) {
-    input.addEventListener(
-        "input",
-        function () {
-            const sanitizedValue =
-                sanitizeLossesRateInput(
-                    input,
-                );
-
-            const state =
-                getLossesRateState();
-
-            updateLossesRateMonthField(
-                state.activeMonth,
-                field,
-                sanitizedValue,
-            );
-        },
-    );
-}
-
-/* CONECTA OS INPUTS MENSAIS */
-
-function bindLossesRateInputs(
-    elements,
-) {
-    bindLossesRateMonthInput(
-        elements.movedInput,
-        "moved",
-    );
-
-    bindLossesRateMonthInput(
-        elements.possibleLossesInput,
-        "possibleLosses",
-    );
-
-    bindLossesRateMonthInput(
-        elements.lostInput,
-        "lost",
-    );
-
-    bindLossesRateMonthInput(
-        elements.damageInput,
-        "damage",
     );
 }
 
@@ -659,10 +437,6 @@ function initializeLossesRateView(
     );
 
     bindLossesRateMonthTabs(
-        elements,
-    );
-
-    bindLossesRateInputs(
         elements,
     );
 

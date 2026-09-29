@@ -1492,7 +1492,7 @@
                                         <img id="damageAndLossesNotificationIcon" src="images/geral-icons/bell-icon.svg" alt="">
 
                                         <h4 id="damageAndLossesNotificationText">
-                                            Importe uma planilha com a aba Histórico de Avarias e Histórico de Análises, seguindo exatamente o modelo fornecido no footer do dashboard.
+                                            Importe a planilha de Avarias e Perdas com as abas Histórico de Avarias, Histórico de Análises e Taxa de Perdas.
                                         </h4>
                                     </div>
                                 </div>
@@ -1929,7 +1929,7 @@
                                         <img id="lossesRateNotificationIcon" src="images/geral-icons/bell-icon.svg" alt="">
 
                                         <h4 id="lossesRateNotificationText">
-                                            Importe uma planilha com a aba Taxa de Perdas, seguindo exatamente o modelo fornecido no footer do dashboard.
+                                            Importe a planilha de Avarias e Perdas com a aba Taxa de Perdas; os dois relatórios serão atualizados.
                                         </h4>
                                     </div>
                                 </div>
@@ -1939,9 +1939,11 @@
                                         <img src="images/geral-icons/image-icon.svg" alt="">
                                     </button>
 
-                                    <button id="lossesRateImportActionButton" type="button" title="Importar histórico da área de transferência" aria-label="Importar histórico da taxa de perdas">
+                                    <button id="lossesRateImportActionButton" type="button" title="Importar planilha de avarias e perdas" aria-label="Importar planilha de avarias e perdas">
                                         <img src="images/geral-icons/import-icon.svg" alt="">
                                     </button>
+
+                                    <input id="lossesRateFileInput" type="file" accept=".xlsx,.xls" hidden>
 
                                     <button id="lossesRateClearReportButton" type="button" title="Limpar relatório" aria-label="Limpar relatório de taxa de perdas">
                                         <img src="images/geral-icons/trash-basket-icon.svg" alt="">
@@ -2027,75 +2029,6 @@
                                     </div>
                                 </div>
 
-                                <!-- CONTROLES DO RELATÓRIO -->
-
-                                <div class="report-controls">
-                                    <div class="title">
-                                        <h4>Importe a Bipagem de Erros</h4>
-                                    </div>
-
-                                    <div class="padding">
-                                
-                                        <div class="input-group losses-rate-identification">
-                                            <div>
-                                                <h4>Descrição</h4>
-                                                <input id="lossesRateDescriptionInput" type="text">
-                                            </div>
-
-                                            <div>
-                                                <h4>Código do Hub</h4>
-                                                <input id="lossesRateHubCodeInput" type="text">
-                                            </div>
-
-                                            <div>
-                                                <h4>Sub Regional</h4>
-                                                <input id="lossesRateSubRegionalInput" type="text">
-                                            </div>
-                                        </div>
-
-                                        <div class="input-group losses-rate-values">
-                                            <div>
-                                                <h4>Volume Movimentado</h4>
-                                                <input id="lossesRateMovedInput" type="text" inputmode="numeric" maxlength="9">
-                                            </div>
-
-                                            <div>
-                                                <h4>Possíveis Perdas</h4>
-                                                <input id="lossesRatePossibleLossesInput" type="text" inputmode="numeric" maxlength="6">                                        
-                                            </div>
-
-                                            <div>
-                                                <h4>Quantidade de LOST</h4>
-                                                <input id="lossesRateLostInput" type="text" inputmode="numeric" maxlength="6">                                        
-                                            </div>
-
-                                            <div>
-                                                <h4>Quantidade de AVARIA</h4>
-                                                <input id="lossesRateDamageInput" type="text" inputmode="numeric" maxlength="6">
-                                            </div>
-                                        </div>
-
-                                        <div class="losses-rate-controls-summary">
-                                            <h4>Resumo do Mês</h4>
-
-                                            <div class="losses-rate-goal-status">
-                                                <span>Referência máxima</span>
-                                                <span>0,030%</span>
-                                            </div>
-
-                                            <div>
-                                                <span>Total de Perdas</span>
-                                                <span id="lossesRateControlsTotal">—</span>
-                                            </div>
-
-                                            <div>
-                                                <span>Taxa de Perda</span>
-                                                <span id="lossesRateControlsRate">—</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                </div>
                             </div>
                         </div>
 
