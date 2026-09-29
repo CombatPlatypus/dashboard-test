@@ -1639,6 +1639,165 @@ function updateExpeditionManualQuantity(
     return true;
 }
 
+/* ALTERA MANUALMENTE UMA QUANTIDADE DA ANÁLISE DE ERROS */
+
+function updateExpeditionErrorQuantity(
+    field,
+    value,
+) {
+    if (
+        field !== "sortingErrors" &&
+        field !== "labelingErrors" &&
+        field !== "revertedErrors"
+    ) {
+        return false;
+    }
+
+    const normalizedValue =
+        normalizeExpeditionQuantity(
+            value,
+        );
+
+    const isEmpty =
+        value === "" ||
+        value === null ||
+        value === undefined;
+
+    if (
+        normalizedValue === null &&
+        !isEmpty
+    ) {
+        return false;
+    }
+
+    const nextValue =
+        normalizedValue ?? 0;
+
+    const currentValue =
+        field === "revertedErrors"
+            ? expeditionState
+                .revertedErrors
+            : expeditionState
+                .errorTotals[field];
+
+    const hasChanged =
+        currentValue !== nextValue ||
+        expeditionState.hasErrorData !==
+            true;
+
+    if (!hasChanged) {
+        return true;
+    }
+
+    if (field === "revertedErrors") {
+        expeditionState.revertedErrors =
+            nextValue;
+    } else {
+        expeditionState
+            .errorTotals[field] =
+                nextValue;
+    }
+
+    expeditionState.hasErrorData =
+        true;
+
+    expeditionState.errorSourceFileName =
+        "";
+
+    notifyExpeditionState({
+        type:
+            "error-quantity-updated",
+
+        field,
+    });
+
+    return true;
+}
+
+/* FAZ O TOTAL DO SPX PREVALECER SOBRE VALORES MANUAIS MAIORES */
+
+function reconcileExpeditionErrorQuantities() {
+    const summary =
+        getExpeditionSummary(
+            expeditionState,
+        );
+
+    if (
+        !summary.hasData ||
+        expeditionState.hasErrorData !==
+            true
+    ) {
+        return false;
+    }
+
+    const spxTotal =
+        normalizeExpeditionQuantity(
+            summary.missortedOrders,
+        ) ?? 0;
+
+    const sortingErrors =
+        normalizeExpeditionQuantity(
+            expeditionState
+                .errorTotals
+                .sortingErrors,
+        ) ?? 0;
+
+    const labelingErrors =
+        normalizeExpeditionQuantity(
+            expeditionState
+                .errorTotals
+                .labelingErrors,
+        ) ?? 0;
+
+    let hasChanged = false;
+
+    if (
+        sortingErrors +
+            labelingErrors >
+        spxTotal
+    ) {
+        const balancedTypes =
+            allocateExpeditionQuantities(
+                [
+                    sortingErrors,
+                    labelingErrors,
+                ],
+                spxTotal,
+            );
+
+        expeditionState.errorTotals = {
+            sortingErrors:
+                balancedTypes[0],
+            labelingErrors:
+                balancedTypes[1],
+        };
+
+        hasChanged = true;
+    }
+
+    const revertedErrors =
+        normalizeExpeditionQuantity(
+            expeditionState
+                .revertedErrors,
+        ) ?? 0;
+
+    if (revertedErrors > spxTotal) {
+        expeditionState.revertedErrors =
+            spxTotal;
+
+        hasChanged = true;
+    }
+
+    if (hasChanged) {
+        notifyExpeditionState({
+            type:
+                "error-quantities-reconciled",
+        });
+    }
+
+    return hasChanged;
+}
+
 /* ALTERA MANUALMENTE O GUARDIÃO DE UMA RUA */
 
 function updateExpeditionStreetGuardian(
@@ -2121,11 +2280,13 @@ export {
     getExpeditionState,
     getExpeditionSummary,
     isExpeditionValidatedRoute,
+    reconcileExpeditionErrorQuantities,
     replaceExpeditionErrorData,
     replaceExpeditionRoutes,
     resetExpeditionReport,
     restoreExpeditionState,
     subscribeExpeditionState,
+    updateExpeditionErrorQuantity,
     updateExpeditionManualQuantity,
     updateExpeditionOperatorSelection,
     updateExpeditionStreetGuardian,

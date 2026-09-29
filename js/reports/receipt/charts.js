@@ -631,6 +631,8 @@ function createReceiptComparisonChart(
                     },
 
                     tooltip: {
+                        enabled: false,
+
                         callbacks: {
                             label(
                                 context,
@@ -1428,6 +1430,8 @@ function createReceiptAlignedComparisonChart(
                         display: false,
                     },
                     tooltip: {
+                        enabled: false,
+
                         titleFont: {
                             family:
                                 '"Open Sans", sans-serif',

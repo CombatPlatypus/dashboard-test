@@ -366,6 +366,8 @@ function createOverallAnalysisChart(
                         },
 
                         tooltip: {
+                            enabled: false,
+
                             titleFont: {
                                 ...OVERALL_ANALYSIS_CHART_FONT,
                                 weight: "600",

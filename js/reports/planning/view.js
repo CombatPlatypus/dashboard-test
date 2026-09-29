@@ -852,8 +852,37 @@ function handlePlanningGeneralInput(event) {
                 input.maxLength,
             );
 
+    if (field === "averageSpr") {
+        return;
+    }
+
     updatePlanningGeneralField(
         field,
+        input.value,
+    );
+}
+
+/* CONFIRMA O SPR APÓS A EDIÇÃO DO CAMPO */
+
+function handlePlanningGeneralChange(
+    event,
+) {
+    const input =
+        event.target instanceof
+        HTMLInputElement
+            ? event.target
+            : null;
+
+    if (
+        input?.dataset
+            .planningField !==
+        "averageSpr"
+    ) {
+        return;
+    }
+
+    updatePlanningGeneralField(
+        "averageSpr",
         input.value,
     );
 }
@@ -1832,6 +1861,11 @@ function initializePlanningView(
     planningPanel.addEventListener(
         "input",
         handlePlanningGeneralInput,
+    );
+
+    planningPanel.addEventListener(
+        "change",
+        handlePlanningGeneralChange,
     );
 
     planningPanel.addEventListener(

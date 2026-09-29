@@ -3,8 +3,10 @@ import {
     getExpeditionOperatorRanking,
     getExpeditionState,
     getExpeditionSummary,
+    reconcileExpeditionErrorQuantities,
     resetExpeditionReport,
     subscribeExpeditionState,
+    updateExpeditionErrorQuantity,
     updateExpeditionManualQuantity,
     updateExpeditionOperatorSelection,
     updateExpeditionStreetGuardian,
@@ -36,8 +38,8 @@ const EXPEDITION_ERROR_TAB_TARGETS =
         "#expedition-streets",
     ]);
 
-const EXPEDITION_ERROR_IMPORT_MESSAGE =
-    "Importe uma planilha com a aba Bipagem de Erros, seguindo exatamente o modelo fornecido no footer do dashboard.";
+const EXPEDITION_ERROR_INPUT_MESSAGE =
+    "Preencha manualmente os erros de Sorting, Etiqueta e Revertidos nos controles deste relatório.";
 
 let expeditionViewElements =
     null;
@@ -218,6 +220,11 @@ function getExpeditionElements(
                 "expedition-view-tabs",
             ),
 
+        importButton:
+            getElementById(
+                "expeditionImportActionButton",
+            ),
+
         floorVolumeInput:
             getElementById(
                 "expeditionFloorRoutesInput",
@@ -231,6 +238,16 @@ function getExpeditionElements(
         exceptionInput:
             getElementById(
                 "expeditionExceptionInput",
+            ),
+
+        sortingErrorsInput:
+            getElementById(
+                "expeditionSortingErrorsInput",
+            ),
+
+        labelingErrorsInput:
+            getElementById(
+                "expeditionLabelingErrorsInput",
             ),
 
         revertedInput:
@@ -419,7 +436,6 @@ function hasExpeditionElements(
 function setExpeditionGeneralControlsAvailability(
     elements,
     hasImportedFile,
-    hasErrorAnalysis,
 ) {
     const disabled =
         !hasImportedFile;
@@ -436,8 +452,14 @@ function setExpeditionGeneralControlsAvailability(
     elements.exceptionInput.disabled =
         disabled;
 
+    elements.sortingErrorsInput.disabled =
+        disabled;
+
+    elements.labelingErrorsInput.disabled =
+        disabled;
+
     elements.revertedInput.disabled =
-        !hasErrorAnalysis;
+        disabled;
 
 }
 
@@ -1197,7 +1219,6 @@ function renderExpeditionReport(
     setExpeditionGeneralControlsAvailability(
         elements,
         hasImportedFile,
-        errorAnalysis.canCalculate,
     );
 
     const operators =
@@ -1305,6 +1326,29 @@ function renderExpeditionReport(
         summary.exceptionOrders,
     );
 
+    setExpeditionInputValue(
+        elements.sortingErrorsInput,
+        state.hasErrorData
+            ? state.errorTotals
+                .sortingErrors
+            : null,
+    );
+
+    setExpeditionInputValue(
+        elements.labelingErrorsInput,
+        state.hasErrorData
+            ? state.errorTotals
+                .labelingErrors
+            : null,
+    );
+
+    setExpeditionInputValue(
+        elements.revertedInput,
+        state.hasErrorData
+            ? state.revertedErrors
+            : null,
+    );
+
     renderExpeditionOperators(
         elements,
         selectedOperators,
@@ -1347,16 +1391,20 @@ function renderExpeditionTabNotification(
             "href",
         );
 
-    if (
+    const isErrorTab =
         EXPEDITION_ERROR_TAB_TARGETS.has(
             activeTarget,
-        )
-    ) {
+        );
+
+    elements.importButton.hidden =
+        isErrorTab;
+
+    if (isErrorTab) {
         setReportNotification({
             reportId: "expedition",
             type: "idle",
             message:
-                EXPEDITION_ERROR_IMPORT_MESSAGE,
+                EXPEDITION_ERROR_INPUT_MESSAGE,
         });
 
         return;
@@ -1437,6 +1485,47 @@ function bindExpeditionEvents(
         );
     }
 
+    function bindErrorQuantityInput(
+        input,
+        field,
+    ) {
+        input.addEventListener(
+            "input",
+            function () {
+                const normalizedValue =
+                    input.value
+                        .replace(
+                            /\D/g,
+                            "",
+                        )
+                        .slice(
+                            0,
+                            input.maxLength,
+                        );
+
+                if (
+                    input.value !==
+                    normalizedValue
+                ) {
+                    input.value =
+                        normalizedValue;
+                }
+            },
+        );
+
+        input.addEventListener(
+            "blur",
+            function () {
+                updateExpeditionErrorQuantity(
+                    field,
+                    input.value,
+                );
+
+                reconcileExpeditionErrorQuantities();
+            },
+        );
+    }
+
     bindManualQuantityInput(
         elements.floorVolumeInput,
         "floorVolume",
@@ -1452,7 +1541,17 @@ function bindExpeditionEvents(
         "exceptionOrders",
     );
 
-    bindManualQuantityInput(
+    bindErrorQuantityInput(
+        elements.sortingErrorsInput,
+        "sortingErrors",
+    );
+
+    bindErrorQuantityInput(
+        elements.labelingErrorsInput,
+        "labelingErrors",
+    );
+
+    bindErrorQuantityInput(
         elements.revertedInput,
         "revertedErrors",
     );

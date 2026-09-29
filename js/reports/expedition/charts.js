@@ -898,6 +898,8 @@ function createComparisonChart(canvas) {
                     },
 
                     tooltip: {
+                        enabled: false,
+
                         titleFont: {
                             family:
                                 '"Open Sans", sans-serif',

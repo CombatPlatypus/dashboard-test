@@ -263,6 +263,8 @@ function createErrorBalanceChart(
                     },
 
                     tooltip: {
+                        enabled: false,
+
                         titleFont: {
                             ...ERROR_CHART_FONT,
                             weight: "600",
@@ -389,6 +391,8 @@ function createStreetOccurrencesChart(
                     },
 
                     tooltip: {
+                        enabled: false,
+
                         titleFont: {
                             ...ERROR_CHART_FONT,
                             weight: "600",

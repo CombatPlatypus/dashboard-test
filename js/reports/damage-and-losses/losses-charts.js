@@ -426,6 +426,8 @@ function createLossesPeriodChart(canvas) {
             plugins: {
                 legend: { display: false },
                 tooltip: {
+                    enabled: false,
+
                     callbacks: {
                         label(context) {
                             return `${context.dataset.label}: ${lossesQuantityFormatter.format(context.raw)}`;
@@ -497,6 +499,8 @@ function createLossesPackRecoveryChart(canvas) {
             plugins: {
                 legend: { display: false },
                 tooltip: {
+                    enabled: false,
+
                     callbacks: {
                         label(context) {
                             return lossesQuantityFormatter.format(
@@ -561,6 +565,8 @@ function createLossesValueCompositionChart(canvas) {
             plugins: {
                 legend: { display: false },
                 tooltip: {
+                    enabled: false,
+
                     callbacks: {
                         label(context) {
                             const values =

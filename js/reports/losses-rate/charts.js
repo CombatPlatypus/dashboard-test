@@ -557,6 +557,8 @@ function createLossesRateCompositionChart(
                     },
 
                     tooltip: {
+                        enabled: false,
+
                         callbacks: {
                             label(
                                 context,
@@ -706,6 +708,8 @@ function createLossesRateHistoryChart(
                     },
 
                     tooltip: {
+                        enabled: false,
+
                         callbacks: {
                             label(
                                 context,

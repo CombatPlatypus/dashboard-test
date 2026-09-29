@@ -17,10 +17,6 @@ import {
 } from "./import.js";
 
 import {
-    initializeExpeditionErrorsImport,
-} from "./errors-import.js";
-
-import {
     initializeExpeditionCharts,
 } from "./charts.js";
 
@@ -58,7 +54,6 @@ function initializeExpeditionController() {
     const initializers = [
         initializeExpeditionView,
         initializeExpeditionImport,
-        initializeExpeditionErrorsImport,
         initializeExpeditionCharts,
         initializeExpeditionErrorsCharts,
         initializeExpeditionExport,

@@ -630,6 +630,8 @@ function createDamageCompositionChart(
                     },
 
                     tooltip: {
+                        enabled: false,
+
                         callbacks: {
                             label(context) {
                                 const value =
@@ -750,6 +752,8 @@ function createDamageLastSevenDaysChart(
                     },
 
                     tooltip: {
+                        enabled: false,
+
                         callbacks: {
                             footer(items) {
                                 const index =
@@ -865,6 +869,8 @@ function createDamageSocChart(
                     },
 
                     tooltip: {
+                        enabled: false,
+
                         callbacks: {
                             label(context) {
                                 return `Avarias: ${damageChartQuantityFormatter.format(context.raw)}`;
