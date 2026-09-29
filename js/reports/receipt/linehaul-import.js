@@ -135,15 +135,43 @@ function getReceiptLinehaulLoadedOrders(
 function getReceiptLinehaulCpt(
     values,
 ) {
-    return getSpXLinehaulWindow(
+    const importedValues =
         values.flatMap(
             splitReceiptLinehaulImportValues,
-        ),
-    );
+        );
+
+    const cpt =
+        getSpXLinehaulWindow(
+            importedValues,
+        );
+
+    if (cpt) {
+        return cpt;
+    }
+
+    for (const value of importedValues) {
+        const match =
+            value
+                .toUpperCase()
+                .replace(
+                    /\s+/g,
+                    "",
+                )
+                .match(
+                    /(?:^|_)(AM|PM1|PM2)(?:\d{2})?(?:$|_)/,
+                );
+
+        if (match) {
+            return match[1];
+        }
+    }
+
+    return "";
 }
 
 function getReceiptLinehaulVehiclePlate(
     values,
+    allowFallback = true,
 ) {
     for (
         const value of values.flatMap(
@@ -160,6 +188,10 @@ function getReceiptLinehaulVehiclePlate(
         if (match) {
             return match[0];
         }
+    }
+
+    if (!allowFallback) {
+        return "";
     }
 
     return values
@@ -394,13 +426,19 @@ function getReceiptLinehaulColumns(
         code:
             findReceiptLinehaulColumn(
                 normalizedRow,
-                ["numero do lh"],
+                [
+                    "numero do lh",
+                    "lh trip number",
+                ],
             ),
 
         origin:
             findReceiptLinehaulColumn(
                 normalizedRow,
-                ["station"],
+                [
+                    "station",
+                    "estacao",
+                ],
             ),
 
         driver:
@@ -419,13 +457,20 @@ function getReceiptLinehaulColumns(
         cpt:
             findReceiptLinehaulColumn(
                 normalizedRow,
-                ["cpt"],
+                [
+                    "cpt",
+                    "lh trip name",
+                    "nome da viagem lh",
+                ],
             ),
 
         punctuality:
             findReceiptLinehaulColumn(
                 normalizedRow,
-                ["indicador de pontualidade"],
+                [
+                    "indicador de pontualidade",
+                    "on time indicator",
+                ],
             ),
 
         loadedOrders:
@@ -434,13 +479,19 @@ function getReceiptLinehaulColumns(
                 [
                     "pedido carregado",
                     "pedidos carregados",
+                    "loaded order",
+                    "loaded orders",
                 ],
             ),
 
         vehiclePlate:
             findReceiptLinehaulColumn(
                 normalizedRow,
-                ["placa do veiculo"],
+                [
+                    "placa do veiculo",
+                    "vehicle plate",
+                    "license plate",
+                ],
             ),
     };
 
@@ -452,6 +503,7 @@ function getReceiptLinehaulColumns(
                 return ![
                     "driver",
                     "loadedOrders",
+                    "vehiclePlate",
                 ].includes(
                     key,
                 );
@@ -647,7 +699,9 @@ function parseReceiptLinehaulMatrix(
                 );
 
                 currentRecord.vehiclePlate.push(
-                    row[columns.vehiclePlate] ?? "",
+                    columns.vehiclePlate >= 0
+                        ? row[columns.vehiclePlate] ?? ""
+                        : "",
                 );
             },
         );
@@ -747,20 +801,46 @@ function parseReceiptLinehaulSpXPlainText(
         );
 
     const hasRequiredHeadings =
-        normalizedText.includes(
+        [
             "numero do lh",
+            "lh trip number",
+        ].some(
+            function (heading) {
+                return normalizedText.includes(
+                    heading,
+                );
+            },
         ) &&
-        normalizedText.includes(
+        [
             "station",
+            "estacao",
+        ].some(
+            function (heading) {
+                return normalizedText.includes(
+                    heading,
+                );
+            },
         ) &&
-        normalizedText.includes(
+        [
             "cpt",
+            "lh trip name",
+            "nome da viagem lh",
+        ].some(
+            function (heading) {
+                return normalizedText.includes(
+                    heading,
+                );
+            },
         ) &&
-        normalizedText.includes(
+        [
             "indicador de pontualidade",
-        ) &&
-        normalizedText.includes(
-            "placa do veiculo",
+            "on time indicator",
+        ].some(
+            function (heading) {
+                return normalizedText.includes(
+                    heading,
+                );
+            },
         );
 
     if (!hasRequiredHeadings) {
@@ -863,6 +943,7 @@ function parseReceiptLinehaulSpXPlainText(
                     vehiclePlate:
                         getReceiptLinehaulVehiclePlate(
                             values,
+                            false,
                         ),
                 };
             },
