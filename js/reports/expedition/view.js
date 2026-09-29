@@ -761,9 +761,9 @@ function renderExpeditionRankingCards(
                     `${formatExpeditionQuantity(
                         topRoutesOperator
                             .routesChecked,
-                    )} Rotas Conferidas`
+                    )} rotas conferidas`
                 )
-                : "0 Rotas Conferidas";
+                : "0 rotas conferidas";
 
     const operatorsWithTime =
         operators.filter(

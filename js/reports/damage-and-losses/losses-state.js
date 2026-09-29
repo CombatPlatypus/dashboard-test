@@ -425,28 +425,28 @@ function getLossesSummary(
         chartPeriods.push(
             createLossesChartPeriod(
                 "last7",
-                "Últimos 7 Dias",
+                "Últimos 7 dias",
                 daysByDate,
                 clampToMonthStart(createOffsetDate(6)),
                 latestDate,
             ),
             createLossesChartPeriod(
                 "days8to14",
-                "De 8 a 14 Dias Atrás",
+                "De 8 a 14 dias atrás",
                 daysByDate,
                 clampToMonthStart(createOffsetDate(13)),
                 createOffsetDate(7),
             ),
             createLossesChartPeriod(
                 "monthStart",
-                "De 15 Dias Atrás Até o Começo do Mês",
+                "De 15 dias atrás até o começo do mês",
                 daysByDate,
                 monthStart,
                 createOffsetDate(14),
             ),
             createLossesChartPeriod(
                 "totalMonth",
-                "Total do Mês",
+                "Total do mês",
                 daysByDate,
                 monthStart,
                 latestDate,

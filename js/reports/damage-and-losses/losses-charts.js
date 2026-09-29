@@ -632,7 +632,7 @@ function getActiveLossesChartPeriod(summary) {
                 )
         ) || preferredPeriod || {
             id: "last7",
-            title: "Últimos 7 Dias",
+            title: "Últimos 7 dias",
             days: [],
             underReview: 0,
             confirmedLosses: 0,

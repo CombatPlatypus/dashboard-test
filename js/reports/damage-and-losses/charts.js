@@ -958,7 +958,7 @@ function getActiveDamageChartPeriod(
                 )
         ) || preferredPeriod || {
             id: "last7",
-            title: "Últimos 7 Dias",
+            title: "Últimos 7 dias",
             days: [],
             hub: 0,
             soc: 0,

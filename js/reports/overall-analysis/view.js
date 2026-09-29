@@ -541,7 +541,7 @@ function renderOverallAnalysisView(
         null
     ) {
         elements.capacityStatus.textContent =
-            "Folga de — Pacotes";
+            "Folga de — pacotes";
     } else if (
         data.cards.capacity.balance >= 0
     ) {
@@ -550,7 +550,7 @@ function renderOverallAnalysisView(
             formatOverallAnalysisQuantity(
                 data.cards.capacity.balance,
             ) +
-            " Pacotes";
+            " pacotes";
     } else {
         elements.capacityStatus.textContent =
             "Excesso de " +
@@ -559,7 +559,7 @@ function renderOverallAnalysisView(
                     data.cards.capacity.balance,
                 ),
             ) +
-            " Pacotes";
+            " pacotes";
     }
 
     elements.packagesAnalysisValue.textContent =
@@ -578,7 +578,7 @@ function renderOverallAnalysisView(
                         .packagesAnalysis
                         .rate,
                 ) +
-                " dos Registros"
+                " dos registros"
             );
 
     elements.lossRate.textContent =
@@ -595,14 +595,14 @@ function renderOverallAnalysisView(
                     data.cards.lossesRate
                         .differencePercentagePoints,
                 ) +
-                " p.p " +
+                " p.p. " +
                 (
                     data.cards.lossesRate
                         .withinLimit
-                        ? "Abaixo"
-                        : "Acima"
+                        ? "abaixo"
+                        : "acima"
                 ) +
-                " do Limite"
+                " do limite"
             );
 
     elements.planned.textContent =
@@ -629,13 +629,13 @@ function renderOverallAnalysisView(
         data.flow.gap === null
             ? "—"
             : data.flow.gap === 0
-                ? "Piso Zerado"
+                ? "Piso zerado"
                 : (
                     "Gap de " +
                     formatOverallAnalysisQuantity(
                         data.flow.gap,
                     ) +
-                    " Em Relação ao Planejamento"
+                    " em relação ao planejamento"
                 );
 
     elements.fastestReceiver.textContent =
@@ -650,7 +650,7 @@ function renderOverallAnalysisView(
                     data.highlights
                         .mostPackages,
                 ) +
-                " Pacotes"
+                " pacotes"
             )
             : "—";
 

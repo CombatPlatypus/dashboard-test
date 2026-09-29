@@ -200,7 +200,7 @@ function createColumnAnalysis(
         columnName,
         frequency: null,
         headlineLabel:
-            "Valores Preenchidos",
+            "Valores preenchidos",
         headlineValue:
             formatAnalysisNumber(
                 filledValues.length,
@@ -262,7 +262,7 @@ function createColumnAnalysis(
         );
 
         card.headlineLabel =
-            "Total da Coluna";
+            "Total da coluna";
         card.headlineValue =
             formatAnalysisNumber(
                 total,
@@ -352,7 +352,7 @@ function createColumnAnalysis(
             );
 
         card.headlineLabel =
-            "Datas Válidas";
+            "Datas válidas";
         card.headlineValue =
             formatAnalysisNumber(
                 dateValues.length,
@@ -404,7 +404,7 @@ function createColumnAnalysis(
             frequencyData.length;
 
         card.headlineLabel =
-            "Valores Diferentes";
+            "Valores diferentes";
         card.headlineValue =
             formatAnalysisNumber(
                 frequencyData.length,

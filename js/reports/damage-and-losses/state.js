@@ -810,7 +810,7 @@ function getDamageAndLossesSummary(
         chartPeriods.push(
             createDamageChartPeriod(
                 "last7",
-                "Últimos 7 Dias",
+                "Últimos 7 dias",
                 daysByDate,
                 clampToMonthStart(
                     createOffsetDate(6),
@@ -820,7 +820,7 @@ function getDamageAndLossesSummary(
 
             createDamageChartPeriod(
                 "days8to14",
-                "De 8 a 14 Dias Atrás",
+                "De 8 a 14 dias atrás",
                 daysByDate,
                 clampToMonthStart(
                     createOffsetDate(13),
@@ -830,7 +830,7 @@ function getDamageAndLossesSummary(
 
             createDamageChartPeriod(
                 "monthStart",
-                "De 15 Dias Atrás Até o Começo do Mês",
+                "De 15 dias atrás até o começo do mês",
                 daysByDate,
                 monthStart,
                 createOffsetDate(14),
@@ -838,7 +838,7 @@ function getDamageAndLossesSummary(
 
             createDamageChartPeriod(
                 "totalMonth",
-                "Total do Mês",
+                "Total do mês",
                 daysByDate,
                 monthStart,
                 latestDate,

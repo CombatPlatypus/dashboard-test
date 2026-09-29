@@ -29,7 +29,7 @@ const SPX_LINEHAUL_IMPORT_NOTIFICATION =
         type: "idle",
 
         message:
-            "No SPX, acesse Transporte Principal / Viagens de Carga Direta, escolha Inbound e aperte Crtl A, depois Crtl C, então volte aqui e clique em importar.",
+            "No SPX, acesse Transporte Principal / Viagens de Carga Direta, escolha Inbound e pressione Ctrl + A e, em seguida, Ctrl + C. Depois, volte aqui e clique em importar.",
     });
 
 const DAMAGE_AND_LOSSES_IMPORT_NOTIFICATION =
@@ -53,7 +53,7 @@ const EXPEDITION_IMPORT_NOTIFICATION =
         type: "idle",
 
         message:
-            "No SPX, acesse Gestão Audit / Conferencia: LM Hub AT/TO, escolha uma tarefa para exportar, então volte aqui e clique em importar.",
+            "No SPX, acesse Gestão Audit / Conferência: LM Hub AT/TO, escolha uma tarefa para exportar e, em seguida, volte aqui e clique em importar.",
     });
 
 const OVERALL_ANALYSIS_NOTIFICATION =
@@ -61,7 +61,7 @@ const OVERALL_ANALYSIS_NOTIFICATION =
         type: "idle",
 
         message:
-            "Preencha os relatórios para completar a análise geral, tudo aqui vai se atualizar automaticamente.",
+            "Preencha os relatórios para completar a análise geral. Todas as informações serão atualizadas automaticamente.",
     });
 
 const DEFAULT_REPORT_NOTIFICATIONS =

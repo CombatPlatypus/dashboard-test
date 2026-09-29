@@ -1152,11 +1152,11 @@ function renderCards(
                         topRoutesOperator
                             .routesChecked ===
                         1
-                            ? " Rota Conferida"
-                            : " Rotas Conferidas"
+                            ? " rota conferida"
+                            : " rotas conferidas"
                     )
                 )
-                : "0 Rotas Conferidas";
+                : "0 rotas conferidas";
 
     elements
         .fastestOperator
@@ -1173,13 +1173,13 @@ function renderCards(
         .textContent =
             fastestOperator
                 ? (
-                    "Tempo Médio: " +
+                    "Tempo médio: " +
                     formatDuration(
                         fastestOperator
                             .averageDurationSeconds,
                     )
                 )
-                : "Tempo Médio: —";
+                : "Tempo médio: —";
 }
 
 function renderCharts(

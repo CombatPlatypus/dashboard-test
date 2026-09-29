@@ -6,7 +6,7 @@ const SUPPORTED_EXTENSIONS =
     ]);
 
 const FILTER_INITIAL_MESSAGE =
-    "Importe o relatório final do seu respectivo hub, ou o rastreio de pedidos, para montar a base de dados filtrada.";
+    "Importe o relatório final do seu respectivo hub ou o rastreio de pedidos para montar a base de dados filtrada.";
 
 const NOTIFICATION_ICONS =
     Object.freeze({
@@ -986,9 +986,14 @@ function renderPreview(
             ? "linha encontrada"
             : "linhas encontradas";
 
+    const unmatchedLabel =
+        unmatchedValues.length === 1
+            ? "valor não encontrado"
+            : "valores não encontrados";
+
     const unmatchedMessage =
         unmatchedValues.length > 0
-            ? ` ${unmatchedValues.length} valor(es) não encontrado(s).`
+            ? ` ${unmatchedValues.length} ${unmatchedLabel}.`
             : "";
 
     elements.previewSummary.textContent =

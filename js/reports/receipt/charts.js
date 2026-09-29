@@ -1797,9 +1797,9 @@ function renderReceiptComparison(
                     topVolumeOperator
                         .packagesReceived,
                 ) +
-                " Pacotes"
+                " pacotes"
             )
-            : "— Pacotes";
+            : "— pacotes";
 
     const errorRanking =
         data.operators
