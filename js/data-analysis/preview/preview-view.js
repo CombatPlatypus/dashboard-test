@@ -83,6 +83,11 @@ function getPreviewElements(
                 rootElement,
                 "#analysisPreviewSummary",
             ),
+        previewWaiting:
+            requireElement(
+                rootElement,
+                "#analysisPreviewWaiting",
+            ),
         tableContainer:
             requireElement(
                 rootElement,
@@ -454,9 +459,14 @@ function createPreviewView(
                 true;
             elements.emptyState.hidden =
                 true;
+            elements.previewWaiting.hidden =
+                false;
 
             return;
         }
+
+        elements.previewWaiting.hidden =
+            true;
 
         const hasVisibleColumns =
             snapshot

@@ -5,6 +5,9 @@ const SUPPORTED_EXTENSIONS =
         "csv",
     ]);
 
+const FILTER_INITIAL_MESSAGE =
+    "Importe o relatório final do seu respectivo hub, ou o rastreio de pedidos, para montar a base de dados filtrada.";
+
 const NOTIFICATION_ICONS =
     Object.freeze({
         idle:
@@ -663,7 +666,7 @@ function resetPanel({
 
     if (notification) {
         setNotification(
-            "Importe uma base de dados vinda do SPX para começar.",
+            FILTER_INITIAL_MESSAGE,
             "idle",
         );
     }

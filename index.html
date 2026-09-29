@@ -218,6 +218,14 @@
                 color: var(--color-gray-p);
                 font-size: 12px;
             }
+            #analysis .analysis-preview-waiting {
+                margin: auto 0;
+                color: var(--color-gray-p);
+                text-align: center;
+            }
+            #analysis .analysis-preview-waiting[hidden] {
+                display: none;
+            }
             #analysis .analysis-table-container {
                 width: 100%;
                 max-height: 687px;
@@ -472,10 +480,6 @@
                 display: grid;
                 grid-template-columns: repeat(2, minmax(146px, 1fr));
                 gap: 15px;
-            }
-            #analysis .comparison-textarea-title label {
-                margin: 0;
-                font-weight: 600;
             }
             #analysis .comparison-textarea-title span {
                 color: var(--color-gray-p);
@@ -3194,6 +3198,8 @@
                                     <div class="padding">
                                         <p id="analysisPreviewSummary" class="analysis-preview-summary" hidden></p>
 
+                                        <p id="analysisPreviewWaiting" class="analysis-preview-waiting">A prévia será exibida depois que uma planilha for importada.</p>
+
                                         <!-- TABELA GERADA DE ACORDO COM O ARQUIVO -->
 
                                         <div class="analysis-empty" id="analysisEmptyState" hidden>
@@ -3371,7 +3377,7 @@
                             <div class="flex-box-start">
                                 <img id="filterNotificationIcon" src="images/geral-icons/bell-icon.svg" alt="" aria-hidden="true">
 
-                                <h4 id="filterNotificationText">Importe uma base de dados vinda do SPX para começar.</h4>
+                                <h4 id="filterNotificationText">Importe o relatório final do seu respectivo hub, ou o rastreio de pedidos, para montar a base de dados filtrada.</h4>
                             </div>
                         </div>
 
