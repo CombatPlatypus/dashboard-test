@@ -956,7 +956,72 @@ function classifyLossesSituation(value) {
     return "";
 }
 
-function createLossesMonthData(
+function getSourceMonthCandidates(
+    source,
+    date,
+) {
+    const requestedMonthValue =
+        date.getFullYear() * 12 +
+        date.getMonth();
+    const candidatesByMonth =
+        new Map();
+
+    for (
+        let rowIndex = source.headerRowIndex + 1;
+        rowIndex < source.rows.length;
+        rowIndex += 1
+    ) {
+        const parsedDate =
+            parseDamageDate(
+                source.rows[rowIndex]?.[
+                    source.columns.date
+                ],
+            );
+
+        if (!parsedDate) {
+            continue;
+        }
+
+        const monthIndex =
+            parsedDate.month - 1;
+        const monthValue =
+            parsedDate.year * 12 +
+            monthIndex;
+
+        if (
+            monthValue > requestedMonthValue ||
+            candidatesByMonth.has(monthValue)
+        ) {
+            continue;
+        }
+
+        candidatesByMonth.set(
+            monthValue,
+            new Date(
+                parsedDate.year,
+                monthIndex,
+                1,
+                12,
+            ),
+        );
+    }
+
+    return Array.from(
+        candidatesByMonth.entries(),
+    )
+        .sort(
+            function (first, second) {
+                return second[0] - first[0];
+            },
+        )
+        .map(
+            function ([, candidateDate]) {
+                return candidateDate;
+            },
+        );
+}
+
+function createLossesDataForMonth(
     source,
     date = new Date(),
 ) {
@@ -1049,12 +1114,6 @@ function createLossesMonthData(
         }
     }
 
-    if (importedRows === 0) {
-        throw new Error(
-            `Nenhum registro de perdas de ${DAMAGE_MONTH_NAMES[monthIndex]} de ${year} foi encontrado.`,
-        );
-    }
-
     return {
         monthIndex,
         year,
@@ -1071,7 +1130,46 @@ function createLossesMonthData(
     };
 }
 
-function createDamageMonthData(
+function createLossesMonthData(
+    source,
+    date = new Date(),
+) {
+    const requestedMonthIndex =
+        date.getMonth();
+    const requestedYear =
+        date.getFullYear();
+    const candidates =
+        getSourceMonthCandidates(
+            source,
+            date,
+        );
+
+    for (const candidateDate of candidates) {
+        const result =
+            createLossesDataForMonth(
+                source,
+                candidateDate,
+            );
+
+        if (result.importedRows > 0) {
+            return {
+                ...result,
+                requestedMonthIndex,
+                requestedYear,
+                fallbackUsed:
+                    result.monthIndex !==
+                        requestedMonthIndex ||
+                    result.year !== requestedYear,
+            };
+        }
+    }
+
+    throw new Error(
+        `Nenhum registro válido de perdas foi encontrado até ${DAMAGE_MONTH_NAMES[requestedMonthIndex]} de ${requestedYear}.`,
+    );
+}
+
+function createDamageDataForMonth(
     source,
     date = new Date(),
 ) {
@@ -1294,12 +1392,6 @@ function createDamageMonthData(
             },
         );
 
-    if (importedRows === 0) {
-        throw new Error(
-            `Nenhuma avaria de ${DAMAGE_MONTH_NAMES[monthIndex]} de ${year} foi encontrada.`,
-        );
-    }
-
     return {
         monthIndex,
         year,
@@ -1308,6 +1400,45 @@ function createDamageMonthData(
         importedRows,
         ignoredRows,
     };
+}
+
+function createDamageMonthData(
+    source,
+    date = new Date(),
+) {
+    const requestedMonthIndex =
+        date.getMonth();
+    const requestedYear =
+        date.getFullYear();
+    const candidates =
+        getSourceMonthCandidates(
+            source,
+            date,
+        );
+
+    for (const candidateDate of candidates) {
+        const result =
+            createDamageDataForMonth(
+                source,
+                candidateDate,
+            );
+
+        if (result.importedRows > 0) {
+            return {
+                ...result,
+                requestedMonthIndex,
+                requestedYear,
+                fallbackUsed:
+                    result.monthIndex !==
+                        requestedMonthIndex ||
+                    result.year !== requestedYear,
+            };
+        }
+    }
+
+    throw new Error(
+        `Nenhuma avaria válida foi encontrada até ${DAMAGE_MONTH_NAMES[requestedMonthIndex]} de ${requestedYear}.`,
+    );
 }
 
 async function readDamageAndLossesFile(
@@ -1446,6 +1577,34 @@ function setDamageAndLossesImportNotification(
     );
 }
 
+function createDamageAndLossesSuccessMessage(
+    result,
+) {
+    const fallbackPeriods = [];
+
+    [
+        ["Avarias", result.damage],
+        ["Perdas", result.losses],
+    ].forEach(
+        function ([label, data]) {
+            if (!data?.fallbackUsed) {
+                return;
+            }
+
+            fallbackPeriods.push(
+                `${label}: ${DAMAGE_MONTH_NAMES[data.monthIndex]} de ${data.year}`,
+            );
+        },
+    );
+
+    const baseMessage =
+        "Relatórios de Avarias e Perdas e Taxa de Perdas atualizados.";
+
+    return fallbackPeriods.length > 0
+        ? `${baseMessage} Períodos anteriores utilizados: ${fallbackPeriods.join("; ")}.`
+        : baseMessage;
+}
+
 async function importDamageAndLossesFile(
     file,
     importButton,
@@ -1490,7 +1649,9 @@ async function importDamageAndLossesFile(
 
         setDamageAndLossesImportNotification(
             "success",
-            "Relatórios de Avarias e Perdas e Taxa de Perdas atualizados.",
+            createDamageAndLossesSuccessMessage(
+                result,
+            ),
         );
 
         return true;

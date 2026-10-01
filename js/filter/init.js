@@ -65,6 +65,9 @@ const FILTER_PURPOSES =
                 preserveUnmatchedRows:
                     true,
 
+                keepFirstOccurrence:
+                    true,
+
                 previewColumnLabels:
                     Object.freeze({
                         Shipment_id:
@@ -1153,20 +1156,26 @@ function filterRows() {
 
             const shouldReplace =
                 !selectedResult ||
-                oldestColumnIndex ===
-                    undefined ||
                 (
-                    Number.isFinite(
-                        priorityTimestamp,
-                    ) &&
+                    purpose.keepFirstOccurrence !==
+                        true &&
                     (
-                        !Number.isFinite(
-                            selectedResult
-                                .priorityTimestamp,
-                        ) ||
-                        priorityTimestamp <
-                            selectedResult
-                                .priorityTimestamp
+                        oldestColumnIndex ===
+                            undefined ||
+                        (
+                            Number.isFinite(
+                                priorityTimestamp,
+                            ) &&
+                            (
+                                !Number.isFinite(
+                                    selectedResult
+                                        .priorityTimestamp,
+                                ) ||
+                                priorityTimestamp <
+                                    selectedResult
+                                        .priorityTimestamp
+                            )
+                        )
                     )
                 );
 
@@ -1185,7 +1194,8 @@ function filterRows() {
     /*
      * Mantém uma única linha para cada valor colado.
      * Finalidades com oldestByColumn usam a data mais
-     * antiga; as demais mantêm a última ocorrência.
+     * antiga; keepFirstOccurrence mantém a primeira
+     * linha da planilha; as demais mantêm a última.
      * A montagem abaixo preserva a ordem da textarea.
      */
 
