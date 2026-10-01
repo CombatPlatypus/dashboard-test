@@ -81,6 +81,9 @@ const FILTER_PURPOSES =
 
                         driver_id:
                             "ID do Motorista",
+
+                        motorista:
+                            "Motorista",
                     }),
 
                 previewHiddenColumns:
