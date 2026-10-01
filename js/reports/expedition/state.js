@@ -383,6 +383,7 @@ const expeditionState = {
 
     duplicatedOrders: 0,
     exceptionOrders: 0,
+    withdrawnOrders: 0,
 
     excludedOperatorKeys:
         new Set(),
@@ -495,6 +496,9 @@ function getExpeditionState() {
 
         exceptionOrders:
             expeditionState.exceptionOrders,
+
+        withdrawnOrders:
+            expeditionState.withdrawnOrders,
 
         excludedOperatorKeys:
             Array.from(
@@ -711,6 +715,10 @@ function getExpeditionSummary(
 
         exceptionOrders:
             state.exceptionOrders ??
+            0,
+
+        withdrawnOrders:
+            state.withdrawnOrders ??
             0,
 
         volumeChecked,
@@ -1597,6 +1605,7 @@ function updateExpeditionManualQuantity(
         field !== "floorVolume" &&
         field !== "duplicatedOrders" &&
         field !== "exceptionOrders" &&
+        field !== "withdrawnOrders" &&
         field !== "revertedErrors"
     ) {
         return false;
@@ -1984,6 +1993,9 @@ function replaceExpeditionRoutes(
     expeditionState.exceptionOrders =
         0;
 
+    expeditionState.withdrawnOrders =
+        0;
+
     expeditionState.streetGuardians =
         {};
 
@@ -2150,6 +2162,7 @@ function restoreExpeditionState(
         "revertedLabelingErrors",
         "duplicatedOrders",
         "exceptionOrders",
+        "withdrawnOrders",
     ].forEach(
         function (field) {
             expeditionState[field] =
@@ -2257,6 +2270,9 @@ function resetExpeditionReport() {
         0;
 
     expeditionState.exceptionOrders =
+        0;
+
+    expeditionState.withdrawnOrders =
         0;
 
     expeditionState

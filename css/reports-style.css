@@ -547,7 +547,7 @@
         grid-template-columns: repeat(auto-fit, minmax(299px, 1fr));
     }
     #expedition .report-controls .input-group {
-        grid-template-columns: repeat(auto-fit, minmax(162px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(117px, 1fr));
         border-bottom: 2px solid var(--color-border);
         padding-bottom: 20px;
         margin-bottom: 20px;

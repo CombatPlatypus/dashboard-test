@@ -240,6 +240,11 @@ function getExpeditionElements(
                 "expeditionExceptionInput",
             ),
 
+        withdrawnInput:
+            getElementById(
+                "expeditionWithdrawnInput",
+            ),
+
         sortingErrorsInput:
             getElementById(
                 "expeditionSortingErrorsInput",
@@ -310,6 +315,11 @@ function getExpeditionElements(
         previewException:
             getElementById(
                 "expeditionPreviewException",
+            ),
+
+        previewWithdrawn:
+            getElementById(
+                "expeditionPreviewWithdrawn",
             ),
 
         previewOperatorBody:
@@ -450,6 +460,9 @@ function setExpeditionGeneralControlsAvailability(
         disabled;
 
     elements.exceptionInput.disabled =
+        disabled;
+
+    elements.withdrawnInput.disabled =
         disabled;
 
     elements.sortingErrorsInput.disabled =
@@ -1326,6 +1339,17 @@ function renderExpeditionReport(
         summary.exceptionOrders,
     );
 
+    elements.previewWithdrawn
+        .textContent =
+            quantityOrDash(
+                summary.withdrawnOrders,
+            );
+
+    setExpeditionInputValue(
+        elements.withdrawnInput,
+        summary.withdrawnOrders,
+    );
+
     setExpeditionInputValue(
         elements.sortingErrorsInput,
         state.hasErrorData
@@ -1539,6 +1563,11 @@ function bindExpeditionEvents(
     bindManualQuantityInput(
         elements.exceptionInput,
         "exceptionOrders",
+    );
+
+    bindManualQuantityInput(
+        elements.withdrawnInput,
+        "withdrawnOrders",
     );
 
     bindErrorQuantityInput(

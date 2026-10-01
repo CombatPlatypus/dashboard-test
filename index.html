@@ -805,6 +805,7 @@
                                                             <th>Pacotes Duplicados</th>
                                                             <th>Pacotes Incorretos</th>
                                                             <th>Pacotes Exceção</th>
+                                                            <th>Pacotes Retirados</th>
                                                         </tr>
                                                     </thead>
 
@@ -814,6 +815,7 @@
                                                             <td id="expeditionPreviewDuplicated">—</td>
                                                             <td id="expeditionPreviewMissorted">—</td>
                                                             <td id="expeditionPreviewException">—</td>
+                                                            <td id="expeditionPreviewWithdrawn">—</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
@@ -1062,8 +1064,13 @@
                                         <div class="padding">
                                             <div class="input-group">
                                                 <div>
-                                                    <h4>Volume no Piso</h4>
+                                                    <h4>No Piso</h4>
                                                     <input id="expeditionFloorRoutesInput" type="text" inputmode="numeric" maxlength="5" autocomplete="off" disabled>
+                                                </div>
+
+                                                <div>
+                                                    <h4>Exceção</h4>
+                                                    <input id="expeditionExceptionInput" type="text" inputmode="numeric" maxlength="3" autocomplete="off" disabled>
                                                 </div>
 
                                                 <div>
@@ -1072,8 +1079,8 @@
                                                 </div>
 
                                                 <div>
-                                                    <h4>Pacotes de Exceção</h4>
-                                                    <input id="expeditionExceptionInput" type="text" inputmode="numeric" maxlength="3" autocomplete="off" disabled>
+                                                    <h4>Retirados</h4>
+                                                    <input id="expeditionWithdrawnInput" type="text" inputmode="numeric" maxlength="8" autocomplete="off" aria-label="Pacotes retirados" disabled>
                                                 </div>
                                             </div>
 

@@ -366,8 +366,13 @@ function createOverallAnalysisData(
 
     const expeditedVolume =
         hasExpeditionData
-            ? expeditionSummary
-                .volumeChecked
+            ? Math.max(
+                expeditionSummary
+                    .volumeChecked -
+                    expeditionSummary
+                        .withdrawnOrders,
+                0,
+            )
             : null;
 
     const planningGap =
