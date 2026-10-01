@@ -2744,7 +2744,7 @@
                             <div class="flex-box-start">
                                 <img id="filterNotificationIcon" src="images/geral-icons/bell-icon.svg" alt="" aria-hidden="true">
 
-                                <h4 id="filterNotificationText">Importe o relatório final do seu respectivo hub ou o rastreio de pedidos para montar a base de dados filtrada.</h4>
+                                <h4 id="filterNotificationText">Selecione a finalidade para definir como os dados serão importados.</h4>
                             </div>
                         </div>
 
@@ -2757,7 +2757,7 @@
                                 <img src="images/geral-icons/save-icon.svg" alt="" aria-hidden="true">
                             </button>
 
-                            <button id="filterImportButton" type="button" title="Importar base de dados" aria-label="Importar base de dados">
+                            <button id="filterImportButton" type="button" title="Selecione uma finalidade" aria-label="Selecione uma finalidade" disabled>
                                 <img src="images/geral-icons/import-icon.svg" alt="" aria-hidden="true">
                             </button>
 
@@ -2781,10 +2781,11 @@
                             <div class="padding">
                                 <label class="x" for="filterPurpose">Finalidade?</label>
 
-                                <select class="standard-select" id="filterPurpose" style="width: 100%;" disabled>
+                                <select class="standard-select" id="filterPurpose" style="width: 100%;">
                                     <option value="">Selecione uma finalidade</option>
                                     <option value="export-analysis">Export Análises</option>
-                                    <option value="export-damage">Export Avaria</option>
+                                    <option value="export-damage">Export Avaria (.CSV)</option>
+                                    <option value="export-damage-clipboard">Export Avaria (Área de Transferência)</option>
                                     <option value="not-listed" disabled>Não Listada (em breve)</option>
                                 </select>
 

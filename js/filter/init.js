@@ -6,7 +6,7 @@ const SUPPORTED_EXTENSIONS =
     ]);
 
 const FILTER_INITIAL_MESSAGE =
-    "Importe o relatório final do seu respectivo hub ou o rastreio de pedidos para montar a base de dados filtrada.";
+    "Selecione a finalidade para definir como os dados serão importados.";
 
 const NOTIFICATION_ICONS =
     Object.freeze({
@@ -37,6 +37,9 @@ const FILTER_PURPOSES =
             Object.freeze({
                 label:
                     "Export Análises",
+
+                sourceType:
+                    "file",
 
                 filterColumn:
                     "Shipment_id",
@@ -95,7 +98,10 @@ const FILTER_PURPOSES =
         "export-damage":
             Object.freeze({
                 label:
-                    "Export Avaria",
+                    "Export Avaria (.CSV)",
+
+                sourceType:
+                    "file",
 
                 filterColumn:
                     "Order ID",
@@ -136,6 +142,74 @@ const FILTER_PURPOSES =
 
                         "Current Station":
                             "Estação Inicial",
+                    }),
+            }),
+
+        "export-damage-clipboard":
+            Object.freeze({
+                label:
+                    "Export Avaria (Área de Transferência)",
+
+                sourceType:
+                    "clipboard",
+
+                filterColumn:
+                    "Order ID",
+
+                outputSuffix:
+                    "export-avaria-area-transferencia",
+
+                columns:
+                    Object.freeze([
+                        "Order ID",
+                        "Status",
+                        "Current Station",
+                        "Data",
+                    ]),
+
+                exportIgnoredColumns:
+                    Object.freeze([
+                        "Order ID",
+                    ]),
+
+                requiredColumns:
+                    Object.freeze([
+                        "Order ID",
+                        "Status",
+                        "Current Station",
+                        "Data",
+                    ]),
+
+                columnAliases:
+                    Object.freeze({
+                        "Order ID":
+                            Object.freeze([
+                                "Ordem ID",
+                            ]),
+                    }),
+
+                oldestByColumn:
+                    "Data",
+
+                preserveUnmatchedRows:
+                    true,
+
+                unmatchedCellValue:
+                    "",
+
+                previewColumnLabels:
+                    Object.freeze({
+                        "Order ID":
+                            "Código BR",
+
+                        Status:
+                            "Status Inicial",
+
+                        "Current Station":
+                            "Estação Inicial",
+
+                        Data:
+                            "Data",
                     }),
             }),
     });
@@ -558,6 +632,134 @@ function createHeaderIndex(headers) {
     return headerIndexes;
 }
 
+function createPurposeHeaderIndex(
+    headers,
+    purpose,
+) {
+    const sourceHeaderIndexes =
+        createHeaderIndex(headers);
+
+    const headerIndexes =
+        new Map(sourceHeaderIndexes);
+
+    const purposeColumns =
+        new Set([
+            purpose.filterColumn,
+            ...(purpose.requiredColumns ?? []),
+            ...purpose.columns,
+            purpose.oldestByColumn,
+        ].filter(Boolean));
+
+    purposeColumns.forEach(
+        function (column) {
+            const normalizedColumn =
+                normalizeText(column);
+
+            if (
+                headerIndexes.has(
+                    normalizedColumn,
+                )
+            ) {
+                return;
+            }
+
+            const aliases =
+                purpose.columnAliases?.[
+                    column
+                ] ?? [];
+
+            const matchingAlias =
+                aliases.find(
+                    function (alias) {
+                        return sourceHeaderIndexes
+                            .has(
+                                normalizeText(
+                                    alias,
+                                ),
+                            );
+                    },
+                );
+
+            if (!matchingAlias) {
+                return;
+            }
+
+            headerIndexes.set(
+                normalizedColumn,
+                sourceHeaderIndexes.get(
+                    normalizeText(
+                        matchingAlias,
+                    ),
+                ),
+            );
+        },
+    );
+
+    return headerIndexes;
+}
+
+function findCompatibleClipboardSource(
+    rows,
+    purpose,
+) {
+    let closestSource = null;
+
+    for (
+        let rowIndex = 0;
+        rowIndex < rows.length;
+        rowIndex += 1
+    ) {
+        const headers =
+            Array.isArray(rows[rowIndex])
+                ? rows[rowIndex]
+                : [];
+
+        const headerIndexes =
+            createPurposeHeaderIndex(
+                headers,
+                purpose,
+            );
+
+        const requiredColumns =
+            purpose.requiredColumns ??
+            purpose.columns;
+
+        const missingColumns =
+            requiredColumns.filter(
+                function (column) {
+                    return !headerIndexes.has(
+                        normalizeText(
+                            column,
+                        ),
+                    );
+                },
+            );
+
+        const sourceCandidate = {
+            rowIndex,
+            headerIndexes,
+            missingColumns,
+        };
+
+        if (missingColumns.length === 0) {
+            return sourceCandidate;
+        }
+
+        if (
+            !closestSource ||
+            missingColumns.length <
+                closestSource
+                    .missingColumns
+                    .length
+        ) {
+            closestSource =
+                sourceCandidate;
+        }
+    }
+
+    return closestSource;
+}
+
 function findCompatibleSheet(
     workbook,
     purpose,
@@ -681,19 +883,58 @@ function resetSelectedPurpose() {
     clearPreview();
 }
 
-function resetPanel({
-    notification = true,
-} = {}) {
+function getSelectedPurpose() {
+    return FILTER_PURPOSES[
+        elements.purpose.value
+    ];
+}
+
+function syncImportButton() {
+    const purpose =
+        getSelectedPurpose();
+
+    const importsClipboard =
+        purpose?.sourceType ===
+        "clipboard";
+
+    const title = purpose
+        ? importsClipboard
+            ? "Importar dados da área de transferência"
+            : "Importar base de dados"
+        : "Selecione uma finalidade";
+
+    elements.importButton.title =
+        title;
+
+    elements.importButton.setAttribute(
+        "aria-label",
+        title,
+    );
+
+    elements.importButton.disabled =
+        !purpose;
+}
+
+function clearImportedSource() {
     filterState.sourceFileName = "";
     filterState.workbook = null;
 
     elements.fileInput.value = "";
-    elements.purpose.value = "";
-    elements.purpose.disabled = true;
     elements.clearButton.disabled = true;
 
     resetSelectedPurpose();
+}
+
+function resetPanel({
+    notification = true,
+} = {}) {
+    clearImportedSource();
+
+    elements.purpose.value = "";
+    elements.purpose.disabled = false;
+
     syncPurposeSelect();
+    syncImportButton();
 
     if (notification) {
         setNotification(
@@ -746,8 +987,119 @@ async function readWorkbook(file) {
     return workbook;
 }
 
+function parseClipboardRows(text) {
+    const clipboardText =
+        String(text ?? "")
+            .replace(/\r\n?/g, "\n")
+            .replace(/\n+$/g, "");
+
+    if (!clipboardText.trim()) {
+        throw new Error(
+            "A área de transferência está vazia.",
+        );
+    }
+
+    return clipboardText
+        .split("\n")
+        .map(
+            function (line) {
+                return line.split("\t");
+            },
+        );
+}
+
+async function readClipboardText() {
+    if (!navigator.clipboard) {
+        throw new Error(
+            "O navegador não disponibilizou acesso à área de transferência.",
+        );
+    }
+
+    let readError = null;
+
+    if (
+        typeof navigator.clipboard
+            .readText === "function"
+    ) {
+        try {
+            const text =
+                await navigator.clipboard
+                    .readText();
+
+            if (text) {
+                return text;
+            }
+        } catch (error) {
+            readError = error;
+        }
+    }
+
+    if (
+        typeof navigator.clipboard.read ===
+        "function"
+    ) {
+        try {
+            const items =
+                await navigator.clipboard
+                    .read();
+
+            for (const item of items) {
+                if (
+                    !item.types.includes(
+                        "text/plain",
+                    )
+                ) {
+                    continue;
+                }
+
+                const blob =
+                    await item.getType(
+                        "text/plain",
+                    );
+
+                const text =
+                    await blob.text();
+
+                if (text) {
+                    return text;
+                }
+            }
+        } catch (error) {
+            readError = error;
+        }
+    }
+
+    if (
+        readError?.name ===
+        "NotAllowedError"
+    ) {
+        throw new Error(
+            "O navegador bloqueou a área de transferência. Permita o acesso e clique novamente.",
+        );
+    }
+
+    throw new Error(
+        "Não foi possível ler a área de transferência.",
+    );
+}
+
 async function importFile(file) {
     if (!file) {
+        return;
+    }
+
+    const purpose =
+        getSelectedPurpose();
+
+    if (
+        !purpose ||
+        purpose.sourceType !== "file"
+    ) {
+        setNotification(
+            "Selecione uma finalidade de arquivo antes de importar.",
+            "warning",
+        );
+
         return;
     }
 
@@ -763,9 +1115,29 @@ async function importFile(file) {
         const workbook =
             await readWorkbook(file);
 
-        resetPanel({
-            notification: false,
-        });
+        const compatibleSheet =
+            findCompatibleSheet(
+                workbook,
+                purpose,
+            );
+
+        if (!compatibleSheet) {
+            throw new Error(
+                `O arquivo não possui uma aba com cabeçalhos legíveis para ${purpose.label}.`,
+            );
+        }
+
+        if (
+            compatibleSheet
+                .missingColumns
+                .length > 0
+        ) {
+            throw new Error(
+                `Colunas obrigatórias ausentes: ${compatibleSheet.missingColumns.join(", ")}.`,
+            );
+        }
+
+        clearImportedSource();
 
         filterState.sourceFileName =
             file.name;
@@ -773,22 +1145,27 @@ async function importFile(file) {
         filterState.workbook =
             workbook;
 
-        elements.purpose.disabled =
-            false;
+        filterState.sourceSheetName =
+            compatibleSheet.sheetName;
 
+        filterState.sourceRows =
+            compatibleSheet.rows.slice(1);
+
+        filterState.headerIndexes =
+            compatibleSheet.headerIndexes;
+
+        elements.values.disabled = false;
         elements.clearButton.disabled =
             false;
 
-        syncPurposeSelect();
+        elements.values.focus();
 
         setNotification(
-            `Arquivo "${file.name}" importado, agora selecione a finalidade da filtragem.`,
+            `Arquivo "${file.name}" importado. Cole um Código BR por linha para filtrar a aba "${compatibleSheet.sheetName}".`,
             "success",
         );
     } catch (error) {
-        resetPanel({
-            notification: false,
-        });
+        clearImportedSource();
 
         setNotification(
             error instanceof Error
@@ -797,75 +1174,147 @@ async function importFile(file) {
             "error",
         );
     } finally {
-        elements.importButton.disabled =
+        elements.fileInput.value = "";
+        syncImportButton();
+    }
+}
+
+async function importClipboard(purpose) {
+    setNotification(
+        "Lendo dados da área de transferência...",
+        "info",
+    );
+
+    elements.importButton.disabled =
+        true;
+
+    try {
+        const clipboardText =
+            await readClipboardText();
+
+        const rows =
+            parseClipboardRows(
+                clipboardText,
+            );
+
+        const compatibleSource =
+            findCompatibleClipboardSource(
+                rows,
+                purpose,
+            );
+
+        if (!compatibleSource) {
+            throw new Error(
+                "A área de transferência não possui cabeçalhos legíveis.",
+            );
+        }
+
+        if (
+            compatibleSource
+                .missingColumns
+                .length > 0
+        ) {
+            throw new Error(
+                `Colunas obrigatórias ausentes: ${compatibleSource.missingColumns.join(", ")}. Copie também a linha de cabeçalhos.`,
+            );
+        }
+
+        const sourceRows =
+            rows
+                .slice(
+                    compatibleSource
+                        .rowIndex + 1,
+                )
+                .filter(
+                    function (row) {
+                        return row.some(
+                            function (cell) {
+                                return Boolean(
+                                    formatCellValue(
+                                        cell,
+                                    ).trim(),
+                                );
+                            },
+                        );
+                    },
+                );
+
+        if (sourceRows.length === 0) {
+            throw new Error(
+                "Nenhuma linha de dados foi encontrada abaixo dos cabeçalhos.",
+            );
+        }
+
+        clearImportedSource();
+
+        filterState.sourceFileName =
+            "area-de-transferencia";
+
+        filterState.sourceSheetName =
+            "Área de transferência";
+
+        filterState.sourceRows =
+            sourceRows;
+
+        filterState.headerIndexes =
+            compatibleSource
+                .headerIndexes;
+
+        elements.values.disabled = false;
+        elements.clearButton.disabled =
             false;
+
+        elements.values.focus();
+
+        setNotification(
+            `Área de transferência importada com ${sourceRows.length} linha(s). Cole um Código BR por linha para filtrar.`,
+            "success",
+        );
+    } catch (error) {
+        clearImportedSource();
+
+        setNotification(
+            error instanceof Error
+                ? error.message
+                : "Não foi possível importar os dados copiados.",
+            "error",
+        );
+    } finally {
+        syncImportButton();
     }
 }
 
 function handlePurposeChange() {
-    resetSelectedPurpose();
-
-    if (!filterState.workbook) {
-        return;
-    }
+    clearImportedSource();
+    syncImportButton();
 
     const purpose =
-        FILTER_PURPOSES[
-            elements.purpose.value
-        ];
+        getSelectedPurpose();
 
     if (!purpose) {
         setNotification(
-            "Selecione uma finalidade para continuar.",
-            "info",
-        );
-
-        return;
-    }
-
-    const compatibleSheet =
-        findCompatibleSheet(
-            filterState.workbook,
-            purpose,
-        );
-
-    if (!compatibleSheet) {
-        setNotification(
-            `O arquivo não possui uma aba com cabeçalhos legíveis para ${purpose.label}. A filtragem permanece bloqueada.`,
-            "error",
+            FILTER_INITIAL_MESSAGE,
+            "idle",
         );
 
         return;
     }
 
     if (
-        compatibleSheet
-            .missingColumns
-            .length > 0
+        purpose.sourceType ===
+        "clipboard"
     ) {
         setNotification(
-            "Colunas obrigatórias ausentes.",
-            "error",
+            "Copie a tabela com os cabeçalhos Order ID (ou Ordem ID), Status, Current Station e Data; depois clique em Importar.",
+            "info",
         );
 
         return;
     }
 
-    filterState.sourceSheetName =
-        compatibleSheet.sheetName;
-
-    filterState.sourceRows =
-        compatibleSheet.rows.slice(1);
-
-    filterState.headerIndexes =
-        compatibleSheet.headerIndexes;
-
-    elements.values.disabled = false;
-    elements.values.focus();
-
     setNotification(
-        `Finalidade "${purpose.label}" escolhida, agora cole um valor por linha para filtrar a aba "${compatibleSheet.sheetName}".`,
-        "success",
+        `Finalidade "${purpose.label}" selecionada. Clique em Importar para escolher o arquivo.`,
+        "info",
     );
 }
 
@@ -1242,7 +1691,8 @@ function filterRows() {
                                 ? uniqueValues[
                                     valueIndex
                                 ]
-                                : "-";
+                                : purpose.unmatchedCellValue ??
+                                    "-";
                         },
                     );
                 },
@@ -1584,7 +2034,32 @@ function handleValuesInput() {
 
 elements.importButton.addEventListener(
     "click",
-    function () {
+    async function () {
+        const purpose =
+            getSelectedPurpose();
+
+        if (!purpose) {
+            setNotification(
+                "Selecione uma finalidade antes de importar.",
+                "warning",
+            );
+
+            elements.purpose.focus();
+
+            return;
+        }
+
+        if (
+            purpose.sourceType ===
+            "clipboard"
+        ) {
+            await importClipboard(
+                purpose,
+            );
+
+            return;
+        }
+
         elements.fileInput.click();
     },
 );
@@ -1605,7 +2080,7 @@ elements.clearButton.addEventListener(
         resetPanel();
 
         setNotification(
-            "O arquivo importado e a filtragem foram descartados.",
+            "Os dados importados e a filtragem foram descartados.",
             "success",
         );
     },
