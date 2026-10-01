@@ -19,9 +19,6 @@ import {
     findLossesRateWorkbookHistory,
 } from "../losses-rate/workbook.js";
 
-const MAX_DAMAGE_FILE_SIZE =
-    10 * 1024 * 1024;
-
 const MAX_DAMAGE_HEADER_SEARCH_ROWS =
     50;
 
@@ -33,6 +30,9 @@ const DAMAGE_HISTORY_SHEET_NAME =
 
 const DAMAGE_PRODUCT_SHEET_NAME =
     "avarias recebidas";
+
+const DAMAGE_BASE_SHEET_NAME =
+    "base de avarias";
 
 const LOSSES_HISTORY_SHEET_NAME =
     "historico de analises";
@@ -53,11 +53,35 @@ const damageColumnAliases =
             "date",
         ],
 
+        packageCode: [
+            "codigo br",
+            "codigo do pacote",
+            "package code",
+            "tracking number",
+        ],
+    });
+
+const damageBaseColumnAliases =
+    Object.freeze({
+        packageCode: [
+            "codigo br",
+            "codigo do pacote",
+            "package code",
+            "tracking number",
+        ],
+
         currentStation: [
-            "current station",
-            "estacao atual",
-            "estacao corrente",
-            "estacao da avaria",
+            "estacao inicial",
+        ],
+    });
+
+const damageProductColumnAliases =
+    Object.freeze({
+        packageCode: [
+            "codigo br",
+            "codigo do pacote",
+            "package code",
+            "tracking number",
         ],
 
         productType: [
@@ -79,22 +103,11 @@ const lossesColumnAliases =
             "status",
         ],
 
-        packRecovery: [
-            "pack recovery",
-            "pack recover",
-        ],
-
         packageCode: [
             "codigo br",
             "codigo do pacote",
             "package code",
             "tracking number",
-        ],
-
-        monetaryValue: [
-            "valor r",
-            "valor",
-            "value",
         ],
     });
 
@@ -127,30 +140,46 @@ function normalizeDamageSearchText(
         .trim();
 }
 
-function damageHeaderMatches(
-    header,
-    field,
-    aliases,
+function findColumnsByAliases(
+    row,
+    aliasesByField,
 ) {
-    if (aliases.includes(header)) {
-        return true;
+    if (!Array.isArray(row)) {
+        return null;
     }
 
-    if (field === "currentStation") {
-        return (
-            header === "current station" ||
-            /^esta.*(?:atual|corrente|avaria)$/.test(
-                header,
-            )
+    const headers =
+        row.map(
+            normalizeDamageSearchText,
         );
-    }
 
-    if (field === "productType") {
-        return /^tipo.*produto$/.test(header);
-    }
+    const columns =
+        Object.fromEntries(
+            Object.entries(
+                aliasesByField,
+            ).map(
+                function ([field, aliases]) {
+                    return [
+                        field,
+                        headers.findIndex(
+                            function (header) {
+                                return aliases.includes(
+                                    header,
+                                );
+                            },
+                        ),
+                    ];
+                },
+            ),
+        );
 
-    return field === "date" &&
-        /^(?:data|date)$/.test(header);
+    return Object.values(columns).every(
+        function (columnIndex) {
+            return columnIndex >= 0;
+        },
+    )
+        ? columns
+        : null;
 }
 
 function isDamageHistorySheetName(value) {
@@ -179,6 +208,12 @@ function isDamageProductSheetName(value) {
     return normalizeDamageSearchText(
         value,
     ) === DAMAGE_PRODUCT_SHEET_NAME;
+}
+
+function isDamageBaseSheetName(value) {
+    return normalizeDamageSearchText(
+        value,
+    ) === DAMAGE_BASE_SHEET_NAME;
 }
 
 function isLossesRecoverySheetName(value) {
@@ -214,82 +249,106 @@ function incrementDamageSocStation(
 function findDamageColumns(
     row,
 ) {
-    if (!Array.isArray(row)) {
-        return null;
-    }
-
-    const headers =
-        row.map(
-            normalizeDamageSearchText,
-        );
-
-    const columns = {};
-
-    for (
-        const [
-            field,
-            aliases,
-        ] of Object.entries(
-            damageColumnAliases,
-        )
-    ) {
-        const columnIndex =
-            headers.findIndex(
-                function (header) {
-                    return damageHeaderMatches(
-                        header,
-                        field,
-                        aliases,
-                    );
-                },
-            );
-
-        if (
-            columnIndex === -1 &&
-            field !== "productType"
-        ) {
-            return null;
-        }
-
-        columns[field] =
-            columnIndex;
-    }
-
-    return columns;
+    return findColumnsByAliases(
+        row,
+        damageColumnAliases,
+    );
 }
 
 function findDamageProductColumns(row) {
-    if (!Array.isArray(row)) {
-        return null;
+    return findColumnsByAliases(
+        row,
+        damageProductColumnAliases,
+    );
+}
+
+function findDamageBaseColumns(row) {
+    return findColumnsByAliases(
+        row,
+        damageBaseColumnAliases,
+    );
+}
+
+function findDamageBaseSource(workbook) {
+    const sheetName =
+        workbook.SheetNames.find(
+            isDamageBaseSheetName,
+        );
+
+    if (!sheetName) {
+        throw new Error(
+            "O arquivo não possui a aba Base de Avarias.",
+        );
     }
 
-    const headers =
-        row.map(
-            normalizeDamageSearchText,
-        );
-    const date =
-        headers.findIndex(
-            function (header) {
-                return /^(?:data|date)$/.test(
-                    header,
-                );
+    const rows =
+        window.XLSX.utils.sheet_to_json(
+            workbook.Sheets[sheetName],
+            {
+                header: 1,
+                defval: "",
+                raw: true,
+                blankrows: false,
             },
         );
-    const productType =
-        headers.findIndex(
-            function (header) {
-                return /^tipo.*produto$/.test(
-                    header,
-                );
-            },
+    const searchLimit =
+        Math.min(
+            rows.length,
+            MAX_DAMAGE_HEADER_SEARCH_ROWS,
         );
 
-    return date >= 0 && productType >= 0
-        ? {
-            date,
-            productType,
+    for (
+        let rowIndex = 0;
+        rowIndex < searchLimit;
+        rowIndex += 1
+    ) {
+        const columns =
+            findDamageBaseColumns(
+                rows[rowIndex],
+            );
+
+        if (!columns) {
+            continue;
         }
-        : null;
+
+        const valuesByPackageCode =
+            new Map();
+
+        rows
+            .slice(rowIndex + 1)
+            .forEach(
+                function (row) {
+                    const packageCode =
+                        normalizeDamagePackageCode(
+                            row?.[
+                                columns.packageCode
+                            ],
+                        );
+
+                    if (packageCode) {
+                        valuesByPackageCode.set(
+                            packageCode,
+                            {
+                                currentStation:
+                                    row?.[
+                                        columns
+                                            .currentStation
+                                    ],
+                            },
+                        );
+                    }
+                },
+            );
+
+        return {
+            sheetName,
+            valuesByPackageCode,
+        };
+    }
+
+    throw new Error(
+        `A aba ${sheetName} não possui as colunas Código BR e Estação Inicial.`,
+    );
 }
 
 function findDamageProductSource(
@@ -301,7 +360,9 @@ function findDamageProductSource(
         );
 
     if (!sheetName) {
-        return null;
+        throw new Error(
+            "O arquivo não possui a aba Avarias Recebidas.",
+        );
     }
 
     const rows =
@@ -331,17 +392,41 @@ function findDamageProductSource(
             );
 
         if (columns) {
+            const valuesByPackageCode =
+                new Map();
+
+            rows
+                .slice(rowIndex + 1)
+                .forEach(
+                    function (row) {
+                        const packageCode =
+                            normalizeDamagePackageCode(
+                                row?.[
+                                    columns.packageCode
+                                ],
+                            );
+
+                        if (packageCode) {
+                            valuesByPackageCode.set(
+                                packageCode,
+                                row?.[
+                                    columns.productType
+                                ],
+                            );
+                        }
+                    },
+                );
+
             return {
                 sheetName,
-                rows,
-                columns,
-                headerRowIndex:
-                    rowIndex,
+                valuesByPackageCode,
             };
         }
     }
 
-    return null;
+    throw new Error(
+        `A aba ${sheetName} não possui as colunas Código BR e Tipo de Produto.`,
+    );
 }
 
 function findDamageMonthSource(
@@ -409,18 +494,20 @@ function findDamageMonthSource(
                 columns,
                 headerRowIndex:
                     rowIndex,
+                baseSource:
+                    findDamageBaseSource(
+                        workbook,
+                    ),
                 productSource:
-                    columns.productType >= 0
-                        ? null
-                        : findDamageProductSource(
-                            workbook,
-                        ),
+                    findDamageProductSource(
+                        workbook,
+                    ),
             };
         }
     }
 
     throw new Error(
-        `A aba ${sheetName} não possui as colunas Data e Estação da Avaria.`,
+        `A aba ${sheetName} não possui as colunas Data e Código BR.`,
     );
 }
 
@@ -595,65 +682,11 @@ function parseDamageDate(
         : null;
 }
 
-function lossesHeaderMatches(
-    header,
-    field,
-    aliases,
-) {
-    if (aliases.includes(header)) {
-        return true;
-    }
-
-    if (field === "situation") {
-        return /^situa.*o$/.test(header);
-    }
-
-    if (field === "monetaryValue") {
-        return /^valor(?: r)?$/.test(header);
-    }
-
-    return false;
-}
-
 function findLossesColumns(row) {
-    if (!Array.isArray(row)) {
-        return null;
-    }
-
-    const headers =
-        row.map(normalizeDamageSearchText);
-    const columns = {};
-
-    for (
-        const [field, aliases] of
-        Object.entries(lossesColumnAliases)
-    ) {
-        const columnIndex =
-            headers.findIndex(
-                function (header) {
-                    return lossesHeaderMatches(
-                        header,
-                        field,
-                        aliases,
-                    );
-                },
-            );
-
-        if (
-            columnIndex === -1 &&
-            [
-                "date",
-                "situation",
-                "monetaryValue",
-            ].includes(field)
-        ) {
-            return null;
-        }
-
-        columns[field] = columnIndex;
-    }
-
-    return columns;
+    return findColumnsByAliases(
+        row,
+        lossesColumnAliases,
+    );
 }
 
 function findLossesRecoveryColumns(row) {
@@ -708,7 +741,9 @@ function findLossesRecoverySource(
         );
 
     if (!sheetName) {
-        return null;
+        throw new Error(
+            "O arquivo não possui a aba Pack Recovery.",
+        );
     }
 
     const rows =
@@ -780,60 +815,9 @@ function findLossesRecoverySource(
         };
     }
 
-    return null;
-}
-
-function findEmptyPackagesColumns(row) {
-    if (!Array.isArray(row)) {
-        return null;
-    }
-
-    const headers =
-        row.map(normalizeDamageSearchText);
-    const date =
-        headers.findIndex(
-            function (header) {
-                return header === "data";
-            },
-        );
-    const packageCode =
-        headers.findIndex(
-            function (header) {
-                return header === "codigo br" ||
-                    /^c.*digo br$/.test(header);
-            },
-        );
-    const ticketOpened =
-        headers.findIndex(
-            function (header) {
-                return header === "abertura de ticket";
-            },
-        );
-    const ticketResolved =
-        headers.findIndex(
-            function (header) {
-                return header === "resolucao de ticket" ||
-                    /^resolu.*de ticket$/.test(header);
-            },
-        );
-
-    return [
-        date,
-        packageCode,
-        ticketOpened,
-        ticketResolved,
-    ].every(
-        function (columnIndex) {
-            return columnIndex >= 0;
-        },
-    )
-        ? {
-            date,
-            packageCode,
-            ticketOpened,
-            ticketResolved,
-        }
-        : null;
+    throw new Error(
+        `A aba ${sheetName} não possui as colunas Código BR e Situação.`,
+    );
 }
 
 function findLossesMonthSource(
@@ -880,56 +864,37 @@ function findLossesMonthSource(
         );
     let columns = null;
     let headerRowIndex = -1;
-    let emptyPackagesColumns = null;
-    let emptyPackagesHeaderRowIndex = -1;
 
     for (
         let rowIndex = 0;
         rowIndex < searchLimit;
         rowIndex += 1
     ) {
-        if (!columns) {
-            columns =
-                findLossesColumns(rows[rowIndex]);
+        columns =
+            findLossesColumns(rows[rowIndex]);
 
-            if (columns) {
-                headerRowIndex = rowIndex;
-            }
-        }
-
-        if (!emptyPackagesColumns) {
-            emptyPackagesColumns =
-                findEmptyPackagesColumns(
-                    rows[rowIndex],
-                );
-
-            if (emptyPackagesColumns) {
-                emptyPackagesHeaderRowIndex =
-                    rowIndex;
-            }
+        if (columns) {
+            headerRowIndex = rowIndex;
+            break;
         }
     }
 
     if (!columns) {
         throw new Error(
-            `A aba ${sheetName} não possui as colunas Data, Situação e Valor R$.`,
+            `A aba ${sheetName} não possui as colunas Data, Código BR e Situação.`,
         );
     }
 
     const recoverySource =
-        columns.packRecovery >= 0
-            ? null
-            : findLossesRecoverySource(
-                workbook,
-            );
+        findLossesRecoverySource(
+            workbook,
+        );
 
     return {
         sheetName,
         rows,
         columns,
         headerRowIndex,
-        emptyPackagesColumns,
-        emptyPackagesHeaderRowIndex,
         recoverySource,
     };
 }
@@ -967,41 +932,6 @@ function parseLossesBoolean(value) {
     }
 
     return null;
-}
-
-function parseLossesMonetaryValue(value) {
-    if (
-        typeof value === "number" &&
-        Number.isFinite(value) &&
-        value >= 0
-    ) {
-        return value;
-    }
-
-    const receivedValue =
-        normalizeDamageText(value);
-
-    if (!receivedValue) {
-        return null;
-    }
-
-    const numericText =
-        receivedValue
-            .replace(/[^\d,.-]/g, "")
-            .replace(/\.(?=.*[,])/g, "")
-            .replace(",", ".");
-
-    if (!/\d/.test(numericText)) {
-        return null;
-    }
-
-    const numericValue =
-        Number(numericText);
-
-    return Number.isFinite(numericValue) &&
-        numericValue >= 0
-        ? numericValue
-        : null;
 }
 
 function classifyLossesSituation(value) {
@@ -1054,10 +984,6 @@ function createLossesMonthData(
                 recoveryYes: 0,
                 recoveryNo: 0,
                 recoveryUnknown: 0,
-                confirmedValue: 0,
-                underReviewValue: 0,
-                confirmedValueRecords: 0,
-                underReviewValueRecords: 0,
             };
 
             daysByDate.set(dateKey, day);
@@ -1101,39 +1027,17 @@ function createLossesMonthData(
         day[situation] += 1;
         importedRows += 1;
 
-        let recovery =
-            source.columns.packRecovery >= 0
-                ? parseLossesBoolean(
-                    row?.[
-                        source.columns
-                            .packRecovery
-                    ],
-                )
-                : null;
-
-        if (
-            recovery === null &&
-            source.columns.packageCode >= 0
-        ) {
-            const packageCode =
-                normalizeDamagePackageCode(
-                    row?.[
-                        source.columns
-                            .packageCode
-                    ],
-                );
-
-            if (
-                source.recoverySource
-                    ?.valuesByPackageCode
-                    .has(packageCode)
-            ) {
-                recovery =
-                    source.recoverySource
-                        .valuesByPackageCode
-                        .get(packageCode);
-            }
-        }
+        const packageCode =
+            normalizeDamagePackageCode(
+                row?.[
+                    source.columns
+                        .packageCode
+                ],
+            );
+        const recovery =
+            source.recoverySource
+                .valuesByPackageCode
+                .get(packageCode) ?? null;
 
         if (recovery === true) {
             day.recoveryYes += 1;
@@ -1142,70 +1046,6 @@ function createLossesMonthData(
             day.recoveryNo += 1;
         } else {
             day.recoveryUnknown += 1;
-        }
-
-        const monetaryValue =
-            parseLossesMonetaryValue(
-                row?.[source.columns.monetaryValue],
-            );
-
-        if (monetaryValue !== null) {
-            const valueField =
-                situation === "confirmedLosses"
-                    ? "confirmedValue"
-                    : "underReviewValue";
-            const recordsField =
-                situation === "confirmedLosses"
-                    ? "confirmedValueRecords"
-                    : "underReviewValueRecords";
-
-            day[valueField] += monetaryValue;
-            day[recordsField] += 1;
-        }
-    }
-
-    if (
-        source.emptyPackagesColumns &&
-        source.emptyPackagesHeaderRowIndex >= 0
-    ) {
-        for (
-            let rowIndex =
-                source.emptyPackagesHeaderRowIndex + 1;
-            rowIndex < source.rows.length;
-            rowIndex += 1
-        ) {
-            const row = source.rows[rowIndex];
-            const columns =
-                source.emptyPackagesColumns;
-            const packageCode =
-                normalizeDamageText(
-                    row?.[columns.packageCode],
-                );
-
-            if (!packageCode) {
-                continue;
-            }
-
-            const parsedDate =
-                parseDamageDate(row?.[columns.date]);
-
-            if (
-                !parsedDate ||
-                parsedDate.month - 1 !== monthIndex ||
-                parsedDate.year !== year
-            ) {
-                continue;
-            }
-
-            const ticketOpened =
-                parseLossesBoolean(
-                    row?.[columns.ticketOpened],
-                );
-
-            if (ticketOpened !== true) {
-                getDay(parsedDate.key)
-                    .emptyAwaitingTicket += 1;
-            }
         }
     }
 
@@ -1250,11 +1090,6 @@ function createDamageMonthData(
     const socStationsByDate =
         new Map();
 
-    const usesSeparateProductSource =
-        Boolean(
-            source.productSource,
-        );
-
     let ignoredRows = 0;
 
     for (
@@ -1294,6 +1129,38 @@ function createDamageMonthData(
             continue;
         }
 
+        const packageCode =
+            normalizeDamagePackageCode(
+                row?.[
+                    source.columns
+                        .packageCode
+                ],
+            );
+        const baseRecord =
+            source.baseSource
+                .valuesByPackageCode
+                .get(packageCode);
+
+        const currentStation =
+            normalizeDamageText(
+                baseRecord?.currentStation,
+            );
+
+        const currentStationSearch =
+            normalizeDamageSearchText(
+                currentStation,
+            );
+
+        if (
+            !packageCode ||
+            !currentStation ||
+            currentStationSearch ===
+                "sem dados"
+        ) {
+            ignoredRows += 1;
+            continue;
+        }
+
         const day =
             daysByDate.get(
                 parsedDate.key,
@@ -1305,19 +1172,6 @@ function createDamageMonthData(
                 liquid: 0,
                 glass: 0,
             };
-
-        const currentStation =
-            normalizeDamageText(
-                row?.[
-                    source.columns
-                        .currentStation
-                ],
-            );
-
-        const currentStationSearch =
-            normalizeDamageSearchText(
-                currentStation,
-            );
 
         if (
             currentStation ===
@@ -1357,76 +1211,21 @@ function createDamageMonthData(
             );
         }
 
-        if (!usesSeparateProductSource) {
-            const productType =
-                classifyDamageProductType(
-                    row?.[
-                        source.columns
-                            .productType
-                    ],
-                );
+        const productType =
+            classifyDamageProductType(
+                source.productSource
+                    .valuesByPackageCode
+                    .get(packageCode),
+            );
 
-            if (productType) {
-                day[productType] += 1;
-            }
+        if (productType) {
+            day[productType] += 1;
         }
 
         daysByDate.set(
             parsedDate.key,
             day,
         );
-    }
-
-    if (usesSeparateProductSource) {
-        const productSource =
-            source.productSource;
-
-        for (
-            let rowIndex =
-                productSource
-                    .headerRowIndex + 1;
-            rowIndex <
-                productSource.rows.length;
-            rowIndex += 1
-        ) {
-            const row =
-                productSource.rows[
-                    rowIndex
-                ];
-            const parsedDate =
-                parseDamageDate(
-                    row?.[
-                        productSource
-                            .columns.date
-                    ],
-                );
-
-            if (
-                !parsedDate ||
-                parsedDate.month - 1 !==
-                    monthIndex ||
-                parsedDate.year !== year
-            ) {
-                continue;
-            }
-
-            const day =
-                daysByDate.get(
-                    parsedDate.key,
-                );
-            const productType =
-                classifyDamageProductType(
-                    row?.[
-                        productSource
-                            .columns
-                            .productType
-                    ],
-                );
-
-            if (day && productType) {
-                day[productType] += 1;
-            }
-        }
     }
 
     const days =
@@ -1530,15 +1329,6 @@ async function readDamageAndLossesFile(
     ) {
         throw new Error(
             "Selecione um arquivo XLSX ou XLS.",
-        );
-    }
-
-    if (
-        file.size >
-        MAX_DAMAGE_FILE_SIZE
-    ) {
-        throw new Error(
-            "O arquivo ultrapassa o limite de 10 MB.",
         );
     }
 

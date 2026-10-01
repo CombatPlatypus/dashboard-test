@@ -7,14 +7,6 @@ import {
 const lossesQuantityFormatter =
     new Intl.NumberFormat("pt-BR");
 
-const lossesCurrencyFormatter =
-    new Intl.NumberFormat("pt-BR", {
-        style: "currency",
-        currency: "BRL",
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-    });
-
 let lossesViewElements = null;
 
 function getLossesViewElements(rootElement) {
@@ -25,8 +17,6 @@ function getLossesViewElements(rootElement) {
             rootElement.querySelector("#PackagesUnderReview"),
         confirmed:
             rootElement.querySelector("#confirmedLosses"),
-        monetaryValue:
-            rootElement.querySelector("#lossesMonetaryValue"),
         traditionalAnalysisTable:
             rootElement.querySelector(
                 "#lossesTraditionalAnalysisTable",
@@ -116,13 +106,6 @@ function renderLossesView(
             summary.confirmedLosses,
             summary.hasData,
         );
-    lossesViewElements.monetaryValue.textContent =
-        summary.informedValueRecords > 0
-            ? lossesCurrencyFormatter.format(
-                summary.estimatedLoss,
-            )
-            : "—";
-
     renderLossesTraditionalAnalysis(summary);
 
     return true;

@@ -15,14 +15,6 @@ const lossesQuantityFormatter =
         maximumFractionDigits: 0,
     });
 
-const lossesCurrencyFormatter =
-    new Intl.NumberFormat("pt-BR", {
-        style: "currency",
-        currency: "BRL",
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-    });
-
 const lossesPercentageFormatter =
     new Intl.NumberFormat("pt-BR", {
         style: "percent",
@@ -32,7 +24,6 @@ const lossesPercentageFormatter =
 
 let lossesPeriodChart = null;
 let lossesPackRecoveryChart = null;
-let lossesValueCompositionChart = null;
 let lossesChartPeriodTitle = null;
 let lossesChartPeriodSelector = null;
 let activeLossesChartPeriod = "last7";
@@ -316,81 +307,6 @@ const lossesRecoveryLabelsPlugin = {
     },
 };
 
-const lossesValueLabelsPlugin = {
-    id: "lossesValueLabels",
-
-    afterDatasetsDraw(chart) {
-        const values =
-            chart.data.datasets[0]?.data || [];
-        const bars =
-            chart.getDatasetMeta(0).data;
-        const chartArea = chart.chartArea;
-        const total =
-            values.reduce(
-                function (sum, value) {
-                    return sum + (Number(value) || 0);
-                },
-                0,
-            );
-
-        if (!chartArea) {
-            return;
-        }
-
-        const context = chart.ctx;
-        context.save();
-
-        bars.forEach(
-            function (bar, index) {
-                const value =
-                    Number(values[index]) || 0;
-                const properties =
-                    bar.getProps(["x", "y"], true);
-                const barWidth =
-                    Math.max(
-                        0,
-                        properties.x - chartArea.left,
-                    );
-                const currencyPositionX =
-                    barWidth >= 115
-                        ? properties.x - 10
-                        : properties.x + 10;
-
-                drawLossesChartText(
-                    context,
-                    lossesCurrencyFormatter.format(value),
-                    currencyPositionX,
-                    properties.y,
-                    {
-                        align:
-                            barWidth >= 115
-                                ? "right"
-                                : "left",
-                        font: '600 13px "Open Sans", sans-serif',
-                    },
-                );
-
-                drawLossesChartText(
-                    context,
-                    total > 0
-                        ? lossesPercentageFormatter.format(
-                            value / total,
-                        )
-                        : "0,0%",
-                    chartArea.right + 12,
-                    properties.y,
-                    {
-                        align: "left",
-                        outline: false,
-                    },
-                );
-            },
-        );
-
-        context.restore();
-    },
-};
-
 function createLossesPeriodChart(canvas) {
     return new window.Chart(canvas, {
         type: "bar",
@@ -534,82 +450,6 @@ function createLossesPackRecoveryChart(canvas) {
     });
 }
 
-function createLossesValueCompositionChart(canvas) {
-    return new window.Chart(canvas, {
-        type: "bar",
-        data: {
-            labels: [
-                "Perdas Confirmadas",
-                "Em Análise",
-            ],
-            datasets: [
-                {
-                    data: [0, 0],
-                    backgroundColor: [
-                        LOSSES_CONFIRMED_COLOR,
-                        LOSSES_REVIEW_COLOR,
-                    ],
-                    borderWidth: 0,
-                    barThickness: 32,
-                },
-            ],
-        },
-        options: {
-            indexAxis: "y",
-            responsive: true,
-            maintainAspectRatio: false,
-            animation: false,
-            layout: {
-                padding: { right: 66 },
-            },
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    enabled: false,
-
-                    callbacks: {
-                        label(context) {
-                            const values =
-                                context.chart.data.datasets[0].data;
-                            const total = values.reduce(
-                                function (sum, value) {
-                                    return sum + (Number(value) || 0);
-                                },
-                                0,
-                            );
-                            const value = Number(context.raw) || 0;
-
-                            return total > 0
-                                ? `${lossesCurrencyFormatter.format(value)} (${lossesPercentageFormatter.format(value / total)})`
-                                : lossesCurrencyFormatter.format(0);
-                        },
-                    },
-                },
-            },
-            scales: {
-                x: {
-                    beginAtZero: true,
-                    display: false,
-                },
-                y: {
-                    ticks: {
-                        color: "#e4e6eb",
-                        font: { size: 14 },
-                        padding: 12,
-                    },
-                    grid: { display: false },
-                    border: { display: false },
-                },
-            },
-        },
-        plugins: [
-            lossesHorizontalTextStylePlugin,
-            lossesHorizontalTrackPlugin,
-            lossesValueLabelsPlugin,
-        ],
-    });
-}
-
 function getActiveLossesChartPeriod(summary) {
     const periods =
         Array.isArray(summary.chartPeriods)
@@ -639,8 +479,6 @@ function getActiveLossesChartPeriod(summary) {
             recoveryYes: 0,
             recoveryNo: 0,
             recoveryUnknown: 0,
-            confirmedValue: 0,
-            underReviewValue: 0,
             dailyAverage: 0,
         };
 
@@ -698,8 +536,7 @@ function renderLossesCharts(
 ) {
     if (
         !lossesPeriodChart ||
-        !lossesPackRecoveryChart ||
-        !lossesValueCompositionChart
+        !lossesPackRecoveryChart
     ) {
         return false;
     }
@@ -778,27 +615,6 @@ function renderLossesCharts(
     );
     lossesPackRecoveryChart.update();
 
-    const valueComposition = [
-        selectedPeriod.confirmedValue,
-        selectedPeriod.underReviewValue,
-    ];
-    const maximumValue =
-        Math.max(...valueComposition, 0);
-
-    lossesValueCompositionChart
-        .data.datasets[0].data =
-            valueComposition;
-    lossesValueCompositionChart
-        .options.scales.x.suggestedMax =
-            maximumValue > 0
-                ? maximumValue * 1.15
-                : 1;
-    lossesValueCompositionChart.canvas.setAttribute(
-        "aria-label",
-        `Composição dos valores informados: ${selectedPeriod.title}`,
-    );
-    lossesValueCompositionChart.update();
-
     return true;
 }
 
@@ -806,7 +622,6 @@ function resizeLossesCharts() {
     [
         lossesPeriodChart,
         lossesPackRecoveryChart,
-        lossesValueCompositionChart,
     ].forEach(
         function (chart) {
             chart?.resize();
@@ -860,8 +675,6 @@ function initializeLossesCharts(
         panel?.querySelector("#lossesLastSevenDaysChart");
     const recoveryCanvas =
         panel?.querySelector("#lossesPackRecoveryChart");
-    const valueCanvas =
-        panel?.querySelector("#lossesValueCompositionChart");
 
     lossesChartPeriodTitle =
         panel?.querySelector("#lossesChartPeriodTitle");
@@ -873,7 +686,6 @@ function initializeLossesCharts(
         !(lossesPanel instanceof HTMLElement) ||
         !(periodCanvas instanceof HTMLCanvasElement) ||
         !(recoveryCanvas instanceof HTMLCanvasElement) ||
-        !(valueCanvas instanceof HTMLCanvasElement) ||
         !(lossesChartPeriodTitle instanceof HTMLElement) ||
         !(lossesChartPeriodSelector instanceof HTMLElement) ||
         typeof window.Chart !== "function"
@@ -888,7 +700,7 @@ function initializeLossesCharts(
         return true;
     }
 
-    [periodCanvas, recoveryCanvas, valueCanvas]
+    [periodCanvas, recoveryCanvas]
         .forEach(
             function (canvas) {
                 canvas.dataset.lossesChartInitialized =
@@ -900,8 +712,6 @@ function initializeLossesCharts(
         createLossesPeriodChart(periodCanvas);
     lossesPackRecoveryChart =
         createLossesPackRecoveryChart(recoveryCanvas);
-    lossesValueCompositionChart =
-        createLossesValueCompositionChart(valueCanvas);
 
     lossesChartPeriodSelector.addEventListener(
         "click",

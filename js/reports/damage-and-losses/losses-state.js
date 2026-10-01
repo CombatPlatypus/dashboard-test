@@ -15,16 +15,6 @@ function normalizeLossesCount(value) {
         : 0;
 }
 
-function normalizeLossesMoney(value) {
-    const numericValue =
-        Number(value);
-
-    return Number.isFinite(numericValue) &&
-        numericValue >= 0
-        ? numericValue
-        : 0;
-}
-
 function normalizeLossesDateKey(value) {
     const dateKey =
         String(value ?? "").trim();
@@ -70,14 +60,6 @@ function createLossesDayRecord(values = {}) {
             normalizeLossesCount(values.recoveryNo),
         recoveryUnknown:
             normalizeLossesCount(values.recoveryUnknown),
-        confirmedValue:
-            normalizeLossesMoney(values.confirmedValue),
-        underReviewValue:
-            normalizeLossesMoney(values.underReviewValue),
-        confirmedValueRecords:
-            normalizeLossesCount(values.confirmedValueRecords),
-        underReviewValueRecords:
-            normalizeLossesCount(values.underReviewValueRecords),
     };
 }
 
@@ -285,10 +267,6 @@ function createLossesMetrics(days) {
         recoveryYes: 0,
         recoveryNo: 0,
         recoveryUnknown: 0,
-        confirmedValue: 0,
-        underReviewValue: 0,
-        confirmedValueRecords: 0,
-        underReviewValueRecords: 0,
     };
 
     (Array.isArray(days) ? days : [])
@@ -308,14 +286,6 @@ function createLossesMetrics(days) {
                     normalizeLossesCount(day.recoveryNo);
                 metrics.recoveryUnknown +=
                     normalizeLossesCount(day.recoveryUnknown);
-                metrics.confirmedValue +=
-                    normalizeLossesMoney(day.confirmedValue);
-                metrics.underReviewValue +=
-                    normalizeLossesMoney(day.underReviewValue);
-                metrics.confirmedValueRecords +=
-                    normalizeLossesCount(day.confirmedValueRecords);
-                metrics.underReviewValueRecords +=
-                    normalizeLossesCount(day.underReviewValueRecords);
             },
         );
 
@@ -326,12 +296,6 @@ function createLossesMetrics(days) {
         metrics.recoveryYes +
         metrics.recoveryNo +
         metrics.recoveryUnknown;
-    metrics.valueCompositionTotal =
-        metrics.confirmedValue +
-        metrics.underReviewValue;
-    metrics.informedValueRecords =
-        metrics.confirmedValueRecords +
-        metrics.underReviewValueRecords;
 
     return metrics;
 }
@@ -502,8 +466,6 @@ function getLossesSummary(
     return {
         hasData: monthMetrics.total > 0,
         ...monthMetrics,
-        estimatedLoss:
-            monthMetrics.valueCompositionTotal,
         chartDays:
             chartPeriods[0]?.days || [],
         chartPeriods,
