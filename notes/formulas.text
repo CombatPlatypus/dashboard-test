@@ -57,6 +57,12 @@ Planilha Avarias e Perdas
 
             =UNIQUE(FILTER('Base de Avarias'!A2:A;'Base de Avarias'!A2:A<>"";'Base de Avarias'!A2:A<>"Order ID";'Base de Avarias'!C2:C="LM Hub_SP_Santos_PraiaGrande_02"))
 
+    Aba Base de Avarias
+
+
+
+
+
     Aba Avarais Histórico de Análises
 
         Coluna A

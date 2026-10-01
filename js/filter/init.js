@@ -49,17 +49,18 @@ const FILTER_PURPOSES =
                         "Shipment_id",
                         "binding_entity",
                         "AT_Number",
-                        "valor_produto",
                         "driver_id",
                         "motorista",
                         "item_names",
                     ]),
 
-                columnFormatters:
-                    Object.freeze({
-                        valor_produto:
-                            formatDecimalWithComma,
-                    }),
+                exportIgnoredColumns:
+                    Object.freeze([
+                        "Shipment_id",
+                    ]),
+
+                includeCsvHeaders:
+                    false,
 
                 previewHiddenColumns:
                     Object.freeze([
@@ -215,17 +216,6 @@ function formatCellValue(value) {
     }
 
     return String(value);
-}
-
-function formatDecimalWithComma(value) {
-    const formattedValue =
-        formatCellValue(value)
-            .trim();
-
-    return formattedValue.replace(
-        /^([+-]?\d+)\.(\d+)$/,
-        "$1,$2",
-    );
 }
 
 function formatPurposeColumnValue(
@@ -1286,13 +1276,64 @@ function createFilteredWorksheet(
     purpose,
     includeHeaders = true,
 ) {
+    const ignoredExportColumns =
+        new Set(
+            (
+                purpose.exportIgnoredColumns ??
+                []
+            ).map(
+                normalizeText,
+            ),
+        );
+
+    const exportColumnIndexes =
+        purpose.columns.reduce(
+            function (
+                columnIndexes,
+                column,
+                columnIndex,
+            ) {
+                if (
+                    !ignoredExportColumns.has(
+                        normalizeText(
+                            column,
+                        ),
+                    )
+                ) {
+                    columnIndexes.push(
+                        columnIndex,
+                    );
+                }
+
+                return columnIndexes;
+            },
+            [],
+        );
+
+    const exportRows =
+        filterState.resultRows.map(
+            function (row) {
+                return exportColumnIndexes.map(
+                    function (columnIndex) {
+                        return row[columnIndex];
+                    },
+                );
+            },
+        );
+
     const matrix =
         includeHeaders
             ? [
-                [...purpose.columns],
-                ...filterState.resultRows,
+                exportColumnIndexes.map(
+                    function (columnIndex) {
+                        return purpose.columns[
+                            columnIndex
+                        ];
+                    },
+                ),
+                ...exportRows,
             ]
-            : filterState.resultRows;
+            : exportRows;
 
     return window.XLSX.utils
         .aoa_to_sheet(
@@ -1401,6 +1442,8 @@ function saveFilteredFile() {
     const worksheet =
         createFilteredWorksheet(
             purpose,
+            purpose.includeCsvHeaders !==
+                false,
         );
 
     const csvContent =
