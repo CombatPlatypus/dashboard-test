@@ -1,3 +1,11 @@
+import {
+    createHeaderIndex,
+    findBestClipboardSource,
+    normalizeText,
+    parseClipboardHtmlRows,
+    parseClipboardRows,
+} from "./clipboard-source.js";
+
 const SUPPORTED_EXTENSIONS =
     new Set([
         "xlsx",
@@ -326,16 +334,6 @@ const filterState = {
     unmatchedValues: [],
 };
 
-function normalizeText(value) {
-    return String(
-        value ?? "",
-    )
-        .trim()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .toLocaleLowerCase("pt-BR");
-}
-
 function formatCellValue(value) {
     if (
         value === null ||
@@ -617,163 +615,6 @@ function isSupportedFile(file) {
         );
 }
 
-function createHeaderIndex(headers) {
-    const headerIndexes =
-        new Map();
-
-    headers.forEach(
-        function (
-            header,
-            columnIndex,
-        ) {
-            const normalizedHeader =
-                normalizeText(header);
-
-            if (
-                normalizedHeader &&
-                !headerIndexes.has(
-                    normalizedHeader,
-                )
-            ) {
-                headerIndexes.set(
-                    normalizedHeader,
-                    columnIndex,
-                );
-            }
-        },
-    );
-
-    return headerIndexes;
-}
-
-function createPurposeHeaderIndex(
-    headers,
-    purpose,
-) {
-    const sourceHeaderIndexes =
-        createHeaderIndex(headers);
-
-    const headerIndexes =
-        new Map(sourceHeaderIndexes);
-
-    const purposeColumns =
-        new Set([
-            purpose.filterColumn,
-            ...(purpose.requiredColumns ?? []),
-            ...purpose.columns,
-            purpose.oldestByColumn,
-        ].filter(Boolean));
-
-    purposeColumns.forEach(
-        function (column) {
-            const normalizedColumn =
-                normalizeText(column);
-
-            if (
-                headerIndexes.has(
-                    normalizedColumn,
-                )
-            ) {
-                return;
-            }
-
-            const aliases =
-                purpose.columnAliases?.[
-                    column
-                ] ?? [];
-
-            const matchingAlias =
-                aliases.find(
-                    function (alias) {
-                        return sourceHeaderIndexes
-                            .has(
-                                normalizeText(
-                                    alias,
-                                ),
-                            );
-                    },
-                );
-
-            if (!matchingAlias) {
-                return;
-            }
-
-            headerIndexes.set(
-                normalizedColumn,
-                sourceHeaderIndexes.get(
-                    normalizeText(
-                        matchingAlias,
-                    ),
-                ),
-            );
-        },
-    );
-
-    return headerIndexes;
-}
-
-function findCompatibleClipboardSource(
-    rows,
-    purpose,
-) {
-    let closestSource = null;
-
-    for (
-        let rowIndex = 0;
-        rowIndex < rows.length;
-        rowIndex += 1
-    ) {
-        const headers =
-            Array.isArray(rows[rowIndex])
-                ? rows[rowIndex]
-                : [];
-
-        const headerIndexes =
-            createPurposeHeaderIndex(
-                headers,
-                purpose,
-            );
-
-        const requiredColumns =
-            purpose.requiredColumns ??
-            purpose.columns;
-
-        const missingColumns =
-            requiredColumns.filter(
-                function (column) {
-                    return !headerIndexes.has(
-                        normalizeText(
-                            column,
-                        ),
-                    );
-                },
-            );
-
-        const sourceCandidate = {
-            rowIndex,
-            headerIndexes,
-            missingColumns,
-        };
-
-        if (missingColumns.length === 0) {
-            return sourceCandidate;
-        }
-
-        if (
-            !closestSource ||
-            missingColumns.length <
-                closestSource
-                    .missingColumns
-                    .length
-        ) {
-            closestSource =
-                sourceCandidate;
-        }
-    }
-
-    return closestSource;
-}
-
 function findCompatibleSheet(
     workbook,
     purpose,
@@ -1011,28 +852,7 @@ async function readWorkbook(file) {
     return workbook;
 }
 
-function parseClipboardRows(text) {
-    const clipboardText =
-        String(text ?? "")
-            .replace(/\r\n?/g, "\n")
-            .replace(/\n+$/g, "");
-
-    if (!clipboardText.trim()) {
-        throw new Error(
-            "A área de transferência está vazia.",
-        );
-    }
-
-    return clipboardText
-        .split("\n")
-        .map(
-            function (line) {
-                return line.split("\t");
-            },
-        );
-}
-
-async function readClipboardText() {
+async function readClipboardContent() {
     if (!navigator.clipboard) {
         throw new Error(
             "O navegador não disponibilizou acesso à área de transferência.",
@@ -1040,23 +860,6 @@ async function readClipboardText() {
     }
 
     let readError = null;
-
-    if (
-        typeof navigator.clipboard
-            .readText === "function"
-    ) {
-        try {
-            const text =
-                await navigator.clipboard
-                    .readText();
-
-            if (text) {
-                return text;
-            }
-        } catch (error) {
-            readError = error;
-        }
-    }
 
     if (
         typeof navigator.clipboard.read ===
@@ -1067,8 +870,27 @@ async function readClipboardText() {
                 await navigator.clipboard
                     .read();
 
+            let text = "";
+            let html = "";
+
             for (const item of items) {
                 if (
+                    !html &&
+                    item.types.includes(
+                        "text/html",
+                    )
+                ) {
+                    const blob =
+                        await item.getType(
+                            "text/html",
+                        );
+
+                    html =
+                        await blob.text();
+                }
+
+                if (
+                    text ||
                     !item.types.includes(
                         "text/plain",
                     )
@@ -1081,12 +903,34 @@ async function readClipboardText() {
                         "text/plain",
                     );
 
-                const text =
-                    await blob.text();
+                text = await blob.text();
+            }
 
-                if (text) {
-                    return text;
-                }
+            if (text || html) {
+                return {
+                    text,
+                    html,
+                };
+            }
+        } catch (error) {
+            readError = error;
+        }
+    }
+
+    if (
+        typeof navigator.clipboard
+            .readText === "function"
+    ) {
+        try {
+            const text =
+                await navigator.clipboard
+                    .readText();
+
+            if (text) {
+                return {
+                    text,
+                    html: "",
+                };
             }
         } catch (error) {
             readError = error;
@@ -1216,17 +1060,25 @@ async function importClipboard(purpose) {
         true;
 
     try {
-        const clipboardText =
-            await readClipboardText();
+        const clipboardContent =
+            await readClipboardContent();
 
-        const rows =
+        const htmlRows =
+            parseClipboardHtmlRows(
+                clipboardContent.html,
+            );
+
+        const textRows =
             parseClipboardRows(
-                clipboardText,
+                clipboardContent.text,
             );
 
         const compatibleSource =
-            findCompatibleClipboardSource(
-                rows,
+            findBestClipboardSource(
+                [
+                    htmlRows,
+                    textRows,
+                ],
                 purpose,
             );
 
@@ -1247,7 +1099,8 @@ async function importClipboard(purpose) {
         }
 
         const sourceRows =
-            rows
+            compatibleSource
+                .rows
                 .slice(
                     compatibleSource
                         .rowIndex + 1,
