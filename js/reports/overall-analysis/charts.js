@@ -734,7 +734,7 @@ function initializeOverallAnalysisCharts(
         createOverallAnalysisChart(
             expeditionCanvas,
             [
-                "Volume Conferido",
+                "Volume Expedido",
                 "Volume no Piso",
             ],
             [

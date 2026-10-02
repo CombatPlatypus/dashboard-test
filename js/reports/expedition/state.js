@@ -580,11 +580,7 @@ function getExpeditionSummary(
                 return (
                     total +
                     (
-                        route.scannedOrders ??
-                        0
-                    ) -
-                    (
-                        route.missortedOrders ??
+                        route.finalOrders ??
                         0
                     )
                 );
@@ -806,8 +802,7 @@ function getExpeditionOperatorRanking(
                 summary.routesChecked += 1;
 
                 summary.volumeChecked +=
-                    (route.scannedOrders ?? 0) -
-                    (route.missortedOrders ?? 0);
+                    route.finalOrders ?? 0;
 
                 summary.missingOrders +=
                     route.missingOrders ?? 0;

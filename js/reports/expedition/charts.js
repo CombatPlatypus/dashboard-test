@@ -954,7 +954,7 @@ function createComparisonChart(canvas) {
                                     "routes"
                                 ) {
                                     return (
-                                        "Volume conferido: " +
+                                        "Volume expedido: " +
                                         formatQuantity(
                                             data.details
                                                 .volumeChecked,
