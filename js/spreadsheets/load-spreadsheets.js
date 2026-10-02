@@ -48,7 +48,7 @@ const DEFAULT_SPREADSHEET_SETTINGS =
             menuName: "Insucesso",
         },
         {
-            spreadsheetId: "1Kw7h5nDUxjdpzmR4mY3oPH2oTfYP3P7Z",
+            spreadsheetId: "1xJZpuck84CM9-FTYd5UnWbZ4AezWUdGx",
             menuName: "Pacotes em Análise",
         },
         {
@@ -56,7 +56,7 @@ const DEFAULT_SPREADSHEET_SETTINGS =
             menuName: "Pacotes Retornados",
         },
         {
-            spreadsheetId: "1385sakCqF4Es4swDn3evACaHRWAks2THNJkgJP2TUT4",
+            spreadsheetId: "1cbHXjnfHGIDSob9Sh977p5J827qPlM5f9juRq_sIgcM",
             menuName: "Backlogs e Logs",
         },
         {
@@ -84,7 +84,7 @@ const DEFAULT_SPREADSHEET_SETTINGS =
             menuName: "Justificativas",
         },
         {
-            spreadsheetId: "1FojFYpuisveWci0pivDfWf_KEHQVcnY7",
+            spreadsheetId: "1WaHywDEm3ipdvEtq-pB01v4kyaREhn2i",
             menuName: "Avarias",
         },
         {
