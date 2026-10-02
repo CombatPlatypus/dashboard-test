@@ -266,18 +266,6 @@ function getOverallDamageAndLossesAnalysis(
                             ? lossesPeriod
                                 ?.confirmedLosses ?? 0
                             : null,
-
-                    savedAwaitingTicket:
-                        lossesHasData
-                            ? lossesPeriod
-                                ?.savedAwaitingTicket ?? 0
-                            : null,
-
-                    emptyAwaitingTicket:
-                        lossesHasData
-                            ? lossesPeriod
-                                ?.emptyAwaitingTicket ?? 0
-                            : null,
                 };
             },
         );

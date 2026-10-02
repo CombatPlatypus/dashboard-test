@@ -50,10 +50,6 @@ function createLossesDayRecord(values = {}) {
             normalizeLossesCount(values.underReview),
         confirmedLosses:
             normalizeLossesCount(values.confirmedLosses),
-        savedAwaitingTicket:
-            normalizeLossesCount(values.savedAwaitingTicket),
-        emptyAwaitingTicket:
-            normalizeLossesCount(values.emptyAwaitingTicket),
         recoveryYes:
             normalizeLossesCount(values.recoveryYes),
         recoveryNo:
@@ -262,8 +258,6 @@ function createLossesMetrics(days) {
     const metrics = {
         underReview: 0,
         confirmedLosses: 0,
-        savedAwaitingTicket: 0,
-        emptyAwaitingTicket: 0,
         recoveryYes: 0,
         recoveryNo: 0,
         recoveryUnknown: 0,
@@ -276,10 +270,6 @@ function createLossesMetrics(days) {
                     normalizeLossesCount(day.underReview);
                 metrics.confirmedLosses +=
                     normalizeLossesCount(day.confirmedLosses);
-                metrics.savedAwaitingTicket +=
-                    normalizeLossesCount(day.savedAwaitingTicket);
-                metrics.emptyAwaitingTicket +=
-                    normalizeLossesCount(day.emptyAwaitingTicket);
                 metrics.recoveryYes +=
                     normalizeLossesCount(day.recoveryYes);
                 metrics.recoveryNo +=

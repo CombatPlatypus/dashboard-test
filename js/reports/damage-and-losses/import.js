@@ -1044,8 +1044,6 @@ function createLossesDataForMonth(
                 date: dateKey,
                 underReview: 0,
                 confirmedLosses: 0,
-                savedAwaitingTicket: 0,
-                emptyAwaitingTicket: 0,
                 recoveryYes: 0,
                 recoveryNo: 0,
                 recoveryUnknown: 0,
@@ -1106,7 +1104,6 @@ function createLossesDataForMonth(
 
         if (recovery === true) {
             day.recoveryYes += 1;
-            day.savedAwaitingTicket += 1;
         } else if (recovery === false) {
             day.recoveryNo += 1;
         } else {

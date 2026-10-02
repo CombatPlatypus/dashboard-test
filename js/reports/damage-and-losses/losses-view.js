@@ -57,6 +57,18 @@ function renderLossesTraditionalAnalysis(summary) {
                     row.dataset.lossesAnalysisField;
                 const cells = row.querySelectorAll("td");
 
+                if (
+                    field === "savedAwaitingTicket" ||
+                    field === "emptyAwaitingTicket"
+                ) {
+                    cells.forEach(
+                        function (cell) {
+                            cell.textContent = "—";
+                        },
+                    );
+                    return;
+                }
+
                 periods.forEach(
                     function (period, index) {
                         const cell = cells[index];
