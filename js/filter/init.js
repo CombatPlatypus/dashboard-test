@@ -177,6 +177,10 @@ const FILTER_PURPOSES =
                         "Order ID",
                         "Status",
                         "Current Station",
+                    ]),
+
+                optionalColumns:
+                    Object.freeze([
                         "Data",
                     ]),
 
@@ -185,6 +189,19 @@ const FILTER_PURPOSES =
                         "Order ID":
                             Object.freeze([
                                 "Ordem ID",
+                                "SPX TN (Número de rastreamento)",
+                                "SPX Tracking Number",
+                            ]),
+
+                        Status:
+                            Object.freeze([
+                                "Status do pedido",
+                                "Order Status",
+                            ]),
+
+                        "Current Station":
+                            Object.freeze([
+                                "Station Atual",
                             ]),
                     }),
 
@@ -306,6 +323,8 @@ const filterState = {
     sourceRows: [],
 
     headerIndexes: new Map(),
+
+    activeColumns: [],
 
     resultRows: [],
 
@@ -873,6 +892,7 @@ function resetSelectedPurpose() {
     filterState.sourceRows = [];
     filterState.headerIndexes =
         new Map();
+    filterState.activeColumns = [];
 
     elements.values.value = "";
     elements.values.disabled = true;
@@ -887,6 +907,15 @@ function getSelectedPurpose() {
     return FILTER_PURPOSES[
         elements.purpose.value
     ];
+}
+
+function getActivePurposeColumns(
+    purpose,
+) {
+    return filterState
+        .activeColumns.length > 0
+        ? filterState.activeColumns
+        : purpose.columns;
 }
 
 function syncImportButton() {
@@ -1154,6 +1183,9 @@ async function importFile(file) {
         filterState.headerIndexes =
             compatibleSheet.headerIndexes;
 
+        filterState.activeColumns =
+            [...purpose.columns];
+
         elements.values.disabled = false;
         elements.clearButton.disabled =
             false;
@@ -1260,15 +1292,51 @@ async function importClipboard(purpose) {
             compatibleSource
                 .headerIndexes;
 
+        filterState.activeColumns =
+            purpose.columns.filter(
+                function (column) {
+                    return compatibleSource
+                        .headerIndexes
+                        .has(
+                            normalizeText(
+                                column,
+                            ),
+                        );
+                },
+            );
+
         elements.values.disabled = false;
         elements.clearButton.disabled =
             false;
 
         elements.values.focus();
 
+        const missingOptionalColumns =
+            (
+                purpose.optionalColumns ??
+                []
+            ).filter(
+                function (column) {
+                    return !compatibleSource
+                        .headerIndexes
+                        .has(
+                            normalizeText(
+                                column,
+                            ),
+                        );
+                },
+            );
+
+        const optionalMessage =
+            missingOptionalColumns.length > 0
+                ? " A coluna Data não foi encontrada e será omitida da prévia."
+                : "";
+
         setNotification(
-            `Área de transferência importada com ${sourceRows.length} linha(s). Cole um Código BR por linha para filtrar.`,
-            "success",
+            `Área de transferência importada com ${sourceRows.length} linha(s).${optionalMessage} Cole um Código BR por linha para filtrar.`,
+            missingOptionalColumns.length > 0
+                ? "warning"
+                : "success",
         );
     } catch (error) {
         clearImportedSource();
@@ -1305,7 +1373,7 @@ function handlePurposeChange() {
         "clipboard"
     ) {
         setNotification(
-            "Copie a tabela com os cabeçalhos Order ID (ou Ordem ID), Status, Current Station e Data; depois clique em Importar.",
+            "Copie o trecho da tabela ou a página inteira do SPX e clique em Importar. Os cabeçalhos de rastreamento, status e estação atual em português ou inglês são reconhecidos; Data é opcional.",
             "info",
         );
 
@@ -1350,6 +1418,11 @@ function renderPreview(
     const headerRow =
         document.createElement("tr");
 
+    const activeColumns =
+        getActivePurposeColumns(
+            purpose,
+        );
+
     const hiddenPreviewColumns =
         new Set(
             (
@@ -1361,7 +1434,7 @@ function renderPreview(
         );
 
     const previewColumnIndexes =
-        purpose.columns.reduce(
+        activeColumns.reduce(
             function (
                 columnIndexes,
                 column,
@@ -1390,10 +1463,10 @@ function renderPreview(
                 createTableCell(
                     "th",
                     purpose.previewColumnLabels?.[
-                        purpose.columns[
+                        activeColumns[
                             columnIndex
                         ]
-                    ] ?? purpose.columns[
+                    ] ?? activeColumns[
                         columnIndex
                     ],
                 ),
@@ -1529,8 +1602,13 @@ function filterRows() {
             ),
         );
 
+    const activeColumns =
+        getActivePurposeColumns(
+            purpose,
+        );
+
     const outputColumnIndexes =
-        purpose.columns.map(
+        activeColumns.map(
             function (column) {
                 return filterState
                     .headerIndexes
@@ -1552,6 +1630,17 @@ function filterRows() {
                     ),
                 )
             : undefined;
+
+    const keepFirstOccurrence =
+        purpose.keepFirstOccurrence ===
+            true ||
+        (
+            Boolean(
+                purpose.oldestByColumn,
+            ) &&
+            oldestColumnIndex ===
+                undefined
+        );
 
     const selectedResultByValue =
         new Map();
@@ -1581,7 +1670,7 @@ function filterRows() {
                     ) {
                         return formatPurposeColumnValue(
                             purpose,
-                            purpose.columns[
+                            activeColumns[
                                 outputColumnIndex
                             ],
                             sourceRow[
@@ -1609,7 +1698,7 @@ function filterRows() {
             const shouldReplace =
                 !selectedResult ||
                 (
-                    purpose.keepFirstOccurrence !==
+                    keepFirstOccurrence !==
                         true &&
                     (
                         oldestColumnIndex ===
@@ -1646,8 +1735,9 @@ function filterRows() {
     /*
      * Mantém uma única linha para cada valor colado.
      * Finalidades com oldestByColumn usam a data mais
-     * antiga; keepFirstOccurrence mantém a primeira
-     * linha da planilha; as demais mantêm a última.
+     * antiga. Sem essa coluna, ou com
+     * keepFirstOccurrence, mantém a primeira linha;
+     * as demais mantêm a última.
      * A montagem abaixo preserva a ordem da textarea.
      */
 
@@ -1681,7 +1771,7 @@ function filterRows() {
                         return resultRow;
                     }
 
-                    return purpose.columns.map(
+                    return activeColumns.map(
                         function (column) {
                             return normalizeText(
                                 column,
@@ -1814,6 +1904,11 @@ function createFilteredWorksheet(
     purpose,
     includeHeaders = true,
 ) {
+    const activeColumns =
+        getActivePurposeColumns(
+            purpose,
+        );
+
     const ignoredExportColumns =
         new Set(
             (
@@ -1825,7 +1920,7 @@ function createFilteredWorksheet(
         );
 
     const exportColumnIndexes =
-        purpose.columns.reduce(
+        activeColumns.reduce(
             function (
                 columnIndexes,
                 column,
@@ -1864,7 +1959,7 @@ function createFilteredWorksheet(
             ? [
                 exportColumnIndexes.map(
                     function (columnIndex) {
-                        return purpose.columns[
+                        return activeColumns[
                             columnIndex
                         ];
                     },
