@@ -179,11 +179,6 @@ const FILTER_PURPOSES =
                         "Current Station",
                     ]),
 
-                optionalColumns:
-                    Object.freeze([
-                        "Data",
-                    ]),
-
                 columnAliases:
                     Object.freeze({
                         "Order ID":
@@ -1311,32 +1306,9 @@ async function importClipboard(purpose) {
 
         elements.values.focus();
 
-        const missingOptionalColumns =
-            (
-                purpose.optionalColumns ??
-                []
-            ).filter(
-                function (column) {
-                    return !compatibleSource
-                        .headerIndexes
-                        .has(
-                            normalizeText(
-                                column,
-                            ),
-                        );
-                },
-            );
-
-        const optionalMessage =
-            missingOptionalColumns.length > 0
-                ? " A coluna Data não foi encontrada e será omitida da prévia."
-                : "";
-
         setNotification(
-            `Área de transferência importada com ${sourceRows.length} linha(s).${optionalMessage} Cole um Código BR por linha para filtrar.`,
-            missingOptionalColumns.length > 0
-                ? "warning"
-                : "success",
+            `Área de transferência importada com ${sourceRows.length} linha(s). Cole um Código BR por linha para filtrar.`,
+            "success",
         );
     } catch (error) {
         clearImportedSource();
@@ -1373,7 +1345,7 @@ function handlePurposeChange() {
         "clipboard"
     ) {
         setNotification(
-            "Copie o trecho da tabela ou a página inteira do SPX e clique em Importar. Os cabeçalhos de rastreamento, status e estação atual em português ou inglês são reconhecidos; Data é opcional.",
+            "Copie o trecho da tabela ou a página inteira do SPX e clique em Importar.",
             "info",
         );
 
