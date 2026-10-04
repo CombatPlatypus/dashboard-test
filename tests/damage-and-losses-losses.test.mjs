@@ -122,6 +122,13 @@ test("o HTML liga o novo gráfico e a linha de retornados ao estado", () => {
         new URL("../index.html", import.meta.url),
         "utf8",
     );
+    const lossesView = readFileSync(
+        new URL(
+            "../js/reports/damage-and-losses/losses-view.js",
+            import.meta.url,
+        ),
+        "utf8",
+    );
 
     assert.equal(
         Array.from(
@@ -134,5 +141,9 @@ test("o HTML liga o novo gráfico e a linha de retornados ao estado", () => {
     assert.match(
         html,
         /data-losses-analysis-field="returnedPackages"/,
+    );
+    assert.doesNotMatch(
+        html + lossesView,
+        /savedAwaitingTicket|emptyAwaitingTicket|Aguardando Ticket/,
     );
 });
