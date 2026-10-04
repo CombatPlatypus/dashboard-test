@@ -6,9 +6,11 @@ import {
 
 const LOSSES_REVIEW_COLOR = "#ffc107";
 const LOSSES_CONFIRMED_COLOR = "#F44336";
-const LOSSES_RECOVERED_COLOR = "#66bb6a";
-const LOSSES_NOT_RECOVERED_COLOR = "#ef5350";
-const LOSSES_UNKNOWN_COLOR = "#a0a4aa";
+const LOSSES_RETURNED_COLOR = "#66bb6a";
+const LOSSES_RECOVERY_DONE_COLOR = "#43a047";
+const LOSSES_RECOVERY_NOT_DONE_COLOR = "#ef5350";
+const LOSSES_RECOVERY_INVALID_ID_COLOR = "#ff9800";
+const LOSSES_RECOVERY_UNINFORMED_COLOR = "#a0a4aa";
 
 const lossesQuantityFormatter =
     new Intl.NumberFormat("pt-BR", {
@@ -24,6 +26,7 @@ const lossesPercentageFormatter =
 
 let lossesPeriodChart = null;
 let lossesPackRecoveryChart = null;
+let lossesReturnedComparisonChart = null;
 let lossesChartPeriodTitle = null;
 let lossesChartPeriodSelector = null;
 let activeLossesChartPeriod = "last7";
@@ -389,14 +392,89 @@ function createLossesPackRecoveryChart(canvas) {
     return new window.Chart(canvas, {
         type: "bar",
         data: {
-            labels: ["Sim", "Não", "Não Informado"],
+            labels: [
+                "Feito",
+                "Não Feito",
+                "ID Inválido",
+                "-",
+            ],
             datasets: [
                 {
                     data: [0, 0, 0],
                     backgroundColor: [
-                        LOSSES_RECOVERED_COLOR,
-                        LOSSES_NOT_RECOVERED_COLOR,
-                        LOSSES_UNKNOWN_COLOR,
+                        LOSSES_RECOVERY_DONE_COLOR,
+                        LOSSES_RECOVERY_NOT_DONE_COLOR,
+                        LOSSES_RECOVERY_INVALID_ID_COLOR,
+                        LOSSES_RECOVERY_UNINFORMED_COLOR,
+                    ],
+                    borderWidth: 0,
+                    borderRadius: 3,
+                    barThickness: 24,
+                },
+            ],
+        },
+        options: {
+            indexAxis: "y",
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: false,
+            layout: {
+                padding: { right: 52 },
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    enabled: false,
+
+                    callbacks: {
+                        label(context) {
+                            return lossesQuantityFormatter.format(
+                                context.raw,
+                            );
+                        },
+                    },
+                },
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    display: false,
+                },
+                y: {
+                    ticks: {
+                        color: "#e4e6eb",
+                        font: { size: 14 },
+                        padding: 12,
+                    },
+                    grid: { display: false },
+                    border: { display: false },
+                },
+            },
+        },
+        plugins: [
+            lossesHorizontalTextStylePlugin,
+            lossesHorizontalTrackPlugin,
+            lossesRecoveryLabelsPlugin,
+        ],
+    });
+}
+
+function createLossesReturnedComparisonChart(canvas) {
+    return new window.Chart(canvas, {
+        type: "bar",
+        data: {
+            labels: [
+                "Retornados",
+                "Perdidos",
+                "Em Análise",
+            ],
+            datasets: [
+                {
+                    data: [0, 0, 0],
+                    backgroundColor: [
+                        LOSSES_RETURNED_COLOR,
+                        LOSSES_CONFIRMED_COLOR,
+                        LOSSES_REVIEW_COLOR,
                     ],
                     borderWidth: 0,
                     borderRadius: 3,
@@ -476,9 +554,11 @@ function getActiveLossesChartPeriod(summary) {
             days: [],
             underReview: 0,
             confirmedLosses: 0,
-            recoveryYes: 0,
-            recoveryNo: 0,
-            recoveryUnknown: 0,
+            returnedPackages: 0,
+            recoveryDone: 0,
+            recoveryNotDone: 0,
+            recoveryInvalidId: 0,
+            recoveryUninformed: 0,
             dailyAverage: 0,
         };
 
@@ -536,7 +616,8 @@ function renderLossesCharts(
 ) {
     if (
         !lossesPeriodChart ||
-        !lossesPackRecoveryChart
+        !lossesPackRecoveryChart ||
+        !lossesReturnedComparisonChart
     ) {
         return false;
     }
@@ -596,9 +677,10 @@ function renderLossesCharts(
     lossesPeriodChart.update();
 
     const recoveryValues = [
-        selectedPeriod.recoveryYes,
-        selectedPeriod.recoveryNo,
-        selectedPeriod.recoveryUnknown,
+        selectedPeriod.recoveryDone,
+        selectedPeriod.recoveryNotDone,
+        selectedPeriod.recoveryInvalidId,
+        selectedPeriod.recoveryUninformed,
     ];
     const maximumRecovery =
         Math.max(...recoveryValues, 0);
@@ -615,6 +697,28 @@ function renderLossesCharts(
     );
     lossesPackRecoveryChart.update();
 
+    const comparisonValues = [
+        selectedPeriod.returnedPackages,
+        selectedPeriod.confirmedLosses,
+        selectedPeriod.underReview,
+    ];
+    const maximumComparison =
+        Math.max(...comparisonValues, 0);
+
+    lossesReturnedComparisonChart
+        .data.datasets[0].data =
+        comparisonValues;
+    lossesReturnedComparisonChart
+        .options.scales.x.suggestedMax =
+        maximumComparison > 0
+            ? Math.ceil(maximumComparison * 1.15)
+            : 1;
+    lossesReturnedComparisonChart.canvas.setAttribute(
+        "aria-label",
+        `Pacotes retornados, perdidos e em análise: ${selectedPeriod.title}`,
+    );
+    lossesReturnedComparisonChart.update();
+
     return true;
 }
 
@@ -622,6 +726,7 @@ function resizeLossesCharts() {
     [
         lossesPeriodChart,
         lossesPackRecoveryChart,
+        lossesReturnedComparisonChart,
     ].forEach(
         function (chart) {
             chart?.resize();
@@ -675,6 +780,10 @@ function initializeLossesCharts(
         panel?.querySelector("#lossesLastSevenDaysChart");
     const recoveryCanvas =
         panel?.querySelector("#lossesPackRecoveryChart");
+    const returnedComparisonCanvas =
+        panel?.querySelector(
+            "#lossesReturnedComparisonChart",
+        );
 
     lossesChartPeriodTitle =
         panel?.querySelector("#lossesChartPeriodTitle");
@@ -686,6 +795,7 @@ function initializeLossesCharts(
         !(lossesPanel instanceof HTMLElement) ||
         !(periodCanvas instanceof HTMLCanvasElement) ||
         !(recoveryCanvas instanceof HTMLCanvasElement) ||
+        !(returnedComparisonCanvas instanceof HTMLCanvasElement) ||
         !(lossesChartPeriodTitle instanceof HTMLElement) ||
         !(lossesChartPeriodSelector instanceof HTMLElement) ||
         typeof window.Chart !== "function"
@@ -700,7 +810,11 @@ function initializeLossesCharts(
         return true;
     }
 
-    [periodCanvas, recoveryCanvas]
+    [
+        periodCanvas,
+        recoveryCanvas,
+        returnedComparisonCanvas,
+    ]
         .forEach(
             function (canvas) {
                 canvas.dataset.lossesChartInitialized =
@@ -712,6 +826,10 @@ function initializeLossesCharts(
         createLossesPeriodChart(periodCanvas);
     lossesPackRecoveryChart =
         createLossesPackRecoveryChart(recoveryCanvas);
+    lossesReturnedComparisonChart =
+        createLossesReturnedComparisonChart(
+            returnedComparisonCanvas,
+        );
 
     lossesChartPeriodSelector.addEventListener(
         "click",

@@ -50,12 +50,16 @@ function createLossesDayRecord(values = {}) {
             normalizeLossesCount(values.underReview),
         confirmedLosses:
             normalizeLossesCount(values.confirmedLosses),
-        recoveryYes:
-            normalizeLossesCount(values.recoveryYes),
-        recoveryNo:
-            normalizeLossesCount(values.recoveryNo),
-        recoveryUnknown:
-            normalizeLossesCount(values.recoveryUnknown),
+        returnedPackages:
+            normalizeLossesCount(values.returnedPackages),
+        recoveryDone:
+            normalizeLossesCount(values.recoveryDone),
+        recoveryNotDone:
+            normalizeLossesCount(values.recoveryNotDone),
+        recoveryInvalidId:
+            normalizeLossesCount(values.recoveryInvalidId),
+        recoveryUninformed:
+            normalizeLossesCount(values.recoveryUninformed),
     };
 }
 
@@ -258,9 +262,11 @@ function createLossesMetrics(days) {
     const metrics = {
         underReview: 0,
         confirmedLosses: 0,
-        recoveryYes: 0,
-        recoveryNo: 0,
-        recoveryUnknown: 0,
+        returnedPackages: 0,
+        recoveryDone: 0,
+        recoveryNotDone: 0,
+        recoveryInvalidId: 0,
+        recoveryUninformed: 0,
     };
 
     (Array.isArray(days) ? days : [])
@@ -270,12 +276,16 @@ function createLossesMetrics(days) {
                     normalizeLossesCount(day.underReview);
                 metrics.confirmedLosses +=
                     normalizeLossesCount(day.confirmedLosses);
-                metrics.recoveryYes +=
-                    normalizeLossesCount(day.recoveryYes);
-                metrics.recoveryNo +=
-                    normalizeLossesCount(day.recoveryNo);
-                metrics.recoveryUnknown +=
-                    normalizeLossesCount(day.recoveryUnknown);
+                metrics.returnedPackages +=
+                    normalizeLossesCount(day.returnedPackages);
+                metrics.recoveryDone +=
+                    normalizeLossesCount(day.recoveryDone);
+                metrics.recoveryNotDone +=
+                    normalizeLossesCount(day.recoveryNotDone);
+                metrics.recoveryInvalidId +=
+                    normalizeLossesCount(day.recoveryInvalidId);
+                metrics.recoveryUninformed +=
+                    normalizeLossesCount(day.recoveryUninformed);
             },
         );
 
@@ -283,9 +293,10 @@ function createLossesMetrics(days) {
         metrics.underReview +
         metrics.confirmedLosses;
     metrics.packRecoveryTotal =
-        metrics.recoveryYes +
-        metrics.recoveryNo +
-        metrics.recoveryUnknown;
+        metrics.recoveryDone +
+        metrics.recoveryNotDone +
+        metrics.recoveryInvalidId +
+        metrics.recoveryUninformed;
 
     return metrics;
 }

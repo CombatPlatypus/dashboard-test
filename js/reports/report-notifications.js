@@ -37,7 +37,7 @@ const DAMAGE_AND_LOSSES_IMPORT_NOTIFICATION =
         type: "idle",
 
         message:
-            "Importe a planilha de Avarias e Perdas com as abas Histórico de Avarias, Histórico de Análises e Taxa de Perdas.",
+            "Importe a planilha de Avarias e Perdas com as abas Histórico de Avarias, Histórico de Análises, Base de Análises, Histórico de Retornados e Taxa de Perdas.",
     });
 
 const LOSSES_RATE_IMPORT_NOTIFICATION =

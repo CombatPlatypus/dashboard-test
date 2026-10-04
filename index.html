@@ -1504,7 +1504,7 @@
                                         <img id="damageAndLossesNotificationIcon" src="images/geral-icons/bell-icon.svg" alt="">
 
                                         <h4 id="damageAndLossesNotificationText">
-                                            Importe a planilha de Avarias e Perdas com as abas Histórico de Avarias, Histórico de Análises e Taxa de Perdas.
+                                            Importe a planilha de Avarias e Perdas com as abas Histórico de Avarias, Histórico de Análises, Base de Análises, Histórico de Retornados e Taxa de Perdas.
                                         </h4>
                                     </div>
                                 </div>
@@ -1836,8 +1836,8 @@
                                                         <h4>Pacotes Retornados x Perdidos x Em Análise</h4>
                                                     </div>
 
-                                                    <div id="" class="losses-horizontal-chart-canvas">
-                                                        <canvas id="" role="img" aria-label=""></canvas>
+                                                    <div id="lossesReturnedComparisonChartContainer" class="losses-horizontal-chart-canvas">
+                                                        <canvas id="lossesReturnedComparisonChart" role="img" aria-label="Pacotes retornados, perdidos e em análise"></canvas>
                                                     </div>
                                                 </div>
                                             </div>
@@ -1874,6 +1874,19 @@
                                                 <tbody>
                                                     <tr data-losses-analysis-field="confirmedLosses">
                                                         <th scope="row">Perdas Confirmadas</th>
+                                                        <td>-</td>
+                                                        <td>-</td>
+                                                        <td>-</td>
+                                                        <td>-</td>
+                                                        <td>-</td>
+                                                        <td>-</td>
+                                                        <td>-</td>
+                                                    </tr>
+                                                </tbody>
+
+                                                <tbody>
+                                                    <tr data-losses-analysis-field="returnedPackages">
+                                                        <th scope="row">Pacotes Retornados</th>
                                                         <td>-</td>
                                                         <td>-</td>
                                                         <td>-</td>
