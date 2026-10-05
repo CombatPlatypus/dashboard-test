@@ -829,6 +829,7 @@ function filterParcelPackageRows(
 
 function createParcelSummary(
     rows,
+    operatorKindOverrides = {},
 ) {
     const receivedRows =
         Array.isArray(
@@ -854,7 +855,15 @@ function createParcelSummary(
     const operatorStats =
         classifyParcelOperators(
             receivedRows,
-        );
+        ).map(function (operator) {
+            const hasOverride = Object.hasOwn(operatorKindOverrides ?? {}, operator.operatorKey) &&
+                typeof operatorKindOverrides[operator.operatorKey] === "boolean";
+
+            return hasOverride ? {
+                ...operator,
+                packageKind: operatorKindOverrides[operator.operatorKey] ? "bulky" : "common",
+            } : operator;
+        });
 
     const bulkyOperatorKeys =
         new Set(

@@ -330,6 +330,7 @@ function updateParcelCharts(
     const summary =
         createParcelSummary(
             state.rows,
+            state.operatorKindOverrides,
         );
 
     parcelCoverageChart

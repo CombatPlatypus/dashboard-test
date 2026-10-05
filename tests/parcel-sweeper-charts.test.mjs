@@ -120,7 +120,8 @@ test("aging mostra as sete janelas solicitadas em uma linha, preservando percent
 });
 
 class TestElement {
-    constructor(tag) { this.tag = tag; this.children = []; this.textContent = ""; }
+    constructor(tag) { this.tag = tag; this.children = []; this.textContent = ""; this.dataset = {}; this.attributes = {}; }
+    setAttribute(name, value) { this.attributes[name] = value; }
     replaceChildren() { this.children = []; }
     appendChild(child) {
         if (child.tag === "fragment") this.children.push(...child.children);
@@ -128,7 +129,7 @@ class TestElement {
     }
 }
 
-test("distribuição mantém no mínimo 8 linhas de 3 células, sem truncar operadores", t => {
+test("distribuição mantém 8 linhas de 4 células com classificação clicável, sem truncar operadores", t => {
     replaceGlobal(t, "document", {
         createElement: tag => new TestElement(tag),
         createDocumentFragment: () => new TestElement("fragment"),
@@ -138,16 +139,25 @@ test("distribuição mantém no mínimo 8 linhas de 3 células, sem truncar oper
         const operators = Array.from({ length: count }, (_, index) => ({
             operator: `[Ops${index + 1}]OPERADOR TESTE SOBRENOME`,
             count: 20, percentage: 1 / count,
+            packageKind: index % 2 === 0 ? "common" : "bulky",
         }));
         renderParcelOperatorTable(body, operators);
         assert.equal(body.children.length, Math.max(8, count));
-        assert.ok(body.children.every(row => row.children.length === 3));
+        assert.ok(body.children.every(row => row.children.length === 4));
         body.children.forEach((row, index) => {
             if (index >= count) {
-                assert.deepEqual(row.children.map(cell => cell.textContent), ["-", "-", "-"]);
+                assert.deepEqual(row.children.map(cell => cell.textContent), ["-", "-", "-", "-"]);
+                assert.ok(row.children.every(cell => cell.children.length === 0));
             } else {
                 assert.equal(row.children[0].textContent, `[Ops${index + 1}] Operador Teste`);
                 assert.equal(row.children[1].textContent, "20");
+                const button = row.children[3].children[0];
+                assert.equal(button.tag, "button");
+                assert.equal(button.type, "button");
+                assert.equal(button.textContent, index % 2 === 0 ? "Não" : "Sim");
+                assert.equal(button.dataset.parcelOperatorKey, operators[index].operator.toLowerCase());
+                assert.equal(button.attributes["aria-pressed"], String(index % 2 !== 0));
+                assert.equal(button.attributes["aria-label"], `Volumoso? [Ops${index + 1}] Operador Teste`);
             }
         });
     }
@@ -157,6 +167,7 @@ test("HTML inicial da distribuição também contém 8 linhas com hífens", () =
     const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
     const body = html.match(/<tbody id="parcelOperatorDistributionBody">([\s\S]*?)<\/tbody>/)[1];
     assert.equal((body.match(/<tr/g) ?? []).length, 8);
-    assert.equal((body.match(/<td>-<\/td>/g) ?? []).length, 24);
+    assert.equal((body.match(/<td>-<\/td>/g) ?? []).length, 32);
+    assert.match(html, /<th>Volumoso\?<\/th>/);
     assert.doesNotMatch(body, /colspan/);
 });

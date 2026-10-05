@@ -27,6 +27,7 @@ function canExportParcelReport(
 ) {
     return createParcelSummary(
         state.rows,
+        state.operatorKindOverrides,
     ).hasData;
 }
 

@@ -1,5 +1,9 @@
 import {
     createParcelRow,
+    createParcelSummary,
+    getParcelOperatorKey,
+    isParcelOperator,
+    isParcelScannedRow,
     normalizeParcelFilter,
 } from "./model.js";
 
@@ -10,6 +14,7 @@ const parcelState = {
     rows: [],
     sourceFileName: "",
     activeFilter: "all",
+    operatorKindOverrides: {},
 };
 
 function getParcelState() {
@@ -26,6 +31,7 @@ function getParcelState() {
             parcelState.sourceFileName,
         activeFilter:
             parcelState.activeFilter,
+        operatorKindOverrides: { ...parcelState.operatorKindOverrides },
     };
 }
 
@@ -98,6 +104,7 @@ function replaceParcelRows(
 
     parcelState.activeFilter =
         "all";
+    parcelState.operatorKindOverrides = {};
 
     notifyParcelState({
         type: "parcel-rows-replaced",
@@ -135,12 +142,40 @@ function resetParcelReport() {
     parcelState.rows = [];
     parcelState.sourceFileName = "";
     parcelState.activeFilter = "all";
+    parcelState.operatorKindOverrides = {};
 
     notifyParcelState({
         type: "parcel-reset",
     });
 
     return true;
+}
+
+function toggleParcelOperatorBulky(operatorKey) {
+    const key = getParcelOperatorKey(operatorKey);
+    const summary = createParcelSummary(parcelState.rows, parcelState.operatorKindOverrides);
+    const operator = summary.operatorStats.find(item => item.operatorKey === key);
+    if (!operator) {
+        return false;
+    }
+
+    parcelState.operatorKindOverrides[key] = operator.packageKind !== "bulky";
+    notifyParcelState({ type: "parcel-operator-kind-updated", operatorKey: key });
+    return true;
+}
+
+function normalizeParcelOperatorOverrides(overrides, rows) {
+    if (!overrides || typeof overrides !== "object" || Array.isArray(overrides)) {
+        return {};
+    }
+
+    const operatorKeys = new Set(rows
+        .filter(row => isParcelScannedRow(row) && isParcelOperator(row.operator))
+        .map(row => getParcelOperatorKey(row.operator)));
+    return Object.fromEntries(Object.entries(overrides)
+        .filter(([key, value]) => typeof value === "boolean" &&
+            operatorKeys.has(getParcelOperatorKey(key)))
+        .map(([key, value]) => [getParcelOperatorKey(key), value]));
 }
 
 function restoreParcelState(
@@ -185,6 +220,9 @@ function restoreParcelState(
                 .activeFilter,
         );
 
+    parcelState.operatorKindOverrides = normalizeParcelOperatorOverrides(
+        receivedState.operatorKindOverrides, parcelState.rows);
+
     notifyParcelState({
         type: "parcel-state-restored",
     });
@@ -198,5 +236,6 @@ export {
     resetParcelReport,
     restoreParcelState,
     subscribeParcelState,
+    toggleParcelOperatorBulky,
     updateParcelFilter,
 };

@@ -2,11 +2,13 @@ import {
     createParcelSummary,
     filterParcelPackageRows,
     formatParcelOperatorName,
+    getParcelOperatorKey,
 } from "./model.js";
 
 import {
     getParcelState,
     subscribeParcelState,
+    toggleParcelOperatorBulky,
     updateParcelFilter,
 } from "./state.js";
 
@@ -168,6 +170,18 @@ function renderParcelOperatorTable(
                 },
             );
 
+            const classificationCell = document.createElement("td");
+            const button = document.createElement("button");
+            const isBulky = operator.packageKind === "bulky";
+            button.type = "button";
+            button.className = "parcel-bulky-toggle";
+            button.dataset.parcelOperatorKey = operator.operatorKey ?? getParcelOperatorKey(operator.operator);
+            button.textContent = isBulky ? "Sim" : "Não";
+            button.setAttribute("aria-label", `Volumoso? ${formatParcelOperatorName(operator.operator)}`);
+            button.setAttribute("aria-pressed", String(isBulky));
+            classificationCell.appendChild(button);
+            row.appendChild(classificationCell);
+
             fragment.appendChild(
                 row,
             );
@@ -178,7 +192,7 @@ function renderParcelOperatorTable(
         const row = document.createElement("tr");
         row.className = "empty-row";
 
-        for (let column = 0; column < 3; column += 1) {
+        for (let column = 0; column < 4; column += 1) {
             const cell = document.createElement("td");
             cell.textContent = "-";
             row.appendChild(cell);
@@ -312,6 +326,7 @@ function renderParcelView(
     const summary =
         createParcelSummary(
             state.rows,
+            state.operatorKindOverrides,
         );
 
     const formatMetric =
@@ -464,6 +479,23 @@ function initializeParcelView(
     subscribeParcelState(
         renderParcelView,
     );
+
+    parcelViewElements.operatorBody.addEventListener("click", event => {
+        const button = event.target instanceof Element
+            ? event.target.closest("[data-parcel-operator-key]")
+            : null;
+        if (!(button instanceof HTMLButtonElement) ||
+            !parcelViewElements.operatorBody.contains(button)) {
+            return;
+        }
+
+        const operatorKey = button.dataset.parcelOperatorKey;
+        if (toggleParcelOperatorBulky(operatorKey)) {
+            const replacement = [...parcelViewElements.operatorBody.querySelectorAll("[data-parcel-operator-key]")]
+                .find(item => item.dataset.parcelOperatorKey === operatorKey);
+            replacement?.focus({ preventScroll: true });
+        }
+    });
 
     parcelPackageSorts.common = null;
     parcelPackageSorts.bulky = null;

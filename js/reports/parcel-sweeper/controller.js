@@ -138,8 +138,10 @@ function importParcelSession(
 }
 
 function getParcelSummary() {
+    const state = getParcelState();
     return createParcelSummary(
-        getParcelState().rows,
+        state.rows,
+        state.operatorKindOverrides,
     );
 }
 
