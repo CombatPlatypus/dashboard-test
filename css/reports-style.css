@@ -327,9 +327,10 @@
         flex-direction: column;
         gap: 20px;
     }
-    .doughnut-chart > div > div:first-child {
-        width: 270px;;
+    .doughnut-chart > div:first-of-type {
+        width: 100%;
         height: 270px;
+        position: relative;
     }
     #reports .doughnut-chart > div:last-of-type {
         width: 100%;
