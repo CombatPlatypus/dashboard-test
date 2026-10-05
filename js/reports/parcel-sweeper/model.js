@@ -140,6 +140,28 @@ function getParcelOperatorKey(
     );
 }
 
+function formatParcelOperatorName(value) {
+    const text = normalizeParcelText(value);
+    const match = text.match(/^\[ops(\d+)\]\s*(.*)$/i);
+
+    if (!match) {
+        return text;
+    }
+
+    const shortName = match[2]
+        .split(" ")
+        .filter(Boolean)
+        .slice(0, 2)
+        .map(function (name) {
+            const lowercaseName = name.toLocaleLowerCase("pt-BR");
+            return lowercaseName.charAt(0).toLocaleUpperCase("pt-BR") +
+                lowercaseName.slice(1);
+        })
+        .join(" ");
+
+    return `[Ops${match[1]}]${shortName ? ` ${shortName}` : ""}`;
+}
+
 function isParcelOperator(
     value,
 ) {
@@ -915,6 +937,7 @@ export {
     createParcelRow,
     createParcelSummary,
     filterParcelPackageRows,
+    formatParcelOperatorName,
     getParcelOperatorKey,
     isParcelOperator,
     isParcelScannedRow,

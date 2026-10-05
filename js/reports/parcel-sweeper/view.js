@@ -1,6 +1,7 @@
 import {
     createParcelSummary,
     filterParcelPackageRows,
+    formatParcelOperatorName,
 } from "./model.js";
 
 import {
@@ -146,7 +147,7 @@ function renderParcelOperatorTable(
                 );
 
             [
-                operator.operator,
+                formatParcelOperatorName(operator.operator),
                 parcelIntegerFormatter
                     .format(
                         operator.count,
@@ -211,7 +212,7 @@ function renderParcelPackageTable(
                 );
 
             [
-                item.operator,
+                formatParcelOperatorName(item.operator),
                 item.trackingNumber,
             ].forEach(
                 function (value) {

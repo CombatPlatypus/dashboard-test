@@ -9,6 +9,7 @@ import {
     createParcelRow,
     createParcelSummary,
     filterParcelPackageRows,
+    formatParcelOperatorName,
     isParcelOperator,
 } from "../js/reports/parcel-sweeper/model.js";
 
@@ -79,6 +80,45 @@ function createOperatorRows({
         },
     );
 }
+
+test("exibe código Ops e os dois primeiros nomes com iniciais maiúsculas", () => {
+    const examples = [
+        ["[Ops68017]LUCAS CAMPOS JUNQUEIRA", "[Ops68017] Lucas Campos"],
+        ["  [ops0012]  mARIA   EDUARDA SANTOS  ", "[Ops0012] Maria Eduarda"],
+        ["[Ops26438]JÕAO PEDRO PEREIRA BARROS", "[Ops26438] Jõao Pedro"],
+        ["[OPS3]ÁLVARO ÉRICO SILVA", "[Ops3] Álvaro Érico"],
+        ["[Ops4]ANA", "[Ops4] Ana"],
+        ["[Ops5]", "[Ops5]"],
+        ["operador@empresa.com", "operador@empresa.com"],
+        [null, ""],
+    ];
+
+    for (const [original, formatted] of examples) {
+        assert.equal(formatParcelOperatorName(original), formatted);
+    }
+});
+
+test("abreviar nomes não altera os dados originais nem une operadores distintos", () => {
+    const names = [
+        "[Ops10]LUCAS CAMPOS JUNQUEIRA",
+        "[Ops20]LUCAS CAMPOS SILVA",
+    ];
+    const rows = names.map((operator, index) => createParcelRow({
+        trackingNumber: `BR${index}`,
+        scannedStatus: "LMHub_Received",
+        operator,
+        countType: "Backlog",
+        scannedTime: "2026-10-02 14:00:00",
+    }));
+
+    const summary = createParcelSummary(rows);
+    assert.equal(summary.operatorStats.length, 2);
+    assert.deepEqual(rows.map(row => row.operator), names);
+    assert.deepEqual(summary.operatorStats.map(stat =>
+        formatParcelOperatorName(stat.operator),
+    ), ["[Ops10] Lucas Campos", "[Ops20] Lucas Campos"]);
+    assert.ok(summary.operatorStats.every(stat => stat.count === 1));
+});
 
 test("identifica o operador de volumosos pela combinação de baixo volume e cadência lenta", () => {
     const rows = [
