@@ -109,7 +109,6 @@
 #analysis .columns #analysisVisibleColumns {
     max-height: 274px;
     padding-right: 15px;
-    margin: 15px 0 0 0;
     display: flex;
     flex-direction: column;
     gap: 10px;
