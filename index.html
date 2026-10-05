@@ -33,24 +33,29 @@
 
         <style>
 
+            /* ESTRUTURA */
+
             #reports #parcel .preview {
                 flex: 1 1 0;
             }
+
+            /* CARDS  */
+
             #reports #parcel .cards > div > .flex-box-start > img {
                 width: 35px;
             }
+
+            /* COBERTURA DE VARREDURA  */
+
             #reports #parcel #parcelPreview > .flex-box-start {
                 gap: 15px;
+                align-items: flex-start;
             }
-            #reports #parcel #parcelPreview > .flex-box-start > div {
+            #reports #parcel #parcelPreview > .distribution {
                 flex: 1 1 0;
             }
-            #reports #parcel .doughnut-chart > .flex-box-center > div:first-child {
-                flex: 0 0 270px;
-                width: 270px;
-            }
 
-
+            /* BOTÕES */
 
             #parcel .data-selector {
                 display: grid;
@@ -107,6 +112,34 @@
                 cursor: default;
             }
 
+            /* TABLEAS DE BR BIPADOS */
+
+            #reports #parcel #parcelPreview > .flex-box-start:last-of-type > div {
+                flex: 1 1 0;
+                max-height: 412px;
+                overflow: auto;
+                border: 1px solid var(--color-border);
+                border-radius: 4px;
+            }
+            #reports #parcel #parcelPreview > .flex-box-start:last-of-type > div::-webkit-scrollbar {
+                width: 7px;
+                height: 5px;
+                background-color: var(--color-container-focus);
+                border-left: 1px solid var(--color-border);
+            }
+            #reports #parcel #parcelPreview > .flex-box-start:last-of-type > div::-webkit-scrollbar-thumb {
+                border-radius: 0px 3px 3px 0px;
+                background-color: var(--color-text);
+            }
+            #reports #parcel #parcelPreview > .flex-box-start:last-of-type > div::-webkit-scrollbar-track {
+                background-color: transparent;
+            }
+            #reports #parcel #parcelPreview > .flex-box-start:last-of-type > div table thead {
+                position: sticky;
+                top: 0;
+                z-index: 1;
+                background-color: var(--color-table-th);
+            }
 
         </style>
     </head>
@@ -1677,26 +1710,24 @@
                                                 <div class="doughnut-chart">
                                                     <h4>Composição das Avarias</h4>
 
-                                                    <div class="flex-box-center">
-                                                        <div>
-                                                            <canvas id="damageCompositionChart" role="img" aria-label="Composição das avarias entre sólidas, líquidas e de vidro"></canvas>
+                                                    <div>
+                                                        <canvas id="damageCompositionChart" role="img" aria-label="Composição das avarias entre sólidas, líquidas e de vidro"></canvas>
+                                                    </div>
+
+                                                    <div>
+                                                        <div class="type">
+                                                            <div style="background-color: #F44336;"></div>
+                                                            <p>Avarias Sólidas <span id="damageSolidValue">—</span></p>
                                                         </div>
 
-                                                        <div>
-                                                            <div class="type">
-                                                                <div style="background-color: #F44336;"></div>
-                                                                <p>Avarias Sólidas <span id="damageSolidValue">—</span></p>
-                                                            </div>
+                                                        <div class="type">
+                                                            <div style="background-color: #ff9800;"></div>
+                                                            <p>Avarias Líquidas <span id="damageLiquidValue">—</span></p>
+                                                        </div>
 
-                                                            <div class="type">
-                                                                <div style="background-color: #ff9800;"></div>
-                                                                <p>Avarias Líquidas <span id="damageLiquidValue">—</span></p>
-                                                            </div>
-
-                                                            <div class="type">
-                                                                <div style="background-color: #3F51B5;"></div>
-                                                                <p>Avarias de Vidro <span id="damageGlassValue">—</span></p>
-                                                            </div>
+                                                        <div class="type">
+                                                            <div style="background-color: #3F51B5;"></div>
+                                                            <p>Avarias de Vidro <span id="damageGlassValue">—</span></p>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -2165,25 +2196,23 @@
 
                                     <!-- GRAFICO DE COBERTURA E TABELA DE OPERADORES -->
 
-                                    <div class="flex-box-start">
+                                    <div class="distribution flex-box-start">
                                         <div class="doughnut-chart" style="flex: 0 0 772px;">
                                             <h3>Cobertura da Varredura</h3>
 
-                                            <div class="flex-box-center">
-                                                <div>
-                                                    <canvas id="parcelCoverageChart" role="img" aria-label="Cobertura da varredura entre pacotes escaneados e não escaneados"></canvas>
+                                            <div>
+                                                <canvas id="parcelCoverageChart" role="img" aria-label="Cobertura da varredura entre pacotes escaneados e não escaneados"></canvas>
+                                            </div>
+
+                                            <div>
+                                                <div class="type">
+                                                    <div style="background-color: #3F51B5;"></div>
+                                                    <p>Escaneados <span id="parcelCoverageScanned">—</span></p>
                                                 </div>
 
-                                                <div>
-                                                    <div class="type">
-                                                        <div style="background-color: #3F51B5;"></div>
-                                                        <p>Escaneados <span id="parcelCoverageScanned">—</span></p>
-                                                    </div>
-
-                                                    <div class="type">
-                                                        <div style="background-color: #e4e6eb;"></div>
-                                                        <p>Não Escaneados <span id="parcelCoverageUnscanned">—</span></p>
-                                                    </div>
+                                                <div class="type">
+                                                    <div style="background-color: #e4e6eb;"></div>
+                                                    <p>Não Escaneados <span id="parcelCoverageUnscanned">—</span></p>
                                                 </div>
                                             </div>
                                         </div>
