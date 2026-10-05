@@ -13,7 +13,7 @@
     margin: 0;
 }
 #filter .padding {
-    min-height: 574px;
+    min-height: 596px;
     padding: 30px;
     display: flex;
     gap: 15px;
@@ -82,7 +82,7 @@
 }
 #filter .filter-preview #filterPreviewResult > div {
     width: 100%;
-    max-height: 481px;
+    max-height: 503px;
     overflow: auto;
     border: 2px solid var(--color-border);
     border-radius: 5px;
