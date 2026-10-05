@@ -198,60 +198,34 @@
                     </div>
 
                     <!-- NAVEGAÇÃO ENTRE OS RELATÓRIOS -->
-
                     <div class="flex-box-start">
                         <ul class="tabs" data-tabs id="report-choice">
                             <li class="tabs-title is-active">
-                                <a href="#receipt">
-                                    <div class="flex-box-full-center">
-                                        <h4>Processamento</h4>
-                                    </div>
-                                </a>
+                                <a href="#receipt">Processamento</a>
                             </li> 
 
                             <li class="tabs-title">
-                                <a href="#expedition">
-                                    <div class="flex-box-full-center">
-                                        <h4>Expedição</h4>
-                                    </div>
-                                </a>
+                                <a href="#expedition">Expedição</a>
                             </li> 
 
                             <li class="tabs-title">
-                                <a href="#planning">
-                                    <div class="flex-box-full-center">
-                                        <h4>Planejamento</h4>
-                                    </div>
-                                </a>
+                                <a href="#planning">Planejamento</a>
                             </li> 
 
                             <li class="tabs-title">
-                                <a href="#damage-and-losses">
-                                    <div class="flex-box-full-center">
-                                        <h4>Avarias e Perdas</h4>
-                                    </div>
-                                </a>
+                                <a href="#damage-and-losses">Avarias e Perdas</a>
                             </li>
 
                             <li class="tabs-title">
-                                <a href="#losses-rate">
-                                    <div class="flex-box-full-center">
-                                        <h4>Taxa de Perdas</h4>
-                                    </div>
-                                </a>
+                                <a href="#losses-rate">Taxa de Perdas</a>
                             </li> 
 
                             <li class="tabs-title">
-                                <a href="#parcel"><h4>Parcel Sweeper</h4>
-                                </a>
+                                <a href="#parcel">Parcel Sweeper</a>
                             </li> 
 
                             <li class="tabs-title">
-                                <a href="#overall-analysis">
-                                    <div class="flex-box-full-center">
-                                        <h4>Análise Geral</h4>
-                                    </div>
-                                </a>
+                                <a href="#overall-analysis">Análise Geral</a>
                             </li>
                         </ul>
                     </div>
@@ -2029,6 +2003,55 @@
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- RELATÓRIO DO PARCEL -->
+
+                        <div class="tabs-panel" id="parcel">
+
+                            <!-- BARRA DE NOTIFICAÇÕES E BOTÕES DE AÇÃO -->
+
+                            <div class="flex-box-start">
+                                <div class="warning" id="parcelNotification" role="status" aria-live="polite" aria-atomic="true" data-notification-type="idle">
+                                    <div class="flex-box-start">
+                                        <img id="parcelNotificationIcon" src="images/geral-icons/bell-icon.svg" alt="">
+
+                                        <h4 id="parcelNotificationText">
+                                            Importe a planilha de Avarias e Perdas com a aba Taxa de Perdas; os dois relatórios serão atualizados.
+                                        </h4>
+                                    </div>
+                                </div>
+
+                                <div class="report-actions">
+                                    <button id="parcelCopyReportButton" type="button" title="Clique para copiar; segure por 1,5 s para baixar" aria-label="Copiar relatório do parcel; segure por 1,5 segundo para baixar">
+                                        <img src="images/geral-icons/image-icon.svg" alt="">
+                                    </button>
+
+                                    <button id="parcelImportActionButton" type="button" title="" aria-label="">
+                                        <img src="images/geral-icons/import-icon.svg" alt="">
+                                    </button>
+
+                                    <input id="parcelFileInput" type="file" accept=".xlsx,.xls" hidden>
+
+                                    <button id="parcelClearReportButton" type="button" title="Limpar relatório" aria-label="Limpar relatório do parcel">
+                                        <img src="images/geral-icons/trash-basket-icon.svg" alt="">
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- CONTEÚDO DO RELATÓRIO -->
+
+                            <div class="preview">
+
+                                <div class="preview-style" id="parcelPreview">
+                                        <div class="title">
+                                            <h2>Parcel Sweeper</h2>
+                                        </div> 
+
+
+
                                 </div>
                             </div>
                         </div>
