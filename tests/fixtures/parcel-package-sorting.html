@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Teste de ordenação do Parcel — dados fictícios</title>
+    <link rel="stylesheet" href="../../css/font-face.css">
+    <link rel="stylesheet" href="../../css/reset-style.css">
+    <link rel="stylesheet" href="../../css/dashboard-style.css">
+    <link rel="stylesheet" href="../../css/reports-style.css">
+    <style>
+        body { padding: 24px; }
+        header { margin-bottom: 20px; }
+        header button { padding: 10px 18px; margin-right: 12px; background: #252525; border: 1px solid #666; color: #e4e6eb; cursor: pointer; }
+        #reports .preview { flex: 1; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Ordenação — dados fictícios</h1>
+        <button id="replaceRows">Reimportar dados fictícios</button>
+        <button id="resetRows">Limpar teste</button>
+        <p id="testStatus" role="status">Carregando...</p>
+    </header>
+    <main id="reports" class="tabs-panel is-active">
+        <section id="parcel" class="tabs-panel is-active"><div class="preview"></div></section>
+    </main>
+    <script type="module">
+        import { initializeParcelView } from "../../js/reports/parcel-sweeper/view.js";
+        import { replaceParcelRows, resetParcelReport } from "../../js/reports/parcel-sweeper/state.js";
+
+        // Reutiliza os cabeçalhos e o layout reais para evitar uma cópia divergente.
+        const source = new DOMParser().parseFromString(await (await fetch("../../index.html")).text(), "text/html");
+        document.head.append(source.querySelector("head style"));
+        const preview = source.querySelector("#parcelPreview");
+        document.querySelector("#parcel .preview").append(preview);
+        preview.querySelectorAll(".doughnut-chart, .vertical-bars-chart").forEach(chart => chart.remove());
+        for (const id of ["parcelCoverageScanned", "parcelCoverageUnscanned"]) {
+            const metric = document.createElement("span");
+            metric.id = id;
+            metric.hidden = true;
+            preview.append(metric);
+        }
+
+        const profiles = [
+            { operator: "[Ops100]ANA SILVA SOUZA", count: 100, gap: 2 },
+            { operator: "[Ops20]BRUNO LIMA SOUZA", count: 90, gap: 2 },
+            { operator: "[Ops300]CAIO SANTOS SOUZA", count: 25, gap: 10 },
+            { operator: "[Ops400]DANIEL LOPES SOUZA", count: 20, gap: 10 },
+        ];
+        const rows = profiles.flatMap((profile, operatorIndex) => Array.from({ length: profile.count }, (_, index) => ({
+            operator: profile.operator,
+            trackingNumber: `BR${operatorIndex + 1}${String(index + 1).padStart(4, "0")}`,
+            scannedStatus: "LMHub_Received",
+            scannedTime: new Date(Date.UTC(2026, 9, 2, 14, 0, index * profile.gap))
+                .toISOString().slice(0, 19).replace("T", " "),
+            countType: index % 3 === 0 ? "Exception" : "Backlog",
+            agingTime: "5h",
+        }))).reverse();
+
+        initializeParcelView();
+        const replaceRows = () => {
+            replaceParcelRows(rows, "dados-ficticios.csv");
+            document.getElementById("testStatus").textContent = "235 pacotes fictícios: 190 comuns e 45 volumosos.";
+        };
+        document.getElementById("replaceRows").addEventListener("click", replaceRows);
+        document.getElementById("resetRows").addEventListener("click", () => {
+            resetParcelReport();
+            document.getElementById("testStatus").textContent = "Teste limpo.";
+        });
+        replaceRows();
+    </script>
+</body>
+</html>

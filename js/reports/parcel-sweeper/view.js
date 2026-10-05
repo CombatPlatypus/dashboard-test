@@ -10,6 +10,11 @@ import {
     updateParcelFilter,
 } from "./state.js";
 
+import {
+    sortParcelPackageRows,
+    toggleParcelPackageSort,
+} from "./table-sort.js";
+
 const parcelIntegerFormatter =
     new Intl.NumberFormat(
         "pt-BR",
@@ -29,6 +34,7 @@ const parcelPercentageFormatter =
     );
 
 let parcelViewElements = null;
+const parcelPackageSorts = { common: null, bulky: null };
 
 const parcelMinimumOperatorRows = 8;
 
@@ -189,7 +195,17 @@ function renderParcelOperatorTable(
 function renderParcelPackageTable(
     body,
     rows,
+    sort,
 ) {
+    body.closest("table").querySelectorAll("[data-parcel-sort]").forEach(button => {
+        const isSorted = sort?.column === button.dataset.parcelSort;
+        const direction = isSorted ? sort.direction : null;
+        button.closest("th").setAttribute("aria-sort",
+            direction === "asc" ? "ascending" : direction === "desc" ? "descending" : "none");
+        button.querySelector(".parcel-sort-indicator").textContent =
+            direction === "asc" ? "↑" : direction === "desc" ? "↓" : "↕";
+    });
+
     body.replaceChildren();
 
     if (
@@ -207,7 +223,7 @@ function renderParcelPackageTable(
     const fragment =
         document.createDocumentFragment();
 
-    rows.forEach(
+    sortParcelPackageRows(rows, sort).forEach(
         function (item) {
             const row =
                 document.createElement(
@@ -282,9 +298,15 @@ function renderParcelFilter(
 
 function renderParcelView(
     state = getParcelState(),
+    event,
 ) {
     if (!parcelViewElements) {
         return false;
+    }
+
+    if (["parcel-rows-replaced", "parcel-reset", "parcel-state-restored"].includes(event?.type)) {
+        parcelPackageSorts.common = null;
+        parcelPackageSorts.bulky = null;
     }
 
     const summary =
@@ -362,6 +384,7 @@ function renderParcelView(
             summary.commonRows,
             state.activeFilter,
         ),
+        parcelPackageSorts.common,
     );
 
     renderParcelPackageTable(
@@ -371,6 +394,7 @@ function renderParcelView(
             summary.bulkyRows,
             state.activeFilter,
         ),
+        parcelPackageSorts.bulky,
     );
 
     return true;
@@ -440,6 +464,27 @@ function initializeParcelView(
     subscribeParcelState(
         renderParcelView,
     );
+
+    parcelPackageSorts.common = null;
+    parcelPackageSorts.bulky = null;
+    [
+        ["common", parcelViewElements.commonPackagesBody],
+        ["bulky", parcelViewElements.bulkyPackagesBody],
+    ].forEach(([kind, body]) => {
+        const table = body.closest("table");
+        table.addEventListener("click", event => {
+            const button = event.target instanceof Element
+                ? event.target.closest("[data-parcel-sort]")
+                : null;
+            if (!(button instanceof HTMLButtonElement) || !table.contains(button)) {
+                return;
+            }
+
+            parcelPackageSorts[kind] = toggleParcelPackageSort(
+                parcelPackageSorts[kind], button.dataset.parcelSort);
+            renderParcelView();
+        });
+    });
 
     return renderParcelView(
         getParcelState(),

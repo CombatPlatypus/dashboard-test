@@ -145,6 +145,36 @@
         letter-spacing: 1.5px;
     }
 
+    /* PARCEL SWEEPER - ORDENAÇÃO DAS TABELAS DE PACOTES */
+
+    #reports #parcel .parcel-sort-button {
+        width: 100%;
+        min-height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin: 0;
+        padding: 0;
+        color: inherit;
+        background: transparent;
+        border: 0;
+        font: inherit;
+        font-weight: 600;
+        letter-spacing: inherit;
+        text-align: left;
+        cursor: pointer;
+    }
+    #reports #parcel .parcel-sort-button:hover,
+    #reports #parcel .parcel-sort-button:focus-visible {
+        color: var(--color-button);
+    }
+    #reports #parcel .parcel-sort-indicator {
+        flex: 0 0 auto;
+        color: var(--color-gray-p);
+        font-size: 15px;
+    }
+
     /* CARDS DE DESTAQUES */
 
     #reports .cards {
