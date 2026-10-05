@@ -7,6 +7,10 @@ import {
     subscribeParcelState,
 } from "./state.js";
 
+import {
+    drawParcelCoverage3D,
+} from "./coverage-3d.js";
+
 const parcelChartIntegerFormatter =
     new Intl.NumberFormat(
         "pt-BR",
@@ -29,6 +33,27 @@ let parcelCoverageChart = null;
 let parcelAgingChart = null;
 let parcelChartVisibilityObserver = null;
 
+const parcelCoverageProjection = {
+    id: "parcel-coverage-3d",
+
+    beforeDatasetDraw(chart, args) {
+        if (args.index !== 0) {
+            return;
+        }
+
+        const dataset = chart.data.datasets[0];
+        chart.$parcelCoverageGeometry = drawParcelCoverage3D({
+            context: chart.ctx,
+            area: chart.chartArea,
+            values: dataset.data,
+            colors: dataset.backgroundColor,
+        });
+
+        // Suppress only this chart's default flat arcs.
+        return false;
+    },
+};
+
 const parcelCoverageCenterText = {
     id: "parcelCoverageCenterText",
 
@@ -44,24 +69,15 @@ const parcelCoverageCenterText = {
         const context =
             chart.ctx;
 
-        const area =
-            chart.chartArea;
+        const geometry =
+            chart.$parcelCoverageGeometry;
 
-        if (!area) {
+        if (!geometry) {
             return;
         }
 
-        const centerX =
-            (
-                area.left +
-                area.right
-            ) / 2;
-
-        const centerY =
-            (
-                area.top +
-                area.bottom
-            ) / 2;
+        const centerX = geometry.centerX;
+        const centerY = geometry.textCenterY;
 
         context.save();
         context.textAlign = "center";
@@ -186,62 +202,25 @@ function createParcelCoverageChart(
                         "#e4e6eb",
                     ],
                     borderWidth: 0,
-                    hoverOffset: 4,
+                    hoverOffset: 0,
                 }],
             },
             plugins: [
+                parcelCoverageProjection,
                 parcelCoverageCenterText,
             ],
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 cutout: "66%",
-                animation: {
-                    duration: 350,
-                },
+                animation: false,
+                events: [],
                 plugins: {
                     legend: {
                         display: false,
                     },
                     tooltip: {
-                        callbacks: {
-                            label(
-                                context,
-                            ) {
-                                const value =
-                                    Number(
-                                        context.raw,
-                                    ) || 0;
-
-                                const total =
-                                    context.dataset
-                                        .data
-                                        .reduce(
-                                            function (
-                                                sum,
-                                                item,
-                                            ) {
-                                                return sum +
-                                                    Number(
-                                                        item,
-                                                    );
-                                            },
-                                            0,
-                                        );
-
-                                const percentage =
-                                    total > 0
-                                        ? value /
-                                            total
-                                        : 0;
-
-                                return (
-                                    `${context.label}: ` +
-                                    `${parcelChartIntegerFormatter.format(value)} ` +
-                                    `(${parcelChartPercentageFormatter.format(percentage)})`
-                                );
-                            },
-                        },
+                        enabled: false,
                     },
                 },
             },
@@ -274,6 +253,7 @@ function createParcelAgingChart(
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                events: [],
                 layout: {
                     padding: {
                         top: 20,
@@ -287,22 +267,7 @@ function createParcelAgingChart(
                         display: false,
                     },
                     tooltip: {
-                        callbacks: {
-                            label(
-                                context,
-                            ) {
-                                const percentage =
-                                    context.chart
-                                        .$parcelAgingPercentages?.[
-                                            context.dataIndex
-                                        ] ?? 0;
-
-                                return (
-                                    `${parcelChartIntegerFormatter.format(context.raw)} pacotes ` +
-                                    `(${parcelChartPercentageFormatter.format(percentage)})`
-                                );
-                            },
-                        },
+                        enabled: false,
                     },
                 },
                 scales: {

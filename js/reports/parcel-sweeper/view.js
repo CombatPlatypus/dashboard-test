@@ -30,6 +30,8 @@ const parcelPercentageFormatter =
 
 let parcelViewElements = null;
 
+const parcelMinimumOperatorRows = 8;
+
 function getParcelViewElements(
     rootElement,
 ) {
@@ -124,18 +126,6 @@ function renderParcelOperatorTable(
 ) {
     body.replaceChildren();
 
-    if (
-        operatorStats.length === 0
-    ) {
-        body.appendChild(
-            createEmptyTableRow(
-                3,
-            ),
-        );
-
-        return;
-    }
-
     const fragment =
         document.createDocumentFragment();
 
@@ -177,6 +167,19 @@ function renderParcelOperatorTable(
             );
         },
     );
+
+    for (let index = operatorStats.length; index < parcelMinimumOperatorRows; index += 1) {
+        const row = document.createElement("tr");
+        row.className = "empty-row";
+
+        for (let column = 0; column < 3; column += 1) {
+            const cell = document.createElement("td");
+            cell.textContent = "-";
+            row.appendChild(cell);
+        }
+
+        fragment.appendChild(row);
+    }
 
     body.appendChild(
         fragment,
@@ -445,5 +448,6 @@ function initializeParcelView(
 
 export {
     initializeParcelView,
+    renderParcelOperatorTable,
     renderParcelView,
 };
