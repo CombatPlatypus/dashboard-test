@@ -331,6 +331,11 @@
         align-items: center;
         gap: 20px;
     }
+    .doughnut-chart > div > div:first-child {
+        flex: 1 1 0px;
+        min-width: 0;
+        height: 270px;
+    }
     #reports .doughnut-chart > div > div:last-of-type {
         display: flex;
         flex-direction: row;
@@ -576,11 +581,6 @@
 
     #damage-and-losses .tabs {
         grid-template-columns: repeat(auto-fit, minmax(299px, 1fr));
-    }
-    #damage-and-losses .doughnut-chart > div > div:first-child {
-        flex: 1 1 0px;
-        min-width: 0;
-        height: 270px;
     }
     #damage-and-losses .doughnut-chart canvas {
         display: block;
