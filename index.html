@@ -144,6 +144,15 @@
                 background-color: var(--color-table-th);
             }
 
+            /*  */
+
+            #parcel .parcel-horizontal-chart-canvas {
+                width: 100%;
+                height: 220px;
+                position: relative;
+            }
+
+
         </style>
     </head>
 
@@ -2233,8 +2242,6 @@
                                                     </tr>
                                                 </thead>
 
-                                                
-
                                                 <tbody id="parcelOperatorDistributionBody">
                                                     <tr class="empty-row">
                                                         <td>-</td><td>-</td><td>-</td><td>-</td>
@@ -2277,6 +2284,30 @@
                                         <div id="parcelAgingChartContainer">
                                             <div>
                                                 <canvas id="parcelAgingChart" role="img" aria-label="Quantidade de pacotes escaneados por faixa de aging"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!--  -->
+
+                                    <div class="flex-box-start">
+                                        <div class="horizontal-bars-chart">
+                                            <div class="chart-title">
+                                                <h4>Distribuição por Final Status</h4>
+                                            </div>
+
+                                            <div id="" class="parcel-horizontal-chart-canvas">
+                                                <canvas id="" role="img"></canvas>
+                                            </div>
+                                        </div>
+
+                                        <div class="horizontal-bars-chart">
+                                            <div class="chart-title">
+                                                <h4>Distribuição por Next Step Action</h4>
+                                            </div>
+
+                                            <div id="" class="parcel-horizontal-chart-canvas">
+                                                <canvas id="" role="img"></canvas>
                                             </div>
                                         </div>
                                     </div>
