@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Teste visual da Taxa de Perdas — dados fictícios</title>
+    <link rel="stylesheet" href="../../css/font-face.css">
+    <link rel="stylesheet" href="../../css/reports-style.css">
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 24px; background: #101010; color: #e4e6eb; font: 14px "Open Sans", sans-serif; }
+        header { margin-bottom: 20px; }
+        button { padding: 10px 18px; margin: 0 8px 8px 0; color: #e4e6eb; background: #242424; border: 1px solid #666; cursor: pointer; }
+        #lossesRatePreview { padding: 20px; border: 1px solid #666; background: #101010; }
+        #exportPreview { display: block; max-width: 100%; margin-top: 20px; }
+        [hidden] { display: none !important; }
+        #exportStatus { min-height: 24px; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Prévia técnica — dados fictícios</h1>
+        <button data-scenario="reference">Exemplo: 132 ocorrências</button>
+        <button data-scenario="mixed">Três categorias</button>
+        <button data-scenario="lost">Somente LOST</button>
+        <button data-scenario="zero">Zero ocorrências</button>
+        <button id="resetTest">Limpar dados fictícios</button>
+        <button id="generateExport">Gerar imagem</button>
+        <p id="exportStatus" role="status"></p>
+    </header>
+    <main id="reports">
+        <section id="losses-rate" class="is-active">
+            <div id="lossesRatePreview">
+                <div class="losses-rate-charts">
+                    <div class="doughnut-chart">
+                        <h3>Composição das Ocorrências — <span id="lossesRateCompositionMonth"></span></h3>
+                        <div><canvas id="lossesRateCompositionChart"></canvas></div>
+                    </div>
+                    <div class="line-chart">
+                        <h3>Histórico da Taxa de Perda — <span id="lossesRateHistoryYear"></span></h3>
+                        <div><canvas id="lossesRateHistoryChart"></canvas></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <img id="exportPreview" alt="Imagem exportada do relatório de teste" hidden>
+    <script src="../../js/libraries/chart.umd.min.js"></script>
+    <script src="../../js/libraries/html2canvas.min.js"></script>
+    <script type="module">
+        import { initializeLossesRateCharts } from "../../js/reports/losses-rate/charts.js?preview=3d";
+        import { restoreLossesRateState, resetLossesRateReport } from "../../js/reports/losses-rate/state.js";
+        import { createReportImageBlob } from "../../js/reports/export.js";
+
+        initializeLossesRateCharts();
+        const scenarios = { reference: [0, 17, 115], mixed: [10, 20, 70], lost: [100, 0, 0], zero: [0, 0, 0] };
+        function setScenario(name) {
+            const [lost, damage, possibleLosses] = scenarios[name];
+            const months = Array.from({ length: 12 }, () => ({}));
+            months[9] = { moved: 100000, lost, damage, possibleLosses };
+            restoreLossesRateState({ activeMonth: 9, year: 2026, months });
+        }
+        document.querySelectorAll("[data-scenario]").forEach(button => {
+            button.addEventListener("click", () => setScenario(button.dataset.scenario));
+        });
+        setScenario("reference");
+        document.getElementById("resetTest").addEventListener("click", resetLossesRateReport);
+        document.getElementById("generateExport").addEventListener("click", async () => {
+            const status = document.getElementById("exportStatus");
+            status.textContent = "Gerando imagem...";
+            try {
+                const blob = await createReportImageBlob(document.getElementById("lossesRatePreview"));
+                const image = document.getElementById("exportPreview");
+                if (image.dataset.blobUrl) URL.revokeObjectURL(image.dataset.blobUrl);
+                image.dataset.blobUrl = URL.createObjectURL(blob);
+                image.src = image.dataset.blobUrl;
+                image.hidden = false;
+                status.textContent = "Imagem PNG gerada com sucesso.";
+            } catch (error) {
+                status.textContent = `Falha na exportação: ${error.message}`;
+            }
+        });
+    </script>
+</body>
+</html>
