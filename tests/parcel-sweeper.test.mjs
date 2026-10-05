@@ -375,6 +375,7 @@ test("distribui aging nas sete faixas e exclui valores abaixo de uma hora", () =
         "4d 0h",
         "4d 1h",
         "7d 0h",
+        "7d 0h 30min",
         "7d 1h",
         "38min",
         "",
@@ -426,7 +427,7 @@ test("distribui aging nas sete faixas e exclui valores abaixo de uma hora", () =
             2,
             2,
             2,
-            1,
+            2,
         ],
     );
 });

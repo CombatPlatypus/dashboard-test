@@ -101,19 +101,19 @@ test("somente gráficos do Parcel desativam tooltips e hover; texto central fica
     assert.ok(!aging.plugins.some(item => item.id === "parcel-coverage-3d"));
 });
 
-test("aging acima de 48h mostra equivalência exata em dias, sem mudar horas ou percentuais", () => {
+test("aging mostra as sete janelas solicitadas em uma linha, preservando percentuais", () => {
     const bins = [
-        { key: "1-6h", label: "1–6h", days: "" },
-        { key: "7-12h", label: "7–12h", days: "" },
-        { key: "13-24h", label: "13–24h", days: "" },
-        { key: "25-48h", label: "25–48h", days: "" },
-        { key: "49-96h", label: "49–96h", days: "2 dias e 1h–4 dias" },
-        { key: "97-168h", label: "97–168h", days: "4 dias e 1h–7 dias" },
-        { key: "over-168h", label: ">168h", days: "Mais de 7 dias" },
+        { key: "1-6h", label: "1–6h", display: "1 - 6h" },
+        { key: "7-12h", label: "7–12h", display: "7 - 12h" },
+        { key: "13-24h", label: "13–24h", display: "13 - 24h" },
+        { key: "25-48h", label: "25–48h", display: "25 - 48h" },
+        { key: "49-96h", label: "49–96h", display: "2 - 4 Dias" },
+        { key: "97-168h", label: "97–168h", display: "5 - 7 Dias" },
+        { key: "over-168h", label: ">168h", display: "Super Expedite" },
     ];
-    bins.forEach(({ key, label, days }) => {
+    bins.forEach(({ key, label, display }) => {
         const bin = Object.freeze({ key, label, percentage: 0.125 });
-        assert.deepEqual(createParcelAgingChartLabel(bin), [label, days, "12,5%"]);
+        assert.deepEqual(createParcelAgingChartLabel(bin), [display, "12,5%"]);
         assert.equal(bin.label, label);
         assert.equal(bin.percentage, 0.125);
     });

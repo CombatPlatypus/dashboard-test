@@ -29,16 +29,19 @@ const parcelChartPercentageFormatter =
         },
     );
 
-const parcelAgingDayLabels = Object.freeze({
-    "49-96h": "2 dias e 1h–4 dias",
-    "97-168h": "4 dias e 1h–7 dias",
-    "over-168h": "Mais de 7 dias",
+const parcelAgingWindowLabels = Object.freeze({
+    "1-6h": "1 - 6h",
+    "7-12h": "7 - 12h",
+    "13-24h": "13 - 24h",
+    "25-48h": "25 - 48h",
+    "49-96h": "2 - 4 Dias",
+    "97-168h": "5 - 7 Dias",
+    "over-168h": "Super Expedite",
 });
 
 function createParcelAgingChartLabel(bin) {
     return [
-        bin.label,
-        parcelAgingDayLabels[bin.key] ?? "",
+        parcelAgingWindowLabels[bin.key] ?? bin.label,
         parcelChartPercentageFormatter.format(bin.percentage),
     ];
 }

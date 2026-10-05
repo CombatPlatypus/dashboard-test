@@ -52,7 +52,8 @@ const PARCEL_AGING_BINS =
         Object.freeze({
             key: "over-168h",
             label: ">168h",
-            minimumHours: 169,
+            minimumHours: 168,
+            minimumExclusive: true,
             maximumHours: Number.POSITIVE_INFINITY,
             color: "#EF5350",
         }),
@@ -753,8 +754,9 @@ function createParcelAgingDistribution(
                     distribution.find(
                         function (item) {
                             return (
-                                hours >=
-                                    item.minimumHours &&
+                                (item.minimumExclusive
+                                    ? hours > item.minimumHours
+                                    : hours >= item.minimumHours) &&
                                 hours <=
                                     item.maximumHours
                             );
