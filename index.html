@@ -53,6 +53,64 @@
                 flex: 1 1 0;
             }
 
+
+
+            #parcel .data-selector {
+                display: grid;
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 10px;
+            }
+            #parcel .data-selector button {
+                position: relative;
+                display: flex;
+                min-height: 58px;
+                padding: 10px 12px;
+                align-items: center;
+                justify-content: center;
+                flex-direction: column;
+                color: var(--color-gray-p);
+                background-color: var(--color-container);
+                border: 1px solid var(--color-border);
+                border-radius: 3px;
+                font: inherit;
+                font-size: 13px;
+                font-weight: 600;
+                letter-spacing: 0.7px;
+                line-height: 1.35;
+                text-align: center;
+                cursor: pointer;
+                transition:
+                    color 160ms ease,
+                    background-color 160ms ease,
+                    border-color 160ms ease;
+            }
+            #parcel .data-selector button::before {
+                position: absolute;
+                top: -1px;
+                right: -1px;
+                left: -1px;
+                height: 3px;
+                background-color: transparent;
+                border-radius: 3px 3px 0 0;
+                content: "";
+            }
+            #parcel .data-selector button:hover,
+            #parcel .data-selector button:focus-visible {
+                color: var(--color-text);
+                background-color: var(--color-container-houver);
+                border-color: var(--color-gray-p);
+            }
+            #parcel .data-selector button.is-active {
+                color: var(--color-text);
+                background-color: var(--color-container-houver);
+            }
+
+            #parcel .data-selector button:disabled {
+                opacity: 0.45;
+                cursor: default;
+            }
+
+
         </style>
     </head>
 
@@ -2165,7 +2223,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="damage-chart-period-selector" id="" role="tablist" aria-label="">
+                                    <div class="data-selector" id="" role="tablist" aria-label="">
                                         <button class="is-active" type="button" role="tab" aria-selected="true" disabled>
                                             <span>Todos os Pacotes</span>
                                         </button>
