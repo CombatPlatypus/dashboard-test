@@ -1,0 +1,170 @@
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { test } from "node:test";
+import {
+    createParcelColumnDistribution,
+    createParcelRow,
+    createParcelSummary,
+} from "../js/reports/parcel-sweeper/model.js";
+import {
+    createParcelHorizontalChart,
+    getParcelHorizontalChartHeight,
+    updateParcelHorizontalChart,
+} from "../js/reports/parcel-sweeper/horizontal-charts.js";
+import { initializeParcelCharts } from "../js/reports/parcel-sweeper/charts.js";
+import { replaceParcelRows, resetParcelReport } from "../js/reports/parcel-sweeper/state.js";
+
+function replaceGlobal(t, name, value) {
+    const original = Object.getOwnPropertyDescriptor(globalThis, name);
+    Object.defineProperty(globalThis, name, { configurable: true, writable: true, value });
+    t.after(() => {
+        if (original) Object.defineProperty(globalThis, name, original);
+        else delete globalThis[name];
+    });
+}
+
+test("distribuições incluem todas as linhas, inclusive não bipadas e operadores ignorados", () => {
+    const rows = [
+        { scannedStatus: "LMHub_Received", operator: "[Ops1]ANA", finalStatus: "LMHub_Received", nextStepAction: "Process for delivery" },
+        { scannedStatus: "-", operator: "", finalStatus: "SOC_Packed", nextStepAction: "-" },
+        { scannedStatus: "LMHub_Received", operator: "outro@empresa.com", finalStatus: "LMHub_Received", nextStepAction: "Put in EHA" },
+        { scannedStatus: "LMHub_Received", operator: "[Ops1]ANA", finalStatus: "Return_LMHub_Packed", nextStepAction: "Process for delivery" },
+    ].map((row, index) => createParcelRow({ ...row, trackingNumber: `BR${index}` }));
+    const summary = createParcelSummary(rows);
+    assert.equal(summary.finalStatusDistribution[0].label, "LMHub_Received");
+    assert.equal(summary.finalStatusDistribution[0].count, 2);
+    assert.equal(summary.nextStepActionDistribution[0].label, "Process for delivery");
+    assert.equal(summary.nextStepActionDistribution[0].count, 2);
+    for (const distribution of [summary.finalStatusDistribution, summary.nextStepActionDistribution]) {
+        assert.equal(distribution.reduce((sum, item) => sum + item.count, 0), 4);
+        assert.equal(distribution.reduce((sum, item) => sum + item.percentage, 0), 1);
+    }
+    const corrected = createParcelSummary(rows, { "[ops1]ana": true });
+    assert.deepEqual(corrected.finalStatusDistribution, summary.finalStatusDistribution);
+    assert.deepEqual(corrected.nextStepActionDistribution, summary.nextStepActionDistribution);
+});
+
+test("agrupa espaços, maiúsculas e vazios, preserva nomes oficiais e ordena quantidades", () => {
+    const rows = Object.freeze([
+        { finalStatus: "  LMHub_Received " }, { finalStatus: "lmhub_received" },
+        { finalStatus: "SOC_Received" }, { finalStatus: "Return_LMHub_Packed" },
+        { finalStatus: "" }, { finalStatus: "-" }, {}, { finalStatus: null },
+    ].map(Object.freeze));
+    assert.deepEqual(createParcelColumnDistribution(rows, "finalStatus"), [
+        { label: "-", count: 4, percentage: 0.5 },
+        { label: "LMHub_Received", count: 2, percentage: 0.25 },
+        { label: "Return_LMHub_Packed", count: 1, percentage: 0.125 },
+        { label: "SOC_Received", count: 1, percentage: 0.125 },
+    ]);
+    assert.equal(rows[0].finalStatus, "  LMHub_Received ");
+    assert.deepEqual(createParcelColumnDistribution([], "finalStatus"), []);
+    assert.deepEqual(createParcelColumnDistribution(null, "finalStatus"), []);
+    assert.deepEqual(createParcelColumnDistribution(rows, "operator"), []);
+    assert.equal(getParcelHorizontalChartHeight(0), 220);
+    assert.equal(getParcelHorizontalChartHeight(4), 220);
+    assert.equal(getParcelHorizontalChartHeight(10), 416);
+});
+
+test("barras horizontais seguem trilhos e valores do relatório de perdas, sem tooltips", t => {
+    replaceGlobal(t, "window", { Chart: class { constructor(canvas, config) { return config; } } });
+    const config = createParcelHorizontalChart({}, "#42A5F5");
+    assert.equal(config.type, "bar");
+    assert.equal(config.options.indexAxis, "y");
+    assert.equal(config.options.animation, false);
+    assert.deepEqual(config.options.events, []);
+    assert.equal(config.options.plugins.tooltip.enabled, false);
+    assert.equal(config.options.scales.y.ticks.autoSkip, false);
+    assert.equal(config.options.scales.y.ticks.font.size, 14);
+    assert.equal(config.data.datasets[0].barThickness, 24);
+    const context = { rectangles: [], texts: [], balance: 0, letterSpacing: "1px",
+        save() { this.balance += 1; }, restore() { this.balance -= 1; },
+        fillRect(...args) { this.rectangles.push(args); }, fillText(...args) { this.texts.push(args); } };
+    const chart = { ctx: context, chartArea: { left: 100, right: 400 },
+        $parcelHasDistribution: true, data: { datasets: [{ data: [2185, 30] }] },
+        getDatasetMeta: () => ({ data: [40, 80].map(y => ({ getProps: () => ({ y, height: 24 }) })) }) };
+    config.plugins.forEach(plugin => plugin.beforeLayout?.(chart));
+    config.plugins.forEach(plugin => plugin.beforeDraw?.(chart));
+    config.plugins.forEach(plugin => plugin.beforeDatasetsDraw?.(chart));
+    config.plugins.forEach(plugin => plugin.afterDatasetsDraw?.(chart));
+    assert.equal(context.letterSpacing, "0px");
+    assert.deepEqual(context.rectangles, [[100, 28, 300, 24], [100, 68, 300, 24]]);
+    assert.deepEqual(context.texts, [["2.185", 412, 40], ["30", 412, 80]]);
+    assert.equal(context.balance, 0);
+    chart.$parcelHasDistribution = false;
+    config.plugins.find(plugin => plugin.id === "parcelHorizontalValues").afterDatasetsDraw(chart);
+    assert.equal(context.texts.at(-1)[0], "—");
+});
+
+test("atualização limpa dados antigos, adapta altura e reserva espaço para quantidades grandes", t => {
+    replaceGlobal(t, "window", { Chart: class { constructor(canvas, config) { return config; } } });
+    const chart = createParcelHorizontalChart({}, "#42A5F5");
+    let updates = 0, resizes = 0;
+    const attributes = {};
+    chart.canvas = { parentElement: { style: { height: "220px" } }, setAttribute: (name, value) => { attributes[name] = value; } };
+    chart.update = () => { updates += 1; };
+    chart.resize = () => { resizes += 1; };
+    updateParcelHorizontalChart(chart, [{ label: "LMHub_Received", count: 10000000 }, { label: "-", count: 20 }], {
+        title: "Final Status", color: "#42A5F5", height: 416,
+    });
+    assert.deepEqual(chart.data.datasets[0].data, [10000000, 20]);
+    assert.deepEqual(chart.data.datasets[0].backgroundColor, ["#42A5F5", "#a8a9ad"]);
+    assert.equal(chart.canvas.parentElement.style.height, "416px");
+    assert.ok(chart.options.layout.padding.right >= 90);
+    assert.match(attributes["aria-label"], /LMHub_Received: 10\.000\.000; -: 20/);
+    updateParcelHorizontalChart(chart, [], { title: "Final Status", color: "#42A5F5", height: 220 });
+    assert.deepEqual(chart.data.labels, ["—"]);
+    assert.deepEqual(chart.data.datasets[0].data, [0]);
+    assert.equal(chart.$parcelHasDistribution, false);
+    assert.equal(chart.options.scales.x.suggestedMax, 1);
+    assert.equal(chart.canvas.parentElement.style.height, "220px");
+    assert.equal(attributes["aria-label"], "Final Status: sem pacotes importados.");
+    assert.equal(updates, 2);
+    assert.equal(resizes, 2);
+});
+
+test("os quatro gráficos inicializam uma vez e atualizam na importação e limpeza", t => {
+    class Element { constructor() { this.dataset = {}; this.style = {}; } }
+    class Canvas extends Element {
+        constructor(id) { super(); this.id = id; this.parentElement = new Element(); }
+        setAttribute(name, value) { this[name] = value; }
+    }
+    const panel = new Element();
+    panel.id = "parcel";
+    const canvases = ["parcelCoverageChart", "parcelAgingChart", "parcelFinalStatusChart", "parcelNextStepActionChart"]
+        .map(id => new Canvas(id));
+    panel.querySelector = selector => canvases.find(canvas => `#${canvas.id}` === selector);
+    const charts = [];
+    replaceGlobal(t, "HTMLElement", Element);
+    replaceGlobal(t, "HTMLCanvasElement", Canvas);
+    replaceGlobal(t, "MutationObserver", class { observe() {} disconnect() {} });
+    replaceGlobal(t, "window", { Chart: class {
+        constructor(canvas, config) { Object.assign(this, config); this.canvas = canvas; charts.push(this); }
+        resize() {} update() {}
+    } });
+    assert.equal(initializeParcelCharts(panel), true);
+    assert.equal(initializeParcelCharts(panel), true);
+    assert.equal(charts.length, 4);
+    replaceParcelRows([
+        { trackingNumber: "BR1", finalStatus: "LMHub_Received", nextStepAction: "Process for delivery" },
+        { trackingNumber: "BR2", finalStatus: "LMHub_Received", nextStepAction: "Put in EHA" },
+        { trackingNumber: "BR3", finalStatus: "SOC_Packed", nextStepAction: "" },
+    ]);
+    assert.deepEqual(charts[2].data.labels, ["LMHub_Received", "SOC_Packed"]);
+    assert.deepEqual(charts[2].data.datasets[0].data, [2, 1]);
+    assert.deepEqual(charts[3].data.labels, ["-", "Process for delivery", "Put in EHA"]);
+    assert.deepEqual(charts[3].data.datasets[0].data, [1, 1, 1]);
+    resetParcelReport();
+    assert.deepEqual(charts[2].data.labels, ["—"]);
+    assert.deepEqual(charts[3].data.datasets[0].data, [0]);
+});
+
+test("HTML conecta os dois canvases na estrutura fornecida, sem ids vazios", () => {
+    const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
+    const parcel = html.match(/<div class="tabs-panel" id="parcel">([\s\S]*?)<!-- RELATÓRIO ANÁLISE GERAL -->/)[1];
+    assert.match(parcel, /id="parcelStatusCharts"/);
+    for (const name of ["FinalStatus", "NextStepAction"]) {
+        assert.match(parcel, new RegExp(`id="parcel${name}ChartContainer"`));
+        assert.match(parcel, new RegExp(`<canvas id="parcel${name}Chart" role="img" aria-label="[^"]+"`));
+    }
+    assert.doesNotMatch(parcel, /id=""/);
+});

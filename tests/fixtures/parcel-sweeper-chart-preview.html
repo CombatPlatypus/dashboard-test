@@ -20,6 +20,7 @@
         #parcelPreview { padding: 20px; border: 1px solid #666; }
         #parcelAgingChartContainer { height: 250px; margin-top: 30px; }
         #parcelAgingChartContainer > div { height: 100%; }
+        #parcelStatusCharts { margin-top: 24px; }
         #exportPreview { display: block; max-width: 100%; margin-top: 20px; }
         #exportStatus { min-height: 24px; }
         @media (max-width: 850px) { .distribution { grid-template-columns: 1fr; } }
@@ -33,6 +34,7 @@
         <button data-coverage="0.6666666666666666">66,7%</button>
         <button data-coverage="1">100%</button>
         <button id="generateExport">Gerar imagem</button>
+        <button id="resetParcelTest">Limpar dados fictícios</button>
         <p id="exportStatus" role="status"></p>
     </header>
     <main id="reports">
@@ -58,6 +60,20 @@
                 <div id="parcelAgingChartContainer">
                     <div><canvas id="parcelAgingChart" role="img" aria-label="Quantidade de pacotes escaneados por faixa de aging"></canvas></div>
                 </div>
+                <div id="parcelStatusCharts">
+                    <div class="horizontal-bars-chart">
+                        <div class="chart-title"><h4>Distribuição por Final Status</h4></div>
+                        <div id="parcelFinalStatusChartContainer" class="parcel-horizontal-chart-canvas">
+                            <canvas id="parcelFinalStatusChart" role="img" aria-label="Quantidade de pacotes por Final Status"></canvas>
+                        </div>
+                    </div>
+                    <div class="horizontal-bars-chart">
+                        <div class="chart-title"><h4>Distribuição por Next Step Action</h4></div>
+                        <div id="parcelNextStepActionChartContainer" class="parcel-horizontal-chart-canvas">
+                            <canvas id="parcelNextStepActionChart" role="img" aria-label="Quantidade de pacotes por Next Step Action"></canvas>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div hidden>
                 <span id="parcelTotalScanned"></span><span id="parcelBacklogTotal"></span>
@@ -74,7 +90,7 @@
     <script type="module">
         import { initializeParcelCharts } from "../../js/reports/parcel-sweeper/charts.js";
         import { initializeParcelView } from "../../js/reports/parcel-sweeper/view.js";
-        import { replaceParcelRows } from "../../js/reports/parcel-sweeper/state.js";
+        import { replaceParcelRows, resetParcelReport } from "../../js/reports/parcel-sweeper/state.js";
         import { createReportImageBlob } from "../../js/reports/export.js";
 
         initializeParcelCharts();
@@ -87,12 +103,15 @@
                 operator: index < scanned ? `[Ops${100 + index % 3}]OPERADOR TESTE ${index % 3}` : "",
                 countType: index < scanned ? "Backlog" : "Missing",
                 agingTime: `${2 + index % 100}h`,
+                finalStatus: ["LMHub_Received", "SOC_LHTransported", "Return_LMHub_Packed", "Return_LMHub_Received", "FMHub_LHTransported", "Delivered", "SOC_Received", "SOC_Packed", "LMHub_Packed", "-"][index % 20 < 10 ? 0 : index % 10],
+                nextStepAction: index % 20 < 12 ? "Process for delivery" : ["-", "Put in EHA", "Process for return", "Return to SOC", "Process for liquidation"][index % 5],
             })), "dados-ficticios.csv");
         }
         document.querySelectorAll("[data-coverage]").forEach(button => {
             button.addEventListener("click", () => setCoverage(Number(button.dataset.coverage)));
         });
         setCoverage(2 / 3);
+        document.getElementById("resetParcelTest").addEventListener("click", resetParcelReport);
         document.getElementById("generateExport").addEventListener("click", async () => {
             const status = document.getElementById("exportStatus");
             status.textContent = "Gerando imagem...";

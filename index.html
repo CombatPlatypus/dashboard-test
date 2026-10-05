@@ -146,10 +146,14 @@
 
             /*  */
 
-            #parcel .parcel-horizontal-chart-canvas {
+            #parcel .flex-box-start > .parcel-horizontal-chart-canvas {
                 width: 100%;
                 height: 220px;
                 position: relative;
+            }
+
+            #parcel .flex-box-start > .horizontal-bars-chart {
+                flex: 1 1 0;
             }
 
 
@@ -2288,16 +2292,16 @@
                                         </div>
                                     </div>
 
-                                    <!--  -->
+                                    <!-- GRÁFICOS DE FINAL STATUS E NEXT STEP ACTION -->
 
-                                    <div class="flex-box-start">
+                                    <div class="flex-box-start" id="parcelStatusCharts">
                                         <div class="horizontal-bars-chart">
                                             <div class="chart-title">
                                                 <h4>Distribuição por Final Status</h4>
                                             </div>
 
-                                            <div id="" class="parcel-horizontal-chart-canvas">
-                                                <canvas id="" role="img"></canvas>
+                                            <div id="parcelFinalStatusChartContainer" class="parcel-horizontal-chart-canvas">
+                                                <canvas id="parcelFinalStatusChart" role="img" aria-label="Quantidade de pacotes por Final Status"></canvas>
                                             </div>
                                         </div>
 
@@ -2306,8 +2310,8 @@
                                                 <h4>Distribuição por Next Step Action</h4>
                                             </div>
 
-                                            <div id="" class="parcel-horizontal-chart-canvas">
-                                                <canvas id="" role="img"></canvas>
+                                            <div id="parcelNextStepActionChartContainer" class="parcel-horizontal-chart-canvas">
+                                                <canvas id="parcelNextStepActionChart" role="img" aria-label="Quantidade de pacotes por Next Step Action"></canvas>
                                             </div>
                                         </div>
                                     </div>

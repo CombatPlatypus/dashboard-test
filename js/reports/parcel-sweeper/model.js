@@ -827,6 +827,27 @@ function filterParcelPackageRows(
     );
 }
 
+function createParcelColumnDistribution(rows, column) {
+    if (!Array.isArray(rows) || !["finalStatus", "nextStepAction"].includes(column)) {
+        return [];
+    }
+
+    const groups = new Map();
+    rows.forEach(row => {
+        const label = normalizeParcelText(row?.[column]) || "-";
+        const key = label.toLocaleLowerCase("pt-BR");
+        if (!groups.has(key)) {
+            groups.set(key, { label, count: 0 });
+        }
+        groups.get(key).count += 1;
+    });
+
+    return [...groups.values()]
+        .map(group => ({ ...group, percentage: group.count / rows.length }))
+        .sort((first, second) => second.count - first.count ||
+            first.label.localeCompare(second.label, "pt-BR", { numeric: true }));
+}
+
 function createParcelSummary(
     rows,
     operatorKindOverrides = {},
@@ -933,6 +954,8 @@ function createParcelSummary(
             scannedRows.length -
                 validOperatorRows.length,
         operatorStats,
+        finalStatusDistribution: createParcelColumnDistribution(receivedRows, "finalStatus"),
+        nextStepActionDistribution: createParcelColumnDistribution(receivedRows, "nextStepAction"),
         agingDistribution:
             createParcelAgingDistribution(
                 receivedRows,
@@ -948,6 +971,7 @@ export {
     PARCEL_PACKAGE_FILTERS,
     classifyParcelOperators,
     createParcelAgingDistribution,
+    createParcelColumnDistribution,
     createParcelOperatorStats,
     createParcelRow,
     createParcelSummary,

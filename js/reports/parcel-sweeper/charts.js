@@ -11,6 +11,12 @@ import {
     drawParcelCoverage3D,
 } from "./coverage-3d.js";
 
+import {
+    createParcelHorizontalChart,
+    getParcelHorizontalChartHeight,
+    updateParcelHorizontalChart,
+} from "./horizontal-charts.js";
+
 const parcelChartIntegerFormatter =
     new Intl.NumberFormat(
         "pt-BR",
@@ -48,6 +54,8 @@ function createParcelAgingChartLabel(bin) {
 
 let parcelCoverageChart = null;
 let parcelAgingChart = null;
+let parcelFinalStatusChart = null;
+let parcelNextStepActionChart = null;
 let parcelChartVisibilityObserver = null;
 
 const parcelCoverageProjection = {
@@ -322,7 +330,9 @@ function updateParcelCharts(
 ) {
     if (
         !parcelCoverageChart ||
-        !parcelAgingChart
+        !parcelAgingChart ||
+        !parcelFinalStatusChart ||
+        !parcelNextStepActionChart
     ) {
         return;
     }
@@ -389,6 +399,15 @@ function updateParcelCharts(
                 );
 
     parcelAgingChart.update();
+
+    const horizontalHeight = getParcelHorizontalChartHeight(Math.max(
+        summary.finalStatusDistribution.length, summary.nextStepActionDistribution.length));
+    updateParcelHorizontalChart(parcelFinalStatusChart, summary.finalStatusDistribution, {
+        title: "Quantidade de pacotes por Final Status", color: "#42A5F5", height: horizontalHeight,
+    });
+    updateParcelHorizontalChart(parcelNextStepActionChart, summary.nextStepActionDistribution, {
+        title: "Quantidade de pacotes por Next Step Action", color: "#3F51B5", height: horizontalHeight,
+    });
 }
 
 function resizeParcelCharts() {
@@ -398,6 +417,8 @@ function resizeParcelCharts() {
                 ?.resize();
             parcelAgingChart
                 ?.resize();
+            parcelFinalStatusChart?.resize();
+            parcelNextStepActionChart?.resize();
         },
     );
 }
@@ -454,6 +475,9 @@ function initializeParcelCharts(
             "#parcelAgingChart",
         );
 
+    const finalStatusCanvas = rootElement.querySelector("#parcelFinalStatusChart");
+    const nextStepActionCanvas = rootElement.querySelector("#parcelNextStepActionChart");
+
     if (
         !(panel instanceof HTMLElement) ||
         !(
@@ -464,6 +488,8 @@ function initializeParcelCharts(
             agingCanvas instanceof
                 HTMLCanvasElement
         ) ||
+        !(finalStatusCanvas instanceof HTMLCanvasElement) ||
+        !(nextStepActionCanvas instanceof HTMLCanvasElement) ||
         typeof window.Chart !==
             "function"
     ) {
@@ -491,6 +517,8 @@ function initializeParcelCharts(
         createParcelAgingChart(
             agingCanvas,
         );
+    parcelFinalStatusChart = createParcelHorizontalChart(finalStatusCanvas, "#42A5F5");
+    parcelNextStepActionChart = createParcelHorizontalChart(nextStepActionCanvas, "#3F51B5");
 
     subscribeParcelState(
         updateParcelCharts,
