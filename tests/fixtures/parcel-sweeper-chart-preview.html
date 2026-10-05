@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Teste visual do Parcel Sweeper — dados fictícios</title>
+    <link rel="stylesheet" href="../../css/font-face.css">
+    <link rel="stylesheet" href="../../css/reports-style.css">
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 24px; background: #101010; color: #e4e6eb; font: 14px "Open Sans", sans-serif; }
+        header { margin-bottom: 20px; }
+        button { margin: 0 8px 8px 0; padding: 10px 18px; color: #e4e6eb; background: #242424; border: 1px solid #666; cursor: pointer; }
+        .distribution { display: grid; grid-template-columns: minmax(300px, 500px) minmax(340px, 1fr); gap: 15px; }
+        .operator-card { padding: 25px; border: 1px solid #666; }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        caption, th { padding: 12px; background: #252525; font-weight: 600; }
+        td, th { border: 1px solid #666; padding: 10px; text-align: center; }
+        tr:nth-child(even) { background: #1b1b1b; }
+        #parcelPreview { padding: 20px; border: 1px solid #666; }
+        #parcelAgingChartContainer { height: 250px; margin-top: 30px; }
+        #parcelAgingChartContainer > div { height: 100%; }
+        #exportPreview { display: block; max-width: 100%; margin-top: 20px; }
+        #exportStatus { min-height: 24px; }
+        @media (max-width: 850px) { .distribution { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Prévia técnica — dados fictícios</h1>
+        <button data-coverage="0">0%</button>
+        <button data-coverage="0.01">1%</button>
+        <button data-coverage="0.6666666666666666">66,7%</button>
+        <button data-coverage="1">100%</button>
+        <button id="generateExport">Gerar imagem</button>
+        <p id="exportStatus" role="status"></p>
+    </header>
+    <main id="reports">
+        <section id="parcel" class="is-active">
+            <div id="parcelPreview">
+                <div class="distribution">
+                    <div class="doughnut-chart">
+                        <h3>Cobertura da Varredura</h3>
+                        <div><canvas id="parcelCoverageChart" role="img" aria-label="Cobertura da varredura entre pacotes escaneados e não escaneados"></canvas></div>
+                        <div>
+                            <p>Escaneados <span id="parcelCoverageScanned">—</span></p>
+                            <p>Não Escaneados <span id="parcelCoverageUnscanned">—</span></p>
+                        </div>
+                    </div>
+                    <div class="operator-card">
+                        <table>
+                            <caption>Distribuição por Operador</caption>
+                            <thead><tr><th>Operador</th><th>Quantidade</th><th>Percentual</th></tr></thead>
+                            <tbody id="parcelOperatorDistributionBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div id="parcelAgingChartContainer">
+                    <div><canvas id="parcelAgingChart" role="img" aria-label="Quantidade de pacotes escaneados por faixa de aging"></canvas></div>
+                </div>
+            </div>
+            <div hidden>
+                <span id="parcelTotalScanned"></span><span id="parcelBacklogTotal"></span>
+                <span id="parcelExceptionTotal"></span><span id="parcelUnscannedTotal"></span>
+                <div id="parcelPackageFilter"></div>
+                <table><tbody id="parcelCommonPackagesBody"></tbody></table>
+                <table><tbody id="parcelBulkyPackagesBody"></tbody></table>
+            </div>
+        </section>
+    </main>
+    <img id="exportPreview" alt="Imagem exportada do relatório de teste" hidden>
+    <script src="../../js/libraries/chart.umd.min.js"></script>
+    <script src="../../js/libraries/html2canvas.min.js"></script>
+    <script type="module">
+        import { initializeParcelCharts } from "../../js/reports/parcel-sweeper/charts.js";
+        import { initializeParcelView } from "../../js/reports/parcel-sweeper/view.js";
+        import { replaceParcelRows } from "../../js/reports/parcel-sweeper/state.js";
+        import { createReportImageBlob } from "../../js/reports/export.js";
+
+        initializeParcelCharts();
+        initializeParcelView();
+        function setCoverage(percentage) {
+            const scanned = Math.round(300 * percentage);
+            replaceParcelRows(Array.from({ length: 300 }, (_, index) => ({
+                trackingNumber: `BRTEST${index}`,
+                scannedStatus: index < scanned ? "Scanned" : "-",
+                operator: index < scanned ? `[Ops${100 + index % 3}]OPERADOR TESTE ${index % 3}` : "",
+                countType: index < scanned ? "Backlog" : "Missing",
+                agingTime: `${2 + index % 100}h`,
+            })), "dados-ficticios.csv");
+        }
+        document.querySelectorAll("[data-coverage]").forEach(button => {
+            button.addEventListener("click", () => setCoverage(Number(button.dataset.coverage)));
+        });
+        setCoverage(2 / 3);
+        document.getElementById("generateExport").addEventListener("click", async () => {
+            const status = document.getElementById("exportStatus");
+            status.textContent = "Gerando imagem...";
+            try {
+                const blob = await createReportImageBlob(document.getElementById("parcelPreview"));
+                const image = document.getElementById("exportPreview");
+                if (image.dataset.blobUrl) URL.revokeObjectURL(image.dataset.blobUrl);
+                image.dataset.blobUrl = URL.createObjectURL(blob);
+                image.src = image.dataset.blobUrl;
+                image.hidden = false;
+                status.textContent = "Imagem PNG gerada com sucesso.";
+            } catch (error) {
+                status.textContent = `Falha na exportação: ${error.message}`;
+            }
+        });
+    </script>
+</body>
+</html>

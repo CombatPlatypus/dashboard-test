@@ -498,6 +498,8 @@ function initializeParcelCharts(
 }
 
 export {
+    createParcelAgingChart,
+    createParcelCoverageChart,
     initializeParcelCharts,
     updateParcelCharts,
 };
