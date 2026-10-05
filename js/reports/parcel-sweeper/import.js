@@ -329,11 +329,25 @@ async function readParcelFile(
     const fileBuffer =
         await file.arrayBuffer();
 
+    let workbookData = fileBuffer;
+    let workbookType = "array";
+
+    if (extension === "csv") {
+        try {
+            // A leitura binária da biblioteca altera acentos em CSV UTF-8.
+            workbookData = new TextDecoder("utf-8", { fatal: true })
+                .decode(fileBuffer);
+            workbookType = "string";
+        } catch {
+            // Mantém a leitura original para CSV em codificações antigas.
+        }
+    }
+
     const workbook =
         window.XLSX.read(
-            fileBuffer,
+            workbookData,
             {
-                type: "array",
+                type: workbookType,
             },
         );
 

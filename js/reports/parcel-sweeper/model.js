@@ -60,6 +60,8 @@ const PARCEL_AGING_BINS =
 
 const PARCEL_BULKY_RULE =
     Object.freeze({
+        // As duas amostras rotuladas têm P75 de 2–4s para comuns
+        // e 8–10s para volumosos. Volume baixo sozinho não basta.
         minimumScans: 15,
         baselineVolumeFloor: 0.65,
         maximumVolumeRatio: 0.55,
@@ -498,6 +500,8 @@ function createParcelOperatorStats(
                         group.operator,
                     count:
                         group.rows.length,
+                    timedScanCount:
+                        timestamps.length,
                     percentage:
                         total > 0
                             ? group.rows.length /
@@ -641,7 +645,7 @@ function classifyParcelOperators(
                     );
 
             const isBulky =
-                operator.count >=
+                operator.timedScanCount >=
                     PARCEL_BULKY_RULE
                         .minimumScans &&
                 volumeRatio <=

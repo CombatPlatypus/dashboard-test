@@ -148,6 +148,96 @@ test("identifica o operador de volumosos pela combinação de baixo volume e cad
     );
 });
 
+// Os histogramas preservam volume e cadência, sem nomes reais ou códigos BR.
+const cadenceSamples = JSON.parse(readFileSync(
+    new URL("./fixtures/parcel-sweeper-cadence.json", import.meta.url),
+    "utf8",
+));
+
+function createRowsFromGapHistogram(profile, operator) {
+    const gaps = Object.entries(profile.gapHistogram).flatMap(
+        ([gap, count]) => Array(count).fill(Number(gap)),
+    );
+
+    assert.equal(gaps.length + 1, profile.count);
+
+    let timestamp = Date.UTC(2026, 9, 2, 14);
+
+    return createOperatorRows({
+        operator,
+        count: profile.count,
+        gapSeconds: 0,
+    }).map((row, index) => {
+        if (index > 0) {
+            timestamp += gaps[index - 1] * 1000;
+        }
+
+        return createParcelRow({
+            ...row,
+            scannedTime: formatTimestamp(timestamp),
+        });
+    });
+}
+
+for (const sample of cadenceSamples) {
+    test(`preserva as classificações da amostra ${sample.source} sem depender dos nomes`, () => {
+        const profiles = sample.operators.map((profile, index) => ({
+            ...profile,
+            operator: `[Ops${index + 100}]OPERADOR ${index + 1}`,
+        }));
+
+        // O arquivo pode trazer as linhas em ordem cronológica inversa.
+        const rows = profiles.flatMap(profile =>
+            createRowsFromGapHistogram(profile, profile.operator),
+        ).reverse();
+        const summary = createParcelSummary(rows);
+
+        for (const profile of profiles) {
+            const operator = summary.operatorStats.find(stat =>
+                stat.operator === profile.operator,
+            );
+
+            assert.equal(operator.count, profile.count);
+            assert.equal(operator.timedScanCount, profile.count);
+            assert.equal(operator.packageKind, profile.packageKind);
+            assert.equal(operator.medianGapSeconds, profile.medianGapSeconds);
+            assert.equal(operator.p75GapSeconds, profile.p75GapSeconds);
+        }
+
+        assert.equal(summary.commonRows.length, sample.commonCount);
+        assert.equal(summary.bulkyRows.length, sample.bulkyCount);
+    });
+}
+
+test("não classifica volumosos com poucos horários válidos, baixo volume rápido ou uma pausa isolada", () => {
+    const insufficientTimes = createOperatorRows({
+        operator: "[Ops3]POUCOS HORARIOS",
+        count: 25,
+        gapSeconds: 10,
+    }).map((row, index) => createParcelRow({
+        ...row,
+        scannedTime: index < 2 ? row.scannedTime : "",
+    }));
+
+    const profiles = [
+        { operator: "[Ops4]BIPAGEM RAPIDA", count: 25, gapHistogram: { 2: 24 } },
+        { operator: "[Ops5]PAUSA ISOLADA", count: 25, gapHistogram: { 2: 23, 300: 1 } },
+        { operator: "[Ops6]AMOSTRA PEQUENA", count: 14, gapHistogram: { 10: 13 } },
+    ];
+
+    const rows = [
+        ...createOperatorRows({ operator: "[Ops1]BASE A", count: 100, gapSeconds: 2 }),
+        ...createOperatorRows({ operator: "[Ops2]BASE B", count: 90, gapSeconds: 2 }),
+        ...insufficientTimes,
+        ...profiles.flatMap(profile => createRowsFromGapHistogram(profile, profile.operator)),
+    ];
+
+    const operators = classifyParcelOperators(rows);
+
+    assert.equal(operators.find(stat => stat.operator.includes("HORARIOS")).timedScanCount, 2);
+    assert.ok(operators.every(stat => stat.packageKind === "common"));
+});
+
 test("aceita somente operadores iniciados por [Ops] sem diferenciar maiúsculas", () => {
     assert.equal(
         isParcelOperator(
@@ -386,6 +476,31 @@ test("importa o CSV exportado pelo Parcel Sweeper", async () => {
         } else {
             globalThis.window =
                 previousWindow;
+        }
+    }
+});
+
+test("preserva nomes acentuados em CSV UTF-8 com ou sem BOM e em CSV legado", async () => {
+    const require = createRequire(import.meta.url);
+    const previousWindow = globalThis.window;
+    globalThis.window = { XLSX: require("../js/libraries/xlsx.full.min.js") };
+
+    const expectedOperator = "[Ops26438]JÕAO PEDRO PEREIRA BARROS";
+    const csv = [
+        "SPX Tracking Number,Scanned Status,Count Type,Operator,Aging Time,Scanned Time",
+        `BR1,LMHub_Received,Backlog,${expectedOperator},5h,2026-09-26 15:27:31`,
+    ].join("\r\n");
+
+    try {
+        for (const content of [csv, `\uFEFF${csv}`, Buffer.from(csv, "latin1")]) {
+            const imported = await readParcelFile(new File([content], "acentos.csv"));
+            assert.equal(imported.rows[0].operator, expectedOperator);
+        }
+    } finally {
+        if (previousWindow === undefined) {
+            delete globalThis.window;
+        } else {
+            globalThis.window = previousWindow;
         }
     }
 });
