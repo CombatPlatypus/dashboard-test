@@ -29,6 +29,20 @@ const parcelChartPercentageFormatter =
         },
     );
 
+const parcelAgingDayLabels = Object.freeze({
+    "49-96h": "2 dias e 1h–4 dias",
+    "97-168h": "4 dias e 1h–7 dias",
+    "over-168h": "Mais de 7 dias",
+});
+
+function createParcelAgingChartLabel(bin) {
+    return [
+        bin.label,
+        parcelAgingDayLabels[bin.key] ?? "",
+        parcelChartPercentageFormatter.format(bin.percentage),
+    ];
+}
+
 let parcelCoverageChart = null;
 let parcelAgingChart = null;
 let parcelChartVisibilityObserver = null;
@@ -102,7 +116,7 @@ const parcelCoverageCenterText = {
             "12px Open Sans, Arial, sans-serif";
 
         context.fillText(
-            "bipados",
+            "Bipados",
             centerX,
             centerY + 18,
         );
@@ -336,15 +350,7 @@ function updateParcelCharts(
     parcelAgingChart.data.labels =
         summary.agingDistribution
             .map(
-                function (bin) {
-                    return [
-                        bin.label,
-                        parcelChartPercentageFormatter
-                            .format(
-                                bin.percentage,
-                            ),
-                    ];
-                },
+                createParcelAgingChartLabel,
             );
 
     parcelAgingChart
@@ -498,6 +504,7 @@ function initializeParcelCharts(
 }
 
 export {
+    createParcelAgingChartLabel,
     createParcelAgingChart,
     createParcelCoverageChart,
     initializeParcelCharts,

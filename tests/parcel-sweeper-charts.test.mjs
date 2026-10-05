@@ -7,6 +7,7 @@ import {
     drawParcelCoverage3D,
 } from "../js/reports/parcel-sweeper/coverage-3d.js";
 import {
+    createParcelAgingChartLabel,
     createParcelAgingChart,
     createParcelCoverageChart,
 } from "../js/reports/parcel-sweeper/charts.js";
@@ -95,9 +96,27 @@ test("somente gráficos do Parcel desativam tooltips e hover; texto central fica
     assert.equal(plugin.beforeDatasetDraw(chart, { index: 1 }), undefined);
     coverage.plugins.find(item => item.id === "parcelCoverageCenterText").afterDraw(chart);
     assert.equal(context.texts[0][0], "66,7%");
-    assert.equal(context.texts[1][0], "bipados");
+    assert.equal(context.texts[1][0], "Bipados");
     assert.equal(context.balance, 0);
     assert.ok(!aging.plugins.some(item => item.id === "parcel-coverage-3d"));
+});
+
+test("aging acima de 48h mostra equivalência exata em dias, sem mudar horas ou percentuais", () => {
+    const bins = [
+        { key: "1-6h", label: "1–6h", days: "" },
+        { key: "7-12h", label: "7–12h", days: "" },
+        { key: "13-24h", label: "13–24h", days: "" },
+        { key: "25-48h", label: "25–48h", days: "" },
+        { key: "49-96h", label: "49–96h", days: "2 dias e 1h–4 dias" },
+        { key: "97-168h", label: "97–168h", days: "4 dias e 1h–7 dias" },
+        { key: "over-168h", label: ">168h", days: "Mais de 7 dias" },
+    ];
+    bins.forEach(({ key, label, days }) => {
+        const bin = Object.freeze({ key, label, percentage: 0.125 });
+        assert.deepEqual(createParcelAgingChartLabel(bin), [label, days, "12,5%"]);
+        assert.equal(bin.label, label);
+        assert.equal(bin.percentage, 0.125);
+    });
 });
 
 class TestElement {
