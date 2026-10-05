@@ -406,22 +406,11 @@ async function importParcelFile(
                 result.rows,
             );
 
-        const ignoredMessage =
-            summary.ignoredScannedCount > 0
-                ? (
-                    ` ${summary.ignoredScannedCount.toLocaleString("pt-BR")} leitura(s) com operador fora do padrão [Ops] foram omitidas das análises por operador.`
-                )
-                : "";
-
         setReportNotification({
             reportId: "parcel",
-            type:
-                summary.ignoredScannedCount > 0
-                    ? "warning"
-                    : "success",
+            type: "success",
             message:
-                `${summary.totalRows.toLocaleString("pt-BR")} pacotes importados de ${file.name}.` +
-                ignoredMessage,
+                `${summary.totalRows.toLocaleString("pt-BR")} pacotes importados de ${file.name}.`,
         });
     } catch (error) {
         const message =
