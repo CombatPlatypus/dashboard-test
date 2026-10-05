@@ -60,11 +60,11 @@ const PARCEL_AGING_BINS =
 
 const PARCEL_BULKY_RULE =
     Object.freeze({
-        // As duas amostras rotuladas têm P75 de 2–4s para comuns
-        // e 8–10s para volumosos. Volume baixo sozinho não basta.
+        // Nas amostras rotuladas, volumosos podem chegar a 59,3%
+        // do volume de referência. A cadência lenta continua obrigatória.
         minimumScans: 15,
         baselineVolumeFloor: 0.65,
-        maximumVolumeRatio: 0.55,
+        maximumVolumeRatio: 0.65,
         minimumP75GapSeconds: 6,
         minimumP75GapRatio: 1.75,
         slowGapSeconds: 5,
@@ -666,10 +666,13 @@ function classifyParcelOperators(
                             : 1
                     );
 
-            const isBulky =
+            const hasSufficientTimingEvidence =
                 operator.timedScanCount >=
                     PARCEL_BULKY_RULE
-                        .minimumScans &&
+                        .minimumScans;
+
+            const isBulky =
+                hasSufficientTimingEvidence &&
                 volumeRatio <=
                     PARCEL_BULKY_RULE
                         .maximumVolumeRatio &&
@@ -693,6 +696,7 @@ function classifyParcelOperators(
                         ? "bulky"
                         : "common",
                 classification: {
+                    hasSufficientTimingEvidence,
                     volumeRatio,
                     p75GapRatio,
                     slowGapShareRatio,

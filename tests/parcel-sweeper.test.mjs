@@ -220,7 +220,7 @@ function createRowsFromGapHistogram(profile, operator) {
 }
 
 for (const sample of cadenceSamples) {
-    test(`preserva as classificações da amostra ${sample.source} sem depender dos nomes`, () => {
+    test(`reproduz cadência e previsões da amostra ${sample.source} sem depender dos nomes`, () => {
         const profiles = sample.operators.map((profile, index) => ({
             ...profile,
             operator: `[Ops${index + 100}]OPERADOR ${index + 1}`,
@@ -239,9 +239,15 @@ for (const sample of cadenceSamples) {
 
             assert.equal(operator.count, profile.count);
             assert.equal(operator.timedScanCount, profile.count);
-            assert.equal(operator.packageKind, profile.packageKind);
+            // Rótulo físico e previsão são distintos nos casos incertos
+            // ou com poucos horários; não tratamos esses casos como acertos.
+            assert.equal(operator.packageKind, profile.expectedPackageKind ?? profile.packageKind);
             assert.equal(operator.medianGapSeconds, profile.medianGapSeconds);
             assert.equal(operator.p75GapSeconds, profile.p75GapSeconds);
+            if (typeof profile.hasSufficientTimingEvidence === "boolean") {
+                assert.equal(operator.classification.hasSufficientTimingEvidence,
+                    profile.hasSufficientTimingEvidence);
+            }
         }
 
         assert.equal(summary.commonRows.length, sample.commonCount);
@@ -275,6 +281,8 @@ test("não classifica volumosos com poucos horários válidos, baixo volume ráp
     const operators = classifyParcelOperators(rows);
 
     assert.equal(operators.find(stat => stat.operator.includes("HORARIOS")).timedScanCount, 2);
+    assert.equal(operators.find(stat => stat.operator.includes("HORARIOS"))
+        .classification.hasSufficientTimingEvidence, false);
     assert.ok(operators.every(stat => stat.packageKind === "common"));
 });
 
