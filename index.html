@@ -42,6 +42,13 @@
             #reports #parcel #parcelPreview > .flex-box-start {
                 gap: 15px;
             }
+
+
+            #reports #parcel #parcelPreview > .flex-box-start:first-of-type > div:last-of-type {
+                flex: 1 1 0;
+            }
+
+
             #reports #parcel #parcelPreview > .flex-box-start:last-of-type > div {
                 flex: 1 1 0;
             }
@@ -2157,6 +2164,22 @@
                                             </table>
                                         </div>
                                     </div>
+
+                                    <div class="damage-chart-period-selector" id="" role="tablist" aria-label="">
+                                        <button class="is-active" type="button" role="tab" aria-selected="true" disabled>
+                                            <span>Todos os Pacotes</span>
+                                        </button>
+
+                                        <button type="button" role="tab" aria-selected="false" disabled>
+                                            <span>Backlog</span>
+                                        </button>
+
+                                        <button type="button" role="tab" aria-selected="false" disabled>
+                                            <span>Exception</span>
+                                        </button>
+                                    </div>
+
+                                    <!-- LISTA DE PACOTES BIPADOS POR OPERADOR -->
 
                                     <div class="flex-box-start">
                                         <div>
