@@ -44,7 +44,10 @@
             }
 
 
-            #reports #parcel #parcelPreview > .flex-box-start:first-of-type > div:last-of-type {
+            #reports #parcel #parcelPreview > .flex-box-start .doughnut-chart {
+                flex: 1 1 0;
+            }
+            #reports #parcel #parcelPreview > .flex-box-start .distribution-by-operator {
                 flex: 1 1 0;
             }
 
@@ -75,7 +78,7 @@
                 font: inherit;
                 font-size: 13px;
                 font-weight: 600;
-                letter-spacing: 0.7px;
+                letter-spacing: 1px;
                 line-height: 1.35;
                 text-align: center;
                 cursor: pointer;
@@ -1680,7 +1683,7 @@
                                                 <div class="doughnut-chart">
                                                     <h4>Composição das Avarias</h4>
 
-                                                    <div class="flex-box-start">
+                                                    <div class="flex-box-center">
                                                         <div>
                                                             <canvas id="damageCompositionChart" role="img" aria-label="Composição das avarias entre sólidas, líquidas e de vidro"></canvas>
                                                         </div>
@@ -2167,25 +2170,26 @@
                                     <div class="flex-box-start">
                                         <div class="doughnut-chart">
                                             <h3>Cobertura da Varredura</h3>
-
                                             <div>
-                                                <canvas id="" role="img"></canvas>
-                                            </div>
-
-                                            <div>
-                                                <div class="type">
-                                                    <div style="background-color: #3F51B5;"></div>
-                                                    <p>Escaneados <span id="">—</span></p>
+                                                <div>
+                                                    <canvas id="" role="img"></canvas>
                                                 </div>
 
-                                                <div class="type">
-                                                    <div style="background-color: #e4e6eb;"></div>
-                                                    <p>Não Escaneados <span id="">—</span></p>
+                                                <div>
+                                                    <div class="type">
+                                                        <div style="background-color: #3F51B5;"></div>
+                                                        <p>Escaneados <span id="">—</span></p>
+                                                    </div>
+
+                                                    <div class="type">
+                                                        <div style="background-color: #e4e6eb;"></div>
+                                                        <p>Não Escaneados <span id="">—</span></p>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div>
+                                        <div class="distribution-by-operator">
                                             <table>
                                                 <caption>Distruição por Operador</caption>
 

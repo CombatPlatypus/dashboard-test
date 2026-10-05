@@ -320,7 +320,7 @@
     /* GRAFICOS - ROSCA */
 
     #reports .doughnut-chart {
-        padding: 15px;
+        padding: 25px;
         background-color: var(--color-container);
         border: 1px solid var(--color-border);
     }
@@ -333,7 +333,7 @@
     }
     #reports .doughnut-chart > div > div:last-of-type {
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
         gap: 20px;
     }
     #reports .doughnut-chart > h3 {
@@ -578,7 +578,7 @@
         grid-template-columns: repeat(auto-fit, minmax(299px, 1fr));
     }
     #damage-and-losses .doughnut-chart > div > div:first-child {
-        flex: 0 0 300px;
+        flex: 1 1 0px;
         min-width: 0;
         height: 270px;
     }
