@@ -206,7 +206,7 @@
 
     #reports .horizontal-bars-chart {
         width: 100%;
-        padding: 20px;
+        padding: 25px;
         background-color: var(--color-container);
         border: 1px solid var(--color-border);
     }
