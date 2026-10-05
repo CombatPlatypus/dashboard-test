@@ -150,6 +150,20 @@ const parcelAgingValueLabels = {
     },
 };
 
+const parcelAgingTextSpacing = {
+    id: "parcelAgingTextSpacing",
+
+    beforeLayout(chart) {
+        if ("letterSpacing" in chart.ctx) {
+            chart.ctx.letterSpacing = "1px";
+        }
+    },
+
+    beforeDraw(chart) {
+        this.beforeLayout(chart);
+    },
+};
+
 function createParcelCoverageChart(
     canvas,
 ) {
@@ -254,6 +268,7 @@ function createParcelAgingChart(
                 }],
             },
             plugins: [
+                parcelAgingTextSpacing,
                 parcelAgingValueLabels,
             ],
             options: {
@@ -296,9 +311,9 @@ function createParcelAgingChart(
                             display: false,
                         },
                         ticks: {
-                            color: "#b7b7b7",
+                            color: "#a8a9ad",
                             font: {
-                                size: 11,
+                                size: 14,
                             },
                         },
                     },
