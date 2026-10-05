@@ -2469,6 +2469,23 @@
                                             <option value="all">Todas as Linhas</option>
                                         </select>
 
+                                        <div class="columns no-file">
+                                            <div>
+                                                <h4>Lista de Colunas</h4>
+
+                                                <div>
+                                                    <button class="button" id="analysisShowAllColumns" type="button" data-analysis-requires-data disabled>Marcar todas</button>
+                                                    <button class="button" id="analysisHideAllColumns" type="button" data-analysis-requires-data disabled>Desmarcar todas</button>
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <div id="analysisVisibleColumns" aria-live="polite"></div>
+                                            </div>
+                                        </div>
+
+
+                                        
                                         <div class="filters">
 
                                             <!-- SELETOR DE COLUNAS -->
@@ -2512,26 +2529,6 @@
                                             </div>
                                         </div>
 
-                                        <div class="columns no-file">
-                                            <div>
-                                                <h4>Lista de Colunas</h4>
-
-                                                <div>
-                                                    <button class="button" id="analysisShowAllColumns" type="button" data-analysis-requires-data disabled>Marcar todas</button>
-                                                    <button class="button" id="analysisHideAllColumns" type="button" data-analysis-requires-data disabled>Desmarcar todas</button>
-                                                </div>
-                                            </div>
-
-
-
-
-                                            
-                                            <div>
-
-                                                <div id="analysisVisibleColumns" aria-live="polite"></div>
-
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
 

@@ -72,11 +72,16 @@
 #analysis .title h4 {
     margin: 0;
 }
+#analysis .columns > div:last-of-type {
+    padding: 20px;
+    background-color: var(--color-container);
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+}
 #analysis .columns > div:first-of-type > div {
     display: flex;
-    gap: 5px;
+    gap: 10px;
     padding-bottom: 15px;
-    border-bottom: 2px solid var(--color-border);
 }
 #analysis .no-file > div:first-of-type > div {
     padding: 0 !important;
