@@ -56,6 +56,14 @@ const EXPEDITION_IMPORT_NOTIFICATION =
             "No SPX, acesse Gestão Audit / Conferência: LM Hub AT/TO, escolha uma tarefa para exportar e, em seguida, volte aqui e clique em importar.",
     });
 
+const PARCEL_IMPORT_NOTIFICATION =
+    Object.freeze({
+        type: "idle",
+
+        message:
+            "No SPX, acesse Parcel Sweeper / Parcel Sweeper View, escolha uma parcel para exportar e, em seguida, volte aqui e clique em importar.",
+    });
+
 const OVERALL_ANALYSIS_NOTIFICATION =
     Object.freeze({
         type: "idle",
@@ -75,6 +83,9 @@ const DEFAULT_REPORT_NOTIFICATIONS =
         expedition:
             EXPEDITION_IMPORT_NOTIFICATION,
 
+        parcel:
+            PARCEL_IMPORT_NOTIFICATION,
+
         "damage-and-losses":
             DAMAGE_AND_LOSSES_IMPORT_NOTIFICATION,
 
@@ -93,6 +104,7 @@ const REPORT_NOTIFICATION_PREFIXES =
         planning: "planning",
         receipt: "receipt",
         expedition: "expedition",
+        parcel: "parcel",
         "damage-and-losses":
             "damageAndLosses",
         "losses-rate": "lossesRate",

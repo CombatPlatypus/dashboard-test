@@ -45,6 +45,10 @@
             #reports #parcel #parcelPreview > .flex-box-start > div {
                 flex: 1 1 0;
             }
+            #reports #parcel .doughnut-chart > .flex-box-center > div:first-child {
+                flex: 0 0 270px;
+                width: 270px;
+            }
 
 
 
@@ -2084,7 +2088,7 @@
                             <!-- BARRA DE NOTIFICAÇÕES E BOTÕES DE AÇÃO -->
 
                             <div class="flex-box-start">
-                                <div class="warning" id="parcelNotification" role="" aria-live="" aria-atomic="" data-notification-type="">
+                                <div class="warning" id="parcelNotification" role="status" aria-live="polite" aria-atomic="true" data-notification-type="idle">
                                     <div class="flex-box-start">
                                         <img id="parcelNotificationIcon" src="images/geral-icons/bell-icon.svg" alt="">
 
@@ -2099,11 +2103,11 @@
                                         <img src="images/geral-icons/image-icon.svg" alt="">
                                     </button>
 
-                                    <button id="parcelImportActionButton" type="button" title="" aria-label="">
+                                    <button id="parcelImportActionButton" type="button" title="Importar dados do Parcel Sweeper" aria-label="Importar arquivo do Parcel Sweeper">
                                         <img src="images/geral-icons/import-icon.svg" alt="">
                                     </button>
 
-                                    <input id="parcelFileInput" type="file" accept=".xlsx,.xls" hidden>
+                                    <input id="parcelFileInput" type="file" accept=".csv,.xlsx,.xls" hidden>
 
                                     <button id="parcelClearReportButton" type="button" title="Limpar relatório" aria-label="Limpar relatório do parcel">
                                         <img src="images/geral-icons/trash-basket-icon.svg" alt="">
@@ -2119,43 +2123,47 @@
                                         <h2>Parcel Sweeper</h2>
                                     </div> 
 
+                                    <!-- CARDS PRINCIAPAIS -->
+
                                     <div class="cards">
                                         <div>
                                             <div class="flex-box-start">
                                                 <img src="images/geral-icons/barcode-scanner-icon.svg">
-                                                <h4 id="">—</h4>
+                                                <h4 id="parcelTotalScanned">—</h4>
                                             </div>
 
-                                            <p id="">Total de Bipado</p>
+                                            <p>Total de Bipado</p>
                                         </div>
 
                                         <div>
                                             <div class="flex-box-start">
                                                 <img src="images/geral-icons/box-icon.svg">
-                                                <h4 id="">—</h4>
+                                                <h4 id="parcelBacklogTotal">—</h4>
                                             </div>
 
-                                            <p id="">Pacotes Backlog</p>
+                                            <p>Pacotes Backlog</p>
                                         </div>
 
                                         <div>
                                             <div class="flex-box-start">
                                                 <img src="images/geral-icons/exception-icon.svg">
-                                                <h4 id="">—</h4>
+                                                <h4 id="parcelExceptionTotal">—</h4>
                                             </div>
 
-                                            <p id="">Pacotes Exception</p>
+                                            <p>Pacotes Exception</p>
                                         </div>
 
                                         <div>
                                             <div class="flex-box-start">
                                                 <img src="images/geral-icons/alert-icon.svg">
-                                                <h4 id="">—</h4>
+                                                <h4 id="parcelUnscannedTotal">—</h4>
                                             </div>
 
-                                            <p id="">Não Escaneados</p>
+                                            <p>Não Escaneados</p>
                                         </div>
                                     </div>
+
+                                    <!-- GRAFICO DE COBERTURA E TABELA DE OPERADORES -->
 
                                     <div class="flex-box-start">
                                         <div class="doughnut-chart" style="flex: 0 0 772px;">
@@ -2163,18 +2171,18 @@
 
                                             <div class="flex-box-center">
                                                 <div>
-                                                    <canvas id="" role="img"></canvas>
+                                                    <canvas id="parcelCoverageChart" role="img" aria-label="Cobertura da varredura entre pacotes escaneados e não escaneados"></canvas>
                                                 </div>
 
                                                 <div>
                                                     <div class="type">
                                                         <div style="background-color: #3F51B5;"></div>
-                                                        <p>Escaneados <span id="">—</span></p>
+                                                        <p>Escaneados <span id="parcelCoverageScanned">—</span></p>
                                                     </div>
 
                                                     <div class="type">
                                                         <div style="background-color: #e4e6eb;"></div>
-                                                        <p>Não Escaneados <span id="">—</span></p>
+                                                        <p>Não Escaneados <span id="parcelCoverageUnscanned">—</span></p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -2182,7 +2190,7 @@
 
                                         <div class="distribution-by-operator">
                                             <table>
-                                                <caption>Distruição por Operador</caption>
+                                                <caption>Distribuição por Operador</caption>
 
                                                 <thead>
                                                     <tr>
@@ -2192,84 +2200,43 @@
                                                     </tr>
                                                 </thead>
 
-                                                <tbody>
-                                                    <tr>
-                                                        <td>—</td>
-                                                        <td>—</td>
-                                                        <td>—</td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td>—</td>
-                                                        <td>—</td>
-                                                        <td>—</td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td>—</td>
-                                                        <td>—</td>
-                                                        <td>—</td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td>—</td>
-                                                        <td>—</td>
-                                                        <td>—</td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td>—</td>
-                                                        <td>—</td>
-                                                        <td>—</td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td>—</td>
-                                                        <td>—</td>
-                                                        <td>—</td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td>—</td>
-                                                        <td>—</td>
-                                                        <td>—</td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td>—</td>
-                                                        <td>—</td>
-                                                        <td>—</td>
+                                                <tbody id="parcelOperatorDistributionBody">
+                                                    <tr class="empty-row">
+                                                        <td colspan="3">—</td>
                                                     </tr>
                                                 </tbody>
                                             </table>
                                         </div>
                                     </div>
 
+                                    <!-- GRAFICO DE AGING -->
+
                                     <div class="vertical-bars-chart">
                                         <div class="chart-title">
                                             <div class="flex-box-between">
-                                                <h4>Distruição por Aging</h4>
+                                                <h4>Distribuição por Aging</h4>
                                             </div>
                                         </div>
 
-                                        <div id="">
+                                        <div id="parcelAgingChartContainer">
                                             <div>
-                                                <canvas id="" role="img"></canvas>
+                                                <canvas id="parcelAgingChart" role="img" aria-label="Quantidade de pacotes escaneados por faixa de aging"></canvas>
                                             </div>
                                         </div>
                                     </div>
 
+                                    <!-- BOTÕES DO BACKLOG -->
 
-                                    <div class="data-selector" id="" role="tablist" aria-label="">
-                                        <button class="is-active" type="button" role="tab" aria-selected="true" disabled>
+                                    <div class="data-selector" id="parcelPackageFilter" role="tablist" aria-label="Filtrar pacotes por tipo de contagem">
+                                        <button class="is-active" type="button" role="tab" aria-selected="true" data-parcel-filter="all" disabled>
                                             <span>Todos os Pacotes</span>
                                         </button>
 
-                                        <button type="button" role="tab" aria-selected="false" disabled>
+                                        <button type="button" role="tab" aria-selected="false" data-parcel-filter="backlog" disabled>
                                             <span>Backlog</span>
                                         </button>
 
-                                        <button type="button" role="tab" aria-selected="false" disabled>
+                                        <button type="button" role="tab" aria-selected="false" data-parcel-filter="exception" disabled>
                                             <span>Exception</span>
                                         </button>
                                     </div>
@@ -2288,10 +2255,9 @@
                                                     </tr>
                                                 </thead>
 
-                                                <tbody>
-                                                    <tr>
-                                                        <td>—</td>
-                                                        <td>—</td>
+                                                <tbody id="parcelCommonPackagesBody">
+                                                    <tr class="empty-row">
+                                                        <td colspan="2">—</td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -2308,10 +2274,9 @@
                                                     </tr>
                                                 </thead>
 
-                                                <tbody>
-                                                    <tr>
-                                                        <td>—</td>
-                                                        <td>—</td>
+                                                <tbody id="parcelBulkyPackagesBody">
+                                                    <tr class="empty-row">
+                                                        <td colspan="2">—</td>
                                                     </tr>
                                                 </tbody>
                                             </table>

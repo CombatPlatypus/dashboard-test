@@ -23,6 +23,10 @@ import {
 } from "./losses-rate/index.js";
 
 import {
+    parcelReport,
+} from "./parcel-sweeper/index.js";
+
+import {
     overallAnalysisReport,
 } from "./overall-analysis/index.js";
 
@@ -70,6 +74,10 @@ function initializeReportsPanel() {
 
     reportManager.register(
         lossesRateReport,
+    );
+
+    reportManager.register(
+        parcelReport,
     );
 
     reportManager.register(
