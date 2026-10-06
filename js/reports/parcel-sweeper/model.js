@@ -152,7 +152,7 @@ function formatParcelOperatorName(value) {
     const shortName = match[2]
         .split(" ")
         .filter(Boolean)
-        .slice(0, 2)
+        .slice(0, 1)
         .map(function (name) {
             const lowercaseName = name.toLocaleLowerCase("pt-BR");
             return lowercaseName.charAt(0).toLocaleUpperCase("pt-BR") +

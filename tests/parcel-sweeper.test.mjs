@@ -81,12 +81,13 @@ function createOperatorRows({
     );
 }
 
-test("exibe código Ops e os dois primeiros nomes com iniciais maiúsculas", () => {
+test("exibe código Ops e somente o primeiro nome com inicial maiúscula", () => {
     const examples = [
-        ["[Ops68017]LUCAS CAMPOS JUNQUEIRA", "[Ops68017] Lucas Campos"],
-        ["  [ops0012]  mARIA   EDUARDA SANTOS  ", "[Ops0012] Maria Eduarda"],
-        ["[Ops26438]JÕAO PEDRO PEREIRA BARROS", "[Ops26438] Jõao Pedro"],
-        ["[OPS3]ÁLVARO ÉRICO SILVA", "[Ops3] Álvaro Érico"],
+        ["[Ops68017]LUCAS CAMPOS JUNQUEIRA", "[Ops68017] Lucas"],
+        ["  [ops0012]  mARIA   EDUARDA SANTOS  ", "[Ops0012] Maria"],
+        ["[Ops26438]JÕAO PEDRO PEREIRA BARROS", "[Ops26438] Jõao"],
+        ["[OPS3]ÁLVARO ÉRICO SILVA", "[Ops3] Álvaro"],
+        ["[Ops85572]LETICIA OLIVEIRA", "[Ops85572] Leticia"],
         ["[Ops4]ANA", "[Ops4] Ana"],
         ["[Ops5]", "[Ops5]"],
         ["operador@empresa.com", "operador@empresa.com"],
@@ -116,7 +117,7 @@ test("abreviar nomes não altera os dados originais nem une operadores distintos
     assert.deepEqual(rows.map(row => row.operator), names);
     assert.deepEqual(summary.operatorStats.map(stat =>
         formatParcelOperatorName(stat.operator),
-    ), ["[Ops10] Lucas Campos", "[Ops20] Lucas Campos"]);
+    ), ["[Ops10] Lucas", "[Ops20] Lucas"]);
     assert.ok(summary.operatorStats.every(stat => stat.count === 1));
 });
 

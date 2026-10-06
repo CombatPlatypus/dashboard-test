@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { readFileSync } from "node:fs";
 import {
     createLossesRateCompositionChart,
     createLossesRateHistoryChart,
@@ -113,7 +114,9 @@ test("troca de mês, restauração e limpeza atualizam a composição sem recria
     class Canvas extends Element {}
     const elements = [new Element("losses-rate"), new Element("lossesRateCompositionMonth"),
         new Element("lossesRateHistoryYear"), new Canvas("lossesRateCompositionChart"),
-        new Canvas("lossesRateHistoryChart")];
+        new Canvas("lossesRateHistoryChart"), new Element("lossesRateCompositionPossibleLosses"),
+        new Element("lossesRateCompositionLost"), new Element("lossesRateCompositionDamage")];
+    const indicatorValues = () => elements.slice(5).map(element => element.textContent);
     const panel = elements[0];
     panel.querySelector = selector => elements.find(element => `#${element.id}` === selector);
     replaceGlobal(t, "HTMLElement", Element);
@@ -141,19 +144,41 @@ test("troca de mês, restauração e limpeza atualizam a composição sem recria
     assert.deepEqual(composition.data.datasets[0].data, [0, 17, 115]);
     assert.equal(composition.options.plugins.lossesRateCenterText.text, "132");
     assert.equal(elements[1].textContent, "Outubro");
+    assert.deepEqual(indicatorValues(), ["115", "0", "17"]);
     setActiveLossesRateMonth(10);
     assert.deepEqual(composition.data.datasets[0].data, [10, 20, 70]);
     assert.equal(composition.options.plugins.lossesRateCenterText.text, "100");
     assert.equal(elements[1].textContent, "Novembro");
+    assert.deepEqual(indicatorValues(), ["70", "10", "20"]);
     setActiveLossesRateMonth(11);
     assert.equal(composition.options.plugins.lossesRateCenterText.text, "0");
+    assert.deepEqual(indicatorValues(), ["0", "0", "0"]);
     setActiveLossesRateMonth(0);
     assert.equal(composition.options.plugins.lossesRateCenterText.text, "—");
+    assert.deepEqual(indicatorValues(), ["—", "—", "—"]);
     restoreLossesRateState({ activeMonth: 9, year: 2026, months });
     assert.equal(composition.options.plugins.lossesRateCenterText.text, "132");
+    assert.deepEqual(indicatorValues(), ["115", "0", "17"]);
+    months[9] = { possibleLosses: 2185, lost: 0 };
+    restoreLossesRateState({ activeMonth: 9, year: 2026, months });
+    assert.deepEqual(indicatorValues(), ["2.185", "0", "—"]);
     resetLossesRateReport();
     assert.deepEqual(composition.data.datasets[0].data, [0, 0, 0]);
     assert.equal(composition.options.plugins.lossesRateCenterText.text, "—");
+    assert.deepEqual(indicatorValues(), ["—", "—", "—"]);
     assert.deepEqual(composition.data.datasets[0].backgroundColor, colors);
     assert.equal(charts.length, 2);
+});
+
+test("indicadores do HTML estão ligados aos três campos com as cores originais", () => {
+    const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
+    const composition = html.match(/<div class="tabs-panel" id="losses-rate">([\s\S]*?)<!-- RELATÓRIO DO PARCEL -->/)[1];
+    for (const [color, label, id] of [
+        ["#8b8d91", "Possíveis Perdas", "lossesRateCompositionPossibleLosses"],
+        ["#d9534f", "Lost", "lossesRateCompositionLost"],
+        ["#f0ad4e", "Avaria", "lossesRateCompositionDamage"],
+    ]) {
+        assert.match(composition, new RegExp(`background-color: ${color};[\\s\\S]*?<p>${label} <span id="${id}">—</span>`));
+        assert.equal(html.split(`id="${id}"`).length - 1, 1);
+    }
 });

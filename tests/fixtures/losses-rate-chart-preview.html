@@ -35,6 +35,20 @@
                     <div class="doughnut-chart">
                         <h3>Composição das Ocorrências — <span id="lossesRateCompositionMonth"></span></h3>
                         <div><canvas id="lossesRateCompositionChart"></canvas></div>
+                        <div>
+                            <div class="type">
+                                <div style="background-color: #8b8d91;"></div>
+                                <p>Possíveis Perdas <span id="lossesRateCompositionPossibleLosses">—</span></p>
+                            </div>
+                            <div class="type">
+                                <div style="background-color: #d9534f;"></div>
+                                <p>Lost <span id="lossesRateCompositionLost">—</span></p>
+                            </div>
+                            <div class="type">
+                                <div style="background-color: #f0ad4e;"></div>
+                                <p>Avaria <span id="lossesRateCompositionDamage">—</span></p>
+                            </div>
+                        </div>
                     </div>
                     <div class="line-chart">
                         <h3>Histórico da Taxa de Perda — <span id="lossesRateHistoryYear"></span></h3>
@@ -48,7 +62,7 @@
     <script src="../../js/libraries/chart.umd.min.js"></script>
     <script src="../../js/libraries/html2canvas.min.js"></script>
     <script type="module">
-        import { initializeLossesRateCharts } from "../../js/reports/losses-rate/charts.js?preview=3d";
+        import { initializeLossesRateCharts } from "../../js/reports/losses-rate/charts.js?preview=3d-indicators";
         import { restoreLossesRateState, resetLossesRateReport } from "../../js/reports/losses-rate/state.js";
         import { createReportImageBlob } from "../../js/reports/export.js";
 

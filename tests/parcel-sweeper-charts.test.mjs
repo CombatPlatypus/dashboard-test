@@ -149,7 +149,7 @@ test("distribuição mantém 8 linhas de 4 células com classificação clicáve
                 assert.deepEqual(row.children.map(cell => cell.textContent), ["-", "-", "-", "-"]);
                 assert.ok(row.children.every(cell => cell.children.length === 0));
             } else {
-                assert.equal(row.children[0].textContent, `[Ops${index + 1}] Operador Teste`);
+                assert.equal(row.children[0].textContent, `[Ops${index + 1}] Operador`);
                 assert.equal(row.children[1].textContent, "20");
                 const button = row.children[3].children[0];
                 assert.equal(button.tag, "button");
@@ -157,7 +157,7 @@ test("distribuição mantém 8 linhas de 4 células com classificação clicáve
                 assert.equal(button.textContent, index % 2 === 0 ? "Não" : "Sim");
                 assert.equal(button.dataset.parcelOperatorKey, operators[index].operator.toLowerCase());
                 assert.equal(button.attributes["aria-pressed"], String(index % 2 !== 0));
-                assert.equal(button.attributes["aria-label"], `Volumoso? [Ops${index + 1}] Operador Teste`);
+                assert.equal(button.attributes["aria-label"], `Volumoso? [Ops${index + 1}] Operador`);
             }
         });
     }

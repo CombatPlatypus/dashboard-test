@@ -20,6 +20,8 @@ let lossesRateHistoryChart =
 let lossesRateCompositionMonthElement =
     null;
 
+let lossesRateCompositionIndicators = {};
+
 let lossesRateHistoryYearElement =
     null;
 
@@ -655,6 +657,19 @@ function updateLossesRateCompositionChart(
                 );
     lossesRateCompositionChart.update();
 
+    Object.entries(lossesRateCompositionIndicators).forEach(
+        function ([field, element]) {
+            if (!(element instanceof HTMLElement)) {
+                return;
+            }
+
+            const quantity = summary[field];
+            element.textContent = quantity === null || quantity === undefined
+                ? "—"
+                : lossesRateChartIntegerFormatter.format(quantity);
+        },
+    );
+
     lossesRateCompositionMonthElement
         .textContent =
         LOSSES_RATE_MONTHS[
@@ -849,6 +864,18 @@ function initializeLossesRateCharts(
         rootElement.querySelector(
             "#lossesRateHistoryYear",
         );
+
+    lossesRateCompositionIndicators = {
+        possibleLosses: rootElement.querySelector(
+            "#lossesRateCompositionPossibleLosses",
+        ),
+        lost: rootElement.querySelector(
+            "#lossesRateCompositionLost",
+        ),
+        damage: rootElement.querySelector(
+            "#lossesRateCompositionDamage",
+        ),
+    };
 
     if (
         !(compositionCanvas instanceof HTMLCanvasElement) ||
