@@ -103,6 +103,38 @@ const FILTER_PURPOSES =
                     ]),
             }),
 
+        "export-errors":
+            Object.freeze({
+                label:
+                    "Export Erros",
+
+                sourceType:
+                    "file",
+
+                supportedExtensions:
+                    Object.freeze([
+                        "csv",
+                    ]),
+
+                filterColumn:
+                    "SPX Tracking Number",
+
+                outputSuffix:
+                    "export-erros",
+
+                columns:
+                    Object.freeze([
+                        "SPX Tracking Number",
+                        "Operator",
+                    ]),
+
+                requiredColumns:
+                    Object.freeze([
+                        "SPX Tracking Number",
+                        "Operator",
+                    ]),
+            }),
+
         "export-damage":
             Object.freeze({
                 label:
@@ -778,6 +810,16 @@ function syncImportButton() {
 
     elements.importButton.disabled =
         !purpose;
+
+    elements.fileInput.accept =
+        (
+            purpose?.supportedExtensions ??
+            Array.from(SUPPORTED_EXTENSIONS)
+        )
+            .map(function (extension) {
+                return `.${extension}`;
+            })
+            .join(",");
 }
 
 function clearImportedSource() {
@@ -829,10 +871,26 @@ async function readWorkbook(file) {
     const fileData =
         await file.arrayBuffer();
 
+    let workbookData = fileData;
+    let workbookType = "array";
+
+    if (getFileExtension(file.name) === "csv") {
+        try {
+            // A leitura binária altera acentos em CSV UTF-8 sem BOM.
+            workbookData =
+                new TextDecoder("utf-8", { fatal: true })
+                    .decode(fileData);
+            workbookType = "string";
+        } catch {
+            // Preserva a leitura original para codificações antigas.
+        }
+    }
+
     const workbook =
         window.XLSX.read(
-            fileData,
+            workbookData,
             {
+                type: workbookType,
                 cellDates: true,
                 cellFormula: false,
             },
@@ -972,7 +1030,7 @@ async function importFile(file) {
     }
 
     setNotification(
-        `Lendo "${file.name}"...`,
+        "Lendo arquivo...",
         "info",
     );
 
@@ -980,6 +1038,17 @@ async function importFile(file) {
         true;
 
     try {
+        if (
+            purpose.supportedExtensions &&
+            !purpose.supportedExtensions.includes(
+                getFileExtension(file.name),
+            )
+        ) {
+            throw new Error(
+                `Selecione um arquivo ${purpose.supportedExtensions.join(", ").toUpperCase()} para ${purpose.label}.`,
+            );
+        }
+
         const workbook =
             await readWorkbook(file);
 
@@ -1032,7 +1101,7 @@ async function importFile(file) {
         elements.values.focus();
 
         setNotification(
-            `Arquivo "${file.name}" importado. Cole um Código BR por linha para filtrar a aba "${compatibleSheet.sheetName}".`,
+            "Arquivo importado. Cole um código BR por linha para filtrar.",
             "success",
         );
     } catch (error) {
@@ -1658,7 +1727,7 @@ function filterRows() {
 
     const duplicateMessage =
         duplicateCount > 0
-            ? ` ${duplicateCount} valor(es) repetido(s) foram considerados uma única vez.`
+            ? ` ${duplicateCount} repetido(s) ignorado(s).`
             : "";
 
     if (matchedRows.length === 0) {
@@ -1672,11 +1741,11 @@ function filterRows() {
 
     const unmatchedMessage =
         unmatchedValues.length > 0
-            ? ` ${unmatchedValues.length} valor(es) não foram encontrados.`
+            ? ` ${unmatchedValues.length} não encontrado(s).`
             : "";
 
     setNotification(
-        `Filtragem concluída com ${matchedRows.length} linha(s).${unmatchedMessage}${duplicateMessage}`,
+        `Filtragem concluída: ${matchedRows.length} linha(s).${unmatchedMessage}${duplicateMessage}`,
         unmatchedValues.length > 0
             ? "warning"
             : "success",
@@ -1931,7 +2000,7 @@ function saveFilteredFile() {
     );
 
     setNotification(
-        `Arquivo "${fileName}" salvo com ${filterState.resultRows.length} linha(s) filtrada(s).`,
+        `CSV salvo com ${filterState.resultRows.length} linha(s) filtrada(s).`,
         "success",
     );
 }
