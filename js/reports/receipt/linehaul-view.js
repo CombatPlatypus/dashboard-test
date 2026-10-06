@@ -85,6 +85,18 @@ function getReceiptLinehaulElements(
                 "receiptLinehaulPreviewExpected",
             ),
 
+        previewRemainingVolume:
+            getReceiptLinehaulElement(
+                rootElement,
+                "receiptLinehaulPreviewRemainingVolume",
+            ),
+
+        previewVolumeLabel:
+            getReceiptLinehaulElement(
+                rootElement,
+                "receiptLinehaulPreviewVolumeLabel",
+            ),
+
         previewUnloadedVolume:
             getReceiptLinehaulElement(
                 rootElement,
@@ -686,6 +698,21 @@ function renderReceiptLinehaulSummary(
                     summary.unloadedVolume,
                 )
                 : "—";
+
+    elements.previewRemainingVolume
+        .textContent =
+            hasData
+                ? formatReceiptLinehaulQuantity(
+                    summary.allLinehaulsUnloaded
+                        ? summary.unloadedVolume
+                        : summary.remainingVolume,
+                )
+                : "—";
+
+    elements.previewVolumeLabel.textContent =
+        summary.allLinehaulsUnloaded
+            ? "Volume Descarregado"
+            : "Volume Restante";
 
     elements.previewUnloadedCount
         .textContent =

@@ -222,42 +222,43 @@ function getReceiptLinehaulSummary(
             },
         );
 
+    const activeLinehauls =
+        linehauls.filter(
+            function (linehaul) {
+                return Boolean(linehaul.code) ||
+                    linehaul.loadedOrders !== null;
+            },
+        );
+
+    const unloadedVolume =
+        selectedLinehauls.reduce(
+            function (total, linehaul) {
+                return total +
+                    (linehaul.loadedOrders ?? 0);
+            },
+            0,
+        );
+
+    const remainingVolume =
+        Number.isSafeInteger(state.expectedVolume) &&
+        state.expectedVolume >= 0
+            ? Math.max(state.expectedVolume - unloadedVolume, 0)
+            : null;
+
     return {
-        hasData:
-            linehauls.some(
-                function (linehaul) {
-                    return (
-                        Boolean(
-                            linehaul.code,
-                        ) ||
-                        linehaul.loadedOrders !==
-                            null
-                    );
-                },
-            ),
+        hasData: activeLinehauls.length > 0,
+
+        allLinehaulsUnloaded:
+            activeLinehauls.length > 0 &&
+            activeLinehauls.every(linehaul => linehaul.selected === true),
 
         selectedLinehauls,
 
         unloadedCount:
             selectedLinehauls.length,
 
-        unloadedVolume:
-            selectedLinehauls.reduce(
-                function (
-                    total,
-                    linehaul,
-                ) {
-                    return (
-                        total +
-                        (
-                            linehaul
-                                .loadedOrders ??
-                            0
-                        )
-                    );
-                },
-                0,
-            ),
+        unloadedVolume,
+        remainingVolume,
     };
 }
 
