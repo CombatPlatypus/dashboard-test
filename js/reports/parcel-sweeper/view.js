@@ -17,6 +17,8 @@ import {
     toggleParcelPackageSort,
 } from "./table-sort.js";
 
+import { bindParcelPackageCopyButton } from "./package-copy.js";
+
 const parcelIntegerFormatter =
     new Intl.NumberFormat(
         "pt-BR",
@@ -220,7 +222,13 @@ function renderParcelPackageTable(
     rows,
     sort,
 ) {
-    body.closest("table").querySelectorAll("[data-parcel-sort]").forEach(button => {
+    const table = body.closest("table");
+    const copyButton = table.querySelector("[data-parcel-copy]");
+    if (copyButton instanceof HTMLButtonElement) {
+        copyButton.disabled = copyButton.dataset.parcelCopyBusy === "true" || rows.length === 0;
+    }
+
+    table.querySelectorAll("[data-parcel-sort]").forEach(button => {
         const isSorted = sort?.column === button.dataset.parcelSort;
         const direction = isSorted ? sort.direction : null;
         button.closest("th").setAttribute("aria-sort",
@@ -527,6 +535,11 @@ function initializeParcelView(
                 parcelPackageSorts[kind], button.dataset.parcelSort);
             renderParcelView();
         });
+
+        bindParcelPackageCopyButton(
+            table.querySelector("[data-parcel-copy]"), body,
+            kind === "common" ? "pacotes comuns" : "pacotes volumosos",
+        );
     });
 
     return renderParcelView(

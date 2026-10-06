@@ -144,6 +144,15 @@
                 background-color: var(--color-table-th);
             }
 
+            caption .flex-box-start {
+                gap: 10px;
+                width: max-content;
+            }
+            caption .flex-box-start button img {
+                width: 20px;
+                cursor: pointer;
+            }
+
             /*  */
 
             #parcel .flex-box-start > .parcel-horizontal-chart-canvas {
@@ -2157,7 +2166,7 @@
                                         <img id="parcelNotificationIcon" src="images/geral-icons/bell-icon.svg" alt="">
 
                                         <h4 id="parcelNotificationText">
-                                            No SPX, acesse Parcel Sweeper / Parcel Sweeper View, escolha uma parcel para exportar e, em seguida, volte aqui e clique em importar.
+                                            No SPX, acesse Parcel Sweeper / Parcel Sweeper View, escolha um arquivo parcel para exportar e, em seguida, volte aqui e clique em importar.
                                         </h4>
                                     </div>
                                 </div>
@@ -2210,7 +2219,7 @@
 
                                         <div>
                                             <div class="flex-box-start">
-                                                <img src="images/geral-icons/exception-icon.svg">
+                                                <img src="images/geral-icons/error-icon.svg">
                                                 <h4 id="parcelExceptionTotal">—</h4>
                                             </div>
 
@@ -2315,12 +2324,12 @@
                                         <div>
                                             <table id="parcelCommonPackagesTable">
                                                 <caption>
-                                                    <div class="flex-box-between">
+                                                    <div class="flex-box-start">
 
                                                         <span>Pacotes Comuns</span>
 
-                                                        <button id="">
-                                                            <img src="images/geral-icons/copy-mini-icon.svg">
+                                                        <button id="parcelCopyCommonPackagesButton" type="button" data-parcel-copy="common" title="Copiar BRs de pacotes comuns" aria-label="Copiar BRs de pacotes comuns" disabled>
+                                                            <img src="images/geral-icons/copy-mini-icon.svg" alt="">
                                                         </button>
                                                     </div>
                                                 </caption>
@@ -2351,11 +2360,11 @@
                                         <div>
                                             <table id="parcelBulkyPackagesTable">
                                                 <caption>
-                                                    <div class="flex-box-between">
+                                                    <div class="flex-box-start">
                                                         <span>Pacotes Volumosos</span>
                                                         
-                                                        <button id="">
-                                                            <img src="images/geral-icons/copy-mini-icon.svg">
+                                                        <button id="parcelCopyBulkyPackagesButton" type="button" data-parcel-copy="bulky" title="Copiar BRs de pacotes volumosos" aria-label="Copiar BRs de pacotes volumosos" disabled>
+                                                            <img src="images/geral-icons/copy-mini-icon.svg" alt="">
                                                         </button>
                                                     </div>
                                                 </caption>

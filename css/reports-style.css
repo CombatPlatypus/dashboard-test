@@ -665,10 +665,6 @@
         width: 100% !important;
         height: 100% !important;
     }
-    #damage-and-losses .doughnut-chart .type span {
-        color: var(--color-text);
-        font-weight: 600;
-    }
     #damage-and-losses #damageLastSevenDaysChartContainer {
         min-height: 0;
         height: auto;
