@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Teste da cópia de BRs — dados fictícios</title>
+    <link rel="stylesheet" href="../../css/font-face.css">
+    <link rel="stylesheet" href="../../css/reports-style.css">
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 24px; background: #101010; color: #e4e6eb; font: 14px "Open Sans", sans-serif; }
+        button { color: inherit; background: #242424; border: 1px solid #666; padding: 8px 14px; cursor: pointer; }
+        button:disabled { opacity: .45; cursor: default; }
+        #parcelNotification { padding: 14px; border: 1px solid #666; margin: 16px 0; }
+        #parcelNotificationIcon { width: 20px; vertical-align: middle; }
+        #parcelNotificationText { display: inline; }
+        #parcelPackageFilter { margin: 15px 0; }
+        .package-tables { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .table-scroll { max-height: 240px; overflow: auto; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+        caption, th { background: #252525; font-weight: 600; padding: 10px; }
+        td, th { border: 1px solid #666; padding: 10px; text-align: center; }
+        caption > div { display: flex; align-items: center; justify-content: space-between; }
+        caption img { width: 20px; height: 20px; }
+        [hidden] { display: none !important; }
+    </style>
+</head>
+<body>
+    <h1>Prévia técnica — dados fictícios</h1>
+    <button id="loadTest">Reimportar dados fictícios</button>
+    <button id="resetTest">Limpar dados fictícios</button>
+    <main id="reports">
+        <section id="parcel">
+            <div id="parcelNotification" role="status">
+                <img id="parcelNotificationIcon" alt=""><h4 id="parcelNotificationText"></h4>
+            </div>
+            <table>
+                <caption>Distribuição por Operador</caption>
+                <thead><tr><th>Operador</th><th>Quantidade</th><th>Percentual</th><th>Volumoso?</th></tr></thead>
+                <tbody id="parcelOperatorDistributionBody"></tbody>
+            </table>
+            <div id="parcelPackageFilter" role="tablist">
+                <button data-parcel-filter="all" role="tab">Todos os Pacotes</button>
+                <button data-parcel-filter="backlog" role="tab">Backlog</button>
+                <button data-parcel-filter="exception" role="tab">Exception</button>
+            </div>
+            <div class="package-tables">
+                <div class="table-scroll">
+                    <table id="parcelCommonPackagesTable">
+                        <caption><div><span>Pacotes Comuns</span><button id="parcelCopyCommonPackagesButton" type="button" data-parcel-copy="common" title="Copiar BRs de pacotes comuns" aria-label="Copiar BRs de pacotes comuns" disabled><img src="../../images/geral-icons/copy-mini-icon.svg" alt=""></button></div></caption>
+                        <thead><tr>
+                            <th><button data-parcel-sort="operator" aria-label="Ordenar comuns por operador"><span>Operador</span><span class="parcel-sort-indicator">↕</span></button></th>
+                            <th><button data-parcel-sort="trackingNumber" aria-label="Ordenar comuns por BR"><span>Código BR</span><span class="parcel-sort-indicator">↕</span></button></th>
+                        </tr></thead>
+                        <tbody id="parcelCommonPackagesBody"></tbody>
+                    </table>
+                </div>
+                <div class="table-scroll">
+                    <table id="parcelBulkyPackagesTable">
+                        <caption><div><span>Pacotes Volumosos</span><button id="parcelCopyBulkyPackagesButton" type="button" data-parcel-copy="bulky" title="Copiar BRs de pacotes volumosos" aria-label="Copiar BRs de pacotes volumosos" disabled><img src="../../images/geral-icons/copy-mini-icon.svg" alt=""></button></div></caption>
+                        <thead><tr>
+                            <th><button data-parcel-sort="operator" aria-label="Ordenar volumosos por operador"><span>Operador</span><span class="parcel-sort-indicator">↕</span></button></th>
+                            <th><button data-parcel-sort="trackingNumber" aria-label="Ordenar volumosos por BR"><span>Código BR</span><span class="parcel-sort-indicator">↕</span></button></th>
+                        </tr></thead>
+                        <tbody id="parcelBulkyPackagesBody"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div hidden><span id="parcelTotalScanned"></span><span id="parcelBacklogTotal"></span><span id="parcelExceptionTotal"></span><span id="parcelUnscannedTotal"></span><span id="parcelCoverageScanned"></span><span id="parcelCoverageUnscanned"></span></div>
+        </section>
+    </main>
+    <script type="module">
+        import { initializeParcelView } from "../../js/reports/parcel-sweeper/view.js?preview=copy-brs";
+        import { replaceParcelRows, resetParcelReport, toggleParcelOperatorBulky } from "../../js/reports/parcel-sweeper/state.js";
+        import { resetReportNotification } from "../../js/reports/report-notifications.js";
+        initializeParcelView();
+        resetReportNotification("parcel");
+        function loadData() {
+            replaceParcelRows([
+                { operator: "[Ops100]ANA TESTE", trackingNumber: "BR10", countType: "Exception", scannedStatus: "Scanned" },
+                { operator: "[Ops100]ANA TESTE", trackingNumber: "BR2", countType: "Backlog", scannedStatus: "Scanned" },
+                { operator: "[Ops100]ANA TESTE", trackingNumber: "BR1", countType: "Backlog", scannedStatus: "Scanned" },
+                { operator: "[Ops100]ANA TESTE", trackingNumber: "BR20", countType: "Exception", scannedStatus: "Scanned" },
+                { operator: "[Ops200]CAIO TESTE", trackingNumber: "BR8", countType: "Backlog", scannedStatus: "Scanned" },
+                { operator: "[Ops200]CAIO TESTE", trackingNumber: "BR3", countType: "Exception", scannedStatus: "Scanned" },
+                { operator: "[Ops100]ANA TESTE", trackingNumber: "BR997", countType: "Processed", scannedStatus: "Scanned" },
+                { operator: "operador@teste.com", trackingNumber: "BR998", countType: "Backlog", scannedStatus: "Scanned" },
+            ], "dados-ficticios.csv");
+            toggleParcelOperatorBulky("[Ops200]CAIO TESTE");
+        }
+        document.getElementById("loadTest").addEventListener("click", loadData);
+        document.getElementById("resetTest").addEventListener("click", () => {
+            resetParcelReport(); resetReportNotification("parcel");
+        });
+        loadData();
+    </script>
+</body>
+</html>
