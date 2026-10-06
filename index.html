@@ -137,7 +137,7 @@
             #reports #parcel #parcelPreview > .distribution-tables > div::-webkit-scrollbar-track {
                 background-color: transparent;
             }
-            #reports #parcel #parcelPreview > .distribution-tables > div table thead {
+            #reports #parcel #parcelPreview > .distribution-tables > div table div:first-of-type {
                 position: sticky;
                 top: 0;
                 z-index: 1;
@@ -2323,31 +2323,33 @@
                                     <div class="distribution-tables flex-box-start">
                                         <div>
                                             <table id="parcelCommonPackagesTable">
-                                                <caption>
-                                                    <div class="flex-box-start">
+                                                <div>
+                                                    <caption>
+                                                        <div class="flex-box-start">
 
-                                                        <span>Pacotes Comuns</span>
+                                                            <span>Pacotes Comuns</span>
 
-                                                        <button id="parcelCopyCommonPackagesButton" type="button" data-parcel-copy="common" title="Copiar BRs de pacotes comuns" aria-label="Copiar BRs de pacotes comuns" disabled>
-                                                            <img src="images/geral-icons/copy-mini-icon.svg" alt="">
-                                                        </button>
-                                                    </div>
-                                                </caption>
-
-                                                <thead>
-                                                    <tr>
-                                                        <th scope="col" aria-sort="none">
-                                                            <button class="parcel-sort-button" type="button" data-parcel-sort="operator" aria-label="Ordenar pela coluna Operador">
-                                                                <span>Operador</span><span class="parcel-sort-indicator" aria-hidden="true">↕</span>
+                                                            <button id="parcelCopyCommonPackagesButton" type="button" data-parcel-copy="common" title="Copiar BRs de pacotes comuns" aria-label="Copiar BRs de pacotes comuns" disabled>
+                                                                <img src="images/geral-icons/copy-mini-icon.svg" alt="">
                                                             </button>
-                                                        </th>
-                                                        <th scope="col" aria-sort="none">
-                                                            <button class="parcel-sort-button" type="button" data-parcel-sort="trackingNumber" aria-label="Ordenar pela coluna Código BR">
-                                                                <span>Código BR</span><span class="parcel-sort-indicator" aria-hidden="true">↕</span>
-                                                            </button>
-                                                        </th>
-                                                    </tr>
-                                                </thead>
+                                                        </div>
+                                                    </caption>
+
+                                                    <thead>
+                                                        <tr>
+                                                            <th scope="col" aria-sort="none">
+                                                                <button class="parcel-sort-button" type="button" data-parcel-sort="operator" aria-label="Ordenar pela coluna Operador">
+                                                                    <span>Operador</span><span class="parcel-sort-indicator" aria-hidden="true">↕</span>
+                                                                </button>
+                                                            </th>
+                                                            <th scope="col" aria-sort="none">
+                                                                <button class="parcel-sort-button" type="button" data-parcel-sort="trackingNumber" aria-label="Ordenar pela coluna Código BR">
+                                                                    <span>Código BR</span><span class="parcel-sort-indicator" aria-hidden="true">↕</span>
+                                                                </button>
+                                                            </th>
+                                                        </tr>
+                                                    </thead>
+                                                </div>
 
                                                 <tbody id="parcelCommonPackagesBody">
                                                     <tr class="empty-row">
@@ -2359,30 +2361,32 @@
 
                                         <div>
                                             <table id="parcelBulkyPackagesTable">
-                                                <caption>
-                                                    <div class="flex-box-start">
-                                                        <span>Pacotes Volumosos</span>
-                                                        
-                                                        <button id="parcelCopyBulkyPackagesButton" type="button" data-parcel-copy="bulky" title="Copiar BRs de pacotes volumosos" aria-label="Copiar BRs de pacotes volumosos" disabled>
-                                                            <img src="images/geral-icons/copy-mini-icon.svg" alt="">
-                                                        </button>
-                                                    </div>
-                                                </caption>
+                                                <div>
+                                                    <caption>
+                                                        <div class="flex-box-start">
+                                                            <span>Pacotes Volumosos</span>
+                                                            
+                                                            <button id="parcelCopyBulkyPackagesButton" type="button" data-parcel-copy="bulky" title="Copiar BRs de pacotes volumosos" aria-label="Copiar BRs de pacotes volumosos" disabled>
+                                                                <img src="images/geral-icons/copy-mini-icon.svg" alt="">
+                                                            </button>
+                                                        </div>
+                                                    </caption>
 
-                                                <thead>
-                                                    <tr>
-                                                        <th scope="col" aria-sort="none">
-                                                            <button class="parcel-sort-button" type="button" data-parcel-sort="operator" aria-label="Ordenar pela coluna Operador">
-                                                                <span>Operador</span><span class="parcel-sort-indicator" aria-hidden="true">↕</span>
-                                                            </button>
-                                                        </th>
-                                                        <th scope="col" aria-sort="none">
-                                                            <button class="parcel-sort-button" type="button" data-parcel-sort="trackingNumber" aria-label="Ordenar pela coluna Código BR">
-                                                                <span>Código BR</span><span class="parcel-sort-indicator" aria-hidden="true">↕</span>
-                                                            </button>
-                                                        </th>
-                                                    </tr>
-                                                </thead>
+                                                    <thead>
+                                                        <tr>
+                                                            <th scope="col" aria-sort="none">
+                                                                <button class="parcel-sort-button" type="button" data-parcel-sort="operator" aria-label="Ordenar pela coluna Operador">
+                                                                    <span>Operador</span><span class="parcel-sort-indicator" aria-hidden="true">↕</span>
+                                                                </button>
+                                                            </th>
+                                                            <th scope="col" aria-sort="none">
+                                                                <button class="parcel-sort-button" type="button" data-parcel-sort="trackingNumber" aria-label="Ordenar pela coluna Código BR">
+                                                                    <span>Código BR</span><span class="parcel-sort-indicator" aria-hidden="true">↕</span>
+                                                                </button>
+                                                            </th>
+                                                        </tr>
+                                                    </thead>
+                                                </div>
 
                                                 <tbody id="parcelBulkyPackagesBody">
                                                     <tr class="empty-row">
