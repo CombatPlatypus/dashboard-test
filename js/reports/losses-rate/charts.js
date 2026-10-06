@@ -49,6 +49,15 @@ const lossesRateChartPercentageFormatter =
         },
     );
 
+const lossesRateCompositionPercentageFormatter =
+    new Intl.NumberFormat(
+        "pt-BR",
+        {
+            style: "percent",
+            maximumFractionDigits: 0,
+        },
+    );
+
 /* PROJEÇÃO 3D DA COMPOSIÇÃO */
 
 const lossesRateCompositionProjection = {
@@ -664,9 +673,16 @@ function updateLossesRateCompositionChart(
             }
 
             const quantity = summary[field];
-            element.textContent = quantity === null || quantity === undefined
-                ? "—"
-                : lossesRateChartIntegerFormatter.format(quantity);
+            if (quantity === null || quantity === undefined) {
+                element.textContent = "—";
+                return;
+            }
+
+            const percentage = compositionTotal > 0
+                ? quantity / compositionTotal
+                : 0;
+            element.textContent = `${lossesRateChartIntegerFormatter.format(quantity)} ` +
+                `(${lossesRateCompositionPercentageFormatter.format(percentage)})`;
         },
     );
 

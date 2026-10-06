@@ -35,6 +35,21 @@ const parcelPercentageFormatter =
         },
     );
 
+const parcelCoveragePercentageFormatter =
+    new Intl.NumberFormat("pt-BR", {
+        style: "percent",
+        maximumFractionDigits: 0,
+    });
+
+function formatParcelCoverageMetric(quantity, total) {
+    if (total <= 0) {
+        return "—";
+    }
+
+    return `${parcelIntegerFormatter.format(quantity)} ` +
+        `(${parcelCoveragePercentageFormatter.format(quantity / total)})`;
+}
+
 let parcelViewElements = null;
 const parcelPackageSorts = { common: null, bulky: null };
 
@@ -370,15 +385,17 @@ function renderParcelView(
     parcelViewElements
         .coverageScanned
         .textContent =
-            formatMetric(
+            formatParcelCoverageMetric(
                 summary.scannedCount,
+                summary.totalRows,
             );
 
     parcelViewElements
         .coverageUnscanned
         .textContent =
-            formatMetric(
+            formatParcelCoverageMetric(
                 summary.unscannedCount,
+                summary.totalRows,
             );
 
     renderParcelOperatorTable(
@@ -524,6 +541,7 @@ function initializeParcelView(
 }
 
 export {
+    formatParcelCoverageMetric,
     initializeParcelView,
     renderParcelOperatorTable,
     renderParcelView,

@@ -11,7 +11,7 @@ import {
     createParcelAgingChart,
     createParcelCoverageChart,
 } from "../js/reports/parcel-sweeper/charts.js";
-import { renderParcelOperatorTable } from "../js/reports/parcel-sweeper/view.js";
+import { formatParcelCoverageMetric, renderParcelOperatorTable } from "../js/reports/parcel-sweeper/view.js";
 
 function createCanvasContext() {
     const context = { ellipses: [], fills: 0, texts: [], balance: 0 };
@@ -33,6 +33,16 @@ function replaceGlobal(t, name, value) {
         else delete globalThis[name];
     });
 }
+
+test("indicadores de cobertura mostram quantidade e percentual sobre o total importado", () => {
+    for (const [quantity, total, expected] of [
+        [1606, 1988, "1.606 (81%)"], [382, 1988, "382 (19%)"],
+        [200, 300, "200 (67%)"], [100, 300, "100 (33%)"],
+        [0, 300, "0 (0%)"], [300, 300, "300 (100%)"], [0, 0, "—"],
+    ]) {
+        assert.equal(formatParcelCoverageMetric(quantity, total), expected);
+    }
+});
 
 test("fatias 3D preservam a proporção real, inclusive 0% e 100%", () => {
     for (const scanned of [0, 1, 50, 67, 99, 100]) {

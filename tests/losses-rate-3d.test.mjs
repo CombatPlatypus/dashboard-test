@@ -144,24 +144,28 @@ test("troca de mês, restauração e limpeza atualizam a composição sem recria
     assert.deepEqual(composition.data.datasets[0].data, [0, 17, 115]);
     assert.equal(composition.options.plugins.lossesRateCenterText.text, "132");
     assert.equal(elements[1].textContent, "Outubro");
-    assert.deepEqual(indicatorValues(), ["115", "0", "17"]);
+    assert.deepEqual(indicatorValues(), ["115 (87%)", "0 (0%)", "17 (13%)"]);
     setActiveLossesRateMonth(10);
     assert.deepEqual(composition.data.datasets[0].data, [10, 20, 70]);
     assert.equal(composition.options.plugins.lossesRateCenterText.text, "100");
     assert.equal(elements[1].textContent, "Novembro");
-    assert.deepEqual(indicatorValues(), ["70", "10", "20"]);
+    assert.deepEqual(indicatorValues(), ["70 (70%)", "10 (10%)", "20 (20%)"]);
     setActiveLossesRateMonth(11);
     assert.equal(composition.options.plugins.lossesRateCenterText.text, "0");
-    assert.deepEqual(indicatorValues(), ["0", "0", "0"]);
+    assert.deepEqual(indicatorValues(), ["0 (0%)", "0 (0%)", "0 (0%)"]);
     setActiveLossesRateMonth(0);
     assert.equal(composition.options.plugins.lossesRateCenterText.text, "—");
     assert.deepEqual(indicatorValues(), ["—", "—", "—"]);
     restoreLossesRateState({ activeMonth: 9, year: 2026, months });
     assert.equal(composition.options.plugins.lossesRateCenterText.text, "132");
-    assert.deepEqual(indicatorValues(), ["115", "0", "17"]);
+    assert.deepEqual(indicatorValues(), ["115 (87%)", "0 (0%)", "17 (13%)"]);
     months[9] = { possibleLosses: 2185, lost: 0 };
     restoreLossesRateState({ activeMonth: 9, year: 2026, months });
-    assert.deepEqual(indicatorValues(), ["2.185", "0", "—"]);
+    assert.deepEqual(indicatorValues(), ["2.185 (100%)", "0 (0%)", "—"]);
+    months[9] = { moved: 100000, possibleLosses: 200, lost: 127, damage: 7 };
+    restoreLossesRateState({ activeMonth: 9, year: 2026, months });
+    assert.equal(composition.options.plugins.lossesRateCenterText.text, "334");
+    assert.deepEqual(indicatorValues(), ["200 (60%)", "127 (38%)", "7 (2%)"]);
     resetLossesRateReport();
     assert.deepEqual(composition.data.datasets[0].data, [0, 0, 0]);
     assert.equal(composition.options.plugins.lossesRateCenterText.text, "—");
@@ -178,7 +182,7 @@ test("indicadores do HTML estão ligados aos três campos com as cores originais
         ["#d9534f", "Lost", "lossesRateCompositionLost"],
         ["#f0ad4e", "Avaria", "lossesRateCompositionDamage"],
     ]) {
-        assert.match(composition, new RegExp(`background-color: ${color};[\\s\\S]*?<p>${label} <span id="${id}">—</span>`));
+        assert.match(composition, new RegExp(`background-color: ${color};[\\s\\S]*?<p>${label} - <span id="${id}">—</span>`));
         assert.equal(html.split(`id="${id}"`).length - 1, 1);
     }
 });
