@@ -225,6 +225,10 @@ function getOverallDamageAndLossesAnalysis(
     const lossesHasData =
         lossesSummary.hasData;
 
+    const returnedHasData =
+        lossesHasData ||
+        lossesSummary.returnedPackages > 0;
+
     const traditionalAnalysis = {};
 
     OVERALL_ANALYSIS_PERIOD_KEYS
@@ -266,6 +270,12 @@ function getOverallDamageAndLossesAnalysis(
                             ? lossesPeriod
                                 ?.confirmedLosses ?? 0
                             : null,
+
+                    returnedPackages:
+                        returnedHasData
+                            ? lossesPeriod
+                                ?.returnedPackages ?? 0
+                            : null,
                 };
             },
         );
@@ -273,7 +283,7 @@ function getOverallDamageAndLossesAnalysis(
     return {
         hasData:
             damageHasData ||
-            lossesHasData,
+            returnedHasData,
 
         damageHasData,
         lossesHasData,

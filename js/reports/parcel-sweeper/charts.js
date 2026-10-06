@@ -403,7 +403,7 @@ function updateParcelCharts(
     const horizontalHeight = getParcelHorizontalChartHeight(Math.max(
         summary.finalStatusDistribution.length, summary.nextStepActionDistribution.length));
     updateParcelHorizontalChart(parcelFinalStatusChart, summary.finalStatusDistribution, {
-        title: "Quantidade de pacotes por Final Status", color: "#42A5F5", height: horizontalHeight,
+        title: "Quantidade de pacotes por Final Status", color: "#3F51B5", height: horizontalHeight,
     });
     updateParcelHorizontalChart(parcelNextStepActionChart, summary.nextStepActionDistribution, {
         title: "Quantidade de pacotes por Next Step Action", color: "#3F51B5", height: horizontalHeight,
@@ -517,7 +517,7 @@ function initializeParcelCharts(
         createParcelAgingChart(
             agingCanvas,
         );
-    parcelFinalStatusChart = createParcelHorizontalChart(finalStatusCanvas, "#42A5F5");
+    parcelFinalStatusChart = createParcelHorizontalChart(finalStatusCanvas, "#3F51B5");
     parcelNextStepActionChart = createParcelHorizontalChart(nextStepActionCanvas, "#3F51B5");
 
     subscribeParcelState(

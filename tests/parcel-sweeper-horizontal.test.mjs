@@ -151,8 +151,10 @@ test("os quatro gráficos inicializam uma vez e atualizam na importação e limp
     ]);
     assert.deepEqual(charts[2].data.labels, ["LMHub_Received", "SOC_Packed"]);
     assert.deepEqual(charts[2].data.datasets[0].data, [2, 1]);
+    assert.deepEqual(charts[2].data.datasets[0].backgroundColor, ["#3F51B5", "#3F51B5"]);
     assert.deepEqual(charts[3].data.labels, ["-", "Process for delivery", "Put in EHA"]);
     assert.deepEqual(charts[3].data.datasets[0].data, [1, 1, 1]);
+    assert.deepEqual(charts[3].data.datasets[0].backgroundColor, ["#a8a9ad", "#3F51B5", "#3F51B5"]);
     resetParcelReport();
     assert.deepEqual(charts[2].data.labels, ["—"]);
     assert.deepEqual(charts[3].data.datasets[0].data, [0]);
