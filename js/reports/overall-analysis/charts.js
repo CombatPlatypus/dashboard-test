@@ -597,7 +597,7 @@ function renderOverallAnalysisCharts(
     updateOverallAnalysisMiniChart(
         overallAnalysisPackagesAnalysisChart,
         packagesAnalysisProgress,
-        "#d9534f",
+        "#f0ad4e",
         updateMode,
     );
 
@@ -706,7 +706,7 @@ function initializeOverallAnalysisCharts(
     overallAnalysisPackagesAnalysisChart =
         createOverallAnalysisMiniChart(
             packagesAnalysisCanvas,
-            "#d9534f",
+            "#f0ad4e",
         );
 
     overallAnalysisLossRateChart =
