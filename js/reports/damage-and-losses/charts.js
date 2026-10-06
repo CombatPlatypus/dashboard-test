@@ -4,6 +4,8 @@ import {
     subscribeDamageAndLossesState,
 } from "./state.js";
 
+import { drawDoughnut3D } from "../core/doughnut-3d.js";
+
 const DAMAGE_SOC_COLOR =
     "#ffc107";
 
@@ -32,8 +34,7 @@ const damageCompositionPercentageFormatter =
         "pt-BR",
         {
             style: "percent",
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
+            maximumFractionDigits: 0,
         },
     );
 
@@ -322,6 +323,26 @@ const damageChartLabelsPlugin = {
     },
 };
 
+const damageCompositionProjection = {
+    id: "damage-composition-3d",
+
+    beforeDatasetDraw(chart, args) {
+        if (args.index !== 0) {
+            return;
+        }
+
+        const dataset = chart.data.datasets[0];
+        chart.$damageCompositionGeometry = drawDoughnut3D({
+            context: chart.ctx,
+            area: chart.chartArea,
+            values: dataset.data,
+            colors: dataset.backgroundColor,
+        });
+
+        return false;
+    },
+};
+
 const damageCompositionCenterPlugin = {
     id: "damageCompositionCenter",
 
@@ -330,24 +351,18 @@ const damageCompositionCenterPlugin = {
         args,
         options,
     ) {
-        const chartArea =
-            chart.chartArea;
+        const geometry =
+            chart.$damageCompositionGeometry;
 
-        if (!chartArea) {
+        if (!geometry) {
             return;
         }
 
         const centerX =
-            (
-                chartArea.left +
-                chartArea.right
-            ) / 2;
+            geometry.centerX;
 
         const centerY =
-            (
-                chartArea.top +
-                chartArea.bottom
-            ) / 2;
+            geometry.textCenterY;
 
         const context =
             chart.ctx;
@@ -391,114 +406,6 @@ const damageCompositionCenterPlugin = {
                 "Classificadas",
             centerX,
             centerY + 16,
-        );
-
-        context.restore();
-    },
-};
-
-const damageCompositionLabelsPlugin = {
-    id: "damageCompositionLabels",
-
-    afterDatasetsDraw(chart) {
-        const dataset =
-            chart.data.datasets[0];
-
-        const metadata =
-            chart.getDatasetMeta(0);
-
-        const total =
-            dataset.data.reduce(
-                function (sum, item) {
-                    return sum +
-                        (
-                            Number(item) ||
-                            0
-                        );
-                },
-                0,
-            );
-
-        if (total <= 0) {
-            return;
-        }
-
-        const context = chart.ctx;
-
-        context.save();
-        context.font =
-            '400 12px "Open Sans", sans-serif';
-        context.textBaseline = "middle";
-        context.textAlign = "center";
-        context.lineWidth = 3;
-
-        metadata.data.forEach(
-            function (arc, index) {
-                if (
-                    !chart.getDataVisibility(
-                        index,
-                    )
-                ) {
-                    return;
-                }
-
-                const value =
-                    Number(
-                        dataset.data[index],
-                    );
-
-                if (
-                    !Number.isFinite(value) ||
-                    value <= 0
-                ) {
-                    return;
-                }
-
-                const angle =
-                    (
-                        arc.startAngle +
-                        arc.endAngle
-                    ) / 2;
-
-                const radius =
-                    (
-                        arc.innerRadius +
-                        arc.outerRadius
-                    ) / 2;
-
-                const positionX =
-                    arc.x +
-                    Math.cos(angle) *
-                        radius;
-
-                const positionY =
-                    arc.y +
-                    Math.sin(angle) *
-                        radius;
-
-                const text =
-                    damageCompositionPercentageFormatter
-                        .format(
-                            value / total,
-                        );
-
-                context.strokeStyle =
-                    "#18191a";
-                context.fillStyle =
-                    "#e4e6eb";
-
-                context.strokeText(
-                    text,
-                    positionX,
-                    positionY,
-                );
-
-                context.fillText(
-                    text,
-                    positionX,
-                    positionY,
-                );
-            },
         );
 
         context.restore();
@@ -599,7 +506,6 @@ function createDamageCompositionChart(
                             "transparent",
 
                         borderWidth: 0,
-                        hoverOffset: 5,
                     },
                 ],
             },
@@ -614,15 +520,14 @@ function createDamageCompositionChart(
                         2,
                     ),
 
-                cutout: "64%",
+                cutout: "66%",
+                events: [],
 
                 layout: {
                     padding: 12,
                 },
 
-                animation: {
-                    duration: 350,
-                },
+                animation: false,
 
                 plugins: {
                     legend: {
@@ -631,49 +536,6 @@ function createDamageCompositionChart(
 
                     tooltip: {
                         enabled: false,
-
-                        callbacks: {
-                            label(context) {
-                                const value =
-                                    Number(
-                                        context.raw,
-                                    ) || 0;
-
-                                const total =
-                                    context.dataset
-                                        .data
-                                        .reduce(
-                                            function (
-                                                sum,
-                                                item,
-                                            ) {
-                                                return sum +
-                                                    (
-                                                        Number(
-                                                            item,
-                                                        ) || 0
-                                                    );
-                                            },
-                                            0,
-                                        );
-
-                                const percentage =
-                                    total > 0
-                                        ? value /
-                                            total *
-                                            100
-                                        : 0;
-
-                                return (
-                                    `${context.label}: ` +
-                                    `${damageChartQuantityFormatter.format(value)} ` +
-                                    `(${percentage.toLocaleString("pt-BR", {
-                                        minimumFractionDigits: 1,
-                                        maximumFractionDigits: 1,
-                                    })}%)`
-                                );
-                            },
-                        },
                     },
 
                     damageCompositionCenter: {
@@ -684,8 +546,8 @@ function createDamageCompositionChart(
             },
 
             plugins: [
+                damageCompositionProjection,
                 damageCompositionCenterPlugin,
-                damageCompositionLabelsPlugin,
             ],
         },
     );
@@ -1061,8 +923,10 @@ function renderDamageCompositionValues(
             if (element) {
                 element.textContent =
                     hasComposition
-                        ? damageChartQuantityFormatter
-                            .format(value)
+                        ? `${damageChartQuantityFormatter.format(value)} ` +
+                            `(${damageCompositionPercentageFormatter.format(
+                                value / selectedPeriod.compositionTotal,
+                            )})`
                         : "—";
             }
         },
@@ -1441,6 +1305,7 @@ function initializeDamageAndLossesCharts(
 }
 
 export {
+    createDamageCompositionChart,
     formatDamageSocName,
     initializeDamageAndLossesCharts,
     renderDamageAndLossesCharts,

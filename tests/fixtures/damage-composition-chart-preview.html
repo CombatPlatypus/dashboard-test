@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Teste visual de composição de avarias — dados fictícios</title>
+    <link rel="stylesheet" href="../../css/font-face.css">
+    <link rel="stylesheet" href="../../css/reports-style.css">
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 24px; background: #101010; color: #e4e6eb; font: 14px "Open Sans", sans-serif; }
+        header { margin-bottom: 20px; }
+        button { padding: 10px 18px; margin: 0 8px 8px 0; color: #e4e6eb; background: #242424; border: 1px solid #666; cursor: pointer; }
+        #damagePreview { padding: 20px; border: 1px solid #666; }
+        .composition-layout { display: grid; grid-template-columns: minmax(550px, 3fr) minmax(300px, 2fr); gap: 20px; }
+        #exportPreview { display: block; max-width: 100%; margin-top: 20px; }
+        #exportStatus { min-height: 24px; }
+        [hidden] { display: none !important; }
+        @media (max-width: 1000px) { .composition-layout { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Prévia técnica — dados fictícios</h1>
+        <button id="sampleData">Exemplo: 8 classificadas</button>
+        <button id="singleCategory">Somente avarias líquidas</button>
+        <button id="resetTest">Limpar dados fictícios</button>
+        <button id="generateExport">Gerar imagem</button>
+        <p id="exportStatus" role="status"></p>
+    </header>
+    <main id="reports">
+        <section id="damage-and-losses" class="is-active">
+            <div id="damageChartPeriodSelector">
+                <button data-damage-chart-period="last7">Últimos 7 dias</button>
+                <button data-damage-chart-period="days8to14">De 8 a 14 dias atrás</button>
+                <button data-damage-chart-period="totalMonth">Total do mês</button>
+            </div>
+            <div id="damagePreview">
+                <p id="damageChartPeriodTitle"></p>
+                <div class="composition-layout">
+                    <div class="doughnut-chart">
+                        <h4>Composição das Avarias</h4>
+                        <div><canvas id="damageCompositionChart" role="img" aria-label="Composição das avarias entre sólidas, líquidas e de vidro"></canvas></div>
+                        <div>
+                            <div class="type"><div style="background-color: #F44336;"></div><p>Avarias Sólidas <span id="damageSolidValue">—</span></p></div>
+                            <div class="type"><div style="background-color: #ff9800;"></div><p>Avarias Líquidas <span id="damageLiquidValue">—</span></p></div>
+                            <div class="type"><div style="background-color: #3F51B5;"></div><p>Avarias de Vidro <span id="damageGlassValue">—</span></p></div>
+                        </div>
+                    </div>
+                    <div class="horizontal-bars-chart">
+                        <div class="chart-title"><h4>Avarias por SOC</h4></div>
+                        <div id="damageSocChartContainer" class="damage-soc-chart-container"><canvas id="damageSocChart"></canvas></div>
+                    </div>
+                </div>
+            </div>
+            <div hidden><canvas id="damageLastSevenDaysChart"></canvas></div>
+        </section>
+    </main>
+    <img id="exportPreview" alt="Imagem exportada do relatório de teste" hidden>
+    <script src="../../js/libraries/chart.umd.min.js"></script>
+    <script src="../../js/libraries/html2canvas.min.js"></script>
+    <script type="module">
+        import { initializeDamageAndLossesCharts } from "../../js/reports/damage-and-losses/charts.js?preview=3d";
+        import { replaceDamageAndLossesData, resetDamageAndLossesState } from "../../js/reports/damage-and-losses/state.js";
+        import { createReportImageBlob } from "../../js/reports/export.js";
+
+        initializeDamageAndLossesCharts();
+        function setData(singleCategory = false) {
+            const days = singleCategory
+                ? [{ date: "2026-10-10", hub: 100, liquid: 100 }]
+                : [
+                    { date: "2026-10-01", hub: 16, solid: 8, liquid: 4, glass: 4 },
+                    { date: "2026-10-10", hub: 4, soc: 4, solid: 2, liquid: 4, glass: 2,
+                        socStations: [{ name: "SOC_TESTE", count: 4 }] },
+                ];
+            replaceDamageAndLossesData({ monthIndex: 9, year: 2026, days });
+        }
+        document.getElementById("sampleData").addEventListener("click", () => setData());
+        document.getElementById("singleCategory").addEventListener("click", () => setData(true));
+        document.getElementById("resetTest").addEventListener("click", resetDamageAndLossesState);
+        setData();
+        document.getElementById("generateExport").addEventListener("click", async () => {
+            const status = document.getElementById("exportStatus");
+            status.textContent = "Gerando imagem...";
+            try {
+                const blob = await createReportImageBlob(document.getElementById("damagePreview"));
+                const image = document.getElementById("exportPreview");
+                if (image.dataset.blobUrl) URL.revokeObjectURL(image.dataset.blobUrl);
+                image.dataset.blobUrl = URL.createObjectURL(blob);
+                image.src = image.dataset.blobUrl;
+                image.hidden = false;
+                status.textContent = "Imagem PNG gerada com sucesso.";
+            } catch (error) {
+                status.textContent = `Falha na exportação: ${error.message}`;
+            }
+        });
+    </script>
+</body>
+</html>
