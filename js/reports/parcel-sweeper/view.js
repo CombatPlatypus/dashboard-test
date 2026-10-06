@@ -35,19 +35,13 @@ const parcelPercentageFormatter =
         },
     );
 
-const parcelCoveragePercentageFormatter =
-    new Intl.NumberFormat("pt-BR", {
-        style: "percent",
-        maximumFractionDigits: 0,
-    });
-
 function formatParcelCoverageMetric(quantity, total) {
     if (total <= 0) {
         return "—";
     }
 
     return `${parcelIntegerFormatter.format(quantity)} ` +
-        `(${parcelCoveragePercentageFormatter.format(quantity / total)})`;
+        `(${parcelPercentageFormatter.format(quantity / total)})`;
 }
 
 let parcelViewElements = null;
