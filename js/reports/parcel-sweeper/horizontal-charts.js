@@ -2,11 +2,33 @@ const parcelHorizontalQuantityFormatter = new Intl.NumberFormat("pt-BR", {
     maximumFractionDigits: 0,
 });
 
+const parcelHorizontalLabelFont = {
+    size: 14,
+    family: '"Open Sans", Arial, sans-serif',
+};
+
+function fitParcelHorizontalLabels(scale) {
+    const context = scale.ctx;
+    context.save();
+    context.font = `${parcelHorizontalLabelFont.size}px ${parcelHorizontalLabelFont.family}`;
+    if ("letterSpacing" in context) context.letterSpacing = "1px";
+
+    const labelWidths = scale.ticks.flatMap(tick =>
+        (Array.isArray(tick.label) ? tick.label : [tick.label])
+            .map(label => context.measureText(String(label ?? "")).width));
+
+    // Chart.js caps the automatic axis width. Reserve the full measured text,
+    // including tracking and a safety margin, on updates, resizes and export.
+    scale.width = Math.max(scale.width,
+        Math.ceil(Math.max(0, ...labelWidths) + scale.options.ticks.padding * 2 + 8));
+    context.restore();
+}
+
 const parcelHorizontalTextStyle = {
     id: "parcelHorizontalTextStyle",
     beforeLayout(chart) {
         if ("letterSpacing" in chart.ctx) {
-            chart.ctx.letterSpacing = "0px";
+            chart.ctx.letterSpacing = "1px";
         }
     },
     beforeDraw(chart) {
@@ -39,6 +61,7 @@ const parcelHorizontalValues = {
 
         const context = chart.ctx;
         context.save();
+        if ("letterSpacing" in context) context.letterSpacing = "0px";
         context.font = '600 14px "Open Sans", Arial, sans-serif';
         context.fillStyle = "#e4e6eb";
         context.textAlign = "left";
@@ -86,9 +109,10 @@ function createParcelHorizontalChart(canvas, color) {
             scales: {
                 x: { beginAtZero: true, display: false, suggestedMax: 1 },
                 y: {
+                    afterFit: fitParcelHorizontalLabels,
                     ticks: {
                         color: "#e4e6eb",
-                        font: { size: 14 },
+                        font: parcelHorizontalLabelFont,
                         padding: 12,
                         autoSkip: false,
                     },

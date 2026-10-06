@@ -111,6 +111,7 @@ test("somente gráficos do Parcel desativam tooltips e hover; texto central fica
     replaceGlobal(t, "window", { Chart: class { constructor(canvas, config) { return config; } } });
     const coverage = createParcelCoverageChart({});
     const aging = createParcelAgingChart({});
+    assert.equal(aging.data.datasets[0].backgroundColor, "#3F51B5");
     for (const config of [coverage, aging]) {
         assert.equal(config.options.plugins.tooltip.enabled, false);
         assert.deepEqual(config.options.events, []);

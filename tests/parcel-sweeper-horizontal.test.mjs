@@ -76,23 +76,52 @@ test("barras horizontais seguem trilhos e valores do relatório de perdas, sem t
     assert.equal(config.options.scales.y.ticks.autoSkip, false);
     assert.equal(config.options.scales.y.ticks.font.size, 14);
     assert.equal(config.data.datasets[0].barThickness, 24);
-    const context = { rectangles: [], texts: [], balance: 0, letterSpacing: "1px",
-        save() { this.balance += 1; }, restore() { this.balance -= 1; },
+    const context = { rectangles: [], texts: [], balance: 0, letterSpacing: "0px", spacingStack: [],
+        save() { this.balance += 1; this.spacingStack.push(this.letterSpacing); },
+        restore() { this.balance -= 1; this.letterSpacing = this.spacingStack.pop(); },
         fillRect(...args) { this.rectangles.push(args); }, fillText(...args) { this.texts.push(args); } };
     const chart = { ctx: context, chartArea: { left: 100, right: 400 },
         $parcelHasDistribution: true, data: { datasets: [{ data: [2185, 30] }] },
         getDatasetMeta: () => ({ data: [40, 80].map(y => ({ getProps: () => ({ y, height: 24 }) })) }) };
     config.plugins.forEach(plugin => plugin.beforeLayout?.(chart));
     config.plugins.forEach(plugin => plugin.beforeDraw?.(chart));
+    assert.equal(context.letterSpacing, "1px");
     config.plugins.forEach(plugin => plugin.beforeDatasetsDraw?.(chart));
     config.plugins.forEach(plugin => plugin.afterDatasetsDraw?.(chart));
-    assert.equal(context.letterSpacing, "0px");
+    assert.equal(context.letterSpacing, "1px");
     assert.deepEqual(context.rectangles, [[100, 28, 300, 24], [100, 68, 300, 24]]);
     assert.deepEqual(context.texts, [["2.185", 412, 40], ["30", 412, 80]]);
     assert.equal(context.balance, 0);
     chart.$parcelHasDistribution = false;
     config.plugins.find(plugin => plugin.id === "parcelHorizontalValues").afterDatasetsDraw(chart);
     assert.equal(context.texts.at(-1)[0], "—");
+});
+
+test("largura dos indicadores inclui letter-spacing e todos os nomes, sem o corte automático do eixo", t => {
+    replaceGlobal(t, "window", { Chart: class { constructor(canvas, config) { return config; } } });
+    const config = createParcelHorizontalChart({}, "#3F51B5");
+    const context = {
+        letterSpacing: "0px", font: "10px Arial", stack: [], measurements: [],
+        save() { this.stack.push({ letterSpacing: this.letterSpacing, font: this.font }); },
+        restore() { Object.assign(this, this.stack.pop()); },
+        measureText(text) {
+            this.measurements.push({ text, letterSpacing: this.letterSpacing, font: this.font });
+            return { width: text.length * (this.letterSpacing === "1px" ? 8 : 7) };
+        },
+    };
+    const labels = ["LMHub_Received", "Return_SOC_LHTransported", "Process for liquidation"];
+    const scale = { ctx: context, width: 80, options: config.options.scales.y,
+        ticks: labels.map(label => ({ label })) };
+    config.options.scales.y.afterFit(scale);
+    assert.equal(scale.width, Math.max(...labels.map(label => label.length * 8)) + 32);
+    assert.ok(context.measurements.every(item => item.letterSpacing === "1px" && item.font.includes("14px")));
+    assert.deepEqual(scale.ticks.map(tick => tick.label), labels);
+    assert.equal(context.letterSpacing, "0px");
+    assert.equal(context.font, "10px Arial");
+    scale.width = 40;
+    scale.ticks = [{ label: "—" }];
+    config.options.scales.y.afterFit(scale);
+    assert.equal(scale.width, 40);
 });
 
 test("atualização limpa dados antigos, adapta altura e reserva espaço para quantidades grandes", t => {
@@ -144,6 +173,7 @@ test("os quatro gráficos inicializam uma vez e atualizam na importação e limp
     assert.equal(initializeParcelCharts(panel), true);
     assert.equal(initializeParcelCharts(panel), true);
     assert.equal(charts.length, 4);
+    assert.equal(charts[1].data.datasets[0].backgroundColor, "#3F51B5");
     replaceParcelRows([
         { trackingNumber: "BR1", finalStatus: "LMHub_Received", nextStepAction: "Process for delivery" },
         { trackingNumber: "BR2", finalStatus: "LMHub_Received", nextStepAction: "Put in EHA" },
@@ -155,9 +185,12 @@ test("os quatro gráficos inicializam uma vez e atualizam na importação e limp
     assert.deepEqual(charts[3].data.labels, ["-", "Process for delivery", "Put in EHA"]);
     assert.deepEqual(charts[3].data.datasets[0].data, [1, 1, 1]);
     assert.deepEqual(charts[3].data.datasets[0].backgroundColor, ["#a8a9ad", "#3F51B5", "#3F51B5"]);
+    assert.equal(charts[1].data.datasets[0].backgroundColor, "#3F51B5");
+    assert.equal(charts[1].data.datasets[0].data.length, 7);
     resetParcelReport();
     assert.deepEqual(charts[2].data.labels, ["—"]);
     assert.deepEqual(charts[3].data.datasets[0].data, [0]);
+    assert.equal(charts[1].data.datasets[0].backgroundColor, "#3F51B5");
 });
 
 test("HTML conecta os dois canvases na estrutura fornecida, sem ids vazios", () => {

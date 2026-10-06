@@ -17,6 +17,8 @@ import {
     updateParcelHorizontalChart,
 } from "./horizontal-charts.js";
 
+const PARCEL_BAR_COLOR = "#3F51B5";
+
 const parcelChartIntegerFormatter =
     new Intl.NumberFormat(
         "pt-BR",
@@ -265,7 +267,7 @@ function createParcelAgingChart(
                 datasets: [{
                     label: "Pacotes",
                     data: [],
-                    backgroundColor: [],
+                    backgroundColor: PARCEL_BAR_COLOR,
                     borderWidth: 0,
                     borderRadius: 0,
                     maxBarThickness: 70,
@@ -381,13 +383,7 @@ function updateParcelCharts(
     parcelAgingChart
         .data
         .datasets[0]
-        .backgroundColor =
-            summary.agingDistribution
-                .map(
-                    function (bin) {
-                        return bin.color;
-                    },
-                );
+        .backgroundColor = PARCEL_BAR_COLOR;
 
     parcelAgingChart
         .$parcelAgingPercentages =
@@ -403,10 +399,10 @@ function updateParcelCharts(
     const horizontalHeight = getParcelHorizontalChartHeight(Math.max(
         summary.finalStatusDistribution.length, summary.nextStepActionDistribution.length));
     updateParcelHorizontalChart(parcelFinalStatusChart, summary.finalStatusDistribution, {
-        title: "Quantidade de pacotes por Final Status", color: "#3F51B5", height: horizontalHeight,
+        title: "Quantidade de pacotes por Final Status", color: PARCEL_BAR_COLOR, height: horizontalHeight,
     });
     updateParcelHorizontalChart(parcelNextStepActionChart, summary.nextStepActionDistribution, {
-        title: "Quantidade de pacotes por Next Step Action", color: "#3F51B5", height: horizontalHeight,
+        title: "Quantidade de pacotes por Next Step Action", color: PARCEL_BAR_COLOR, height: horizontalHeight,
     });
 }
 
@@ -517,8 +513,8 @@ function initializeParcelCharts(
         createParcelAgingChart(
             agingCanvas,
         );
-    parcelFinalStatusChart = createParcelHorizontalChart(finalStatusCanvas, "#3F51B5");
-    parcelNextStepActionChart = createParcelHorizontalChart(nextStepActionCanvas, "#3F51B5");
+    parcelFinalStatusChart = createParcelHorizontalChart(finalStatusCanvas, PARCEL_BAR_COLOR);
+    parcelNextStepActionChart = createParcelHorizontalChart(nextStepActionCanvas, PARCEL_BAR_COLOR);
 
     subscribeParcelState(
         updateParcelCharts,
