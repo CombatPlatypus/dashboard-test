@@ -950,6 +950,14 @@ function createParcelSummary(
                     ) === "exception";
                 },
             ).length,
+        missortedCount:
+            receivedRows.filter(
+                function (row) {
+                    return normalizeParcelCountType(
+                        row.countType,
+                    ) === "mis-sorted";
+                },
+            ).length,
         ignoredScannedCount:
             scannedRows.length -
                 validOperatorRows.length,

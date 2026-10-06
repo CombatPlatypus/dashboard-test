@@ -578,6 +578,7 @@ test("o HTML e a inicialização ligam todos os pontos do relatório", () => {
         "parcelTotalScanned",
         "parcelBacklogTotal",
         "parcelExceptionTotal",
+        "parcelMissortedTotal",
         "parcelUnscannedTotal",
         "parcelCoverageChart",
         "parcelAgingChart",

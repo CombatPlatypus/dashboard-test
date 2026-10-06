@@ -67,6 +67,10 @@ function getParcelViewElements(
             rootElement.querySelector(
                 "#parcelExceptionTotal",
             ),
+        missortedTotal:
+            rootElement.querySelector(
+                "#parcelMissortedTotal",
+            ),
         unscannedTotal:
             rootElement.querySelector(
                 "#parcelUnscannedTotal",
@@ -375,6 +379,13 @@ function renderParcelView(
         .textContent =
             formatMetric(
                 summary.exceptionCount,
+            );
+
+    parcelViewElements
+        .missortedTotal
+        .textContent =
+            formatMetric(
+                summary.missortedCount,
             );
 
     parcelViewElements
