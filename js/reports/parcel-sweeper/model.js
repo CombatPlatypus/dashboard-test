@@ -810,6 +810,13 @@ function filterParcelPackageRows(
                 );
 
             if (
+                countType === "exception" &&
+                normalizeParcelText(row.finalStatus) !== "LMHub_Received"
+            ) {
+                return false;
+            }
+
+            if (
                 normalizedFilter ===
                 "all"
             ) {

@@ -35,6 +35,7 @@ function createTestRows() {
         operator: index % 2 === 0 ? operator : operator.toLowerCase(),
         trackingNumber: `BR${operator.match(/\d+/)[0]}${index}`,
         scannedStatus: "LMHub_Received",
+        finalStatus: "LMHub_Received",
         countType: index % 3 === 0 ? "Exception" : "Backlog",
         scannedTime: new Date(Date.UTC(2026, 9, 2, 14, 0, index * gap))
             .toISOString().slice(0, 19).replace("T", " "),

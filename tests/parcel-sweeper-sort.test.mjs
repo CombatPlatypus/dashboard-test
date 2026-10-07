@@ -50,7 +50,7 @@ test("ordena o rótulo exibido do operador sem mudar código, nome original ou a
 
 test("tabelas mantêm ordenações independentes ao aplicar os filtros", () => {
     const rows = [
-        { operator: "[Ops2]ANA SILVA", trackingNumber: "BR10", countType: "Exception" },
+        { operator: "[Ops2]ANA SILVA", trackingNumber: "BR10", countType: "Exception", finalStatus: "LMHub_Received" },
         { operator: "[Ops10]BRUNO LIMA", trackingNumber: "BR2", countType: "Backlog" },
         { operator: "[Ops2]ANA SILVA", trackingNumber: "BR1", countType: "Backlog" },
         { operator: "[Ops1]CARLA SOUZA", trackingNumber: "BR3", countType: "Processed" },

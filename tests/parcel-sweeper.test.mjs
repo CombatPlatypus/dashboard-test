@@ -433,9 +433,17 @@ test("distribui aging nas sete faixas e exclui valores abaixo de uma hora", () =
     );
 });
 
-test("os três filtros usam Count Type e Todos reúne Backlog e Exception", () => {
+test("Exception exige Final Status LMHub_Received, inclusive no filtro Todos", () => {
     const rows = [
         { countType: "Backlog" },
+        { countType: "Exception", finalStatus: "LMHub_Received" },
+        { countType: " exception ", finalStatus: " LMHub_Received " },
+        { countType: "Exception", finalStatus: "SOC_Received", scannedStatus: "LMHub_Received" },
+        { countType: "Exception", finalStatus: "Return_LMHub_Received" },
+        { countType: "Exception", finalStatus: "lmhub_received" },
+        { countType: "Exception", finalStatus: "-" },
+        { countType: "Exception", finalStatus: "" },
+        { countType: "Exception", finalStatus: null },
         { countType: "Exception" },
         { countType: "Missing" },
     ];
@@ -445,7 +453,7 @@ test("os três filtros usam Count Type e Todos reúne Backlog e Exception", () =
             rows,
             "all",
         ).length,
-        2,
+        3,
     );
 
     assert.equal(
@@ -461,8 +469,12 @@ test("os três filtros usam Count Type e Todos reúne Backlog e Exception", () =
             rows,
             "exception",
         ).length,
-        1,
+        2,
     );
+
+    assert.deepEqual(filterParcelPackageRows(rows, "all"), rows.slice(0, 3));
+    assert.deepEqual(filterParcelPackageRows(rows, "backlog"), rows.slice(0, 1));
+    assert.deepEqual(filterParcelPackageRows(rows, "exception"), rows.slice(1, 3));
 });
 
 test("importa o CSV exportado pelo Parcel Sweeper", async () => {

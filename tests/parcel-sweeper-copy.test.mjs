@@ -76,12 +76,14 @@ test("cada botão acompanha filtros, ordenação e correções de Volumoso sem m
     const writes = [];
     setup(t, async value => writes.push(value));
     const rows = [
-        { operator: "[Ops100]ANA TESTE", trackingNumber: "BR10", countType: "Exception", scannedStatus: "Scanned" },
+        { operator: "[Ops100]ANA TESTE", trackingNumber: "BR10", countType: "Exception", finalStatus: "LMHub_Received", scannedStatus: "Scanned" },
         { operator: "[Ops100]ANA TESTE", trackingNumber: "BR2", countType: "Backlog", scannedStatus: "Scanned" },
-        { operator: "[Ops200]CAIO TESTE", trackingNumber: "BR3", countType: "Exception", scannedStatus: "Scanned" },
+        { operator: "[Ops200]CAIO TESTE", trackingNumber: "BR3", countType: "Exception", finalStatus: "LMHub_Received", scannedStatus: "Scanned" },
         { operator: "[Ops200]CAIO TESTE", trackingNumber: "BR1", countType: "Backlog", scannedStatus: "Scanned" },
         { operator: "[Ops100]ANA TESTE", trackingNumber: "BR99", countType: "Processed", scannedStatus: "Scanned" },
         { operator: "operador@teste.com", trackingNumber: "BR98", countType: "Backlog", scannedStatus: "Scanned" },
+        { operator: "[Ops100]ANA TESTE", trackingNumber: "BR97", countType: "Exception", finalStatus: "SOC_Received", scannedStatus: "LMHub_Received" },
+        { operator: "[Ops200]CAIO TESTE", trackingNumber: "BR96", countType: "Exception", finalStatus: "Return_LMHub_Packed", scannedStatus: "LMHub_Received" },
     ];
     const common = new Body(); const bulky = new Body();
     const commonButton = new Button(); const bulkyButton = new Button();
