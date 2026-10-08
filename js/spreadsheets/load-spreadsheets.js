@@ -1,3 +1,7 @@
+import {
+    loadDefaultSpreadsheetSettings,
+} from "./default-spreadsheets.js";
+
 const DASHBOARD_SPREADSHEET_LIMIT = 20;
 
 const DASHBOARD_SPREADSHEET_IMPORT_LIMIT = 30;
@@ -37,7 +41,7 @@ const DEFAULT_COLLECTION_APP_URL =
     "&page=gallery&sort=%5B%5D" +
     "&table=MenuInicial&view=Menu";
 
-const DEFAULT_SPREADSHEET_SETTINGS =
+const FALLBACK_SPREADSHEET_SETTINGS =
     Object.freeze([
         {
             spreadsheetId: "1SGoeFt_aVK0sZ5Ivz3ORD1Hd75sxH-A-HYqHX8wWXKY",
@@ -52,7 +56,7 @@ const DEFAULT_SPREADSHEET_SETTINGS =
             menuName: "Pacotes em Análise",
         },
         {
-            spreadsheetId: "1BjOehuyFzjWAMIA-90lQRKmxvCdmCcOm",
+            spreadsheetId: "1b9VlTXNfWhOqJtx9UoPrQchh77AiPqcs",
             menuName: "Pacotes Retornados",
         },
         {
@@ -108,6 +112,9 @@ const DEFAULT_SPREADSHEET_SETTINGS =
             menuName: "Erros de Processo",
         },
     ]);
+
+let defaultSpreadsheetSettings =
+    FALLBACK_SPREADSHEET_SETTINGS;
 
 const SPREADSHEET_POSITION_NAMES =
     Object.freeze([
@@ -182,7 +189,7 @@ function createDefaultSpreadsheetSetting(
     index,
 ) {
     const defaultSetting =
-        DEFAULT_SPREADSHEET_SETTINGS[
+        defaultSpreadsheetSettings[
             index
         ];
 
@@ -196,9 +203,12 @@ function createDefaultSpreadsheetSetting(
 
     return {
         link:
-            `${GOOGLE_SPREADSHEETS_URL_PREFIX}` +
-            `d/${defaultSetting.spreadsheetId}/` +
-            "edit?gid=0#gid=0",
+            defaultSetting.link ||
+            (
+                `${GOOGLE_SPREADSHEETS_URL_PREFIX}` +
+                `d/${defaultSetting.spreadsheetId}/` +
+                "edit?gid=0#gid=0"
+            ),
         menuName:
             defaultSetting.menuName,
         visible: true,
@@ -1894,7 +1904,7 @@ function hasDashboardSettingsElements(
 
 /* INICIALIZA AS CONFIGURAÇÕES E O PAINEL */
 
-function initializeDashboardSettings() {
+async function initializeDashboardSettings() {
     const elements =
         getDashboardSettingsElements();
 
@@ -1912,6 +1922,19 @@ function initializeDashboardSettings() {
 
     dashboardSettingsElements =
         elements;
+
+    try {
+        defaultSpreadsheetSettings =
+            await loadDefaultSpreadsheetSettings();
+    } catch (error) {
+        console.warn(
+            "Não foi possível carregar a configuração atualizada das planilhas. Usando a configuração incorporada.",
+            error,
+        );
+
+        defaultSpreadsheetSettings =
+            FALLBACK_SPREADSHEET_SETTINGS;
+    }
 
     const initialSettings =
         createDefaultDashboardSettings();
@@ -1938,7 +1961,7 @@ function initializeDashboardSettings() {
     return true;
 }
 
-initializeDashboardSettings();
+await initializeDashboardSettings();
 
 export {
     exportDashboardSettings,

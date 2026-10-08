@@ -1,0 +1,72 @@
+{
+    "spreadsheets": [
+        {
+            "link": "https://docs.google.com/spreadsheets/d/1SGoeFt_aVK0sZ5Ivz3ORD1Hd75sxH-A-HYqHX8wWXKY/edit?gid=0#gid=0",
+            "menuName": "Checklist Operacional"
+        },
+        {
+            "link": "https://docs.google.com/spreadsheets/d/1J41DYbdogIyzxJxKOBJa_9uforRo5faS/edit?gid=0#gid=0",
+            "menuName": "Insucesso"
+        },
+        {
+            "link": "https://docs.google.com/spreadsheets/d/1xJZpuck84CM9-FTYd5UnWbZ4AezWUdGx/edit?gid=0#gid=0",
+            "menuName": "Pacotes em Análise"
+        },
+        {
+            "link": "https://docs.google.com/spreadsheets/d/1b9VlTXNfWhOqJtx9UoPrQchh77AiPqcs/",
+            "menuName": "Pacotes Retornados"
+        },
+        {
+            "link": "https://docs.google.com/spreadsheets/d/1cbHXjnfHGIDSob9Sh977p5J827qPlM5f9juRq_sIgcM/edit?gid=0#gid=0",
+            "menuName": "Backlogs e Logs"
+        },
+        {
+            "link": "https://docs.google.com/spreadsheets/d/1MJFZlrUrcZXve4WOYYLjCrKeUkD0QgSshCfZdWxNMZA/edit?gid=0#gid=0",
+            "menuName": "Erros de Etiquetagem"
+        },
+        {
+            "link": "https://docs.google.com/spreadsheets/d/15ycLVugBymQR63SivMIvwRMce4dTe5XV/edit?gid=0#gid=0",
+            "menuName": "Controle Geral"
+        },
+        {
+            "link": "https://docs.google.com/spreadsheets/d/1sh3TgSwLOt8EhoDhji2CHivbrEQiuhIpoBw0VHe2JoE/edit?gid=0#gid=0",
+            "menuName": "Controle Operacional"
+        },
+        {
+            "link": "https://docs.google.com/spreadsheets/d/19mhzxy8xih2yPfxX6f8ILQJWTgRMhSXv/edit?gid=0#gid=0",
+            "menuName": "Stuck Orders"
+        },
+        {
+            "link": "https://docs.google.com/spreadsheets/d/1pmKMyhiQdRU787MHdKFZEjwVqG6IIeLB6glOK3m-uMc/edit?gid=0#gid=0",
+            "menuName": "Controle de Endereços"
+        },
+        {
+            "link": "https://docs.google.com/spreadsheets/d/1sOzs3lgS6dO0WluGRQR2B8kmFTDUR5VC/edit?gid=0#gid=0",
+            "menuName": "Justificativas"
+        },
+        {
+            "link": "https://docs.google.com/spreadsheets/d/1WaHywDEm3ipdvEtq-pB01v4kyaREhn2i/edit?gid=0#gid=0",
+            "menuName": "Avarias"
+        },
+        {
+            "link": "https://docs.google.com/spreadsheets/d/1SpChx2r8HHeqWQAYDELewvKzQM8eRLIgknT2EiMjPnU/edit?gid=0#gid=0",
+            "menuName": "Avarias AppSheet"
+        },
+        {
+            "link": "https://docs.google.com/spreadsheets/d/1wtALHYfXyFm9nfkV9TP1idnVV12oBwa-/edit?gid=0#gid=0",
+            "menuName": "Reversa"
+        },
+        {
+            "link": "https://docs.google.com/spreadsheets/d/1PnKEGQtfETj0ptk7xAIPG3dcrZgbBunWFUJp18O_XDE/edit?gid=0#gid=0",
+            "menuName": "Pacotes Full"
+        },
+        {
+            "link": "https://docs.google.com/spreadsheets/d/1UWlOQfVw-eD1ZkD5gxCo2MHZ4CEyJUd4osungKFTfwA/edit?gid=0#gid=0",
+            "menuName": "Gerenciamento de Rotas"
+        },
+        {
+            "link": "https://docs.google.com/spreadsheets/d/1FpcZuJboPyMKUGZwYHGHRYg4Pr_Phs4-ycqg-u7qGSU/edit?gid=0#gid=0",
+            "menuName": "Erros de Processo"
+        }
+    ]
+}
