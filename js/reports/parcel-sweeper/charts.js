@@ -37,6 +37,16 @@ const parcelChartPercentageFormatter =
         },
     );
 
+const parcelCoveragePercentageFormatter =
+    new Intl.NumberFormat(
+        "pt-BR",
+        {
+            style: "percent",
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        },
+    );
+
 const parcelAgingWindowLabels = Object.freeze({
     "1-6h": "1 - 6h",
     "7-12h": "7 - 12h",
@@ -115,7 +125,7 @@ const parcelCoverageCenterText = {
 
         context.fillText(
             total > 0
-                ? parcelChartPercentageFormatter
+                ? parcelCoveragePercentageFormatter
                     .format(
                         scanned / total,
                     )

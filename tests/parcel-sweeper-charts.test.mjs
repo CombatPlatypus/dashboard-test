@@ -36,10 +36,11 @@ function replaceGlobal(t, name, value) {
 
 test("indicadores de cobertura mostram quantidade e percentual sobre o total esperado", () => {
     for (const [quantity, total, expected] of [
-        [516, 702, "516 (73,5%)"], [186, 702, "186 (26,5%)"],
-        [1606, 1988, "1.606 (80,8%)"], [382, 1988, "382 (19,2%)"],
-        [200, 300, "200 (66,7%)"], [100, 300, "100 (33,3%)"],
-        [0, 300, "0 (0,0%)"], [300, 300, "300 (100,0%)"], [0, 0, "—"],
+        [516, 702, "516 (73,50%)"], [186, 702, "186 (26,50%)"],
+        [1606, 1988, "1.606 (80,78%)"], [382, 1988, "382 (19,22%)"],
+        [200, 300, "200 (66,67%)"], [100, 300, "100 (33,33%)"],
+        [5668, 10000, "5.668 (56,68%)"],
+        [0, 300, "0 (0,00%)"], [300, 300, "300 (100,00%)"], [0, 0, "—"],
     ]) {
         assert.equal(formatParcelCoverageMetric(quantity, total), expected);
     }
@@ -50,7 +51,7 @@ test("centro e indicador de escaneados usam a mesma precisão e o mesmo total", 
     const config = createParcelCoverageChart({});
     const projection = config.plugins.find(plugin => plugin.id === "parcel-coverage-3d");
     const center = config.plugins.find(plugin => plugin.id === "parcelCoverageCenterText");
-    for (const [scanned, total] of [[516, 702], [1606, 1988], [200, 300], [0, 300], [300, 300], [0, 0]]) {
+    for (const [scanned, total] of [[516, 702], [1606, 1988], [200, 300], [5668, 10000], [0, 300], [300, 300], [0, 0]]) {
         const context = createCanvasContext();
         const chart = { ctx: context, chartArea: { left: 0, top: 0, right: 450, bottom: 270 },
             data: { datasets: [{ data: [scanned, total - scanned], backgroundColor: ["#3F51B5", "#e4e6eb"] }] },
@@ -124,7 +125,7 @@ test("somente gráficos do Parcel desativam tooltips e hover; texto central fica
     assert.equal(plugin.beforeDatasetDraw(chart, { index: 0 }), false);
     assert.equal(plugin.beforeDatasetDraw(chart, { index: 1 }), undefined);
     coverage.plugins.find(item => item.id === "parcelCoverageCenterText").afterDraw(chart);
-    assert.equal(context.texts[0][0], "66,7%");
+    assert.equal(context.texts[0][0], "66,67%");
     assert.equal(context.texts[1][0], "Bipados");
     assert.equal(context.balance, 0);
     assert.ok(!aging.plugins.some(item => item.id === "parcel-coverage-3d"));
