@@ -29,7 +29,7 @@ const SPX_LINEHAUL_IMPORT_NOTIFICATION =
         type: "idle",
 
         message:
-            "No SPX, Transporte Principal / Viagens de Carga, escolha Inbound e pressione Ctrl + A e, em seguida, Ctrl + C. Depois, volte aqui e clique em importar.",
+            "No SPX, Transporte Principal / Viagens de Carga / Inbound e pressione Ctrl + A e, em seguida, Ctrl + C. Depois, volte aqui e clique em importar.",
     });
 
 const DAMAGE_AND_LOSSES_IMPORT_NOTIFICATION =
