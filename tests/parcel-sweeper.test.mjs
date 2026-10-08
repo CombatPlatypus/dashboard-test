@@ -395,6 +395,47 @@ test("cobertura segue Count Type do SPX mesmo quando Scanned Status diverge", ()
     assert.equal(summary.operatorStats.length, 0);
 });
 
+test("cobertura do SPX considera somente pacotes marcados como esperados", () => {
+    const createRows = (count, values) => Array.from(
+        { length: count },
+        (_, index) => createParcelRow({
+            trackingNumber: `${values.trackingNumber}${index}`,
+            ...values,
+        }),
+    );
+
+    const rows = [
+        ...createRows(319, {
+            trackingNumber: "BR-EXPECTED-SCANNED-",
+            countType: "Backlog",
+            scannedStatus: "LMHub_Received",
+            expected: "Y",
+        }),
+        ...createRows(242, {
+            trackingNumber: "BR-EXPECTED-MISSING-",
+            countType: "Missing",
+            scannedStatus: "-",
+            expected: "Y",
+        }),
+        ...createRows(7, {
+            trackingNumber: "BR-UNEXPECTED-SCANNED-",
+            countType: "Backlog",
+            scannedStatus: "LMHub_Received",
+            expected: "N",
+        }),
+    ];
+
+    const summary = createParcelSummary(rows);
+
+    assert.equal(summary.totalRows, 568);
+    assert.equal(summary.scannedCount, 326);
+    assert.equal(summary.unscannedCount, 242);
+    assert.equal(summary.expectedTotalCount, 561);
+    assert.equal(summary.expectedScannedCount, 319);
+    assert.equal(summary.expectedUnscannedCount, 242);
+    assert.equal((summary.expectedScannedCount / summary.expectedTotalCount * 100).toFixed(2), "56.86");
+});
+
 test("distribui aging nas sete faixas e exclui valores abaixo de uma hora", () => {
     const values = [
         "1h",

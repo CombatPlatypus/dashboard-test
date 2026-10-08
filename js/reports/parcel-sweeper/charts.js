@@ -349,17 +349,17 @@ function updateParcelCharts(
         .data
         .datasets[0]
         .data = [
-            summary.scannedCount,
-            summary.unscannedCount,
+            summary.expectedScannedCount,
+            summary.expectedUnscannedCount,
         ];
 
     parcelCoverageChart
         .$parcelTotal =
-            summary.totalRows;
+            summary.expectedTotalCount;
 
     parcelCoverageChart
         .$parcelScanned =
-            summary.scannedCount;
+            summary.expectedScannedCount;
 
     parcelCoverageChart.update();
 

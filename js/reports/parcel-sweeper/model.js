@@ -886,6 +886,31 @@ function createParcelSummary(
             isParcelScannedRow,
         );
 
+    const hasExpectedData =
+        receivedRows.some(
+            function (row) {
+                return normalizeParcelText(
+                    row.expected,
+                ) !== "";
+            },
+        );
+
+    const expectedRows =
+        hasExpectedData
+            ? receivedRows.filter(
+                function (row) {
+                    return normalizeParcelText(
+                        row.expected,
+                    ).toLowerCase() === "y";
+                },
+            )
+            : receivedRows;
+
+    const expectedScannedRows =
+        expectedRows.filter(
+            isParcelScannedRow,
+        );
+
     const validOperatorRows =
         scannedRows.filter(
             function (row) {
@@ -956,6 +981,13 @@ function createParcelSummary(
         unscannedCount:
             receivedRows.length -
                 scannedRows.length,
+        expectedTotalCount:
+            expectedRows.length,
+        expectedScannedCount:
+            expectedScannedRows.length,
+        expectedUnscannedCount:
+            expectedRows.length -
+                expectedScannedRows.length,
         backlogCount:
             receivedRows.filter(
                 function (row) {

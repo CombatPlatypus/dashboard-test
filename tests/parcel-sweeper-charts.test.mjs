@@ -34,7 +34,7 @@ function replaceGlobal(t, name, value) {
     });
 }
 
-test("indicadores de cobertura mostram quantidade e percentual sobre o total importado", () => {
+test("indicadores de cobertura mostram quantidade e percentual sobre o total esperado", () => {
     for (const [quantity, total, expected] of [
         [516, 702, "516 (73,5%)"], [186, 702, "186 (26,5%)"],
         [1606, 1988, "1.606 (80,8%)"], [382, 1988, "382 (19,2%)"],

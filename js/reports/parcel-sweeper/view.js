@@ -399,16 +399,16 @@ function renderParcelView(
         .coverageScanned
         .textContent =
             formatParcelCoverageMetric(
-                summary.scannedCount,
-                summary.totalRows,
+                summary.expectedScannedCount,
+                summary.expectedTotalCount,
             );
 
     parcelViewElements
         .coverageUnscanned
         .textContent =
             formatParcelCoverageMetric(
-                summary.unscannedCount,
-                summary.totalRows,
+                summary.expectedUnscannedCount,
+                summary.expectedTotalCount,
             );
 
     renderParcelOperatorTable(
