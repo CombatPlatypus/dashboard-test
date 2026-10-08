@@ -12,9 +12,11 @@ import {
 import {
     createPlanningSpreadsheetCells,
     createPlanningSpreadsheetFileName,
+    createPlanningSpreadsheetLayout,
 } from "../js/reports/planning/spreadsheet.js";
 
 import {
+    readXlsxTemplateWorksheet,
     updateXlsxTemplateArchive,
 } from "../js/reports/xlsx-template.js";
 
@@ -35,9 +37,32 @@ const XLSX =
 
 const templatePath =
     new URL(
-        "../xlsx/Relatório de Planejamento - Planilhas da Operação 2026.xlsx",
+        "../xlsx/Relatório de Planejamento.xlsx",
         import.meta.url,
     );
+
+async function loadPlanningTemplate() {
+    const archive =
+        await JSZip.loadAsync(
+            await readFile(
+                templatePath,
+            ),
+        );
+
+    const template =
+        await readXlsxTemplateWorksheet({
+            archive,
+            sheetName: "Modelo",
+        });
+
+    return {
+        archive,
+        layout:
+            createPlanningSpreadsheetLayout(
+                template.cellValues,
+            ),
+    };
+}
 
 function createPlanningState() {
     return {
@@ -89,10 +114,14 @@ function createPlanningState() {
 
 test(
     "mapeia o relatório de planejamento para as células do modelo",
-    function () {
+    async function () {
+        const { layout } =
+            await loadPlanningTemplate();
+
         const cells =
             createPlanningSpreadsheetCells(
                 createPlanningState(),
+                layout,
             );
 
         assert.deepEqual(
@@ -128,9 +157,6 @@ test(
                 cells.B17,
                 cells.C17,
                 cells.D17,
-                cells.B18,
-                cells.C18,
-                cells.D18,
             ],
             [
                 "LT0QA702II1S1",
@@ -139,27 +165,27 @@ test(
                 "LT0QA702IP701",
                 "Cumbica Guarulhos",
                 5575,
-                "—",
-                "—",
-                "—",
             ],
         );
 
         assert.equal(
             cells.B25,
-            "—",
+            undefined,
         );
 
         assert.equal(
-            cells.B35,
-            "—",
+            cells.B38,
+            undefined,
         );
     },
 );
 
 test(
     "preenche LHs e TOs segregados com a quantidade efetivamente segregada",
-    function () {
+    async function () {
+        const { layout } =
+            await loadPlanningTemplate();
+
         const state =
             createPlanningState();
 
@@ -193,6 +219,7 @@ test(
         const cells =
             createPlanningSpreadsheetCells(
                 state,
+                layout,
             );
 
         assert.deepEqual(
@@ -216,12 +243,12 @@ test(
 
         assert.deepEqual(
             [
-                cells.B35,
-                cells.C35,
-                cells.D35,
-                cells.B36,
-                cells.C36,
-                cells.D36,
+                cells.B38,
+                cells.C38,
+                cells.D38,
+                cells.B39,
+                cells.C39,
+                cells.D39,
             ],
             [
                 "TO-001",
@@ -236,36 +263,77 @@ test(
 );
 
 test(
-    "impede que o download omita registros que não cabem no modelo",
-    function () {
+    "descobre no próprio modelo as novas faixas disponíveis",
+    async function () {
+        const { layout } =
+            await loadPlanningTemplate();
+
+        assert.deepEqual(
+            layout,
+            {
+                lhs: {
+                    startRow: 15,
+                    rowCount: 8,
+                },
+                segregatedLhs: {
+                    startRow: 25,
+                    rowCount: 11,
+                },
+                tos: {
+                    startRow: 38,
+                    rowCount: 2963,
+                },
+            },
+        );
+    },
+);
+
+test(
+    "usa a faixa ampliada de TOs sem o limite antigo de 20 linhas",
+    async function () {
+        const { layout } =
+            await loadPlanningTemplate();
+
         const state =
             createPlanningState();
 
-        state.lhs =
+        state.lhs[0].segregate =
+            true;
+
+        state.lhs[0].segregateTos =
+            true;
+
+        state.lhs[0].tos =
             Array.from(
                 {
-                    length: 9,
+                    length: 25,
                 },
                 function (_, index) {
                     return {
                         id: index + 1,
-                        code: `LH-${index + 1}`,
-                        origin: "Origem",
-                        quantity: 1,
-                        segregate: false,
-                        segregateTos: false,
-                        tos: [],
+                        code: `TO-${index + 1}`,
+                        quantity: index + 1,
                     };
                 },
             );
 
-        assert.throws(
-            function () {
-                createPlanningSpreadsheetCells(
-                    state,
-                );
-            },
-            /até 8 LHs programados/,
+        const cells =
+            createPlanningSpreadsheetCells(
+                state,
+                layout,
+            );
+
+        assert.deepEqual(
+            [
+                cells.B38,
+                cells.B62,
+                cells.D62,
+            ],
+            [
+                "TO-1",
+                "TO-25",
+                25,
+            ],
         );
     },
 );
@@ -273,15 +341,9 @@ test(
 test(
     "preenche o XLSX sem alterar estilos, desenhos ou áreas não mapeadas",
     async function () {
-        const template =
-            await readFile(
-                templatePath,
-            );
-
-        const archive =
-            await JSZip.loadAsync(
-                template,
-            );
+        const {
+            archive,
+        } = await loadPlanningTemplate();
 
         const originalEntries =
             Object.keys(
@@ -313,9 +375,16 @@ test(
             archive,
             sheetName: "Modelo",
             cells:
-                createPlanningSpreadsheetCells(
-                    createPlanningState(),
-                ),
+                function ({
+                    cellValues,
+                }) {
+                    return createPlanningSpreadsheetCells(
+                        createPlanningState(),
+                        createPlanningSpreadsheetLayout(
+                            cellValues,
+                        ),
+                    );
+                },
         });
 
         const worksheetXml =

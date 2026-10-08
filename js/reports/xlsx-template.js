@@ -205,6 +205,159 @@ async function readArchiveText(
     );
 }
 
+async function readOptionalArchiveText(
+    archive,
+    path,
+) {
+    const file =
+        archive?.file?.(
+            path,
+        );
+
+    return file
+        ? file.async(
+            "string",
+        )
+        : "";
+}
+
+function getXmlTextContent(xml) {
+    return Array.from(
+        String(xml).matchAll(
+            /<t\b[^>]*>([\s\S]*?)<\/t>/g,
+        ),
+    )
+        .map(
+            function (match) {
+                return decodeXmlText(
+                    match[1],
+                );
+            },
+        )
+        .join("");
+}
+
+function parseSharedStringsXml(
+    sharedStringsXml,
+) {
+    return Array.from(
+        String(sharedStringsXml).matchAll(
+            /<si\b[^>]*>([\s\S]*?)<\/si>/g,
+        ),
+    ).map(
+        function (match) {
+            return getXmlTextContent(
+                match[1],
+            );
+        },
+    );
+}
+
+function parseWorksheetCellValues(
+    worksheetXml,
+    sharedStrings = [],
+) {
+    const cellValues =
+        new Map();
+
+    Array.from(
+        String(worksheetXml).matchAll(
+            /<c\b[^>]*\/>|<c\b[^>]*>[\s\S]*?<\/c>/g,
+        ),
+    ).forEach(
+        function (match) {
+            const cellXml =
+                match[0];
+
+            const openingTag =
+                cellXml.match(
+                    /^<c\b[^>]*\/?\s*>/,
+                )?.[0];
+
+            const cellReference =
+                getXmlAttribute(
+                    openingTag,
+                    "r",
+                )?.toUpperCase();
+
+            if (!cellReference) {
+                return;
+            }
+
+            const type =
+                getXmlAttribute(
+                    openingTag,
+                    "t",
+                );
+
+            if (type === "inlineStr") {
+                cellValues.set(
+                    cellReference,
+                    getXmlTextContent(
+                        cellXml,
+                    ),
+                );
+
+                return;
+            }
+
+            const rawValue =
+                cellXml.match(
+                    /<v\b[^>]*>([\s\S]*?)<\/v>/,
+                )?.[1];
+
+            if (rawValue === undefined) {
+                return;
+            }
+
+            const decodedValue =
+                decodeXmlText(
+                    rawValue,
+                );
+
+            if (type === "s") {
+                cellValues.set(
+                    cellReference,
+                    sharedStrings[
+                        Number.parseInt(
+                            decodedValue,
+                            10,
+                        )
+                    ] ?? "",
+                );
+
+                return;
+            }
+
+            if (type === "b") {
+                cellValues.set(
+                    cellReference,
+                    decodedValue === "1",
+                );
+
+                return;
+            }
+
+            const numericValue =
+                Number(
+                    decodedValue,
+                );
+
+            cellValues.set(
+                cellReference,
+                decodedValue !== "" &&
+                Number.isFinite(
+                    numericValue,
+                )
+                    ? numericValue
+                    : decodedValue,
+            );
+        },
+    );
+
+    return cellValues;
+}
+
 async function findWorksheetPath(
     archive,
     sheetName,
@@ -305,6 +458,43 @@ async function findWorksheetPath(
             "Target",
         ),
     );
+}
+
+async function readXlsxTemplateWorksheet({
+    archive,
+    sheetName,
+}) {
+    const worksheetPath =
+        await findWorksheetPath(
+            archive,
+            sheetName,
+        );
+
+    const [
+        worksheetXml,
+        sharedStringsXml,
+    ] = await Promise.all([
+        readArchiveText(
+            archive,
+            worksheetPath,
+        ),
+        readOptionalArchiveText(
+            archive,
+            "xl/sharedStrings.xml",
+        ),
+    ]);
+
+    return {
+        worksheetPath,
+        worksheetXml,
+        cellValues:
+            parseWorksheetCellValues(
+                worksheetXml,
+                parseSharedStringsXml(
+                    sharedStringsXml,
+                ),
+            ),
+    };
 }
 
 function normalizeCellReference(value) {
@@ -674,23 +864,24 @@ async function updateXlsxTemplateArchive({
         );
     }
 
-    const worksheetPath =
-        await findWorksheetPath(
+    const template =
+        await readXlsxTemplateWorksheet({
             archive,
             sheetName,
-        );
+        });
 
-    const worksheetXml =
-        await readArchiveText(
-            archive,
-            worksheetPath,
-        );
+    const resolvedCells =
+        typeof cells === "function"
+            ? await cells(
+                template,
+            )
+            : cells;
 
     archive.file(
-        worksheetPath,
+        template.worksheetPath,
         replaceWorksheetCells(
-            worksheetXml,
-            cells,
+            template.worksheetXml,
+            resolvedCells,
         ),
         {
             createFolders: false,
@@ -699,7 +890,8 @@ async function updateXlsxTemplateArchive({
 
     return {
         archive,
-        worksheetPath,
+        worksheetPath:
+            template.worksheetPath,
     };
 }
 
@@ -783,6 +975,9 @@ export {
     XLSX_MIME_TYPE,
     createXlsxTemplateBlob,
     findWorksheetPath,
+    parseSharedStringsXml,
+    parseWorksheetCellValues,
+    readXlsxTemplateWorksheet,
     replaceWorksheetCells,
     updateXlsxTemplateArchive,
 };

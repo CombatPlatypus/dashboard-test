@@ -12,20 +12,32 @@ import {
 } from "../xlsx-template.js";
 
 const PLANNING_SPREADSHEET_TEMPLATE_URL =
-    "xlsx/Relatório de Planejamento - Planilhas da Operação 2026.xlsx";
+    "xlsx/Relatório de Planejamento.xlsx";
 
 const PLANNING_SPREADSHEET_SHEET_NAME =
     "Modelo";
 
-const PLANNING_SPREADSHEET_LIMITS =
-    Object.freeze({
-        lhs: 8,
-        segregatedLhs: 8,
-        tos: 20,
-    });
-
 const EMPTY_SPREADSHEET_VALUE =
     "—";
+
+const PLANNING_SPREADSHEET_TABLE_HEADERS =
+    Object.freeze({
+        lhs: [
+            "LHs Programados",
+            "Origem",
+            "QTD",
+        ],
+        segregatedLhs: [
+            "LHs a Segregar",
+            "Origem",
+            "QTD",
+        ],
+        tos: [
+            "TOs para Segregar",
+            "LH",
+            "QTD",
+        ],
+    });
 
 function hasPlanningLhInformation(lh) {
     return (
@@ -55,7 +67,10 @@ function hasPlanningLhInformation(lh) {
     );
 }
 
-function trimUnusedPlanningLhs(lhs) {
+function trimUnusedPlanningLhs(
+    lhs,
+    minimumLength,
+) {
     const normalizedLhs =
         Array.isArray(lhs)
             ? [...lhs]
@@ -63,7 +78,7 @@ function trimUnusedPlanningLhs(lhs) {
 
     while (
         normalizedLhs.length >
-            PLANNING_SPREADSHEET_LIMITS.lhs &&
+            minimumLength &&
         !hasPlanningLhInformation(
             normalizedLhs.at(-1),
         )
@@ -72,6 +87,138 @@ function trimUnusedPlanningLhs(lhs) {
     }
 
     return normalizedLhs;
+}
+
+function getPlanningSpreadsheetCellText(
+    cellValues,
+    reference,
+) {
+    return String(
+        cellValues.get(
+            reference,
+        ) ?? "",
+    ).trim();
+}
+
+function findPlanningSpreadsheetHeaderRow(
+    cellValues,
+    headers,
+) {
+    const candidateRows =
+        Array.from(
+            cellValues.keys(),
+        )
+            .map(
+                function (reference) {
+                    return reference.match(
+                        /^B([1-9]\d*)$/,
+                    )?.[1];
+                },
+            )
+            .filter(Boolean)
+            .map(Number);
+
+    return candidateRows.find(
+        function (rowNumber) {
+            return [
+                "B",
+                "C",
+                "D",
+            ].every(
+                function (
+                    column,
+                    columnIndex,
+                ) {
+                    return (
+                        getPlanningSpreadsheetCellText(
+                            cellValues,
+                            `${column}${rowNumber}`,
+                        ) ===
+                        headers[columnIndex]
+                    );
+                },
+            );
+        },
+    );
+}
+
+function createPlanningSpreadsheetSection(
+    cellValues,
+    headers,
+) {
+    const headerRow =
+        findPlanningSpreadsheetHeaderRow(
+            cellValues,
+            headers,
+        );
+
+    if (!headerRow) {
+        throw new Error(
+            `A seção ${headers[0]} não foi encontrada no modelo XLSX.`,
+        );
+    }
+
+    const startRow =
+        headerRow + 1;
+
+    let rowCount = 0;
+
+    while (
+        [
+            "B",
+            "C",
+            "D",
+        ].every(
+            function (column) {
+                return (
+                    getPlanningSpreadsheetCellText(
+                        cellValues,
+                        `${column}${startRow + rowCount}`,
+                    ) ===
+                    EMPTY_SPREADSHEET_VALUE
+                );
+            },
+        )
+    ) {
+        rowCount += 1;
+    }
+
+    if (rowCount === 0) {
+        throw new Error(
+            `A seção ${headers[0]} não possui linhas disponíveis no modelo XLSX.`,
+        );
+    }
+
+    return {
+        startRow,
+        rowCount,
+    };
+}
+
+function createPlanningSpreadsheetLayout(
+    cellValues,
+) {
+    if (!(cellValues instanceof Map)) {
+        throw new TypeError(
+            "Não foi possível ler as células do modelo XLSX.",
+        );
+    }
+
+    return Object.fromEntries(
+        Object.entries(
+            PLANNING_SPREADSHEET_TABLE_HEADERS,
+        ).map(
+            function ([key, headers]) {
+                return [
+                    key,
+                    createPlanningSpreadsheetSection(
+                        cellValues,
+                        headers,
+                    ),
+                ];
+            },
+        ),
+    );
 }
 
 function getPlanningSpreadsheetTos(lhs) {
@@ -116,22 +263,22 @@ function assertPlanningSpreadsheetCapacity({
     lhs,
     segregatedLhs,
     tos,
-}) {
+}, layout) {
     const exceededSection = [
         [
             "LHs programados",
             lhs.length,
-            PLANNING_SPREADSHEET_LIMITS.lhs,
+            layout.lhs.rowCount,
         ],
         [
             "LHs a segregar",
             segregatedLhs.length,
-            PLANNING_SPREADSHEET_LIMITS.segregatedLhs,
+            layout.segregatedLhs.rowCount,
         ],
         [
             "TOs para segregar",
             tos.length,
-            PLANNING_SPREADSHEET_LIMITS.tos,
+            layout.tos.rowCount,
         ],
     ].find(
         function ([, quantity, limit]) {
@@ -178,13 +325,12 @@ function addPlanningSpreadsheetRows(
     cells,
     {
         startRow,
-        rowCount,
         rows,
     },
 ) {
     for (
         let rowIndex = 0;
-        rowIndex < rowCount;
+        rowIndex < rows.length;
         rowIndex += 1
     ) {
         const rowNumber =
@@ -214,10 +360,12 @@ function addPlanningSpreadsheetRows(
 
 function createPlanningSpreadsheetCells(
     state,
+    layout,
 ) {
     const lhs =
         trimUnusedPlanningLhs(
             state?.lhs,
+            layout.lhs.rowCount,
         );
 
     const segregatedLhs =
@@ -236,7 +384,7 @@ function createPlanningSpreadsheetCells(
         lhs,
         segregatedLhs,
         tos,
-    });
+    }, layout);
 
     const cells = {
         B3:
@@ -293,9 +441,7 @@ function createPlanningSpreadsheetCells(
     addPlanningSpreadsheetRows(
         cells,
         {
-            startRow: 15,
-            rowCount:
-                PLANNING_SPREADSHEET_LIMITS.lhs,
+            ...layout.lhs,
             rows:
                 lhs.map(
                     function (lh) {
@@ -312,9 +458,7 @@ function createPlanningSpreadsheetCells(
     addPlanningSpreadsheetRows(
         cells,
         {
-            startRow: 25,
-            rowCount:
-                PLANNING_SPREADSHEET_LIMITS.segregatedLhs,
+            ...layout.segregatedLhs,
             rows:
                 segregatedLhs.map(
                     function (lh) {
@@ -333,9 +477,7 @@ function createPlanningSpreadsheetCells(
     addPlanningSpreadsheetRows(
         cells,
         {
-            startRow: 35,
-            rowCount:
-                PLANNING_SPREADSHEET_LIMITS.tos,
+            ...layout.tos,
             rows:
                 tos.map(
                     function (to) {
@@ -380,20 +522,31 @@ function createPlanningSpreadsheetBlob(
         sheetName:
             PLANNING_SPREADSHEET_SHEET_NAME,
         cells:
-            createPlanningSpreadsheetCells(
-                state,
-            ),
+            function ({
+                cellValues,
+            }) {
+                const layout =
+                    createPlanningSpreadsheetLayout(
+                        cellValues,
+                    );
+
+                return createPlanningSpreadsheetCells(
+                    state,
+                    layout,
+                );
+            },
     });
 }
 
 export {
     EMPTY_SPREADSHEET_VALUE,
-    PLANNING_SPREADSHEET_LIMITS,
     PLANNING_SPREADSHEET_SHEET_NAME,
     PLANNING_SPREADSHEET_TEMPLATE_URL,
+    PLANNING_SPREADSHEET_TABLE_HEADERS,
     assertPlanningSpreadsheetCapacity,
     createPlanningSpreadsheetBlob,
     createPlanningSpreadsheetCells,
     createPlanningSpreadsheetFileName,
+    createPlanningSpreadsheetLayout,
     getPlanningSpreadsheetTos,
 };
