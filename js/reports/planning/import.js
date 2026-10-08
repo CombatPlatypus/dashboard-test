@@ -23,9 +23,6 @@ const PLANNING_IMPORT_DEFAULT_TEXT =
 const PLANNING_IMPORT_SOURCE =
     "spx-clipboard";
 
-const PLANNING_IMPORT_EXPECTED_MAXIMUM =
-    8;
-
 const PLANNING_IMPORT_SUCCESS_DURATION =
     3000;
 
@@ -2121,24 +2118,6 @@ async function handlePlanningClipboardImport(
             throw new Error(
                 `A janela ${selectedWindow} não possui pelo menos dois LHs consecutivos com o mesmo CPT.`,
             );
-        }
-
-        if (
-            selection.lhs.length >
-            PLANNING_IMPORT_EXPECTED_MAXIMUM
-        ) {
-            const shouldContinue =
-                window.confirm(
-                    `Foram encontrados ${selection.lhs.length} LHs no bloco da janela ${selection.targetWindow}. Normalmente a lista possui até ${PLANNING_IMPORT_EXPECTED_MAXIMUM}. Deseja importar todos mesmo assim?`,
-                );
-
-            if (!shouldContinue) {
-                restorePlanningImportButton(
-                    button,
-                );
-
-                return;
-            }
         }
 
         if (

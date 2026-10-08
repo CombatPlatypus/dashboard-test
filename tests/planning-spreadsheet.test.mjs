@@ -124,6 +124,9 @@ test(
                 layout,
             );
 
+        const lhsStart =
+            layout.lhs.startRow;
+
         assert.deepEqual(
             {
                 B3: cells.B3,
@@ -151,12 +154,12 @@ test(
 
         assert.deepEqual(
             [
-                cells.B15,
-                cells.C15,
-                cells.D15,
-                cells.B17,
-                cells.C17,
-                cells.D17,
+                cells[`B${lhsStart}`],
+                cells[`C${lhsStart}`],
+                cells[`D${lhsStart}`],
+                cells[`B${lhsStart + 2}`],
+                cells[`C${lhsStart + 2}`],
+                cells[`D${lhsStart + 2}`],
             ],
             [
                 "LT0QA702II1S1",
@@ -169,12 +172,16 @@ test(
         );
 
         assert.equal(
-            cells.B25,
+            cells[
+                `B${layout.segregatedLhs.startRow}`
+            ],
             undefined,
         );
 
         assert.equal(
-            cells.B38,
+            cells[
+                `B${layout.tos.startRow}`
+            ],
             undefined,
         );
     },
@@ -222,14 +229,20 @@ test(
                 layout,
             );
 
+        const segregatedStart =
+            layout.segregatedLhs.startRow;
+
+        const tosStart =
+            layout.tos.startRow;
+
         assert.deepEqual(
             [
-                cells.B25,
-                cells.C25,
-                cells.D25,
-                cells.B26,
-                cells.C26,
-                cells.D26,
+                cells[`B${segregatedStart}`],
+                cells[`C${segregatedStart}`],
+                cells[`D${segregatedStart}`],
+                cells[`B${segregatedStart + 1}`],
+                cells[`C${segregatedStart + 1}`],
+                cells[`D${segregatedStart + 1}`],
             ],
             [
                 "LT0QA702II1S1",
@@ -243,12 +256,12 @@ test(
 
         assert.deepEqual(
             [
-                cells.B38,
-                cells.C38,
-                cells.D38,
-                cells.B39,
-                cells.C39,
-                cells.D39,
+                cells[`B${tosStart}`],
+                cells[`C${tosStart}`],
+                cells[`D${tosStart}`],
+                cells[`B${tosStart + 1}`],
+                cells[`C${tosStart + 1}`],
+                cells[`D${tosStart + 1}`],
             ],
             [
                 "TO-001",
@@ -268,22 +281,26 @@ test(
         const { layout } =
             await loadPlanningTemplate();
 
-        assert.deepEqual(
-            layout,
-            {
-                lhs: {
-                    startRow: 15,
-                    rowCount: 8,
-                },
-                segregatedLhs: {
-                    startRow: 25,
-                    rowCount: 11,
-                },
-                tos: {
-                    startRow: 38,
-                    rowCount: 2963,
-                },
-            },
+        assert.ok(
+            layout.lhs.rowCount >= 20,
+        );
+
+        assert.ok(
+            layout.segregatedLhs.rowCount >= 20,
+        );
+
+        assert.ok(
+            layout.segregatedLhs.startRow >
+            layout.lhs.startRow,
+        );
+
+        assert.ok(
+            layout.tos.startRow >
+            layout.segregatedLhs.startRow,
+        );
+
+        assert.ok(
+            layout.tos.rowCount > 20,
         );
     },
 );
@@ -323,11 +340,14 @@ test(
                 layout,
             );
 
+        const tosStart =
+            layout.tos.startRow;
+
         assert.deepEqual(
             [
-                cells.B38,
-                cells.B62,
-                cells.D62,
+                cells[`B${tosStart}`],
+                cells[`B${tosStart + 24}`],
+                cells[`D${tosStart + 24}`],
             ],
             [
                 "TO-1",

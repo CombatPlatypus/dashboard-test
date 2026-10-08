@@ -25,9 +25,6 @@ const RECEIPT_LINEHAUL_IMPORT_DEFAULT_TEXT =
 const RECEIPT_LINEHAUL_IMPORT_FEEDBACK_DURATION =
     3000;
 
-const RECEIPT_LINEHAUL_IMPORT_EXPECTED_MAXIMUM =
-    8;
-
 const RECEIPT_LINEHAUL_CODE_PATTERN =
     /\bLT[A-Z0-9]{8,24}\b/i;
 
@@ -1621,24 +1618,6 @@ async function handleReceiptLinehaulClipboardImport(
             throw new Error(
                 `A janela ${selectedWindow} não possui pelo menos dois LHs consecutivos com o mesmo CPT.`,
             );
-        }
-
-        if (
-            selection.records.length >
-            RECEIPT_LINEHAUL_IMPORT_EXPECTED_MAXIMUM
-        ) {
-            const shouldContinue =
-                window.confirm(
-                    `Foram encontrados ${selection.records.length} LHs no bloco da janela ${selection.targetWindow}. Normalmente a lista possui até ${RECEIPT_LINEHAUL_IMPORT_EXPECTED_MAXIMUM}. Deseja importar todos mesmo assim?`,
-                );
-
-            if (!shouldContinue) {
-                restoreReceiptLinehaulImportButton(
-                    button,
-                );
-
-                return;
-            }
         }
 
         const currentState =
