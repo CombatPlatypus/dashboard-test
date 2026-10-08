@@ -11,6 +11,7 @@ import {
     filterParcelPackageRows,
     formatParcelOperatorName,
     isParcelOperator,
+    isParcelScannedRow,
 } from "../js/reports/parcel-sweeper/model.js";
 
 import {
@@ -362,6 +363,38 @@ test("calcula cobertura e omite operadores fora do padrão apenas das análises 
     );
 });
 
+test("cobertura segue Count Type do SPX mesmo quando Scanned Status diverge", () => {
+    const examples = [
+        ["Processed", "-", true],
+        [" processed ", "", true],
+        ["Backlog", "-", true],
+        ["Exception", "", true],
+        ["Mis-sorted", "-", true],
+        ["Missing", "LMHub_Received", false],
+        [" MISSING ", "-", false],
+        ["", "LMHub_Received", true],
+        ["", "-", false],
+        ["Outro", "LMHub_Received", true],
+        ["Outro", "", false],
+    ];
+    const rows = examples.map(([countType, scannedStatus], index) => createParcelRow({
+        trackingNumber: `BR${index}`,
+        countType,
+        scannedStatus,
+        expected: "N",
+    }));
+
+    rows.forEach((row, index) => assert.equal(isParcelScannedRow(row), examples[index][2]));
+    assert.equal(isParcelScannedRow({ countType: "Processed" }), false);
+
+    const summary = createParcelSummary(rows);
+    assert.equal(summary.totalRows, 11);
+    assert.equal(summary.scannedCount, 7);
+    assert.equal(summary.unscannedCount, 4);
+    assert.equal(summary.scannedCount + summary.unscannedCount, summary.totalRows);
+    assert.equal(summary.operatorStats.length, 0);
+});
+
 test("distribui aging nas sete faixas e exclui valores abaixo de uma hora", () => {
     const values = [
         "1h",
@@ -498,6 +531,7 @@ test("importa o CSV exportado pelo Parcel Sweeper", async () => {
             "SPX Tracking Number,Scanned Status,Expedite Tag,Final Status,Sort Code,Next Step Action,OnHold Times,Count Type,Expected,Operator,Aging Time,Scanned Time",
             "BR1,LMHub_Received,-,LMHub_Received,SOC-SP8,Process for delivery,0,Backlog,Y,[Ops1]ANA,5h,2026-10-02 14:00:00",
             "BR2,-,-,SOC_LHTransported,SOC-SP8,-,0,Missing,Y,,,",
+            "BR3,-,,SOC_Packed,SOC-SP8,-,0,Processed,Y,,,2026-10-02 14:00:03",
         ].join(
             "\n",
         );
@@ -520,15 +554,16 @@ test("importa o CSV exportado pelo Parcel Sweeper", async () => {
 
         assert.equal(
             imported.rows.length,
-            2,
+            3,
         );
 
         assert.equal(
             createParcelSummary(
                 imported.rows,
             ).scannedCount,
-            1,
+            2,
         );
+        assert.equal(createParcelSummary(imported.rows).unscannedCount, 1);
     } finally {
         if (
             previousWindow ===

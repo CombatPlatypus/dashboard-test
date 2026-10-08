@@ -333,13 +333,28 @@ function createParcelRow(
 function isParcelScannedRow(
     row,
 ) {
+    if (!row?.trackingNumber) {
+        return false;
+    }
+
+    // Count Type define a cobertura no SPX. Processed pode ter
+    // Scanned Status "-" e ainda assim não pertencer a Missing.
+    const countType = normalizeParcelCountType(row.countType);
+
+    if (countType === "missing") {
+        return false;
+    }
+
+    if (["backlog", "exception", "mis-sorted", "processed"].includes(countType)) {
+        return true;
+    }
+
     const scannedStatus =
         normalizeParcelText(
             row?.scannedStatus,
         );
 
     return Boolean(
-        row?.trackingNumber &&
         scannedStatus &&
         scannedStatus !== "-",
     );
