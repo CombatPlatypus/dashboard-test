@@ -8,6 +8,7 @@ import {
     removePlanningLh,
     removePlanningTo,
     subscribePlanningState,
+    updatePlanningBacklogField,
     updatePlanningCollectionPoolField,
     updatePlanningGeneralField,
     updatePlanningLh,
@@ -22,6 +23,7 @@ import {
     canExportPlanningReport,
     getPlanningLhQuantity,
     getPlanningLhSegregatedQuantity,
+    getPlanningBacklogTotal,
     getPlanningPoolQuantity,
     getPlanningPreviewLhs,
     hasPlanningToInformation,
@@ -741,7 +743,10 @@ function renderPlanningPreview(state) {
 
     planningPreviewCpAdded.textContent =
         planningNumberFormatter.format(
-            state.collectionPool.added ?? 0,
+            getPlanningPoolQuantity(
+                state,
+                "added",
+            ),
         );
 
     planningPreviewCpRemoved.textContent =
@@ -948,6 +953,7 @@ function handlePlanningPoolInput(event) {
 
     if (
         !input ||
+        input.readOnly ||
         !field
     ) {
         return;
@@ -967,6 +973,32 @@ function handlePlanningPoolInput(event) {
     updatePlanningCollectionPoolField(
         field,
         input.value,
+    );
+}
+
+/* ATUALIZA UMA LISTA DE BRS DO BACKLOG */
+
+function handlePlanningBacklogInput(event) {
+    const textarea =
+        event.target instanceof
+        HTMLTextAreaElement
+            ? event.target
+            : null;
+
+    const field =
+        textarea?.dataset
+            .planningBacklogField;
+
+    if (
+        !textarea ||
+        !field
+    ) {
+        return;
+    }
+
+    updatePlanningBacklogField(
+        field,
+        textarea.value,
     );
 }
 
@@ -1020,6 +1052,11 @@ function synchronizePlanningIndicatorControls(
 function synchronizePlanningPoolControls(
     state,
 ) {
+    const backlogTotal =
+        getPlanningBacklogTotal(
+            state,
+        );
+
     planningPanel
         .querySelectorAll(
             "[data-planning-pool-field]",
@@ -1030,9 +1067,47 @@ function synchronizePlanningPoolControls(
                     input.dataset
                         .planningPoolField;
 
+                const isCalculatedAdded =
+                    field === "added" &&
+                    backlogTotal > 0;
+
                 input.value =
-                    state
-                        .collectionPool[field] ??
+                    isCalculatedAdded
+                        ? backlogTotal
+                        : state
+                            .collectionPool[field] ??
+                            "";
+
+                input.readOnly =
+                    isCalculatedAdded;
+
+                input.setAttribute(
+                    "aria-readonly",
+                    String(
+                        isCalculatedAdded,
+                    ),
+                );
+            },
+        );
+}
+
+/* SINCRONIZA AS LISTAS DE BRS DO BACKLOG */
+
+function synchronizePlanningBacklogControls(
+    state,
+) {
+    planningPanel
+        .querySelectorAll(
+            "[data-planning-backlog-field]",
+        )
+        .forEach(
+            function (textarea) {
+                const field =
+                    textarea.dataset
+                        .planningBacklogField;
+
+                textarea.value =
+                    state.backlog?.[field] ??
                     "";
             },
         );
@@ -1048,6 +1123,10 @@ function synchronizePlanningControls(
     );
 
     synchronizePlanningPoolControls(
+        state,
+    );
+
+    synchronizePlanningBacklogControls(
         state,
     );
 }
@@ -1911,9 +1990,22 @@ function initializePlanningView(
                 change.type ===
                     "planning-session-imported" ||
                 change.type ===
-                    "collection-pool-updated"
+                    "collection-pool-updated" ||
+                change.type ===
+                    "backlog-updated"
             ) {
                 synchronizePlanningPoolControls(
+                    state,
+                );
+            }
+
+            if (
+                change.type ===
+                    "planning-reset" ||
+                change.type ===
+                    "planning-session-imported"
+            ) {
+                synchronizePlanningBacklogControls(
                     state,
                 );
             }
@@ -1996,6 +2088,11 @@ function initializePlanningView(
     planningPanel.addEventListener(
         "input",
         handlePlanningPoolInput,
+    );
+
+    planningPanel.addEventListener(
+        "input",
+        handlePlanningBacklogInput,
     );
 
     renderPlanningReport();

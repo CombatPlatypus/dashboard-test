@@ -84,6 +84,46 @@ function getPlanningPoolQuantity(
     state,
     field,
 ) {
+    const backlogPackages =
+        getPlanningBacklogCodes(
+            state,
+            "packages",
+        );
+
+    const backlogBulky =
+        getPlanningBacklogCodes(
+            state,
+            "bulky",
+        );
+
+    const hasBacklogCodes =
+        backlogPackages.length > 0 ||
+        backlogBulky.length > 0;
+
+    if (
+        field === "backlogPackages" &&
+        hasBacklogCodes
+    ) {
+        return backlogPackages.length;
+    }
+
+    if (
+        field === "backlogBulky" &&
+        hasBacklogCodes
+    ) {
+        return backlogBulky.length;
+    }
+
+    if (
+        field === "added" &&
+        hasBacklogCodes
+    ) {
+        return (
+            backlogPackages.length +
+            backlogBulky.length
+        );
+    }
+
     const quantity =
         state.collectionPool[field];
 
@@ -96,6 +136,100 @@ function getPlanningPoolQuantity(
     }
 
     return quantity;
+}
+
+/* NORMALIZA OS CÓDIGOS COLADOS NO BACKLOG */
+
+function parsePlanningBacklogCodes(value) {
+    const receivedCodes =
+        String(
+            value ?? "",
+        )
+        .split(/[\s,;]+/)
+        .map(
+            function (code) {
+                return code.trim();
+            },
+        )
+        .filter(Boolean);
+
+    const uniqueCodes = [];
+    const seenCodes = new Set();
+
+    receivedCodes.forEach(
+        function (code) {
+            const comparisonCode =
+                code.toUpperCase();
+
+            if (
+                seenCodes.has(
+                    comparisonCode,
+                )
+            ) {
+                return;
+            }
+
+            seenCodes.add(
+                comparisonCode,
+            );
+
+            uniqueCodes.push(
+                code,
+            );
+        },
+    );
+
+    return uniqueCodes;
+}
+
+/* RETORNA OS CÓDIGOS DE UM TIPO DE BACKLOG */
+
+function getPlanningBacklogCodes(
+    state,
+    field,
+) {
+    const codes =
+        parsePlanningBacklogCodes(
+            state?.backlog?.[field],
+        );
+
+    if (field !== "bulky") {
+        return codes;
+    }
+
+    const packageCodes =
+        new Set(
+            parsePlanningBacklogCodes(
+                state?.backlog?.packages,
+            ).map(
+                function (code) {
+                    return code.toUpperCase();
+                },
+            ),
+        );
+
+    return codes.filter(
+        function (code) {
+            return !packageCodes.has(
+                code.toUpperCase(),
+            );
+        },
+    );
+}
+
+/* RETORNA A QUANTIDADE DE BRS INFORMADOS */
+
+function getPlanningBacklogTotal(state) {
+    return (
+        getPlanningBacklogCodes(
+            state,
+            "packages",
+        ).length +
+        getPlanningBacklogCodes(
+            state,
+            "bulky",
+        ).length
+    );
 }
 
 /* CALCULA A QUANTIDADE PRESENTE NOS LHS */
@@ -273,7 +407,10 @@ export {
     canExportPlanningReport,
     getPlanningLhQuantity,
     getPlanningLhSegregatedQuantity,
+    getPlanningBacklogCodes,
+    getPlanningBacklogTotal,
     getPlanningPoolQuantity,
     getPlanningPreviewLhs,
     hasPlanningToInformation,
+    parsePlanningBacklogCodes,
 };

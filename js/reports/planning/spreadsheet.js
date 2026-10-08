@@ -3,6 +3,7 @@ import {
     calculatePlanningEstimatedVolume,
     getPlanningLhQuantity,
     getPlanningLhSegregatedQuantity,
+    getPlanningBacklogCodes,
     getPlanningPoolQuantity,
     hasPlanningToInformation,
 } from "./calculations.js";
@@ -37,6 +38,16 @@ const PLANNING_SPREADSHEET_TABLE_HEADERS =
             "LH",
             "QTD",
         ],
+    });
+
+const PLANNING_SPREADSHEET_BACKLOG_HEADERS =
+    Object.freeze({
+        title:
+            "Backlog Adicionado",
+        packages:
+            "Pacotes Normais",
+        bulky:
+            "Pacotes Volumosos",
     });
 
 function hasPlanningLhInformation(lh) {
@@ -204,21 +215,82 @@ function createPlanningSpreadsheetLayout(
         );
     }
 
-    return Object.fromEntries(
-        Object.entries(
-            PLANNING_SPREADSHEET_TABLE_HEADERS,
-        ).map(
-            function ([key, headers]) {
-                return [
-                    key,
-                    createPlanningSpreadsheetSection(
-                        cellValues,
-                        headers,
-                    ),
-                ];
-            },
-        ),
-    );
+    const layout =
+        Object.fromEntries(
+            Object.entries(
+                PLANNING_SPREADSHEET_TABLE_HEADERS,
+            ).map(
+                function ([key, headers]) {
+                    return [
+                        key,
+                        createPlanningSpreadsheetSection(
+                            cellValues,
+                            headers,
+                        ),
+                    ];
+                },
+            ),
+        );
+
+    const hasBacklogHeaders =
+        getPlanningSpreadsheetCellText(
+            cellValues,
+            "F1",
+        ) ===
+            PLANNING_SPREADSHEET_BACKLOG_HEADERS.title &&
+        getPlanningSpreadsheetCellText(
+            cellValues,
+            "F2",
+        ) ===
+            PLANNING_SPREADSHEET_BACKLOG_HEADERS.packages &&
+        getPlanningSpreadsheetCellText(
+            cellValues,
+            "G2",
+        ) ===
+            PLANNING_SPREADSHEET_BACKLOG_HEADERS.bulky;
+
+    if (!hasBacklogHeaders) {
+        throw new Error(
+            "A seção Backlog Adicionado não foi encontrada no modelo XLSX.",
+        );
+    }
+
+    const lastTemplateRow =
+        Math.max(
+            ...Array.from(
+                cellValues.keys(),
+            ).map(
+                function (reference) {
+                    return Number(
+                        reference.match(
+                            /\d+$/,
+                        )?.[0] ?? 0,
+                    );
+                },
+            ),
+        );
+
+    const backlogStartRow = 3;
+
+    if (
+        lastTemplateRow <
+        backlogStartRow
+    ) {
+        throw new Error(
+            "A seção Backlog Adicionado não possui linhas disponíveis no modelo XLSX.",
+        );
+    }
+
+    layout.backlog = {
+        startRow:
+            backlogStartRow,
+        rowCount:
+            lastTemplateRow -
+            backlogStartRow +
+            1,
+    };
+
+    return layout;
 }
 
 function getPlanningSpreadsheetTos(lhs) {
@@ -263,6 +335,8 @@ function assertPlanningSpreadsheetCapacity({
     lhs,
     segregatedLhs,
     tos,
+    backlogPackages = [],
+    backlogBulky = [],
 }, layout) {
     const exceededSection = [
         [
@@ -279,6 +353,16 @@ function assertPlanningSpreadsheetCapacity({
             "TOs para segregar",
             tos.length,
             layout.tos.rowCount,
+        ],
+        [
+            "pacotes normais no backlog",
+            backlogPackages.length,
+            layout.backlog.rowCount,
+        ],
+        [
+            "pacotes volumosos no backlog",
+            backlogBulky.length,
+            layout.backlog.rowCount,
         ],
     ].find(
         function ([, quantity, limit]) {
@@ -358,6 +442,23 @@ function addPlanningSpreadsheetRows(
     }
 }
 
+function addPlanningSpreadsheetBacklogCodes(
+    cells,
+    {
+        column,
+        startRow,
+        codes,
+    },
+) {
+    codes.forEach(
+        function (code, index) {
+            cells[
+                `${column}${startRow + index}`
+            ] = code;
+        },
+    );
+}
+
 function createPlanningSpreadsheetCells(
     state,
     layout,
@@ -380,10 +481,24 @@ function createPlanningSpreadsheetCells(
             lhs,
         );
 
+    const backlogPackages =
+        getPlanningBacklogCodes(
+            state,
+            "packages",
+        );
+
+    const backlogBulky =
+        getPlanningBacklogCodes(
+            state,
+            "bulky",
+        );
+
     assertPlanningSpreadsheetCapacity({
         lhs,
         segregatedLhs,
         tos,
+        backlogPackages,
+        backlogBulky,
     }, layout);
 
     const cells = {
@@ -452,6 +567,28 @@ function createPlanningSpreadsheetCells(
                         ];
                     },
                 ),
+        },
+    );
+
+    addPlanningSpreadsheetBacklogCodes(
+        cells,
+        {
+            column: "F",
+            startRow:
+                layout.backlog.startRow,
+            codes:
+                backlogPackages,
+        },
+    );
+
+    addPlanningSpreadsheetBacklogCodes(
+        cells,
+        {
+            column: "G",
+            startRow:
+                layout.backlog.startRow,
+            codes:
+                backlogBulky,
         },
     );
 

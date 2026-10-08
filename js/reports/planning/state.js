@@ -27,6 +27,11 @@ const planningState = {
         removed: null,
     },
 
+    backlog: {
+        packages: "",
+        bulky: "",
+    },
+
     lhs: [],
 };
 
@@ -70,6 +75,12 @@ const planningCollectionPoolFields =
         "errors",
         "added",
         "removed",
+    ]);
+
+const planningBacklogFields =
+    new Set([
+        "packages",
+        "bulky",
     ]);
     
 let nextPlanningLhId = 1;
@@ -259,6 +270,10 @@ function getPlanningState() {
 
         collectionPool: {
             ...planningState.collectionPool,
+        },
+
+        backlog: {
+            ...planningState.backlog,
         },
                     
         lhs:
@@ -762,6 +777,43 @@ function updatePlanningCollectionPoolField(
     return true;
 }
 
+/* ATUALIZA UMA LISTA DE BRS DO BACKLOG */
+
+function updatePlanningBacklogField(
+    field,
+    value,
+) {
+    if (
+        !planningBacklogFields.has(
+            field,
+        )
+    ) {
+        return false;
+    }
+
+    const normalizedValue =
+        normalizeTextValue(
+            value,
+        );
+
+    if (
+        planningState.backlog[field] ===
+        normalizedValue
+    ) {
+        return true;
+    }
+
+    planningState.backlog[field] =
+        normalizedValue;
+
+    notifyPlanningState({
+        type: "backlog-updated",
+        field,
+    });
+
+    return true;
+}
+
 /* REINICIA A LISTA DE LHS */
 
 function resetPlanningLhs() {
@@ -801,6 +853,13 @@ function resetPlanningReport() {
             planningState
                 .collectionPool[field] =
                     null;
+        },
+    );
+
+    planningBacklogFields.forEach(
+        function (field) {
+            planningState.backlog[field] =
+                "";
         },
     );
 
@@ -936,6 +995,22 @@ function restorePlanningState(
         },
     );
 
+    const backlog =
+        sessionState.backlog &&
+        typeof sessionState.backlog ===
+            "object"
+            ? sessionState.backlog
+            : {};
+
+    planningBacklogFields.forEach(
+        function (field) {
+            planningState.backlog[field] =
+                normalizeTextValue(
+                    backlog[field],
+                );
+        },
+    );
+
     nextPlanningLhId = 1;
     nextPlanningToId = 1;
 
@@ -979,6 +1054,7 @@ export {
     restorePlanningState,
     subscribePlanningState,
     updatePlanningCollectionPoolField,
+    updatePlanningBacklogField,
     updatePlanningGeneralField,
     updatePlanningLh,
     updatePlanningTo,

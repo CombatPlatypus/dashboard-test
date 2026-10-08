@@ -966,6 +966,10 @@
         color: var(--color-gray-p);
         font-size: 14px;
     }
+    #collection-indicators input[readonly] {
+        cursor: not-allowed;
+        opacity: 0.65;
+    }
     #collection-indicators > a {
         font-size: 13px;
         transition: color 0.2s ease;
