@@ -1532,7 +1532,7 @@
     align-items: flex-start;
 }
 #reports #parcel #parcelPreview > .distribution > .doughnut-chart {
-    flex: 0 0 530px;
+    flex: 0 0 535px;
 }
 #reports #parcel #parcelPreview > .distribution > .distribution-by-operator {
     flex: 1 1 0;
