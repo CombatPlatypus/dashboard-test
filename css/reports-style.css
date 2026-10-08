@@ -953,11 +953,13 @@
 
     #collection-indicators .operations, #collection-indicators .fleet {
         grid-template-columns: repeat(auto-fit, minmax(162px, 1fr)) !important;
+        border-top: 2px solid var(--color-border);
+        padding-top: 20px;
     }
     #collection-indicators .padding {
         display: flex;
         flex-direction: column;
-        gap: 17px;
+        gap: 27px;
     }
     #collection-indicators p {
         margin: 0 0 2px 0;
@@ -971,6 +973,12 @@
     #collection-indicators > a:hover,
     #collection-indicators > a:focus-visible {
         color: #1a73e8;
+    }
+
+    /*  */
+
+    #planning-backlog textarea {
+        min-height: 403px;
     }
 
     /* SPX - SELEÇÃO DE JANELA */
