@@ -10,9 +10,11 @@ import {
 } from "node:test";
 
 import {
+    createPlanningSpreadsheetBlob,
     createPlanningSpreadsheetCells,
     createPlanningSpreadsheetFileName,
     createPlanningSpreadsheetLayout,
+    createPlanningSpreadsheetSheetName,
 } from "../js/reports/planning/spreadsheet.js";
 
 import {
@@ -561,6 +563,84 @@ test(
 );
 
 test(
+    "renomeia a aba gerada com a data local",
+    async function () {
+        const date =
+            new Date(
+                2026,
+                9,
+                7,
+                20,
+                30,
+            );
+
+        assert.equal(
+            createPlanningSpreadsheetSheetName(
+                date,
+            ),
+            "07-10",
+        );
+
+        const template =
+            await readFile(
+                templatePath,
+            );
+
+        const outputBlob =
+            await createPlanningSpreadsheetBlob(
+                createPlanningState(),
+                date,
+                {
+                    fetchFunction:
+                        async function () {
+                            return {
+                                ok: true,
+                                status: 200,
+                                arrayBuffer:
+                                    async function () {
+                                        return template;
+                                    },
+                            };
+                        },
+                    jsZipLibrary:
+                        JSZip,
+                },
+            );
+
+        const output =
+            Buffer.from(
+                await outputBlob.arrayBuffer(),
+            );
+
+        const workbook =
+            XLSX.read(
+                output,
+                {
+                    type: "buffer",
+                    cellStyles: true,
+                },
+            );
+
+        assert.deepEqual(
+            workbook.SheetNames,
+            [
+                "07-10",
+            ],
+        );
+
+        assert.equal(
+            workbook.Sheets["07-10"].F3.v,
+            "BR-PACOTE-001",
+        );
+
+        assert.equal(
+            workbook.Sheets["07-10"].G3.v,
+            "BR-VOLUMOSO-001",
+        );
+    },
+);
+
+test(
     "o HTML carrega o JSZip e conecta o botão ao exportador de planilhas",
     async function () {
         const [
@@ -604,7 +684,12 @@ test(
 
         assert.match(
             view,
-            /await createPlanningSpreadsheetBlob\(\s*state/,
+            /await createPlanningSpreadsheetBlob\(\s*state,\s*exportDate/,
+        );
+
+        assert.match(
+            view,
+            /createPlanningSpreadsheetFileName\(\s*exportDate/,
         );
     },
 );

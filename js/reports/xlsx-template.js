@@ -16,6 +16,12 @@ function escapeXmlText(value) {
         .replace(/>/g, "&gt;");
 }
 
+function escapeXmlAttribute(value) {
+    return escapeXmlText(value)
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&apos;");
+}
+
 function decodeXmlText(value) {
     return String(value)
         .replace(
@@ -95,7 +101,7 @@ function setXmlAttribute(
     }
 
     const attribute =
-        ` ${attributeName}="${escapeXmlText(value)}"`;
+        ` ${attributeName}="${escapeXmlAttribute(value)}"`;
 
     if (pattern.test(tag)) {
         return String(tag).replace(
@@ -458,6 +464,157 @@ async function findWorksheetPath(
             "Target",
         ),
     );
+}
+
+function normalizeWorksheetName(value) {
+    const worksheetName =
+        String(
+            value ?? "",
+        ).trim();
+
+    if (!worksheetName) {
+        throw new Error(
+            "O nome da aba do arquivo XLSX não pode ficar vazio.",
+        );
+    }
+
+    if (worksheetName.length > 31) {
+        throw new Error(
+            "O nome da aba do arquivo XLSX deve ter no máximo 31 caracteres.",
+        );
+    }
+
+    if (/[:\\/?*\[\]]/.test(worksheetName)) {
+        throw new Error(
+            "O nome da aba do arquivo XLSX possui caracteres inválidos.",
+        );
+    }
+
+    if (
+        worksheetName.startsWith("'") ||
+        worksheetName.endsWith("'")
+    ) {
+        throw new Error(
+            "O nome da aba do arquivo XLSX não pode começar ou terminar com apóstrofo.",
+        );
+    }
+
+    return worksheetName;
+}
+
+async function renameXlsxTemplateWorksheet({
+    archive,
+    sheetName,
+    newSheetName,
+}) {
+    if (
+        !archive ||
+        typeof archive.file !==
+            "function"
+    ) {
+        throw new TypeError(
+            "O modelo XLSX carregado é inválido.",
+        );
+    }
+
+    const workbookPath =
+        "xl/workbook.xml";
+
+    const workbookXml =
+        await readArchiveText(
+            archive,
+            workbookPath,
+        );
+
+    const currentSheetName =
+        normalizeWorksheetName(
+            sheetName,
+        );
+
+    const outputSheetName =
+        normalizeWorksheetName(
+            newSheetName,
+        );
+
+    const sheetTags =
+        Array.from(
+            workbookXml.matchAll(
+                /<sheet\b[^>]*\/?\s*>/g,
+            ),
+            function (match) {
+                return match[0];
+            },
+        );
+
+    const sheetTag =
+        sheetTags.find(
+            function (tag) {
+                return (
+                    getXmlAttribute(
+                        tag,
+                        "name",
+                    ) ===
+                    currentSheetName
+                );
+            },
+        );
+
+    if (!sheetTag) {
+        throw new Error(
+            `A aba ${currentSheetName} não foi encontrada no modelo XLSX.`,
+        );
+    }
+
+    const hasDuplicateName =
+        sheetTags.some(
+            function (tag) {
+                return (
+                    tag !== sheetTag &&
+                    String(
+                        getXmlAttribute(
+                            tag,
+                            "name",
+                        ) ?? "",
+                    ).toLocaleLowerCase() ===
+                        outputSheetName.toLocaleLowerCase()
+                );
+            },
+        );
+
+    if (hasDuplicateName) {
+        throw new Error(
+            `A aba ${outputSheetName} já existe no arquivo XLSX.`,
+        );
+    }
+
+    if (currentSheetName === outputSheetName) {
+        return {
+            archive,
+            sheetName:
+                outputSheetName,
+        };
+    }
+
+    archive.file(
+        workbookPath,
+        workbookXml.replace(
+            sheetTag,
+            setXmlAttribute(
+                sheetTag,
+                "name",
+                outputSheetName,
+            ),
+        ),
+        {
+            createFolders: false,
+        },
+    );
+
+    return {
+        archive,
+        sheetName:
+            outputSheetName,
+    };
 }
 
 async function readXlsxTemplateWorksheet({
@@ -915,6 +1072,7 @@ function getJsZipLibrary(
 async function createXlsxTemplateBlob({
     templateUrl,
     sheetName,
+    outputSheetName,
     cells,
     fetchFunction =
         globalThis.fetch,
@@ -960,6 +1118,18 @@ async function createXlsxTemplateBlob({
         cells,
     });
 
+    if (
+        outputSheetName !== null &&
+        outputSheetName !== undefined
+    ) {
+        await renameXlsxTemplateWorksheet({
+            archive,
+            sheetName,
+            newSheetName:
+                outputSheetName,
+        });
+    }
+
     return archive.generateAsync({
         type: "blob",
         mimeType:
@@ -978,6 +1148,7 @@ export {
     parseSharedStringsXml,
     parseWorksheetCellValues,
     readXlsxTemplateWorksheet,
+    renameXlsxTemplateWorksheet,
     replaceWorksheetCells,
     updateXlsxTemplateArchive,
 };

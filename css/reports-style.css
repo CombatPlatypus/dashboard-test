@@ -968,7 +968,6 @@
     }
     #collection-indicators input[readonly] {
         cursor: not-allowed;
-        opacity: 0.65;
     }
     #collection-indicators > a {
         font-size: 13px;

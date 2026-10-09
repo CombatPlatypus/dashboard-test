@@ -650,14 +650,38 @@ function createPlanningSpreadsheetFileName(
     );
 }
 
+function createPlanningSpreadsheetSheetName(
+    date = new Date(),
+) {
+    return [
+        String(
+            date.getDate(),
+        ).padStart(2, "0"),
+        String(
+            date.getMonth() + 1,
+        ).padStart(2, "0"),
+    ].join("-");
+}
+
 function createPlanningSpreadsheetBlob(
     state,
+    date = new Date(),
+    {
+        fetchFunction =
+            globalThis.fetch,
+        jsZipLibrary =
+            globalThis.JSZip,
+    } = {},
 ) {
     return createXlsxTemplateBlob({
         templateUrl:
             PLANNING_SPREADSHEET_TEMPLATE_URL,
         sheetName:
             PLANNING_SPREADSHEET_SHEET_NAME,
+        outputSheetName:
+            createPlanningSpreadsheetSheetName(
+                date,
+            ),
         cells:
             function ({
                 cellValues,
@@ -672,6 +696,8 @@ function createPlanningSpreadsheetBlob(
                     layout,
                 );
             },
+        fetchFunction,
+        jsZipLibrary,
     });
 }
 
@@ -685,5 +711,6 @@ export {
     createPlanningSpreadsheetCells,
     createPlanningSpreadsheetFileName,
     createPlanningSpreadsheetLayout,
+    createPlanningSpreadsheetSheetName,
     getPlanningSpreadsheetTos,
 };

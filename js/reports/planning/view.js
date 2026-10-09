@@ -1435,13 +1435,19 @@ async function handleDownloadPlanningSpreadsheet() {
     );
 
     try {
+        const exportDate =
+            new Date();
+
         const spreadsheetBlob =
             await createPlanningSpreadsheetBlob(
                 state,
+                exportDate,
             );
 
         const fileName =
-            createPlanningSpreadsheetFileName();
+            createPlanningSpreadsheetFileName(
+                exportDate,
+            );
 
         downloadReportBlob(
             spreadsheetBlob,
