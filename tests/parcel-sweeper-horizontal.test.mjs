@@ -35,13 +35,32 @@ test("distribuições incluem todas as linhas, inclusive não bipadas e operador
     assert.equal(summary.scannedStatusDistribution[0].count, 3);
     assert.equal(summary.finalStatusDistribution[0].label, "LMHub_Received");
     assert.equal(summary.finalStatusDistribution[0].count, 2);
-    for (const distribution of [summary.scannedStatusDistribution, summary.finalStatusDistribution]) {
+    assert.deepEqual(summary.nextStepActionDistribution, [
+        { label: "Process for delivery", count: 2, percentage: 0.5 },
+        { label: "-", count: 1, percentage: 0.25 },
+        { label: "Put in EHA", count: 1, percentage: 0.25 },
+    ]);
+    for (const distribution of [summary.scannedStatusDistribution, summary.finalStatusDistribution, summary.nextStepActionDistribution]) {
         assert.equal(distribution.reduce((sum, item) => sum + item.count, 0), 4);
         assert.equal(distribution.reduce((sum, item) => sum + item.percentage, 0), 1);
     }
     const corrected = createParcelSummary(rows, { "[ops1]ana": true });
     assert.deepEqual(corrected.scannedStatusDistribution, summary.scannedStatusDistribution);
     assert.deepEqual(corrected.finalStatusDistribution, summary.finalStatusDistribution);
+    assert.deepEqual(corrected.nextStepActionDistribution, summary.nextStepActionDistribution);
+});
+
+test("Next Step Action agrupa nomes equivalentes e valores ausentes sem perder pacotes", () => {
+    const rows = [
+        { nextStepAction: "  Process for delivery  " }, { nextStepAction: "process for delivery" },
+        { nextStepAction: "Put in EHA" }, { nextStepAction: "" }, {}, { nextStepAction: "-" },
+    ];
+    assert.deepEqual(createParcelColumnDistribution(rows, "nextStepAction"), [
+        { label: "-", count: 3, percentage: 0.5 },
+        { label: "Process for delivery", count: 2, percentage: 2 / 6 },
+        { label: "Put in EHA", count: 1, percentage: 1 / 6 },
+    ]);
+    assert.deepEqual(createParcelSummary([]).nextStepActionDistribution, []);
 });
 
 test("agrupa espaços, maiúsculas e vazios, preserva nomes oficiais e ordena quantidades", () => {
@@ -151,7 +170,7 @@ test("atualização limpa dados antigos, adapta altura e reserva espaço para qu
     assert.equal(resizes, 2);
 });
 
-test("os quatro gráficos inicializam uma vez e atualizam na importação e limpeza", t => {
+test("os cinco gráficos inicializam uma vez e atualizam na importação, troca de painel e limpeza", t => {
     class Element { constructor() { this.dataset = {}; this.style = {}; } }
     class Canvas extends Element {
         constructor(id) { super(); this.id = id; this.parentElement = new Element(); }
@@ -159,20 +178,22 @@ test("os quatro gráficos inicializam uma vez e atualizam na importação e limp
     }
     const panel = new Element();
     panel.id = "parcel";
-    const canvases = ["parcelCoverageChart", "parcelAgingChart", "parcelScannedStatusChart", "parcelFinalStatusChart"]
+    panel.classList = { contains: () => true };
+    const canvases = ["parcelCoverageChart", "parcelAgingChart", "parcelScannedStatusChart", "parcelFinalStatusChart", "parcelNextStepActionChart"]
         .map(id => new Canvas(id));
     panel.querySelector = selector => canvases.find(canvas => `#${canvas.id}` === selector);
     const charts = [];
     replaceGlobal(t, "HTMLElement", Element);
     replaceGlobal(t, "HTMLCanvasElement", Canvas);
-    replaceGlobal(t, "MutationObserver", class { observe() {} disconnect() {} });
-    replaceGlobal(t, "window", { Chart: class {
+    let visibilityChanged;
+    replaceGlobal(t, "MutationObserver", class { constructor(callback) { visibilityChanged = callback; } observe() {} disconnect() {} });
+    replaceGlobal(t, "window", { requestAnimationFrame: callback => callback(), Chart: class {
         constructor(canvas, config) { Object.assign(this, config); this.canvas = canvas; charts.push(this); }
-        resize() {} update() {}
+        resize() { this.resizes = (this.resizes ?? 0) + 1; } update() {}
     } });
     assert.equal(initializeParcelCharts(panel), true);
     assert.equal(initializeParcelCharts(panel), true);
-    assert.equal(charts.length, 4);
+    assert.equal(charts.length, 5);
     assert.equal(charts[1].data.datasets[0].backgroundColor, "#3F51B5");
     replaceParcelRows([
         { trackingNumber: "BR1", scannedStatus: "LMHub_Received", finalStatus: "LMHub_Received", nextStepAction: "Process for delivery" },
@@ -191,13 +212,34 @@ test("os quatro gráficos inicializam uma vez e atualizam na importação e limp
     assert.match(charts[3].canvas["aria-label"], /Quantidade de pacotes por Final Status/);
     assert.equal(charts[1].data.datasets[0].backgroundColor, "#3F51B5");
     assert.equal(charts[1].data.datasets[0].data.length, 7);
+    assert.equal(charts[4].canvas.id, "parcelNextStepActionChart");
+    assert.equal(charts[4].type, "bar");
+    assert.equal(charts[4].options.indexAxis ?? "x", "x");
+    assert.deepEqual(charts[4].options, charts[1].options);
+    assert.deepEqual(charts[4].plugins, charts[1].plugins);
+    assert.deepEqual(charts[4].data.labels, [["-", "33,3%"], ["Process for delivery", "33,3%"], ["Put in EHA", "33,3%"]]);
+    assert.deepEqual(charts[4].data.datasets[0].data, [1, 1, 1]);
+    assert.equal(charts[4].data.datasets[0].backgroundColor, "#3F51B5");
+    assert.match(charts[4].canvas["aria-label"], /Process for delivery: 1; Put in EHA: 1/);
+    const resizeCount = charts[4].resizes ?? 0;
+    visibilityChanged();
+    assert.equal(charts[4].resizes, resizeCount + 1);
+    replaceParcelRows([
+        { trackingNumber: "BR4", nextStepAction: "Reroute to correct station" },
+        { trackingNumber: "BR5", nextStepAction: "Reroute to correct station" },
+    ]);
+    assert.deepEqual(charts[4].data.labels, [["Reroute to correct", "station", "100,0%"]]);
+    assert.deepEqual(charts[4].data.datasets[0].data, [2]);
     resetParcelReport();
     assert.deepEqual(charts[2].data.labels, ["—"]);
     assert.deepEqual(charts[3].data.datasets[0].data, [0]);
     assert.equal(charts[1].data.datasets[0].backgroundColor, "#3F51B5");
+    assert.deepEqual(charts[4].data.labels, []);
+    assert.deepEqual(charts[4].data.datasets[0].data, []);
+    assert.match(charts[4].canvas["aria-label"], /sem pacotes importados/);
 });
 
-test("HTML conecta os dois canvases na estrutura fornecida, sem ids vazios", () => {
+test("HTML mantém os dois status juntos e Next Step Action como gráfico vertical logo abaixo", () => {
     const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
     const parcel = html.match(/<div class="tabs-panel" id="parcel">([\s\S]*?)<!-- RELATÓRIO ANÁLISE GERAL -->/)[1];
     assert.match(parcel, /id="parcelStatusCharts"/);
@@ -208,6 +250,9 @@ test("HTML conecta os dois canvases na estrutura fornecida, sem ids vazios", () 
     assert.ok(parcel.indexOf('id="parcelScannedStatusChart"') < parcel.indexOf('id="parcelFinalStatusChart"'));
     assert.match(parcel, /<h4>Distribuição por Scanned Status<\/h4>/);
     assert.match(parcel, /<h4>Distribuição por Final Status<\/h4>/);
-    assert.doesNotMatch(parcel, /parcelNextStepActionChart/);
+    assert.match(parcel, /id="parcelFinalStatusChart"[^>]*><\/canvas>\s*<\/div>\s*<\/div>\s*<\/div>\s*<!-- GRÁFICO DE NEXT STEP ACTION -->\s*<div class="vertical-bars-chart">/);
+    assert.match(parcel, /<h4>Distribuição por Next Step Action<\/h4>/);
+    assert.match(parcel, /id="parcelNextStepActionChartContainer">\s*<div>\s*<canvas id="parcelNextStepActionChart" role="img" aria-label="[^"]+"/);
+    assert.equal((parcel.match(/id="parcelNextStepActionChart"/g) ?? []).length, 1);
     assert.doesNotMatch(parcel, /id=""/);
 });

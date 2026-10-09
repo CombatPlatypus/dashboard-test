@@ -64,10 +64,24 @@ function createParcelAgingChartLabel(bin) {
     ];
 }
 
+function createParcelNextStepActionChartLabel(group) {
+    const lines = [];
+    for (const word of group.label.split(" ")) {
+        const last = lines.length - 1;
+        if (last >= 0 && lines[last].length + word.length + 1 <= 22) {
+            lines[last] += ` ${word}`;
+        } else {
+            lines.push(word);
+        }
+    }
+    return [...lines, parcelChartPercentageFormatter.format(group.percentage)];
+}
+
 let parcelCoverageChart = null;
 let parcelAgingChart = null;
 let parcelScannedStatusChart = null;
 let parcelFinalStatusChart = null;
+let parcelNextStepActionChart = null;
 let parcelChartVisibilityObserver = null;
 
 const parcelCoverageProjection = {
@@ -265,7 +279,7 @@ function createParcelCoverageChart(
     );
 }
 
-function createParcelAgingChart(
+function createParcelVerticalChart(
     canvas,
 ) {
     return new window.Chart(
@@ -337,6 +351,10 @@ function createParcelAgingChart(
     );
 }
 
+function createParcelAgingChart(canvas) {
+    return createParcelVerticalChart(canvas);
+}
+
 function updateParcelCharts(
     state,
 ) {
@@ -344,7 +362,8 @@ function updateParcelCharts(
         !parcelCoverageChart ||
         !parcelAgingChart ||
         !parcelScannedStatusChart ||
-        !parcelFinalStatusChart
+        !parcelFinalStatusChart ||
+        !parcelNextStepActionChart
     ) {
         return;
     }
@@ -414,6 +433,15 @@ function updateParcelCharts(
     updateParcelHorizontalChart(parcelFinalStatusChart, summary.finalStatusDistribution, {
         title: "Quantidade de pacotes por Final Status", color: PARCEL_BAR_COLOR, height: horizontalHeight,
     });
+
+    const nextStepActions = summary.nextStepActionDistribution;
+    parcelNextStepActionChart.data.labels = nextStepActions.map(createParcelNextStepActionChartLabel);
+    parcelNextStepActionChart.data.datasets[0].data = nextStepActions.map(group => group.count);
+    parcelNextStepActionChart.canvas.setAttribute("aria-label", nextStepActions.length
+        ? `Quantidade de pacotes por Next Step Action: ${nextStepActions.map(group =>
+            `${group.label}: ${parcelChartIntegerFormatter.format(group.count)}`).join("; ")}.`
+        : "Quantidade de pacotes por Next Step Action: sem pacotes importados.");
+    parcelNextStepActionChart.update();
 }
 
 function resizeParcelCharts() {
@@ -425,6 +453,7 @@ function resizeParcelCharts() {
                 ?.resize();
             parcelScannedStatusChart?.resize();
             parcelFinalStatusChart?.resize();
+            parcelNextStepActionChart?.resize();
         },
     );
 }
@@ -483,6 +512,7 @@ function initializeParcelCharts(
 
     const scannedStatusCanvas = rootElement.querySelector("#parcelScannedStatusChart");
     const finalStatusCanvas = rootElement.querySelector("#parcelFinalStatusChart");
+    const nextStepActionCanvas = rootElement.querySelector("#parcelNextStepActionChart");
 
     if (
         !(panel instanceof HTMLElement) ||
@@ -496,6 +526,7 @@ function initializeParcelCharts(
         ) ||
         !(scannedStatusCanvas instanceof HTMLCanvasElement) ||
         !(finalStatusCanvas instanceof HTMLCanvasElement) ||
+        !(nextStepActionCanvas instanceof HTMLCanvasElement) ||
         typeof window.Chart !==
             "function"
     ) {
@@ -525,6 +556,7 @@ function initializeParcelCharts(
         );
     parcelScannedStatusChart = createParcelHorizontalChart(scannedStatusCanvas, PARCEL_BAR_COLOR);
     parcelFinalStatusChart = createParcelHorizontalChart(finalStatusCanvas, PARCEL_BAR_COLOR);
+    parcelNextStepActionChart = createParcelVerticalChart(nextStepActionCanvas);
 
     subscribeParcelState(
         updateParcelCharts,
@@ -544,6 +576,8 @@ function initializeParcelCharts(
 export {
     createParcelAgingChartLabel,
     createParcelAgingChart,
+    createParcelNextStepActionChartLabel,
+    createParcelVerticalChart,
     createParcelCoverageChart,
     initializeParcelCharts,
     updateParcelCharts,

@@ -17,10 +17,7 @@
         caption, th { padding: 12px; background: #252525; font-weight: 600; }
         td, th { border: 1px solid #666; padding: 10px; text-align: center; }
         tr:nth-child(even) { background: #1b1b1b; }
-        #parcelPreview { padding: 20px; border: 1px solid #666; }
-        #parcelAgingChartContainer { height: 250px; margin-top: 30px; }
-        #parcelAgingChartContainer > div { height: 100%; }
-        #parcelStatusCharts { margin-top: 24px; }
+        #parcelPreview { display: flex; flex-direction: column; gap: 20px; padding: 20px; border: 1px solid #666; }
         #exportPreview { display: block; max-width: 100%; margin-top: 20px; }
         #exportStatus { min-height: 24px; }
         @media (max-width: 850px) { .distribution { grid-template-columns: 1fr; } }
@@ -57,8 +54,11 @@
                         </table>
                     </div>
                 </div>
-                <div id="parcelAgingChartContainer">
-                    <div><canvas id="parcelAgingChart" role="img" aria-label="Quantidade de pacotes escaneados por faixa de aging"></canvas></div>
+                <div class="vertical-bars-chart">
+                    <div class="chart-title"><h4>Distribuição por Aging</h4></div>
+                    <div id="parcelAgingChartContainer">
+                        <div><canvas id="parcelAgingChart" role="img" aria-label="Quantidade de pacotes escaneados por faixa de aging"></canvas></div>
+                    </div>
                 </div>
                 <div id="parcelStatusCharts">
                     <div class="horizontal-bars-chart">
@@ -72,6 +72,12 @@
                         <div id="parcelFinalStatusChartContainer" class="parcel-horizontal-chart-canvas">
                             <canvas id="parcelFinalStatusChart" role="img" aria-label="Quantidade de pacotes por Final Status"></canvas>
                         </div>
+                    </div>
+                </div>
+                <div class="vertical-bars-chart">
+                    <div class="chart-title"><h4>Distribuição por Next Step Action</h4></div>
+                    <div id="parcelNextStepActionChartContainer">
+                        <div><canvas id="parcelNextStepActionChart" role="img" aria-label="Quantidade de pacotes por Next Step Action"></canvas></div>
                     </div>
                 </div>
             </div>

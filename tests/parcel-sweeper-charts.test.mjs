@@ -9,6 +9,8 @@ import {
 import {
     createParcelAgingChartLabel,
     createParcelAgingChart,
+    createParcelNextStepActionChartLabel,
+    createParcelVerticalChart,
     createParcelCoverageChart,
 } from "../js/reports/parcel-sweeper/charts.js";
 import { formatParcelCoverageMetric, renderParcelOperatorTable } from "../js/reports/parcel-sweeper/view.js";
@@ -147,6 +149,23 @@ test("aging mostra as sete janelas solicitadas em uma linha, preservando percent
         assert.equal(bin.label, label);
         assert.equal(bin.percentage, 0.125);
     });
+});
+
+test("Next Step Action conserva ações completas e percentuais em rótulos com quebra de linha", t => {
+    replaceGlobal(t, "window", { Chart: class { constructor(canvas, config) { return config; } } });
+    const chart = createParcelVerticalChart({});
+    assert.deepEqual(chart, createParcelAgingChart({}));
+    assert.deepEqual(createParcelNextStepActionChartLabel({ label: "Process for delivery", percentage: 0.5 }),
+        ["Process for delivery", "50,0%"]);
+    assert.deepEqual(createParcelNextStepActionChartLabel({ label: "Process for liquidation", percentage: 0.125 }),
+        ["Process for", "liquidation", "12,5%"]);
+    const context = createCanvasContext();
+    chart.ctx = context;
+    chart.data.datasets[0].data = [2185, 0, 7];
+    chart.getDatasetMeta = () => ({ data: [{ x: 50, y: 25 }, { x: 100, y: 120 }, { x: 150, y: 80 }] });
+    chart.plugins.forEach(plugin => plugin.afterDatasetsDraw?.(chart));
+    assert.deepEqual(context.texts, [["2.185", 50, 19], ["7", 150, 74]]);
+    assert.equal(context.balance, 0);
 });
 
 class TestElement {
