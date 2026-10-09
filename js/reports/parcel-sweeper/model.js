@@ -850,7 +850,7 @@ function filterParcelPackageRows(
 }
 
 function createParcelColumnDistribution(rows, column) {
-    if (!Array.isArray(rows) || !["finalStatus", "nextStepAction"].includes(column)) {
+    if (!Array.isArray(rows) || !["scannedStatus", "finalStatus"].includes(column)) {
         return [];
     }
 
@@ -1016,8 +1016,8 @@ function createParcelSummary(
             scannedRows.length -
                 validOperatorRows.length,
         operatorStats,
+        scannedStatusDistribution: createParcelColumnDistribution(receivedRows, "scannedStatus"),
         finalStatusDistribution: createParcelColumnDistribution(receivedRows, "finalStatus"),
-        nextStepActionDistribution: createParcelColumnDistribution(receivedRows, "nextStepAction"),
         agingDistribution:
             createParcelAgingDistribution(
                 receivedRows,

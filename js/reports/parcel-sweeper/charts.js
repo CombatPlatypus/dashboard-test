@@ -66,8 +66,8 @@ function createParcelAgingChartLabel(bin) {
 
 let parcelCoverageChart = null;
 let parcelAgingChart = null;
+let parcelScannedStatusChart = null;
 let parcelFinalStatusChart = null;
-let parcelNextStepActionChart = null;
 let parcelChartVisibilityObserver = null;
 
 const parcelCoverageProjection = {
@@ -343,8 +343,8 @@ function updateParcelCharts(
     if (
         !parcelCoverageChart ||
         !parcelAgingChart ||
-        !parcelFinalStatusChart ||
-        !parcelNextStepActionChart
+        !parcelScannedStatusChart ||
+        !parcelFinalStatusChart
     ) {
         return;
     }
@@ -407,12 +407,12 @@ function updateParcelCharts(
     parcelAgingChart.update();
 
     const horizontalHeight = getParcelHorizontalChartHeight(Math.max(
-        summary.finalStatusDistribution.length, summary.nextStepActionDistribution.length));
+        summary.scannedStatusDistribution.length, summary.finalStatusDistribution.length));
+    updateParcelHorizontalChart(parcelScannedStatusChart, summary.scannedStatusDistribution, {
+        title: "Quantidade de pacotes por Scanned Status", color: PARCEL_BAR_COLOR, height: horizontalHeight,
+    });
     updateParcelHorizontalChart(parcelFinalStatusChart, summary.finalStatusDistribution, {
         title: "Quantidade de pacotes por Final Status", color: PARCEL_BAR_COLOR, height: horizontalHeight,
-    });
-    updateParcelHorizontalChart(parcelNextStepActionChart, summary.nextStepActionDistribution, {
-        title: "Quantidade de pacotes por Next Step Action", color: PARCEL_BAR_COLOR, height: horizontalHeight,
     });
 }
 
@@ -423,8 +423,8 @@ function resizeParcelCharts() {
                 ?.resize();
             parcelAgingChart
                 ?.resize();
+            parcelScannedStatusChart?.resize();
             parcelFinalStatusChart?.resize();
-            parcelNextStepActionChart?.resize();
         },
     );
 }
@@ -481,8 +481,8 @@ function initializeParcelCharts(
             "#parcelAgingChart",
         );
 
+    const scannedStatusCanvas = rootElement.querySelector("#parcelScannedStatusChart");
     const finalStatusCanvas = rootElement.querySelector("#parcelFinalStatusChart");
-    const nextStepActionCanvas = rootElement.querySelector("#parcelNextStepActionChart");
 
     if (
         !(panel instanceof HTMLElement) ||
@@ -494,8 +494,8 @@ function initializeParcelCharts(
             agingCanvas instanceof
                 HTMLCanvasElement
         ) ||
+        !(scannedStatusCanvas instanceof HTMLCanvasElement) ||
         !(finalStatusCanvas instanceof HTMLCanvasElement) ||
-        !(nextStepActionCanvas instanceof HTMLCanvasElement) ||
         typeof window.Chart !==
             "function"
     ) {
@@ -523,8 +523,8 @@ function initializeParcelCharts(
         createParcelAgingChart(
             agingCanvas,
         );
+    parcelScannedStatusChart = createParcelHorizontalChart(scannedStatusCanvas, PARCEL_BAR_COLOR);
     parcelFinalStatusChart = createParcelHorizontalChart(finalStatusCanvas, PARCEL_BAR_COLOR);
-    parcelNextStepActionChart = createParcelHorizontalChart(nextStepActionCanvas, PARCEL_BAR_COLOR);
 
     subscribeParcelState(
         updateParcelCharts,
