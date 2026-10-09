@@ -37,25 +37,6 @@ const parcelPercentageFormatter =
         },
     );
 
-const parcelCoveragePercentageFormatter =
-    new Intl.NumberFormat(
-        "pt-BR",
-        {
-            style: "percent",
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-        },
-    );
-
-function formatParcelCoverageMetric(quantity, total) {
-    if (total <= 0) {
-        return "—";
-    }
-
-    return `${parcelIntegerFormatter.format(quantity)} ` +
-        `(${parcelCoveragePercentageFormatter.format(quantity / total)})`;
-}
-
 let parcelViewElements = null;
 const parcelPackageSorts = { common: null, bulky: null };
 
@@ -405,20 +386,20 @@ function renderParcelView(
                 summary.unscannedCount,
             );
 
+    // Os totais do SPX incluem Expected = N. O percentual do gráfico
+    // continua usando somente os pacotes esperados (Expected = Y).
     parcelViewElements
         .coverageScanned
         .textContent =
-            formatParcelCoverageMetric(
-                summary.expectedScannedCount,
-                summary.expectedTotalCount,
+            formatMetric(
+                summary.scannedCount,
             );
 
     parcelViewElements
         .coverageUnscanned
         .textContent =
-            formatParcelCoverageMetric(
-                summary.expectedUnscannedCount,
-                summary.expectedTotalCount,
+            formatMetric(
+                summary.unscannedCount,
             );
 
     renderParcelOperatorTable(
@@ -569,7 +550,6 @@ function initializeParcelView(
 }
 
 export {
-    formatParcelCoverageMetric,
     initializeParcelView,
     renderParcelOperatorTable,
     renderParcelView,

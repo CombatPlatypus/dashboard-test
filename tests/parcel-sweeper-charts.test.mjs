@@ -13,7 +13,7 @@ import {
     createParcelVerticalChart,
     createParcelCoverageChart,
 } from "../js/reports/parcel-sweeper/charts.js";
-import { formatParcelCoverageMetric, renderParcelOperatorTable } from "../js/reports/parcel-sweeper/view.js";
+import { renderParcelOperatorTable } from "../js/reports/parcel-sweeper/view.js";
 
 function createCanvasContext() {
     const context = { ellipses: [], fills: 0, texts: [], balance: 0 };
@@ -36,32 +36,23 @@ function replaceGlobal(t, name, value) {
     });
 }
 
-test("indicadores de cobertura mostram quantidade e percentual sobre o total esperado", () => {
-    for (const [quantity, total, expected] of [
-        [516, 702, "516 (73,50%)"], [186, 702, "186 (26,50%)"],
-        [1606, 1988, "1.606 (80,78%)"], [382, 1988, "382 (19,22%)"],
-        [200, 300, "200 (66,67%)"], [100, 300, "100 (33,33%)"],
-        [5668, 10000, "5.668 (56,68%)"],
-        [0, 300, "0 (0,00%)"], [300, 300, "300 (100,00%)"], [0, 0, "—"],
-    ]) {
-        assert.equal(formatParcelCoverageMetric(quantity, total), expected);
-    }
-});
-
-test("centro e indicador de escaneados usam a mesma precisão e o mesmo total", t => {
+test("centro da cobertura preserva dois decimais sobre o total esperado, como no SPX", t => {
     replaceGlobal(t, "window", { Chart: class { constructor(canvas, config) { return config; } } });
     const config = createParcelCoverageChart({});
     const projection = config.plugins.find(plugin => plugin.id === "parcel-coverage-3d");
     const center = config.plugins.find(plugin => plugin.id === "parcelCoverageCenterText");
-    for (const [scanned, total] of [[516, 702], [1606, 1988], [200, 300], [5668, 10000], [0, 300], [300, 300], [0, 0]]) {
+    for (const [scanned, total, expected] of [
+        [516, 702, "73,50%"], [1606, 1988, "80,78%"], [200, 300, "66,67%"],
+        [5668, 10000, "56,68%"], [348, 718, "48,47%"], [319, 561, "56,86%"],
+        [0, 300, "0,00%"], [300, 300, "100,00%"], [0, 0, "—"],
+    ]) {
         const context = createCanvasContext();
         const chart = { ctx: context, chartArea: { left: 0, top: 0, right: 450, bottom: 270 },
             data: { datasets: [{ data: [scanned, total - scanned], backgroundColor: ["#3F51B5", "#e4e6eb"] }] },
             $parcelTotal: total, $parcelScanned: scanned };
         projection.beforeDatasetDraw(chart, { index: 0 });
         center.afterDraw(chart);
-        const indicator = formatParcelCoverageMetric(scanned, total);
-        assert.equal(total > 0 ? indicator.match(/\(([^)]+)\)$/)[1] : indicator, context.texts[0][0]);
+        assert.equal(context.texts[0][0], expected);
     }
 });
 
