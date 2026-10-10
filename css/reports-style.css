@@ -1098,19 +1098,7 @@
         }
     }
 
-    /* TAXA DE PERDAS - TABELA DE IDENTIFICAÇÃO */
-
-    #losses-rate .losses-rate-identification-table th:first-child,
-    #losses-rate .losses-rate-identification-table td:first-child {
-        width: 40%;
-        white-space: nowrap;
-    }
-    #losses-rate .losses-rate-identification-table th:nth-child(n + 2),
-    #losses-rate .losses-rate-identification-table td:nth-child(n + 2) {
-        width: 20%;
-    }
-
-    /* TAXA DE PERDAS - VALORES DAS TABELAS */
+    /* TAXA DE PERDAS - VALORES DA TABELA */
 
     #losses-rate #lossesRatePreview > table tbody td {
         text-align: center;
@@ -1524,7 +1512,7 @@
 
     /*  */
 
-    /* ESTRUTURA */
+/* ESTRUTURA */
 
 #reports #parcel .preview {
     flex: 1 1 0;

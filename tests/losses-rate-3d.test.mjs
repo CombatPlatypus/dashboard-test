@@ -186,3 +186,26 @@ test("indicadores do HTML estão ligados aos três campos com as cores originais
         assert.equal(html.split(`id="${id}"`).length - 1, 1);
     }
 });
+
+test("resumo reúne volume movimentado e perdas em uma única tabela", () => {
+    const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
+    const view = readFileSync(new URL("../js/reports/losses-rate/view.js", import.meta.url), "utf8");
+    const preview = html.match(/<div class="preview-style" id="lossesRatePreview">([\s\S]*?)<div class="losses-rate-charts">/)[1];
+
+    assert.equal((preview.match(/<table\b/g) || []).length, 1);
+    assert.match(preview, /<th>Volume Movimentado<\/th>\s*<th>Possíveis Perdas<\/th>/);
+    assert.match(preview, /id="lossesRatePreviewMoved">—<\/td>\s*<td id="lossesRatePreviewPossibleLosses">—<\/td>/);
+    assert.doesNotMatch(preview, /Descrição|Código do Hub|Sub Regional|losses-rate-identification-table/);
+    assert.doesNotMatch(view, /previewDescription|previewHubCode|previewSubRegional/);
+});
+
+test("notificação inicial orienta a geração do relatório de taxa de perdas", () => {
+    const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
+    const notifications = readFileSync(new URL("../js/reports/report-notifications.js", import.meta.url), "utf8");
+    const message = "Importe a planilha de Avarias e Perdas para gerar o relatório de Taxa de Perdas.";
+
+    assert.match(html, new RegExp(`<h4 id="lossesRateNotificationText">\\s*${message.replaceAll(".", "\\.")}\\s*</h4>`));
+    assert.ok(notifications.includes(`"${message}"`));
+    assert.doesNotMatch(html, /os dois relatórios serão atualizados/);
+    assert.doesNotMatch(notifications, /os dois relatórios serão atualizados/);
+});

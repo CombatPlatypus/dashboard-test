@@ -30,6 +30,19 @@
         <link rel="stylesheet" href="css/data-analysis.css">
         <link rel="stylesheet" href="css/docs.css">
         <link rel="stylesheet" href="css/filter.css">
+
+        <style>
+
+            #reports #reverse .preview {
+                flex: 1 1 0;
+            }
+            #reports #reverse #reversePreview > .flex-box-start {
+                gap: 15px;
+                align-items: flex-start;
+            }
+
+
+        </style>
     </head>
 
     <!-- CONTEÚDO DA PÁGINA -->
@@ -217,6 +230,10 @@
 
                             <li class="tabs-title">
                                 <a href="#parcel">Parcel Sweeper</a>
+                            </li> 
+
+                            <li class="tabs-title">
+                                <a href="#reverse">Reversa</a>
                             </li> 
 
                             <li class="tabs-title">
@@ -1917,7 +1934,7 @@
                                         <img id="lossesRateNotificationIcon" src="images/geral-icons/bell-icon.svg" alt="">
 
                                         <h4 id="lossesRateNotificationText">
-                                            Importe a planilha de Avarias e Perdas com a aba Taxa de Perdas; os dois relatórios serão atualizados.
+                                            Importe a planilha de Avarias e Perdas para gerar o relatório de Taxa de Perdas.
                                         </h4>
                                     </div>
                                 </div>
@@ -1951,29 +1968,10 @@
                                             <h2>Relatório de Taxa de Perdas</h2>
                                         </div>
 
-                                        <table class="losses-rate-identification-table">
-                                            <thead>
-                                                <tr>
-                                                    <th>Descrição</th>
-                                                    <th>Código do Hub</th>
-                                                    <th>Sub Regional</th>
-                                                    <th>Volume Movimentado</th>
-                                                </tr>
-                                            </thead>
-
-                                            <tbody>
-                                                <tr>
-                                                    <td id="lossesRatePreviewDescription">—</td>
-                                                    <td id="lossesRatePreviewHubCode">—</td>
-                                                    <td id="lossesRatePreviewSubRegional">—</td>
-                                                    <td id="lossesRatePreviewMoved">—</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-
                                         <table>
                                             <thead>
                                                 <tr>
+                                                    <th>Volume Movimentado</th>
                                                     <th>Possíveis Perdas</th>
                                                     <th>Quantidade de LOST</th>
                                                     <th>Quantidade de AVARIA</th>
@@ -1984,6 +1982,7 @@
 
                                             <tbody>
                                                 <tr>
+                                                    <td id="lossesRatePreviewMoved">—</td>
                                                     <td id="lossesRatePreviewPossibleLosses">—</td>
                                                     <td id="lossesRatePreviewLost">—</td>
                                                     <td id="lossesRatePreviewDamage">—</td>
@@ -2341,6 +2340,55 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+
+                        <!-- RELATÓRIO DE REVERSA -->
+
+                        <div class="tabs-panel" id="reverse">
+
+                            <!-- BARRA DE NOTIFICAÇÕES E BOTÕES DE AÇÃO -->
+
+                            <div class="flex-box-start">
+                                <div class="warning" id="reverseNotification" role="status" aria-live="polite" aria-atomic="true" data-notification-type="idle">
+                                    <div class="flex-box-start">
+                                        <img id="reverseNotificationIcon" src="images/geral-icons/bell-icon.svg" alt="">
+
+                                        <h4 id="reverseNotificationText">
+                                            No SPX, acesse Parcel Sweeper / Parcel Sweeper View, escolha um arquivo parcel para exportar e, em seguida, volte aqui e clique em importar.
+                                        </h4>
+                                    </div>
+                                </div>
+
+                                <div class="report-actions">
+                                    <button id="reverseCopyReportButton" type="button" title="Clique para copiar; segure por 1,5 s para baixar" aria-label="Copiar relatório do parcel; segure por 1,5 segundo para baixar">
+                                        <img src="images/geral-icons/image-icon.svg" alt="">
+                                    </button>
+
+                                    <button id="reverseImportActionButton" type="button" title="" aria-label="">
+                                        <img src="images/geral-icons/import-icon.svg" alt="">
+                                    </button>
+
+                                    <input id="reverseFileInput" type="file" accept=".csv,.xlsx,.xls" hidden>
+
+                                    <button id="reverseClearReportButton" type="button" title="Limpar relatório" aria-label="">
+                                        <img src="images/geral-icons/trash-basket-icon.svg" alt="">
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- CONTEÚDO DO RELATÓRIO -->
+
+                            <div class="preview">
+                                <div class="preview-style" id="reversePreview">
+                                    <div class="title">
+                                        <h2>Parcel Sweeper</h2>
+                                    </div> 
+                                </div> 
+
+
+
+
+                            </div> 
                         </div>
 
                         <!-- RELATÓRIO ANÁLISE GERAL -->

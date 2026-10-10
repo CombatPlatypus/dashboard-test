@@ -45,7 +45,7 @@ const LOSSES_RATE_IMPORT_NOTIFICATION =
         type: "idle",
 
         message:
-            "Importe a planilha de Avarias e Perdas com a aba Taxa de Perdas; os dois relatórios serão atualizados.",
+            "Importe a planilha de Avarias e Perdas para gerar o relatório de Taxa de Perdas.",
     });
 
 const EXPEDITION_IMPORT_NOTIFICATION =

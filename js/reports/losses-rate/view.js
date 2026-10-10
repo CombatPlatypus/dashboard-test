@@ -85,21 +85,6 @@ function getLossesRateElements(
                 "lossesRateMonthTabs",
             ),
 
-        previewDescription:
-            getElementById(
-                "lossesRatePreviewDescription",
-            ),
-
-        previewHubCode:
-            getElementById(
-                "lossesRatePreviewHubCode",
-            ),
-
-        previewSubRegional:
-            getElementById(
-                "lossesRatePreviewSubRegional",
-            ),
-
         previewMoved:
             getElementById(
                 "lossesRatePreviewMoved",
@@ -284,24 +269,8 @@ function renderLossesRateMonthTabs(
 
 function renderLossesRatePreview(
     elements,
-    state,
     summary,
 ) {
-    const identification =
-        state.identification;
-
-    elements.previewDescription.textContent =
-        identification.description ||
-        "—";
-
-    elements.previewHubCode.textContent =
-        identification.hubCode ||
-        "—";
-
-    elements.previewSubRegional.textContent =
-        identification.subRegional ||
-        "—";
-
     elements.previewMoved.textContent =
         formatLossesRateQuantity(
             summary.moved,
@@ -355,7 +324,6 @@ function renderLossesRateReport(
 
     renderLossesRatePreview(
         elements,
-        state,
         summary,
     );
 }
