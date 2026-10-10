@@ -146,14 +146,12 @@ const DASHBOARD_EXTERNAL_LINK_KEYS =
         "packRecovery",
         "damageApp",
         "collectionApp",
-        "fleet",
     ]);
 
 const LEGACY_DASHBOARD_EXTERNAL_LINK_KEYS =
     Object.freeze([
         "damageApp",
         "collectionApp",
-        "fleet",
     ]);
 
 const DEFAULT_DASHBOARD_EXTERNAL_LINKS =
@@ -166,7 +164,6 @@ const DEFAULT_DASHBOARD_EXTERNAL_LINKS =
             DEFAULT_DAMAGE_APP_URL,
         collectionApp:
             DEFAULT_COLLECTION_APP_URL,
-        fleet: "",
     });
 
 const dashboardSettingsState = {
@@ -1403,19 +1400,11 @@ function renderExternalLinks() {
                 .collectionApp,
         );
 
-    const fleetUrl =
-        normalizeDashboardUrl(
-            dashboardSettingsState
-                .externalLinks
-                .fleet,
-        );
-
     const {
         reverseFormButton,
         packRecoveryButton,
         damageAppButton,
         collectionAppButton,
-        fleetLink,
     } = dashboardSettingsElements;
 
     [
@@ -1453,32 +1442,6 @@ function renderExternalLinks() {
         },
     );
 
-    if (fleetUrl) {
-        fleetLink.href = fleetUrl;
-        fleetLink.target = "_blank";
-        fleetLink.rel =
-            "noopener noreferrer";
-        fleetLink.setAttribute(
-            "aria-disabled",
-            "false",
-        );
-        fleetLink.removeAttribute(
-            "tabindex",
-        );
-    } else {
-        fleetLink.href = "#";
-        fleetLink.removeAttribute(
-            "target",
-        );
-        fleetLink.removeAttribute(
-            "rel",
-        );
-        fleetLink.setAttribute(
-            "aria-disabled",
-            "true",
-        );
-        fleetLink.tabIndex = -1;
-    }
 }
 
 /* APLICA AS CONFIGURAÇÕES IMPORTADAS */
@@ -1537,7 +1500,6 @@ function bindDashboardSettingsEvents() {
     const {
         spreadsheetRows,
         anotherLinks,
-        fleetLink,
     } = dashboardSettingsElements;
 
     const getSpreadsheetLinkInput =
@@ -1798,18 +1760,6 @@ function bindDashboardSettingsEvents() {
         },
     );
 
-    fleetLink.addEventListener(
-        "click",
-        function (event) {
-            if (
-                fleetLink.getAttribute(
-                    "aria-disabled",
-                ) === "true"
-            ) {
-                event.preventDefault();
-            }
-        },
-    );
 }
 
 /* LOCALIZA E VALIDA OS ELEMENTOS */
@@ -1861,11 +1811,6 @@ function getDashboardSettingsElements() {
             document.getElementById(
                 "footerCollectionAppLink",
             ),
-
-        fleetLink:
-            document.getElementById(
-                "planningFleetLink",
-            ),
     };
 }
 
@@ -1896,9 +1841,7 @@ function hasDashboardSettingsElements(
         elements.damageAppButton instanceof
             HTMLButtonElement &&
         elements.collectionAppButton instanceof
-            HTMLButtonElement &&
-        elements.fleetLink instanceof
-            HTMLAnchorElement
+            HTMLButtonElement
     );
 }
 

@@ -277,3 +277,39 @@ test(
         );
     },
 );
+
+test(
+    "remove o link descontinuado de consulta da frota",
+    async function () {
+        const [
+            html,
+            spreadsheetSettings,
+        ] =
+            await Promise.all([
+                readFile(
+                    new URL(
+                        "../index.html",
+                        import.meta.url,
+                    ),
+                    "utf8",
+                ),
+                readFile(
+                    new URL(
+                        "../js/spreadsheets/load-spreadsheets.js",
+                        import.meta.url,
+                    ),
+                    "utf8",
+                ),
+            ]);
+
+        assert.doesNotMatch(
+            html,
+            /Consultar Frota|planningFleetLink|settingsFleetLink|data-dashboard-external-link="fleet"/i,
+        );
+
+        assert.doesNotMatch(
+            spreadsheetSettings,
+            /planningFleetLink|fleetLink|fleetUrl|["']fleet["']/,
+        );
+    },
+);

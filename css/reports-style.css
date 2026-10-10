@@ -959,7 +959,7 @@
     #collection-indicators .padding {
         display: flex;
         flex-direction: column;
-        gap: 15px;
+        gap: 20px;
     }
     #collection-indicators p {
         margin: 0;
