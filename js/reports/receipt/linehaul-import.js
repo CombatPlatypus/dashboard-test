@@ -137,33 +137,9 @@ function getReceiptLinehaulCpt(
             splitReceiptLinehaulImportValues,
         );
 
-    const cpt =
-        getSpXLinehaulWindow(
-            importedValues,
-        );
-
-    if (cpt) {
-        return cpt;
-    }
-
-    for (const value of importedValues) {
-        const match =
-            value
-                .toUpperCase()
-                .replace(
-                    /\s+/g,
-                    "",
-                )
-                .match(
-                    /(?:^|_)(AM|PM1|PM2)(?:\d{2})?(?:$|_)/,
-                );
-
-        if (match) {
-            return match[1];
-        }
-    }
-
-    return "";
+    return getSpXLinehaulWindow(
+        importedValues,
+    );
 }
 
 function getReceiptLinehaulVehiclePlate(
@@ -461,6 +437,16 @@ function getReceiptLinehaulColumns(
                 ],
             ),
 
+        tripName:
+            findReceiptLinehaulColumn(
+                normalizedRow,
+                [
+                    "nome da viagem",
+                    "lh trip name",
+                    "nome da viagem lh",
+                ],
+            ),
+
         punctuality:
             findReceiptLinehaulColumn(
                 normalizedRow,
@@ -500,6 +486,7 @@ function getReceiptLinehaulColumns(
                 return ![
                     "driver",
                     "loadedOrders",
+                    "tripName",
                     "vehiclePlate",
                 ].includes(
                     key,
@@ -533,7 +520,10 @@ function createReceiptLinehaulRecord(
 
     const cpt =
         getReceiptLinehaulCpt(
-            receivedRecord.cpt,
+            [
+                ...receivedRecord.cpt,
+                ...receivedRecord.tripName,
+            ],
         );
 
     const driver =
@@ -662,6 +652,7 @@ function parseReceiptLinehaulMatrix(
                         origin: [],
                         driver: [],
                         cpt: [],
+                        tripName: [],
                         punctuality: [],
                         loadedOrders: [],
                         vehiclePlate: [],
@@ -684,6 +675,12 @@ function parseReceiptLinehaulMatrix(
 
                 currentRecord.cpt.push(
                     row[columns.cpt] ?? "",
+                );
+
+                currentRecord.tripName.push(
+                    columns.tripName >= 0
+                        ? row[columns.tripName] ?? ""
+                        : "",
                 );
 
                 currentRecord.punctuality.push(

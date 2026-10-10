@@ -7,6 +7,7 @@ import {
     createSpXLinehaulWindowCandidates,
     formatSpXLinehaulOrigin,
     getSpXLinehaulPlainLoadedOrders,
+    getSpXLinehaulWindow,
     parseSpXLinehaulQuantity,
 } from "../core/spx-linehaul-rules.js";
 
@@ -157,23 +158,9 @@ function parsePlanningImportQuantity(
 function getPlanningImportWindow(
     values,
 ) {
-    for (
-        const value of values
-    ) {
-        const match =
-            value
-                .trim()
-                .match(
-                    PLANNING_SPX_WINDOW_PATTERN,
-                );
-
-        if (match) {
-            return match[1]
-                .toUpperCase();
-        }
-    }
-
-    return "";
+    return getSpXLinehaulWindow(
+        values,
+    );
 }
 
 /* LÊ O TEXTO DE UMA CÉLULA */
@@ -344,6 +331,11 @@ function getPlanningImportColumns(
                 "cpt",
             ),
 
+        tripName:
+            findColumn(
+                "nome da viagem",
+            ),
+
         quantity:
             findColumn(
                 "pedido carregado",
@@ -364,6 +356,7 @@ function getPlanningImportColumns(
                     return ![
                         "quantity",
                         "action",
+                        "tripName",
                     ].includes(
                         key,
                     );
@@ -410,6 +403,12 @@ function createPlanningImportHtmlRecord(
                 splitPlanningImportValues,
             );
 
+    const tripNameValues =
+        receivedRecord.tripName
+            .flatMap(
+                splitPlanningImportValues,
+            );
+
     const hideQuantity =
         hasPlanningImportVisualizeAction(
             receivedRecord.action,
@@ -442,7 +441,10 @@ function createPlanningImportHtmlRecord(
 
         window:
             getPlanningImportWindow(
-                cptValues,
+                [
+                    ...cptValues,
+                    ...tripNameValues,
+                ],
             ),
 
         waiting:
@@ -537,6 +539,7 @@ function parsePlanningImportMatrix(
                         origin: [],
                         punctuality: [],
                         cpt: [],
+                        tripName: [],
                         quantity: [],
                         action: [],
                     };
@@ -557,6 +560,12 @@ function parsePlanningImportMatrix(
 
                 currentRecord.cpt.push(
                     row[columns.cpt] ?? "",
+                );
+
+                currentRecord.tripName.push(
+                    columns.tripName >= 0
+                        ? row[columns.tripName] ?? ""
+                        : "",
                 );
 
                 currentRecord.quantity.push(

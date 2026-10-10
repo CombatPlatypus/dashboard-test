@@ -120,7 +120,12 @@ function parseSpXLinehaulQuantity(
 function getSpXLinehaulWindow(
     values,
 ) {
-    for (const value of values) {
+    const receivedValues =
+        Array.isArray(values)
+            ? values
+            : [];
+
+    for (const value of receivedValues) {
         const match =
             String(value)
                 .trim()
@@ -131,6 +136,29 @@ function getSpXLinehaulWindow(
         if (match) {
             return match[1]
                 .toUpperCase();
+        }
+    }
+
+    /*
+     * O SPX nem sempre preenche a coluna CPT, mas mantém a janela
+     * no nome da viagem (por exemplo, HUB_PM101 ou HUB_AM01).
+     * A mesma recuperação precisa valer para todos os importadores.
+     */
+
+    for (const value of receivedValues) {
+        const match =
+            String(value ?? "")
+                .toUpperCase()
+                .replace(
+                    /\s+/g,
+                    "",
+                )
+                .match(
+                    /(?:^|_)(AM|PM1|PM2)(?:\d{2})?(?:$|_)/,
+                );
+
+        if (match) {
+            return match[1];
         }
     }
 
