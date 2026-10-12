@@ -3,16 +3,14 @@ import {
 } from "./model.js";
 
 function requestReverseImportType(
-    file,
     rootElement = document,
 ) {
     const modal = rootElement.querySelector("#reverseImportTypeModal");
     const form = rootElement.querySelector("#reverseImportTypeForm");
-    const fileName = rootElement.querySelector("#reverseImportTypeFileName");
     const confirmButton = rootElement.querySelector("#reverseImportTypeConfirm");
 
     if (
-        !modal || !form || !fileName || !confirmButton ||
+        !modal || !form || !confirmButton ||
         typeof window.jQuery !== "function" ||
         typeof window.Foundation?.Reveal !== "function"
     ) {
@@ -20,7 +18,6 @@ function requestReverseImportType(
     }
 
     form.reset();
-    fileName.textContent = file.name;
     confirmButton.disabled = true;
 
     const modalQuery = window.jQuery(modal);

@@ -1486,8 +1486,8 @@ footer > div > div:last-of-type {
         overflow-wrap: anywhere;
     }
     #reverseImportTypeForm fieldset {
-        display: flex;
-        flex-direction: column;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(112px, 1fr));
         gap: 12px;
         border: 0;
         margin: 0 0 25px;

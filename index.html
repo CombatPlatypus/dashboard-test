@@ -3435,15 +3435,16 @@
             </div>
 
             <div class="padding">
-                <p id="reverseImportTypeFileName"></p>
+                <p>Escolha uma das opções abaixo para classificar a TO.</p>
+
                 <form id="reverseImportTypeForm">
                     <fieldset>
-                        <legend>Escolha o tipo da reversa</legend>
                         <label><input type="radio" name="reverseImportType" value="return" required> Return</label>
                         <label><input type="radio" name="reverseImportType" value="missorted" required> Missorted</label>
                         <label><input type="radio" name="reverseImportType" value="liquidate" required> Liquidate</label>
                         <label><input type="radio" name="reverseImportType" value="intercept" required> Intercept</label>
                     </fieldset>
+
                     <div class="flex-box-center">
                         <button class="button" type="button" data-close>Cancelar</button>
                         <button class="button" id="reverseImportTypeConfirm" type="submit" disabled>Importar TO</button>

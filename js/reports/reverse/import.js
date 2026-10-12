@@ -446,7 +446,7 @@ function initializeReverseImport(
 
             try {
                 const reverseType =
-                    await requestReverseImportType(file);
+                    await requestReverseImportType();
 
                 if (!reverseType) {
                     return;

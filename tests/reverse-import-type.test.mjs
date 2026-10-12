@@ -1,8 +1,11 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import { requestReverseImportType } from "../js/reports/reverse/import-type.js";
 import { initializeReverseImport } from "../js/reports/reverse/import.js";
 import { getReverseState, resetReverseReport, upsertReverseTransfer } from "../js/reports/reverse/state.js";
+
+const classificationPrompt = "Escolha uma das opções abaixo para classificar a TO.";
 
 function setup(t) {
     class Element {
@@ -23,9 +26,11 @@ function setup(t) {
     const confirm = new Button();
     const input = new Input();
     const button = new Button();
+    const instruction = new Element();
+    instruction.textContent = classificationPrompt;
     const elements = new Map([
         ["reverseImportTypeModal", new Element()], ["reverseImportTypeForm", form],
-        ["reverseImportTypeFileName", new Element()], ["reverseImportTypeConfirm", confirm],
+        ["reverseImportTypeFileName", instruction], ["reverseImportTypeConfirm", confirm],
         ["reverseFileInput", input], ["reverseImportActionButton", button],
     ]);
     const root = { querySelector: selector => elements.get(selector.slice(1)), getElementById: () => null };
@@ -56,10 +61,10 @@ function setup(t) {
 test("Reveal exige seleção, aceita os quatro tipos e limpa a escolha entre arquivos", async t => {
     const { root, form, confirm, modal, query, elements } = setup(t);
     for (const type of ["return", "missorted", "liquidate", "intercept"]) {
-        const pending = requestReverseImportType({ name: `${type}.xlsx` }, root);
+        const pending = requestReverseImportType(root);
         assert.equal(form.selected, null);
         assert.equal(confirm.disabled, true);
-        assert.equal(elements.get("reverseImportTypeFileName").textContent, `${type}.xlsx`);
+        assert.equal(elements.get("reverseImportTypeFileName").textContent, classificationPrompt);
         form.emit("submit");
         assert.equal(modal.closes, modal.opens - 1);
         form.selected = type;
@@ -70,6 +75,12 @@ test("Reveal exige seleção, aceita os quatro tipos e limpa a escolha entre arq
         assert.equal(form.listeners.size, 0);
         assert.equal(query.listeners.size, 0);
     }
+});
+
+test("instrução de classificação da TO permanece fixa no HTML", () => {
+    const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
+    const instruction = html.match(/<p\s+id="reverseImportTypeFileName">([^<]*)<\/p>/);
+    assert.equal(instruction?.[1], classificationPrompt);
 });
 
 test("fechar o Reveal cancela a importação antes da leitura e preserva dados existentes", async t => {
