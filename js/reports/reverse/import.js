@@ -14,6 +14,10 @@ import {
     setReportNotification,
 } from "../report-notifications.js";
 
+import {
+    requestReverseImportType,
+} from "./import-type.js";
+
 const MAX_REVERSE_FILE_SIZE =
     10 * 1024 * 1024;
 
@@ -51,23 +55,10 @@ function findReverseDetailHeader(
                 },
             );
 
-        const journeyType =
-            headers.findIndex(
-                function (header) {
-                    return header ===
-                        "journey type" ||
-                        header === "tipo";
-                },
-            );
-
-        if (
-            trackingNumber >= 0 &&
-            journeyType >= 0
-        ) {
+        if (trackingNumber >= 0) {
             return {
                 rowIndex,
                 trackingNumber,
-                journeyType,
             };
         }
     }
@@ -158,8 +149,15 @@ function createReverseImportRecord(
     rows,
     {
         sourceFileName = "",
+        reverseType,
     } = {},
 ) {
+    const typeKey = normalizeReverseType(reverseType);
+
+    if (!typeKey) {
+        throw new Error("Escolha o tipo da TO antes de importar a reversa.");
+    }
+
     if (!Array.isArray(rows)) {
         throw new TypeError(
             "O conteúdo do arquivo de reversa é inválido.",
@@ -184,7 +182,7 @@ function createReverseImportRecord(
 
     if (!detailHeader) {
         throw new Error(
-            "Não encontrei as colunas de pacotes e tipo da reversa.",
+            "Não encontrei a coluna de pacotes da reversa.",
         );
     }
 
@@ -211,17 +209,8 @@ function createReverseImportRecord(
                 ],
             ).toUpperCase();
 
-        const typeKey =
-            normalizeReverseType(
-                row?.[
-                    detailHeader
-                        .journeyType
-                ],
-            );
-
         if (
             !trackingNumber ||
-            !typeKey ||
             seenTrackingNumbers.has(
                 trackingNumber,
             )
@@ -301,7 +290,14 @@ function parseReverseWorkbook(
 
 async function readReverseFile(
     file,
+    { reverseType } = {},
 ) {
+    const typeKey = normalizeReverseType(reverseType);
+
+    if (!typeKey) {
+        throw new Error("Escolha o tipo da TO antes de importar a reversa.");
+    }
+
     if (
         !file ||
         typeof file.arrayBuffer !==
@@ -378,6 +374,7 @@ async function readReverseFile(
         workbook,
         window.XLSX,
         {
+            reverseType: typeKey,
             sourceFileName:
                 file.name,
         },
@@ -437,23 +434,35 @@ function initializeReverseImport(
                 return;
             }
 
+            if (importButton.disabled) {
+                return;
+            }
+
             importButton.disabled = true;
             importButton.setAttribute(
                 "aria-busy",
                 "true",
             );
 
-            setReportNotification({
-                reportId: "reverse",
-                type: "info",
-                message:
-                    `Importando ${file.name}...`,
-            });
-
             try {
+                const reverseType =
+                    await requestReverseImportType(file);
+
+                if (!reverseType) {
+                    return;
+                }
+
+                setReportNotification({
+                    reportId: "reverse",
+                    type: "info",
+                    message:
+                        `Importando ${file.name}...`,
+                });
+
                 const transfer =
                     await readReverseFile(
                         file,
+                        { reverseType },
                     );
 
                 const result =

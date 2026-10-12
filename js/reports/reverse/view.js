@@ -21,8 +21,7 @@ const reversePercentageFormatter =
         "pt-BR",
         {
             style: "percent",
-            minimumFractionDigits: 1,
-            maximumFractionDigits: 1,
+            maximumFractionDigits: 0,
         },
     );
 

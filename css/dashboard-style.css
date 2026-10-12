@@ -1476,6 +1476,36 @@ footer > div > div:last-of-type {
         padding: 0px !important;
         overflow-y: hidden !important;
     }
+    #reverseImportTypeModal {
+        padding: 0;
+        max-width: 560px;
+    }
+    #reverseImportTypeFileName {
+        width: 100%;
+        margin-bottom: 20px;
+        overflow-wrap: anywhere;
+    }
+    #reverseImportTypeForm fieldset {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        border: 0;
+        margin: 0 0 25px;
+        padding: 0;
+    }
+    #reverseImportTypeForm legend {
+        margin-bottom: 15px;
+    }
+    #reverseImportTypeForm label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+    }
+    #reverseImportTypeForm input[type="radio"] {
+        margin: 0;
+        accent-color: #3F51B5;
+    }
     .reveal .title {
         display: flex;
         justify-content: space-between;

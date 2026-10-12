@@ -12,6 +12,11 @@ import {
 } from "./coverage-3d.js";
 
 import {
+    DOUGHNUT_3D_PADDING,
+    drawDoughnut3DCenterText,
+} from "../core/doughnut-3d.js";
+
+import {
     createParcelHorizontalChart,
     getParcelHorizontalChartHeight,
     updateParcelHorizontalChart,
@@ -117,48 +122,18 @@ const parcelCoverageCenterText = {
         const scanned =
             chart.$parcelScanned ?? 0;
 
-        const context =
-            chart.ctx;
-
         const geometry =
             chart.$parcelCoverageGeometry;
 
-        if (!geometry) {
-            return;
-        }
-
-        const centerX = geometry.centerX;
-        const centerY = geometry.textCenterY;
-
-        context.save();
-        context.textAlign = "center";
-        context.textBaseline = "middle";
-        context.fillStyle = "#f7f7f7";
-        context.font =
-            "600 24px Open Sans, Arial, sans-serif";
-
-        context.fillText(
-            total > 0
+        drawDoughnut3DCenterText(chart, geometry, {
+            text: total > 0
                 ? parcelCoveragePercentageFormatter
                     .format(
                         scanned / total,
                     )
                 : "—",
-            centerX,
-            centerY - 7,
-        );
-
-        context.fillStyle = "#b7b7b7";
-        context.font =
-            "12px Open Sans, Arial, sans-serif";
-
-        context.fillText(
-            "Bipados",
-            centerX,
-            centerY + 18,
-        );
-
-        context.restore();
+            label: "Bipados",
+        });
     },
 };
 
@@ -263,6 +238,10 @@ function createParcelCoverageChart(
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                devicePixelRatio: Math.max(window.devicePixelRatio || 1, 2),
+                layout: {
+                    padding: { ...DOUGHNUT_3D_PADDING },
+                },
                 cutout: "66%",
                 animation: false,
                 events: [],

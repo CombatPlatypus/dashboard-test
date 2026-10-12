@@ -10,7 +10,9 @@ import {
 } from "./state.js";
 
 import {
+    DOUGHNUT_3D_PADDING,
     drawDoughnut3D,
+    drawDoughnut3DCenterText,
 } from "../core/doughnut-3d.js";
 
 let reverseCompositionChart = null;
@@ -46,34 +48,10 @@ const reverseCenterTextPlugin = {
         const geometry =
             chart.$reverseCompositionGeometry;
 
-        if (!geometry) {
-            return;
-        }
-
-        const context = chart.ctx;
-        const fontFamily =
-            window.getComputedStyle(
-                chart.canvas,
-            ).fontFamily || "sans-serif";
-
-        context.save();
-        context.textAlign = "center";
-        context.textBaseline = "middle";
-        context.fillStyle = "#e4e6eb";
-        context.font = `600 22px ${fontFamily}`;
-        context.fillText(
-            options.text || "—",
-            geometry.centerX,
-            geometry.textCenterY - 8,
-        );
-        context.fillStyle = "#8b8d91";
-        context.font = `12px ${fontFamily}`;
-        context.fillText(
-            options.label || "Pacotes",
-            geometry.centerX,
-            geometry.textCenterY + 16,
-        );
-        context.restore();
+        drawDoughnut3DCenterText(chart, geometry, {
+            text: options.text || "—",
+            label: options.label || "Pacotes",
+        });
     },
 };
 
@@ -126,12 +104,7 @@ function createReverseCompositionChart(
                 cutout: "66%",
                 events: [],
                 layout: {
-                    padding: {
-                        top: 10,
-                        right: 20,
-                        bottom: 5,
-                        left: 20,
-                    },
+                    padding: { ...DOUGHNUT_3D_PADDING },
                 },
                 animation: false,
                 plugins: {

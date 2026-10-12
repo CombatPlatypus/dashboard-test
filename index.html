@@ -110,14 +110,10 @@
 
             /* AJUSTES POR RELATÓRIO */
 
-                /* TAXA DE PERDAS */
+                /* EXPEDIÇÃO */
 
-                #losses-rate .losses-rate-charts {
-                    gap: 15px;
-                    align-items: flex-start;
-                }
-                #losses-rate .losses-rate-charts > div {
-                    flex: 1 1 0;
+                #expedition-mistakes .horizontal-bars-chart .chart-canvas-container {
+                    height: 273px !important;
                 }
 
                 /* AVARIAS E PERDAS */
@@ -137,38 +133,6 @@
                     height: 320px !important;
                     margin: 20px;
                 }
-
-            /* GRAFICOS - BARRAS HORIZONTAIS DUPLO */
-
-            #reports .two-horizontal-bars-chart {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
-                width: 100%;
-                height: auto;
-                gap: 15px;
-            }
-            #reports .two-horizontal-bars-chart .chart-panel {
-                display: flex;
-                flex-direction: column;
-                height: 470px;
-                padding: 20px;
-                background-color: var(--color-container);
-                border: 1px solid var(--color-border);
-                border-radius: 0 0 5px 5px;
-            }
-            #reports .two-horizontal-bars-chart .chart-panel h3 {
-                margin: 0 0 5px;
-                text-align: center;
-            }
-            #reports .two-horizontal-bars-chart .chart-panel > p {
-                margin: 0 0 15px 0;
-                color: var(--color-gray-p);
-                font-size: 14px;
-                text-align: center;
-            }
-            #reports .two-horizontal-bars-chart .chart-panel > div {
-                height: 359px
-            }
 
             /* GRAFICOS - BARRA ÚNICA HORRIZONTAL DE PROGRESSO */
 
@@ -1068,7 +1032,7 @@
                                                 <!-- GRAFICO DE COMPARAÇÃO ENTRE CONFERENTES -->
 
                                                 <div class="chart">
-                                                    <div class="chart-canvas-container" id="expeditionAlignedComparisonChartContainer">
+                                                    <div class="chart-canvas-container" id="expeditionAlignedComparisonChartContainer" style="min-height: 1224px;">
                                                         <canvas id="expeditionAlignedComparisonChart" role="img"></canvas>
                                                     </div>
                                                 </div>
@@ -1123,7 +1087,7 @@
                                                     </tbody>
                                                 </table>
 
-                                                <div class="horizontal-bars-chart">
+                                                <div class="chart horizontal-bars-chart">
                                                     <div class="chart-title">
                                                         <h4>Identificados x Revertidos x Saldo Final</h4>
                                                     </div>
@@ -3462,6 +3426,35 @@
                 </div>
             </div>
         </footer>
+
+        <!-- REVEAL - REVERSA -->
+
+        <div class="reveal small" id="reverseImportTypeModal" data-reveal data-close-on-click="true" aria-labelledby="reverseImportTypeTitle">
+            <div class="title">
+                <h4 id="reverseImportTypeTitle">O que é essa TO?</h4>
+            </div>
+
+            <div class="padding">
+                <p id="reverseImportTypeFileName"></p>
+                <form id="reverseImportTypeForm">
+                    <fieldset>
+                        <legend>Escolha o tipo da reversa</legend>
+                        <label><input type="radio" name="reverseImportType" value="return" required> Return</label>
+                        <label><input type="radio" name="reverseImportType" value="missorted" required> Missorted</label>
+                        <label><input type="radio" name="reverseImportType" value="liquidate" required> Liquidate</label>
+                        <label><input type="radio" name="reverseImportType" value="intercept" required> Intercept</label>
+                    </fieldset>
+                    <div class="flex-box-center">
+                        <button class="button" type="button" data-close>Cancelar</button>
+                        <button class="button" id="reverseImportTypeConfirm" type="submit" disabled>Importar TO</button>
+                    </div>
+                </form>
+            </div>
+
+            <button class="close-button" data-close type="button" aria-label="Cancelar importação">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
 
         <!-- REVEAL - CONFIGURAÇÕES -->
 

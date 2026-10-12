@@ -1,6 +1,16 @@
 const fullCircle = Math.PI * 2;
 const startAngle = -Math.PI / 2;
 const ellipseScale = 0.7;
+const DOUGHNUT_3D_PADDING = Object.freeze({
+    top: 10,
+    right: 20,
+    bottom: 5,
+    left: 20,
+});
+// Match the Reversa's 264px canvas, even inside a wider or taller chart.
+const referenceRadius =
+    (264 - DOUGHNUT_3D_PADDING.top - DOUGHNUT_3D_PADDING.bottom - 40) /
+    (2 * ellipseScale + 0.16);
 
 function createDoughnut3DGeometry(area) {
     if (!area) {
@@ -19,7 +29,7 @@ function createDoughnut3DGeometry(area) {
     const outerRadius = Math.min(
         (width - 36) / 2,
         (height - 40) / (2 * ellipseScale + 0.16),
-        165,
+        referenceRadius,
     );
     const depth = outerRadius * 0.16;
     const centerY = (area.top + area.bottom - depth) / 2;
@@ -168,8 +178,31 @@ function drawDoughnut3D({ context, area, values, colors }) {
     return geometry;
 }
 
+function drawDoughnut3DCenterText(chart, geometry, { text = "—", label = "" } = {}) {
+    if (!geometry) {
+        return;
+    }
+
+    const context = chart.ctx;
+    const fontFamily = window.getComputedStyle?.(chart.canvas)?.fontFamily ||
+        "Open Sans, Arial, sans-serif";
+    const lineHeight = 14;
+
+    context.save();
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    context.fillStyle = "#a8a9ad";
+    context.font = `14px ${fontFamily}`;
+    context.letterSpacing = "1px";
+    context.fillText(text, geometry.centerX, geometry.textCenterY - lineHeight / 2);
+    context.fillText(label, geometry.centerX, geometry.textCenterY + lineHeight / 2);
+    context.restore();
+}
+
 export {
+    DOUGHNUT_3D_PADDING,
     createDoughnut3DGeometry,
     createDoughnut3DSegments,
     drawDoughnut3D,
+    drawDoughnut3DCenterText,
 };

@@ -72,7 +72,7 @@ function createRows({
     return rows;
 }
 
-test("lê a TO em B2 e soma os pacotes nas categorias da reversa", () => {
+test("lê a TO em B2 e classifica pacotes únicos pelo tipo escolhido, ignorando Journey Type", () => {
     const rows = createRows({
         packages: [
             ["BR1", "Return"],
@@ -90,6 +90,7 @@ test("lê a TO em B2 e soma os pacotes nas categorias da reversa", () => {
             {
                 sourceFileName:
                     "transport-list.xlsx",
+                reverseType: "missorted",
             },
         );
 
@@ -97,10 +98,10 @@ test("lê a TO em B2 e soma os pacotes nas categorias da reversa", () => {
     assert.equal(transfer.destination, "SoC de destino");
     assert.equal(transfer.quantity, 5);
     assert.deepEqual(transfer.quantities, {
-        return: 2,
-        missorted: 1,
-        liquidate: 1,
-        confiscated: 1,
+        return: 0,
+        missorted: 5,
+        liquidate: 0,
+        confiscated: 0,
     });
 });
 
@@ -145,6 +146,7 @@ test("arquivo XLSX do SPX é lido de ponta a ponta", async () => {
                     [bytes],
                     "transport-list.xlsx",
                 ),
+                { reverseType: "liquidate" },
             );
 
         assert.equal(
@@ -152,6 +154,7 @@ test("arquivo XLSX do SPX é lido de ponta a ponta", async () => {
             "TO202610065X5E2",
         );
         assert.equal(transfer.quantity, 3);
+        assert.equal(transfer.quantities.liquidate, 3);
     } finally {
         if (previousWindow === undefined) {
             delete globalThis.window;
@@ -166,6 +169,7 @@ test("uma TO nova é adicionada e a mesma TO é atualizada sem duplicar totais",
     const first =
         createReverseImportRecord(
             createRows(),
+            { reverseType: "return" },
         );
 
     const second =
@@ -177,6 +181,7 @@ test("uma TO nova é adicionada e a mesma TO é atualizada sem duplicar totais",
                     ["BR11", "Liquidate"],
                 ],
             }),
+            { reverseType: "liquidate" },
         );
 
     assert.equal(
@@ -199,8 +204,8 @@ test("uma TO nova é adicionada e a mesma TO é atualizada sem duplicar totais",
     assert.equal(summary.transfers.length, 2);
     assert.equal(summary.total, 5);
     assert.deepEqual(summary.quantities, {
-        return: 2,
-        missorted: 1,
+        return: 3,
+        missorted: 0,
         liquidate: 2,
         confiscated: 0,
     });
@@ -214,6 +219,7 @@ test("uma TO nova é adicionada e a mesma TO é atualizada sem duplicar totais",
                     ["BR22", "Intercept"],
                 ],
             }),
+            { reverseType: "intercept" },
         );
 
     assert.equal(
@@ -232,9 +238,33 @@ test("uma TO nova é adicionada e a mesma TO é atualizada sem duplicar totais",
     assert.equal(summary.transfers.length, 2);
     assert.equal(summary.total, 5);
     assert.deepEqual(summary.quantities, {
-        return: 1,
+        return: 0,
         missorted: 0,
         liquidate: 2,
-        confiscated: 2,
+        confiscated: 3,
     });
+});
+
+test("os quatro tipos aceitam Forward, tipos desconhecidos e coluna Journey Type ausente", () => {
+    for (const reverseType of ["return", "missorted", "liquidate", "intercept"]) {
+        const rows = createRows({ packages: [["BR1", "Forward"], ["BR2", ""], ["BR3", "Unknown"]] });
+        rows[23][7] = "";
+        const transfer = createReverseImportRecord(rows, { reverseType });
+        const key = reverseType === "intercept" ? "confiscated" : reverseType;
+        assert.equal(transfer.quantity, 3);
+        assert.equal(transfer.quantities[key], 3);
+        assert.equal(Object.values(transfer.quantities).filter(value => value > 0).length, 1);
+    }
+});
+
+test("exige tipo válido antes de ler ou analisar o arquivo", async () => {
+    for (const reverseType of [undefined, "", "Forward", "invalid"]) {
+        assert.throws(() => createReverseImportRecord(createRows(), { reverseType }), /Escolha o tipo/);
+        let reads = 0;
+        await assert.rejects(readReverseFile({
+            name: "transport.xlsx", size: 1,
+            arrayBuffer() { reads++; throw new Error("Não deve ler"); },
+        }, { reverseType }), /Escolha o tipo/);
+        assert.equal(reads, 0);
+    }
 });
