@@ -937,20 +937,6 @@
         overflow-wrap: anywhere;
     }
 
-    /* EXPEDIÇÃO - GRÁFICOS */
-
-    #expedition .expedition-error-balance-chart {
-        position: relative;
-        width: 100%;
-        height: 300px;
-    }
-    #expedition .expedition-street-occurrences-chart {
-        position: relative;
-        width: 100%;
-        min-height: 228px;
-        height: 228px;
-    }
-
     /* EXPEDIÇÃO - CONTROLES */
 
     #expedition #expeditionWindowInput {
