@@ -4,6 +4,10 @@ Ajustes
 
     2. O Input global da Capacidade do turno deve começar com o valor padrão de 20000, e deve mudar de nome, para "Capacidade do Hub".
 
-    3.
+    3. No Grafico de Avarias por SOC lá no painel de avarias e perdas, todas as barras devem ter essa cor #ffc107.
+
+    4. No Grafico de linhas de taxa de perdas, o valor taxa de perdas em porcetagem da tabela e do grafico estão diferentes, encontre a fonte do problema e arrume.
+
+    5. Prepare o painel de reversa para importação com base no arquivo que foi fornecido, a importação deve funcionar da seguinte forma: o importador vai verificar qual TO é informada no arquivo, se for uma nova TO, adiciona suas informações ao relatório, realiza soma de suas informações nos respectivos campos e afins, se a importação for de uma TO já presente no relatório, apenas atualize as informações relaciondas a aquela respectiva TO, no arquivo do SPX, a TO é informada na coluna B linha 2.
 
     Item Final. Procure por erros de ortografia escritos nos paragrafos, titulos e legendas, se econtrar os arrume, e informe quais itens foram arrumados.  
