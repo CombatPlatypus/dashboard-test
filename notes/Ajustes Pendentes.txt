@@ -1,0 +1,7 @@
+Ajustes 
+
+    1. Os indicadores do grafico de cobertura da varredura no painel parcel estão mostrando os valores em números, vamos mudar isso para mostrar a porcetagem, não há necessidade de repetir essa informação se já está na tabela.
+
+    2. 
+
+    Item Final. Procure por erros de ortografia escritos nos paragrafos, titulos e legendas, se econtrar os arrume, e informe quais itens foram arrumados.  
