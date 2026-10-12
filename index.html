@@ -2336,66 +2336,43 @@
                                         <h2>Parcel Sweeper</h2>
                                     </div> 
 
-                                    <!-- CARDS PRINCIAPAIS -->
+                                    <!-- TABELA PRINCIPAL  -->
 
-                                    <div class="cards">
-                                        <div>
-                                            <div class="flex-box-start">
-                                                <img src="images/geral-icons/barcode-scanner-icon.svg">
-                                                <h4 id="parcelTotalScanned">—</h4>
-                                            </div>
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Total de Bipado</th>
+                                                <th>Pacotes Backlog</th>
+                                                <th>Pacotes Exception</th>
+                                                <th>Pacotes Missorted</th>
+                                                <th>Não Escaneados</th>
+                                            </tr>
+                                        </thead>
 
-                                            <p>Total de Bipado</p>
-                                        </div>
-
-                                        <div>
-                                            <div class="flex-box-start">
-                                                <img src="images/geral-icons/box-icon.svg">
-                                                <h4 id="parcelBacklogTotal">—</h4>
-                                            </div>
-
-                                            <p>Pacotes Backlog</p>
-                                        </div>
-
-                                        <div>
-                                            <div class="flex-box-start">
-                                                <img src="images/geral-icons/alert-icon.svg">
-                                                <h4 id="parcelExceptionTotal">—</h4>
-                                            </div>
-
-                                            <p>Pacotes Exception</p>
-                                        </div>
-
-                                        <div>
-                                            <div class="flex-box-start">
-                                                <img src="images/geral-icons/missorted-icon.svg">
-                                                <h4 id="parcelMissortedTotal">—</h4>
-                                            </div>
-
-                                            <p>Pacotes Missorted</p>
-                                        </div>
-
-                                        <div>
-                                            <div class="flex-box-start">
-                                                <img src="images/geral-icons/missing-icon.svg">
-                                                <h4 id="parcelUnscannedTotal">—</h4>
-                                            </div>
-
-                                            <p>Não Escaneados</p>
-                                        </div>
-                                    </div>
+                                        <tbody>
+                                            <tr>
+                                                <td id="parcelTotalScanned">—</td>
+                                                <td id="parcelBacklogTotal">—</td>
+                                                <td id="parcelExceptionTotal">—</td>
+                                                <td id="parcelMissortedTotal">—</td>
+                                                <td id="parcelUnscannedTotal">—</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
 
                                     <!-- GRAFICO DE COBERTURA E TABELA DE OPERADORES -->
 
                                     <div class="distribution flex-box-start">
-                                        <div class="doughnut-chart">
-                                            <h3>Cobertura da Varredura</h3>
-
-                                            <div>
+                                        <div class="chart doughnut-chart">
+                                            <div class="chart-title">
+                                                <h4>Cobertura da Varredura</h4>
+                                            </div>
+                                            
+                                            <div class="chart-canvas-container">
                                                 <canvas id="parcelCoverageChart" role="img" aria-label="Cobertura da varredura entre pacotes escaneados e não escaneados"></canvas>
                                             </div>
 
-                                            <div>
+                                            <div class="chart-label">
                                                 <div class="type">
                                                     <div style="background-color: #3F51B5;"></div>
                                                     <p>Escaneados <span id="parcelCoverageScanned">—</span></p>
