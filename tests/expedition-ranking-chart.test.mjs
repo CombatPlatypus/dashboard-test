@@ -12,7 +12,7 @@ function replaceGlobal(t, name, value) {
 }
 
 function createContext() {
-    const context = { strokes: [], texts: [], fills: 0, balance: 0, letterSpacing: "0px" };
+    const context = { strokes: [], texts: [], fills: 0, filledPaths: [], balance: 0, letterSpacing: "0px" };
     let path = [];
     let dash = [];
     context.save = () => { context.balance += 1; };
@@ -23,7 +23,10 @@ function createContext() {
     context.quadraticCurveTo = () => {};
     context.setLineDash = value => { dash = [...value]; };
     context.stroke = () => context.strokes.push({ path: [...path], color: context.strokeStyle, dash });
-    context.fill = () => { context.fills += 1; };
+    context.fill = () => {
+        context.fills += 1;
+        context.filledPaths.push([...path]);
+    };
     context.fillText = (text, x, y) => context.texts.push({
         text, x, y, alignment: context.textAlign, baseline: context.textBaseline, color: context.fillStyle,
     });
@@ -32,7 +35,7 @@ function createContext() {
     return context;
 }
 
-test("ranking restaura grades sem escalas inferiores e alinha valores acima das barras", t => {
+test("padding interno do ranking recua barras e textos juntos, preservando a grade", t => {
     class TestElement {
         dataset = {};
         style = {};
@@ -83,7 +86,7 @@ test("ranking restaura grades sem escalas inferiores e alinha valores acima das 
     chart.ctx = createContext();
     plugin.beforeDatasetsDraw(chart);
 
-    const referenceX = 471 + (896 - 471) * (600 / 960);
+    const referenceX = 481 + (886 - 481) * (600 / 960);
     assert.deepEqual(chart.ctx.strokes.filter(stroke => stroke.color === "#d9534f"), [{
         path: [["moveTo", referenceX, 34], ["lineTo", referenceX, 340]],
         color: "#d9534f",
@@ -95,6 +98,15 @@ test("ranking restaura grades sem escalas inferiores e alinha valores acima das 
     assert.ok(chart.ctx.strokes.some(stroke =>
         JSON.stringify(stroke.path) === JSON.stringify([["moveTo", 16, 99], ["lineTo", 896, 99]])));
     assert.equal(chart.ctx.fills, 11);
+    const getHorizontalBounds = path => {
+        const points = path.filter(([command]) => command === "moveTo" || command === "lineTo");
+        return [Math.min(...points.map(point => point[1])), Math.max(...points.map(point => point[1]))];
+    };
+    assert.deepEqual(getHorizontalBounds(chart.ctx.filledPaths[0]), [26, 431]);
+    assert.deepEqual(getHorizontalBounds(chart.ctx.filledPaths[2]), [481, 886]);
+    const firstRouteBounds = getHorizontalBounds(chart.ctx.filledPaths[1]);
+    assert.equal(firstRouteBounds[0], 26);
+    assert.ok(Math.abs(firstRouteBounds[1] - (26 + (431 - 26) * 21 / 22)) < 1e-9);
     for (const [index, name, routes, time] of [
         [0, "Rosa", "21", "06:34"], [1, "Gabriel", "20", "06:24"], [2, "Ana", "19", "—"],
     ]) {

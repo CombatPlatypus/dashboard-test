@@ -32,8 +32,11 @@ const TIME_MAXIMUM_REFERENCE_SECONDS =
 const TIME_AXIS_INTERVAL_SECONDS =
     2 * 60;
 const COMPARISON_COLUMN_GAP = 30;
-const COMPARISON_TEXT_INSET = 10;
-const COMPARISON_ROW_TOP_PADDING = 12;
+const COMPARISON_CONTENT_PADDING = Object.freeze({
+    top: 12,
+    right: 10,
+    left: 10,
+});
 const COMPARISON_LABEL_HEIGHT = 14;
 const COMPARISON_LABEL_BAR_GAP = 8;
 const ROUTES_BAR_COLOR = "#e4e6eb";
@@ -425,16 +428,24 @@ function drawComparisonStructure(chart) {
     const volumeEnd =
         volumeStart +
         columnWidth;
-    const timeStart =
+    const timeGridStart =
         volumeEnd +
         COMPARISON_COLUMN_GAP;
-    const timeEnd =
-        timeStart +
+    const timeGridEnd =
+        timeGridStart +
         columnWidth;
     const routeStart =
-        volumeStart;
+        volumeStart +
+        COMPARISON_CONTENT_PADDING.left;
     const routeEnd =
-        volumeEnd;
+        volumeEnd -
+        COMPARISON_CONTENT_PADDING.right;
+    const timeStart =
+        timeGridStart +
+        COMPARISON_CONTENT_PADDING.left;
+    const timeEnd =
+        timeGridEnd -
+        COMPARISON_CONTENT_PADDING.right;
     const barHeight = 20;
 
     context.save();
@@ -451,8 +462,8 @@ function drawComparisonStructure(chart) {
             routeValue /
             routeMaximum;
         const positionX =
-            routeStart +
-            (routeEnd - routeStart) *
+            volumeStart +
+            (volumeEnd - volumeStart) *
                 ratio;
 
         context.beginPath();
@@ -472,10 +483,10 @@ function drawComparisonStructure(chart) {
     ).forEach(
         function (timeValue) {
             const positionX =
-                timeStart +
+                timeGridStart +
                 (
-                    timeEnd -
-                    timeStart
+                    timeGridEnd -
+                    timeGridStart
                 ) *
                 (
                     timeValue /
@@ -508,7 +519,7 @@ function drawComparisonStructure(chart) {
                 positionY,
             );
             context.lineTo(
-                timeEnd,
+                timeGridEnd,
                 positionY,
             );
             context.stroke();
@@ -551,7 +562,7 @@ function drawComparisonStructure(chart) {
                         index,
                     ),
                     rowTop +
-                        COMPARISON_ROW_TOP_PADDING +
+                        COMPARISON_CONTENT_PADDING.top +
                         COMPARISON_LABEL_HEIGHT +
                         COMPARISON_LABEL_BAR_GAP +
                         barHeight / 2,
@@ -601,7 +612,7 @@ function drawComparisonStructure(chart) {
                 rowBottom,
             );
             context.lineTo(
-                timeEnd,
+                timeGridEnd,
                 rowBottom,
             );
             context.stroke();
@@ -618,7 +629,7 @@ function drawComparisonStructure(chart) {
                 getOperatorName(
                     operator.operator,
                 ),
-                routeStart + COMPARISON_TEXT_INSET,
+                routeStart,
                 labelY,
             );
 
@@ -672,7 +683,7 @@ function drawComparisonStructure(chart) {
                 formatQuantity(
                     operator.routesChecked,
                 ),
-                routeEnd - COMPARISON_TEXT_INSET,
+                routeEnd,
                 labelY,
                 "right",
             );
@@ -684,7 +695,7 @@ function drawComparisonStructure(chart) {
                     "left";
                 context.fillText(
                     "—",
-                    timeStart + COMPARISON_TEXT_INSET,
+                    timeStart,
                     labelY,
                 );
             } else {
@@ -693,7 +704,7 @@ function drawComparisonStructure(chart) {
                     formatDuration(
                         receivedTime,
                     ),
-                    timeStart + COMPARISON_TEXT_INSET,
+                    timeStart,
                     labelY,
                     "left",
                     receivedTime >

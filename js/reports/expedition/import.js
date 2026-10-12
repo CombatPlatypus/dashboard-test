@@ -800,20 +800,6 @@ function initializeExpeditionImport(
     importButton.addEventListener(
         "click",
         function () {
-            const activeTarget =
-                rootElement.querySelector(
-                    "#expedition-view-tabs .tabs-title.is-active > a",
-                )?.getAttribute(
-                    "href",
-                );
-
-            if (
-                activeTarget !== "#expedition-tables" &&
-                activeTarget !== "#expedition-charts"
-            ) {
-                return;
-            }
-
             fileInput.click();
         },
     );

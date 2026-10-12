@@ -1426,8 +1426,7 @@ function renderExpeditionTabNotification(
             activeTarget,
         );
 
-    elements.importButton.hidden =
-        isErrorTab;
+    elements.importButton.hidden = false;
 
     if (isErrorTab) {
         setReportNotification({
