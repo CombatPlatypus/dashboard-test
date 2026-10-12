@@ -412,39 +412,17 @@
     #damage-and-losses .tabs {
         grid-template-columns: repeat(auto-fit, minmax(299px, 1fr));
     }
-    #damage-and-losses .doughnut-chart canvas {
-        display: block;
-        width: 100% !important;
-        height: 100% !important;
-    }
-    #damage-and-losses #damageLastSevenDaysChartContainer {
-        min-height: 0;
-        height: auto;
-    }
+
     #damage-and-losses .damage-period-chart-canvas {
         position: relative;
         width: 100%;
         height: 300px;
     }
-    #damage-and-losses .damage-period-chart-canvas canvas {
-        display: block;
-        width: 100% !important;
-        height: 100% !important;
-    }
-    #damage-and-losses #lossesLastSevenDaysChartContainer {
-        min-height: 0;
-        height: auto;
-    }
+
     #damage-and-losses .losses-period-chart-canvas {
         position: relative;
         width: 100%;
         height: 300px;
-    }
-    #damage-and-losses .losses-period-chart-canvas canvas,
-    #damage-and-losses .losses-horizontal-chart-canvas canvas {
-        display: block;
-        width: 100% !important;
-        height: 100% !important;
     }
     #damage-and-losses .losses-horizontal-chart-canvas {
         position: relative;
