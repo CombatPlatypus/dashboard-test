@@ -471,10 +471,6 @@ function drawComparisonStructure(chart) {
     context.fillStyle =
         "#bfc2c8";
 
-    context.strokeStyle =
-        "rgba(82, 82, 82, 0.45)";
-    context.lineWidth = 1;
-
     for (
         let routeValue = 0;
         routeValue <= routeMaximum;
@@ -487,17 +483,6 @@ function drawComparisonStructure(chart) {
             routeStart +
             (routeEnd - routeStart) *
                 ratio;
-
-        context.beginPath();
-        context.moveTo(
-            positionX,
-            chartArea.top,
-        );
-        context.lineTo(
-            positionX,
-            chartArea.bottom,
-        );
-        context.stroke();
 
         context.textAlign =
             routeValue === 0
@@ -532,17 +517,6 @@ function drawComparisonStructure(chart) {
                     timeMaximum
                 );
 
-            context.beginPath();
-            context.moveTo(
-                positionX,
-                chartArea.top,
-            );
-            context.lineTo(
-                positionX,
-                chartArea.bottom,
-            );
-            context.stroke();
-
             context.textAlign =
                 timeValue === 0
                     ? "left"
@@ -559,26 +533,6 @@ function drawComparisonStructure(chart) {
                 positionX,
                 axisY + 16,
             );
-        },
-    );
-
-    context.strokeStyle =
-        "rgba(82, 82, 82, 0.7)";
-    [
-        chartArea.top,
-        chartArea.bottom,
-    ].forEach(
-        function (positionY) {
-            context.beginPath();
-            context.moveTo(
-                volumeStart,
-                positionY,
-            );
-            context.lineTo(
-                timeEnd,
-                positionY,
-            );
-            context.stroke();
         },
     );
 
@@ -610,10 +564,6 @@ function drawComparisonStructure(chart) {
                 yScale.getPixelForValue(
                     index,
                 );
-            const rowBottom =
-                yScale.getPixelForValue(
-                    index + 0.5,
-                );
             const routeBarEnd =
                 routeStart +
                 (
@@ -641,20 +591,6 @@ function drawComparisonStructure(chart) {
                                 timeMaximum,
                             1,
                         );
-
-            context.strokeStyle =
-                "rgba(82, 82, 82, 0.4)";
-            context.lineWidth = 1;
-            context.beginPath();
-            context.moveTo(
-                volumeStart,
-                rowBottom,
-            );
-            context.lineTo(
-                timeEnd,
-                rowBottom,
-            );
-            context.stroke();
 
             context.font =
                 '600 14px "Open Sans", sans-serif';
