@@ -377,8 +377,8 @@
                             </div>
 
                             <div>
-                                <h4>Capacidade do Turno</h4>
-                                <input type="text" id="reportCapacityInput" maxlength="9" autocomplete="off" inputmode="numeric" pattern="[0-9]*" aria-label="Capacidade do Turno">
+                                <h4>Capacidade do Hub</h4>
+                                <input type="text" id="reportCapacityInput" maxlength="9" autocomplete="off" inputmode="numeric" pattern="[0-9]*" aria-label="Capacidade do Hub">
                             </div>
                         </div>
                     </div>
@@ -1847,9 +1847,9 @@
                                                         <th scope="col">Hoje</th>
                                                         <th scope="col">Ontem</th>
                                                         <th scope="col">Anteontem</th>
-                                                        <th scope="col">Dê 3 a 7<br>Dias Atrás</th>
-                                                        <th scope="col">Dê 8 a 14<br>Dias Atrás</th>
-                                                        <th scope="col">Dê 15 Dias Atrás<br>Até o Começo do Mês</th>
+                                                        <th scope="col">De 3 a 7<br>Dias Atrás</th>
+                                                        <th scope="col">De 8 a 14<br>Dias Atrás</th>
+                                                        <th scope="col">De 15 Dias Atrás<br>Até o Começo do Mês</th>
                                                         <th scope="col">Total do Mês</th>
                                                     </tr>
                                                 </thead>
@@ -1869,7 +1869,7 @@
 
                                                 <tbody>
                                                     <tr data-damage-analysis-field="soc">
-                                                        <th scope="row">Avarias do Soc</th>
+                                                        <th scope="row">Avarias do SOC</th>
                                                         <td>-</td>
                                                         <td>-</td>
                                                         <td>-</td>
@@ -2032,16 +2032,16 @@
                                                         <th scope="col">Hoje</th>
                                                         <th scope="col">Ontem</th>
                                                         <th scope="col">Anteontem</th>
-                                                        <th scope="col">Dê 3 a 7<br>Dias Atrás</th>
-                                                        <th scope="col">Dê 8 a 14<br>Dias Atrás</th>
-                                                        <th scope="col">Dê 15 Dias Atrás<br>Até o Começo do Mês</th>
+                                                        <th scope="col">De 3 a 7<br>Dias Atrás</th>
+                                                        <th scope="col">De 8 a 14<br>Dias Atrás</th>
+                                                        <th scope="col">De 15 Dias Atrás<br>Até o Começo do Mês</th>
                                                         <th scope="col">Total do Mês</th>
                                                     </tr>
                                                 </thead>
 
                                                 <tbody>
                                                     <tr data-losses-analysis-field="underReview">
-                                                        <th scope="row">Pacotes Em Análise</th>
+                                                        <th scope="row">Pacotes em Análise</th>
                                                         <td>-</td>
                                                         <td>-</td>
                                                         <td>-</td>
@@ -2145,7 +2145,7 @@
                                                     <th>Lost</th>
                                                     <th>Avarias</th>
                                                     <th>Total de Perdas</th>
-                                                    <th>Taxa de Perda</th>
+                                                    <th>Taxa de Perdas</th>
                                                 </tr>
                                             </thead>
 
@@ -2195,7 +2195,7 @@
 
                                             <div class="chart line-chart">
                                                 <div class="chart-title">
-                                                    <h4>Histórico da Taxa de Perda - <span id="lossesRateHistoryYear"></span></h4>
+                                                    <h4>Histórico da Taxa de Perdas - <span id="lossesRateHistoryYear"></span></h4>
                                                 </div>
 
                                                 <div class="chart-canvas-container">
@@ -2504,17 +2504,17 @@
                                 </div>
 
                                 <div class="report-actions">
-                                    <button id="reverseCopyReportButton" type="button" title="Clique para copiar; segure por 1,5 s para baixar" aria-label="Copiar relatório do parcel; segure por 1,5 segundo para baixar">
+                                    <button id="reverseCopyReportButton" type="button" title="Clique para copiar; segure por 1,5 s para baixar" aria-label="Copiar relatório de reversa; segure por 1,5 segundo para baixar">
                                         <img src="images/geral-icons/image-icon.svg" alt="">
                                     </button>
 
-                                    <button id="reverseImportActionButton" type="button" title="" aria-label="">
+                                    <button id="reverseImportActionButton" type="button" title="Importar arquivo de reversa do SPX" aria-label="Importar arquivo de reversa do SPX">
                                         <img src="images/geral-icons/import-icon.svg" alt="">
                                     </button>
 
                                     <input id="reverseFileInput" type="file" accept=".csv,.xlsx,.xls" hidden>
 
-                                    <button id="reverseClearReportButton" type="button" title="Limpar relatório" aria-label="">
+                                    <button id="reverseClearReportButton" type="button" title="Limpar relatório" aria-label="Limpar relatório de reversa">
                                         <img src="images/geral-icons/trash-basket-icon.svg" alt="">
                                     </button>
                                 </div>
@@ -2543,11 +2543,11 @@
 
                                         <tbody>
                                             <tr>
-                                                <td id="">—</td>
-                                                <td id="">—</td>
-                                                <td id="">—</td>
-                                                <td id="">—</td>
-                                                <td id="">—</td>
+                                                <td id="reverseTotal">—</td>
+                                                <td id="reverseReturn">—</td>
+                                                <td id="reverseMissorted">—</td>
+                                                <td id="reverseLiquidate">—</td>
+                                                <td id="reverseConfiscated">—</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -2560,29 +2560,29 @@
                                                 <h4>Composição da Reversa</h4>
                                             </div>
 
-                                            <div class="chart-canvas-container">
-                                                <canvas id="" role="img" aria-label=""></canvas>
+                                            <div class="chart-canvas-container" id="reverseCompositionChartContainer">
+                                                <canvas id="reverseCompositionChart" role="img" aria-label="Composição da reversa por tipo"></canvas>
                                             </div>
 
                                             <div class="chart-label">
                                                 <div class="type">
                                                     <div style="background-color: #4caf50;"></div>
-                                                    <p>Return <span id="">—</span></p>
+                                                    <p>Return <span id="reverseCompositionReturn">—</span></p>
                                                 </div>
 
                                                 <div class="type">
                                                     <div style="background-color: #FF5722;"></div>
-                                                    <p>Missorted <span id="">—</span></p>
+                                                    <p>Missorted <span id="reverseCompositionMissorted">—</span></p>
                                                 </div>
 
                                                 <div class="type">
                                                     <div style="background-color: #3F51B5;"></div>
-                                                    <p>Liquidate <span id="">—</span></p>
+                                                    <p>Liquidate <span id="reverseCompositionLiquidate">—</span></p>
                                                 </div>
 
                                                 <div class="type">
                                                     <div style="background-color: #f0ad4e;"></div>
-                                                    <p>Confiscado <span id="">—</span></p>
+                                                    <p>Confiscado <span id="reverseCompositionConfiscated">—</span></p>
                                                 </div>
                                             </div>
                                         </div>
@@ -2600,61 +2600,12 @@
                                                     </tr>
                                                 </thead>
 
-                                                <tbody>
+                                                <tbody id="reverseDistributionBody">
                                                     <tr>
-                                                        <td id="">—</td>
-                                                        <td id="">—</td>
-                                                        <td id="">—</td>
-                                                        <td id="">—</td>
-                                                    </tr>
-                                                    
-                                                    <tr>
-                                                        <td id="">—</td>
-                                                        <td id="">—</td>
-                                                        <td id="">—</td>
-                                                        <td id="">—</td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td id="">—</td>
-                                                        <td id="">—</td>
-                                                        <td id="">—</td>
-                                                        <td id="">—</td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td id="">—</td>
-                                                        <td id="">—</td>
-                                                        <td id="">—</td>
-                                                        <td id="">—</td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td id="">—</td>
-                                                        <td id="">—</td>
-                                                        <td id="">—</td>
-                                                        <td id="">—</td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td id="">—</td>
-                                                        <td id="">—</td>
-                                                        <td id="">—</td>
-                                                        <td id="">—</td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td id="">—</td>
-                                                        <td id="">—</td>
-                                                        <td id="">—</td>
-                                                        <td id="">—</td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td id="">—</td>
-                                                        <td id="">—</td>
-                                                        <td id="">—</td>
-                                                        <td id="">—</td>
+                                                        <td>—</td>
+                                                        <td>—</td>
+                                                        <td>—</td>
+                                                        <td>—</td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -2947,9 +2898,9 @@
                                                     <th scope="col">Hoje</th>
                                                     <th scope="col">Ontem</th>
                                                     <th scope="col">Anteontem</th>
-                                                    <th scope="col">Dê 3 a 7<br>Dias Atrás</th>
-                                                    <th scope="col">Dê 8 a 14<br>Dias Atrás</th>
-                                                    <th scope="col">Dê 15 Dias Atrás<br>Até o Começo do Mês</th>
+                                                    <th scope="col">De 3 a 7<br>Dias Atrás</th>
+                                                    <th scope="col">De 8 a 14<br>Dias Atrás</th>
+                                                    <th scope="col">De 15 Dias Atrás<br>Até o Começo do Mês</th>
                                                     <th scope="col">Total do Mês</th>
                                                 </tr>
                                             </thead>
@@ -2969,7 +2920,7 @@
 
                                             <tbody>
                                                 <tr data-overall-damage-losses-field="soc">
-                                                    <th scope="row">Avarias do Soc</th>
+                                                    <th scope="row">Avarias do SOC</th>
                                                     <td>-</td>
                                                     <td>-</td>
                                                     <td>-</td>
@@ -2982,7 +2933,7 @@
 
                                             <tbody>
                                                 <tr data-overall-damage-losses-field="underReview">
-                                                    <th scope="row">Pacotes Em Análise</th>
+                                                    <th scope="row">Pacotes em Análise</th>
                                                     <td>-</td>
                                                     <td>-</td>
                                                     <td>-</td>
@@ -3478,7 +3429,7 @@
                 <div>
                     <img src="images/links-icons/forms-icon.svg">
                     <button id="footerReverseFormLink" type="button" class="external-link" data-url="" disabled>
-                        Forms Reversa ↗
+                        Forms de Reversa ↗
                     </button>
                 </div>
 

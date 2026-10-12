@@ -93,9 +93,9 @@ test("CSV do SPX exibe 354 escaneados, 370 não escaneados e 48,47%, inclusive a
     const imported = await readParcelFile(new File([lines.join("\n")], "parcel.csv"));
     assert.equal(imported.rows.length, 724);
     const check = () => {
-        assert.equal(elements.get("parcelCoverageScanned").textContent, "354");
+        assert.equal(elements.get("parcelCoverageScanned").textContent, "48,47%");
         assert.equal(elements.get("parcelTotalScanned").textContent, "354");
-        assert.equal(elements.get("parcelCoverageUnscanned").textContent, "370");
+        assert.equal(elements.get("parcelCoverageUnscanned").textContent, "51,53%");
         assert.equal(elements.get("parcelUnscannedTotal").textContent, "370");
         assert.deepEqual(coverage.data.datasets[0].data, [348, 370]);
         assert.equal(coverage.$parcelTotal, 718);
@@ -122,16 +122,16 @@ test("totais da legenda preservam outros exports, arquivos sem Expected e arquiv
         { length: quantity }, (_, index) => ({ trackingNumber: `BR${group}-${index}`, countType, expected }),
     ));
     replaceParcelRows(rows);
-    assert.equal(elements.get("parcelCoverageScanned").textContent, "326");
-    assert.equal(elements.get("parcelCoverageUnscanned").textContent, "242");
+    assert.equal(elements.get("parcelCoverageScanned").textContent, "56,86%");
+    assert.equal(elements.get("parcelCoverageUnscanned").textContent, "43,14%");
     assert.equal(centerText(coverage), "56,86%");
     const small = [{ trackingNumber: "BR1", countType: "Backlog" }, { trackingNumber: "BR2", countType: "Missing" }];
     replaceParcelRows(small);
-    assert.equal(elements.get("parcelCoverageScanned").textContent, "1");
-    assert.equal(elements.get("parcelCoverageUnscanned").textContent, "1");
+    assert.equal(elements.get("parcelCoverageScanned").textContent, "50,00%");
+    assert.equal(elements.get("parcelCoverageUnscanned").textContent, "50,00%");
     assert.equal(centerText(coverage), "50,00%");
     replaceParcelRows(small.map(row => ({ ...row, expected: "N" })));
-    assert.equal(elements.get("parcelCoverageScanned").textContent, "1");
-    assert.equal(elements.get("parcelCoverageUnscanned").textContent, "1");
+    assert.equal(elements.get("parcelCoverageScanned").textContent, "—");
+    assert.equal(elements.get("parcelCoverageUnscanned").textContent, "—");
     assert.equal(centerText(coverage), "—");
 });

@@ -6,7 +6,7 @@ const reportContext = {
     analyst: "",
     plannedVolume: null,
     collaboratorCount: null,
-    shiftCapacity: null,
+    shiftCapacity: 20000,
 };
 
 const reportContextTextFields =

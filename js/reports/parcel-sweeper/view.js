@@ -37,6 +37,16 @@ const parcelPercentageFormatter =
         },
     );
 
+const parcelCoveragePercentageFormatter =
+    new Intl.NumberFormat(
+        "pt-BR",
+        {
+            style: "percent",
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        },
+    );
+
 let parcelViewElements = null;
 const parcelPackageSorts = { common: null, bulky: null };
 
@@ -386,20 +396,29 @@ function renderParcelView(
                 summary.unscannedCount,
             );
 
-    // Os totais do SPX incluem Expected = N. O percentual do gráfico
-    // continua usando somente os pacotes esperados (Expected = Y).
+    const formatCoveragePercentage =
+        function (value) {
+            return summary.expectedTotalCount > 0
+                ? parcelCoveragePercentageFormatter
+                    .format(
+                        value /
+                        summary.expectedTotalCount,
+                    )
+                : "—";
+        };
+
     parcelViewElements
         .coverageScanned
         .textContent =
-            formatMetric(
-                summary.scannedCount,
+            formatCoveragePercentage(
+                summary.expectedScannedCount,
             );
 
     parcelViewElements
         .coverageUnscanned
         .textContent =
-            formatMetric(
-                summary.unscannedCount,
+            formatCoveragePercentage(
+                summary.expectedUnscannedCount,
             );
 
     renderParcelOperatorTable(

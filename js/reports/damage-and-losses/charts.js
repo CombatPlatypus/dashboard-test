@@ -1104,10 +1104,8 @@ function renderDamageAndLossesCharts(
         .data.datasets[0]
         .backgroundColor =
             socStations.map(
-                function (_, index) {
-                    return index === 0
-                        ? DAMAGE_SOC_COLOR
-                        : "#e4e6eb";
+                function () {
+                    return DAMAGE_SOC_COLOR;
                 },
             );
 

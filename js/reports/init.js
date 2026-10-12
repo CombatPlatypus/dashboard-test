@@ -27,6 +27,10 @@ import {
 } from "./parcel-sweeper/index.js";
 
 import {
+    reverseReport,
+} from "./reverse/index.js";
+
+import {
     overallAnalysisReport,
 } from "./overall-analysis/index.js";
 
@@ -78,6 +82,10 @@ function initializeReportsPanel() {
 
     reportManager.register(
         parcelReport,
+    );
+
+    reportManager.register(
+        reverseReport,
     );
 
     reportManager.register(

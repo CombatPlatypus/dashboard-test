@@ -64,6 +64,14 @@ const PARCEL_IMPORT_NOTIFICATION =
             "No SPX, acesse Parcel Sweeper / Parcel Sweeper View, escolha um arquivo parcel para exportar e, em seguida, volte aqui e clique em importar.",
     });
 
+const REVERSE_IMPORT_NOTIFICATION =
+    Object.freeze({
+        type: "idle",
+
+        message:
+            "No SPX, acesse Saída / Gerenciamento de Pedidos, escolha uma TO para exportar e, em seguida, volte aqui e clique em importar.",
+    });
+
 const OVERALL_ANALYSIS_NOTIFICATION =
     Object.freeze({
         type: "idle",
@@ -86,6 +94,9 @@ const DEFAULT_REPORT_NOTIFICATIONS =
         parcel:
             PARCEL_IMPORT_NOTIFICATION,
 
+        reverse:
+            REVERSE_IMPORT_NOTIFICATION,
+
         "damage-and-losses":
             DAMAGE_AND_LOSSES_IMPORT_NOTIFICATION,
 
@@ -105,6 +116,7 @@ const REPORT_NOTIFICATION_PREFIXES =
         receipt: "receipt",
         expedition: "expedition",
         parcel: "parcel",
+        reverse: "reverse",
         "damage-and-losses":
             "damageAndLosses",
         "losses-rate": "lossesRate",

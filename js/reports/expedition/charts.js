@@ -454,12 +454,8 @@ function drawComparisonStructure(chart) {
     const timeEnd =
         timeStart +
         columnWidth;
-    const nameStart =
-        volumeStart + 10;
-    const routeStart = Math.min(
-        volumeStart + 120,
-        volumeEnd - 80,
-    );
+    const routeStart =
+        volumeStart;
     const routeEnd =
         volumeEnd;
     const axisY =
@@ -666,13 +662,19 @@ function drawComparisonStructure(chart) {
                 "#e4e6eb";
             context.textAlign =
                 "left";
+            context.textBaseline =
+                "bottom";
             context.fillText(
                 getOperatorName(
                     operator.operator,
                 ),
-                nameStart,
-                positionY,
+                routeStart,
+                positionY -
+                    barHeight / 2 -
+                    8,
             );
+            context.textBaseline =
+                "middle";
 
             drawRoundedBar(
                 context,

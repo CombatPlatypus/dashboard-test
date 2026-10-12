@@ -311,6 +311,7 @@ function renderLossesRateReport(
     const summary =
         getLossesRateMonthSummary(
             state.activeMonth,
+            state,
         );
 
     if (!summary) {

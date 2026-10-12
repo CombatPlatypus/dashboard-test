@@ -622,6 +622,7 @@ function updateLossesRateCompositionChart(
     const summary =
         getLossesRateMonthSummary(
             state.activeMonth,
+            state,
         );
 
     const possibleLosses =
@@ -707,6 +708,7 @@ function updateLossesRateHistoryChart(
                 const summary =
                     getLossesRateMonthSummary(
                         monthIndex,
+                        state,
                     );
 
                 return summary.lossRate ===

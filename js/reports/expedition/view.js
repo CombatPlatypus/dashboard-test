@@ -1331,12 +1331,16 @@ function renderExpeditionReport(
 
     setExpeditionInputValue(
         elements.duplicatedInput,
-        summary.duplicatedOrders,
+        summary.hasData
+            ? summary.duplicatedOrders
+            : null,
     );
 
     setExpeditionInputValue(
         elements.exceptionInput,
-        summary.exceptionOrders,
+        summary.hasData
+            ? summary.exceptionOrders
+            : null,
     );
 
     elements.previewWithdrawn
@@ -1347,7 +1351,9 @@ function renderExpeditionReport(
 
     setExpeditionInputValue(
         elements.withdrawnInput,
-        summary.withdrawnOrders,
+        summary.hasData
+            ? summary.withdrawnOrders
+            : null,
     );
 
     setExpeditionInputValue(

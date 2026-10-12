@@ -95,8 +95,10 @@ test("gráfico e indicadores acompanham período, importação, restauração e 
         update() {} resize() {}
     } });
     const data = { monthIndex: 9, year: 2026, days: [
-        { date: "2026-10-01", hub: 16, soc: 0, solid: 8, liquid: 4, glass: 4 },
-        { date: "2026-10-10", hub: 8, soc: 0, solid: 2, liquid: 4, glass: 2 },
+        { date: "2026-10-01", hub: 16, soc: 3, solid: 8, liquid: 4, glass: 4,
+            socStations: [{ name: "SOC A", count: 2 }, { name: "SOC B", count: 1 }] },
+        { date: "2026-10-10", hub: 8, soc: 2, solid: 2, liquid: 4, glass: 2,
+            socStations: [{ name: "SOC A", count: 1 }, { name: "SOC C", count: 1 }] },
     ] };
     replaceDamageAndLossesData(data);
     assert.equal(initializeDamageAndLossesCharts(panel), true);
@@ -104,6 +106,7 @@ test("gráfico e indicadores acompanham período, importação, restauração e 
     assert.equal(charts.length, 3);
     assert.equal(charts[0].type, "bar");
     assert.equal(charts[2].type, "bar");
+    assert.deepEqual(charts[2].data.datasets[0].backgroundColor, ["#ffc107", "#ffc107"]);
     const composition = charts[1];
     const values = () => elements.slice(5).map(element => element.textContent);
     assert.deepEqual(composition.data.datasets[0].data, [2, 4, 2]);
@@ -116,6 +119,7 @@ test("gráfico e indicadores acompanham período, importação, restauração e 
     assert.deepEqual(composition.data.datasets[0].data, [10, 8, 6]);
     assert.equal(composition.options.plugins.damageCompositionCenter.text, "24");
     assert.deepEqual(values(), ["10 (42%)", "8 (33%)", "6 (25%)"]);
+    assert.deepEqual(charts[2].data.datasets[0].backgroundColor, ["#ffc107", "#ffc107", "#ffc107"]);
     replaceDamageAndLossesData({ monthIndex: 9, year: 2026,
         days: [{ date: "2026-10-10", hub: 2185, liquid: 2185 }] });
     assert.deepEqual(values(), ["0 (0%)", "2.185 (100%)", "0 (0%)"]);
