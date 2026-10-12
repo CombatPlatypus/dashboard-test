@@ -94,29 +94,39 @@
                 height: 100% !important;
             }
             .doughnut-chart .chart-canvas-container {
-                height: 264px !important;
+                height: 264px;
             }
             .horizontal-bars-chart .chart-canvas-container {
-                height: 415px !important;
+                height: 415px;
             }
             .vertical-bars-chart .chart-canvas-container {
-                height: 350px !important;
+                height: 350px;
                 margin-bottom: 20px;
             }
             .line-chart .chart-canvas-container {
-                height: 304px !important;
+                height: 304px;
                 margin-bottom: 20px;
             }
 
             /* AJUSTES POR RELATÓRIO */
 
-            #losses-rate .losses-rate-charts {
-                gap: 15px;
-                align-items: flex-start;
-            }
-            #losses-rate .losses-rate-charts > div {
-                flex: 1 1 0;
-            }
+                /* TAXA DE PERDAS */
+
+                #losses-rate .losses-rate-charts {
+                    gap: 15px;
+                    align-items: flex-start;
+                }
+                #losses-rate .losses-rate-charts > div {
+                    flex: 1 1 0;
+                }
+
+                /* RELATÓRIO FINAL  */
+
+                .final-report-receipt > .horizontal-bars-chart > .chart-canvas-container,
+                .final-report-expedition > .horizontal-bars-chart > .chart-canvas-container {
+                    height: 320px !important;
+                    margin: 20px;
+                }
 
 
 
