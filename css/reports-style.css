@@ -208,16 +208,6 @@
         flex: 1 1 0;
         min-width: 0;
     }
-    #reports #parcel .parcel-horizontal-chart-canvas {
-        position: relative;
-        width: 100%;
-        height: 220px;
-    }
-    #reports #parcel .parcel-horizontal-chart-canvas canvas {
-        display: block;
-        width: 100% !important;
-        height: 100% !important;
-    }
 
     /* CARDS DE DESTAQUES */
 
