@@ -1993,50 +1993,46 @@
                                                 </button>
                                             </div>
 
-                                            <div class="vertical-bars-chart">
+                                            <div class="chart vertical-bars-chart">
                                                 <div class="chart-title">
-                                                    <div class="flex-box-between">
-                                                        <h4 id="lossesChartPeriodTitle">Últimos 7 dias</h4>
-
-                                                        <div class="flex-box-start">
-                                                            <div class="type">
-                                                                <div style="background-color: #ffc107;"></div>
-                                                                <p>Pacotes em Análise</p>
-                                                            </div>
-
-                                                            <div class="type">
-                                                                <div style="background-color: #F44336;"></div>
-                                                                <p>Perdas Confirmadas</p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
+                                                    <h4 id="lossesChartPeriodTitle">Últimos 7 dias</h4>
                                                 </div>
 
-                                                <div id="lossesLastSevenDaysChartContainer">
-                                                    <div class="losses-period-chart-canvas">
-                                                        <canvas id="lossesLastSevenDaysChart" role="img" aria-label="Pacotes em análise e perdas confirmadas nos últimos sete dias"></canvas>
+                                                <div class="chart-canvas-container" id="lossesLastSevenDaysChartContainer">
+                                                    <canvas id="lossesLastSevenDaysChart" role="img"></canvas>
+                                                </div>
+
+                                                <div class="chart-label">
+                                                    <div class="type">
+                                                        <div style="background-color: #ffc107;"></div>
+                                                        <p>Pacotes em Análise</p>
+                                                    </div>
+
+                                                    <div class="type">
+                                                        <div style="background-color: #F44336;"></div>
+                                                        <p>Perdas Confirmadas</p>
                                                     </div>
                                                 </div>
                                             </div>
 
                                             <div class="damage-and-losses-charts flex-box-start">
-                                                <div class="horizontal-bars-chart">
+                                                <div class="chart horizontal-bars-chart">
                                                     <div class="chart-title">
                                                         <h4>Pack Recovery</h4>
                                                     </div>
 
-                                                    <div id="lossesPackRecoveryChartContainer" class="losses-horizontal-chart-canvas">
-                                                        <canvas id="lossesPackRecoveryChart" role="img" aria-label="Pack Recovery"></canvas>
+                                                    <div class="chart-canvas-container" id="lossesPackRecoveryChartContainer">
+                                                        <canvas id="lossesPackRecoveryChart" role="img"></canvas>
                                                     </div>
                                                 </div>
 
-                                                <div class="horizontal-bars-chart">
+                                                <div class="chart horizontal-bars-chart">
                                                     <div class="chart-title">
                                                         <h4>Pacotes Retornados x Perdidos x Em Análise</h4>
                                                     </div>
 
-                                                    <div id="lossesReturnedComparisonChartContainer" class="losses-horizontal-chart-canvas">
-                                                        <canvas id="lossesReturnedComparisonChart" role="img" aria-label="Pacotes retornados, perdidos e em análise"></canvas>
+                                                    <div class="chart-canvas-container" id="lossesReturnedComparisonChartContainer">
+                                                        <canvas id="lossesReturnedComparisonChart" role="img"></canvas>
                                                     </div>
                                                 </div>
                                             </div>
@@ -2614,11 +2610,13 @@
                                                         <th>TO</th>
                                                         <th>Quantidade</th>
                                                         <th>Percentual</th>
+                                                        <th>Tipo</th>
                                                     </tr>
                                                 </thead>
 
                                                 <tbody>
                                                     <tr>
+                                                        <td id="">—</td>
                                                         <td id="">—</td>
                                                         <td id="">—</td>
                                                         <td id="">—</td>
@@ -2628,21 +2626,11 @@
                                                         <td id="">—</td>
                                                         <td id="">—</td>
                                                         <td id="">—</td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td id="">—</td>
-                                                        <td id="">—</td>
                                                         <td id="">—</td>
                                                     </tr>
 
                                                     <tr>
                                                         <td id="">—</td>
-                                                        <td id="">—</td>
-                                                        <td id="">—</td>
-                                                    </tr>
-
-                                                    <tr>
                                                         <td id="">—</td>
                                                         <td id="">—</td>
                                                         <td id="">—</td>
@@ -2652,15 +2640,32 @@
                                                         <td id="">—</td>
                                                         <td id="">—</td>
                                                         <td id="">—</td>
+                                                        <td id="">—</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td id="">—</td>
+                                                        <td id="">—</td>
+                                                        <td id="">—</td>
+                                                        <td id="">—</td>
                                                     </tr>
 
                                                     <tr>
                                                         <td id="">—</td>
                                                         <td id="">—</td>
                                                         <td id="">—</td>
+                                                        <td id="">—</td>
                                                     </tr>
 
                                                     <tr>
+                                                        <td id="">—</td>
+                                                        <td id="">—</td>
+                                                        <td id="">—</td>
+                                                        <td id="">—</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td id="">—</td>
                                                         <td id="">—</td>
                                                         <td id="">—</td>
                                                         <td id="">—</td>
