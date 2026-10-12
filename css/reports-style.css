@@ -253,7 +253,6 @@
         margin: 0;
     }
 
-
     /* TABELAS */
 
     #reports table {
@@ -341,6 +340,155 @@
         text-align: center;
     }
 
+    /* GRAFICOS - ESTRUTURA */
+
+    .chart {
+        background-color: var(--color-container);
+        border: 1px solid var(--color-border);
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    .chart-title  {
+        padding: 0.5rem 0.625rem 0.625rem;
+        background-color: var(--color-table-th);
+        border-bottom: 1px solid var(--color-border);
+    }
+    .chart-title > h4 {
+        font-size: 15px;
+        margin: 0;
+        text-align: center;
+    }
+    .chart-padding {
+        padding: 25px;
+    }
+    .chart-canvas-container {
+        max-width: 100%;
+        position: relative;
+        margin: 0 20px;
+    }
+    .chart-label {
+        max-width: 100%;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+        margin: 0 20px 20px 20px;
+    }
+    .chart-label .type {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .chart-label .type > div {
+        width: 20px;
+        height: 20px;
+        border-radius: 3px;
+    }  
+    .chart-label p {
+        font-size: 14px;
+        color: var(--color-gray-p);
+        line-height: 1;
+        margin: 0;
+    }
+
+    /* TAMANHO DO CANVAS */
+
+    .chart canvas {
+        display: block;
+        width: 100% !important;
+        height: 100% !important;
+    }
+    .doughnut-chart .chart-canvas-container {
+        height: 264px;
+    }
+    .horizontal-bars-chart .chart-canvas-container {
+        height: 415px;
+    }
+    .vertical-bars-chart .chart-canvas-container {
+        height: 350px;
+        margin-bottom: 20px;
+    }
+    .line-chart .chart-canvas-container {
+        height: 304px;
+        margin-bottom: 20px;
+    }
+
+    /* AJUSTES POR RELATÓRIO */
+
+        /* EXPEDIÇÃO */
+
+        #expedition-mistakes .horizontal-bars-chart .chart-canvas-container {
+            height: 313px !important;
+            margin: 0 20px 20px 20px;
+        }
+        #expedition-streets .vertical-bars-chart .chart-canvas-container {
+            height: 252px;
+        }
+        #expedition-streets .vertical-bars-chart .chart-label{
+            margin: 0 20px 0px 20px;
+        }
+        
+        /* AVARIAS E PERDAS */
+
+        #damage-and-losses .horizontal-bars-chart .chart-canvas-container {
+            height: 304px !important;
+            margin: 0 20px 20px 20px;
+        }
+        #damage-and-losses .chart-canvas-container {
+            margin-bottom: 0px !important;
+        }
+
+        /* RELATÓRIO FINAL  */
+
+        .final-report-receipt > .horizontal-bars-chart > .chart-canvas-container,
+        .final-report-expedition > .horizontal-bars-chart > .chart-canvas-container {
+            height: 320px !important;
+            margin: 20px;
+        }
+
+    /* GRAFICOS - BARRA ÚNICA HORRIZONTAL DE PROGRESSO */
+
+    .chart-progress {
+        padding: 18px 20px;
+        border: 1px solid var(--color-border);
+        background-color: var(--color-container);
+    }
+    .chart-progress-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+    }
+    .chart-progress-header h4 {
+        margin: 0 0 5px;
+    }
+    .chart-progress-header p {
+        margin: 0;
+        color: var(--color-gray-p);
+        font-size: 14px;
+    }
+    .chart-progress-percentage {
+        color: var(--color-text) !important;
+        font-size: 16px !important;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+    .chart-progress-track {
+        position: relative;
+        height: 15px;
+        margin-top: 18px;
+        overflow: hidden;
+        background-color: var(--color-progress-bar);
+    }
+    .chart-progress-fill {
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 0;
+        background-color: #4CAF50;
+    }
+
     /* AJUSTES ESPECÍFICOS PARA CADA RELATÓRIO */
 
     #receipt .tabs,
@@ -360,7 +508,6 @@
         margin-bottom: 20px;
         border-bottom: 2px solid var(--color-border);
     }
-
     #receipt .report-controls .input-group:last-of-type {
         padding-bottom: 0;
         margin-bottom: 0;
@@ -398,36 +545,11 @@
     #expedition .expedition-guardian-name {
         text-transform: capitalize;
     }
-    #expedition .two-horizontal-bars-chart .chart-panel {
-        height: auto !important;
-        min-height: 1226px !important;
-    }
-    #expedition .two-horizontal-bars-chart .chart-panel > div {
-        height: 1115px;
-    }
     #overall-analysis td {
         text-align: center;
     }
-
     #damage-and-losses .tabs {
         grid-template-columns: repeat(auto-fit, minmax(299px, 1fr));
-    }
-
-    #damage-and-losses .damage-period-chart-canvas {
-        position: relative;
-        width: 100%;
-        height: 300px;
-    }
-
-    #damage-and-losses .losses-period-chart-canvas {
-        position: relative;
-        width: 100%;
-        height: 300px;
-    }
-    #damage-and-losses .losses-horizontal-chart-canvas {
-        position: relative;
-        width: 100%;
-        height: 220px;
     }
     #damage-and-losses .damage-chart-period-selector {
         display: grid;
@@ -478,26 +600,9 @@
         color: var(--color-text);
         background-color: var(--color-container-houver);
     }
-
     #damage-and-losses .damage-chart-period-selector button:disabled {
         opacity: 0.45;
         cursor: default;
-    }
-    #damage-and-losses .damage-soc-chart-container {
-        position: relative;
-        width: 100%;
-        min-height: 270px;
-    }
-    #damage-and-losses .damage-soc-chart-container canvas {
-        display: block;
-        width: 100% !important;
-        height: 100% !important;
-    }
-    #reports  #receipt .aligned-comparison-chart > div {
-        min-height: 428px;
-    }
-    #reports  #expedition .aligned-comparison-chart > div {
-        min-height: 1184px;
     }
     #reports #losses-rate .preview {
         flex: 1 1 0 !important;
@@ -708,7 +813,7 @@
         color: #1a73e8;
     }
 
-    /*  */
+    /* PLANEJAMENTO - BACKLOG */
 
     #planning-backlog textarea {
         min-height: 403px;
@@ -744,7 +849,6 @@
             grid-template-columns: minmax(0, 1fr);
         }
     }
-
     @media screen and (max-width: 800px) {
         #planning .planning-sheet-metrics {
             grid-template-columns: minmax(0, 1fr);
@@ -1199,136 +1303,111 @@
         margin-top: 15px;
     }
 
-    /*  */
+    /* PARCEL */
 
-/* ESTRUTURA */
-
-#reports #parcel .preview {
-    flex: 1 1 0;
-}
-
-/* CARDS  */
-
-#reports #parcel .cards > div > .flex-box-start > img {
-    width: 35px;
-}
-
-/* COBERTURA DE VARREDURA  */
-
-#reports #parcel #parcelPreview > .flex-box-start {
-    gap: 15px;
-    align-items: flex-start;
-}
-#reports #parcel #parcelPreview > .distribution > .doughnut-chart {
-    flex: 1 1 0;
-}
-#reports #parcel #parcelPreview > .distribution > .distribution-by-operator {
-    flex: 1 1 0;
-}
-
-/* BOTÕES */
-
-#parcel .data-selector {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 10px;
-}
-#parcel .data-selector button {
-    position: relative;
-    display: flex;
-    min-height: 58px;
-    padding: 10px 12px;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    color: var(--color-gray-p);
-    background-color: var(--color-container);
-    border: 1px solid var(--color-border);
-    border-radius: 3px;
-    font: inherit;
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 1px;
-    line-height: 1.35;
-    text-align: center;
-    cursor: pointer;
-    transition:
-        color 160ms ease,
-        background-color 160ms ease,
-        border-color 160ms ease;
-}
-#parcel .data-selector button::before {
-    position: absolute;
-    top: -1px;
-    right: -1px;
-    left: -1px;
-    height: 3px;
-    background-color: transparent;
-    border-radius: 3px 3px 0 0;
-    content: "";
-}
-#parcel .data-selector button:hover,
-#parcel .data-selector button:focus-visible {
-    color: var(--color-text);
-    background-color: var(--color-container-houver);
-    border-color: var(--color-gray-p);
-}
-#parcel .data-selector button.is-active {
-    color: var(--color-text);
-    background-color: var(--color-container-houver);
-}
-
-#parcel .data-selector button:disabled {
-    opacity: 0.45;
-    cursor: default;
-}
-
-/* TABLEAS DE BR BIPADOS */
-
-#reports #parcel #parcelPreview > .distribution-tables > div {
-    flex: 1 1 0;
-    max-height: 412px;
-    overflow: auto;
-    border: 1px solid var(--color-border);
-    border-radius: 4px;
-}
-#reports #parcel #parcelPreview > .distribution-tables > div::-webkit-scrollbar {
-    width: 7px;
-    height: 5px;
-    background-color: var(--color-container-focus);
-    border-left: 1px solid var(--color-border);
-}
-#reports #parcel #parcelPreview > .distribution-tables > div::-webkit-scrollbar-thumb {
-    border-radius: 0px 3px 3px 0px;
-    background-color: var(--color-text);
-}
-#reports #parcel #parcelPreview > .distribution-tables > div::-webkit-scrollbar-track {
-    background-color: transparent;
-}
-#reports #parcel #parcelPreview > .distribution-tables > div table thead {
-    position: sticky;
-    top: 0;
-    z-index: 1;
-    background-color: var(--color-table-th);
-}
-
-caption .flex-box-start {
-    gap: 10px;
-    width: max-content;
-}
-caption .flex-box-start button img {
-    width: 20px;
-    cursor: pointer;
-}
-
-/*  */
-
-#parcel .flex-box-start > .parcel-horizontal-chart-canvas {
-    width: 100%;
-    height: 220px;
-    position: relative;
-}
-
-#parcel .flex-box-start > .horizontal-bars-chart {
-    flex: 1 1 0;
-}
+    #reports #parcel .preview {
+        flex: 1 1 0;
+    }
+    #reports #parcel .cards > div > .flex-box-start > img {
+        width: 35px;
+    }
+    #reports #parcel #parcelPreview > .flex-box-start {
+        gap: 15px;
+        align-items: flex-start;
+    }
+    #reports #parcel #parcelPreview > .distribution > .doughnut-chart {
+        flex: 1 1 0;
+    }
+    #reports #parcel #parcelPreview > .distribution > .distribution-by-operator {
+        flex: 1 1 0;
+    }
+    #parcel .data-selector {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+    }
+    #parcel .data-selector button {
+        position: relative;
+        display: flex;
+        min-height: 58px;
+        padding: 10px 12px;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        color: var(--color-gray-p);
+        background-color: var(--color-container);
+        border: 1px solid var(--color-border);
+        border-radius: 3px;
+        font: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        line-height: 1.35;
+        text-align: center;
+        cursor: pointer;
+        transition:
+            color 160ms ease,
+            background-color 160ms ease,
+            border-color 160ms ease;
+    }
+    #parcel .data-selector button::before {
+        position: absolute;
+        top: -1px;
+        right: -1px;
+        left: -1px;
+        height: 3px;
+        background-color: transparent;
+        border-radius: 3px 3px 0 0;
+        content: "";
+    }
+    #parcel .data-selector button:hover,
+    #parcel .data-selector button:focus-visible {
+        color: var(--color-text);
+        background-color: var(--color-container-houver);
+        border-color: var(--color-gray-p);
+    }
+    #parcel .data-selector button.is-active {
+        color: var(--color-text);
+        background-color: var(--color-container-houver);
+    }
+    #parcel .data-selector button:disabled {
+        opacity: 0.45;
+        cursor: default;
+    }
+    #reports #parcel #parcelPreview > .distribution-tables > div {
+        flex: 1 1 0;
+        max-height: 412px;
+        overflow: auto;
+        border: 1px solid var(--color-border);
+        border-radius: 4px;
+    }
+    #reports #parcel #parcelPreview > .distribution-tables > div::-webkit-scrollbar {
+        width: 7px;
+        height: 5px;
+        background-color: var(--color-container-focus);
+        border-left: 1px solid var(--color-border);
+    }
+    #reports #parcel #parcelPreview > .distribution-tables > div::-webkit-scrollbar-thumb {
+        border-radius: 0px 3px 3px 0px;
+        background-color: var(--color-text);
+    }
+    #reports #parcel #parcelPreview > .distribution-tables > div::-webkit-scrollbar-track {
+        background-color: transparent;
+    }
+    #reports #parcel #parcelPreview > .distribution-tables > div table thead {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background-color: var(--color-table-th);
+    }
+    #reports #parcel caption .flex-box-start {
+        gap: 10px;
+        width: max-content;
+    }
+    #reports #parcel caption .flex-box-start button img {
+        width: 20px;
+        cursor: pointer;
+    }
+    #parcel .flex-box-start > .horizontal-bars-chart {
+        flex: 1 1 0;
+    }
