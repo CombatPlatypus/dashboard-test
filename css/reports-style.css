@@ -976,7 +976,7 @@
         grid-template-columns: repeat(auto-fit, minmax(100%, 1fr)) !important;
     }
     #expedition #expeditionStreetGuardianControls {
-        max-height: 776px;
+        max-height: 827px;
         overflow-y: auto;
         padding-right: 15px;
     }
@@ -1016,6 +1016,7 @@
     }
     .damage-and-losses-charts {
         gap: 15px;
+        flex-direction: row-reverse;
     }
     .damage-and-losses-charts > div {
         flex: 1 1 0;

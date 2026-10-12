@@ -20,6 +20,7 @@ function setup(t) {
     }
     class Button extends Element {}
     class Input extends Element {}
+    class Image extends Element {}
     const form = new Element();
     form.reset = () => { form.selected = null; };
     form.querySelector = () => form.selected ? { value: form.selected } : null;
@@ -32,8 +33,10 @@ function setup(t) {
         ["reverseImportTypeModal", new Element()], ["reverseImportTypeForm", form],
         ["reverseImportTypeFileName", instruction], ["reverseImportTypeConfirm", confirm],
         ["reverseFileInput", input], ["reverseImportActionButton", button],
+        ["reverseNotification", new Element()], ["reverseNotificationIcon", new Image()],
+        ["reverseNotificationText", new Element()],
     ]);
-    const root = { querySelector: selector => elements.get(selector.slice(1)), getElementById: () => null };
+    const root = { querySelector: selector => elements.get(selector.slice(1)), getElementById: id => elements.get(id) };
     const query = new Element();
     query.on = query.addEventListener;
     query.off = query.removeEventListener;
@@ -43,7 +46,7 @@ function setup(t) {
         close() { this.closes++; query.emit("closed.zf.reveal"); },
     };
     for (const [name, value] of Object.entries({
-        HTMLElement: Element, HTMLButtonElement: Button, HTMLInputElement: Input,
+        HTMLElement: Element, HTMLButtonElement: Button, HTMLInputElement: Input, HTMLImageElement: Image,
         document: root,
         window: { jQuery: () => query, Foundation: { Reveal: class { constructor() { return modal; } } },
             alert(message) { throw new Error(message); } },
@@ -79,7 +82,7 @@ test("Reveal exige seleção, aceita os quatro tipos e limpa a escolha entre arq
 
 test("instrução de classificação da TO permanece fixa no HTML", () => {
     const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
-    const instruction = html.match(/<p\s+id="reverseImportTypeFileName">([^<]*)<\/p>/);
+    const instruction = html.match(/id="reverseImportTypeModal"[\s\S]*?<p(?:\s[^>]*)?>([^<]*)<\/p>/);
     assert.equal(instruction?.[1], classificationPrompt);
 });
 
@@ -121,4 +124,30 @@ test("confirmação ocorre antes da leitura e Intercept classifica a TO inteira 
     const transfer = getReverseState().transfers[0];
     assert.equal(transfer.quantity, 2);
     assert.deepEqual(transfer.quantities, { return: 0, missorted: 0, liquidate: 0, confiscated: 2 });
+});
+
+test("notificação usa o código da TO sem prefixo duplicado, tipo escolhido e ação da importação", async t => {
+    const { root, form, input, elements } = setup(t);
+    const rows = [["", "Total Scanned Orders"], ["TO Number", "TO202610076CSM1"],
+        ["SPX Tracking Number", "Journey Type"]];
+    rows.push(...Array.from({ length: 153 }, (_, index) => [`BR${index}`, "Forward"]));
+    window.XLSX = { read: () => ({ SheetNames: ["Sheet1"], Sheets: { Sheet1: {} } }),
+        utils: { sheet_to_json: () => rows } };
+    input.files = [{ name: "reversa.xlsx", size: 1, async arrayBuffer() { return new ArrayBuffer(0); } }];
+    initializeReverseImport(root);
+
+    for (const [type, label, action] of [
+        ["missorted", "Missorted", "adicionada"], ["return", "Return", "atualizada"],
+        ["liquidate", "Liquidate", "atualizada"], ["intercept", "Intercept", "atualizada"],
+    ]) {
+        const pending = input.emit("change");
+        form.selected = type;
+        form.emit("change");
+        form.emit("submit");
+        await pending;
+        assert.equal(elements.get("reverseNotificationText").textContent,
+            `TO202610076CSM1 - ${label} ${action}: 153 pacotes.`);
+        assert.equal(elements.get("reverseNotification").dataset.notificationType, "success");
+        assert.equal(getReverseState().transfers.length, 1);
+    }
 });

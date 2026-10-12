@@ -24,13 +24,15 @@ function createContext() {
     context.setLineDash = value => { dash = [...value]; };
     context.stroke = () => context.strokes.push({ path: [...path], color: context.strokeStyle, dash });
     context.fill = () => { context.fills += 1; };
-    context.fillText = text => context.texts.push(text);
+    context.fillText = (text, x, y) => context.texts.push({
+        text, x, y, alignment: context.textAlign, baseline: context.textBaseline, color: context.fillStyle,
+    });
     context.strokeText = () => {};
     context.measureText = text => ({ width: text.length * 8 });
     return context;
 }
 
-test("ranking de conferentes não desenha grades e preserva barras, escalas e limite de tempo", t => {
+test("ranking restaura grades sem escalas inferiores e alinha valores acima das barras", t => {
     class TestElement {
         dataset = {};
         style = {};
@@ -67,6 +69,7 @@ test("ranking de conferentes não desenha grades e preserva barras, escalas e li
     assert.equal(initializeExpeditionCharts(root), true);
     assert.equal(chart.options.scales.x.display, false);
     assert.equal(chart.options.scales.y.display, false);
+    assert.equal(chart.options.layout.padding.bottom, 16);
     const plugin = chart.plugins.find(item => item.id === "expeditionAlignedComparison");
     chart.chartArea = { left: 16, right: 896, top: 38, bottom: 340 };
     chart.scales = { x: {}, y: { getPixelForValue: index => 70 + index * 58 } };
@@ -81,21 +84,54 @@ test("ranking de conferentes não desenha grades e preserva barras, escalas e li
     plugin.beforeDatasetsDraw(chart);
 
     const referenceX = 471 + (896 - 471) * (600 / 960);
-    assert.deepEqual(chart.ctx.strokes, [{
+    assert.deepEqual(chart.ctx.strokes.filter(stroke => stroke.color === "#d9534f"), [{
         path: [["moveTo", referenceX, 34], ["lineTo", referenceX, 340]],
         color: "#d9534f",
         dash: [6, 5],
     }]);
+    assert.equal(chart.ctx.strokes.length, 27);
+    assert.ok(chart.ctx.strokes.some(stroke =>
+        JSON.stringify(stroke.path) === JSON.stringify([["moveTo", 16, 38], ["lineTo", 16, 340]])));
+    assert.ok(chart.ctx.strokes.some(stroke =>
+        JSON.stringify(stroke.path) === JSON.stringify([["moveTo", 16, 99], ["lineTo", 896, 99]])));
     assert.equal(chart.ctx.fills, 11);
-    for (const text of ["Rosa", "Gabriel", "Ana", "21 rotas", "06:34", "22", "16M", "Máximo 10:00"]) {
-        assert.ok(chart.ctx.texts.includes(text), `Texto preservado: ${text}`);
+    for (const [index, name, routes, time] of [
+        [0, "Rosa", "21", "06:34"], [1, "Gabriel", "20", "06:24"], [2, "Ana", "19", "—"],
+    ]) {
+        const rowTop = 70 + (index - 0.5) * 58;
+        const labelY = rowTop + 12 + 14;
+        for (const [text, x, alignment] of [[name, 26, "left"], [routes, 431, "right"], [time, 481, "left"]]) {
+            const label = chart.ctx.texts.find(label => label.text === text);
+            assert.ok(label, `Texto preservado: ${text}`);
+            assert.equal(label.x, x);
+            assert.equal(label.y, labelY);
+            assert.equal(label.alignment, alignment);
+            assert.equal(label.baseline, "bottom");
+            assert.equal(label.y - 14 - rowTop, 12);
+        }
     }
+    assert.equal(chart.ctx.texts.length, 10);
+    assert.ok(chart.ctx.texts.some(label => label.text === "Máximo 10:00"));
+    assert.ok(chart.ctx.texts.every(label => label.y < chart.chartArea.bottom));
     assert.equal(chart.ctx.balance, 0);
+
+    chart.$expeditionRows = [{ operator: "Rosa", routesChecked: 1, averageDurationSeconds: 650 }];
+    chart.ctx = createContext();
+    plugin.beforeDatasetsDraw(chart);
+    assert.ok(chart.ctx.texts.some(label => label.text === "1" && label.x === 431 && label.alignment === "right"));
+    assert.ok(chart.ctx.texts.some(label => label.text === "10:50" && label.x === 481 && label.color === "#ffc107"));
+
+    // A single operator in a tall row keeps its vertical centering.
+    chart.scales.y.getPixelForValue = index => 200 + index * 300;
+    chart.ctx = createContext();
+    plugin.beforeDatasetsDraw(chart);
+    assert.ok(chart.ctx.texts.some(label => label.text === "Rosa" && label.y === 182));
 
     chart.$expeditionRows = [];
     chart.ctx = createContext();
     plugin.beforeDatasetsDraw(chart);
-    assert.deepEqual(chart.ctx.strokes, []);
-    assert.ok(chart.ctx.texts.includes("Importe os dados para comparar os conferentes."));
+    assert.equal(chart.ctx.strokes.length, 23);
+    assert.equal(chart.ctx.texts.length, 1);
+    assert.equal(chart.ctx.texts[0].text, "Importe os dados para comparar os conferentes.");
     assert.equal(chart.ctx.balance, 0);
 });

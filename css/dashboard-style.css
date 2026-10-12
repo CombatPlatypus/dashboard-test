@@ -1393,9 +1393,7 @@ footer > div > div:last-of-type {
         text-align: center;
     }
     .reveal p {
-        width: 404px;
         text-align: center;
-        margin: 0 auto;
     }
     .reveal .close-button {
         position: absolute;
@@ -1501,6 +1499,7 @@ footer > div > div:last-of-type {
         align-items: center;
         gap: 10px;
         cursor: pointer;
+        justify-content: center;
     }
     #reverseImportTypeForm input[type="radio"] {
         margin: 0;

@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ranking de conferentes — prévia com dados fictícios</title>
+    <link rel="stylesheet" href="../../css/font-face.css">
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 24px; background: #101010; color: #e4e6eb; font: 14px "Open Sans", sans-serif; letter-spacing: 1px; }
+        h1 { font-size: 18px; font-weight: 600; }
+        button { padding: 8px 16px; color: inherit; background: #242424; border: 1px solid #666; cursor: pointer; }
+        #expedition { width: 100%; max-width: 1100px; margin-top: 20px; }
+        .cards { display: flex; gap: 16px; margin-bottom: 20px; }
+        .cards > div { flex: 1; padding: 20px; border: 1px solid #666; text-align: center; }
+        .chart { border: 1px solid #666; }
+        #expeditionAlignedComparisonChartContainer { position: relative; width: 100%; }
+    </style>
+</head>
+<body>
+    <h1>Ranking de conferentes — dados fictícios para teste visual</h1>
+    <button id="toggleWidth">Alternar largura</button>
+    <section id="expedition" class="is-active">
+        <div id="expedition-charts" class="is-active">
+            <div id="expeditionChartsExportArea">
+                <div class="cards">
+                    <div><strong id="expeditionTopRoutesOperator"></strong><p>Maior quantidade de rotas</p><span id="expeditionTopRoutesDetails"></span></div>
+                    <div><strong id="expeditionFastestOperator"></strong><p>Conferente mais rápido</p><span id="expeditionFastestOperatorDetails"></span></div>
+                </div>
+                <div class="chart">
+                    <div id="expeditionAlignedComparisonChartContainer">
+                        <canvas id="expeditionAlignedComparisonChart" role="img" aria-label="Ranking de conferentes por quantidade de rotas e tempo médio"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script src="../../js/libraries/chart.umd.min.js"></script>
+    <script type="module">
+        import { initializeExpeditionCharts } from "../../js/reports/expedition/charts.js";
+        import { replaceExpeditionRoutes } from "../../js/reports/expedition/state.js";
+        const operators = [
+            ["Rosa", 21, 394], ["Maristela", 20, 449], ["Aislane", 20, 449],
+            ["Tamires", 19, 524], ["Vitoria", 19, 495], ["Ellen", 18, 445],
+            ["Gilmara", 17, 554], ["Gabriel", 16, 384],
+        ];
+        const routes = operators.flatMap(([operator, quantity, duration], operatorIndex) =>
+            Array.from({ length: quantity }, (_, routeIndex) => ({
+                code: `TESTE${operatorIndex}-${routeIndex}`, status: "Validated", finalOrders: 10,
+                validationOperator: operator, validationDurationSeconds: duration,
+            })));
+        replaceExpeditionRoutes(routes, "dados-ficticios.csv");
+        initializeExpeditionCharts();
+        document.getElementById("toggleWidth").addEventListener("click", () => {
+            const panel = document.getElementById("expedition");
+            panel.style.maxWidth = panel.style.maxWidth === "480px" ? "1100px" : "480px";
+        });
+    </script>
+</body>
+</html>

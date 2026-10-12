@@ -75,10 +75,10 @@ test("projeção preserva proporções e desenha somente o total no centro", t =
         center.afterDraw(chart, {}, { text: String(total), label: "Ocorrências" });
         const geometry = chart.$lossesRateCompositionGeometry;
         assert.deepEqual(context.texts, [
-            [String(total), geometry.centerX, geometry.textCenterY - 7],
-            ["Ocorrências", geometry.centerX, geometry.textCenterY + 7],
+            [String(total), geometry.centerX, geometry.textCenterY - 11],
+            ["Ocorrências", geometry.centerX, geometry.textCenterY + 11],
         ]);
-        assert.equal(context.font, "14px Open Sans");
+        assert.equal(context.font, "16px Open Sans");
         assert.equal(context.fillStyle, "#a8a9ad");
         assert.equal(context.letterSpacing, "1px");
         assert.equal(context.balance, 0);

@@ -186,16 +186,18 @@ function drawDoughnut3DCenterText(chart, geometry, { text = "—", label = "" } 
     const context = chart.ctx;
     const fontFamily = window.getComputedStyle?.(chart.canvas)?.fontFamily ||
         "Open Sans, Arial, sans-serif";
-    const lineHeight = 14;
+    const lineHeight = 16;
+    const lineGap = 6;
+    const lineOffset = (lineHeight + lineGap) / 2;
 
     context.save();
     context.textAlign = "center";
     context.textBaseline = "middle";
     context.fillStyle = "#a8a9ad";
-    context.font = `14px ${fontFamily}`;
+    context.font = `${lineHeight}px ${fontFamily}`;
     context.letterSpacing = "1px";
-    context.fillText(text, geometry.centerX, geometry.textCenterY - lineHeight / 2);
-    context.fillText(label, geometry.centerX, geometry.textCenterY + lineHeight / 2);
+    context.fillText(text, geometry.centerX, geometry.textCenterY - lineOffset);
+    context.fillText(label, geometry.centerX, geometry.textCenterY + lineOffset);
     context.restore();
 }
 

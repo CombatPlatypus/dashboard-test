@@ -464,17 +464,17 @@ function createLossesReturnedComparisonChart(canvas) {
         type: "bar",
         data: {
             labels: [
-                "Retornados",
-                "Perdidos",
                 "Em Análise",
+                "Perdidos",
+                "Retornados",
             ],
             datasets: [
                 {
                     data: [0, 0, 0],
                     backgroundColor: [
-                        LOSSES_RETURNED_COLOR,
-                        LOSSES_CONFIRMED_COLOR,
                         LOSSES_REVIEW_COLOR,
+                        LOSSES_CONFIRMED_COLOR,
+                        LOSSES_RETURNED_COLOR,
                     ],
                     borderWidth: 0,
                     borderRadius: 3,
@@ -698,9 +698,9 @@ function renderLossesCharts(
     lossesPackRecoveryChart.update();
 
     const comparisonValues = [
-        selectedPeriod.returnedPackages,
-        selectedPeriod.confirmedLosses,
         selectedPeriod.underReview,
+        selectedPeriod.confirmedLosses,
+        selectedPeriod.returnedPackages,
     ];
     const maximumComparison =
         Math.max(...comparisonValues, 0);
@@ -715,7 +715,7 @@ function renderLossesCharts(
             : 1;
     lossesReturnedComparisonChart.canvas.setAttribute(
         "aria-label",
-        `Pacotes retornados, perdidos e em análise: ${selectedPeriod.title}`,
+        `Pacotes em análise, perdidos e retornados: ${selectedPeriod.title}`,
     );
     lossesReturnedComparisonChart.update();
 

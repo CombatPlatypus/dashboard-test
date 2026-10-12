@@ -1,4 +1,5 @@
 import {
+    REVERSE_TYPE_DEFINITIONS,
     createEmptyReverseQuantities,
     createReverseTransfer,
     normalizeReverseSearchText,
@@ -475,12 +476,16 @@ function initializeReverseImport(
                         "updated"
                         ? "atualizada"
                         : "adicionada";
+                const typeLabel =
+                    reverseType === "confiscated"
+                        ? "Intercept"
+                        : REVERSE_TYPE_DEFINITIONS[reverseType].label;
 
                 setReportNotification({
                     reportId: "reverse",
                     type: "success",
                     message:
-                        `TO ${transfer.to} ${action}: ` +
+                        `${transfer.to} - ${typeLabel} ${action}: ` +
                         `${transfer.quantity} pacotes.`,
                 });
             } catch (error) {
