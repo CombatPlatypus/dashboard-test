@@ -21,46 +21,6 @@ const LOSSES_RATE_MONTHS =
 const lossesRateStateListeners =
     new Set();
 
-/* NORMALIZA UM TEXTO */
-
-function normalizeLossesRateText(
-    value,
-) {
-    if (
-        value === null ||
-        value === undefined
-    ) {
-        return "";
-    }
-
-    return String(
-        value,
-    ).trim();
-}
-
-/* CRIA OS DADOS DE IDENTIFICAÇÃO */
-
-function createLossesRateIdentification(
-    values = {},
-) {
-    return {
-        description:
-            normalizeLossesRateText(
-                values.description,
-            ),
-
-        hubCode:
-            normalizeLossesRateText(
-                values.hubCode,
-            ),
-
-        subRegional:
-            normalizeLossesRateText(
-                values.subRegional,
-            ),
-    };
-}
-
 /* NORMALIZA UMA QUANTIDADE */
 
 function normalizeLossesRateQuantity(
@@ -143,9 +103,6 @@ const lossesRateState = {
     year:
         new Date().getFullYear(),
 
-    identification:
-        createLossesRateIdentification(),
-
     months:
         LOSSES_RATE_MONTHS.map(
             function () {
@@ -175,10 +132,6 @@ function getLossesRateState() {
 
         year:
             lossesRateState.year,
-
-        identification: {
-            ...lossesRateState.identification,
-        },
 
         months:
             lossesRateState.months.map(
@@ -317,7 +270,6 @@ function getLossesRateMonthSummary(
 
 function replaceLossesRateHistory(
     months,
-    identification = {},
 ) {
     if (
         !Array.isArray(
@@ -326,11 +278,6 @@ function replaceLossesRateHistory(
     ) {
         return false;
     }
-
-    lossesRateState.identification =
-        createLossesRateIdentification(
-            identification,
-        );
 
     lossesRateState.months =
         LOSSES_RATE_MONTHS.map(
@@ -390,21 +337,6 @@ function restoreLossesRateState(
             ? year
             : currentDate.getFullYear();
 
-    const identification =
-        sessionState.identification &&
-        typeof sessionState.identification ===
-            "object" &&
-        !Array.isArray(
-            sessionState.identification,
-        )
-            ? sessionState.identification
-            : {};
-
-    lossesRateState.identification =
-        createLossesRateIdentification(
-            identification,
-        );
-
     lossesRateState.months =
         LOSSES_RATE_MONTHS.map(
             function (
@@ -442,9 +374,6 @@ function resetLossesRateReport() {
 
     lossesRateState.year =
         currentDate.getFullYear();
-
-    lossesRateState.identification =
-        createLossesRateIdentification();
 
     lossesRateState.months =
         LOSSES_RATE_MONTHS.map(

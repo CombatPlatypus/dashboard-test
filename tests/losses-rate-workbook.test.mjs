@@ -5,6 +5,9 @@ import { beforeEach, test } from "node:test";
 import {
     findLossesRateWorkbookHistory,
 } from "../js/reports/losses-rate/workbook.js";
+import {
+    canExportLossesRateReport,
+} from "../js/reports/losses-rate/export.js";
 
 const require = createRequire(import.meta.url);
 const XLSX = require("../js/libraries/xlsx.full.min.js");
@@ -46,7 +49,7 @@ beforeEach(() => {
     globalThis.window = { XLSX };
 });
 
-test("lê a identificação consolidada da nova estrutura", () => {
+test("ignora a identificação da planilha", () => {
     const result =
         findLossesRateWorkbookHistory(
             createLossesRateWorkbook(
@@ -54,14 +57,12 @@ test("lê a identificação consolidada da nova estrutura", () => {
             ),
         );
 
-    assert.deepEqual(
-        result.identification,
-        {
-            description:
-                "LM HUB SP Santos Praia Grande 02",
-            hubCode: "LSP-63",
-            subRegional: "SPM07",
-        },
+    assert.equal(
+        Object.hasOwn(
+            result,
+            "identification",
+        ),
+        false,
     );
     assert.equal(result.importedRows, 1);
     assert.deepEqual(
@@ -75,15 +76,30 @@ test("lê a identificação consolidada da nova estrutura", () => {
     );
 });
 
-test("rejeita a identificação fora do formato da nova estrutura", () => {
-    assert.throws(
-        function () {
-            findLossesRateWorkbookHistory(
-                createLossesRateWorkbook(
-                    "LM HUB SP Santos Praia Grande 02",
-                ),
-            );
-        },
-        /A célula A1.*Descrição \/ Código do Hub - Sub Regional/,
+test("aceita qualquer conteúdo no campo ignorado", () => {
+    const result =
+        findLossesRateWorkbookHistory(
+            createLossesRateWorkbook(
+                "Texto livre sem identificação estruturada",
+            ),
+        );
+
+    assert.equal(result.importedRows, 1);
+});
+
+test("libera a exportação sem identificação", () => {
+    assert.equal(
+        canExportLossesRateReport({
+            activeMonth: 0,
+            months: [
+                {
+                    possibleLosses: 0,
+                    lost: 26,
+                    damage: 60,
+                    moved: 356741,
+                },
+            ],
+        }),
+        true,
     );
 });

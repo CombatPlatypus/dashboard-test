@@ -57,16 +57,6 @@ function isLossesRateQuantityFilled(
     );
 }
 
-/* VERIFICA UM TEXTO PREENCHIDO */
-
-function isLossesRateTextFilled(
-    value,
-) {
-    return String(
-        value ?? "",
-    ).trim() !== "";
-}
-
 /* VERIFICA SE O RELATÓRIO PODE SER EXPORTADO */
 
 function canExportLossesRateReport(
@@ -80,20 +70,6 @@ function canExportLossesRateReport(
     if (!month) {
         return false;
     }
-
-    const identification =
-        state.identification;
-
-    const hasIdentification =
-        isLossesRateTextFilled(
-            identification.description,
-        ) &&
-        isLossesRateTextFilled(
-            identification.hubCode,
-        ) &&
-        isLossesRateTextFilled(
-            identification.subRegional,
-        );
 
     const hasMovedVolume =
         Number.isSafeInteger(
@@ -117,7 +93,6 @@ function canExportLossesRateReport(
         );
 
     return (
-        hasIdentification &&
         hasMovedVolume &&
         hasPossibleLosses &&
         hasLost &&
@@ -128,31 +103,17 @@ function canExportLossesRateReport(
 function hasLossesRateReportData(
     state,
 ) {
-    const identification =
-        state.identification || {};
-
-    return (
-        Object.values(
-            identification,
-        ).some(
-            function (value) {
-                return isLossesRateTextFilled(
-                    value,
-                );
-            },
-        ) ||
-        state.months.some(
-            function (month) {
-                return Object.values(
-                    month,
-                ).some(
-                    function (value) {
-                        return value !== null &&
-                            value !== undefined;
-                    },
-                );
-            },
-        )
+    return state.months.some(
+        function (month) {
+            return Object.values(
+                month,
+            ).some(
+                function (value) {
+                    return value !== null &&
+                        value !== undefined;
+                },
+            );
+        },
     );
 }
 

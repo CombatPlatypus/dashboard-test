@@ -397,62 +397,6 @@ function createLossesRateHistory(
     };
 }
 
-function getLossesRateIdentification(
-    rows,
-) {
-    const receivedValue =
-        String(
-            rows[0]?.[0] ?? "",
-        )
-            .replace(/\s+/g, " ")
-            .trim();
-
-    const fields =
-        receivedValue.match(
-            /^(.+?)\s*\/\s*(.+?)\s+-\s+(.+)$/,
-        );
-
-    if (!fields) {
-        throw new Error(
-            "A célula A1 da aba Taxa de Perdas deve usar o formato Descrição / Código do Hub - Sub Regional.",
-        );
-    }
-
-    const [
-        ,
-        description,
-        hubCode,
-        subRegional,
-    ] = fields.map(
-        function (value) {
-            return value.trim();
-        },
-    );
-
-    if (
-        [
-            description,
-            hubCode,
-            subRegional,
-        ].some(
-            function (value) {
-                return value === "-" ||
-                    value === "—";
-            },
-        )
-    ) {
-        throw new Error(
-            "A célula A1 da aba Taxa de Perdas deve informar Descrição, Código do Hub e Sub Regional.",
-        );
-    }
-
-    return {
-        description,
-        hubCode,
-        subRegional,
-    };
-}
-
 function findLossesRateWorkbookHistory(
     workbook,
 ) {
@@ -534,11 +478,6 @@ function findLossesRateWorkbookHistory(
             headerRowIndex,
             columnIndexes,
         ),
-
-        identification:
-            getLossesRateIdentification(
-                rows,
-            ),
 
         sourceSheetName:
             sheetName,

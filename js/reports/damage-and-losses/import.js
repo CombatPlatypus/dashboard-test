@@ -1655,7 +1655,6 @@ function synchronizeLossesRateReport(
 ) {
     return replaceLossesRateHistory(
         result.lossesRate.history,
-        result.lossesRate.identification,
     );
 }
 

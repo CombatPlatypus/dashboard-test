@@ -98,11 +98,6 @@ function importLossesRateData(data) {
             : data?.months ??
                 data?.history;
 
-    const identification =
-        Array.isArray(data)
-            ? {}
-            : data?.identification ?? {};
-
     if (!Array.isArray(months)) {
         throw new TypeError(
             "Os dados importados da taxa de perdas devem possuir um histórico mensal.",
@@ -111,7 +106,6 @@ function importLossesRateData(data) {
 
     return replaceLossesRateHistory(
         months,
-        identification,
     );
 }
 
