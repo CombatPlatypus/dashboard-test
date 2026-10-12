@@ -2128,6 +2128,8 @@
                                             <h2>Taxa de Perdas</h2>
                                         </div>
 
+                                        <!-- TABELA PRINCIPAL -->
+
                                         <table>
                                             <thead>
                                                 <tr>
@@ -2152,17 +2154,21 @@
                                             </tbody>
                                         </table>
 
-                                        <div class="losses-rate-charts">
-                                            <div class="doughnut-chart">
-                                                <h3>Composição das Ocorrências — <span id="lossesRateCompositionMonth"></span></h3>
+                                        <!-- GRAFICOS DE COMPOSIÇÃO E LINHA -->
 
-                                                <div>
+                                        <div class="losses-rate-charts">
+                                            <div class="chart doughnut-chart">
+                                                <div class="chart-title">
+                                                    <h4>Composição das Ocorrências — <span id="lossesRateCompositionMonth"></span></h4>
+                                                </div>
+
+                                                <div class="chart-canvas-container">
                                                     <canvas id="lossesRateCompositionChart">
                                                         Seu navegador não suporta gráficos em canvas.
                                                     </canvas>
                                                 </div>
 
-                                                <div>
+                                                <div class="chart-label">
                                                     <div class="type">
                                                         <div style="background-color: #8b8d91;"></div>
                                                         <p>Possíveis Perdas <span id="lossesRateCompositionPossibleLosses">—</span></p>
@@ -2180,10 +2186,12 @@
                                                 </div>
                                             </div>
 
-                                            <div class="line-chart">
-                                                <h3>Histórico da Taxa de Perda — <span id="lossesRateHistoryYear"></span></h3>
+                                            <div class="chart line-chart">
+                                                <div class="chart-title">
+                                                    <h4>Histórico da Taxa de Perda — <span id="lossesRateHistoryYear"></span></h4>
+                                                </div>
 
-                                                <div>
+                                                <div class="chart-canvas-container">
                                                     <canvas id="lossesRateHistoryChart">
                                                         Seu navegador não suporta gráficos em canvas.
                                                     </canvas>
