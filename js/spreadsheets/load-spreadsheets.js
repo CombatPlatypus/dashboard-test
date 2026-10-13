@@ -48,28 +48,28 @@ const FALLBACK_SPREADSHEET_SETTINGS =
             menuName: "Checklist Operacional",
         },
         {
-            spreadsheetId: "1J41DYbdogIyzxJxKOBJa_9uforRo5faS",
-            menuName: "Insucesso",
+            spreadsheetId: "1WaHywDEm3ipdvEtq-pB01v4kyaREhn2i",
+            menuName: "Avarias",
         },
         {
             spreadsheetId: "1xJZpuck84CM9-FTYd5UnWbZ4AezWUdGx",
             menuName: "Pacotes em Análise",
         },
         {
-            spreadsheetId: "1b9VlTXNfWhOqJtx9UoPrQchh77AiPqcs",
-            menuName: "Pacotes Retornados",
+            spreadsheetId: "1cbHXjnfHGIDSob9Sh977p5J827qPlM5f9juRq_sIgcM",
+            menuName: "Backlog e Logs",
         },
         {
-            spreadsheetId: "1cbHXjnfHGIDSob9Sh977p5J827qPlM5f9juRq_sIgcM",
-            menuName: "Backlogs e Logs",
+            spreadsheetId: "1b9VlTXNfWhOqJtx9UoPrQchh77AiPqcs",
+            menuName: "Pacotes Retornados",
         },
         {
             spreadsheetId: "1MJFZlrUrcZXve4WOYYLjCrKeUkD0QgSshCfZdWxNMZA",
             menuName: "Erros de Etiquetagem",
         },
         {
-            spreadsheetId: "15ycLVugBymQR63SivMIvwRMce4dTe5XV",
-            menuName: "Controle Geral",
+            spreadsheetId: "1UWlOQfVw-eD1ZkD5gxCo2MHZ4CEyJUd4osungKFTfwA",
+            menuName: "Gerenciamento de Rotas",
         },
         {
             spreadsheetId: "1sh3TgSwLOt8EhoDhji2CHivbrEQiuhIpoBw0VHe2JoE",
@@ -88,28 +88,28 @@ const FALLBACK_SPREADSHEET_SETTINGS =
             menuName: "Justificativas",
         },
         {
-            spreadsheetId: "1WaHywDEm3ipdvEtq-pB01v4kyaREhn2i",
-            menuName: "Avarias",
+            spreadsheetId: "1FpcZuJboPyMKUGZwYHGHRYg4Pr_Phs4-ycqg-u7qGSU",
+            menuName: "Erros de Processo",
         },
         {
-            spreadsheetId: "1SpChx2r8HHeqWQAYDELewvKzQM8eRLIgknT2EiMjPnU",
-            menuName: "Avarias AppSheet",
+            spreadsheetId: "1J41DYbdogIyzxJxKOBJa_9uforRo5faS",
+            menuName: "Insucesso",
         },
         {
             spreadsheetId: "1wtALHYfXyFm9nfkV9TP1idnVV12oBwa-",
             menuName: "Reversa",
         },
         {
+            spreadsheetId: "15ycLVugBymQR63SivMIvwRMce4dTe5XV",
+            menuName: "Equipamentos",
+        },
+        {
             spreadsheetId: "1PnKEGQtfETj0ptk7xAIPG3dcrZgbBunWFUJp18O_XDE",
             menuName: "Pacotes Full",
         },
         {
-            spreadsheetId: "1UWlOQfVw-eD1ZkD5gxCo2MHZ4CEyJUd4osungKFTfwA",
-            menuName: "Gerenciamento de Rotas",
-        },
-        {
-            spreadsheetId: "1FpcZuJboPyMKUGZwYHGHRYg4Pr_Phs4-ycqg-u7qGSU",
-            menuName: "Erros de Processo",
+            spreadsheetId: "1SpChx2r8HHeqWQAYDELewvKzQM8eRLIgknT2EiMjPnU",
+            menuName: "Avarias AppSheet",
         },
     ]);
 

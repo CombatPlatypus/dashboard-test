@@ -21,6 +21,12 @@ const PLANNING_SPREADSHEET_SHEET_NAME =
 const EMPTY_SPREADSHEET_VALUE =
     "—";
 
+const PLANNING_SPREADSHEET_EMPTY_VALUES =
+    new Set([
+        EMPTY_SPREADSHEET_VALUE,
+        "⬝",
+    ]);
+
 const PLANNING_SPREADSHEET_TABLE_HEADERS =
     Object.freeze({
         lhs: [
@@ -122,7 +128,7 @@ function findPlanningSpreadsheetHeaderRow(
             .map(
                 function (reference) {
                     return reference.match(
-                        /^B([1-9]\d*)$/,
+                        /^A([1-9]\d*)$/,
                     )?.[1];
                 },
             )
@@ -132,9 +138,9 @@ function findPlanningSpreadsheetHeaderRow(
     return candidateRows.find(
         function (rowNumber) {
             return [
+                "A",
                 "B",
                 "C",
-                "D",
             ].every(
                 function (
                     column,
@@ -176,17 +182,18 @@ function createPlanningSpreadsheetSection(
 
     while (
         [
+            "A",
             "B",
             "C",
-            "D",
         ].every(
             function (column) {
                 return (
-                    getPlanningSpreadsheetCellText(
-                        cellValues,
-                        `${column}${startRow + rowCount}`,
-                    ) ===
-                    EMPTY_SPREADSHEET_VALUE
+                    PLANNING_SPREADSHEET_EMPTY_VALUES.has(
+                        getPlanningSpreadsheetCellText(
+                            cellValues,
+                            `${column}${startRow + rowCount}`,
+                        ),
+                    )
                 );
             },
         )
@@ -235,17 +242,17 @@ function createPlanningSpreadsheetLayout(
     const hasBacklogHeaders =
         getPlanningSpreadsheetCellText(
             cellValues,
-            "F1",
+            "E1",
         ) ===
             PLANNING_SPREADSHEET_BACKLOG_HEADERS.title &&
         getPlanningSpreadsheetCellText(
             cellValues,
-            "F2",
+            "E2",
         ) ===
             PLANNING_SPREADSHEET_BACKLOG_HEADERS.packages &&
         getPlanningSpreadsheetCellText(
             cellValues,
-            "G2",
+            "F2",
         ) ===
             PLANNING_SPREADSHEET_BACKLOG_HEADERS.bulky;
 
@@ -425,17 +432,17 @@ function addPlanningSpreadsheetRows(
             rows[rowIndex] ??
             [];
 
-        cells[`B${rowNumber}`] =
+        cells[`A${rowNumber}`] =
             normalizeSpreadsheetText(
                 row[0],
             );
 
-        cells[`C${rowNumber}`] =
+        cells[`B${rowNumber}`] =
             normalizeSpreadsheetText(
                 row[1],
             );
 
-        cells[`D${rowNumber}`] =
+        cells[`C${rowNumber}`] =
             normalizeSpreadsheetQuantity(
                 row[2],
             );
@@ -502,51 +509,51 @@ function createPlanningSpreadsheetCells(
     }, layout);
 
     const cells = {
-        B3:
+        A3:
             calculatePlanningEstimatedVolume(
                 state,
             ),
 
-        C3:
+        B3:
             calculatePlanningAverageSpr(
                 state,
             ),
 
-        D3:
+        C3:
             normalizeSpreadsheetQuantity(
                 state.dailyCapacity,
             ),
 
-        B7:
+        A7:
             getPlanningPoolQuantity(
                 state,
                 "backlogPackages",
             ),
 
-        C7:
+        B7:
             getPlanningPoolQuantity(
                 state,
                 "backlogBulky",
             ),
 
-        D7:
+        C7:
             getPlanningLhQuantity(
                 lhs,
             ),
 
-        B11:
+        A11:
             getPlanningPoolQuantity(
                 state,
                 "added",
             ),
 
-        C11:
+        B11:
             getPlanningPoolQuantity(
                 state,
                 "removed",
             ),
 
-        D11:
+        C11:
             getPlanningPoolQuantity(
                 state,
                 "errors",
@@ -573,7 +580,7 @@ function createPlanningSpreadsheetCells(
     addPlanningSpreadsheetBacklogCodes(
         cells,
         {
-            column: "F",
+            column: "E",
             startRow:
                 layout.backlog.startRow,
             codes:
@@ -584,7 +591,7 @@ function createPlanningSpreadsheetCells(
     addPlanningSpreadsheetBacklogCodes(
         cells,
         {
-            column: "G",
+            column: "F",
             startRow:
                 layout.backlog.startRow,
             codes:

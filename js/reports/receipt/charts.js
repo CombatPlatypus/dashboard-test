@@ -1089,16 +1089,18 @@ function drawReceiptAlignedComparison(
             volumeStart +
             (volumeEnd - volumeStart) * ratio;
 
-        context.beginPath();
-        context.moveTo(
-            positionX,
-            chartArea.top,
-        );
-        context.lineTo(
-            positionX,
-            chartArea.bottom,
-        );
-        context.stroke();
+        if (index > 0) {
+            context.beginPath();
+            context.moveTo(
+                positionX,
+                chartArea.top,
+            );
+            context.lineTo(
+                positionX,
+                chartArea.bottom,
+            );
+            context.stroke();
+        }
         context.textAlign =
             index === 0
                 ? "left"

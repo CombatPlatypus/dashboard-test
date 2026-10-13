@@ -29,7 +29,7 @@ function createContext() {
     return context;
 }
 
-test("ranking de recebedores posiciona os textos acima das barras sem as bordas superior e direita", t => {
+test("ranking de recebedores posiciona os textos acima das barras sem as bordas esquerda, superior e direita", t => {
     class TestElement {
         dataset = {};
         style = { getPropertyValue() { return ""; }, setProperty() {} };
@@ -93,12 +93,14 @@ test("ranking de recebedores posiciona os textos acima das barras sem as bordas 
     assert.deepEqual(volumeBar.path[0], ["moveTo", 29, 75]);
     const volumeEnd = 26 + (431 - 26) * 1949 / 2500;
     assert.ok(volumeBar.path.some(point => Math.abs(point[1] - volumeEnd) < 1e-9));
-    assert.equal(chart.ctx.strokes.length, 15);
+    assert.equal(chart.ctx.strokes.length, 14);
     // A grade ocupa o container; os textos e as barras têm padding interno de 10px.
-    for (const gridX of [16, 441, 471]) {
+    for (const gridX of [101, 441, 471]) {
         assert.ok(chart.ctx.strokes.some(stroke => JSON.stringify(stroke.path) ===
             JSON.stringify([["moveTo", gridX, 38], ["lineTo", gridX, 340]])));
     }
+    assert.ok(!chart.ctx.strokes.some(stroke => stroke.path.every(point => point[1] === chart.chartArea.left)));
+    assert.ok(chart.ctx.texts.some(label => label.text === "0" && label.x === chart.chartArea.left));
     assert.ok(!chart.ctx.strokes.some(stroke => stroke.path.every(point => point[2] === chart.chartArea.top)));
     assert.ok(!chart.ctx.strokes.some(stroke => stroke.path.every(point => point[1] === 886 || point[1] === 896)));
     assert.ok(chart.ctx.strokes.some(stroke => JSON.stringify(stroke.path) ===
@@ -120,6 +122,7 @@ test("ranking de recebedores posiciona os textos acima das barras sem as bordas 
     chart.ctx = createContext();
     plugin.beforeDatasetsDraw(chart);
     assert.equal(chart.ctx.fills.length, 0);
+    assert.ok(!chart.ctx.strokes.some(stroke => stroke.path.every(point => point[1] === chart.chartArea.left)));
     assert.ok(chart.ctx.texts.some(label => label.text === "Importe os dados para comparar os recebedores."));
     assert.equal(chart.ctx.balance, 0);
 });

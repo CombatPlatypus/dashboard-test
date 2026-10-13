@@ -10,6 +10,7 @@ import {
 } from "node:test";
 
 import {
+    assertPlanningSpreadsheetCapacity,
     createPlanningSpreadsheetBlob,
     createPlanningSpreadsheetCells,
     createPlanningSpreadsheetFileName,
@@ -59,6 +60,8 @@ async function loadPlanningTemplate() {
 
     return {
         archive,
+        cellValues:
+            template.cellValues,
         layout:
             createPlanningSpreadsheetLayout(
                 template.cellValues,
@@ -137,34 +140,34 @@ test(
 
         assert.deepEqual(
             {
+                A3: cells.A3,
                 B3: cells.B3,
                 C3: cells.C3,
-                D3: cells.D3,
+                A7: cells.A7,
                 B7: cells.B7,
                 C7: cells.C7,
-                D7: cells.D7,
+                A11: cells.A11,
                 B11: cells.B11,
                 C11: cells.C11,
-                D11: cells.D11,
             },
             {
-                B3: 8970,
-                C3: 95,
-                D3: 20000,
-                B7: 2,
-                C7: 1,
-                D7: 8967,
-                B11: 3,
+                A3: 8970,
+                B3: 95,
+                C3: 20000,
+                A7: 2,
+                B7: 1,
+                C7: 8967,
+                A11: 3,
+                B11: 2,
                 C11: 2,
-                D11: 2,
             },
         );
 
         assert.deepEqual(
             [
+                cells.E3,
+                cells.E4,
                 cells.F3,
-                cells.F4,
-                cells.G3,
             ],
             [
                 "BR-PACOTE-001",
@@ -174,23 +177,23 @@ test(
         );
 
         assert.equal(
-            cells.F5,
+            cells.E5,
             undefined,
         );
 
         assert.equal(
-            cells.G4,
+            cells.F4,
             undefined,
         );
 
         assert.deepEqual(
             [
+                cells[`A${lhsStart}`],
                 cells[`B${lhsStart}`],
                 cells[`C${lhsStart}`],
-                cells[`D${lhsStart}`],
+                cells[`A${lhsStart + 2}`],
                 cells[`B${lhsStart + 2}`],
                 cells[`C${lhsStart + 2}`],
-                cells[`D${lhsStart + 2}`],
             ],
             [
                 "LT0QA702II1S1",
@@ -204,14 +207,14 @@ test(
 
         assert.equal(
             cells[
-                `B${layout.segregatedLhs.startRow}`
+                `A${layout.segregatedLhs.startRow}`
             ],
             undefined,
         );
 
         assert.equal(
             cells[
-                `B${layout.tos.startRow}`
+                `A${layout.tos.startRow}`
             ],
             undefined,
         );
@@ -268,12 +271,12 @@ test(
 
         assert.deepEqual(
             [
+                cells[`A${segregatedStart}`],
                 cells[`B${segregatedStart}`],
                 cells[`C${segregatedStart}`],
-                cells[`D${segregatedStart}`],
+                cells[`A${segregatedStart + 1}`],
                 cells[`B${segregatedStart + 1}`],
                 cells[`C${segregatedStart + 1}`],
-                cells[`D${segregatedStart + 1}`],
             ],
             [
                 "LT0QA702II1S1",
@@ -287,12 +290,12 @@ test(
 
         assert.deepEqual(
             [
+                cells[`A${tosStart}`],
                 cells[`B${tosStart}`],
                 cells[`C${tosStart}`],
-                cells[`D${tosStart}`],
+                cells[`A${tosStart + 1}`],
                 cells[`B${tosStart + 1}`],
                 cells[`C${tosStart + 1}`],
-                cells[`D${tosStart + 1}`],
             ],
             [
                 "TO-001",
@@ -312,37 +315,108 @@ test(
         const { layout } =
             await loadPlanningTemplate();
 
-        assert.ok(
-            layout.lhs.rowCount >= 20,
-        );
-
-        assert.ok(
-            layout.segregatedLhs.rowCount >= 20,
-        );
-
-        assert.ok(
-            layout.segregatedLhs.startRow >
-            layout.lhs.startRow,
-        );
-
-        assert.ok(
-            layout.tos.startRow >
-            layout.segregatedLhs.startRow,
-        );
-
-        assert.ok(
-            layout.tos.rowCount > 20,
-        );
-
         assert.deepEqual(
-            layout.backlog,
+            layout,
             {
-                startRow: 3,
-                rowCount: 3019,
+                lhs: { startRow: 15, rowCount: 20 },
+                segregatedLhs: { startRow: 37, rowCount: 20 },
+                tos: { startRow: 59, rowCount: 5942 },
+                backlog: { startRow: 3, rowCount: 5998 },
             },
         );
     },
 );
+
+test("reconhece ⬝, — e os dois marcadores misturados nas linhas disponíveis", async () => {
+    const { cellValues, layout } = await loadPlanningTemplate();
+    for (const marker of ["⬝", "—", "mixed"]) {
+        const values = new Map(Array.from(cellValues, ([reference, value], index) => [
+            reference,
+            ["⬝", "—"].includes(value)
+                ? ` ${marker === "mixed" ? (index % 2 ? "⬝" : "—") : marker} `
+                : value,
+        ]));
+        assert.deepEqual(createPlanningSpreadsheetLayout(values), layout, `Marcador: ${marker}`);
+        assert.equal(createPlanningSpreadsheetCells(createPlanningState(),
+            createPlanningSpreadsheetLayout(values)).A15, "LT0QA702II1S1");
+    }
+});
+
+test("não considera células sem marcador ou com dados como linhas disponíveis", async () => {
+    const { cellValues } = await loadPlanningTemplate();
+    for (const value of ["", "LH-OCUPADO", 0]) {
+        const values = new Map(cellValues);
+        values.set("A15", value);
+        assert.throws(() => createPlanningSpreadsheetLayout(values), /LHs Programados não possui linhas disponíveis/);
+    }
+    const values = new Map(cellValues);
+    values.set("E1", "Outra seção");
+    assert.throws(() => createPlanningSpreadsheetLayout(values), /Backlog Adicionado não foi encontrada/);
+});
+
+test("valida os limites de LHs, TOs e das duas categorias do backlog", async () => {
+    const { layout } = await loadPlanningTemplate();
+    const sections = [
+        ["lhs", layout.lhs.rowCount, "LHs programados"],
+        ["segregatedLhs", layout.segregatedLhs.rowCount, "LHs a segregar"],
+        ["tos", layout.tos.rowCount, "TOs para segregar"],
+        ["backlogPackages", layout.backlog.rowCount, "pacotes normais no backlog"],
+        ["backlogBulky", layout.backlog.rowCount, "pacotes volumosos no backlog"],
+    ];
+    for (const [section, limit, label] of sections) {
+        const rows = { lhs: [], segregatedLhs: [], tos: [], backlogPackages: [], backlogBulky: [] };
+        rows[section] = Array.from({ length: limit });
+        assert.equal(assertPlanningSpreadsheetCapacity(rows, layout), true);
+        rows[section].push({});
+        assert.throws(() => assertPlanningSpreadsheetCapacity(rows, layout), {
+            message: `O modelo comporta até ${limit} ${label}, mas o relatório possui ${limit + 1}.`,
+        });
+    }
+});
+
+test("exporta até a última linha disponível de cada seção do modelo atual", async () => {
+    const { layout } = await loadPlanningTemplate();
+    const state = createPlanningState();
+    state.lhs = Array.from({ length: layout.lhs.rowCount }, (_, index) => ({
+        id: index + 1, code: `LH-${index + 1}`, origin: "Origem de teste", quantity: 6000,
+        segregate: true, segregateTos: index === 0,
+        tos: index === 0 ? Array.from({ length: layout.tos.rowCount }, (_, toIndex) => ({
+            id: toIndex + 1, code: `TO-${toIndex + 1}`, quantity: 1,
+        })) : [],
+    }));
+    state.backlog = {
+        packages: Array.from({ length: layout.backlog.rowCount }, (_, index) => `BR-PACOTE-${index + 1}`).join("\n"),
+        bulky: Array.from({ length: layout.backlog.rowCount }, (_, index) => `BR-VOLUMOSO-${index + 1}`).join("\n"),
+    };
+    const template = await readFile(templatePath);
+    const outputBlob = await createPlanningSpreadsheetBlob(state, new Date(2026, 9, 13, 12), {
+        fetchFunction: async () => ({ ok: true, status: 200, arrayBuffer: async () => template }),
+        jsZipLibrary: JSZip,
+    });
+    const workbook = XLSX.read(Buffer.from(await outputBlob.arrayBuffer()), { type: "buffer" });
+    const sheet = workbook.Sheets["13-10"];
+    assert.equal(sheet.A34.v, "LH-20");
+    assert.equal(sheet.A56.v, "LH-20");
+    assert.equal(sheet.A6000.v, "TO-5942");
+    assert.equal(sheet.B6000.v, "LH-1");
+    assert.equal(sheet.C6000.v, 1);
+    assert.equal(sheet.E6000.v, "BR-PACOTE-5998");
+    assert.equal(sheet.F6000.v, "BR-VOLUMOSO-5998");
+    assert.equal(sheet.D3, undefined);
+    assert.equal(sheet.G3, undefined);
+});
+
+test("exporta campos sem valor como — e mantém zero como número", async () => {
+    const { layout } = await loadPlanningTemplate();
+    const state = createPlanningState();
+    state.dailyCapacity = null;
+    state.lhs[0] = { ...state.lhs[0], code: "", origin: "", quantity: 0 };
+    const cells = createPlanningSpreadsheetCells(state, layout);
+    assert.equal(cells.C3, "—");
+    assert.equal(cells.A15, "—");
+    assert.equal(cells.B15, "—");
+    assert.equal(cells.C15, 0);
+});
 
 test(
     "usa a faixa ampliada de TOs sem o limite antigo de 20 linhas",
@@ -384,9 +458,9 @@ test(
 
         assert.deepEqual(
             [
-                cells[`B${tosStart}`],
-                cells[`B${tosStart + 24}`],
-                cells[`D${tosStart + 24}`],
+                cells[`A${tosStart}`],
+                cells[`A${tosStart + 24}`],
+                cells[`C${tosStart + 24}`],
             ],
             [
                 "TO-1",
@@ -409,11 +483,10 @@ test(
                 archive.files,
             ).sort();
 
-        const preservedPaths = [
-            "xl/styles.xml",
-            "xl/sharedStrings.xml",
-            "xl/drawings/drawing1.xml",
-        ];
+        const preservedPaths = originalEntries.filter(path => path !== "xl/worksheets/sheet1.xml");
+        const originalWorksheetXml = await archive.file("xl/worksheets/sheet1.xml").async("string");
+        const { cellValues } = await readXlsxTemplateWorksheet({ archive, sheetName: "Modelo" });
+        const cells = createPlanningSpreadsheetCells(createPlanningState(), createPlanningSpreadsheetLayout(cellValues));
 
         const preservedContents =
             Object.fromEntries(
@@ -451,30 +524,19 @@ test(
                 "xl/worksheets/sheet1.xml",
             ).async("string");
 
-        assert.match(
-            worksheetXml,
-            /<c r="B3" s="7"><v>8970<\/v><\/c>/,
-        );
-
-        assert.match(
-            worksheetXml,
-            /<c r="B15" s="7" t="inlineStr"><is><t>LT0QA702II1S1<\/t><\/is><\/c>/,
-        );
-
-        assert.match(
-            worksheetXml,
-            /<c r="F1" s="1" t="s"><v>1<\/v><\/c>/,
-        );
-
-        assert.match(
-            worksheetXml,
-            /<c r="F3" s="9" t="inlineStr"><is><t>BR-PACOTE-001<\/t><\/is><\/c>/,
-        );
-
-        assert.match(
-            worksheetXml,
-            /<c r="G3" s="9" t="inlineStr"><is><t>BR-VOLUMOSO-001<\/t><\/is><\/c>/,
-        );
+        const cellPattern = /<c\b[^>]*\/>|<c\b[^>]*>[\s\S]*?<\/c>/g;
+        const getCellXml = xml => new Map(Array.from(xml.matchAll(cellPattern), ([cell]) => [cell.match(/\br="([^"]+)"/)[1], cell]));
+        const originalCells = getCellXml(originalWorksheetXml);
+        const updatedCells = getCellXml(worksheetXml);
+        for (const reference of Object.keys(cells)) {
+            assert.equal(updatedCells.get(reference).match(/\bs="([^"]+)"/)?.[1],
+                originalCells.get(reference).match(/\bs="([^"]+)"/)?.[1], `Estilo preservado: ${reference}`);
+        }
+        const maskUpdatedCells = xml => xml.replace(cellPattern, cell => {
+            const reference = cell.match(/\br="([^"]+)"/)[1];
+            return Object.hasOwn(cells, reference) ? `<mapped-cell r="${reference}"/>` : cell;
+        });
+        assert.equal(maskUpdatedCells(worksheetXml), maskUpdatedCells(originalWorksheetXml));
 
         const output =
             await archive.generateAsync({
@@ -515,27 +577,27 @@ test(
             workbook.Sheets.Modelo;
 
         assert.equal(
-            sheet.B3.v,
+            sheet.A3.v,
             8970,
         );
 
         assert.equal(
-            sheet.B15.v,
+            sheet.A15.v,
             "LT0QA702II1S1",
         );
 
         assert.equal(
-            sheet.F1.v,
+            sheet.E1.v,
             "Backlog Adicionado",
         );
 
         assert.equal(
-            sheet.F3.v,
+            sheet.E3.v,
             "BR-PACOTE-001",
         );
 
         assert.equal(
-            sheet.G3.v,
+            sheet.F3.v,
             "BR-VOLUMOSO-001",
         );
     },
@@ -629,12 +691,12 @@ test(
         );
 
         assert.equal(
-            workbook.Sheets["07-10"].F3.v,
+            workbook.Sheets["07-10"].E3.v,
             "BR-PACOTE-001",
         );
 
         assert.equal(
-            workbook.Sheets["07-10"].G3.v,
+            workbook.Sheets["07-10"].F3.v,
             "BR-VOLUMOSO-001",
         );
     },
