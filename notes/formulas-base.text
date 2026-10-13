@@ -1,0 +1,505 @@
+Conceitos Fundamentais
+    1. As funções internas produzem resultados que são utilizados pelas funções externas, de dentro para fora, de acordo com o resultado de cada função.
+
+    2. Principais símbolos utilizados
+
+        Símbolo e Função
+
+        =	Inicia uma fórmula ou compara igualdade
+        ;	Separa argumentos na configuração brasileira
+        :	Define um intervalo
+        !	Separa nome da aba e referência
+        "	Delimita textos
+        ()	Agrupa expressões e argumentos
+        $	Fixa referências de células
+        <>	Diferente de
+        >=	Maior ou igual
+        <=	Menor ou igual
+        &	Junta textos ou critérios
+
+SOMA (FUNÇÃO PARA SOMAR VALORES NUMÉRICOS)
+
+    =SOMA(A2:A100)
+
+    A função soma todos os valores numéricos do intervalo.
+
+    Também podemos somar intervalos diferentes:
+
+    =SOMA(A2:A100;C2:C100)
+
+    Ela soma os números de ambos.
+
+
+SOMASES (FUNÇÃO PARA SOMAR, PORÉM ADICIONANDO CRITERIOS, OU SEJA, SÓ VAI SOMAR SE TAIS CRITERIOS FOREM ATENTIDOS)
+
+    =SOMASES(
+        intervalo_soma;
+        intervalo_criterio1;criterio1;
+        intervalo_criterio2;criterio2
+    )
+
+DIVISÃO
+
+    =B2/C2 // FAZ UMA DIVISÃO COM BASE NO VALORES DESSAS CELULAS
+
+    Existe um detalhe importante: se C2 for zero, teremos um erro de divisão.
+
+    Podemos prevenir isso:
+
+    =SE(C2=0;0;B2/C2)
+
+    Tradução: se o denominador for zero, mostre zero; caso contrário, realize a divisão. Isso é diferente de dizer que a taxa real é 0%, portanto, em alguns relatórios pode ser melhor exibir vazio ou "N/D".
+
+CONTAGEM DE REGISTROS (FUNÇÕES DE CONTAGEM E PARA QUE SERVEM)
+
+    CONT.NÚM // Conta células numéricas
+
+    CONT.VALORES // Conta células preenchidas, incluindo textos
+
+    CONT.SE // Conta registros com uma condição
+
+    CONT.SES // Conta registros com várias condições
+
+    COUNTUNIQUE	// Conta valores distintos
+
+    EXEMPLOS
+
+    =CONT.VALORES(A2:A100) Conta células não vazias, sejam elas textos ou números, mas não é muito recomendável usar para contar dados de uma coluna que seja gerada por uma fórmula, uma célula contendo fórmula que retorna "" também pode ser considerada preenchida por CONT.VALORES.
+
+    Usar somente para colunas que sejam preenchidas manualmente
+
+    =CONT.SE(A2:A100;"<>") O critério "<>" significa diferente de vazio, faz basicamente o que a de cima faz, só que melhor, mais seguro eu diria, prefira usar =CONT.SE(A2:A100;"<>") invés de =CONT.VALORES(A2:A100) para contar o valores de uma coluna, é certeza que só vai contar os valores e não as celulas vazias.
+
+    =CONT.SE(B2:B100;"Lost") Basicamente conta as linhas 2 ATÉ 100 da coluna B, onde tiver o valor de "Lost".
+
+    ESTRUTURA DA FORMULA
+
+    =CONT.SE(
+        intervalo;
+        critério
+        )
+
+    =CONT.SE(A2:A100;"BR*") O asterisco * funciona como um caractere curinga. Ele representa qualquer sequência de caracteres. Assim, BR* aceita BR001, BR123456 etc.
+
+    OUTRO EXEMPLO
+
+    =CONT.SES(
+        B2:B100;"Lost";
+        C2:C100;"Hub"
+    )
+
+    TRADUZINDO A ESTRUTURA
+
+    =CONT.SES(
+        intervalo1;critério1;
+        intervalo2;critério2
+    )
+
+CONDIÇÕES E LÓGICA
+
+    FUNÇÃO SE (equivalente ao if/else da programação)
+
+        ESTRUTURA
+
+        =SE(
+            condição;
+            valor_se_verdadeiro;
+            valor_se_falso
+            )
+
+        EXEMPLO
+
+        =SE(B2="Lost";"Perdido";"Não perdido")
+
+        A formula avalia se B2 é igual a Lost, se a condição for verdadeira, retorna Perdido. Caso contrário, retorna Não perdido.
+
+    Entendendo VERDADEIRO e FALSO
+
+    Uma comparação pode gerar um resultado lógico:
+
+    =B2="Lost"
+
+    O resultado será VERDADEIRO ou FALSO.
+
+    Podemos combinar comparações usando E: ("E" PELO QUE EU ENTENDI É BASICAMENTE O AND DOS IFs)
+
+    Esse exemplo exige que ambas as condições sejam verdadeiras:
+
+    =SE(
+        E(B2="Lost";C2="Hub");
+        "Perda do Hub";
+        "Outro registro"
+    )
+
+    A função OU funciona de outra maneira: basta que uma condição seja verdadeira. ("OU" PELO QUE EU ENTENDI É BASICAMENTE O OR DOS IFs)
+
+        =SE(
+            OU(B2="Lost";B2="Em Análise");
+            "Acompanhar";
+            "Outros"
+        )
+
+FILTER (FÓRMULA PARA FILTRAR DADOS DE UMA COLUNA)
+
+    =FILTER(intervalo; condição1; condição2)
+
+    =FILTER (
+        A2:A100; // Intervalo da Busca
+        B2:B100="Lost" // Condição da Busca
+    )
+
+    Filtrando vários campos ao mesmo tempo
+
+    =FILTER(
+        'Base de Avarias'!A2:A1000; // Intervalo da Busca
+        'Base de Avarias'!A2:A1000<>""; // Condição 1 da Busca
+        'Base de Avarias'!B2:B1000<>""; // Condição 2 da Busca
+        'Base de Avarias'!C2:C1000<>""; // Condição 3 da Busca
+        'Base de Avarias'!D2:D1000<>"" // Condição 4 da Busca
+    )
+
+    Como filtrar registros por mês e ano, suponha que as datas estejam na coluna D.
+
+    =CONT.SES(
+        D2:D;">="&DATA(2026;10;1);
+        D2:D;"<"&DATA(2026;11;1)
+    )
+
+    A fórmula considera registros a partir de 1º de outubro e anteriores a 1º de novembro.
+
+
+UNIQUE (FÓRMULA PARA EXCLUIR DUPLICIDADES DE UMA COLUNA)
+
+    =UNIQUE(A2:A100)
+
+    UNIQUE não escolhe automaticamente a situação mais recente de um BR. Ele apenas elimina repetições dos valores retornados.
+
+    Combinando FILTER e UNIQUE
+
+        =UNIQUE(
+            FILTER(
+                A2:A100; // Intervalo da Busca
+                B2:B100="Lost" // Condição da Busca
+            )
+        )
+
+    Combinando FILTER, UNIQUE, CONT.VALORES e SEERRO
+
+        Essa fórmula conta BRs distintos que possuem pelo menos um registro Lost.
+
+        =SEERRO(
+            CONT.VALORES(
+                UNIQUE(
+                    FILTER(
+                        A2:A100; // Intervalo da Busca
+                        B2:B100="Lost" // Condição da Busca
+                    )
+                )
+            );
+
+            0
+        )
+
+IMPORTRANGE (FÓRMULA PARA IMPORTAR DADOS DE OUTRA PLANILHA)
+
+    =IMPORTRANGE(
+        "URL_DA_PLANILHA"; // Endereço URL da planilha, basicamente o link da planilha.
+        "Base de Avarias!A2:D1000" // Intervalo da Busca
+    )
+
+    =QUERY(
+        IMPORTRANGE(
+            "URL_DA_PLANILHA"; // Endereço URL da planilha, basicamente o link da planilha.
+            "Base de Avarias!A2:D1000" // Intervalo da Busca
+        );
+
+        "SELECT Col1, Col3 WHERE Col1 IS NOT NULL"; // Nesse exemplo, importamos dados de outro arquivo e selecionamos apenas as colunas 1 e 3.
+
+        0
+    )
+
+PROCX
+
+    A estrutura principal:
+
+    =PROCX(
+        valor_procurado;
+        intervalo_de_busca;
+        intervalo_de_retorno;
+        valor_se_não_encontrar
+    )
+
+    Vamos buscar a estação de um BR:
+
+    =PROCX(
+        A2;
+        'Base de Avarias'!A2:A;
+        'Base de Avarias'!C2:C;
+        "" // "", indica que a função deve retornar vazio caso não encontre o BR.
+    )
+
+    Por padrão, PROCX procura da primeira linha para a última. Portanto, se o BR aparecer três vezes, normalmente a função retornará o resultado da primeira ocorrência.
+
+    =PROCX(
+        A2;
+        'Base de Avarias'!A2:A;
+        'Base de Avarias'!B2:B;
+        "";
+        0;
+        -1
+    )
+
+    Os dois novos argumentos significam:
+
+        - 0: correspondência exata.
+        - -1: pesquisar de baixo para cima.
+
+        Assim, você obtém a última ocorrência física da tabela.
+
+ARRAYFORMULA
+
+    =ARRAYFORMULA(...)
+
+ARRAYFORMULA e PROCX
+
+    =ARRAYFORMULA(
+        SE(
+            A2:A="";
+            "";
+            PROCX(
+            A2:A;
+            'Base de Avarias'!A2:A;
+            'Base de Avarias'!C2:C;
+            ""
+            )
+        )
+    )
+
+EXEMPLOS PRATICOS
+
+    =CONT.SE('Base de TOs'!U3:U;"Liquidate")
+    =CONT.SE(E3:E;"Liquidate")
+
+    =CONT.SES(
+        E3:E;"Missorted";
+        B3:B;">="&DATA(2026;10;1);
+        B3:B;"<"&DATA(2026;11;1)
+    )
+
+    =CONT.SES(
+        E3:E;"Return";
+        B3:B;">="&DATA(2026;10;1);
+        B3:B;"<"&DATA(2026;11;1)
+    )
+
+    =CONT.SES(
+        E3:E;"Liquidate";
+        B3:B;">="&DATA(2026;10;1);
+        B3:B;"<"&DATA(2026;11;1)
+    )
+
+    =CONT.SES(
+        E3:E;"Intercept";
+        B3:B;">="&DATA(2026;10;1);
+        B3:B;"<"&DATA(2026;11;1)
+    )
+
+    =SOMA('Base de TOs'!R3:R;)
+
+    =SOMASES('Base de TOs'!R3:R;'Base de TOs'!Q3:Q;">="&DATA(2026;10;1);'Base de TOs'!Q3:Q;"<"&DATA(2026;11;1))
+
+    =FILTER (
+        'BRs Pendentes'!C3:C; 
+        'BRs Pendentes'!C3:C<>""
+    )
+
+    =FILTER (
+        'BRs Pendentes'!C3:C; 
+        ESQUERDA('BRs Pendentes'!C3:C;2)="BR"
+    )
+
+    {'BRs Pendentes'!C3:C \LIN ('BRs Pendentes'!C3:C)};
+
+    ={'BRs Pendentes'!C3:C \ARRAYFORMULA(LIN('BRs Pendentes'!C3:C))}
+
+
+    BUSCA COM ORDENAÇÃO INVERSA DE VALORES EM OUTRA ABA
+
+        =QUERY(
+            
+            {'BRs Pendentes'!C3:C \ARRAYFORMULA(LIN('BRs Pendentes'!C3:C))};
+
+            "SELECT Col1 WHERE Col1 LIKE 'BR%' ORDER BY Col2 DESC";
+
+            0
+        )
+
+    BUSCA COM ORDENAÇÃO INVERSA DE VALORES EM OUTRA ABA
+
+        =QUERY(
+            
+            {'BRs Pendentes'!C3:C \ ARRAYFORMULA(LIN('BRs Pendentes'!C3:C)) \ 'BRs Pendentes'!E3:E };
+
+            "SELECT Col1, Col3 WHERE Col1 LIKE 'BR%' ORDER BY Col2 DESC";
+
+            0
+        )
+
+    BUSCA COM ORDENAÇÃO INVERSA DE VALORES EM OUTRA ABA ESPECIFCANDO POR CAMPO DE DATA
+
+        =QUERY(
+            
+            {'BRs Pendentes'!C3:C \ ARRAYFORMULA(LIN('BRs Pendentes'!C3:C)) \ 'BRs Pendentes'!E3:E };
+
+            "SELECT Col1, Col3 WHERE Col1 LIKE 'BR%' AND Col3 >= date '2026-10-01' AND Col3 < date '2026-11-01' ORDER BY Col2 DESC";
+
+            0
+        )
+
+    BUSCA COM ORDENAÇÃO INVERSA DE VALORES EM OUTRA ABA 
+
+        =QUERY(
+            
+            {'Base de TOs'!P3:P \ 'Base de TOs'!Q3:Q \ 'Base de TOs'!R3:R \ 'Base de TOs'!S3:S \ 'Base de TOs'!T3:T \  ARRAYFORMULA(LIN('Base de TOs'!R3:R))};
+
+            "SELECT Col1, Col2, Col3, Col4, Col5 WHERE Col3 LIKE 'TO%' ORDER BY Col6 DESC";
+
+            0
+        )
+
+        =QUERY(
+            
+            {'Base de TOs'!P3:T \ ARRAYFORMULA(LIN('Base de TOs'!R3:R))};
+
+            "SELECT Col1, Col2, Col3, Col4, Col5 WHERE Col3 LIKE 'TO%' ORDER BY Col6 DESC";
+
+            0
+        )
+
+    Exemplo de consolidação de múltiplas tabelas com colunas virtuais, filtros e ordenação por prioridade.
+
+        =QUERY(
+            
+            {
+                'Base de TOs'!A3:C \ ARRAYFORMULA( SE('Base de TOs'!A3:A<>"";"Missorted";"")) \ ARRAYFORMULA(SE('Base de TOs'!A3:A<>"";1;""));
+
+                'Base de TOs'!E3:G \ ARRAYFORMULA(SE('Base de TOs'!E3:E<>"";"Return";"")) \ ARRAYFORMULA(SE('Base de TOs'!E3:E<>"";2;""));
+
+                'Base de TOs'!I3:K \ ARRAYFORMULA(SE('Base de TOs'!I3:I<>"";"Liquidate";"")) \ ARRAYFORMULA(SE('Base de TOs'!I3:I<>"";3;""));
+
+                'Base de TOs'!M3:O \ ARRAYFORMULA(SE('Base de TOs'!M3:M<>"";"Intercept";"")) \ ARRAYFORMULA(SE('Base de TOs'!M3:M<>"";4;""))
+            };
+
+            "SELECT Col2, Col1, Col3, Col4 WHERE Col1 IS NOT NULL AND Col2 IS NOT NULL ORDER BY Col2 DESC, Col5 ASC"; 
+
+            0
+        )
+
+    TESTES
+
+    =UNIQUE('Base de BRs'!B3:B)
+
+    ={'Base de BRs'!B3:B};
+
+    =UNIQUE(FILTER({B3:B; E3:E; H3:H; K3:K}; {B3:B; E3:E; H3:H; K3:K}<>""))
+
+    ={'Base de BRs'!A3:B; 'Base de BRs'!D3:E; 'Base de BRs'!G3:H; 'Base de BRs'!J3:K }
+
+    
+    =ARRAYFORMULA(
+        SE(
+
+            // SE ESSA CONDIÇÃO FOR VERDADEIRA
+
+            B3:B="";
+
+            // MOSTRA
+
+            "Sem BRs";
+
+            // SE FOR FALSA
+
+            PROCX(
+                B3:B;
+                {'Base de BRs'!A3:A; 'Base de BRs'!D3:D; 'Base de BRs'!G3:G; 'Base de BRs'!J3:J };
+                {'Base de BRs'!B3:B; 'Base de BRs'!E3:E; 'Base de BRs'!H3:H; 'Base de BRs'!K3:K };
+                "" 
+            )
+
+        )
+    )
+    
+    =ARRAYFORMULA(
+        SE(
+
+            B3:B="";
+
+            "";
+
+            PROCX(
+                B3:B;
+                {'Base de BRs'!A3:A; 'Base de BRs'!D3:D; 'Base de BRs'!G3:G; 'Base de BRs'!J3:J };
+                {'Base de BRs'!B3:B; 'Base de BRs'!E3:E; 'Base de BRs'!H3:H; 'Base de BRs'!K3:K };
+                "" 
+            )
+        )
+    )
+    
+    =ARRAYFORMULA(
+        SE(
+
+            C3:C="";
+
+            "";
+
+            PROCX(
+                C3:C;
+                {'Base de TOs'!A3:A; 'Base de TOs'!E3:E; 'Base de TOs'!I3:I; 'Base de TOs'!M3:M };
+                {'Base de TOs'!B3:B; 'Base de TOs'!F3:F; 'Base de TOs'!J3:J; 'Base de TOs'!N3:N };
+                "" 
+            )
+        )
+    )
+
+    =ARRAYFORMULA(SE(D3:D=""; ""; HOJE()-D3:D))
+
+    =HOJE()-D3:D;
+
+    {ARRAYFORMULA(SE('Base de BRs'!A3:A<>"";"Missorted";"")); ARRAYFORMULA(SE('Base de BRs'!E3:E<>"";"Return";"")); ARRAYFORMULA(SE('Base de BRs'!I3:I<>"";"Liquidate";"")); ARRAYFORMULA(SE('Base de BRs'!M3:M<>"";"Intercept";""))}
+
+    {'Base de BRs'!A3:A; 'Base de BRs'!E3:E;'Base de BRs'!I3:I; 'Base de BRs'!M3:M}
+
+    =ARRAYFORMULA(
+        SE(
+            B3:B="";
+
+            "";
+
+            PROCX(
+                B3:B;
+
+                {
+                    'Base de BRs'!A3:A;
+                    'Base de BRs'!D3:D;
+                    'Base de BRs'!G3:G;
+                    'Base de BRs'!J3:J
+                  };
+
+                    {
+                        ARRAYFORMULA(SE('Base de BRs'!A3:A<>"";"Missorted";""));
+                        ARRAYFORMULA(SE('Base de BRs'!D3:D<>"";"Return";""));
+                        ARRAYFORMULA(SE('Base de BRs'!G3:G<>"";"Liquidate";""));
+                        ARRAYFORMULA(SE('Base de BRs'!J3:J<>"";"Intercept";""))
+                    };
+                ""
+            )
+        )
+    )
+
+    ={"TO";UNIQUE(FILTER('Base de BRs'!B3:B;'Base de BRs'!B3:B<>""))}
+
+    ={"TO";ARRAYFORMULA(SE(A3:A="";"";PROCX(A3:A;{'Base de BRs'!A3:A; 'Base de BRs'!D3:D; 'Base de BRs'!G3:G; 'Base de BRs'!J3:J };{'Base de BRs'!B3:B; 'Base de BRs'!E3:E; 'Base de BRs'!H3:H; 'Base de BRs'!K3:K };"")))}
+
+    ={"Data de Envio";ARRAYFORMULA(SE(B3:B="";"";PROCX(B3:B;{'Base de TOs'!A3:A; 'Base de TOs'!E3:E; 'Base de TOs'!I3:I; 'Base de TOs'!M3:M };{'Base de TOs'!B3:B; 'Base de TOs'!F3:F; 'Base de TOs'!J3:J; 'Base de TOs'!N3:N };"")))}
+
+    ={"Aging";ARRAYFORMULA(SE(C3:C=""; ""; HOJE()-C3:C))}

@@ -47,7 +47,7 @@ class Element {
     }
 }
 
-function setup() {
+function setup({ clipboardText = "" } = {}) {
     const ids = new Set(Array.from(html.matchAll(/id="([^"]+)"/g), match => match[1]));
     const elements = new Map();
     const copies = [];
@@ -87,7 +87,12 @@ function setup() {
         ...clipboardSource,
         document,
         window: { XLSX, jQuery, setTimeout: callback => callback() },
-        navigator: { clipboard: { writeText: async text => copies.push(text) } },
+        navigator: {
+            clipboard: {
+                readText: async () => clipboardText,
+                writeText: async text => copies.push(text),
+            },
+        },
         URL: {
             createObjectURL(blob) {
                 const url = "blob:test-" + blobs.size;
@@ -282,4 +287,80 @@ test("as notificações de importação e exportação ficam curtas mesmo com no
     await panel.get("filterSaveButton").click();
     assert.equal(panel.type(), "success");
     assert.ok(panel.message().length <= 140);
+});
+
+test("Filtragem Livre por arquivo busca em qualquer coluna, retorna a linha inteira e preserva ausentes", async () => {
+    const panel = setup();
+    await panel.select("free-filter-file");
+    assert.deepEqual(panel.get("filterFileInput").accept.split(",").sort(), [".csv", ".xlsx"]);
+    await panel.import(csvFile([
+        "WEEK,DATA,ORDEM ID,STATUS,Current station,TURNO,LOG,PRODUTO",
+        "1,03/01,BR001,LMHub_Received,LM Hub,AM,Ana,Produto A",
+        "1,03/01,BR002,LMHub_Received,LM Hub,BACKLOG,Bruno,Produto B",
+        "1,03/01,BR003,LMHub_Assigning,LM Hub,PM1,Carla,Produto C",
+    ].join("\n"), "base-livre.csv"));
+
+    await panel.filter("BR002\nBR999\nBR001");
+
+    assert.deepEqual(panel.rows("thead"), []);
+    assert.deepEqual(panel.rows(), [
+        ["1", "03/01", "BR002", "LMHub_Received", "LM Hub", "BACKLOG", "Bruno", "Produto B"],
+        ["", "", "", "", "", "", "", ""],
+        ["1", "03/01", "BR001", "LMHub_Received", "LM Hub", "AM", "Ana", "Produto A"],
+    ]);
+    assert.equal(panel.type(), "warning");
+    assert.match(panel.message(), /1 não encontrado/);
+
+    await panel.get("filterCopyButton").click();
+    assert.equal(panel.copies[0], [
+        "1\t03/01\tBR002\tLMHub_Received\tLM Hub\tBACKLOG\tBruno\tProduto B",
+        "\t\t\t\t\t\t\t",
+        "1\t03/01\tBR001\tLMHub_Received\tLM Hub\tAM\tAna\tProduto A",
+    ].join("\n"));
+
+    await panel.get("filterSaveButton").click();
+    assert.equal(panel.downloads[0].name, "base-livre_filtragem-livre.csv");
+    const bytes = new Uint8Array(await panel.downloads[0].blob.arrayBuffer());
+    assert.deepEqual(Array.from(bytes.slice(0, 3)), [0xEF, 0xBB, 0xBF]);
+    assert.equal(new TextDecoder().decode(bytes), [
+        "1,03/01,BR002,LMHub_Received,LM Hub,BACKLOG,Bruno,Produto B",
+        ",,,,,,,",
+        "1,03/01,BR001,LMHub_Received,LM Hub,AM,Ana,Produto A",
+    ].join("\n"));
+});
+
+test("Filtragem Livre pela área de transferência aceita cabeçalhos arbitrários e busca em qualquer coluna", async () => {
+    const clipboardText = [
+        "Semana\tData\tPedido\tStatus\tResponsável",
+        "1\t03/01\tBR001\tRecebido\tAna",
+        "1\t04/01\tBR002\tPendente\tBruno",
+    ].join("\n");
+    const panel = setup({ clipboardText });
+
+    await panel.select("free-filter-clipboard");
+    await panel.get("filterImportButton").click();
+    assert.equal(panel.type(), "success");
+    await panel.filter("Bruno\nINEXISTENTE\nBR001");
+
+    assert.deepEqual(panel.rows("thead"), []);
+    assert.deepEqual(panel.rows(), [
+        ["1", "04/01", "BR002", "Pendente", "Bruno"],
+        ["", "", "", "", ""],
+        ["1", "03/01", "BR001", "Recebido", "Ana"],
+    ]);
+    assert.match(panel.message(), /1 não encontrado/);
+});
+
+test("Filtragem Livre importa XLSX sem exigir nomes específicos de coluna", async () => {
+    const panel = setup();
+    await panel.select("free-filter-file");
+    await panel.import(workbookFile([
+        ["Campo A", "Campo B", "Campo C"],
+        ["Primeiro", "BR001", "Recebido"],
+        ["Segundo", "BR002", "Pendente"],
+    ], "base-livre.xlsx"));
+
+    assert.equal(panel.type(), "success");
+    await panel.filter("BR002");
+    assert.deepEqual(panel.rows(), [["Segundo", "BR002", "Pendente"]]);
 });

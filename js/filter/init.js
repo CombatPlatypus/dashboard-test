@@ -264,6 +264,90 @@ const FILTER_PURPOSES =
                             "Data",
                     }),
             }),
+
+        "free-filter-file":
+            Object.freeze({
+                label:
+                    "Filtragem Livre (.CSV/XLSX)",
+
+                sourceType:
+                    "file",
+
+                supportedExtensions:
+                    Object.freeze([
+                        "csv",
+                        "xlsx",
+                    ]),
+
+                outputSuffix:
+                    "filtragem-livre",
+
+                columns:
+                    Object.freeze([]),
+
+                requiredColumns:
+                    Object.freeze([]),
+
+                matchAnyColumn:
+                    true,
+
+                dynamicColumns:
+                    true,
+
+                includeCsvHeaders:
+                    false,
+
+                includePreviewHeaders:
+                    false,
+
+                preserveUnmatchedRows:
+                    true,
+
+                unmatchedCellValue:
+                    "",
+
+                keepFirstOccurrence:
+                    true,
+            }),
+
+        "free-filter-clipboard":
+            Object.freeze({
+                label:
+                    "Filtragem Livre (Área de Transferência)",
+
+                sourceType:
+                    "clipboard",
+
+                outputSuffix:
+                    "filtragem-livre-area-transferencia",
+
+                columns:
+                    Object.freeze([]),
+
+                requiredColumns:
+                    Object.freeze([]),
+
+                matchAnyColumn:
+                    true,
+
+                dynamicColumns:
+                    true,
+
+                includeCsvHeaders:
+                    false,
+
+                includePreviewHeaders:
+                    false,
+
+                preserveUnmatchedRows:
+                    true,
+
+                unmatchedCellValue:
+                    "",
+
+                keepFirstOccurrence:
+                    true,
+            }),
     });
 
 const elements = {
@@ -786,6 +870,42 @@ function getActivePurposeColumns(
         : purpose.columns;
 }
 
+function createDynamicColumns(
+    rows,
+) {
+    const columnCount =
+        rows.reduce(
+            function (
+                largestColumnCount,
+                row,
+            ) {
+                return Math.max(
+                    largestColumnCount,
+                    row.length,
+                );
+            },
+            0,
+        );
+
+    const headers = rows[0] ?? [];
+
+    return Array.from(
+        {
+            length:
+                columnCount,
+        },
+        function (_, columnIndex) {
+            const header =
+                formatCellValue(
+                    headers[columnIndex],
+                ).trim();
+
+            return header ||
+                `Coluna ${columnIndex + 1}`;
+        },
+    );
+}
+
 function syncImportButton() {
     const purpose =
         getSelectedPurpose();
@@ -1092,7 +1212,11 @@ async function importFile(file) {
             compatibleSheet.headerIndexes;
 
         filterState.activeColumns =
-            [...purpose.columns];
+            purpose.dynamicColumns
+                ? createDynamicColumns(
+                    compatibleSheet.rows,
+                )
+                : [...purpose.columns];
 
         elements.values.disabled = false;
         elements.clearButton.disabled =
@@ -1101,7 +1225,9 @@ async function importFile(file) {
         elements.values.focus();
 
         setNotification(
-            "Arquivo importado. Cole um código BR por linha para filtrar.",
+            purpose.matchAnyColumn
+                ? "Arquivo importado. Cole um valor por linha para filtrar."
+                : "Arquivo importado. Cole um código BR por linha para filtrar.",
             "success",
         );
     } catch (error) {
@@ -1210,17 +1336,23 @@ async function importClipboard(purpose) {
                 .headerIndexes;
 
         filterState.activeColumns =
-            purpose.columns.filter(
-                function (column) {
-                    return compatibleSource
-                        .headerIndexes
-                        .has(
-                            normalizeText(
-                                column,
-                            ),
-                        );
-                },
-            );
+            purpose.dynamicColumns
+                ? createDynamicColumns(
+                    compatibleSource.rows.slice(
+                        compatibleSource.rowIndex,
+                    ),
+                )
+                : purpose.columns.filter(
+                    function (column) {
+                        return compatibleSource
+                            .headerIndexes
+                            .has(
+                                normalizeText(
+                                    column,
+                                ),
+                            );
+                    },
+                );
 
         elements.values.disabled = false;
         elements.clearButton.disabled =
@@ -1229,7 +1361,9 @@ async function importClipboard(purpose) {
         elements.values.focus();
 
         setNotification(
-            `Área de transferência importada com ${sourceRows.length} linha(s). Cole um Código BR por linha para filtrar.`,
+            purpose.matchAnyColumn
+                ? `Área de transferência importada com ${sourceRows.length} linha(s). Cole um valor por linha para filtrar.`
+                : `Área de transferência importada com ${sourceRows.length} linha(s). Cole um Código BR por linha para filtrar.`,
             "success",
         );
     } catch (error) {
@@ -1267,7 +1401,9 @@ function handlePurposeChange() {
         "clipboard"
     ) {
         setNotification(
-            "Copie o trecho da tabela ou a página inteira do SPX e clique em Importar.",
+            purpose.matchAnyColumn
+                ? "Copie a tabela, incluindo os cabeçalhos, e clique em Importar."
+                : "Copie o trecho da tabela ou a página inteira do SPX e clique em Importar.",
             "info",
         );
 
@@ -1368,9 +1504,16 @@ function renderPreview(
         },
     );
 
-    tableHead.replaceChildren(
-        headerRow,
-    );
+    if (
+        purpose.includePreviewHeaders ===
+        false
+    ) {
+        tableHead.replaceChildren();
+    } else {
+        tableHead.replaceChildren(
+            headerRow,
+        );
+    }
 
     const bodyFragment =
         document.createDocumentFragment();
@@ -1482,7 +1625,9 @@ function filterRows() {
 
     if (uniqueValues.length === 0) {
         setNotification(
-            `Informe ao menos um ${purpose.filterColumn} para filtrar.`,
+            purpose.matchAnyColumn
+                ? "Informe ao menos um valor para filtrar."
+                : `Informe ao menos um ${purpose.filterColumn} para filtrar.`,
             "warning",
         );
 
@@ -1490,11 +1635,13 @@ function filterRows() {
     }
 
     const filterColumnIndex =
-        filterState.headerIndexes.get(
-            normalizeText(
-                purpose.filterColumn,
-            ),
-        );
+        purpose.matchAnyColumn
+            ? undefined
+            : filterState.headerIndexes.get(
+                normalizeText(
+                    purpose.filterColumn,
+                ),
+            );
 
     const activeColumns =
         getActivePurposeColumns(
@@ -1502,17 +1649,23 @@ function filterRows() {
         );
 
     const outputColumnIndexes =
-        activeColumns.map(
-            function (column) {
-                return filterState
-                    .headerIndexes
-                    .get(
-                        normalizeText(
-                            column,
-                        ),
-                    );
-            },
-        );
+        purpose.dynamicColumns
+            ? activeColumns.map(
+                function (_, columnIndex) {
+                    return columnIndex;
+                },
+            )
+            : activeColumns.map(
+                function (column) {
+                    return filterState
+                        .headerIndexes
+                        .get(
+                            normalizeText(
+                                column,
+                            ),
+                        );
+                },
+            );
 
     const oldestColumnIndex =
         purpose.oldestByColumn
@@ -1541,17 +1694,39 @@ function filterRows() {
 
     filterState.sourceRows.forEach(
         function (sourceRow) {
-            const filterValue =
-                normalizeText(
-                    sourceRow[
-                        filterColumnIndex
-                    ],
-                );
+            const matchingFilterValues =
+                purpose.matchAnyColumn
+                    ? new Set(
+                        sourceRow
+                            .map(
+                                normalizeText,
+                            )
+                            .filter(
+                                function (value) {
+                                    return normalizedValues
+                                        .has(value);
+                                },
+                            ),
+                    )
+                    : normalizedValues.has(
+                        normalizeText(
+                            sourceRow[
+                                filterColumnIndex
+                            ],
+                        ),
+                    )
+                        ? new Set([
+                            normalizeText(
+                                sourceRow[
+                                    filterColumnIndex
+                                ],
+                            ),
+                        ])
+                        : new Set();
 
             if (
-                !normalizedValues.has(
-                    filterValue,
-                )
+                matchingFilterValues.size ===
+                0
             ) {
                 return;
             }
@@ -1584,45 +1759,49 @@ function filterRows() {
                         ],
                     );
 
-            const selectedResult =
-                selectedResultByValue.get(
-                    filterValue,
-                );
+            matchingFilterValues.forEach(
+                function (filterValue) {
+                    const selectedResult =
+                        selectedResultByValue.get(
+                            filterValue,
+                        );
 
-            const shouldReplace =
-                !selectedResult ||
-                (
-                    keepFirstOccurrence !==
-                        true &&
-                    (
-                        oldestColumnIndex ===
-                            undefined ||
+                    const shouldReplace =
+                        !selectedResult ||
                         (
-                            Number.isFinite(
-                                priorityTimestamp,
-                            ) &&
+                            keepFirstOccurrence !==
+                                true &&
                             (
-                                !Number.isFinite(
-                                    selectedResult
-                                        .priorityTimestamp,
-                                ) ||
-                                priorityTimestamp <
-                                    selectedResult
-                                        .priorityTimestamp
+                                oldestColumnIndex ===
+                                    undefined ||
+                                (
+                                    Number.isFinite(
+                                        priorityTimestamp,
+                                    ) &&
+                                    (
+                                        !Number.isFinite(
+                                            selectedResult
+                                                .priorityTimestamp,
+                                        ) ||
+                                        priorityTimestamp <
+                                            selectedResult
+                                                .priorityTimestamp
+                                    )
+                                )
                             )
-                        )
-                    )
-                );
+                        );
 
-            if (shouldReplace) {
-                selectedResultByValue.set(
-                    filterValue,
-                    {
-                        resultRow,
-                        priorityTimestamp,
-                    },
-                );
-            }
+                    if (shouldReplace) {
+                        selectedResultByValue.set(
+                            filterValue,
+                            {
+                                resultRow,
+                                priorityTimestamp,
+                            },
+                        );
+                    }
+                },
+            );
         },
     );
 
