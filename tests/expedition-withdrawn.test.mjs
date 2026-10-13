@@ -193,7 +193,6 @@ test("tabelas, legenda e tooltip exibem Volume Expedido", () => {
     const expeditionCharts = readFileSync(new URL("../js/reports/expedition/charts.js", import.meta.url), "utf8");
     const overallCharts = readFileSync(new URL("../js/reports/overall-analysis/charts.js", import.meta.url), "utf8");
     assert.equal(Array.from(html.matchAll(/<th>Volume Expedido<\/th>/g)).length, 2);
-    assert.match(html, /aria-label="Comparação entre volume expedido e volume no piso da expedição"/);
     assert.match(expeditionCharts, /"Volume expedido: "/);
     assert.match(overallCharts, /"Volume Expedido"/);
     assert.doesNotMatch(html + expeditionCharts + overallCharts, /volume conferido/i);

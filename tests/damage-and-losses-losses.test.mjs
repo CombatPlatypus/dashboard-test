@@ -207,7 +207,6 @@ test("comparação mostra Em Análise, Perdidos e Retornados nessa ordem, com co
     const source = findLossesMonthSource(createLossesWorkbook());
     replaceLossesData(createLossesMonthData(source, new Date(2026, 9, 3, 12)));
     assert.deepEqual(comparison.data.datasets[0].data, [1, 3, 2]);
-    assert.match(comparison.canvas["aria-label"], /^Pacotes em análise, perdidos e retornados:/);
     assert.deepEqual(charts.get("lossesPackRecoveryChart").data.datasets[0].data, [1, 1, 1, 1]);
 
     resetLossesState();

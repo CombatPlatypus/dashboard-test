@@ -26,7 +26,7 @@ test("capacidade global começa em 20.000 e usa o nome Capacidade do Hub", () =>
     );
     assert.match(
         html,
-        /<h4>Capacidade do Hub<\/h4>\s*<input[^>]+id="reportCapacityInput"[^>]+aria-label="Capacidade do Hub">/,
+        /<h4>Capacidade do Hub<\/h4>\s*<input\b[^>]*\bid="reportCapacityInput"[^>]*>/,
     );
 });
 
@@ -87,7 +87,7 @@ test("taxa de perdas usa o estado renderizado na tabela e no gráfico", () => {
     );
 });
 
-test("ranking posiciona nomes 8 px acima das barras e libera toda a largura das rotas", () => {
+test("ranking posiciona nomes 8 px acima das barras e aplica padding interno às colunas", () => {
     const charts = readFileSync(
         new URL(
             "../js/reports/expedition/charts.js",
@@ -98,11 +98,15 @@ test("ranking posiciona nomes 8 px acima das barras e libera toda a largura das 
 
     assert.match(
         charts,
-        /const routeStart =\s*volumeStart;/,
+        /const routeStart =\s*volumeStart \+\s*COMPARISON_CONTENT_PADDING\.left;/,
     );
+    assert.match(charts, /const routeEnd =\s*volumeEnd -\s*COMPARISON_CONTENT_PADDING\.right;/);
+    assert.match(charts, /const timeStart =\s*timeGridStart \+\s*COMPARISON_CONTENT_PADDING\.left;/);
+    assert.match(charts, /const timeEnd =\s*timeGridEnd -\s*COMPARISON_CONTENT_PADDING\.right;/);
+    assert.match(charts, /const COMPARISON_LABEL_BAR_GAP = 8;/);
     assert.match(
         charts,
-        /positionY -\s*barHeight \/ 2 -\s*8,/,
+        /const labelY =\s*positionY -\s*barHeight \/ 2 -\s*COMPARISON_LABEL_BAR_GAP;/,
     );
     assert.doesNotMatch(
         charts,

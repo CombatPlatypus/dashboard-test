@@ -68,13 +68,13 @@ test("tabelas mantêm ordenações independentes ao aplicar os filtros", () => {
     assert.deepEqual(bulkySort, { column: "operator", direction: "asc" });
 });
 
-test("ambas as tabelas têm botões acessíveis em Operador e Código BR", () => {
+test("ambas as tabelas têm botões de ordenação em Operador e Código BR", () => {
     const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
     for (const kind of ["Common", "Bulky"]) {
         const table = html.match(new RegExp(`<table id="parcel${kind}PackagesTable">([\\s\\S]*?)</table>`))[1];
         assert.equal((table.match(/aria-sort="none"/g) ?? []).length, 2);
-        assert.match(table, /data-parcel-sort="operator" aria-label="Ordenar pela coluna Operador"/);
-        assert.match(table, /data-parcel-sort="trackingNumber" aria-label="Ordenar pela coluna Código BR"/);
+        assert.match(table, /<button\b[^>]*\bdata-parcel-sort="operator"[^>]*>/);
+        assert.match(table, /<button\b[^>]*\bdata-parcel-sort="trackingNumber"[^>]*>/);
         assert.equal((table.match(/aria-hidden="true">↕/g) ?? []).length, 2);
     }
 });

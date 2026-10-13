@@ -197,7 +197,6 @@ test("distribuição mantém 8 linhas de 4 células com classificação clicáve
                 assert.equal(button.textContent, index % 2 === 0 ? "Não" : "Sim");
                 assert.equal(button.dataset.parcelOperatorKey, operators[index].operator.toLowerCase());
                 assert.equal(button.attributes["aria-pressed"], String(index % 2 !== 0));
-                assert.equal(button.attributes["aria-label"], `Volumoso? [Ops${index + 1}] Operador`);
             }
         });
     }

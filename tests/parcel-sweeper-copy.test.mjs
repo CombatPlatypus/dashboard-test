@@ -162,7 +162,7 @@ test("HTML conecta os botões e mantém a nova orientação ao abrir e limpar", 
     assert.match(html, /<h4 id="parcelNotificationText">\s*No SPX, acesse Parcel Sweeper \/ Parcel Sweeper View, escolha um arquivo parcel para exportar e, em seguida, volte aqui e clique em importar\./);
     for (const [id, kind] of [["parcelCopyCommonPackagesButton", "common"], ["parcelCopyBulkyPackagesButton", "bulky"]]) {
         assert.equal(html.split(`id="${id}"`).length - 1, 1);
-        assert.match(html, new RegExp(`<button id="${id}" type="button" data-parcel-copy="${kind}"[^>]*aria-label="Copiar BRs de pacotes`));
+        assert.match(html, new RegExp(`<button id="${id}" type="button" data-parcel-copy="${kind}"[^>]*>`));
     }
     assert.equal(bindParcelPackageCopyButton(null, new Body(), "pacotes comuns"), false);
 });

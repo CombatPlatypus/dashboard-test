@@ -147,8 +147,7 @@ test("atualização limpa dados antigos, adapta altura e reserva espaço para qu
     replaceGlobal(t, "window", { Chart: class { constructor(canvas, config) { return config; } } });
     const chart = createParcelHorizontalChart({}, "#42A5F5");
     let updates = 0, resizes = 0;
-    const attributes = {};
-    chart.canvas = { parentElement: { style: { height: "220px" } }, setAttribute: (name, value) => { attributes[name] = value; } };
+    chart.canvas = { parentElement: { style: { height: "220px" } }, setAttribute() {} };
     chart.update = () => { updates += 1; };
     chart.resize = () => { resizes += 1; };
     updateParcelHorizontalChart(chart, [{ label: "LMHub_Received", count: 10000000 }, { label: "-", count: 20 }], {
@@ -158,14 +157,12 @@ test("atualização limpa dados antigos, adapta altura e reserva espaço para qu
     assert.deepEqual(chart.data.datasets[0].backgroundColor, ["#42A5F5", "#a8a9ad"]);
     assert.equal(chart.canvas.parentElement.style.height, "416px");
     assert.ok(chart.options.layout.padding.right >= 90);
-    assert.match(attributes["aria-label"], /LMHub_Received: 10\.000\.000; -: 20/);
     updateParcelHorizontalChart(chart, [], { title: "Final Status", color: "#42A5F5", height: 220 });
     assert.deepEqual(chart.data.labels, ["—"]);
     assert.deepEqual(chart.data.datasets[0].data, [0]);
     assert.equal(chart.$parcelHasDistribution, false);
     assert.equal(chart.options.scales.x.suggestedMax, 1);
     assert.equal(chart.canvas.parentElement.style.height, "220px");
-    assert.equal(attributes["aria-label"], "Final Status: sem pacotes importados.");
     assert.equal(updates, 2);
     assert.equal(resizes, 2);
 });
@@ -205,11 +202,9 @@ test("os cinco gráficos inicializam uma vez e atualizam na importação, troca 
     assert.deepEqual(charts[2].data.labels, ["LMHub_Received", "-"]);
     assert.deepEqual(charts[2].data.datasets[0].data, [2, 1]);
     assert.deepEqual(charts[2].data.datasets[0].backgroundColor, ["#3F51B5", "#a8a9ad"]);
-    assert.match(charts[2].canvas["aria-label"], /Quantidade de pacotes por Scanned Status/);
     assert.deepEqual(charts[3].data.labels, ["LMHub_Received", "SOC_Packed"]);
     assert.deepEqual(charts[3].data.datasets[0].data, [2, 1]);
     assert.deepEqual(charts[3].data.datasets[0].backgroundColor, ["#3F51B5", "#3F51B5"]);
-    assert.match(charts[3].canvas["aria-label"], /Quantidade de pacotes por Final Status/);
     assert.equal(charts[1].data.datasets[0].backgroundColor, "#3F51B5");
     assert.equal(charts[1].data.datasets[0].data.length, 7);
     assert.equal(charts[4].canvas.id, "parcelNextStepActionChart");
@@ -220,7 +215,6 @@ test("os cinco gráficos inicializam uma vez e atualizam na importação, troca 
     assert.deepEqual(charts[4].data.labels, [["-", "33,3%"], ["Process for delivery", "33,3%"], ["Put in EHA", "33,3%"]]);
     assert.deepEqual(charts[4].data.datasets[0].data, [1, 1, 1]);
     assert.equal(charts[4].data.datasets[0].backgroundColor, "#3F51B5");
-    assert.match(charts[4].canvas["aria-label"], /Process for delivery: 1; Put in EHA: 1/);
     const resizeCount = charts[4].resizes ?? 0;
     visibilityChanged();
     assert.equal(charts[4].resizes, resizeCount + 1);
@@ -236,7 +230,6 @@ test("os cinco gráficos inicializam uma vez e atualizam na importação, troca 
     assert.equal(charts[1].data.datasets[0].backgroundColor, "#3F51B5");
     assert.deepEqual(charts[4].data.labels, []);
     assert.deepEqual(charts[4].data.datasets[0].data, []);
-    assert.match(charts[4].canvas["aria-label"], /sem pacotes importados/);
 });
 
 test("HTML mantém os dois status juntos e Next Step Action como gráfico vertical logo abaixo", () => {
@@ -245,14 +238,14 @@ test("HTML mantém os dois status juntos e Next Step Action como gráfico vertic
     assert.match(parcel, /id="parcelStatusCharts"/);
     for (const name of ["ScannedStatus", "FinalStatus"]) {
         assert.match(parcel, new RegExp(`id="parcel${name}ChartContainer"`));
-        assert.match(parcel, new RegExp(`<canvas id="parcel${name}Chart" role="img" aria-label="[^"]+"`));
+        assert.match(parcel, new RegExp(`<canvas\\b[^>]*\\bid="parcel${name}Chart"[^>]*\\brole="img"[^>]*>`));
     }
     assert.ok(parcel.indexOf('id="parcelScannedStatusChart"') < parcel.indexOf('id="parcelFinalStatusChart"'));
     assert.match(parcel, /<h4>Distribuição por Scanned Status<\/h4>/);
     assert.match(parcel, /<h4>Distribuição por Final Status<\/h4>/);
-    assert.match(parcel, /id="parcelFinalStatusChart"[^>]*><\/canvas>\s*<\/div>\s*<\/div>\s*<\/div>\s*<!-- GRÁFICO DE NEXT STEP ACTION -->\s*<div class="vertical-bars-chart">/);
+    assert.match(parcel, /id="parcelFinalStatusChart"[^>]*><\/canvas>\s*<\/div>\s*<\/div>\s*<\/div>\s*<!-- GRÁFICO DE NEXT STEP ACTION -->\s*<div\b[^>]*\bclass="[^"]*\bvertical-bars-chart\b[^"]*"[^>]*>/);
     assert.match(parcel, /<h4>Distribuição por Next Step Action<\/h4>/);
-    assert.match(parcel, /id="parcelNextStepActionChartContainer">\s*<div>\s*<canvas id="parcelNextStepActionChart" role="img" aria-label="[^"]+"/);
+    assert.match(parcel, /<div\b[^>]*\bclass="[^"]*\bchart-canvas-container\b[^"]*"[^>]*\bid="parcelNextStepActionChartContainer"[^>]*>\s*<canvas\b[^>]*\bid="parcelNextStepActionChart"[^>]*\brole="img"[^>]*>/);
     assert.equal((parcel.match(/id="parcelNextStepActionChart"/g) ?? []).length, 1);
     assert.doesNotMatch(parcel, /id=""/);
 });

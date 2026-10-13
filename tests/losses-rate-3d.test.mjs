@@ -183,9 +183,9 @@ test("indicadores do HTML estão ligados aos três campos com as cores originais
     for (const [color, label, id] of [
         ["#8b8d91", "Possíveis Perdas", "lossesRateCompositionPossibleLosses"],
         ["#d9534f", "Lost", "lossesRateCompositionLost"],
-        ["#f0ad4e", "Avaria", "lossesRateCompositionDamage"],
+        ["#f0ad4e", "Avarias", "lossesRateCompositionDamage"],
     ]) {
-        assert.match(composition, new RegExp(`background-color: ${color};[\\s\\S]*?<p>${label} - <span id="${id}">—</span>`));
+        assert.match(composition, new RegExp(`background-color: ${color};[\\s\\S]*?<p>${label}\\s+<span id="${id}">—</span>`));
         assert.equal(html.split(`id="${id}"`).length - 1, 1);
     }
 });
@@ -193,7 +193,9 @@ test("indicadores do HTML estão ligados aos três campos com as cores originais
 test("resumo reúne volume movimentado e perdas em uma única tabela", () => {
     const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
     const view = readFileSync(new URL("../js/reports/losses-rate/view.js", import.meta.url), "utf8");
-    const preview = html.match(/<div class="preview-style" id="lossesRatePreview">([\s\S]*?)<div class="losses-rate-charts">/)[1];
+    // Classes de layout adicionais não mudam o contrato da tabela.
+    const preview = html.match(/<div\b[^>]*\bid="lossesRatePreview"[^>]*>([\s\S]*?)<div\b[^>]*\bclass="[^"]*\blosses-rate-charts\b[^"]*"[^>]*>/)?.[1];
+    assert.ok(preview, "A prévia deve conter a tabela antes dos gráficos da taxa de perdas.");
 
     assert.equal((preview.match(/<table\b/g) || []).length, 1);
     assert.match(preview, /<th>Volume Movimentado<\/th>\s*<th>Possíveis Perdas<\/th>/);

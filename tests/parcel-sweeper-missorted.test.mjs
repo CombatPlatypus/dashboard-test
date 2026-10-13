@@ -46,13 +46,16 @@ test("importador lê Mis-sorted da coluna Count Type do CSV", async t => {
     assert.equal(createParcelSummary(imported.rows).missortedCount, 2);
 });
 
-test("novo card tem id único e mantém o layout fornecido", () => {
+test("indicador Missorted tem id único na tabela principal do Parcel", () => {
     const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
+    const summary = html.match(/\bid="parcelPreview"[^>]*>[\s\S]*?<table\b[^>]*>([\s\S]*?)<\/table>/)?.[1];
+    assert.ok(summary, "A prévia do Parcel deve conter a tabela principal.");
     assert.equal([...html.matchAll(/id="parcelMissortedTotal"/g)].length, 1);
-    assert.match(html, /<h4 id="parcelMissortedTotal">—<\/h4>\s*<\/div>\s*<p>Pacotes Missorted<\/p>/);
+    assert.match(summary, /<th>Pacotes Exception<\/th>\s*<th>Pacotes Missorted<\/th>/);
+    assert.match(summary, /<td\b[^>]*\bid="parcelExceptionTotal"[^>]*>—<\/td>\s*<td\b[^>]*\bid="parcelMissortedTotal"[^>]*>—<\/td>/);
 });
 
-test("card acompanha importação, filtros, restauração e limpeza, com número em pt-BR", t => {
+test("indicador acompanha importação, filtros, restauração e limpeza, com número em pt-BR", t => {
     resetParcelReport();
     class Element {
         constructor(tag = "div") { this.tag = tag; this.dataset = {}; this.children = []; this.textContent = ""; }
