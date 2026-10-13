@@ -333,6 +333,9 @@ const FILTER_PURPOSES =
                 dynamicColumns:
                     true,
 
+                skipClipboardHeaderRow:
+                    false,
+
                 includeCsvHeaders:
                     false,
 
@@ -1293,12 +1296,20 @@ async function importClipboard(purpose) {
             );
         }
 
+        const sourceStartIndex =
+            compatibleSource.rowIndex +
+            (
+                purpose.skipClipboardHeaderRow ===
+                    false
+                    ? 0
+                    : 1
+            );
+
         const sourceRows =
             compatibleSource
                 .rows
                 .slice(
-                    compatibleSource
-                        .rowIndex + 1,
+                    sourceStartIndex,
                 )
                 .filter(
                     function (row) {
@@ -1339,7 +1350,7 @@ async function importClipboard(purpose) {
             purpose.dynamicColumns
                 ? createDynamicColumns(
                     compatibleSource.rows.slice(
-                        compatibleSource.rowIndex,
+                        sourceStartIndex,
                     ),
                 )
                 : purpose.columns.filter(
@@ -1402,7 +1413,7 @@ function handlePurposeChange() {
     ) {
         setNotification(
             purpose.matchAnyColumn
-                ? "Copie a tabela, incluindo os cabeçalhos, e clique em Importar."
+                ? "Copie as linhas que deseja usar como base e clique em Importar."
                 : "Copie o trecho da tabela ou a página inteira do SPX e clique em Importar.",
             "info",
         );
@@ -1695,34 +1706,51 @@ function filterRows() {
     filterState.sourceRows.forEach(
         function (sourceRow) {
             const matchingFilterValues =
-                purpose.matchAnyColumn
-                    ? new Set(
-                        sourceRow
-                            .map(
-                                normalizeText,
+                new Map();
+
+            if (purpose.matchAnyColumn) {
+                sourceRow.forEach(
+                    function (
+                        cell,
+                        columnIndex,
+                    ) {
+                        const filterValue =
+                            normalizeText(cell);
+
+                        if (
+                            normalizedValues.has(
+                                filterValue,
+                            ) &&
+                            !matchingFilterValues.has(
+                                filterValue,
                             )
-                            .filter(
-                                function (value) {
-                                    return normalizedValues
-                                        .has(value);
-                                },
-                            ),
+                        ) {
+                            matchingFilterValues.set(
+                                filterValue,
+                                columnIndex,
+                            );
+                        }
+                    },
+                );
+            } else {
+                const filterValue =
+                    normalizeText(
+                        sourceRow[
+                            filterColumnIndex
+                        ],
+                    );
+
+                if (
+                    normalizedValues.has(
+                        filterValue,
                     )
-                    : normalizedValues.has(
-                        normalizeText(
-                            sourceRow[
-                                filterColumnIndex
-                            ],
-                        ),
-                    )
-                        ? new Set([
-                            normalizeText(
-                                sourceRow[
-                                    filterColumnIndex
-                                ],
-                            ),
-                        ])
-                        : new Set();
+                ) {
+                    matchingFilterValues.set(
+                        filterValue,
+                        filterColumnIndex,
+                    );
+                }
+            }
 
             if (
                 matchingFilterValues.size ===
@@ -1760,7 +1788,10 @@ function filterRows() {
                     );
 
             matchingFilterValues.forEach(
-                function (filterValue) {
+                function (
+                    matchingColumnIndex,
+                    filterValue,
+                ) {
                     const selectedResult =
                         selectedResultByValue.get(
                             filterValue,
@@ -1797,6 +1828,7 @@ function filterRows() {
                             {
                                 resultRow,
                                 priorityTimestamp,
+                                matchingColumnIndex,
                             },
                         );
                     }
@@ -1833,6 +1865,64 @@ function filterRows() {
             Boolean,
         );
 
+    const matchingColumnCounts =
+        new Map();
+
+    selectedResultByValue.forEach(
+        function (selectedResult) {
+            const matchingColumnIndex =
+                selectedResult
+                    .matchingColumnIndex;
+
+            matchingColumnCounts.set(
+                matchingColumnIndex,
+                (
+                    matchingColumnCounts.get(
+                        matchingColumnIndex,
+                    ) ?? 0
+                ) + 1,
+            );
+        },
+    );
+
+    const inferredFilterColumnIndex =
+        purpose.matchAnyColumn
+            ? Array.from(
+                matchingColumnCounts,
+            ).reduce(
+                function (
+                    selectedColumn,
+                    [
+                        columnIndex,
+                        matchCount,
+                    ],
+                ) {
+                    if (
+                        !selectedColumn ||
+                        matchCount >
+                            selectedColumn
+                                .matchCount
+                    ) {
+                        return {
+                            columnIndex,
+                            matchCount,
+                        };
+                    }
+
+                    return selectedColumn;
+                },
+                null,
+            )?.columnIndex ?? 0
+            : activeColumns.findIndex(
+                function (column) {
+                    return normalizeText(
+                        column,
+                    ) === normalizeText(
+                        purpose.filterColumn,
+                    );
+                },
+            );
+
     const previewRows =
         purpose.preserveUnmatchedRows
             ? orderedResultRows.map(
@@ -1845,12 +1935,12 @@ function filterRows() {
                     }
 
                     return activeColumns.map(
-                        function (column) {
-                            return normalizeText(
-                                column,
-                            ) === normalizeText(
-                                purpose.filterColumn,
-                            )
+                        function (
+                            _,
+                            columnIndex,
+                        ) {
+                            return columnIndex ===
+                                inferredFilterColumnIndex
                                 ? uniqueValues[
                                     valueIndex
                                 ]

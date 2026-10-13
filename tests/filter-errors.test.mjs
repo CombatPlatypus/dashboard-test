@@ -305,7 +305,7 @@ test("Filtragem Livre por arquivo busca em qualquer coluna, retorna a linha inte
     assert.deepEqual(panel.rows("thead"), []);
     assert.deepEqual(panel.rows(), [
         ["1", "03/01", "BR002", "LMHub_Received", "LM Hub", "BACKLOG", "Bruno", "Produto B"],
-        ["", "", "", "", "", "", "", ""],
+        ["", "", "BR999", "", "", "", "", ""],
         ["1", "03/01", "BR001", "LMHub_Received", "LM Hub", "AM", "Ana", "Produto A"],
     ]);
     assert.equal(panel.type(), "warning");
@@ -314,7 +314,7 @@ test("Filtragem Livre por arquivo busca em qualquer coluna, retorna a linha inte
     await panel.get("filterCopyButton").click();
     assert.equal(panel.copies[0], [
         "1\t03/01\tBR002\tLMHub_Received\tLM Hub\tBACKLOG\tBruno\tProduto B",
-        "\t\t\t\t\t\t\t",
+        "\t\tBR999\t\t\t\t\t",
         "1\t03/01\tBR001\tLMHub_Received\tLM Hub\tAM\tAna\tProduto A",
     ].join("\n"));
 
@@ -324,7 +324,7 @@ test("Filtragem Livre por arquivo busca em qualquer coluna, retorna a linha inte
     assert.deepEqual(Array.from(bytes.slice(0, 3)), [0xEF, 0xBB, 0xBF]);
     assert.equal(new TextDecoder().decode(bytes), [
         "1,03/01,BR002,LMHub_Received,LM Hub,BACKLOG,Bruno,Produto B",
-        ",,,,,,,",
+        ",,BR999,,,,,",
         "1,03/01,BR001,LMHub_Received,LM Hub,AM,Ana,Produto A",
     ].join("\n"));
 });
@@ -345,7 +345,7 @@ test("Filtragem Livre pela área de transferência aceita cabeçalhos arbitrári
     assert.deepEqual(panel.rows("thead"), []);
     assert.deepEqual(panel.rows(), [
         ["1", "04/01", "BR002", "Pendente", "Bruno"],
-        ["", "", "", "", ""],
+        ["", "", "INEXISTENTE", "", ""],
         ["1", "03/01", "BR001", "Recebido", "Ana"],
     ]);
     assert.match(panel.message(), /1 não encontrado/);
@@ -363,4 +363,32 @@ test("Filtragem Livre importa XLSX sem exigir nomes específicos de coluna", asy
     assert.equal(panel.type(), "success");
     await panel.filter("BR002");
     assert.deepEqual(panel.rows(), [["Segundo", "BR002", "Pendente"]]);
+});
+
+test("Filtragem Livre importa todas as linhas copiadas quando a seleção não possui cabeçalho", async () => {
+    const clipboardText = [
+        "03/01\tBR269202922948P\tLMHub_Received\tAM\tCarla",
+        "03/01\tBR257197658371Z\tLMHub_Received\tAM\tPyetra",
+        "03/01\tBR2530830569969\tLMHub_Received\tAM\tCarla",
+    ].join("\n");
+    const panel = setup({ clipboardText });
+
+    await panel.select("free-filter-clipboard");
+    await panel.get("filterImportButton").click();
+    assert.equal(
+        panel.message(),
+        "Área de transferência importada com 3 linha(s). Cole um valor por linha para filtrar.",
+    );
+
+    await panel.filter([
+        "BR269202922948P",
+        "BR257197658371Z",
+        "BR2530830569969",
+    ].join("\n"));
+
+    assert.deepEqual(panel.rows(), [
+        ["03/01", "BR269202922948P", "LMHub_Received", "AM", "Carla"],
+        ["03/01", "BR257197658371Z", "LMHub_Received", "AM", "Pyetra"],
+        ["03/01", "BR2530830569969", "LMHub_Received", "AM", "Carla"],
+    ]);
 });
