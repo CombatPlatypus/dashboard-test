@@ -206,6 +206,59 @@ const expeditionErrorsTextSpacingPlugin = {
     },
 };
 
+const expeditionStreetBarValuesPlugin = {
+    id: "expeditionStreetBarValues",
+
+    afterDatasetsDraw(chart) {
+        if (!chart.chartArea) {
+            return;
+        }
+
+        const context = chart.ctx;
+
+        context.save();
+        applyExpeditionErrorsTextSpacing(chart);
+        context.font =
+            '600 14px "Open Sans", sans-serif';
+        context.textAlign = "center";
+        context.textBaseline = "bottom";
+        context.fillStyle = "#e4e6eb";
+        context.strokeStyle = "#18191a";
+        context.lineWidth = 3;
+
+        chart.data.datasets.forEach(
+            function (dataset, datasetIndex) {
+                if (!chart.isDatasetVisible(datasetIndex)) {
+                    return;
+                }
+
+                chart.getDatasetMeta(datasetIndex).data.forEach(
+                    function (bar, index) {
+                        const value = dataset.data[index];
+
+                        if (
+                            value === null ||
+                            value === undefined ||
+                            !Number.isFinite(Number(value))
+                        ) {
+                            return;
+                        }
+
+                        const label =
+                            formatErrorChartQuantity(value);
+                        const labelY = bar.y - 8;
+
+                        context.strokeText(label, bar.x, labelY);
+                        context.fillText(label, bar.x, labelY);
+                    },
+                );
+            },
+        );
+
+        context.restore();
+    },
+};
+
 function createErrorBalanceChart(
     canvas,
 ) {
@@ -368,6 +421,7 @@ function createStreetOccurrencesChart(
 
             plugins: [
                 expeditionErrorsTextSpacingPlugin,
+                expeditionStreetBarValuesPlugin,
             ],
 
             options: {
@@ -466,7 +520,7 @@ function createStreetOccurrencesChart(
 
                     y: {
                         beginAtZero: true,
-                        grace: "12%",
+                        grace: "15%",
 
                         ticks: {
                             color: "#e4e6eb",

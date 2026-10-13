@@ -779,6 +779,13 @@ function createReceiptComparisonChart(
 /* COMPARAÇÃO ALINHADA DE RECEBEDORES */
 
 const RECEIPT_ALIGNED_COLUMN_GAP = 30;
+const RECEIPT_ALIGNED_CONTENT_PADDING = Object.freeze({
+    top: 12,
+    right: 10,
+    left: 10,
+});
+const RECEIPT_ALIGNED_LABEL_HEIGHT = 14;
+const RECEIPT_ALIGNED_LABEL_BAR_GAP = 8;
 const RECEIPT_ALIGNED_VOLUME_INTERVALS = 5;
 const RECEIPT_ALIGNED_ERROR_INTERVAL = 0.2;
 const RECEIPT_ALIGNED_INITIAL_ERROR_MAXIMUM = 1;
@@ -967,30 +974,14 @@ function drawReceiptAlignedRoundedBar(
 function drawReceiptAlignedMetricLabel(
     context,
     label,
-    barEnd,
-    panelEnd,
+    positionX,
     positionY,
+    textAlign,
 ) {
-    const labelWidth =
-        context.measureText(
-            label,
-        ).width;
-    let positionX =
-        barEnd + 10;
-
     context.textAlign =
-        "left";
-
-    if (
-        positionX + labelWidth >
-        panelEnd - 4
-    ) {
-        positionX =
-            panelEnd - 8;
-        context.textAlign =
-            "right";
-    }
-
+        textAlign;
+    context.textBaseline =
+        "bottom";
     context.strokeStyle =
         "#18191a";
     context.lineWidth = 1;
@@ -1056,12 +1047,18 @@ function drawReceiptAlignedComparison(
     const errorEnd =
         errorStart +
         columnWidth;
-    const nameStart =
-        volumeStart + 5;
-    const volumeBarStart = Math.min(
-        volumeStart + 115,
-        volumeEnd - 80,
-    );
+    const volumeBarStart =
+        volumeStart +
+        RECEIPT_ALIGNED_CONTENT_PADDING.left;
+    const volumeBarLimit =
+        volumeEnd -
+        RECEIPT_ALIGNED_CONTENT_PADDING.right;
+    const errorBarStart =
+        errorStart +
+        RECEIPT_ALIGNED_CONTENT_PADDING.left;
+    const errorBarLimit =
+        errorEnd -
+        RECEIPT_ALIGNED_CONTENT_PADDING.right;
     const axisY =
         chartArea.bottom + 8;
     const barHeight = 20;
@@ -1089,11 +1086,8 @@ function drawReceiptAlignedComparison(
             volumeMaximum *
             ratio;
         const positionX =
-            volumeBarStart +
-            (
-                volumeEnd -
-                volumeBarStart
-            ) * ratio;
+            volumeStart +
+            (volumeEnd - volumeStart) * ratio;
 
         context.beginPath();
         context.moveTo(
@@ -1144,16 +1138,18 @@ function drawReceiptAlignedComparison(
             (errorEnd - errorStart) *
                 ratio;
 
-        context.beginPath();
-        context.moveTo(
-            positionX,
-            chartArea.top,
-        );
-        context.lineTo(
-            positionX,
-            chartArea.bottom,
-        );
-        context.stroke();
+        if (index < errorIntervalCount) {
+            context.beginPath();
+            context.moveTo(
+                positionX,
+                chartArea.top,
+            );
+            context.lineTo(
+                positionX,
+                chartArea.bottom,
+            );
+            context.stroke();
+        }
         context.textAlign =
             index === 0
                 ? "left"
@@ -1170,23 +1166,16 @@ function drawReceiptAlignedComparison(
 
     context.strokeStyle =
         "rgba(82, 82, 82, 0.7)";
-    [
-        chartArea.top,
+    context.beginPath();
+    context.moveTo(
+        volumeStart,
         chartArea.bottom,
-    ].forEach(
-        function (positionY) {
-            context.beginPath();
-            context.moveTo(
-                volumeStart,
-                positionY,
-            );
-            context.lineTo(
-                errorEnd,
-                positionY,
-            );
-            context.stroke();
-        },
     );
+    context.lineTo(
+        errorEnd,
+        chartArea.bottom,
+    );
+    context.stroke();
 
     if (rows.length === 0) {
         context.font =
@@ -1212,9 +1201,20 @@ function drawReceiptAlignedComparison(
 
     rows.forEach(
         function (operator, index) {
-            const positionY =
+            const rowTop =
                 yScale.getPixelForValue(
-                    index,
+                    index - 0.5,
+                );
+            const positionY =
+                Math.max(
+                    yScale.getPixelForValue(
+                        index,
+                    ),
+                    rowTop +
+                        RECEIPT_ALIGNED_CONTENT_PADDING.top +
+                        RECEIPT_ALIGNED_LABEL_HEIGHT +
+                        RECEIPT_ALIGNED_LABEL_BAR_GAP +
+                        barHeight / 2,
                 );
             const rowBottom =
                 yScale.getPixelForValue(
@@ -1225,10 +1225,14 @@ function drawReceiptAlignedComparison(
                 0;
             const errorValue =
                 operator.errorMetric;
+            const labelY =
+                positionY -
+                barHeight / 2 -
+                RECEIPT_ALIGNED_LABEL_BAR_GAP;
             const volumeBarEnd =
                 volumeBarStart +
                 (
-                    volumeEnd -
+                    volumeBarLimit -
                     volumeBarStart
                 ) *
                 Math.min(
@@ -1238,11 +1242,11 @@ function drawReceiptAlignedComparison(
                 );
             const errorBarEnd =
                 errorValue === null
-                    ? errorStart
-                    : errorStart +
+                    ? errorBarStart
+                    : errorBarStart +
                         (
-                            errorEnd -
-                            errorStart
+                            errorBarLimit -
+                            errorBarStart
                         ) *
                         Math.min(
                             errorValue /
@@ -1270,10 +1274,12 @@ function drawReceiptAlignedComparison(
                 "#e4e6eb";
             context.textAlign =
                 "left";
+            context.textBaseline =
+                "bottom";
             context.fillText(
                 operator.receiver,
-                nameStart,
-                positionY,
+                volumeBarStart,
+                labelY,
             );
 
             drawReceiptAlignedRoundedBar(
@@ -1281,7 +1287,7 @@ function drawReceiptAlignedComparison(
                 volumeBarStart,
                 positionY -
                     barHeight / 2,
-                volumeEnd -
+                volumeBarLimit -
                     volumeBarStart,
                 barHeight,
                 "rgba(228, 230, 235, 0.07)",
@@ -1298,10 +1304,10 @@ function drawReceiptAlignedComparison(
             );
             drawReceiptAlignedRoundedBar(
                 context,
-                errorStart,
+                errorBarStart,
                 positionY -
                     barHeight / 2,
-                errorEnd - errorStart,
+                errorBarLimit - errorBarStart,
                 barHeight,
                 "rgba(228, 230, 235, 0.07)",
             );
@@ -1309,11 +1315,11 @@ function drawReceiptAlignedComparison(
             if (errorValue !== null) {
                 drawReceiptAlignedRoundedBar(
                     context,
-                    errorStart,
+                    errorBarStart,
                     positionY -
                         barHeight / 2,
                     errorBarEnd -
-                        errorStart,
+                        errorBarStart,
                     barHeight,
                     RECEIPT_ALIGNED_ERROR_COLOR,
                 );
@@ -1326,9 +1332,9 @@ function drawReceiptAlignedComparison(
                 formatReceiptProgressQuantity(
                     volumeValue,
                 ),
-                volumeBarEnd,
-                volumeEnd,
-                positionY,
+                volumeBarLimit,
+                labelY,
+                "right",
             );
 
             if (errorValue === null) {
@@ -1338,8 +1344,8 @@ function drawReceiptAlignedComparison(
                     "left";
                 context.fillText(
                     "—",
-                    errorStart + 8,
-                    positionY,
+                    errorBarStart,
+                    labelY,
                 );
             } else {
                 drawReceiptAlignedMetricLabel(
@@ -1347,9 +1353,9 @@ function drawReceiptAlignedComparison(
                     formatReceiptComparisonPercentage(
                         errorValue,
                     ),
-                    errorBarEnd,
-                    errorEnd,
-                    positionY,
+                    errorBarStart,
+                    labelY,
+                    "left",
                 );
             }
         },

@@ -454,8 +454,8 @@ function drawComparisonStructure(chart) {
     context.lineWidth = 1;
 
     for (
-        let routeValue = 0;
-        routeValue <= routeMaximum;
+        let routeValue = ROUTE_AXIS_INTERVAL;
+        routeValue < routeMaximum;
         routeValue += ROUTE_AXIS_INTERVAL
     ) {
         const ratio =
@@ -482,6 +482,13 @@ function drawComparisonStructure(chart) {
         timeMaximum,
     ).forEach(
         function (timeValue) {
+            if (
+                timeValue <= 0 ||
+                timeValue >= timeMaximum
+            ) {
+                return;
+            }
+
             const positionX =
                 timeGridStart +
                 (
@@ -501,26 +508,6 @@ function drawComparisonStructure(chart) {
             context.lineTo(
                 positionX,
                 chartArea.bottom,
-            );
-            context.stroke();
-        },
-    );
-
-    context.strokeStyle =
-        "rgba(82, 82, 82, 0.7)";
-    [
-        chartArea.top,
-        chartArea.bottom,
-    ].forEach(
-        function (positionY) {
-            context.beginPath();
-            context.moveTo(
-                volumeStart,
-                positionY,
-            );
-            context.lineTo(
-                timeGridEnd,
-                positionY,
             );
             context.stroke();
         },
@@ -603,19 +590,21 @@ function drawComparisonStructure(chart) {
                             1,
                         );
 
-            context.strokeStyle =
-                "rgba(82, 82, 82, 0.4)";
-            context.lineWidth = 1;
-            context.beginPath();
-            context.moveTo(
-                volumeStart,
-                rowBottom,
-            );
-            context.lineTo(
-                timeGridEnd,
-                rowBottom,
-            );
-            context.stroke();
+            if (index < rows.length - 1) {
+                context.strokeStyle =
+                    "rgba(82, 82, 82, 0.4)";
+                context.lineWidth = 1;
+                context.beginPath();
+                context.moveTo(
+                    volumeStart,
+                    rowBottom,
+                );
+                context.lineTo(
+                    timeGridEnd,
+                    rowBottom,
+                );
+                context.stroke();
+            }
 
             context.font =
                 '600 14px "Open Sans", sans-serif';

@@ -55,9 +55,9 @@ test("texto central fica frontal à projeção, inclusive com categoria única o
         const text = String(data.reduce((sum, quantity) => sum + quantity, 0));
         center.afterDraw(chart, {}, { text, label: "Classificadas" });
         const geometry = chart.$damageCompositionGeometry;
-        assert.deepEqual(ctx.texts, [[text, geometry.centerX, geometry.textCenterY - 11],
-            ["Classificadas", geometry.centerX, geometry.textCenterY + 11]]);
-        assert.equal(ctx.font, "16px Open Sans");
+        assert.deepEqual(ctx.texts, [[text, geometry.centerX, geometry.textCenterY - 10.5],
+            ["Classificadas", geometry.centerX, geometry.textCenterY + 10.5]]);
+        assert.equal(ctx.font, '15px "Open Sans", sans-serif');
         assert.equal(ctx.fillStyle, "#a8a9ad");
         assert.equal(ctx.letterSpacing, "1px");
         assert.ok(ctx.fills > 2);

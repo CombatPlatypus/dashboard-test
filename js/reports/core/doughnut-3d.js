@@ -184,9 +184,8 @@ function drawDoughnut3DCenterText(chart, geometry, { text = "—", label = "" } 
     }
 
     const context = chart.ctx;
-    const fontFamily = window.getComputedStyle?.(chart.canvas)?.fontFamily ||
-        "Open Sans, Arial, sans-serif";
-    const lineHeight = 16;
+    const fontFamily = '"Open Sans", sans-serif';
+    const lineHeight = 15;
     const lineGap = 6;
     const lineOffset = (lineHeight + lineGap) / 2;
 

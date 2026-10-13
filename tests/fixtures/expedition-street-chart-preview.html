@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ocorrências por Rua — prévia com dados fictícios</title>
+    <link rel="stylesheet" href="../../css/font-face.css">
+    <link rel="stylesheet" href="../../css/reports-style.css">
+    <style>
+        * { box-sizing: border-box; }
+        body { --color-container: #101010; --color-table-th: #252525; --color-border: #666; --color-gray-p: #a8a9ad;
+            margin: 24px; background: #101010; color: #e4e6eb; font: 14px "Open Sans", sans-serif; letter-spacing: 1px; }
+        h1 { font-size: 18px; font-weight: 600; }
+        button { padding: 8px 16px; color: inherit; background: #242424; border: 1px solid #666; cursor: pointer; }
+        #expedition { width: 100%; max-width: 1100px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Ocorrências por Rua — dados fictícios para teste visual</h1>
+    <button id="toggleWidth">Alternar largura</button>
+    <section id="expedition" class="is-active">
+        <div id="expedition-mistakes" hidden><canvas id="expeditionErrorBalanceChart"></canvas></div>
+        <div id="expedition-streets" class="is-active">
+            <div hidden><span id="expeditionBestStreet"></span><span id="expeditionBestStreetRate"></span>
+                <span id="expeditionWorstStreet"></span><span id="expeditionWorstStreetRate"></span></div>
+            <div class="chart vertical-bars-chart">
+                <div class="chart-title"><h4>Ocorrências por Rua</h4></div>
+                <div class="chart-label">
+                    <div class="type"><div style="background: #ffc107"></div><p>Pacotes Ausentes</p></div>
+                    <div class="type"><div style="background: #f44336"></div><p>Erros da Rua</p></div>
+                </div>
+                <div class="chart-canvas-container" id="expeditionStreetOccurrencesChartContainer">
+                    <canvas id="expeditionStreetOccurrencesChart" role="img" aria-label="Ocorrências por Rua: pacotes ausentes e erros da rua"></canvas>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script src="../../js/libraries/chart.umd.min.js"></script>
+    <script src="../../js/charts/defaults.js"></script>
+    <script type="module">
+        import { initializeExpeditionErrorsCharts } from "../../js/reports/expedition/errors-charts.js";
+        import { replaceExpeditionRoutes } from "../../js/reports/expedition/state.js";
+        const streets = [["F", 70, 51], ["A", 78, 42], ["C", 74, 42], ["E", 69, 38], ["H", 65, 41],
+            ["B", 64, 34], ["G", 57, 35], ["D", 52, 37], ["I", 18, 15]];
+        replaceExpeditionRoutes(streets.map(([name, missing, errors]) => ({
+            code: `TESTE-${name}`, corridor: `${name}-1`, status: "Validated", finalOrders: 200,
+            missingOrders: missing, missortedOrders: errors, validationOperator: "Teste",
+        })), "dados-ficticios.csv");
+        initializeExpeditionErrorsCharts(document.getElementById("expedition"));
+        document.getElementById("toggleWidth").addEventListener("click", () => {
+            const panel = document.getElementById("expedition");
+            panel.style.maxWidth = panel.style.maxWidth === "480px" ? "1100px" : "480px";
+        });
+    </script>
+</body>
+</html>

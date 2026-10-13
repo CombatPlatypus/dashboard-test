@@ -27,18 +27,18 @@ test("as quatro roscas usam o tamanho e a qualidade da Reversa", t => {
     assert.ok(narrow.outerRadius < referenceGeometry.outerRadius);
 });
 
-test("texto central tem 16px, cor cinza, intervalo de 6px entre linhas e espaçamento de 1px", t => {
+test("texto central tem 15px, cor cinza, intervalo de 6px entre linhas e espaçamento de 1px", t => {
     const previous = globalThis.window;
-    globalThis.window = { getComputedStyle: () => ({ fontFamily: "Open Sans" }) };
+    globalThis.window = { getComputedStyle: () => ({ fontFamily: "Arial" }) };
     t.after(() => { globalThis.window = previous; });
     const texts = [];
     const ctx = { save() {}, restore() {}, fillText(text, x, y) {
         texts.push({ text, x, y, font: this.font, color: this.fillStyle, spacing: this.letterSpacing });
     } };
     drawDoughnut3DCenterText({ ctx, canvas: {} }, { centerX: 100, textCenterY: 100 }, { text: "79%", label: "Pacotes" });
-    assert.equal(texts[0].y, 89);
-    assert.equal(texts[1].y, 111);
-    assert.equal(texts[1].y - texts[0].y - 16, 6);
+    assert.equal(texts[0].y, 89.5);
+    assert.equal(texts[1].y, 110.5);
+    assert.equal(texts[1].y - texts[0].y - 15, 6);
     assert.deepEqual(texts.map(value => [value.font, value.color, value.spacing]),
-        Array(2).fill(["16px Open Sans", "#a8a9ad", "1px"]));
+        Array(2).fill(['15px "Open Sans", sans-serif', "#a8a9ad", "1px"]));
 });

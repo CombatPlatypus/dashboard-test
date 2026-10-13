@@ -4,7 +4,7 @@ const parcelHorizontalQuantityFormatter = new Intl.NumberFormat("pt-BR", {
 
 const parcelHorizontalLabelFont = {
     size: 14,
-    family: '"Open Sans", Arial, sans-serif',
+    family: '"Open Sans", sans-serif',
 };
 
 function fitParcelHorizontalLabels(scale) {
@@ -62,7 +62,7 @@ const parcelHorizontalValues = {
         const context = chart.ctx;
         context.save();
         if ("letterSpacing" in context) context.letterSpacing = "0px";
-        context.font = '600 14px "Open Sans", Arial, sans-serif';
+        context.font = '600 14px "Open Sans", sans-serif';
         context.fillStyle = "#e4e6eb";
         context.textAlign = "left";
         context.textBaseline = "middle";

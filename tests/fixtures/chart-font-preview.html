@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Open Sans — padrão dos gráficos</title>
+    <link rel="stylesheet" href="../../css/font-face.css">
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 24px; background: #101010; color: #e4e6eb; font: 14px "Open Sans", sans-serif; }
+        h1 { font-size: 20px; font-weight: 600; }
+        button { padding: 8px 16px; color: inherit; background: #242424; border: 1px solid #666; cursor: pointer; }
+        .charts { display: flex; flex-wrap: wrap; gap: 24px; max-width: 1100px; }
+        .chart { flex: 1 1 450px; padding: 20px; border: 1px solid #626262; }
+        .canvas { position: relative; height: 270px; }
+        canvas { font-family: 'Open Sans', sans-serif; }
+        output { display: block; margin: 16px 0; }
+    </style>
+</head>
+<body>
+    <h1>Open Sans local — padrão dos gráficos atuais e futuros</h1>
+    <output id="fontsStatus">Carregando fontes locais…</output>
+    <button id="addChart">Criar novo gráfico sem definir fonte</button>
+    <output id="futureStatus"></output>
+    <section class="charts">
+        <div class="chart"><h2>Gráfico sem fonte explícita</h2><div class="canvas">
+            <canvas id="bar" role="img" aria-label="Pacotes recebidos por rua"></canvas></div>
+            <output id="fontFamily"></output></div>
+        <div class="chart"><h2>Texto central da rosca 3D</h2><div class="canvas">
+            <canvas id="donut" role="img" aria-label="Composição da reversa"></canvas></div></div>
+    </section>
+    <script src="../../js/libraries/chart.umd.min.js"></script>
+    <script src="../../js/charts/defaults.js"></script>
+    <script type="module">
+        import { createReverseCompositionChart } from "../../js/reports/reverse/charts.js";
+        const barConfig = () => ({
+            type: "bar", data: { labels: ["Rua A", "Rua B", "Rua C"],
+                datasets: [{ label: "Pacotes recebidos", data: [70, 78, 74], backgroundColor: "#ffc107" }] },
+            options: { responsive: true, maintainAspectRatio: false, animation: false,
+                plugins: { legend: { labels: { color: "#e4e6eb" } },
+                    title: { display: true, text: "Expedição — Ocorrências por Rua", color: "#e4e6eb" } },
+                scales: { x: { ticks: { color: "#e4e6eb" } }, y: { ticks: { color: "#e4e6eb" } } } },
+        });
+        const bar = new Chart(document.getElementById("bar"), barConfig());
+        const donut = createReverseCompositionChart(document.getElementById("donut"));
+        document.getElementById("fontFamily").textContent = `Fonte herdada: ${bar.options.font.family}`;
+        document.fonts.ready.then(() => {
+            document.getElementById("fontsStatus").textContent = [400, 600, 800].every(weight =>
+                document.fonts.check(`${weight} 14px 'Open Sans'`)) ? "Open Sans local carregada: pesos 400, 600 e 800." : "Fonte local indisponível.";
+        });
+        document.getElementById("addChart").addEventListener("click", () => {
+            const card = document.createElement("div"); card.className = "chart";
+            const container = document.createElement("div"); container.className = "canvas";
+            const canvas = document.createElement("canvas"); container.append(canvas); card.append(container);
+            document.querySelector(".charts").append(card);
+            const future = new Chart(canvas, barConfig());
+            document.getElementById("futureStatus").textContent = `Novo gráfico: ${future.options.font.family}`;
+        }, { once: true });
+    </script>
+</body>
+</html>

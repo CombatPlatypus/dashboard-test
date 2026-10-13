@@ -154,7 +154,7 @@ const parcelAgingValueLabels = {
         context.save();
         context.fillStyle = "#f7f7f7";
         context.font =
-            "600 11px Open Sans, Arial, sans-serif";
+            '600 11px "Open Sans", sans-serif';
         context.textAlign = "center";
         context.textBaseline = "bottom";
 

@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import { initializeExpeditionCharts } from "../js/reports/expedition/charts.js";
 
@@ -35,7 +36,9 @@ function createContext() {
     return context;
 }
 
-test("padding interno do ranking recua barras e textos juntos, preservando a grade", t => {
+test("ranking preserva o padding e a grade interna, sem as bordas externas", t => {
+    const styles = readFileSync(new URL("../css/reports-style.css", import.meta.url), "utf8");
+    assert.match(styles, /#expeditionChartsExportArea\s*>\s*\.chart\s*\{\s*border:\s*0;/);
     class TestElement {
         dataset = {};
         style = {};
@@ -92,9 +95,21 @@ test("padding interno do ranking recua barras e textos juntos, preservando a gra
         color: "#d9534f",
         dash: [6, 5],
     }]);
-    assert.equal(chart.ctx.strokes.length, 27);
-    assert.ok(chart.ctx.strokes.some(stroke =>
-        JSON.stringify(stroke.path) === JSON.stringify([["moveTo", 16, 38], ["lineTo", 16, 340]])));
+    assert.equal(chart.ctx.strokes.length, 20);
+    // As bordas dos dois conjuntos de barras não fazem parte da grade interna.
+    for (const borderX of [16, 441, 471, 896]) {
+        assert.ok(!chart.ctx.strokes.some(stroke => stroke.path.every(point => point[1] === borderX)));
+    }
+    for (const borderY of [38, 340]) {
+        assert.ok(!chart.ctx.strokes.some(stroke => stroke.path.every(point => point[2] === borderY)));
+    }
+    assert.ok(!chart.ctx.strokes.some(stroke =>
+        JSON.stringify(stroke.path) === JSON.stringify([["moveTo", 16, 215], ["lineTo", 896, 215]])));
+    for (const gridX of [16 + 425 * 2 / 22, 471 + 425 * 2 / 16]) {
+        assert.ok(chart.ctx.strokes.some(stroke =>
+            stroke.path.every(point => Math.abs(point[1] - gridX) < 1e-9) &&
+            stroke.path[0][2] === 38 && stroke.path[1][2] === 340));
+    }
     assert.ok(chart.ctx.strokes.some(stroke =>
         JSON.stringify(stroke.path) === JSON.stringify([["moveTo", 16, 99], ["lineTo", 896, 99]])));
     assert.equal(chart.ctx.fills, 11);
@@ -132,6 +147,7 @@ test("padding interno do ranking recua barras e textos juntos, preservando a gra
     plugin.beforeDatasetsDraw(chart);
     assert.ok(chart.ctx.texts.some(label => label.text === "1" && label.x === 431 && label.alignment === "right"));
     assert.ok(chart.ctx.texts.some(label => label.text === "10:50" && label.x === 481 && label.color === "#ffc107"));
+    assert.ok(chart.ctx.strokes.every(stroke => stroke.path[0][2] !== stroke.path[1][2]));
 
     // A single operator in a tall row keeps its vertical centering.
     chart.scales.y.getPixelForValue = index => 200 + index * 300;
@@ -142,7 +158,7 @@ test("padding interno do ranking recua barras e textos juntos, preservando a gra
     chart.$expeditionRows = [];
     chart.ctx = createContext();
     plugin.beforeDatasetsDraw(chart);
-    assert.equal(chart.ctx.strokes.length, 23);
+    assert.equal(chart.ctx.strokes.length, 17);
     assert.equal(chart.ctx.texts.length, 1);
     assert.equal(chart.ctx.texts[0].text, "Importe os dados para comparar os conferentes.");
     assert.equal(chart.ctx.balance, 0);
