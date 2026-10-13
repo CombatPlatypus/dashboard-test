@@ -39,6 +39,16 @@ const OVERALL_ANALYSIS_CHART_FONT = {
     size: 14,
 };
 
+const OVERALL_ANALYSIS_CARD_COLORS = Object.freeze({
+    normal: "#4caf50",
+    warning: "#f0ad4e",
+    exceeded: "#d9534f",
+    empty: "#e4e6eb",
+});
+
+// Taxas são armazenadas como proporção: 0,025% = 0.00025.
+const OVERALL_ANALYSIS_LOSS_RATE_WARNING = 0.00025;
+
 /* ESPAÇAMENTO DOS TEXTOS DO CANVAS */
 
 function applyOverallAnalysisTextSpacing(
@@ -579,6 +589,25 @@ function renderOverallAnalysisCharts(
     const packagesAnalysisProgress =
         data.cards.packagesAnalysis.rate;
 
+    const capacityColor =
+        capacityProgress === null
+            ? OVERALL_ANALYSIS_CARD_COLORS.empty
+            : capacityProgress > 1
+                ? OVERALL_ANALYSIS_CARD_COLORS.exceeded
+                : OVERALL_ANALYSIS_CARD_COLORS.normal;
+
+    const lossRate =
+        data.cards.lossesRate.rate;
+
+    const lossRateColor =
+        lossRate === null
+            ? OVERALL_ANALYSIS_CARD_COLORS.empty
+            : lossRate > data.cards.lossesRate.limit
+                ? OVERALL_ANALYSIS_CARD_COLORS.exceeded
+                : lossRate >= OVERALL_ANALYSIS_LOSS_RATE_WARNING
+                    ? OVERALL_ANALYSIS_CARD_COLORS.warning
+                    : OVERALL_ANALYSIS_CARD_COLORS.normal;
+
     const lossRateProgress =
         data.cards.lossesRate.rate !==
             null &&
@@ -590,7 +619,7 @@ function renderOverallAnalysisCharts(
     updateOverallAnalysisMiniChart(
         overallAnalysisCapacityChart,
         capacityProgress,
-        "#e4e6eb",
+        capacityColor,
         updateMode,
     );
 
@@ -627,10 +656,7 @@ function renderOverallAnalysisCharts(
     updateOverallAnalysisMiniChart(
         overallAnalysisLossRateChart,
         lossRateProgress,
-        data.cards.lossesRate
-            .withinLimit === false
-            ? "#d9534f"
-            : "#e4e6eb",
+        lossRateColor,
         updateMode,
     );
 

@@ -419,10 +419,6 @@
 
         /* EXPEDIÇÃO */
 
-        #expeditionChartsExportArea > .chart {
-            border: 0;
-        }
-
         #expedition-mistakes .horizontal-bars-chart .chart-canvas-container {
             height: 313px !important;
             margin: 0 20px 20px 20px;
