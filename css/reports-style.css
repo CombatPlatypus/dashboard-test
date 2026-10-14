@@ -365,7 +365,6 @@
     .chart-canvas-container {
         max-width: 100%;
         position: relative;
-        margin: 0 20px;
     }
     .chart-label {
         max-width: 100%;
@@ -425,6 +424,7 @@
         }
         #expedition-streets .vertical-bars-chart .chart-canvas-container {
             height: 252px;
+            margin: 0 20px 20px 20px;
         }
         #expedition-streets .vertical-bars-chart .chart-label{
             margin: 0 20px 0px 20px;
@@ -437,7 +437,14 @@
             margin: 0 20px 20px 20px;
         }
         #damage-and-losses .chart-canvas-container {
-            margin-bottom: 0px !important;
+            margin: 0 20px 0px 20px;
+        }
+
+        /* PARCEL */
+
+        #parcel .horizontal-bars-chart .chart-canvas-container,
+        #parcel .vertical-bars-chart .chart-canvas-container {
+            margin: 0 20px 0px 20px;
         }
 
         /* RELATÓRIO FINAL  */

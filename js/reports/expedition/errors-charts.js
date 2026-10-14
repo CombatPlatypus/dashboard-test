@@ -269,16 +269,18 @@ function createErrorBalanceChart(
 
             data: {
                 labels: [
-                    "Identificados",
+                    "Erros de Etiqueta",
+                    "Erros de Sorting",
                     "Revertidos",
                     "Saldo Final",
                 ],
 
                 datasets: [
                     {
-                        data: [0, 0, 0],
+                        data: [0, 0, 0, 0],
                         backgroundColor: [
-                            "#ffc107",
+                            "#3F51B5",
+                            "#f0ad4e",
                             "#8BC34A",
                             "#FF5722",
                         ],
@@ -550,8 +552,11 @@ function updateErrorBalanceChart(
     analysis,
     animate,
 ) {
-    const totalErrors =
-        analysis.totalErrors ?? 0;
+    const labelingErrors =
+        analysis.labelingErrors ?? 0;
+
+    const sortingErrors =
+        analysis.sortingErrors ?? 0;
 
     const revertedErrors =
         analysis.totalRevertedErrors ?? 0;
@@ -563,7 +568,8 @@ function updateErrorBalanceChart(
         .data
         .datasets[0]
         .data = [
-            totalErrors,
+            labelingErrors,
+            sortingErrors,
             revertedErrors,
             finalErrors,
         ];

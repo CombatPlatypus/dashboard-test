@@ -175,6 +175,11 @@ function setExpeditionInputValue(
     input,
     value,
 ) {
+    // A atualização do relatório não deve interromper a edição do campo ativo.
+    if (globalThis.document?.activeElement === input) {
+        return;
+    }
+
     const receivedValue =
         value === null ||
         value === undefined
@@ -1444,6 +1449,43 @@ function renderExpeditionTabNotification(
     );
 }
 
+function bindExpeditionErrorQuantityInput(
+    input,
+    field,
+) {
+    input.addEventListener(
+        "input",
+        function () {
+            const normalizedValue =
+                input.value
+                    .replace(/\D/g, "")
+                    .slice(0, input.maxLength);
+
+            if (input.value !== normalizedValue) {
+                input.value = normalizedValue;
+            }
+
+            updateExpeditionErrorQuantity(
+                field,
+                normalizedValue,
+            );
+        },
+    );
+
+    input.addEventListener(
+        "blur",
+        function () {
+            updateExpeditionErrorQuantity(
+                field,
+                input.value,
+            );
+
+            reconcileExpeditionErrorQuantities();
+            renderExpeditionView();
+        },
+    );
+}
+
 function bindExpeditionEvents(
     elements,
 ) {
@@ -1514,47 +1556,6 @@ function bindExpeditionEvents(
         );
     }
 
-    function bindErrorQuantityInput(
-        input,
-        field,
-    ) {
-        input.addEventListener(
-            "input",
-            function () {
-                const normalizedValue =
-                    input.value
-                        .replace(
-                            /\D/g,
-                            "",
-                        )
-                        .slice(
-                            0,
-                            input.maxLength,
-                        );
-
-                if (
-                    input.value !==
-                    normalizedValue
-                ) {
-                    input.value =
-                        normalizedValue;
-                }
-            },
-        );
-
-        input.addEventListener(
-            "blur",
-            function () {
-                updateExpeditionErrorQuantity(
-                    field,
-                    input.value,
-                );
-
-                reconcileExpeditionErrorQuantities();
-            },
-        );
-    }
-
     bindManualQuantityInput(
         elements.floorVolumeInput,
         "floorVolume",
@@ -1575,17 +1576,17 @@ function bindExpeditionEvents(
         "withdrawnOrders",
     );
 
-    bindErrorQuantityInput(
+    bindExpeditionErrorQuantityInput(
         elements.sortingErrorsInput,
         "sortingErrors",
     );
 
-    bindErrorQuantityInput(
+    bindExpeditionErrorQuantityInput(
         elements.labelingErrorsInput,
         "labelingErrors",
     );
 
-    bindErrorQuantityInput(
+    bindExpeditionErrorQuantityInput(
         elements.revertedInput,
         "revertedErrors",
     );
@@ -1731,6 +1732,8 @@ function renderExpeditionView(
 }
 
 export {
+    bindExpeditionErrorQuantityInput,
     initializeExpeditionView,
     renderExpeditionView,
+    setExpeditionInputValue,
 };
