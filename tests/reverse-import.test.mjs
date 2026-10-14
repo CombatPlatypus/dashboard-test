@@ -79,8 +79,8 @@ test("lê a TO em B2 e classifica pacotes únicos pelo tipo escolhido, ignorando
             ["BR2", "Return"],
             ["BR3", "Missorted"],
             ["BR4", "Liquidate"],
-            ["BR5", "Intercept"],
-            ["BR5", "Intercept"],
+            ["BR5", "Confiscado"],
+            ["BR5", "Confiscado"],
         ],
     });
 
@@ -215,11 +215,11 @@ test("uma TO nova é adicionada e a mesma TO é atualizada sem duplicar totais",
             createRows({
                 packages: [
                     ["BR20", "Return"],
-                    ["BR21", "Intercept"],
-                    ["BR22", "Intercept"],
+                    ["BR21", "Confiscado"],
+                    ["BR22", "Confiscado"],
                 ],
             }),
-            { reverseType: "intercept" },
+            { reverseType: "confiscated" },
         );
 
     assert.equal(
@@ -246,19 +246,18 @@ test("uma TO nova é adicionada e a mesma TO é atualizada sem duplicar totais",
 });
 
 test("os quatro tipos aceitam Forward, tipos desconhecidos e coluna Journey Type ausente", () => {
-    for (const reverseType of ["return", "missorted", "liquidate", "intercept"]) {
+    for (const reverseType of ["return", "missorted", "liquidate", "confiscated"]) {
         const rows = createRows({ packages: [["BR1", "Forward"], ["BR2", ""], ["BR3", "Unknown"]] });
         rows[23][7] = "";
         const transfer = createReverseImportRecord(rows, { reverseType });
-        const key = reverseType === "intercept" ? "confiscated" : reverseType;
         assert.equal(transfer.quantity, 3);
-        assert.equal(transfer.quantities[key], 3);
+        assert.equal(transfer.quantities[reverseType], 3);
         assert.equal(Object.values(transfer.quantities).filter(value => value > 0).length, 1);
     }
 });
 
 test("exige tipo válido antes de ler ou analisar o arquivo", async () => {
-    for (const reverseType of [undefined, "", "Forward", "invalid"]) {
+    for (const reverseType of [undefined, "", "Forward", "intercept", "invalid"]) {
         assert.throws(() => createReverseImportRecord(createRows(), { reverseType }), /Escolha o tipo/);
         let reads = 0;
         await assert.rejects(readReverseFile({

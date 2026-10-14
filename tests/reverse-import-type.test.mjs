@@ -63,7 +63,7 @@ function setup(t) {
 
 test("Reveal exige seleção, aceita os quatro tipos e limpa a escolha entre arquivos", async t => {
     const { root, form, confirm, modal, query, elements } = setup(t);
-    for (const type of ["return", "missorted", "liquidate", "intercept"]) {
+    for (const type of ["return", "missorted", "liquidate", "confiscated"]) {
         const pending = requestReverseImportType(root);
         assert.equal(form.selected, null);
         assert.equal(confirm.disabled, true);
@@ -74,7 +74,7 @@ test("Reveal exige seleção, aceita os quatro tipos e limpa a escolha entre arq
         form.emit("change");
         assert.equal(confirm.disabled, false);
         form.emit("submit");
-        assert.equal(await pending, type === "intercept" ? "confiscated" : type);
+        assert.equal(await pending, type);
         assert.equal(form.listeners.size, 0);
         assert.equal(query.listeners.size, 0);
     }
@@ -84,6 +84,9 @@ test("instrução de classificação da TO permanece fixa no HTML", () => {
     const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
     const instruction = html.match(/id="reverseImportTypeModal"[\s\S]*?<p(?:\s[^>]*)?>([^<]*)<\/p>/);
     assert.equal(instruction?.[1], classificationPrompt);
+    const modal = html.match(/id="reverseImportTypeModal"[\s\S]*?<\/form>/)?.[0] ?? "";
+    assert.match(modal, /value="confiscated" required> Confiscado<\/label>/);
+    assert.doesNotMatch(modal, /Intercept/i);
 });
 
 test("fechar o Reveal cancela a importação antes da leitura e preserva dados existentes", async t => {
@@ -104,7 +107,7 @@ test("fechar o Reveal cancela a importação antes da leitura e preserva dados e
     assert.deepEqual(getReverseState(), previousState);
 });
 
-test("confirmação ocorre antes da leitura e Intercept classifica a TO inteira como Confiscado", async t => {
+test("confirmação ocorre antes da leitura e Confiscado classifica a TO inteira", async t => {
     const { root, form, input, button } = setup(t);
     let reads = 0;
     const rows = [["", "Total Scanned Orders", "Total Actual Orders"], ["TO Number", "TOTESTE"], ["Total Orders", 2, 2]];
@@ -115,7 +118,7 @@ test("confirmação ocorre antes da leitura e Intercept classifica a TO inteira 
     initializeReverseImport(root);
     const pending = input.emit("change");
     assert.equal(reads, 0);
-    form.selected = "intercept";
+    form.selected = "confiscated";
     form.emit("change");
     form.emit("submit");
     await pending;
@@ -138,7 +141,7 @@ test("notificação usa o código da TO sem prefixo duplicado, tipo escolhido e 
 
     for (const [type, label, action] of [
         ["missorted", "Missorted", "adicionada"], ["return", "Return", "atualizada"],
-        ["liquidate", "Liquidate", "atualizada"], ["intercept", "Intercept", "atualizada"],
+        ["liquidate", "Liquidate", "atualizada"], ["confiscated", "Confiscado", "atualizada"],
     ]) {
         const pending = input.emit("change");
         form.selected = type;

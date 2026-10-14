@@ -86,8 +86,6 @@ function normalizeReverseType(
     }
 
     if (
-        normalizedValue === "intercept" ||
-        normalizedValue === "interceptado" ||
         normalizedValue === "confiscado" ||
         normalizedValue === "confiscated"
     ) {

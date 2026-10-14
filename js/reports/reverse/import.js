@@ -477,9 +477,7 @@ function initializeReverseImport(
                         ? "atualizada"
                         : "adicionada";
                 const typeLabel =
-                    reverseType === "confiscated"
-                        ? "Intercept"
-                        : REVERSE_TYPE_DEFINITIONS[reverseType].label;
+                    REVERSE_TYPE_DEFINITIONS[reverseType].label;
 
                 setReportNotification({
                     reportId: "reverse",
