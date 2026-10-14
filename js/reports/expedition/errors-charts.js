@@ -1,3 +1,5 @@
+import { CHART_TEXT_COLOR } from "../../charts/theme.js";
+
 import {
     getExpeditionErrorAnalysis,
     getExpeditionState,
@@ -222,7 +224,7 @@ const expeditionStreetBarValuesPlugin = {
             '600 14px "Open Sans", sans-serif';
         context.textAlign = "center";
         context.textBaseline = "bottom";
-        context.fillStyle = "#e4e6eb";
+        context.fillStyle = CHART_TEXT_COLOR;
         context.strokeStyle = "#18191a";
         context.lineWidth = 3;
 
@@ -347,7 +349,7 @@ function createErrorBalanceChart(
                         grace: "12%",
 
                         ticks: {
-                            color: "#e4e6eb",
+                            color: CHART_TEXT_COLOR,
                             precision: 0,
                             font:
                                 ERROR_CHART_FONT,
@@ -371,7 +373,7 @@ function createErrorBalanceChart(
                         },
 
                         ticks: {
-                            color: "#e4e6eb",
+                            color: CHART_TEXT_COLOR,
                             font:
                                 ERROR_CHART_FONT,
                         },
@@ -508,7 +510,7 @@ function createStreetOccurrencesChart(
                 scales: {
                     x: {
                         ticks: {
-                            color: "#e4e6eb",
+                            color: CHART_TEXT_COLOR,
                             autoSkip: false,
                             maxRotation: 0,
                             font:
@@ -525,7 +527,7 @@ function createStreetOccurrencesChart(
                         grace: "15%",
 
                         ticks: {
-                            color: "#e4e6eb",
+                            color: CHART_TEXT_COLOR,
                             precision: 0,
                             font:
                                 ERROR_CHART_FONT,

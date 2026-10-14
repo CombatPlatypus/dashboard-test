@@ -8,6 +8,14 @@
     }
 
     chartLibrary.defaults.font.family = "'Open Sans', sans-serif";
+    chartLibrary.defaults.color = "#a8a9ad";
+
+    const tooltip = chartLibrary.defaults.plugins?.tooltip;
+    if (tooltip) {
+        tooltip.titleColor = "#a8a9ad";
+        tooltip.bodyColor = "#a8a9ad";
+        tooltip.footerColor = "#a8a9ad";
+    }
 
     const fonts = document.fonts;
 

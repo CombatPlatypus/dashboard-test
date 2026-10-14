@@ -4,6 +4,8 @@ const MAX_CHART_ITEMS = 25;
 
 const MAX_PIE_ITEMS = 10;
 
+const ANALYSIS_CHART_TEXT_COLOR = "#a8a9ad";
+
 /* ELEMENTOS DA MONTAGEM DE GRÁFICOS */
 
 const chartPanel = document.getElementById("statisticsChartPanel");
@@ -97,7 +99,7 @@ const chartPercentagePlugin = {
             "middle";
 
         context.fillStyle =
-            "#ffffff";
+            ANALYSIS_CHART_TEXT_COLOR;
 
         context.strokeStyle =
             "rgba(24, 25, 26, 0.85)";
@@ -215,7 +217,7 @@ const chartValueLabelsPlugin = {
             }
 
             context.strokeStyle = "#18191a";
-            context.fillStyle = "#e4e6eb";
+            context.fillStyle = ANALYSIS_CHART_TEXT_COLOR;
             context.strokeText(text, element.x, textPosition);
             context.fillText(text, element.x, textPosition);
         });
@@ -280,7 +282,7 @@ function createPieLegendLabels(chart) {
                 strokeStyle:
                     dataset.borderColor,
 
-                fontColor: "#e4e6eb",
+                fontColor: ANALYSIS_CHART_TEXT_COLOR,
 
                 lineWidth:
                     dataset.borderWidth,
@@ -825,7 +827,7 @@ function createChartScales(chartData) {
     return {
         x: {
             ticks: {
-                color: "#e4e6eb",
+                color: ANALYSIS_CHART_TEXT_COLOR,
                 padding: 12,
                 maxRotation: 45,
                 minRotation: 0,
@@ -855,7 +857,7 @@ function createChartScales(chartData) {
             grace: "5%",
 
             ticks: {
-                color: "#e4e6eb",
+                color: ANALYSIS_CHART_TEXT_COLOR,
                 padding: 12,
                 stepSize,
 
@@ -926,7 +928,7 @@ function renderChart() {
                     display: pieChart,
                     position: "bottom",
                     labels: {
-                        color: "#e4e6eb",
+                        color: ANALYSIS_CHART_TEXT_COLOR,
                         padding: 15,
                         usePointStyle: true,
                         generateLabels:
@@ -940,7 +942,7 @@ function renderChart() {
                 title: {
                     display: true,
                     text: chartData.title,
-                    color: "#e4e6eb",
+                    color: ANALYSIS_CHART_TEXT_COLOR,
                     font: {
                         family: "'Open Sans', sans-serif",
                         size: 16,

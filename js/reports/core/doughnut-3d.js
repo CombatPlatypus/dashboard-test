@@ -1,3 +1,5 @@
+import { CHART_TEXT_COLOR } from "../../charts/theme.js";
+
 const fullCircle = Math.PI * 2;
 const startAngle = -Math.PI / 2;
 const ellipseScale = 0.7;
@@ -192,7 +194,7 @@ function drawDoughnut3DCenterText(chart, geometry, { text = "—", label = "" } 
     context.save();
     context.textAlign = "center";
     context.textBaseline = "middle";
-    context.fillStyle = "#a8a9ad";
+    context.fillStyle = CHART_TEXT_COLOR;
     context.font = `${lineHeight}px ${fontFamily}`;
     context.letterSpacing = "1px";
     context.fillText(text, geometry.centerX, geometry.textCenterY - lineOffset);

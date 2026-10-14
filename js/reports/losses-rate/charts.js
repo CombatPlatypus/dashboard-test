@@ -1,3 +1,5 @@
+import { CHART_TEXT_COLOR } from "../../charts/theme.js";
+
 import {
     LOSSES_RATE_MONTHS,
     getLossesRateMonthSummary,
@@ -191,7 +193,7 @@ const lossesRateMaximumReferencePlugin = {
             "#18191a";
 
         context.fillStyle =
-            "#d9534f";
+            CHART_TEXT_COLOR;
 
         context.strokeText(
             label,
@@ -295,7 +297,7 @@ const lossesRateHistoryLabelsPlugin = {
                             "#18191a";
 
                         context.fillStyle =
-                            "#e4e6eb";
+                            CHART_TEXT_COLOR;
 
                         context.strokeText(
                             text,
@@ -518,7 +520,7 @@ function createLossesRateHistoryChart(
                 scales: {
                     x: {
                         ticks: {
-                            color: "#e4e6eb",
+                            color: CHART_TEXT_COLOR,
                         },
 
                         grid: {
@@ -533,7 +535,7 @@ function createLossesRateHistoryChart(
                             LOSSES_RATE_HISTORY_INITIAL_MAXIMUM,
 
                         ticks: {
-                            color: "#e4e6eb",
+                            color: CHART_TEXT_COLOR,
                             stepSize: 0.01,
                             precision: 3,
 

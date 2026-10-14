@@ -1,3 +1,5 @@
+import { CHART_TEXT_COLOR } from "../../charts/theme.js";
+
 import {
     getLossesState,
     getLossesSummary,
@@ -46,7 +48,7 @@ function drawLossesChartText(
     positionX,
     positionY,
     {
-        color = "#e4e6eb",
+        color = CHART_TEXT_COLOR,
         align = "center",
         font = '600 14px "Open Sans", sans-serif',
         outline = true,
@@ -358,7 +360,7 @@ function createLossesPeriodChart(canvas) {
                 x: {
                     stacked: true,
                     ticks: {
-                        color: "#bfc2c8",
+                        color: CHART_TEXT_COLOR,
                         font: { size: 13 },
                     },
                     grid: {
@@ -370,7 +372,7 @@ function createLossesPeriodChart(canvas) {
                     stacked: true,
                     beginAtZero: true,
                     ticks: {
-                        color: "#bfc2c8",
+                        color: CHART_TEXT_COLOR,
                         precision: 0,
                         font: { size: 13 },
                     },
@@ -442,7 +444,7 @@ function createLossesPackRecoveryChart(canvas) {
                 },
                 y: {
                     ticks: {
-                        color: "#e4e6eb",
+                        color: CHART_TEXT_COLOR,
                         font: { size: 14 },
                         padding: 12,
                     },
@@ -511,7 +513,7 @@ function createLossesReturnedComparisonChart(canvas) {
                 },
                 y: {
                     ticks: {
-                        color: "#e4e6eb",
+                        color: CHART_TEXT_COLOR,
                         font: { size: 14 },
                         padding: 12,
                     },

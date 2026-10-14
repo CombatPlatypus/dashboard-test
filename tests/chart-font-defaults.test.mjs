@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 import { runInNewContext } from "node:vm";
 import { test } from "node:test";
+import { CHART_TEXT_COLOR } from "../js/charts/theme.js";
 
 const source = readFileSync(new URL("../js/charts/defaults.js", import.meta.url), "utf8");
 const flushPromises = () => new Promise(resolve => setImmediate(resolve));
@@ -9,7 +10,10 @@ const flushPromises = () => new Promise(resolve => setImmediate(resolve));
 function configure(fonts, instances = {}) {
     const frames = [];
     const warnings = [];
-    const chartLibrary = { defaults: { font: { family: "Helvetica", size: 12, weight: null } }, instances };
+    const chartLibrary = { defaults: {
+        font: { family: "Helvetica", size: 12, weight: null },
+        plugins: { tooltip: { titleColor: "#fff", bodyColor: "#fff", footerColor: "#fff" } },
+    }, instances };
     runInNewContext(source, {
         window: { Chart: chartLibrary, requestAnimationFrame(callback) { frames.push(callback); return frames.length; } },
         document: { fonts },
@@ -23,6 +27,15 @@ test("Open Sans é o padrão global antes da criação dos gráficos, sem altera
     assert.deepEqual(chartLibrary.defaults.font, { family: "'Open Sans', sans-serif", size: 12, weight: null });
     assert.equal(frames.length, 0);
     assert.doesNotThrow(() => runInNewContext(source, { window: {}, document: {} }));
+});
+
+test("textos e tooltips dos gráficos atuais e futuros usam #a8a9ad por padrão", () => {
+    const { chartLibrary } = configure(undefined);
+    assert.equal(CHART_TEXT_COLOR, "#a8a9ad");
+    assert.equal(chartLibrary.defaults.color, CHART_TEXT_COLOR);
+    for (const property of ["titleColor", "bodyColor", "footerColor"]) {
+        assert.equal(chartLibrary.defaults.plugins.tooltip[property], CHART_TEXT_COLOR);
+    }
 });
 
 test("carrega os três pesos locais e redesenha gráficos atuais e futuros quando a fonte fica pronta", async () => {

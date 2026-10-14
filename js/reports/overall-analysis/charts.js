@@ -1,3 +1,5 @@
+import { CHART_TEXT_COLOR } from "../../charts/theme.js";
+
 import {
     formatOverallAnalysisQuantity,
 } from "./view.js";
@@ -229,7 +231,7 @@ const overallAnalysisBarValuesPlugin = {
         context.strokeStyle =
             "#101010";
         context.fillStyle =
-            "#e4e6eb";
+            CHART_TEXT_COLOR;
 
         chart.data.datasets.forEach(
             function (
@@ -411,7 +413,7 @@ function createOverallAnalysisChart(
                                 display: true,
                                 text:
                                     "Quantidade de pacotes",
-                                color: "#e4e6eb",
+                                color: CHART_TEXT_COLOR,
 
                                 font:
                                     OVERALL_ANALYSIS_CHART_FONT,
@@ -422,7 +424,7 @@ function createOverallAnalysisChart(
                             },
 
                             ticks: {
-                                color: "#e4e6eb",
+                                color: CHART_TEXT_COLOR,
                                 precision: 0,
 
                                 font:
@@ -452,7 +454,7 @@ function createOverallAnalysisChart(
                             },
 
                             ticks: {
-                                color: "#e4e6eb",
+                                color: CHART_TEXT_COLOR,
                                 autoSkip: false,
                                 padding: 8,
 

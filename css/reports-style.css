@@ -444,7 +444,7 @@
 
         #parcel .horizontal-bars-chart .chart-canvas-container,
         #parcel .vertical-bars-chart .chart-canvas-container {
-            margin: 0 20px 0px 20px;
+            margin: 0 20px 20px 20px;
         }
 
         /* RELATÓRIO FINAL  */

@@ -1,3 +1,5 @@
+import { CHART_TEXT_COLOR } from "../../charts/theme.js";
+
 const parcelHorizontalQuantityFormatter = new Intl.NumberFormat("pt-BR", {
     maximumFractionDigits: 0,
 });
@@ -63,7 +65,7 @@ const parcelHorizontalValues = {
         context.save();
         if ("letterSpacing" in context) context.letterSpacing = "0px";
         context.font = '600 14px "Open Sans", sans-serif';
-        context.fillStyle = "#e4e6eb";
+        context.fillStyle = CHART_TEXT_COLOR;
         context.textAlign = "left";
         context.textBaseline = "middle";
         chart.getDatasetMeta(0).data.forEach((bar, index) => {
@@ -111,7 +113,7 @@ function createParcelHorizontalChart(canvas, color) {
                 y: {
                     afterFit: fitParcelHorizontalLabels,
                     ticks: {
-                        color: "#e4e6eb",
+                        color: CHART_TEXT_COLOR,
                         font: parcelHorizontalLabelFont,
                         padding: 12,
                         autoSkip: false,

@@ -1,3 +1,5 @@
+import { CHART_TEXT_COLOR } from "../../charts/theme.js";
+
 import {
     createParcelSummary,
 } from "./model.js";
@@ -152,7 +154,7 @@ const parcelAgingValueLabels = {
             );
 
         context.save();
-        context.fillStyle = "#f7f7f7";
+        context.fillStyle = CHART_TEXT_COLOR;
         context.font =
             '600 11px "Open Sans", sans-serif';
         context.textAlign = "center";
@@ -306,7 +308,7 @@ function createParcelVerticalChart(
                             display: false,
                         },
                         ticks: {
-                            color: "#a8a9ad",
+                            color: CHART_TEXT_COLOR,
                             font: {
                                 size: 14,
                             },
@@ -320,7 +322,7 @@ function createParcelVerticalChart(
                                 "rgba(255, 255, 255, 0.10)",
                         },
                         ticks: {
-                            color: "#b7b7b7",
+                            color: CHART_TEXT_COLOR,
                             precision: 0,
                         },
                     },

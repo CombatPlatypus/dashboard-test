@@ -1,3 +1,5 @@
+import { CHART_TEXT_COLOR } from "../../charts/theme.js";
+
 import {
     getDamageAndLossesState,
     getDamageAndLossesSummary,
@@ -85,7 +87,7 @@ function drawDamageChartText(
     positionX,
     positionY,
     {
-        color = "#e4e6eb",
+        color = CHART_TEXT_COLOR,
         align = "center",
         font =
             '600 14px "Open Sans", sans-serif',
@@ -593,7 +595,7 @@ function createDamageLastSevenDaysChart(
                         stacked: true,
 
                         ticks: {
-                            color: "#bfc2c8",
+                            color: CHART_TEXT_COLOR,
                             font: {
                                 size: 14,
                             },
@@ -614,7 +616,7 @@ function createDamageLastSevenDaysChart(
                         beginAtZero: true,
 
                         ticks: {
-                            color: "#bfc2c8",
+                            color: CHART_TEXT_COLOR,
                             precision: 0,
                             font: {
                                 size: 14,
@@ -699,7 +701,7 @@ function createDamageSocChart(
                         beginAtZero: true,
 
                         ticks: {
-                            color: "#bfc2c8",
+                            color: CHART_TEXT_COLOR,
                             precision: 0,
                             font: {
                                 size: 14,
@@ -718,7 +720,7 @@ function createDamageSocChart(
 
                     y: {
                         ticks: {
-                            color: "#e4e6eb",
+                            color: CHART_TEXT_COLOR,
                             font: {
                                 size: 14,
                             },
