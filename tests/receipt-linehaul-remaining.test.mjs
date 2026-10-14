@@ -92,15 +92,18 @@ test("só conclui após marcar todos os LHs, mesmo quando o volume restante já 
     assert.equal(getReceiptLinehaulSummary().unloadedVolume, 100);
 });
 
-test("HTML acrescenta Volume Restante após Volume Esperado e a visualização usa o resumo", () => {
+test("HTML oculta Volume Restante ao concluir e mantém um único Volume Descarregado", () => {
     const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
     const firstTable = html.match(/id="receiptLinehaulExportArea">[\s\S]*?<table>([\s\S]*?)<\/table>/)[1];
     assert.match(firstTable, /<th>Volume Esperado<\/th>\s*<th id="receiptLinehaulPreviewVolumeLabel">Volume Restante<\/th>\s*<th>Volume Descarregado<\/th>/);
+    assert.equal([...firstTable.matchAll(/<th>Volume Descarregado<\/th>/g)].length, 1);
     assert.match(firstTable, /id="receiptLinehaulPreviewExpected">—<\/td>\s*<td id="receiptLinehaulPreviewRemainingVolume">—<\/td>/);
     assert.equal([...html.matchAll(/id="receiptLinehaulPreviewRemainingVolume"/g)].length, 1);
     const view = readFileSync(new URL("../js/reports/receipt/linehaul-view.js", import.meta.url), "utf8");
     assert.match(view, /previewRemainingVolume:\s*getReceiptLinehaulElement\(\s*rootElement,\s*"receiptLinehaulPreviewRemainingVolume"/);
-    assert.match(view, /elements\.previewRemainingVolume\s*\.textContent\s*=\s*hasData\s*\? formatReceiptLinehaulQuantity\(\s*summary\.allLinehaulsUnloaded\s*\? summary\.unloadedVolume\s*:\s*summary\.remainingVolume,/);
-    assert.match(view, /previewVolumeLabel:\s*getReceiptLinehaulElement\(\s*rootElement,\s*"receiptLinehaulPreviewVolumeLabel"/);
-    assert.match(view, /elements\.previewVolumeLabel\.textContent\s*=\s*summary\.allLinehaulsUnloaded\s*\? "Volume Descarregado"\s*:\s*"Volume Restante"/);
+    assert.match(view, /previewRemainingLabel:\s*getReceiptLinehaulElement\(\s*rootElement,\s*"receiptLinehaulPreviewVolumeLabel"/);
+    assert.match(view, /elements\.previewRemainingVolume\s*\.textContent\s*=\s*hasData\s*\? formatReceiptLinehaulQuantity\(\s*summary\.remainingVolume,/);
+    assert.match(view, /elements\.previewRemainingLabel\.hidden\s*=\s*summary\.allLinehaulsUnloaded/);
+    assert.match(view, /elements\.previewRemainingVolume\.hidden\s*=\s*summary\.allLinehaulsUnloaded/);
+    assert.doesNotMatch(view, /summary\.allLinehaulsUnloaded\s*\?\s*summary\.unloadedVolume/);
 });
