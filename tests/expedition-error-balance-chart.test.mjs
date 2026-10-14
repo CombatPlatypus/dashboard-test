@@ -72,7 +72,7 @@ function createInput(field) {
     return input;
 }
 
-test("gráfico troca Identificados por Etiqueta e Sorting, na ordem e nas cores solicitadas", t => {
+test("gráfico usa o novo título e mantém Etiqueta, Sorting, Revertidos e Saldo Final", t => {
     const { chart } = createCharts(t);
     assert.equal(chart.type, "bar");
     assert.equal(chart.options.indexAxis, "y");
@@ -80,8 +80,8 @@ test("gráfico troca Identificados por Etiqueta e Sorting, na ordem e nas cores 
     assert.deepEqual(chart.data.datasets[0].data, [0, 0, 0, 0]);
     assert.deepEqual(chart.data.datasets[0].backgroundColor, colors);
     const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
-    assert.match(html, /<h4>Erros de Etiqueta x Erros de Sorting x Revertidos x Saldo Final<\/h4>/);
-    assert.doesNotMatch(html, /Identificados x Revertidos x Saldo Final/);
+    assert.match(html, /<h4>Acompanhamento dos Erros<\/h4>/);
+    assert.doesNotMatch(html, /(?:Identificados|Erros de Etiqueta x Erros de Sorting) x? Revertidos x Saldo Final/);
     const view = readFileSync(new URL("../js/reports/expedition/view.js", import.meta.url), "utf8");
     for (const [element, field] of [["labelingErrorsInput", "labelingErrors"],
         ["sortingErrorsInput", "sortingErrors"], ["revertedInput", "revertedErrors"]]) {
