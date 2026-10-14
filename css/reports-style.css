@@ -1087,7 +1087,7 @@
         grid-template-columns: repeat(auto-fit, minmax(100%, 1fr)) !important;
     }
     #expedition #expeditionStreetGuardianControls {
-        max-height: 827px;
+        max-height: 830px;
         overflow-y: auto;
         padding-right: 15px;
     }
@@ -1107,7 +1107,7 @@
       text-transform: capitalize;
     }
     #expedition #expeditionStreetGuardianControls.is-errors-tab-active {
-        max-height: 465px;
+        max-height: 468px;
     }
 
     /* EXPEDIÇÃO - REVEAL */
