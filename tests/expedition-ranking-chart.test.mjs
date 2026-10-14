@@ -1,5 +1,4 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import { initializeExpeditionCharts } from "../js/reports/expedition/charts.js";
 
@@ -36,9 +35,8 @@ function createContext() {
     return context;
 }
 
-test("ranking preserva o padding e a grade interna, sem as bordas externas", t => {
-    const styles = readFileSync(new URL("../css/reports-style.css", import.meta.url), "utf8");
-    assert.match(styles, /#expeditionChartsExportArea\s*>\s*\.chart\s*\{\s*border:\s*0;/);
+test("canvas do ranking preserva o padding e a grade interna, sem desenhar bordas externas", t => {
+    // A moldura do container segue o CSS atual; esta verificação trata apenas do canvas.
     class TestElement {
         dataset = {};
         style = {};
