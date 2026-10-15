@@ -344,10 +344,7 @@ function validateReportSessionPayload(
             lossesRate.months,
         ) ||
         lossesRate.months.length !==
-            12 ||
-        !isSessionObject(
-            lossesRate.identification,
-        )
+            12
     ) {
         throw new TypeError(
             "Os dados da Taxa de Perdas são inválidos.",
