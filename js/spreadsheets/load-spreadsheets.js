@@ -44,7 +44,7 @@ const DEFAULT_COLLECTION_APP_URL =
 const FALLBACK_SPREADSHEET_SETTINGS =
     Object.freeze([
         {
-            spreadsheetId: "1SGoeFt_aVK0sZ5Ivz3ORD1Hd75sxH-A-HYqHX8wWXKY",
+            spreadsheetId: "15goeiy-QDNIVC6N1kFSG55rqECRwv58FMXwgoDyt25o",
             menuName: "Checklist Operacional",
         },
         {

@@ -18,7 +18,7 @@ const configPath =
     );
 
 const expectedSpreadsheets = [
-    ["Checklist Operacional", "1SGoeFt_aVK0sZ5Ivz3ORD1Hd75sxH-A-HYqHX8wWXKY"],
+    ["Checklist Operacional", "15goeiy-QDNIVC6N1kFSG55rqECRwv58FMXwgoDyt25o"],
     ["Avarias", "1WaHywDEm3ipdvEtq-pB01v4kyaREhn2i"],
     ["Pacotes em Análise", "1xJZpuck84CM9-FTYd5UnWbZ4AezWUdGx"],
     ["Backlog e Logs", "1cbHXjnfHGIDSob9Sh977p5J827qPlM5f9juRq_sIgcM"],

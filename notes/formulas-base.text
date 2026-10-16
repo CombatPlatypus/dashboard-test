@@ -503,3 +503,78 @@ EXEMPLOS PRATICOS
     ={"Data de Envio";ARRAYFORMULA(SE(B3:B="";"";PROCX(B3:B;{'Base de TOs'!A3:A; 'Base de TOs'!E3:E; 'Base de TOs'!I3:I; 'Base de TOs'!M3:M };{'Base de TOs'!B3:B; 'Base de TOs'!F3:F; 'Base de TOs'!J3:J; 'Base de TOs'!N3:N };"")))}
 
     ={"Aging";ARRAYFORMULA(SE(C3:C=""; ""; HOJE()-C3:C))}
+
+
+    ={"Pacotes";
+    ARRAYFORMULA(
+        PROCX(
+        FILTER(A12:A; A12:A<>"");
+        'Base do Processamento'!D2:D;
+        'Base do Processamento'!E2:E;
+        ""
+        )
+    )
+    }
+
+={
+    "Pacotes";
+
+    ARRAYFORMULA(
+        SE(
+            A12:A="";
+            "";
+            CONT.SES(
+                'Base do Processamento'!D2:D;A12:A;
+                'Base do Processamento'!A2:A;"<>"
+            )
+        )
+    )
+}
+
+
+=SOMA(
+    ARRAYFORMULA(
+        CONT.SES(
+            intervalo_dos_BRs_processados;
+            lista_dos_BRs_com_erro;
+
+            intervalo_dos_operadores;
+            operador_procurado
+        )
+    )
+)
+    =SOMA(
+        CONT.SES(
+            'Base do Processamento'!A2:A;
+            'Base de Erros'!A2:A;
+
+            'Base do Processamento'!D2:D;
+            A12
+        )
+    )
+
+
+=SOMA(
+    ARRAYFORMULA(
+        CONT.SES(
+            'Base do Processamento'!A2:A;
+            FILTER(
+                'Base de Erros'!A2:A;
+                'Base de Erros'!A2:A<>""
+            );
+
+            'Base do Processamento'!D2:D;
+            A12:A
+        )
+    )
+)
+
+
+        =QUERY(
+            
+            { A12:A \ 'Base do Processamento'!D2:D \ 'Base do Processamento'!A2:A \ 'Base de Erros'!A2:A };
+
+            "SELECT COUNT(Col3) WHERE Col"; 
+
+            0
+        )
