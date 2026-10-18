@@ -109,7 +109,7 @@ function drawDamageChartText(
         color = CHART_TEXT_COLOR,
         align = "center",
         font =
-            '600 14px "Open Sans", sans-serif',
+            '600 15px "Open Sans", sans-serif',
     } = {},
 ) {
     context.font = font;
@@ -202,7 +202,7 @@ const damageChartAveragePlugin = {
             {
                 align: "center",
                 font:
-                    '600 14px "Open Sans", sans-serif',
+                    '600 15px "Open Sans", sans-serif',
             },
         );
 

@@ -69,7 +69,7 @@ function drawLossesChartText(
     {
         color = CHART_TEXT_COLOR,
         align = "center",
-        font = '600 14px "Open Sans", sans-serif',
+        font = '600 15px "Open Sans", sans-serif',
         outline = true,
     } = {},
 ) {
@@ -145,7 +145,7 @@ const lossesAveragePlugin = {
             positionY + 10,
             {
                 align: "center",
-                font: '600 14px "Open Sans", sans-serif',
+                font: '600 15px "Open Sans", sans-serif',
             },
         );
 
@@ -359,7 +359,7 @@ function createLossesPeriodChart(canvas) {
                     stacked: true,
                     ticks: {
                         color: CHART_TEXT_COLOR,
-                        font: { size: 13 },
+                        font: { size: 14 },
                     },
                     grid: {
                         color: "rgba(82, 82, 82, 0.35)",
@@ -372,7 +372,7 @@ function createLossesPeriodChart(canvas) {
                     ticks: {
                         color: CHART_TEXT_COLOR,
                         precision: 0,
-                        font: { size: 13 },
+                        font: { size: 14 },
                     },
                     grid: {
                         color: "rgba(82, 82, 82, 0.35)",
