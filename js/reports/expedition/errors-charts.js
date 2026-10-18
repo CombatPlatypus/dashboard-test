@@ -326,16 +326,16 @@ const expeditionErrorBalance3DPlugin = {
                     y: area.top - depthY,
                 },
                 {
-                    x: area.left,
-                    y: area.top,
+                    x: area.left + depthX,
+                    y: area.top + depthY,
                 },
                 {
-                    x: area.left,
-                    y: area.bottom,
+                    x: area.left + depthX,
+                    y: area.bottom + depthY,
                 },
                 {
                     x: area.left - depthX,
-                    y: area.bottom + depthY,
+                    y: area.bottom - depthY,
                 },
             ],
             ERROR_BALANCE_3D_BASE_COLOR,

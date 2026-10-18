@@ -133,7 +133,7 @@ test("projeção 3D desenha a base e as faces inferior e lateral de cada barra",
     chart.plugins[1].beforeDatasetDraw(chart, { index: 0, meta: { data: [bar] } });
     assert.deepEqual(paths, [
         {
-            points: [[2, 1], [12, 10], [12, 220], [2, 229]],
+            points: [[2, 1], [22, 19], [22, 229], [2, 211]],
             color: "rgba(168, 169, 173, 0.16)",
         },
         {
