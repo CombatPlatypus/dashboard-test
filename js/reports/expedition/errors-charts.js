@@ -29,6 +29,12 @@ const ERROR_BALANCE_3D_DEPTH = {
     y: 9,
 };
 
+const ERROR_BALANCE_3D_BASE_COLOR =
+    "rgba(168, 169, 173, 0.16)";
+
+const ERROR_BALANCE_3D_BASE_BORDER_COLOR =
+    "rgba(168, 169, 173, 0.34)";
+
 const errorChartQuantityFormatter =
     new Intl.NumberFormat(
         "pt-BR",
@@ -265,6 +271,7 @@ function drawErrorBalanceFace(
     context,
     points,
     color,
+    borderColor = null,
 ) {
     context.beginPath();
     context.moveTo(
@@ -284,10 +291,59 @@ function drawErrorBalanceFace(
     context.closePath();
     context.fillStyle = color;
     context.fill();
+
+    if (borderColor) {
+        context.strokeStyle = borderColor;
+        context.lineWidth = 1;
+        context.stroke();
+    }
 }
 
 const expeditionErrorBalance3DPlugin = {
     id: "expeditionErrorBalance3D",
+
+    beforeDatasetsDraw(chart) {
+        const area = chart.chartArea;
+
+        if (!area) {
+            return;
+        }
+
+        const context = chart.ctx;
+        const depthX =
+            ERROR_BALANCE_3D_DEPTH.x;
+
+        const depthY =
+            ERROR_BALANCE_3D_DEPTH.y;
+
+        context.save();
+
+        drawErrorBalanceFace(
+            context,
+            [
+                {
+                    x: area.left - depthX,
+                    y: area.top - depthY,
+                },
+                {
+                    x: area.left,
+                    y: area.top,
+                },
+                {
+                    x: area.left,
+                    y: area.bottom,
+                },
+                {
+                    x: area.left - depthX,
+                    y: area.bottom + depthY,
+                },
+            ],
+            ERROR_BALANCE_3D_BASE_COLOR,
+            ERROR_BALANCE_3D_BASE_BORDER_COLOR,
+        );
+
+        context.restore();
+    },
 
     beforeDatasetDraw(
         chart,

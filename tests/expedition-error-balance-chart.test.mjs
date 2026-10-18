@@ -105,11 +105,12 @@ test("gráfico usa o novo título e mantém Etiqueta, Sorting, Revertidos e Sald
     }
 });
 
-test("projeção 3D desenha faces inferior e lateral derivadas da cor de cada barra", t => {
+test("projeção 3D desenha a base e as faces inferior e lateral de cada barra", t => {
     const { chart } = createCharts(t);
     const paths = [];
     const context = {
         currentPath: [],
+        strokes: [],
         save() {},
         restore() {},
         beginPath() { this.currentPath = []; },
@@ -117,6 +118,7 @@ test("projeção 3D desenha faces inferior e lateral derivadas da cor de cada ba
         lineTo(x, y) { this.currentPath.push([x, y]); },
         closePath() {},
         fill() { paths.push({ points: this.currentPath, color: this.fillStyle }); },
+        stroke() { this.strokes.push({ color: this.strokeStyle, width: this.lineWidth }); },
     };
     const bar = {
         getProps(properties, final) {
@@ -127,8 +129,13 @@ test("projeção 3D desenha faces inferior e lateral derivadas da cor de cada ba
     };
     chart.ctx = context;
     chart.chartArea = { left: 12, top: 10, right: 300, bottom: 220 };
+    chart.plugins[1].beforeDatasetsDraw(chart);
     chart.plugins[1].beforeDatasetDraw(chart, { index: 0, meta: { data: [bar] } });
     assert.deepEqual(paths, [
+        {
+            points: [[2, 1], [12, 10], [12, 220], [2, 229]],
+            color: "rgba(168, 169, 173, 0.16)",
+        },
         {
             points: [[12, 66], [112, 66], [122, 75], [22, 75]],
             color: "#252f69",
@@ -138,6 +145,10 @@ test("projeção 3D desenha faces inferior e lateral derivadas da cor de cada ba
             color: "#7582ca",
         },
     ]);
+    assert.deepEqual(context.strokes, [{
+        color: "rgba(168, 169, 173, 0.34)",
+        width: 1,
+    }]);
     assert.deepEqual(chart.options.layout.padding, { right: 10, bottom: 9 });
 });
 
