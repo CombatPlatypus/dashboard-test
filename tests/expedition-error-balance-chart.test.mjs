@@ -154,17 +154,16 @@ test("projeção 3D desenha a base e as faces inferior e lateral de cada barra",
         color: "rgba(168, 169, 173, 0.34)",
         width: 1,
     }]);
-    assert.deepEqual(chart.options.layout.padding, { right: 10, bottom: 9 });
+    assert.deepEqual(chart.options.layout.padding, { right: 56, bottom: 9 });
 });
 
-test("valores ficam dentro das barras com tipografia preta uniforme", t => {
+test("valores ficam fora das barras com tipografia branca uniforme", t => {
     const { chart } = createCharts(t);
     const texts = [];
     const context = {
         letterSpacing: "0px",
         save() {},
         restore() {},
-        measureText(text) { return { width: String(text).length * 8 }; },
         fillText(text, x, y) {
             texts.push({
                 text, x, y,
@@ -181,9 +180,9 @@ test("valores ficam dentro das barras com tipografia preta uniforme", t => {
     const bars = rightEdges.map((x, index) => ({
         horizontal: true,
         getProps(properties, final) {
-            assert.deepEqual(properties, ["x", "y", "base", "height"]);
+            assert.deepEqual(properties, ["x", "y", "base"]);
             assert.equal(final, false);
-            return { x, y: 40 + index * 50, base: 12, height: 32 };
+            return { x, y: 40 + index * 50, base: 12 };
         },
     }));
     chart.ctx = context;
@@ -192,13 +191,13 @@ test("valores ficam dentro das barras com tipografia preta uniforme", t => {
     chart.getDatasetMeta = () => ({ data: bars });
     chart.plugins[2].afterDatasetsDraw(chart);
     assert.deepEqual(texts, [
-        { text: "100", x: 100, y: 40, color: "#000", align: "right",
+        { text: "100", x: 132, y: 40, color: "#e4e6eb", align: "left",
             baseline: "middle", font: '600 16px "Open Sans", sans-serif', spacing: "1px" },
-        { text: "74", x: 80, y: 90, color: "#000", align: "right",
+        { text: "74", x: 112, y: 90, color: "#e4e6eb", align: "left",
             baseline: "middle", font: '600 16px "Open Sans", sans-serif', spacing: "1px" },
-        { text: "23", x: 50, y: 140, color: "#000", align: "right",
+        { text: "23", x: 82, y: 140, color: "#e4e6eb", align: "left",
             baseline: "middle", font: '600 16px "Open Sans", sans-serif', spacing: "1px" },
-        { text: "151", x: 150, y: 190, color: "#000", align: "right",
+        { text: "151", x: 182, y: 190, color: "#e4e6eb", align: "left",
             baseline: "middle", font: '600 16px "Open Sans", sans-serif', spacing: "1px" },
     ]);
 });

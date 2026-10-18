@@ -39,9 +39,11 @@ const ERROR_BALANCE_VALUE_FONT =
     '600 16px "Open Sans", sans-serif';
 
 const ERROR_BALANCE_VALUE_COLOR =
-    "#000";
+    "#e4e6eb";
 
-const ERROR_BALANCE_VALUE_INSET = 12;
+const ERROR_BALANCE_VALUE_GAP = 10;
+
+const ERROR_BALANCE_VALUE_RIGHT_PADDING = 56;
 
 const errorChartQuantityFormatter =
     new Intl.NumberFormat(
@@ -556,15 +558,8 @@ const expeditionErrorBalanceValuesPlugin = {
                         "x",
                         "y",
                         "base",
-                        "height",
                     ],
                     false,
-                );
-
-            const left =
-                Math.min(
-                    properties.base,
-                    properties.x,
                 );
 
             const right =
@@ -578,40 +573,12 @@ const expeditionErrorBalanceValuesPlugin = {
                     value,
                 );
 
-            const labelWidth =
-                context.measureText(
-                    label,
-                ).width;
-
-            const barWidth =
-                right - left;
-
-            if (
-                barWidth <
-                labelWidth + 4
-            ) {
-                return;
-            }
-
-            if (
-                barWidth >=
-                labelWidth +
-                ERROR_BALANCE_VALUE_INSET * 2
-            ) {
-                context.textAlign = "right";
-                context.fillText(
-                    label,
-                    right -
-                        ERROR_BALANCE_VALUE_INSET,
-                    properties.y,
-                );
-                return;
-            }
-
-            context.textAlign = "center";
+            context.textAlign = "left";
             context.fillText(
                 label,
-                left + barWidth / 2,
+                right +
+                    ERROR_BALANCE_3D_DEPTH.x +
+                    ERROR_BALANCE_VALUE_GAP,
                 properties.y,
             );
         });
@@ -726,7 +693,7 @@ function createErrorBalanceChart(
                 layout: {
                     padding: {
                         right:
-                            ERROR_BALANCE_3D_DEPTH.x,
+                            ERROR_BALANCE_VALUE_RIGHT_PADDING,
                         bottom:
                             ERROR_BALANCE_3D_DEPTH.y,
                     },
