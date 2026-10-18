@@ -38,6 +38,9 @@ const ERROR_BALANCE_3D_BASE_BORDER_COLOR =
 const ERROR_BALANCE_VALUE_FONT =
     '600 16px "Open Sans", sans-serif';
 
+const ERROR_BALANCE_VALUE_COLOR =
+    "#e4e6eb";
+
 const ERROR_BALANCE_VALUE_INSET = 12;
 
 const errorChartQuantityFormatter =
@@ -503,42 +506,6 @@ const expeditionErrorBalance3DPlugin = {
     },
 };
 
-function getErrorBalanceValueColor(
-    color,
-) {
-    const match =
-        typeof color === "string"
-            ? color.trim().match(
-                /^#([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i,
-            )
-            : null;
-
-    if (!match) {
-        return "#101010";
-    }
-
-    const [red, green, blue] =
-        match
-            .slice(1)
-            .map(function (component) {
-                return Number.parseInt(
-                    component,
-                    16,
-                );
-            });
-
-    const brightness =
-        (
-            red * 0.299 +
-            green * 0.587 +
-            blue * 0.114
-        ) / 255;
-
-    return brightness < 0.5
-        ? "#ffffff"
-        : "#101010";
-}
-
 const expeditionErrorBalanceValuesPlugin = {
     id: "expeditionErrorBalanceValues",
 
@@ -553,15 +520,14 @@ const expeditionErrorBalanceValuesPlugin = {
         const bars =
             chart.getDatasetMeta(0).data;
 
-        const colors =
-            dataset.backgroundColor;
-
         const context = chart.ctx;
 
         context.save();
         applyExpeditionErrorsTextSpacing(chart);
         context.font =
             ERROR_BALANCE_VALUE_FONT;
+        context.fillStyle =
+            ERROR_BALANCE_VALUE_COLOR;
         context.textBaseline = "middle";
 
         bars.forEach(function (
@@ -626,16 +592,6 @@ const expeditionErrorBalanceValuesPlugin = {
             ) {
                 return;
             }
-
-            const frontColor =
-                Array.isArray(colors)
-                    ? colors[index]
-                    : colors;
-
-            context.fillStyle =
-                getErrorBalanceValueColor(
-                    frontColor,
-                );
 
             if (
                 barWidth >=
@@ -818,6 +774,7 @@ function createErrorBalanceChart(
                         ticks: {
                             color: CHART_TEXT_COLOR,
                             precision: 0,
+                            padding: 10,
                             font:
                                 ERROR_CHART_FONT,
 

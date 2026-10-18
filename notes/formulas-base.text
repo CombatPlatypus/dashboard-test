@@ -766,7 +766,11 @@ EXEMPLOS PRATICOS
 ='Análise de Erros'!B2
 
 =SORT(
-    J10:L27;
-    coluna_ou_intervalo_de_ordenacao;
+    {
+        'Análise de Erros e Ruas'!J10:L17 \
+        ARRAYFORMULA('Análise de Erros e Ruas'!K10:K17 + 'Análise de Erros e Ruas'!L10:L17)
+    };
+    2;
     FALSO
 )
+

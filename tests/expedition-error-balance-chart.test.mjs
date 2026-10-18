@@ -97,6 +97,7 @@ test("gráfico usa o novo título e mantém Etiqueta, Sorting, Revertidos e Sald
     chart.options.scales.y.afterFit(labelScale);
     assert.equal(labelScale.width, 136);
     assert.equal(chart.options.scales.y.border.display, false);
+    assert.equal(chart.options.scales.x.ticks.padding, 10);
     assert.equal(chart.options.scales.x.grid.color({ tick: { value: 0 } }), "rgba(0, 0, 0, 0)");
     assert.equal(chart.options.scales.x.grid.color({ tick: { value: 20 } }), "rgba(82, 82, 82, 0.45)");
     const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
@@ -156,7 +157,7 @@ test("projeção 3D desenha a base e as faces inferior e lateral de cada barra",
     assert.deepEqual(chart.options.layout.padding, { right: 10, bottom: 9 });
 });
 
-test("valores ficam dentro das barras com contraste adequado a cada cor", t => {
+test("valores ficam dentro das barras com a tipografia branca padrão do dashboard", t => {
     const { chart } = createCharts(t);
     const texts = [];
     const context = {
@@ -191,13 +192,13 @@ test("valores ficam dentro das barras com contraste adequado a cada cor", t => {
     chart.getDatasetMeta = () => ({ data: bars });
     chart.plugins[2].afterDatasetsDraw(chart);
     assert.deepEqual(texts, [
-        { text: "100", x: 100, y: 40, color: "#ffffff", align: "right",
+        { text: "100", x: 100, y: 40, color: "#e4e6eb", align: "right",
             baseline: "middle", font: '600 16px "Open Sans", sans-serif', spacing: "1px" },
-        { text: "74", x: 80, y: 90, color: "#101010", align: "right",
+        { text: "74", x: 80, y: 90, color: "#e4e6eb", align: "right",
             baseline: "middle", font: '600 16px "Open Sans", sans-serif', spacing: "1px" },
-        { text: "23", x: 50, y: 140, color: "#101010", align: "right",
+        { text: "23", x: 50, y: 140, color: "#e4e6eb", align: "right",
             baseline: "middle", font: '600 16px "Open Sans", sans-serif', spacing: "1px" },
-        { text: "151", x: 150, y: 190, color: "#101010", align: "right",
+        { text: "151", x: 150, y: 190, color: "#e4e6eb", align: "right",
             baseline: "middle", font: '600 16px "Open Sans", sans-serif', spacing: "1px" },
     ]);
 });
