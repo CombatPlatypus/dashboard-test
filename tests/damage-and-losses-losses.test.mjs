@@ -198,6 +198,10 @@ test("comparação mostra Em Análise, Perdidos e Retornados nessa ordem, com co
     });
 
     assert.equal(initializeLossesCharts(panel), true);
+    const period = charts.get("lossesLastSevenDaysChart");
+    assert.ok(period.plugins.some(
+        plugin => plugin.id === "lossesPeriodBars3D",
+    ));
     const comparison = charts.get("lossesReturnedComparisonChart");
     assert.equal(comparison.options.indexAxis, "y");
     assert.deepEqual(comparison.data.labels, ["Em Análise", "Perdidos", "Retornados"]);

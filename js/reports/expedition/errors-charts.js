@@ -789,8 +789,12 @@ const expeditionStreetBarValuesPlugin = {
                             STREET_OCCURRENCES_3D_DEPTH.y -
                             8;
 
-                        context.strokeText(label, bar.x, labelY);
-                        context.fillText(label, bar.x, labelY);
+                        const labelX =
+                            bar.x +
+                            STREET_OCCURRENCES_3D_DEPTH.x / 2;
+
+                        context.strokeText(label, labelX, labelY);
+                        context.fillText(label, labelX, labelY);
                     },
                 );
             },

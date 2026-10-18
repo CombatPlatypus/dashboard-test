@@ -12,6 +12,11 @@ import {
     drawDoughnut3DCenterText,
 } from "../core/doughnut-3d.js";
 
+import {
+    STACKED_BAR_3D_DEPTH,
+    createStackedBars3DPlugin,
+} from "../core/stacked-bars-3d.js";
+
 const DAMAGE_SOC_COLOR =
     "#ffc107";
 
@@ -191,6 +196,11 @@ const damageChartAveragePlugin = {
     },
 };
 
+const damagePeriodBars3DPlugin =
+    createStackedBars3DPlugin({
+        id: "damagePeriodBars3D",
+    });
+
 const damageChartLabelsPlugin = {
     id: "damageChartLabels",
 
@@ -316,10 +326,14 @@ const damageChartLabelsPlugin = {
                         context,
                         damageChartQuantityFormatter
                             .format(total),
-                        positionX,
+                        positionX +
+                            STACKED_BAR_3D_DEPTH.x /
+                            2,
                         yScale.getPixelForValue(
                             total,
-                        ) - 11,
+                        ) -
+                            STACKED_BAR_3D_DEPTH.y -
+                            11,
                     );
                 }
             },
@@ -636,6 +650,7 @@ function createDamageLastSevenDaysChart(
             },
 
             plugins: [
+                damagePeriodBars3DPlugin,
                 damageChartAveragePlugin,
                 damageChartLabelsPlugin,
             ],

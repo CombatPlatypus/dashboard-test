@@ -6,6 +6,11 @@ import {
     subscribeLossesState,
 } from "./losses-state.js";
 
+import {
+    STACKED_BAR_3D_DEPTH,
+    createStackedBars3DPlugin,
+} from "../core/stacked-bars-3d.js";
+
 const LOSSES_REVIEW_COLOR = "#ffc107";
 const LOSSES_CONFIRMED_COLOR = "#F44336";
 const LOSSES_RETURNED_COLOR = "#66bb6a";
@@ -134,6 +139,11 @@ const lossesAveragePlugin = {
     },
 };
 
+const lossesPeriodBars3DPlugin =
+    createStackedBars3DPlugin({
+        id: "lossesPeriodBars3D",
+    });
+
 const lossesPeriodLabelsPlugin = {
     id: "lossesPeriodLabels",
 
@@ -209,8 +219,12 @@ const lossesPeriodLabelsPlugin = {
                     drawLossesChartText(
                         context,
                         lossesQuantityFormatter.format(total),
-                        positionX,
-                        yScale.getPixelForValue(total) - 11,
+                        positionX +
+                            STACKED_BAR_3D_DEPTH.x /
+                            2,
+                        yScale.getPixelForValue(total) -
+                            STACKED_BAR_3D_DEPTH.y -
+                            11,
                     );
                 }
             },
@@ -323,6 +337,7 @@ function createLossesPeriodChart(canvas) {
                     data: [],
                     backgroundColor: LOSSES_REVIEW_COLOR,
                     borderWidth: 0,
+                    borderSkipped: false,
                     stack: "losses",
                 },
                 {
@@ -330,6 +345,7 @@ function createLossesPeriodChart(canvas) {
                     data: [],
                     backgroundColor: LOSSES_CONFIRMED_COLOR,
                     borderWidth: 0,
+                    borderSkipped: false,
                     stack: "losses",
                 },
             ],
@@ -384,6 +400,7 @@ function createLossesPeriodChart(canvas) {
             },
         },
         plugins: [
+            lossesPeriodBars3DPlugin,
             lossesAveragePlugin,
             lossesPeriodLabelsPlugin,
         ],

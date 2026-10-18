@@ -109,6 +109,9 @@ test("gráfico e indicadores acompanham período, importação, restauração e 
     assert.equal(charts.length, 3);
     assert.equal(charts[0].type, "bar");
     assert.equal(charts[2].type, "bar");
+    assert.ok(charts[0].plugins.some(
+        plugin => plugin.id === "damagePeriodBars3D",
+    ));
     assert.deepEqual(charts[2].data.datasets[0].backgroundColor, ["#ffc107", "#ffc107"]);
     const composition = charts[1];
     const values = () => elements.slice(5).map(element => element.textContent);

@@ -98,10 +98,10 @@ test("ocorrências por rua exibe o valor acima de cada barra das duas séries", 
     };
     plugin.afterDatasetsDraw(chart);
     assert.deepEqual(texts, [
-        { text: "70", x: 40, y: 55, alignment: "center", baseline: "bottom" },
-        { text: "78", x: 140, y: 35, alignment: "center", baseline: "bottom" },
-        { text: "51", x: 70, y: 85, alignment: "center", baseline: "bottom" },
-        { text: "42", x: 170, y: 115, alignment: "center", baseline: "bottom" },
+        { text: "70", x: 44, y: 55, alignment: "center", baseline: "bottom" },
+        { text: "78", x: 144, y: 35, alignment: "center", baseline: "bottom" },
+        { text: "51", x: 74, y: 85, alignment: "center", baseline: "bottom" },
+        { text: "42", x: 174, y: 115, alignment: "center", baseline: "bottom" },
     ]);
     assert.equal(chart.ctx.letterSpacing, "1px");
     assert.equal(balanceCount, 0);
