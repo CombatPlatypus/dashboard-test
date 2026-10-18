@@ -45,6 +45,11 @@ const ERROR_BALANCE_VALUE_GAP = 10;
 
 const ERROR_BALANCE_VALUE_RIGHT_PADDING = 56;
 
+const STREET_OCCURRENCES_3D_DEPTH = {
+    x: 8,
+    y: 7,
+};
+
 const errorChartQuantityFormatter =
     new Intl.NumberFormat(
         "pt-BR",
@@ -229,7 +234,7 @@ const expeditionErrorsTextSpacingPlugin = {
     },
 };
 
-function mixErrorBalanceColor(
+function mixErrorChartColor(
     color,
     target,
     ratio,
@@ -277,7 +282,7 @@ function mixErrorBalanceColor(
     );
 }
 
-function drawErrorBalanceFace(
+function drawErrorChartFace(
     context,
     points,
     color,
@@ -328,7 +333,7 @@ const expeditionErrorBalance3DPlugin = {
 
         context.save();
 
-        drawErrorBalanceFace(
+        drawErrorChartFace(
             context,
             [
                 {
@@ -461,7 +466,7 @@ const expeditionErrorBalance3DPlugin = {
             const depthY =
                 ERROR_BALANCE_3D_DEPTH.y;
 
-            drawErrorBalanceFace(
+            drawErrorChartFace(
                 context,
                 [
                     { x: left, y: bottom },
@@ -475,14 +480,14 @@ const expeditionErrorBalance3DPlugin = {
                         y: bottom + depthY,
                     },
                 ],
-                mixErrorBalanceColor(
+                mixErrorChartColor(
                     frontColor,
                     "dark",
                     0.42,
                 ),
             );
 
-            drawErrorBalanceFace(
+            drawErrorChartFace(
                 context,
                 [
                     { x: right, y: top },
@@ -496,7 +501,7 @@ const expeditionErrorBalance3DPlugin = {
                     },
                     { x: right, y: bottom },
                 ],
-                mixErrorBalanceColor(
+                mixErrorChartColor(
                     frontColor,
                     "light",
                     0.28,
@@ -587,6 +592,158 @@ const expeditionErrorBalanceValuesPlugin = {
     },
 };
 
+const expeditionStreetBars3DPlugin = {
+    id: "expeditionStreetBars3D",
+
+    beforeDatasetDraw(
+        chart,
+        args,
+    ) {
+        if (!chart.chartArea) {
+            return;
+        }
+
+        const dataset =
+            chart.data.datasets[
+                args.index
+            ];
+
+        const bars =
+            args.meta?.data ??
+            chart.getDatasetMeta(
+                args.index,
+            ).data;
+
+        const colors =
+            dataset.backgroundColor;
+
+        const context = chart.ctx;
+        const depthX =
+            STREET_OCCURRENCES_3D_DEPTH.x;
+
+        const depthY =
+            STREET_OCCURRENCES_3D_DEPTH.y;
+
+        context.save();
+
+        bars.forEach(function (
+            bar,
+            index,
+        ) {
+            const properties =
+                typeof bar.getProps ===
+                "function"
+                    ? bar.getProps(
+                        [
+                            "x",
+                            "y",
+                            "base",
+                            "width",
+                        ],
+                        false,
+                    )
+                    : bar;
+
+            const values = [
+                properties.x,
+                properties.y,
+                properties.base,
+                properties.width,
+            ].map(Number);
+
+            if (
+                values.some(function (value) {
+                    return !Number.isFinite(value);
+                })
+            ) {
+                return;
+            }
+
+            const [
+                x,
+                y,
+                base,
+                width,
+            ] = values;
+
+            const top =
+                Math.min(y, base);
+
+            const bottom =
+                Math.max(y, base);
+
+            if (
+                bottom - top < 0.5 ||
+                width <= 0
+            ) {
+                return;
+            }
+
+            const left =
+                x - width / 2;
+
+            const right =
+                x + width / 2;
+
+            const frontColor =
+                Array.isArray(colors)
+                    ? colors[index]
+                    : colors;
+
+            if (
+                typeof frontColor !==
+                "string"
+            ) {
+                return;
+            }
+
+            drawErrorChartFace(
+                context,
+                [
+                    { x: right, y: top },
+                    {
+                        x: right + depthX,
+                        y: top - depthY,
+                    },
+                    {
+                        x: right + depthX,
+                        y: bottom - depthY,
+                    },
+                    { x: right, y: bottom },
+                ],
+                mixErrorChartColor(
+                    frontColor,
+                    "dark",
+                    0.42,
+                ),
+            );
+
+            drawErrorChartFace(
+                context,
+                [
+                    { x: left, y: top },
+                    { x: right, y: top },
+                    {
+                        x: right + depthX,
+                        y: top - depthY,
+                    },
+                    {
+                        x: left + depthX,
+                        y: top - depthY,
+                    },
+                ],
+                mixErrorChartColor(
+                    frontColor,
+                    "light",
+                    0.28,
+                ),
+            );
+        });
+
+        context.restore();
+    },
+};
+
 const expeditionStreetBarValuesPlugin = {
     id: "expeditionStreetBarValues",
 
@@ -627,7 +784,10 @@ const expeditionStreetBarValuesPlugin = {
 
                         const label =
                             formatErrorChartQuantity(value);
-                        const labelY = bar.y - 8;
+                        const labelY =
+                            bar.y -
+                            STREET_OCCURRENCES_3D_DEPTH.y -
+                            8;
 
                         context.strokeText(label, bar.x, labelY);
                         context.fillText(label, bar.x, labelY);
@@ -826,6 +986,7 @@ function createStreetOccurrencesChart(
 
             plugins: [
                 expeditionErrorsTextSpacingPlugin,
+                expeditionStreetBars3DPlugin,
                 expeditionStreetBarValuesPlugin,
             ],
 
@@ -837,6 +998,15 @@ function createStreetOccurrencesChart(
 
                 animation: {
                     duration: 250,
+                },
+
+                layout: {
+                    padding: {
+                        top:
+                            STREET_OCCURRENCES_3D_DEPTH.y,
+                        right:
+                            STREET_OCCURRENCES_3D_DEPTH.x,
+                    },
                 },
 
                 interaction: {
