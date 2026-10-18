@@ -2,6 +2,8 @@ import { CHART_TEXT_COLOR } from "../../charts/theme.js";
 
 import {
     DAMAGE_AND_LOSSES_RED,
+    DAMAGE_AND_LOSSES_YELLOW,
+    DAMAGE_AND_LOSSES_GREEN,
     getDamageAndLossesPixelRatio,
 } from "./chart-style.js";
 
@@ -23,12 +25,12 @@ import {
     getHorizontalBarLabelPosition,
 } from "../core/horizontal-bars-3d.js";
 
-const LOSSES_REVIEW_COLOR = "#f18f00";
+const LOSSES_REVIEW_COLOR = DAMAGE_AND_LOSSES_YELLOW;
 const LOSSES_CONFIRMED_COLOR = DAMAGE_AND_LOSSES_RED;
-const LOSSES_RETURNED_COLOR = "#66bb6a";
-const LOSSES_RECOVERY_DONE_COLOR = "#43a047";
+const LOSSES_RETURNED_COLOR = DAMAGE_AND_LOSSES_GREEN;
+const LOSSES_RECOVERY_DONE_COLOR = DAMAGE_AND_LOSSES_GREEN;
 const LOSSES_RECOVERY_NOT_DONE_COLOR = DAMAGE_AND_LOSSES_RED;
-const LOSSES_RECOVERY_INVALID_ID_COLOR = "#ff9800";
+const LOSSES_RECOVERY_INVALID_ID_COLOR = DAMAGE_AND_LOSSES_YELLOW;
 const LOSSES_RECOVERY_UNINFORMED_COLOR = "#a0a4aa";
 
 const lossesQuantityFormatter =

@@ -9,7 +9,7 @@ import {
     resetDamageAndLossesState,
 } from "../js/reports/damage-and-losses/state.js";
 
-const colors = ["#8B0000", "#ff9800", "#3F51B5"];
+const colors = ["#8B0000", "#f99400", "#3F51B5"];
 
 function replaceGlobal(t, name, value) {
     const original = Object.getOwnPropertyDescriptor(globalThis, name);
@@ -113,7 +113,7 @@ test("gráfico e indicadores acompanham período, importação, restauração e 
     assert.ok(charts[0].plugins.some(
         plugin => plugin.id === "damagePeriodBars3D",
     ));
-    assert.deepEqual(charts[2].data.datasets[0].backgroundColor, ["#f18f00", "#f18f00"]);
+    assert.deepEqual(charts[2].data.datasets[0].backgroundColor, ["#f99400", "#f99400"]);
     const composition = charts[1];
     const values = () => elements.slice(5).map(element => element.textContent);
     assert.deepEqual(composition.data.datasets[0].data, [2, 4, 2]);
@@ -126,7 +126,7 @@ test("gráfico e indicadores acompanham período, importação, restauração e 
     assert.deepEqual(composition.data.datasets[0].data, [10, 8, 6]);
     assert.equal(composition.options.plugins.damageCompositionCenter.text, "24");
     assert.deepEqual(values(), ["10 (42%)", "8 (33%)", "6 (25%)"]);
-    assert.deepEqual(charts[2].data.datasets[0].backgroundColor, ["#f18f00", "#f18f00", "#f18f00"]);
+    assert.deepEqual(charts[2].data.datasets[0].backgroundColor, ["#f99400", "#f99400", "#f99400"]);
     replaceDamageAndLossesData({ monthIndex: 9, year: 2026,
         days: [{ date: "2026-10-10", hub: 2185, liquid: 2185 }] });
     assert.deepEqual(values(), ["0 (0%)", "2.185 (100%)", "0 (0%)"]);
