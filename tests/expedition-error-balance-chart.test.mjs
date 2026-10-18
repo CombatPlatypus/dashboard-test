@@ -82,6 +82,7 @@ test("gráfico usa o novo título e mantém Etiqueta, Sorting, Revertidos e Sald
     assert.deepEqual(chart.plugins.map(plugin => plugin.id), [
         "expeditionErrorsTextSpacing",
         "expeditionErrorBalance3D",
+        "expeditionErrorBalanceValues",
     ]);
     assert.deepEqual(chart.options.scales.y.ticks.font, {
         family: '"Open Sans", sans-serif',
@@ -95,6 +96,9 @@ test("gráfico usa o novo título e mantém Etiqueta, Sorting, Revertidos e Sald
     const labelScale = { width: 120 };
     chart.options.scales.y.afterFit(labelScale);
     assert.equal(labelScale.width, 136);
+    assert.equal(chart.options.scales.y.border.display, false);
+    assert.equal(chart.options.scales.x.grid.color({ tick: { value: 0 } }), "rgba(0, 0, 0, 0)");
+    assert.equal(chart.options.scales.x.grid.color({ tick: { value: 20 } }), "rgba(82, 82, 82, 0.45)");
     const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
     assert.match(html, /<h4>Acompanhamento dos Erros<\/h4>/);
     assert.doesNotMatch(html, /(?:Identificados|Erros de Etiqueta x Erros de Sorting) x? Revertidos x Saldo Final/);
@@ -150,6 +154,52 @@ test("projeção 3D desenha a base e as faces inferior e lateral de cada barra",
         width: 1,
     }]);
     assert.deepEqual(chart.options.layout.padding, { right: 10, bottom: 9 });
+});
+
+test("valores ficam dentro das barras com contraste adequado a cada cor", t => {
+    const { chart } = createCharts(t);
+    const texts = [];
+    const context = {
+        letterSpacing: "0px",
+        save() {},
+        restore() {},
+        measureText(text) { return { width: String(text).length * 8 }; },
+        fillText(text, x, y) {
+            texts.push({
+                text, x, y,
+                color: this.fillStyle,
+                align: this.textAlign,
+                baseline: this.textBaseline,
+                font: this.font,
+                spacing: this.letterSpacing,
+            });
+        },
+    };
+    const values = [100, 74, 23, 151];
+    const rightEdges = [112, 92, 62, 162];
+    const bars = rightEdges.map((x, index) => ({
+        horizontal: true,
+        getProps(properties, final) {
+            assert.deepEqual(properties, ["x", "y", "base", "height"]);
+            assert.equal(final, false);
+            return { x, y: 40 + index * 50, base: 12, height: 32 };
+        },
+    }));
+    chart.ctx = context;
+    chart.chartArea = { left: 12, top: 10, right: 300, bottom: 220 };
+    chart.data.datasets[0].data = values;
+    chart.getDatasetMeta = () => ({ data: bars });
+    chart.plugins[2].afterDatasetsDraw(chart);
+    assert.deepEqual(texts, [
+        { text: "100", x: 100, y: 40, color: "#ffffff", align: "right",
+            baseline: "middle", font: '600 16px "Open Sans", sans-serif', spacing: "1px" },
+        { text: "74", x: 80, y: 90, color: "#101010", align: "right",
+            baseline: "middle", font: '600 16px "Open Sans", sans-serif', spacing: "1px" },
+        { text: "23", x: 50, y: 140, color: "#101010", align: "right",
+            baseline: "middle", font: '600 16px "Open Sans", sans-serif', spacing: "1px" },
+        { text: "151", x: 150, y: 190, color: "#101010", align: "right",
+            baseline: "middle", font: '600 16px "Open Sans", sans-serif', spacing: "1px" },
+    ]);
 });
 
 test("cada controle atualiza as barras durante a digitação, sem recriar os gráficos", t => {

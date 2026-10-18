@@ -764,3 +764,9 @@ EXEMPLOS PRATICOS
 
 
 ='Análise de Erros'!B2
+
+=SORT(
+    J10:L27;
+    coluna_ou_intervalo_de_ordenacao;
+    FALSO
+)

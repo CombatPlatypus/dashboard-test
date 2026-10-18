@@ -35,6 +35,11 @@ const ERROR_BALANCE_3D_BASE_COLOR =
 const ERROR_BALANCE_3D_BASE_BORDER_COLOR =
     "rgba(168, 169, 173, 0.34)";
 
+const ERROR_BALANCE_VALUE_FONT =
+    '600 16px "Open Sans", sans-serif';
+
+const ERROR_BALANCE_VALUE_INSET = 12;
+
 const errorChartQuantityFormatter =
     new Intl.NumberFormat(
         "pt-BR",
@@ -498,6 +503,167 @@ const expeditionErrorBalance3DPlugin = {
     },
 };
 
+function getErrorBalanceValueColor(
+    color,
+) {
+    const match =
+        typeof color === "string"
+            ? color.trim().match(
+                /^#([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i,
+            )
+            : null;
+
+    if (!match) {
+        return "#101010";
+    }
+
+    const [red, green, blue] =
+        match
+            .slice(1)
+            .map(function (component) {
+                return Number.parseInt(
+                    component,
+                    16,
+                );
+            });
+
+    const brightness =
+        (
+            red * 0.299 +
+            green * 0.587 +
+            blue * 0.114
+        ) / 255;
+
+    return brightness < 0.5
+        ? "#ffffff"
+        : "#101010";
+}
+
+const expeditionErrorBalanceValuesPlugin = {
+    id: "expeditionErrorBalanceValues",
+
+    afterDatasetsDraw(chart) {
+        if (!chart.chartArea) {
+            return;
+        }
+
+        const dataset =
+            chart.data.datasets[0];
+
+        const bars =
+            chart.getDatasetMeta(0).data;
+
+        const colors =
+            dataset.backgroundColor;
+
+        const context = chart.ctx;
+
+        context.save();
+        applyExpeditionErrorsTextSpacing(chart);
+        context.font =
+            ERROR_BALANCE_VALUE_FONT;
+        context.textBaseline = "middle";
+
+        bars.forEach(function (
+            bar,
+            index,
+        ) {
+            if (bar.horizontal !== true) {
+                return;
+            }
+
+            const value =
+                Number(
+                    dataset.data[index],
+                );
+
+            if (
+                !Number.isFinite(value) ||
+                value === 0
+            ) {
+                return;
+            }
+
+            const properties =
+                bar.getProps(
+                    [
+                        "x",
+                        "y",
+                        "base",
+                        "height",
+                    ],
+                    false,
+                );
+
+            const left =
+                Math.min(
+                    properties.base,
+                    properties.x,
+                );
+
+            const right =
+                Math.max(
+                    properties.base,
+                    properties.x,
+                );
+
+            const label =
+                formatErrorChartQuantity(
+                    value,
+                );
+
+            const labelWidth =
+                context.measureText(
+                    label,
+                ).width;
+
+            const barWidth =
+                right - left;
+
+            if (
+                barWidth <
+                labelWidth + 4
+            ) {
+                return;
+            }
+
+            const frontColor =
+                Array.isArray(colors)
+                    ? colors[index]
+                    : colors;
+
+            context.fillStyle =
+                getErrorBalanceValueColor(
+                    frontColor,
+                );
+
+            if (
+                barWidth >=
+                labelWidth +
+                ERROR_BALANCE_VALUE_INSET * 2
+            ) {
+                context.textAlign = "right";
+                context.fillText(
+                    label,
+                    right -
+                        ERROR_BALANCE_VALUE_INSET,
+                    properties.y,
+                );
+                return;
+            }
+
+            context.textAlign = "center";
+            context.fillText(
+                label,
+                left + barWidth / 2,
+                properties.y,
+            );
+        });
+
+        context.restore();
+    },
+};
+
 const expeditionStreetBarValuesPlugin = {
     id: "expeditionStreetBarValues",
 
@@ -587,6 +753,7 @@ function createErrorBalanceChart(
             plugins: [
                 expeditionErrorsTextSpacingPlugin,
                 expeditionErrorBalance3DPlugin,
+                expeditionErrorBalanceValuesPlugin,
             ],
 
             options: {
@@ -662,8 +829,13 @@ function createErrorBalanceChart(
                         },
 
                         grid: {
-                            color:
-                                "rgba(82, 82, 82, 0.45)",
+                            color(context) {
+                                return Number(
+                                    context.tick?.value,
+                                ) === 0
+                                    ? "rgba(0, 0, 0, 0)"
+                                    : "rgba(82, 82, 82, 0.45)";
+                            },
                         },
                     },
 
@@ -680,6 +852,10 @@ function createErrorBalanceChart(
                         },
 
                         grid: {
+                            display: false,
+                        },
+
+                        border: {
                             display: false,
                         },
                     },
