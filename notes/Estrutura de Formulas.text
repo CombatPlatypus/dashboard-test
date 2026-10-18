@@ -1,0 +1,83 @@
+Conceitos Fundamentais
+    1. As funções internas produzem resultados que são utilizados pelas funções externas, de dentro para fora, de acordo com o resultado de cada função.
+
+    2. Principais símbolos utilizados
+
+        Símbolo e Função
+
+        =	Inicia uma fórmula ou compara igualdade
+        ;	Separa argumentos na configuração brasileira
+        :	Define um intervalo
+        !	Separa nome da aba e referência
+        "	Delimita textos
+        ()	Agrupa expressões e argumentos
+        $	Fixa referências de células
+        <>	Diferente de
+        >=	Maior ou igual
+        <=	Menor ou igual
+        &	Junta textos ou critérios
+
+SOMA (FUNÇÃO PARA SOMAR VALORES NUMÉRICOS)
+
+    =SOMA(A2:A100)
+
+    A função soma todos os valores numéricos do intervalo.
+
+    Também podemos somar intervalos diferentes:
+
+    =SOMA(A2:A100; C2:C100)
+
+    Ela soma os números de ambos.
+
+
+SOMASES (FUNÇÃO PARA SOMAR, PORÉM ADICIONANDO CRITERIOS, OU SEJA, SÓ VAI SOMAR SE TAIS CRITERIOS FOREM ATENTIDOS)
+
+    =SOMASES(
+        intervalo_soma;
+        intervalo_criterio1;criterio1;
+        intervalo_criterio2;criterio2
+    )
+
+CONDIÇÕES E LÓGICA
+
+    FUNÇÃO SE (equivalente ao if/else da programação)
+
+        ESTRUTURA
+
+        =SE(
+            condição;
+            valor_se_verdadeiro;
+            valor_se_falso
+            )
+
+        EXEMPLO
+
+        =SE(B2="Lost";"Perdido";"Não perdido")
+
+        A formula avalia se B2 é igual a Lost, se a condição for verdadeira, retorna Perdido. Caso contrário, retorna Não perdido.
+
+    Entendendo VERDADEIRO e FALSO
+
+    Uma comparação pode gerar um resultado lógico:
+
+    =B2="Lost"
+
+    O resultado será VERDADEIRO ou FALSO.
+
+    Podemos combinar comparações usando E: ("E" PELO QUE EU ENTENDI É BASICAMENTE O AND DOS IFs)
+
+    Esse exemplo exige que ambas as condições sejam verdadeiras:
+
+    =SE(
+        E(B2="Lost";C2="Hub");
+        "Perda do Hub";
+        "Outro registro"
+    )
+
+    A função OU funciona de outra maneira: basta que uma condição seja verdadeira. ("OU" PELO QUE EU ENTENDI É BASICAMENTE O OR DOS IFs)
+
+        =SE(
+            OU(B2="Lost";B2="Em Análise");
+            "Acompanhar";
+            "Outros"
+        )
