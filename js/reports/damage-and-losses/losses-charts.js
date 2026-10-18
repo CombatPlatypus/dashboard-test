@@ -11,6 +11,11 @@ import {
     createStackedBars3DPlugin,
 } from "../core/stacked-bars-3d.js";
 
+import {
+    HORIZONTAL_BAR_3D_DEPTH,
+    createHorizontalBars3DPlugin,
+} from "../core/horizontal-bars-3d.js";
+
 const LOSSES_REVIEW_COLOR = "#ffc107";
 const LOSSES_CONFIRMED_COLOR = "#F44336";
 const LOSSES_RETURNED_COLOR = "#66bb6a";
@@ -285,6 +290,11 @@ const lossesHorizontalTextStylePlugin = {
     },
 };
 
+const lossesHorizontalBars3DPlugin =
+    createHorizontalBars3DPlugin({
+        id: "lossesHorizontalBars3D",
+    });
+
 const lossesRecoveryLabelsPlugin = {
     id: "lossesRecoveryLabels",
 
@@ -312,7 +322,9 @@ const lossesRecoveryLabelsPlugin = {
                     lossesQuantityFormatter.format(
                         Number(values[index]) || 0,
                     ),
-                    chartArea.right + 12,
+                    chartArea.right +
+                        HORIZONTAL_BAR_3D_DEPTH.x +
+                        12,
                     properties.y,
                     {
                         align: "left",
@@ -427,7 +439,8 @@ function createLossesPackRecoveryChart(canvas) {
                         LOSSES_RECOVERY_UNINFORMED_COLOR,
                     ],
                     borderWidth: 0,
-                    borderRadius: 3,
+                    borderRadius: 0,
+                    borderSkipped: false,
                     barThickness: 24,
                 },
             ],
@@ -438,7 +451,11 @@ function createLossesPackRecoveryChart(canvas) {
             maintainAspectRatio: false,
             animation: false,
             layout: {
-                padding: { right: 52 },
+                padding: {
+                    top: HORIZONTAL_BAR_3D_DEPTH.y,
+                    bottom: HORIZONTAL_BAR_3D_DEPTH.y,
+                    right: 64,
+                },
             },
             plugins: {
                 legend: { display: false },
@@ -463,7 +480,7 @@ function createLossesPackRecoveryChart(canvas) {
                     ticks: {
                         color: CHART_TEXT_COLOR,
                         font: { size: 14 },
-                        padding: 12,
+                        padding: 22,
                     },
                     grid: { display: false },
                     border: { display: false },
@@ -473,6 +490,7 @@ function createLossesPackRecoveryChart(canvas) {
         plugins: [
             lossesHorizontalTextStylePlugin,
             lossesHorizontalTrackPlugin,
+            lossesHorizontalBars3DPlugin,
             lossesRecoveryLabelsPlugin,
         ],
     });
@@ -496,7 +514,8 @@ function createLossesReturnedComparisonChart(canvas) {
                         LOSSES_RETURNED_COLOR,
                     ],
                     borderWidth: 0,
-                    borderRadius: 3,
+                    borderRadius: 0,
+                    borderSkipped: false,
                     barThickness: 24,
                 },
             ],
@@ -507,7 +526,11 @@ function createLossesReturnedComparisonChart(canvas) {
             maintainAspectRatio: false,
             animation: false,
             layout: {
-                padding: { right: 52 },
+                padding: {
+                    top: HORIZONTAL_BAR_3D_DEPTH.y,
+                    bottom: HORIZONTAL_BAR_3D_DEPTH.y,
+                    right: 64,
+                },
             },
             plugins: {
                 legend: { display: false },
@@ -532,7 +555,7 @@ function createLossesReturnedComparisonChart(canvas) {
                     ticks: {
                         color: CHART_TEXT_COLOR,
                         font: { size: 14 },
-                        padding: 12,
+                        padding: 22,
                     },
                     grid: { display: false },
                     border: { display: false },
@@ -542,6 +565,7 @@ function createLossesReturnedComparisonChart(canvas) {
         plugins: [
             lossesHorizontalTextStylePlugin,
             lossesHorizontalTrackPlugin,
+            lossesHorizontalBars3DPlugin,
             lossesRecoveryLabelsPlugin,
         ],
     });

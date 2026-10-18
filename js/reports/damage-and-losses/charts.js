@@ -17,6 +17,11 @@ import {
     createStackedBars3DPlugin,
 } from "../core/stacked-bars-3d.js";
 
+import {
+    HORIZONTAL_BAR_3D_DEPTH,
+    createHorizontalBars3DPlugin,
+} from "../core/horizontal-bars-3d.js";
+
 const DAMAGE_SOC_COLOR =
     "#ffc107";
 
@@ -381,6 +386,11 @@ const damageCompositionCenterPlugin = {
     },
 };
 
+const damageSocBars3DPlugin =
+    createHorizontalBars3DPlugin({
+        id: "damageSocBars3D",
+    });
+
 const damageSocLabelsPlugin = {
     id: "damageSocLabels",
 
@@ -420,23 +430,16 @@ const damageSocLabelsPlugin = {
                         true,
                     );
 
-                const hasSpaceAfterBar =
-                    properties.x + 42 <
-                    chartArea.right;
-
                 drawDamageChartText(
                     context,
                     damageChartQuantityFormatter
                         .format(value),
-                    hasSpaceAfterBar
-                        ? properties.x + 9
-                        : chartArea.right - 4,
+                    properties.x +
+                        HORIZONTAL_BAR_3D_DEPTH.x +
+                        10,
                     properties.y,
                     {
-                        align:
-                            hasSpaceAfterBar
-                                ? "left"
-                                : "right",
+                        align: "left",
                     },
                 );
             },
@@ -691,7 +694,9 @@ function createDamageSocChart(
 
                 layout: {
                     padding: {
-                        right: 38,
+                        top: HORIZONTAL_BAR_3D_DEPTH.y,
+                        bottom: HORIZONTAL_BAR_3D_DEPTH.y,
+                        right: 64,
                     },
                 },
 
@@ -736,6 +741,7 @@ function createDamageSocChart(
                     y: {
                         ticks: {
                             color: CHART_TEXT_COLOR,
+                            padding: 22,
                             font: {
                                 size: 14,
                             },
@@ -753,6 +759,7 @@ function createDamageSocChart(
             },
 
             plugins: [
+                damageSocBars3DPlugin,
                 damageSocLabelsPlugin,
             ],
         },
