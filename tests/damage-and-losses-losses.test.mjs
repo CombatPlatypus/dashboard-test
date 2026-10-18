@@ -205,7 +205,7 @@ test("comparação mostra Em Análise, Perdidos e Retornados nessa ordem, com co
     const comparison = charts.get("lossesReturnedComparisonChart");
     assert.equal(comparison.options.indexAxis, "y");
     assert.deepEqual(comparison.data.labels, ["Em Análise", "Perdidos", "Retornados"]);
-    assert.deepEqual(comparison.data.datasets[0].backgroundColor, ["#ffc107", "#F44336", "#66bb6a"]);
+    assert.deepEqual(comparison.data.datasets[0].backgroundColor, ["#f18f00", "#F44336", "#66bb6a"]);
     assert.deepEqual(comparison.data.datasets[0].data, [0, 0, 0]);
 
     const source = findLossesMonthSource(createLossesWorkbook());

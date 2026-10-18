@@ -14,9 +14,11 @@ import {
 import {
     HORIZONTAL_BAR_3D_DEPTH,
     createHorizontalBars3DPlugin,
+    horizontalBarGridColor,
+    getHorizontalBarLabelPosition,
 } from "../core/horizontal-bars-3d.js";
 
-const LOSSES_REVIEW_COLOR = "#ffc107";
+const LOSSES_REVIEW_COLOR = "#f18f00";
 const LOSSES_CONFIRMED_COLOR = "#F44336";
 const LOSSES_RETURNED_COLOR = "#66bb6a";
 const LOSSES_RECOVERY_DONE_COLOR = "#43a047";
@@ -239,44 +241,6 @@ const lossesPeriodLabelsPlugin = {
     },
 };
 
-const lossesHorizontalTrackPlugin = {
-    id: "lossesHorizontalTrack",
-
-    beforeDatasetsDraw(chart) {
-        const chartArea = chart.chartArea;
-        const bars =
-            chart.getDatasetMeta(0).data;
-
-        if (!chartArea || bars.length === 0) {
-            return;
-        }
-
-        const context = chart.ctx;
-        context.save();
-        context.fillStyle =
-            "rgba(82, 82, 82, 0.34)";
-
-        bars.forEach(
-            function (bar) {
-                const properties =
-                    bar.getProps(
-                        ["y", "height"],
-                        true,
-                    );
-
-                context.fillRect(
-                    chartArea.left,
-                    properties.y - properties.height / 2,
-                    chartArea.right - chartArea.left,
-                    properties.height,
-                );
-            },
-        );
-
-        context.restore();
-    },
-};
-
 const lossesHorizontalTextStylePlugin = {
     id: "lossesHorizontalTextStyle",
 
@@ -314,18 +278,16 @@ const lossesRecoveryLabelsPlugin = {
 
         bars.forEach(
             function (bar, index) {
-                const properties =
-                    bar.getProps(["y"], true);
+                const position =
+                    getHorizontalBarLabelPosition(bar);
 
                 drawLossesChartText(
                     context,
                     lossesQuantityFormatter.format(
                         Number(values[index]) || 0,
                     ),
-                    chartArea.right +
-                        HORIZONTAL_BAR_3D_DEPTH.x +
-                        12,
-                    properties.y,
+                    position.x,
+                    position.y,
                     {
                         align: "left",
                         outline: false,
@@ -441,6 +403,7 @@ function createLossesPackRecoveryChart(canvas) {
                     borderWidth: 0,
                     borderRadius: 0,
                     borderSkipped: false,
+                    inflateAmount: 0,
                     barThickness: 24,
                 },
             ],
@@ -474,7 +437,14 @@ function createLossesPackRecoveryChart(canvas) {
             scales: {
                 x: {
                     beginAtZero: true,
-                    display: false,
+                    ticks: {
+                        color: CHART_TEXT_COLOR,
+                        precision: 0,
+                        padding: 10,
+                        font: { size: 14 },
+                    },
+                    grid: { color: horizontalBarGridColor },
+                    border: { color: "#525252" },
                 },
                 y: {
                     ticks: {
@@ -489,7 +459,6 @@ function createLossesPackRecoveryChart(canvas) {
         },
         plugins: [
             lossesHorizontalTextStylePlugin,
-            lossesHorizontalTrackPlugin,
             lossesHorizontalBars3DPlugin,
             lossesRecoveryLabelsPlugin,
         ],
@@ -516,6 +485,7 @@ function createLossesReturnedComparisonChart(canvas) {
                     borderWidth: 0,
                     borderRadius: 0,
                     borderSkipped: false,
+                    inflateAmount: 0,
                     barThickness: 24,
                 },
             ],
@@ -549,7 +519,14 @@ function createLossesReturnedComparisonChart(canvas) {
             scales: {
                 x: {
                     beginAtZero: true,
-                    display: false,
+                    ticks: {
+                        color: CHART_TEXT_COLOR,
+                        precision: 0,
+                        padding: 10,
+                        font: { size: 14 },
+                    },
+                    grid: { color: horizontalBarGridColor },
+                    border: { color: "#525252" },
                 },
                 y: {
                     ticks: {
@@ -564,7 +541,6 @@ function createLossesReturnedComparisonChart(canvas) {
         },
         plugins: [
             lossesHorizontalTextStylePlugin,
-            lossesHorizontalTrackPlugin,
             lossesHorizontalBars3DPlugin,
             lossesRecoveryLabelsPlugin,
         ],

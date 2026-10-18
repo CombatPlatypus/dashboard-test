@@ -20,10 +20,12 @@ import {
 import {
     HORIZONTAL_BAR_3D_DEPTH,
     createHorizontalBars3DPlugin,
+    horizontalBarGridColor,
+    getHorizontalBarLabelPosition,
 } from "../core/horizontal-bars-3d.js";
 
 const DAMAGE_SOC_COLOR =
-    "#ffc107";
+    "#f18f00";
 
 const DAMAGE_HUB_COLOR =
     "#F44336";
@@ -424,20 +426,15 @@ const damageSocLabelsPlugin = {
                     return;
                 }
 
-                const properties =
-                    bar.getProps(
-                        ["x", "y"],
-                        true,
-                    );
+                const position =
+                    getHorizontalBarLabelPosition(bar);
 
                 drawDamageChartText(
                     context,
                     damageChartQuantityFormatter
                         .format(value),
-                    properties.x +
-                        HORIZONTAL_BAR_3D_DEPTH.x +
-                        10,
-                    properties.y,
+                    position.x,
+                    position.y,
                     {
                         align: "left",
                     },
@@ -678,6 +675,7 @@ function createDamageSocChart(
                         backgroundColor: [],
                         borderWidth: 0,
                         borderSkipped: false,
+                        inflateAmount: 0,
                         barThickness: 24,
                     },
                 ],
@@ -723,14 +721,14 @@ function createDamageSocChart(
                         ticks: {
                             color: CHART_TEXT_COLOR,
                             precision: 0,
+                            padding: 10,
                             font: {
                                 size: 14,
                             },
                         },
 
                         grid: {
-                            color:
-                                "rgba(82, 82, 82, 0.35)",
+                            color: horizontalBarGridColor,
                         },
 
                         border: {
@@ -752,7 +750,7 @@ function createDamageSocChart(
                         },
 
                         border: {
-                            color: "#525252",
+                            display: false,
                         },
                     },
                 },

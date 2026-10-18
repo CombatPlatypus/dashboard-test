@@ -48,7 +48,7 @@ function createHorizontalBars3DPlugin({ id }) {
                 [area.left + depthX, area.top + depthY],
                 [area.left + depthX, area.bottom + depthY],
                 [area.left - depthX, area.bottom - depthY],
-            ], "rgba(168, 169, 173, 0.16)", "rgba(168, 169, 173, 0.34)");
+            ], "#29292a", "rgba(168, 169, 173, 0.34)");
             context.restore();
         },
 
@@ -113,4 +113,24 @@ function createHorizontalBars3DPlugin({ id }) {
     };
 }
 
-export { HORIZONTAL_BAR_3D_DEPTH, createHorizontalBars3DPlugin };
+function horizontalBarGridColor(context) {
+    return Number(context.tick?.value) === 0
+        ? "rgba(0, 0, 0, 0)"
+        : "rgba(82, 82, 82, 0.35)";
+}
+
+function getHorizontalBarLabelPosition(bar) {
+    const { x, y, base } = bar.getProps(["x", "y", "base"], false);
+
+    return {
+        x: Math.max(x, base) + HORIZONTAL_BAR_3D_DEPTH.x + 10,
+        y: y + HORIZONTAL_BAR_3D_DEPTH.y / 2,
+    };
+}
+
+export {
+    HORIZONTAL_BAR_3D_DEPTH,
+    createHorizontalBars3DPlugin,
+    horizontalBarGridColor,
+    getHorizontalBarLabelPosition,
+};
