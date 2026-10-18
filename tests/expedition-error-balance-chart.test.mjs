@@ -88,7 +88,7 @@ test("gráfico usa o novo título e mantém Etiqueta, Sorting, Revertidos e Sald
         family: '"Open Sans", sans-serif',
         size: 14,
     });
-    assert.equal(chart.options.scales.y.ticks.padding, 8);
+    assert.equal(chart.options.scales.y.ticks.padding, 12);
     const textContext = { letterSpacing: "0px" };
     chart.ctx = textContext;
     chart.plugins[0].beforeDraw(chart);
@@ -157,7 +157,7 @@ test("projeção 3D desenha a base e as faces inferior e lateral de cada barra",
     assert.deepEqual(chart.options.layout.padding, { right: 10, bottom: 9 });
 });
 
-test("valores ficam dentro das barras com a tipografia branca padrão do dashboard", t => {
+test("valores ficam dentro das barras com tipografia preta uniforme", t => {
     const { chart } = createCharts(t);
     const texts = [];
     const context = {
@@ -192,13 +192,13 @@ test("valores ficam dentro das barras com a tipografia branca padrão do dashboa
     chart.getDatasetMeta = () => ({ data: bars });
     chart.plugins[2].afterDatasetsDraw(chart);
     assert.deepEqual(texts, [
-        { text: "100", x: 100, y: 40, color: "#e4e6eb", align: "right",
+        { text: "100", x: 100, y: 40, color: "#000", align: "right",
             baseline: "middle", font: '600 16px "Open Sans", sans-serif', spacing: "1px" },
-        { text: "74", x: 80, y: 90, color: "#e4e6eb", align: "right",
+        { text: "74", x: 80, y: 90, color: "#000", align: "right",
             baseline: "middle", font: '600 16px "Open Sans", sans-serif', spacing: "1px" },
-        { text: "23", x: 50, y: 140, color: "#e4e6eb", align: "right",
+        { text: "23", x: 50, y: 140, color: "#000", align: "right",
             baseline: "middle", font: '600 16px "Open Sans", sans-serif', spacing: "1px" },
-        { text: "151", x: 150, y: 190, color: "#e4e6eb", align: "right",
+        { text: "151", x: 150, y: 190, color: "#000", align: "right",
             baseline: "middle", font: '600 16px "Open Sans", sans-serif', spacing: "1px" },
     ]);
 });

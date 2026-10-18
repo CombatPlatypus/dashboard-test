@@ -39,7 +39,7 @@ const ERROR_BALANCE_VALUE_FONT =
     '600 16px "Open Sans", sans-serif';
 
 const ERROR_BALANCE_VALUE_COLOR =
-    "#e4e6eb";
+    "#000";
 
 const ERROR_BALANCE_VALUE_INSET = 12;
 
@@ -805,7 +805,7 @@ function createErrorBalanceChart(
                             color: CHART_TEXT_COLOR,
                             font:
                                 ERROR_CHART_FONT,
-                            padding: 8,
+                            padding: 12,
                         },
 
                         grid: {
