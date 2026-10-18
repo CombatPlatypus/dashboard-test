@@ -9,7 +9,7 @@ import {
     resetDamageAndLossesState,
 } from "../js/reports/damage-and-losses/state.js";
 
-const colors = ["#8B0000", "#f99400", "#3F51B5"];
+const colors = ["#8B0000", "#f99400", "#2538a5"];
 
 function replaceGlobal(t, name, value) {
     const original = Object.getOwnPropertyDescriptor(globalThis, name);

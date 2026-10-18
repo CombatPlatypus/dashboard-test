@@ -3,6 +3,7 @@ import { CHART_TEXT_COLOR } from "../../charts/theme.js";
 import {
     DAMAGE_AND_LOSSES_RED,
     DAMAGE_AND_LOSSES_YELLOW,
+    DAMAGE_AND_LOSSES_BLUE,
     getDamageAndLossesPixelRatio,
 } from "./chart-style.js";
 
@@ -43,7 +44,7 @@ const DAMAGE_LIQUID_COLOR =
     DAMAGE_AND_LOSSES_YELLOW;
 
 const DAMAGE_GLASS_COLOR =
-    "#3F51B5";
+    DAMAGE_AND_LOSSES_BLUE;
 
 const damageChartQuantityFormatter =
     new Intl.NumberFormat(
