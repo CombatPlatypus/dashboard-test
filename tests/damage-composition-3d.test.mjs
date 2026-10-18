@@ -9,7 +9,7 @@ import {
     resetDamageAndLossesState,
 } from "../js/reports/damage-and-losses/state.js";
 
-const colors = ["#F44336", "#ff9800", "#3F51B5"];
+const colors = ["#8B0000", "#ff9800", "#3F51B5"];
 
 function replaceGlobal(t, name, value) {
     const original = Object.getOwnPropertyDescriptor(globalThis, name);
@@ -107,6 +107,7 @@ test("gráfico e indicadores acompanham período, importação, restauração e 
     assert.equal(initializeDamageAndLossesCharts(panel), true);
     assert.equal(initializeDamageAndLossesCharts(panel), true);
     assert.equal(charts.length, 3);
+    assert.deepEqual(charts.map(chart => chart.options.devicePixelRatio), [2, 2, 2]);
     assert.equal(charts[0].type, "bar");
     assert.equal(charts[2].type, "bar");
     assert.ok(charts[0].plugins.some(

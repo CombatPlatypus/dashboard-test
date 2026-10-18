@@ -35,6 +35,18 @@ function createHorizontalBars3DPlugin({ id }) {
     return {
         id,
 
+        afterLayout(chart) {
+            const scale = chart.scales.y;
+            if (!scale || scale.type !== "category") {
+                return;
+            }
+
+            // Leave a gutter inside the plot, above the bottom axis and its labels.
+            scale.bottom = Math.max(scale.top + 1, scale.bottom - 16);
+            scale.height = scale.bottom - scale.top;
+            scale.configure();
+        },
+
         beforeDatasetsDraw(chart) {
             const area = chart.chartArea;
             if (!area) {

@@ -1,6 +1,11 @@
 import { CHART_TEXT_COLOR } from "../../charts/theme.js";
 
 import {
+    DAMAGE_AND_LOSSES_RED,
+    getDamageAndLossesPixelRatio,
+} from "./chart-style.js";
+
+import {
     getLossesState,
     getLossesSummary,
     subscribeLossesState,
@@ -19,10 +24,10 @@ import {
 } from "../core/horizontal-bars-3d.js";
 
 const LOSSES_REVIEW_COLOR = "#f18f00";
-const LOSSES_CONFIRMED_COLOR = "#F44336";
+const LOSSES_CONFIRMED_COLOR = DAMAGE_AND_LOSSES_RED;
 const LOSSES_RETURNED_COLOR = "#66bb6a";
 const LOSSES_RECOVERY_DONE_COLOR = "#43a047";
-const LOSSES_RECOVERY_NOT_DONE_COLOR = "#ef5350";
+const LOSSES_RECOVERY_NOT_DONE_COLOR = DAMAGE_AND_LOSSES_RED;
 const LOSSES_RECOVERY_INVALID_ID_COLOR = "#ff9800";
 const LOSSES_RECOVERY_UNINFORMED_COLOR = "#a0a4aa";
 
@@ -327,6 +332,7 @@ function createLossesPeriodChart(canvas) {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            devicePixelRatio: getDamageAndLossesPixelRatio(),
             animation: false,
             layout: {
                 padding: {
@@ -412,6 +418,7 @@ function createLossesPackRecoveryChart(canvas) {
             indexAxis: "y",
             responsive: true,
             maintainAspectRatio: false,
+            devicePixelRatio: getDamageAndLossesPixelRatio(),
             animation: false,
             layout: {
                 padding: {
@@ -494,6 +501,7 @@ function createLossesReturnedComparisonChart(canvas) {
             indexAxis: "y",
             responsive: true,
             maintainAspectRatio: false,
+            devicePixelRatio: getDamageAndLossesPixelRatio(),
             animation: false,
             layout: {
                 padding: {

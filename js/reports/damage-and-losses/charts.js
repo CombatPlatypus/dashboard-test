@@ -1,6 +1,11 @@
 import { CHART_TEXT_COLOR } from "../../charts/theme.js";
 
 import {
+    DAMAGE_AND_LOSSES_RED,
+    getDamageAndLossesPixelRatio,
+} from "./chart-style.js";
+
+import {
     getDamageAndLossesState,
     getDamageAndLossesSummary,
     subscribeDamageAndLossesState,
@@ -28,10 +33,10 @@ const DAMAGE_SOC_COLOR =
     "#f18f00";
 
 const DAMAGE_HUB_COLOR =
-    "#F44336";
+    DAMAGE_AND_LOSSES_RED;
 
 const DAMAGE_SOLID_COLOR =
-    "#F44336";
+    DAMAGE_AND_LOSSES_RED;
 
 const DAMAGE_LIQUID_COLOR =
     "#ff9800";
@@ -484,10 +489,7 @@ function createDamageCompositionChart(
                 maintainAspectRatio: false,
 
                 devicePixelRatio:
-                    Math.max(
-                        window.devicePixelRatio || 1,
-                        2,
-                    ),
+                    getDamageAndLossesPixelRatio(),
 
                 cutout: "66%",
                 events: [],
@@ -560,6 +562,8 @@ function createDamageLastSevenDaysChart(
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                devicePixelRatio:
+                    getDamageAndLossesPixelRatio(),
 
                 animation: {
                     duration: 350,
@@ -685,6 +689,8 @@ function createDamageSocChart(
                 indexAxis: "y",
                 responsive: true,
                 maintainAspectRatio: false,
+                devicePixelRatio:
+                    getDamageAndLossesPixelRatio(),
 
                 animation: {
                     duration: 350,
