@@ -686,11 +686,9 @@ function renderOverallAnalysisView(
             : data.flow.gap === 0
                 ? "Piso zerado"
                 : (
-                    "Gap de " +
-                    formatOverallAnalysisQuantity(
-                        data.flow.gap,
-                    ) +
-                    " em relação ao planejamento"
+                    `${formatOverallAnalysisQuantity(data.flow.planned)} Pacotes foram planejados para essa janela, ` +
+                    `mas somente ${formatOverallAnalysisQuantity(data.flow.expedited)} foram expedidos, ` +
+                    `temos um gap de ${formatOverallAnalysisQuantity(data.flow.gap)} ${data.flow.gap === 1 ? "pacote" : "pacotes"}.`
                 );
 
     elements.expectedVolume.textContent =
