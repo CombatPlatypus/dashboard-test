@@ -35,6 +35,8 @@
 
 
 
+
+
         </style>
     </head>
 
@@ -47,7 +49,7 @@
         <nav class="main-menu">
             <div class="flex-box-between">
 
-                <!-- NOME DO SISTEMA E VERSÃO -->
+                <!-- FOTO, NOME DO SISTEMA E VERSÃO -->
 
                 <div class="flex-box-start">
                     <img src="images/geral-icons/hub-logo-menu.svg">
@@ -58,7 +60,9 @@
                     </div>
                 </div>
 
-                <ul class="flex-box-start tabs" data-tabs id="switch-1">
+                <!-- OPÇÕES DO MENU -->
+
+                <ul class="flex-box-start tabs" data-tabs id="change-panel">
 
                     <!-- PAINEL - PLANILHAS -->
 
@@ -108,11 +112,11 @@
 
                     <div class="nav-actions">
                         <button id="reportDownloadButton" type="button" title="Salvar sessão" aria-label="Salvar sessão dos relatórios">
-                            <img src="images/geral-icons/save-icon.svg" alt="" aria-hidden="true">
+                            <img src="images/geral-icons/save-icon.svg" aria-hidden="true">
                         </button>
 
                         <button id="reportImportButton" type="button" title="Importar sessão" aria-label="Importar sessão dos relatórios">
-                            <img src="images/geral-icons/import-icon.svg" alt="" aria-hidden="true">
+                            <img src="images/geral-icons/import-icon.svg" aria-hidden="true">
                         </button>
 
                         <input id="reportSessionFileInput" type="file" accept=".js,text/javascript,application/javascript" hidden>
@@ -131,7 +135,7 @@
 
         <div class="warning report-session-feedback" id="reportSessionFeedback" role="status" aria-live="polite" aria-atomic="true" data-notification-type="info" hidden>
             <div class="flex-box-start">
-                <img id="reportSessionFeedbackIcon" src="images/geral-icons/bell-icon.svg" alt="">
+                <img id="reportSessionFeedbackIcon" src="images/geral-icons/bell-icon.svg">
 
                 <h4 id="reportSessionFeedbackText"></h4>
             </div>
@@ -140,7 +144,7 @@
         <!-- ESTRUTURA PRINCIPAL -->
 
         <div class="main-structure">
-            <div class="tabs-content" data-tabs-content="switch-1">
+            <div class="tabs-content" data-tabs-content="change-panel">
 
                 <!-- PAINEL - PLANILHAS -->
 
@@ -165,35 +169,33 @@
 
                     <div class="global-inputs">
                         <div>
-                            <div>
-                                <h4>Janela do Turno</h4>
+                            <h4>Janela do Turno</h4>
 
-                                <select id="reportWindowInput" class="standard-select" aria-label="Janela do Turno" style="width: 100%">
-                                    <option value="AM">AM</option>
-                                    <option value="PM1">PM1</option>
-                                    <option value="PM2">PM2</option>
-                                </select>
-                            </div>
+                            <select id="reportWindowInput" class="standard-select" style="width: 100%">
+                                <option value="AM">AM</option>
+                                <option value="PM1">PM1</option>
+                                <option value="PM2">PM2</option>
+                            </select>
+                        </div>
 
-                            <div>
-                                <h4>Analista Responsável</h4>
-                                <input type="text" id="reportAnalystInput" maxlength="60" autocomplete="off" aria-label="Analista Responsável">
-                            </div>
+                        <div>
+                            <h4>Analista Responsável</h4>
+                            <input type="text" id="reportAnalystInput" maxlength="60" autocomplete="off">
+                        </div>
 
-                            <div>
-                                <h4>Planejamento da Janela</h4>
-                                <input type="text" id="reportPlanningInput" maxlength="9" autocomplete="off" inputmode="numeric" pattern="[0-9]*" aria-label="Planejamento da Janela">
-                            </div>
+                        <div>
+                            <h4>Planejamento da Janela</h4>
+                            <input type="text" id="reportPlanningInput" maxlength="9" autocomplete="off" inputmode="numeric" pattern="[0-9]*">
+                        </div>
 
-                            <div>
-                                <h4>Total de Colaboradores</h4>
-                                <input type="text" id="reportCollaboratorsInput" maxlength="5" autocomplete="off" inputmode="numeric" pattern="[0-9]*" aria-label="Total de Colaboradores">
-                            </div>
+                        <div>
+                            <h4>Total de Colaboradores</h4>
+                            <input type="text" id="reportCollaboratorsInput" maxlength="5" autocomplete="off" inputmode="numeric" pattern="[0-9]*">
+                        </div>
 
-                            <div>
-                                <h4>Capacidade do Hub</h4>
-                                <input type="text" id="reportCapacityInput" maxlength="9" autocomplete="off" inputmode="numeric" pattern="[0-9]*" aria-label="Capacidade do Hub">
-                            </div>
+                        <div>
+                            <h4>Capacidade do Hub</h4>
+                            <input type="text" id="reportCapacityInput" maxlength="9" autocomplete="off" inputmode="numeric" pattern="[0-9]*">
                         </div>
                     </div>
 
@@ -270,7 +272,7 @@
                             <div class="flex-box-start">
                                 <div class="warning" id="receiptNotification" role="status" aria-live="polite" aria-atomic="true" data-notification-type="idle">
                                     <div class="flex-box-start">
-                                        <img id="receiptNotificationIcon" src="images/geral-icons/bell-icon.svg" alt="">
+                                        <img id="receiptNotificationIcon" src="images/geral-icons/bell-icon.svg">
 
                                         <h4 id="receiptNotificationText">
                                             No SPX, Transporte Principal / Viagens de Carga / Inbound e pressione Ctrl + A e, em seguida, Ctrl + C. Depois, volte aqui e clique em importar.
@@ -279,18 +281,18 @@
                                 </div>
 
                                 <div class="report-actions">
-                                    <button id="receiptCopyReportButton" type="button" title="Clique para copiar; segure por 1,5 s para baixar" aria-label="Copiar relatório de processamento; segure por 1,5 segundo para baixar">
-                                        <img src="images/geral-icons/image-icon.svg" alt="">
+                                    <button id="receiptCopyReportButton" type="button">
+                                        <img src="images/geral-icons/image-icon.svg">
                                     </button>
 
-                                    <button id="receiptImportActionButton" type="button" title="Importar dados da aba atual" aria-label="Importar dados da aba atual do processamento">
-                                        <img src="images/geral-icons/import-icon.svg" alt="">
+                                    <button id="receiptImportActionButton" type="button">
+                                        <img src="images/geral-icons/import-icon.svg">
                                     </button>
 
                                     <input id="receiptFileInput" type="file" accept=".csv,.xlsx,.xls" hidden>
 
-                                    <button id="receiptClearReportButton" type="button" title="Limpar relatório" aria-label="Limpar relatório de processamento">
-                                        <img src="images/geral-icons/trash-basket-icon.svg" alt="">
+                                    <button id="receiptClearReportButton" type="button">
+                                        <img src="images/geral-icons/trash-basket-icon.svg">
                                     </button>
                                 </div>
                             </div>
@@ -619,7 +621,8 @@
 
                                                     <div class="flex-box-start">
                                                         <input type="text" data-receipt-operator-field="labeler" autocomplete="off" disabled>
-                                                        <select class="standard-select" data-receipt-operator-field="errorQuantity" autocomplete="off" disabled>
+
+                                                        <select class="standard-select" data-receipt-operator-field="errorQuantity" autocomplete="off" disabled style="width: 86px;">
                                                             <option value="">—</option>
                                                         </select>
 
@@ -647,11 +650,11 @@
 
                                             <div class="flex-box-start">
                                                 <button id="receiptLinehaulAddButton" type="button" title="Adicionar LH" aria-label="Adicionar LH">
-                                                    <img src="images/geral-icons/add-icon.svg" alt="">
+                                                    <img src="images/geral-icons/add-icon.svg">
                                                 </button>
 
                                                 <button id="receiptLinehaulRemoveButton" type="button" title="Remover último LH" aria-label="Remover último LH">
-                                                    <img src="images/geral-icons/remove-icon.svg" alt="">
+                                                    <img src="images/geral-icons/remove-icon.svg">
                                                 </button>
                                             </div>
                                         </div>
@@ -720,7 +723,7 @@
                             <div class="flex-box-start">
                                 <div class="warning" id="expeditionNotification" role="status" aria-live="polite" aria-atomic="true" data-notification-type="idle">
                                     <div class="flex-box-start">
-                                        <img id="expeditionNotificationIcon" src="images/geral-icons/bell-icon.svg" alt="">
+                                        <img id="expeditionNotificationIcon" src="images/geral-icons/bell-icon.svg">
 
                                         <h4 id="expeditionNotificationText">
                                             No SPX, acesse Gestão Audit / Conferência: LM Hub AT/TO, escolha uma tarefa para exportar e, em seguida, volte aqui e clique em importar.
@@ -729,18 +732,18 @@
                                 </div>
 
                                 <div class="report-actions">
-                                    <button id="expeditionCopyReportButton" type="button" title="Clique para copiar; segure por 1,5 s para baixar" aria-label="Copiar relatório de expedição; segure por 1,5 segundo para baixar">
-                                        <img src="images/geral-icons/image-icon.svg" alt="">
+                                    <button id="expeditionCopyReportButton" type="button">
+                                        <img src="images/geral-icons/image-icon.svg">
                                     </button>
 
-                                    <button id="expeditionImportActionButton" type="button" title="Importar dados da aba atual" aria-label="Importar dados da aba atual da expedição">
-                                        <img src="images/geral-icons/import-icon.svg" alt="">
+                                    <button id="expeditionImportActionButton" type="button">
+                                        <img src="images/geral-icons/import-icon.svg">
                                     </button>
 
                                     <input id="expeditionFileInput" type="file" accept=".csv,.xlsx,.xls" hidden>
                 
-                                    <button id="expeditionClearReportButton" type="button" title="Limpar relatório" aria-label="Limpar relatório de expedição">
-                                        <img src="images/geral-icons/trash-basket-icon.svg" alt="">
+                                    <button id="expeditionClearReportButton" type="button">
+                                        <img src="images/geral-icons/trash-basket-icon.svg">
                                     </button>
                                 </div>
                             </div>
@@ -1125,7 +1128,7 @@
                             <div class="flex-box-start">
                                 <div class="warning" id="planningNotification" role="status" aria-live="polite" aria-atomic="true" data-notification-type="idle">
                                     <div class="flex-box-start">
-                                        <img id="planningNotificationIcon" src="images/geral-icons/bell-icon.svg" alt="">
+                                        <img id="planningNotificationIcon" src="images/geral-icons/bell-icon.svg">
 
                                         <h4 id="planningNotificationText">
                                             No SPX, Transporte Principal / Viagens de Carga / Inbound e pressione Ctrl + A e, em seguida, Ctrl + C. Depois, volte aqui e clique em importar.
@@ -1134,20 +1137,20 @@
                                 </div>
 
                                 <div class="report-actions">
-                                    <button id="planningSpreadsheetDownloadButton" type="button" title="Baixar planilha de planejamento" aria-label="Baixar planilha de planejamento">
-                                        <img src="images/geral-icons/file-xlsx-icon.svg" alt="">
+                                    <button id="planningSpreadsheetDownloadButton" type="button">
+                                        <img src="images/geral-icons/file-xlsx-icon.svg">
                                     </button>
 
-                                    <button id="planningCopyReportButton" type="button" title="Clique para copiar; segure por 1,5 s para baixar" aria-label="Copiar relatório de planejamento; segure por 1,5 segundo para baixar">
-                                        <img src="images/geral-icons/image-icon.svg" alt="">
+                                    <button id="planningCopyReportButton" type="button">
+                                        <img src="images/geral-icons/image-icon.svg">
                                     </button>
 
-                                    <button id="planningImportClipboardButton" type="button" title="Importar LHs da área de transferência" aria-label="Importar LHs da área de transferência">
-                                        <img src="images/geral-icons/import-icon.svg" alt="">
+                                    <button id="planningImportClipboardButton" type="button">
+                                        <img src="images/geral-icons/import-icon.svg">
                                     </button>
 
-                                    <button id="planningClearReportButton" type="button" title="Limpar relatório" aria-label="Limpar relatório de planejamento">
-                                        <img src="images/geral-icons/trash-basket-icon.svg" alt="">
+                                    <button id="planningClearReportButton" type="button">
+                                        <img src="images/geral-icons/trash-basket-icon.svg">
                                     </button>
                                 </div>
                             </div>
@@ -1339,11 +1342,11 @@
 
                                                 <div class="flex-box-start">
                                                     <button id="planningAddLh" type="button" title="Adicionar LH" aria-label="Adicionar LH">
-                                                        <img src="images/geral-icons/add-icon.svg" alt="">
+                                                        <img src="images/geral-icons/add-icon.svg">
                                                     </button>
 
                                                     <button id="planningRemoveLh" type="button" title="Remover último LH" aria-label="Remover último LH">
-                                                        <img src="images/geral-icons/remove-icon.svg" alt="">
+                                                        <img src="images/geral-icons/remove-icon.svg">
                                                     </button>
                                                 </div>
                                             </div>
@@ -1359,11 +1362,11 @@
 
                                                 <div class="flex-box-start">
                                                     <button id="planningAddTo" type="button" title="Adicionar TO" aria-label="Adicionar TO">
-                                                        <img src="images/geral-icons/add-icon.svg" alt="">
+                                                        <img src="images/geral-icons/add-icon.svg">
                                                     </button>
 
                                                     <button id="planningRemoveTo" type="button" title="Remover última TO" aria-label="Remover última TO">
-                                                        <img src="images/geral-icons/remove-icon.svg" alt="">
+                                                        <img src="images/geral-icons/remove-icon.svg">
                                                     </button>
                                                 </div>
                                             </div>
@@ -1484,7 +1487,7 @@
                             <div class="flex-box-start">
                                 <div class="warning" id="damageAndLossesNotification" role="status" aria-live="polite" aria-atomic="true" data-notification-type="idle">
                                     <div class="flex-box-start">
-                                        <img id="damageAndLossesNotificationIcon" src="images/geral-icons/bell-icon.svg" alt="">
+                                        <img id="damageAndLossesNotificationIcon" src="images/geral-icons/bell-icon.svg">
 
                                         <h4 id="damageAndLossesNotificationText">
                                             Importe a planilha de Avarias e Perdas.
@@ -1493,18 +1496,18 @@
                                 </div>
 
                                 <div class="report-actions">
-                                    <button id="damageAndLossesCopyReportButton" type="button" title="Clique para copiar; segure por 1,5 s para baixar" aria-label="Copiar relatório de avarias ou perdas; segure por 1,5 segundo para baixar">
-                                        <img src="images/geral-icons/image-icon.svg" alt="">
+                                    <button id="damageAndLossesCopyReportButton" type="button">
+                                        <img src="images/geral-icons/image-icon.svg">
                                     </button>
 
-                                    <button id="damageAndLossesImportButton" type="button" title="Importar planilha de avarias e perdas" aria-label="Importar planilha de avarias e perdas">
-                                        <img src="images/geral-icons/import-icon.svg" alt="">
+                                    <button id="damageAndLossesImportButton" type="button">
+                                        <img src="images/geral-icons/import-icon.svg">
                                     </button>
 
                                     <input id="damageAndLossesFileInput" type="file" accept=".xlsx,.xls" hidden>
 
-                                    <button id="damageAndLossesClearButton" type="button" title="Limpar relatório" aria-label="Limpar relatório de avarias e perdas">
-                                        <img src="images/geral-icons/trash-basket-icon.svg" alt="">
+                                    <button id="damageAndLossesClearButton" type="button">
+                                        <img src="images/geral-icons/trash-basket-icon.svg">
                                     </button>
                                 </div>
                             </div>
@@ -1892,7 +1895,7 @@
                             <div class="flex-box-start">
                                 <div class="warning" id="lossesRateNotification" role="status" aria-live="polite" aria-atomic="true" data-notification-type="idle">
                                     <div class="flex-box-start">
-                                        <img id="lossesRateNotificationIcon" src="images/geral-icons/bell-icon.svg" alt="">
+                                        <img id="lossesRateNotificationIcon" src="images/geral-icons/bell-icon.svg">
 
                                         <h4 id="lossesRateNotificationText">
                                             Importe a planilha de Avarias e Perdas para gerar o relatório de Taxa de Perdas.
@@ -1902,101 +1905,96 @@
 
                                 <div class="report-actions">
                                     <button id="lossesRateCopyReportButton" type="button" title="Clique para copiar; segure por 1,5 s para baixar" aria-label="Copiar relatório de taxa de perdas; segure por 1,5 segundo para baixar">
-                                        <img src="images/geral-icons/image-icon.svg" alt="">
+                                        <img src="images/geral-icons/image-icon.svg">
                                     </button>
 
                                     <button id="lossesRateImportActionButton" type="button" title="Importar planilha de avarias e perdas" aria-label="Importar planilha de avarias e perdas">
-                                        <img src="images/geral-icons/import-icon.svg" alt="">
+                                        <img src="images/geral-icons/import-icon.svg">
                                     </button>
 
                                     <input id="lossesRateFileInput" type="file" accept=".xlsx,.xls" hidden>
 
                                     <button id="lossesRateClearReportButton" type="button" title="Limpar relatório" aria-label="Limpar relatório de taxa de perdas">
-                                        <img src="images/geral-icons/trash-basket-icon.svg" alt="">
+                                        <img src="images/geral-icons/trash-basket-icon.svg">
                                     </button>
                                 </div>
                             </div>
 
                             <!-- CONTEÚDO DO RELATÓRIO -->
 
-                            <div class="flex-box-start">
+                            <div class="preview">
+                                <div class="preview-style" id="lossesRatePreview">
+                                    <div class="title">
+                                        <h2>Taxa de Perdas</h2>
+                                    </div>
 
-                                <!-- PPÉVIA -->
+                                    <!-- TABELA PRINCIPAL -->
 
-                                <div class="preview">
-                                    <div class="preview-style" id="lossesRatePreview">
-                                        <div class="title">
-                                            <h2>Taxa de Perdas</h2>
-                                        </div>
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Volume Movimentado</th>
+                                                <th>Possíveis Perdas</th>
+                                                <th>Lost</th>
+                                                <th>Avarias</th>
+                                                <th>Total de Perdas</th>
+                                                <th>Taxa de Perdas</th>
+                                            </tr>
+                                        </thead>
 
-                                        <!-- TABELA PRINCIPAL -->
+                                        <tbody>
+                                            <tr>
+                                                <td id="lossesRatePreviewMoved">—</td>
+                                                <td id="lossesRatePreviewPossibleLosses">—</td>
+                                                <td id="lossesRatePreviewLost">—</td>
+                                                <td id="lossesRatePreviewDamage">—</td>
+                                                <td id="lossesRatePreviewTotal">—</td>
+                                                <td id="lossesRatePreviewRate">—</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
 
-                                        <table>
-                                            <thead>
-                                                <tr>
-                                                    <th>Volume Movimentado</th>
-                                                    <th>Possíveis Perdas</th>
-                                                    <th>Lost</th>
-                                                    <th>Avarias</th>
-                                                    <th>Total de Perdas</th>
-                                                    <th>Taxa de Perdas</th>
-                                                </tr>
-                                            </thead>
+                                    <!-- GRAFICOS DE COMPOSIÇÃO E LINHA -->
 
-                                            <tbody>
-                                                <tr>
-                                                    <td id="lossesRatePreviewMoved">—</td>
-                                                    <td id="lossesRatePreviewPossibleLosses">—</td>
-                                                    <td id="lossesRatePreviewLost">—</td>
-                                                    <td id="lossesRatePreviewDamage">—</td>
-                                                    <td id="lossesRatePreviewTotal">—</td>
-                                                    <td id="lossesRatePreviewRate">—</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-
-                                        <!-- GRAFICOS DE COMPOSIÇÃO E LINHA -->
-
-                                        <div class="losses-rate-charts flex-box-start">
-                                            <div class="chart doughnut-chart">
-                                                <div class="chart-title">
-                                                    <h4>Composição das Ocorrências - <span id="lossesRateCompositionMonth"></span></h4>
-                                                </div>
-
-                                                <div class="chart-canvas-container">
-                                                    <canvas id="lossesRateCompositionChart">
-                                                        Seu navegador não suporta gráficos em canvas.
-                                                    </canvas>
-                                                </div>
-
-                                                <div class="chart-label">
-                                                    <div class="type">
-                                                        <div style="background-color: #8b8d91;"></div>
-                                                        <p>Possíveis Perdas <span id="lossesRateCompositionPossibleLosses">—</span></p>
-                                                    </div>
-
-                                                    <div class="type">
-                                                        <div style="background-color: #8B0000;"></div>
-                                                        <p>Lost <span id="lossesRateCompositionLost">—</span></p>
-                                                    </div>
-
-                                                    <div class="type">
-                                                        <div style="background-color: #f99400;"></div>
-                                                        <p>Avarias <span id="lossesRateCompositionDamage">—</span></p>
-                                                    </div>
-                                                </div>
+                                    <div class="losses-rate-charts flex-box-start">
+                                        <div class="chart doughnut-chart">
+                                            <div class="chart-title">
+                                                <h4>Composição das Ocorrências - <span id="lossesRateCompositionMonth"></span></h4>
                                             </div>
 
-                                            <div class="chart line-chart">
-                                                <div class="chart-title">
-                                                    <h4>Histórico da Taxa de Perdas - <span id="lossesRateHistoryYear"></span></h4>
+                                            <div class="chart-canvas-container">
+                                                <canvas id="lossesRateCompositionChart">
+                                                    Seu navegador não suporta gráficos em canvas.
+                                                </canvas>
+                                            </div>
+
+                                            <div class="chart-label">
+                                                <div class="type">
+                                                    <div style="background-color: #8b8d91;"></div>
+                                                    <p>Possíveis Perdas <span id="lossesRateCompositionPossibleLosses">—</span></p>
                                                 </div>
 
-                                                <div class="chart-canvas-container">
-                                                    <canvas id="lossesRateHistoryChart">
-                                                        Seu navegador não suporta gráficos em canvas.
-                                                    </canvas>
+                                                <div class="type">
+                                                    <div style="background-color: #8B0000;"></div>
+                                                    <p>Lost <span id="lossesRateCompositionLost">—</span></p>
                                                 </div>
+
+                                                <div class="type">
+                                                    <div style="background-color: #f99400;"></div>
+                                                    <p>Avarias <span id="lossesRateCompositionDamage">—</span></p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="chart line-chart">
+                                            <div class="chart-title">
+                                                <h4>Histórico da Taxa de Perdas - <span id="lossesRateHistoryYear"></span></h4>
+                                            </div>
+
+                                            <div class="chart-canvas-container">
+                                                <canvas id="lossesRateHistoryChart">
+                                                    Seu navegador não suporta gráficos em canvas.
+                                                </canvas>
                                             </div>
                                         </div>
                                     </div>
@@ -2013,7 +2011,7 @@
                             <div class="flex-box-start">
                                 <div class="warning" id="parcelNotification" role="status" aria-live="polite" aria-atomic="true" data-notification-type="idle">
                                     <div class="flex-box-start">
-                                        <img id="parcelNotificationIcon" src="images/geral-icons/bell-icon.svg" alt="">
+                                        <img id="parcelNotificationIcon" src="images/geral-icons/bell-icon.svg">
 
                                         <h4 id="parcelNotificationText">
                                             No SPX, acesse Parcel Sweeper / Parcel Sweeper View, escolha um arquivo parcel para exportar e, em seguida, volte aqui e clique em importar.
@@ -2023,17 +2021,17 @@
 
                                 <div class="report-actions">
                                     <button id="parcelCopyReportButton" type="button" title="Clique para copiar; segure por 1,5 s para baixar" aria-label="Copiar relatório do parcel; segure por 1,5 segundo para baixar">
-                                        <img src="images/geral-icons/image-icon.svg" alt="">
+                                        <img src="images/geral-icons/image-icon.svg">
                                     </button>
 
                                     <button id="parcelImportActionButton" type="button" title="Importar dados do Parcel Sweeper" aria-label="Importar arquivo do Parcel Sweeper">
-                                        <img src="images/geral-icons/import-icon.svg" alt="">
+                                        <img src="images/geral-icons/import-icon.svg">
                                     </button>
 
                                     <input id="parcelFileInput" type="file" accept=".csv,.xlsx,.xls" hidden>
 
                                     <button id="parcelClearReportButton" type="button" title="Limpar relatório" aria-label="Limpar relatório do parcel">
-                                        <img src="images/geral-icons/trash-basket-icon.svg" alt="">
+                                        <img src="images/geral-icons/trash-basket-icon.svg">
                                     </button>
                                 </div>
                             </div>
@@ -2165,7 +2163,7 @@
                                                         <span>Pacotes Comuns</span>
 
                                                         <button id="parcelCopyCommonPackagesButton" type="button" data-parcel-copy="common" title="Copiar BRs de pacotes comuns" aria-label="Copiar BRs de pacotes comuns" disabled>
-                                                            <img src="images/geral-icons/copy-mini-icon.svg" alt="">
+                                                            <img src="images/geral-icons/copy-mini-icon.svg">
                                                         </button>
                                                     </div>
                                                 </caption>
@@ -2200,7 +2198,7 @@
                                                         <span>Pacotes Volumosos</span>
                                                         
                                                         <button id="parcelCopyBulkyPackagesButton" type="button" data-parcel-copy="bulky" title="Copiar BRs de pacotes volumosos" aria-label="Copiar BRs de pacotes volumosos" disabled>
-                                                            <img src="images/geral-icons/copy-mini-icon.svg" alt="">
+                                                            <img src="images/geral-icons/copy-mini-icon.svg">
                                                         </button>
                                                     </div>
                                                 </caption>
@@ -2289,7 +2287,7 @@
                             <div class="flex-box-start">
                                 <div class="warning" id="reverseNotification" role="status" aria-live="polite" aria-atomic="true" data-notification-type="idle">
                                     <div class="flex-box-start">
-                                        <img id="reverseNotificationIcon" src="images/geral-icons/bell-icon.svg" alt="">
+                                        <img id="reverseNotificationIcon" src="images/geral-icons/bell-icon.svg">
 
                                         <h4 id="reverseNotificationText">
                                             No SPX, acesse Saída / Gerenciamento de Pedidos, escolha uma TO para exportar e, em seguida, volte aqui e clique em importar.
@@ -2299,17 +2297,17 @@
 
                                 <div class="report-actions">
                                     <button id="reverseCopyReportButton" type="button" title="Clique para copiar; segure por 1,5 s para baixar" aria-label="Copiar relatório de reversa; segure por 1,5 segundo para baixar">
-                                        <img src="images/geral-icons/image-icon.svg" alt="">
+                                        <img src="images/geral-icons/image-icon.svg">
                                     </button>
 
                                     <button id="reverseImportActionButton" type="button" title="Importar arquivo de reversa do SPX" aria-label="Importar arquivo de reversa do SPX">
-                                        <img src="images/geral-icons/import-icon.svg" alt="">
+                                        <img src="images/geral-icons/import-icon.svg">
                                     </button>
 
                                     <input id="reverseFileInput" type="file" accept=".csv,.xlsx,.xls" hidden>
 
                                     <button id="reverseClearReportButton" type="button" title="Limpar relatório" aria-label="Limpar relatório de reversa">
-                                        <img src="images/geral-icons/trash-basket-icon.svg" alt="">
+                                        <img src="images/geral-icons/trash-basket-icon.svg">
                                     </button>
                                 </div>
                             </div>
@@ -2418,7 +2416,7 @@
                                                         <span>Return</span>
 
                                                         <button id="reverseCopyReturnPackagesButton" type="button" data-reverse-copy="return" title="Copiar BRs de Return" aria-label="Copiar BRs de Return" disabled>
-                                                            <img src="images/geral-icons/copy-mini-icon.svg" alt="">
+                                                            <img src="images/geral-icons/copy-mini-icon.svg">
                                                         </button>
                                                     </div>
                                                 </caption>
@@ -2446,7 +2444,7 @@
                                                         <span>Missorted</span>
 
                                                         <button id="reverseCopyMissortedPackagesButton" type="button" data-reverse-copy="missorted" title="Copiar BRs de Missorted" aria-label="Copiar BRs de Missorted" disabled>
-                                                            <img src="images/geral-icons/copy-mini-icon.svg" alt="">
+                                                            <img src="images/geral-icons/copy-mini-icon.svg">
                                                         </button>
                                                     </div>
                                                 </caption>
@@ -2474,7 +2472,7 @@
                                                         <span>Liquidate</span>
 
                                                         <button id="reverseCopyLiquidatePackagesButton" type="button" data-reverse-copy="liquidate" title="Copiar BRs de Liquidate" aria-label="Copiar BRs de Liquidate" disabled>
-                                                            <img src="images/geral-icons/copy-mini-icon.svg" alt="">
+                                                            <img src="images/geral-icons/copy-mini-icon.svg">
                                                         </button>
                                                     </div>
                                                 </caption>
@@ -2502,7 +2500,7 @@
                                                         <span>Confiscado</span>
 
                                                         <button id="reverseCopyConfiscatedPackagesButton" type="button" data-reverse-copy="confiscated" title="Copiar BRs de Confiscado" aria-label="Copiar BRs de Confiscado" disabled>
-                                                            <img src="images/geral-icons/copy-mini-icon.svg" alt="">
+                                                            <img src="images/geral-icons/copy-mini-icon.svg">
                                                         </button>
                                                     </div>
                                                 </caption>
@@ -2536,7 +2534,7 @@
                             <div class="flex-box-start">
                                 <div class="warning" id="overallAnalysisNotification" role="status" aria-live="polite" aria-atomic="true" data-notification-type="idle">
                                     <div class="flex-box-start">
-                                        <img id="overallAnalysisNotificationIcon" src="images/geral-icons/bell-icon.svg" alt="">
+                                        <img id="overallAnalysisNotificationIcon" src="images/geral-icons/bell-icon.svg">
 
                                         <h4 id="overallAnalysisNotificationText">
                                             Preencha os relatórios para completar a análise geral. Todas as informações serão atualizadas automaticamente.
@@ -2546,11 +2544,11 @@
 
                                 <div class="report-actions">
                                     <button id="overallAnalysisCopyReportButton" type="button" title="Clique para copiar; segure por 1,5 s para baixar" aria-label="Copiar relatório de análise geral; segure por 1,5 segundo para baixar">
-                                        <img src="images/geral-icons/image-icon.svg" alt="">
+                                        <img src="images/geral-icons/image-icon.svg">
                                     </button>
 
                                     <button id="overallAnalysisClearReportButton" type="button" title="Limpar todos os relatórios" aria-label="Limpar todos os relatórios e a análise geral">
-                                        <img src="images/geral-icons/trash-basket-icon.svg" alt="">
+                                        <img src="images/geral-icons/trash-basket-icon.svg">
                                     </button>
                                 </div>
                             </div>
@@ -2585,11 +2583,11 @@
                                             <div class="final-report-card">
                                                 <div class="flex-box-start">
                                                     <div class="final-report-mini-chart">
-                                                        <canvas id="overallAnalysisCapacityChart" role="img" aria-label="Uso da capacidade operacional">
+                                                        <canvas id="overallAnalysisCapacityChart" role="img">
                                                             Seu navegador não suporta gráficos em canvas.
                                                         </canvas>
 
-                                                        <img src="images/geral-icons/box-icon.svg" alt="" aria-hidden="true">
+                                                        <img src="images/geral-icons/box-icon.svg" aria-hidden="true">
                                                     </div>
 
                                                     <div>
@@ -2608,11 +2606,11 @@
                                             <div class="final-report-card">
                                                 <div class="flex-box-start">
                                                     <div class="final-report-mini-chart">
-                                                        <canvas id="overallAnalysisPackagesAnalysisChart" role="img" aria-label="Pacotes em análise">
+                                                        <canvas id="overallAnalysisPackagesAnalysisChart" role="img">
                                                             Seu navegador não suporta gráficos em canvas.
                                                         </canvas>
 
-                                                        <img src="images/geral-icons/clock-icon.svg" alt="" aria-hidden="true">
+                                                        <img src="images/geral-icons/clock-icon.svg" aria-hidden="true">
                                                     </div>
 
                                                     <div>
@@ -2631,11 +2629,11 @@
                                             <div class="final-report-card">
                                                 <div class="flex-box-start">
                                                     <div class="final-report-mini-chart">
-                                                        <canvas id="overallAnalysisLossRateChart" role="img" aria-label="Taxa de perdas em relação ao limite">
+                                                        <canvas id="overallAnalysisLossRateChart" role="img">
                                                             Seu navegador não suporta gráficos em canvas.
                                                         </canvas>
 
-                                                        <img src="images/geral-icons/bars-icon.svg" alt="" aria-hidden="true">
+                                                        <img src="images/geral-icons/bars-icon.svg" aria-hidden="true">
                                                     </div>
 
                                                     <div>
@@ -2649,91 +2647,60 @@
 
                                     <!-- FLUXO DO DIA E DASTAQUES DA OPERAÇÃO -->
 
-                                    <div class="flex-box-start" style="column-gap: 15px;">
-                                        <div class="final-report-flow">
-                                            <div class="final-report-title">
-                                                <h4>Fluxo da Janela</h4>
-                                            </div>
+                                    <div class="final-report-flow">
+                                        <div class="final-report-title">
+                                            <h4>Fluxo da Janela</h4>
+                                        </div>
 
-                                            <div class="flow">
-                                                <div class="mini-cards">
-                                                    <div class="flex-box-center">
-                                                        <img src="images/geral-icons/clipboard-icon.svg">
+                                        <div class="flow">
+                                            <div class="mini-cards">
+                                                <div class="flex-box-center">
+                                                    <img src="images/geral-icons/clipboard-icon.svg">
 
-                                                        <div>
-                                                            <h4>Planejado</h4>
-                                                            <p id="overallAnalysisPlanned">—</p>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="flex-box-center">
-                                                        <img src="images/geral-icons/barcode-scanner-icon.svg">
-
-                                                        <div>
-                                                            <h4>Processado</h4>
-                                                            <p id="overallAnalysisProcessed">—</p>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="flex-box-center">
-                                                        <img src="images/geral-icons/van-icon.svg" style="width: 40px;">
-
-                                                        <div>
-                                                            <h4>Expedido</h4>
-                                                            <p id="overallAnalysisExpedited">—</p>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="flex-box-center">
-                                                        <img src="images/geral-icons/forklift-icon.svg">
-
-                                                        <div>
-                                                            <h4>Backlog no Piso</h4>
-                                                            <p id="overallAnalysisFloor">—</p>
-                                                        </div>
+                                                    <div>
+                                                        <h4>Planejado</h4>
+                                                        <p id="overallAnalysisPlanned">—</p>
                                                     </div>
                                                 </div>
 
-                                                <div class="dashed-border"></div>
+                                                <div class="flex-box-center">
+                                                    <img src="images/geral-icons/barcode-scanner-icon.svg">
 
-                                                <h5 id="overallAnalysisFlowStatus">—</h5>
+                                                    <div>
+                                                        <h4>Processado</h4>
+                                                        <p id="overallAnalysisProcessed">—</p>
+                                                    </div>
+                                                </div>
+
+                                                <div class="flex-box-center">
+                                                    <img src="images/geral-icons/van-icon.svg" style="width: 40px;">
+
+                                                    <div>
+                                                        <h4>Expedido</h4>
+                                                        <p id="overallAnalysisExpedited">—</p>
+                                                    </div>
+                                                </div>
+
+                                                <div class="flex-box-center">
+                                                    <img src="images/geral-icons/forklift-icon.svg">
+
+                                                    <div>
+                                                        <h4>Backlog no Piso</h4>
+                                                        <p id="overallAnalysisFloor">—</p>
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </div>
 
-                                        <div class="final-report-highlights" style="display: none;">
-                                            <div class="final-report-title">
-                                                <h4>Destaques da Janela</h4>
-                                            </div>
+                                            <div class="dashed-border"></div>
 
-                                            <ul>
-                                                <li>
-                                                    <img src="images/geral-icons/speed-icon.svg">
-                                                    <h5>Recebedor Mais Rápido: <span id="overallAnalysisFastestReceiver">—</span></h5>
-                                                </li>
-
-                                                <li>
-                                                    <img src="images/geral-icons/star-icon.svg">
-                                                    <h5>Recebeu Mais Pacotes: <span id="overallAnalysisMostPackages">—</span></h5>
-                                                </li>
-
-                                                <li>
-                                                    <img src="images/geral-icons/speed-icon.svg">
-                                                    <h5>Conferente Mais Rápido: <span id="overallAnalysisFastestChecker">—</span></h5>
-                                                </li>
-
-                                                <li>
-                                                    <img src="images/geral-icons/star-icon.svg">
-                                                    <h5>Conferiu Mais Rotas: <span id="overallAnalysisMostRoutesChecker">—</span></h5>
-                                                </li>
-
-                                            </ul>
+                                            <h5 id="overallAnalysisFlowStatus">—</h5>
                                         </div>
                                     </div>
 
                                     <!-- RECEBIMENTO E EXPEDIÇÃO -->
 
-                                    <div class="final-report-receipt-and-expedition flex-box-start">
-                                        <div class="final-report-receipt">
+                                    <div class="flex-box-start">
+                                        <div>
                                             <table>
                                                 <caption>Processamento</caption>
 
@@ -2765,7 +2732,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="final-report-expedition">
+                                        <div>
                                             <table>
                                                 <caption>Expedição</caption>
 
@@ -2800,94 +2767,92 @@
 
                                     <!-- AVARIAS E PERDAS -->
 
-                                    <div class="final-report-damage-and-lost">
-                                        <table id="overallAnalysisDamageAndLossesTable">
-                                            <caption>Situação das Avarias e Perdas</caption>
+                                    <table id="overallAnalysisDamageAndLossesTable">
+                                        <caption>Situação das Avarias e Perdas</caption>
 
-                                            <thead>
-                                                <tr>
-                                                    <th scope="col" style="width: 230px;">Ocorrência</th>
-                                                    <th scope="col">Hoje</th>
-                                                    <th scope="col">Ontem</th>
-                                                    <th scope="col">Anteontem</th>
-                                                    <th scope="col">De 3 a 7<br>Dias Atrás</th>
-                                                    <th scope="col">De 8 a 14<br>Dias Atrás</th>
-                                                    <th scope="col">De 15 Dias Atrás<br>Até o Começo do Mês</th>
-                                                    <th scope="col">Total do Mês</th>
-                                                </tr>
-                                            </thead>
+                                        <thead>
+                                            <tr>
+                                                <th scope="col" style="width: 230px;">Ocorrência</th>
+                                                <th scope="col">Hoje</th>
+                                                <th scope="col">Ontem</th>
+                                                <th scope="col">Anteontem</th>
+                                                <th scope="col">De 3 a 7<br>Dias Atrás</th>
+                                                <th scope="col">De 8 a 14<br>Dias Atrás</th>
+                                                <th scope="col">De 15 Dias Atrás<br>Até o Começo do Mês</th>
+                                                <th scope="col">Total do Mês</th>
+                                            </tr>
+                                        </thead>
 
-                                            <tbody>
-                                                <tr data-overall-damage-losses-field="hub">
-                                                    <th scope="row">Avarias do Hub</th>
-                                                    <td>—</td>
-                                                    <td>—</td>
-                                                    <td>—</td>
-                                                    <td>—</td>
-                                                    <td>—</td>
-                                                    <td>—</td>
-                                                    <td>—</td>
-                                                </tr>
-                                            </tbody>
+                                        <tbody>
+                                            <tr data-overall-damage-losses-field="hub">
+                                                <th scope="row">Avarias do Hub</th>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                            </tr>
+                                        </tbody>
 
-                                            <tbody>
-                                                <tr data-overall-damage-losses-field="soc">
-                                                    <th scope="row">Avarias do SOC</th>
-                                                    <td>—</td>
-                                                    <td>—</td>
-                                                    <td>—</td>
-                                                    <td>—</td>
-                                                    <td>—</td>
-                                                    <td>—</td>
-                                                    <td>—</td>
-                                                </tr>
-                                            </tbody>
+                                        <tbody>
+                                            <tr data-overall-damage-losses-field="soc">
+                                                <th scope="row">Avarias do SOC</th>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                            </tr>
+                                        </tbody>
 
-                                            <tbody>
-                                                <tr data-overall-damage-losses-field="underReview">
-                                                    <th scope="row">Pacotes em Análise</th>
-                                                    <td>—</td>
-                                                    <td>—</td>
-                                                    <td>—</td>
-                                                    <td>—</td>
-                                                    <td>—</td>
-                                                    <td>—</td>
-                                                    <td>—</td>
-                                                </tr>
-                                            </tbody>
+                                        <tbody>
+                                            <tr data-overall-damage-losses-field="underReview">
+                                                <th scope="row">Pacotes em Análise</th>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                            </tr>
+                                        </tbody>
 
-                                            <tbody>
-                                                <tr data-overall-damage-losses-field="confirmedLosses">
-                                                    <th scope="row">Perdas Confirmadas</th>
-                                                    <td>—</td>
-                                                    <td>—</td>
-                                                    <td>—</td>
-                                                    <td>—</td>
-                                                    <td>—</td>
-                                                    <td>—</td>
-                                                    <td>—</td>
-                                                </tr>
-                                            </tbody>
+                                        <tbody>
+                                            <tr data-overall-damage-losses-field="confirmedLosses">
+                                                <th scope="row">Perdas Confirmadas</th>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                            </tr>
+                                        </tbody>
 
-                                            <tbody>
-                                                <tr data-overall-damage-losses-field="returnedPackages">
-                                                    <th scope="row">Pacotes Retornados</th>
-                                                    <td>—</td>
-                                                    <td>—</td>
-                                                    <td>—</td>
-                                                    <td>—</td>
-                                                    <td>—</td>
-                                                    <td>—</td>
-                                                    <td>—</td>
-                                                </tr>
-                                            </tbody>
+                                        <tbody>
+                                            <tr data-overall-damage-losses-field="returnedPackages">
+                                                <th scope="row">Pacotes Retornados</th>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                            </tr>
+                                        </tbody>
 
-                                        </table>
-                                    </div>
+                                    </table>
 
                                     <!-- PARCEL E REVERSA -->
 
-                                    <div class="final-report-parcel-and-reverse flex-box-start">
+                                    <div class="flex-box-start">
                                         <div>
                                             <table>
                                                 <caption>Parcel Sweeper</caption>
@@ -3019,7 +2984,7 @@
                     <div class="flex-box-start">
                         <div class="warning" id="analysisNotification" role="status" aria-live="polite" aria-atomic="true" data-notification-type="idle">
                             <div class="flex-box-start">
-                                <img id="analysisNotificationIcon" src="images/geral-icons/bell-icon.svg" alt="" aria-hidden="true">
+                                <img id="analysisNotificationIcon" src="images/geral-icons/bell-icon.svg" aria-hidden="true">
 
                                 <h4 id="analysisNotificationText">Importe uma base de dados vinda do SPX para começar.</h4>
                             </div>
@@ -3027,21 +2992,21 @@
 
                         <div class="report-actions">
                             <button id="analysisCopyButton" type="button" title="Copia os dados filtrados" aria-label="Copia os dados filtrados" data-analysis-requires-data disabled>
-                                <img src="images/geral-icons/copy-icon.svg" alt="" aria-hidden="true">
+                                <img src="images/geral-icons/copy-icon.svg" aria-hidden="true">
                             </button>
 
                             <button id="analysisSaveButton" type="button" title="Salvar arquivo filtrado em CSV" aria-label="Salvar arquivo filtrado em CSV" data-analysis-requires-data disabled>
-                                <img src="images/geral-icons/save-icon.svg" alt="" aria-hidden="true">
+                                <img src="images/geral-icons/save-icon.svg" aria-hidden="true">
                             </button>
 
                             <button id="analysisImportButton" type="button" title="Importar base de dados" aria-label="Importar base de dados">
-                                <img src="images/geral-icons/import-icon.svg" alt="" aria-hidden="true">
+                                <img src="images/geral-icons/import-icon.svg" aria-hidden="true">
                             </button>
 
                             <input id="analysisFileInput" type="file" accept=".csv,.xlsx,.xls" hidden>
 
                             <button id="analysisClearButton" type="button" title="Descartar arquivo importado" aria-label="Descartar arquivo importado" data-analysis-requires-data disabled>
-                                <img src="images/geral-icons/trash-basket-icon.svg" alt="" aria-hidden="true">
+                                <img src="images/geral-icons/trash-basket-icon.svg" aria-hidden="true">
                             </button>
                         </div>
                     </div>
@@ -3320,7 +3285,7 @@
                     <div class="flex-box-start">
                         <div class="warning" id="filterNotification" role="status" aria-live="polite" aria-atomic="true" data-notification-type="idle">
                             <div class="flex-box-start">
-                                <img id="filterNotificationIcon" src="images/geral-icons/bell-icon.svg" alt="" aria-hidden="true">
+                                <img id="filterNotificationIcon" src="images/geral-icons/bell-icon.svg" aria-hidden="true">
 
                                 <h4 id="filterNotificationText">Selecione a finalidade para definir como os dados serão importados.</h4>
                             </div>
@@ -3328,21 +3293,21 @@
 
                         <div class="report-actions">
                             <button id="filterCopyButton" type="button" title="Copia os dados filtrados" aria-label="Copia os dados filtrados" disabled>
-                                <img src="images/geral-icons/copy-icon.svg" alt="" aria-hidden="true">
+                                <img src="images/geral-icons/copy-icon.svg" aria-hidden="true">
                             </button>
 
                             <button id="filterSaveButton" type="button" title="Salvar arquivo filtrado em CSV" aria-label="Salvar arquivo filtrado em CSV" disabled>
-                                <img src="images/geral-icons/save-icon.svg" alt="" aria-hidden="true">
+                                <img src="images/geral-icons/save-icon.svg" aria-hidden="true">
                             </button>
 
                             <button id="filterImportButton" type="button" title="Selecione uma finalidade" aria-label="Selecione uma finalidade" disabled>
-                                <img src="images/geral-icons/import-icon.svg" alt="" aria-hidden="true">
+                                <img src="images/geral-icons/import-icon.svg" aria-hidden="true">
                             </button>
 
                             <input id="filterFileInput" type="file" accept=".csv,.xlsx,.xls" hidden>
 
                             <button id="filterClearButton" type="button" title="Descartar arquivo importado" aria-label="Descartar arquivo importado" disabled>
-                                <img src="images/geral-icons/trash-basket-icon.svg" alt="" aria-hidden="true">
+                                <img src="images/geral-icons/trash-basket-icon.svg" aria-hidden="true">
                             </button>
                         </div>
                     </div>

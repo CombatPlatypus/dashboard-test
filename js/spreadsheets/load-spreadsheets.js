@@ -989,7 +989,7 @@ function initializeSpreadsheetNavigation(
 
     const mainTabs =
         document.getElementById(
-            "switch-1",
+            "change-panel",
         );
 
     if (

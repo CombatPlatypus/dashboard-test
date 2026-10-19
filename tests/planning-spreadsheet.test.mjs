@@ -727,7 +727,7 @@ test(
 
         assert.match(
             html,
-            /id="planningSpreadsheetDownloadButton"[^>]+title="Baixar planilha de planejamento"/,
+            /<button\b[^>]*\bid="planningSpreadsheetDownloadButton"[^>]*\btype="button"[^>]*>/,
         );
 
         assert.ok(

@@ -11,247 +11,171 @@
     align-items: center;
 }
 
-    /* INPUTS GLOBAIS */
+/* INPUTS GLOBAIS */
 
-    .global-inputs {
-        max-width: 1400px;
-        margin: 0 auto 20px auto;
-        column-gap: 15px;
-        align-items: center;
-    }
-    .global-inputs > div {
-        flex: 1 1 0;
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        text-align: center;
-        column-gap: 15px;
-    }
-    .global-inputs > div input {
-        min-height: 50px;
-        text-align: center;
-        border: 2px solid var(--color-border);
-    }
+#reports > .global-inputs {
+    max-width: 1400px;
+    margin: 0 auto 20px auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    align-items: center;
+    text-align: center;
+    column-gap: 15px;
+}
+#reports > .global-inputs > div input {
+    min-height: 50px;
+    text-align: center;
+    border: 2px solid var(--color-border);
+}
+#reports > .global-inputs .select2-container--default .select2-selection--single .select2-selection__rendered {
+    font-size: 14px !important;
+    line-height: 48px !important;
+}
+#reports > .global-inputs .select2-container--default .select2-selection--single {
+    height: 50px !important;
+    border: 2px solid var(--color-border) !important;
+}
 
-    .global-inputs .select2-container--default .select2-selection--single .select2-selection__rendered {
-        font-size: 14px !important;
-        line-height: 48px !important;
-    }
-    .global-inputs .select2-container--default .select2-selection--single {
-        height: 50px !important;
-        border: 2px solid var(--color-border) !important;
-    }
+/* TABS DE ESCOLHA DOS RELATÓRIOS */
 
-    /* TABS DE ESCOLHA DE RELATÓRIOS */
+#report-choice {
+    flex: 1 1 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+}
+#report-choice .tabs-title {
+    width: 100%;
+}
+#report-choice .tabs-title p,
+#report-choice .tabs-title h4 {
+    margin-bottom: 0;
+    text-align: center;
+}
 
-    #report-choice {
-        flex: 1 1 0;
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 15px;
-    }
-    #report-choice .tabs-title {
-        width: 100%;
-    }
-    #report-choice .tabs-title p,
-    #report-choice .tabs-title h4 {
-        margin-bottom: 0;
-        text-align: center;
-    }
-    #reports .action-buttons {
-        flex: 0 0 85px;
-        column-gap: 15px;
-        overflow: hidden;
-    }
-    #reports .action-buttons #reportImportButton {
-        background-color: transparent;
-        border-bottom: none;
-        cursor: pointer;
-    }
-    #reports .action-buttons #reportImportButton:hover {
-        opacity: 0.61;
-        transition: all 0.5s ease;
-    }
-    #reports .action-buttons button img {
-        width: 35px;
-    }
-    #reports > .tabs-content > .tabs-panel > .flex-box-start {
-        gap: 20px;
-        align-items: start;
-    }
+/* TABS DE ESCOLHA DOS MODULOS DE CADA RELATÓRIO ESCOLHIDO */
 
-    /* TABS QUE FICA DENTRO DO RELATÓRIO ESCOLHIDO */
+#reports > .tabs-content > .tabs-panel > .tabs {
+    width: 100%;
+    display: grid;
+    align-items: center;
+    column-gap: 15px;
+    margin-bottom: 20px;
+}
+#reports > .tabs-content > .tabs-panel > #receipt .tabs {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+#reports > .tabs-content > .tabs-panel > #expedition .tabs {
+    grid-template-columns: repeat(auto-fit, minmax(299px, 1fr));
+}
+#reports > .tabs-content > .tabs-panel > #planning .tabs {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+#reports > .tabs-content > .tabs-panel > #damage-and-losses .tabs {
+    grid-template-columns: repeat(auto-fit, minmax(299px, 1fr));
+}
+#reports > .tabs-content > .tabs-panel > #losses-rate .tabs {
+    grid-template-columns: repeat(auto-fit, minmax(115px, 1fr));
+}
+#reports > .tabs-content > .tabs-panel > .tabs .tabs-title {
+    width: 100%;
+}
 
-    #reports > .tabs-content > .tabs-panel > .tabs {
-        width: 100%;
-        display: grid;
-        align-items: center;
-        column-gap: 15px;
-        margin-bottom: 20px;
-    }
-    #reports > .tabs-content > .tabs-panel > .tabs .tabs-title {
-        width: 100%;
-    }
+/* FLEX-BOX-START QUE DIVIDE A PREVIEW E OS CONTROLES */
 
-    /* BOTÕES DE AÇÃO  */
+#reports > .tabs-content > .tabs-panel > .flex-box-start {
+    gap: 20px;
+    align-items: start;
+}
 
-    #reports .report-actions {
-        display: flex;
-        margin: 0 0 20px 0;
-        padding: 20px;
-        border-radius: 5px;
-        gap: 15px;
-        justify-content: center;
-        flex: 0 0 max-content;
-        background-color: var(--color-container);
-        border: 2px solid var(--color-border);
-    }
-    #reports .report-actions > button:hover,
-    #reports .report-actions > a:hover {
-        opacity: 0.61;
-        transition: all 0.5s ease;
-    }
-    #reports .report-actions > button > img, 
-    #reports .report-actions > a > img {
-        width: 35px;
-        cursor: pointer;
-    }
+/* BOTÕES DE AÇÃO DOS RELATÓRIOS */
 
-    /* PREVIEW */
+#reports .report-actions {
+    display: flex;
+    margin: 0 0 20px 0;
+    padding: 20px;
+    border-radius: 5px;
+    gap: 15px;
+    justify-content: center;
+    flex: 0 0 max-content;
+    background-color: var(--color-container);
+    border: 2px solid var(--color-border);
+}
+#reports .report-actions > button:hover,
+#reports .report-actions > a:hover {
+    opacity: 0.61;
+    transition: all 0.5s ease;
+}
+#reports .report-actions > button > img, 
+#reports .report-actions > a > img {
+    width: 35px;
+    cursor: pointer;
+}
 
-    #reports .preview {
-        flex: 0 0 1000px;
-    }
-    #reports .preview .preview-style {
-        display: flex;
-        flex-direction: column;
-        row-gap: 20px;
-        padding: 20px;
-        background-color: var(--color-container);
-        border: 2px solid var(--color-border);
-        border-radius: 5px;
-    }
-    #reports .preview .title {
-        width: 100%;
-        padding: 12px 20px;
-        text-align: center;
-        background-color: var(--color-table-title);
-        border: 1px solid var(--color-border);
-        border-radius: 5px 5px 0 0;
-    }
-    #reports .preview .title > h2 {
-        margin-bottom: 0;
-        font-size: 20px;
-        text-transform: uppercase;
-        letter-spacing: 1.5px;
-    }
+/* PREVIEW */
 
-    /* PARCEL SWEEPER - ORDENAÇÃO DAS TABELAS DE PACOTES */
+#reports .preview {
+    flex: 0 0 1000px;
+}
+#reports .preview .preview-style {
+    display: flex;
+    flex-direction: column;
+    row-gap: 20px;
+    padding: 20px;
+    background-color: var(--color-container);
+    border: 2px solid var(--color-border);
+    border-radius: 5px;
+}
+#reports .preview .title {
+    width: 100%;
+    padding: 12px 20px;
+    text-align: center;
+    background-color: var(--color-table-title);
+    border: 1px solid var(--color-border);
+    border-radius: 5px 5px 0 0;
+}
+#reports .preview .title > h2 {
+    margin-bottom: 0;
+    font-size: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
 
-    #reports #parcel .parcel-sort-button {
-        width: 100%;
-        min-height: 24px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        margin: 0;
-        padding: 0;
-        color: inherit;
-        background: transparent;
-        border: 0;
-        font: inherit;
-        font-weight: 600;
-        letter-spacing: inherit;
-        text-align: left;
-        cursor: pointer;
-    }
-    #reports #parcel .parcel-sort-button:hover,
-    #reports #parcel .parcel-sort-button:focus-visible {
-        color: var(--color-button);
-    }
-    #reports #parcel .parcel-sort-indicator {
-        flex: 0 0 auto;
-        color: var(--color-gray-p);
-        font-size: 15px;
-    }
+/* CONTROLES */
 
-    /* PARCEL SWEEPER - CORREÇÃO DISCRETA DA CLASSIFICAÇÃO */
+#reports .report-controls {
+    flex: 1 1 0;
+    background-color: var(--color-container);
+    border: 2px solid var(--color-border);
+    border-radius: 5px;
+}
+#reports .report-controls .title {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 2px solid var(--color-border);
+    padding: 20px;
+    align-items: center;
+}
+#reports .report-controls .title > h4 {
+    margin: 0;
+}
+#reports .report-controls .title > button {
+    width: 30px;
+    height: 30px;
+}
+#reports .report-controls .title .flex-box-start {
+    column-gap: 10px;
+}
+#reports .report-controls .title img {
+    width: 30px;
+    height: 30px;
+    cursor: pointer
+}
+#reports .report-controls .padding {
+    padding: 30px;
+}
 
-    #reports #parcel .parcel-bulky-toggle {
-        width: 100%;
-        margin: 0;
-        padding: 0;
-        color: inherit;
-        background: transparent;
-        border: 0;
-        font: inherit;
-        letter-spacing: inherit;
-        text-align: inherit;
-        cursor: pointer;
-    }
-    #reports #parcel .parcel-bulky-toggle:hover {
-        text-decoration: underline;
-        text-underline-offset: 3px;
-    }
-    #reports #parcel .parcel-bulky-toggle:focus-visible {
-        outline: 1px solid var(--color-gray-p);
-        outline-offset: 2px;
-    }
-
-    /* PARCEL SWEEPER - DISTRIBUIÇÃO POR STATUS E PRÓXIMA AÇÃO */
-
-    #reports #parcel #parcelStatusCharts {
-        display: flex;
-        gap: 15px;
-    }
-    #reports #parcel #parcelStatusCharts > .horizontal-bars-chart {
-        flex: 1 1 0;
-        min-width: 0;
-    }
-
-    /* CARDS DE DESTAQUES */
-
-    #reports .cards {
-        display: grid;
-        grid-template-columns:
-            repeat(
-                auto-fit,
-                minmax(299px, 1fr)
-            );
-        gap: 15px;
-        width: 100%;
-    }
-    #reports .cards > div {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 11px;
-        min-width: 0;
-        padding: 25px;
-        background-color: var(--color-container);
-        border: 1px solid var(--color-border);
-    }
-    #reports .cards > div > .flex-box-start {
-        align-items: center;
-        column-gap: 10px;
-    }
-    #reports .cards > div > .flex-box-start > h4 {
-        margin: 0;
-        line-height: 1;
-    }
-    #reports .cards > div > .flex-box-start > img {
-        width: 25px;
-    }
-    #reports .cards > div > p {
-        font-size: 14px;
-        color: var(--color-gray-p);
-        line-height: 1;
-        margin: 0;
-    }
-    #reports .cards > div > p:last-child {
-        margin: 0;
-    }
+/* ESTRUTURAS COMPARTILHADAS ENTRE CADA RELATÓRIO */
 
     /* TABELAS */
 
@@ -285,38 +209,44 @@
         text-align: center;
     }
 
-    /* CONTROLES */
+    /* CARDS DE DESTAQUES */
 
-    #reports .report-controls {
-        flex: 1 1 0;
-        background-color: var(--color-container);
-        border: 2px solid var(--color-border);
-        border-radius: 5px;
+    #reports .cards {
+        width: 100%;
+        display: grid;
+        grid-template-columns:repeat(auto-fit, minmax(299px, 1fr));
+        gap: 15px;
     }
-    #reports .report-controls .title {
+    #reports .cards > div {
         display: flex;
-        justify-content: space-between;
-        border-bottom: 2px solid var(--color-border);
-        padding: 20px;
+        flex-direction: column;
         align-items: center;
+        justify-content: center;
+        gap: 11px;
+        min-width: 0;
+        padding: 25px;
+        background-color: var(--color-container);
+        border: 1px solid var(--color-border);
     }
-    #reports .report-controls .title > h4 {
-        margin: 0;
-    }
-    #reports .report-controls .title > button {
-        width: 30px;
-        height: 30px;
-    }
-    #reports .report-controls .title .flex-box-start {
+    #reports .cards > div > .flex-box-start {
+        align-items: center;
         column-gap: 10px;
     }
-    #reports .report-controls .title img {
-        width: 30px;
-        height: 30px;
-        cursor: pointer
+    #reports .cards > div > .flex-box-start > h4 {
+        margin: 0;
+        line-height: 1;
     }
-    #reports .report-controls .padding {
-        padding: 30px;
+    #reports .cards > div > .flex-box-start > img {
+        width: 25px;
+    }
+    #reports .cards > div > p {
+        font-size: 14px;
+        color: var(--color-gray-p);
+        line-height: 1;
+        margin: 0;
+    }
+    #reports .cards > div > p:last-child {
+        margin: 0;
     }
 
     /* INPUT GROUP */
@@ -340,223 +270,572 @@
         text-align: center;
     }
 
-    /* GRAFICOS - ESTRUTURA */
+    /* GRAFICOS */
 
-    .chart {
-        background-color: var(--color-container);
-        border: 1px solid var(--color-border);
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-    }
-    .chart-title  {
-        padding: 0.5rem 0.625rem 0.625rem;
-        background-color: var(--color-table-th);
-        border-bottom: 1px solid var(--color-border);
-    }
-    .chart-title > h4 {
-        font-size: 15px;
-        margin: 0;
-        text-align: center;
-    }
-    .chart-padding {
-        padding: 25px;
-    }
-    .chart-canvas-container {
-        max-width: 100%;
-        position: relative;
-    }
-    .chart-label {
-        max-width: 100%;
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: center;
-        gap: 15px;
-        margin: 0 20px 20px 20px;
-    }
-    .chart-label .type {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-    .chart-label .type > div {
-        width: 20px;
-        height: 20px;
-        border-radius: 3px;
-    }  
-    .chart-label p {
-        font-size: 14px;
-        color: var(--color-text);
-        line-height: 1;
-        margin: 0;
-    }
-
-    /* TAMANHO DO CANVAS */
-
-    .chart canvas {
-        display: block;
-        width: 100% !important;
-        height: 100% !important;
-    }
-    .doughnut-chart .chart-canvas-container {
-        height: 264px;
-    }
-    .horizontal-bars-chart .chart-canvas-container {
-        height: 415px;
-    }
-    .vertical-bars-chart .chart-canvas-container {
-        height: 350px;
-        margin-bottom: 20px;
-    }
-    .line-chart .chart-canvas-container {
-        height: 304px;
-        margin: 0 20px 20px 20px;
-    }
-
-    /* AJUSTES POR RELATÓRIO */
-
-        /* EXPEDIÇÃO */
-
-        #expedition-mistakes .horizontal-bars-chart .chart-canvas-container {
-            height: 313px !important;
+        .chart {
+            background-color: var(--color-container);
+            border: 1px solid var(--color-border);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .chart-title  {
+            padding: 0.5rem 0.625rem 0.625rem;
+            background-color: var(--color-table-th);
+            border-bottom: 1px solid var(--color-border);
+        }
+        .chart-title > h4 {
+            font-size: 15px;
+            margin: 0;
+            text-align: center;
+        }
+        .chart-padding {
+            padding: 25px;
+        }
+        .chart-canvas-container {
+            max-width: 100%;
+            position: relative;
+        }
+        .chart-label {
+            max-width: 100%;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
             margin: 0 20px 20px 20px;
         }
-        #expedition-streets .vertical-bars-chart .chart-canvas-container {
-            height: 252px;
+        .chart-label .type {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .chart-label .type > div {
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+        }  
+        .chart-label p {
+            font-size: 14px;
+            color: var(--color-text);
+            line-height: 1;
+            margin: 0;
+        }
+
+        /* TAMANHO DO CANVAS */
+
+        .chart canvas {
+            display: block;
+            width: 100% !important;
+            height: 100% !important;
+        }
+        .doughnut-chart .chart-canvas-container {
+            height: 264px;
+        }
+        .horizontal-bars-chart .chart-canvas-container {
+            height: 415px;
+        }
+        .vertical-bars-chart .chart-canvas-container {
+            height: 350px;
+            margin-bottom: 20px;
+        }
+        .line-chart .chart-canvas-container {
+            height: 304px;
             margin: 0 20px 20px 20px;
         }
-        #expedition-streets .vertical-bars-chart .chart-label{
-            margin: 0 20px 0px 20px;
+
+        /* BARRA PROGRESSO */
+
+        .chart-progress {
+            padding: 18px 20px;
+            border: 1px solid var(--color-border);
+            background-color: var(--color-container);
+        }
+        .chart-progress-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        .chart-progress-header h4 {
+            margin: 0 0 5px;
+        }
+        .chart-progress-header p {
+            margin: 0;
+            color: var(--color-text);
+            font-size: 14px;
+        }
+        .chart-progress-percentage {
+            color: var(--color-text) !important;
+            font-size: 16px !important;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .chart-progress-track {
+            position: relative;
+            height: 15px;
+            margin-top: 18px;
+            overflow: hidden;
+            background-color: var(--color-progress-bar);
+        }
+        .chart-progress-fill {
+            position: absolute;
+            inset: 0 auto 0 0;
+            width: 0;
+            background-color: #007A48;
+        }
+
+        /* AJUSTES POR RELATÓRIO */
+
+            /* EXPEDIÇÃO */
+
+            #expedition-mistakes .horizontal-bars-chart .chart-canvas-container {
+                height: 313px !important;
+                margin: 0 20px 20px 20px;
+            }
+            #expedition-streets .vertical-bars-chart .chart-canvas-container {
+                height: 252px;
+                margin: 0 20px 20px 20px;
+            }
+            #expedition-streets .vertical-bars-chart .chart-label{
+                margin: 0 20px 0px 20px;
+            }
+            
+            /* AVARIAS E PERDAS */
+
+            #damage-and-losses .horizontal-bars-chart .chart-canvas-container {
+                height: 304px !important;
+                margin: 0 20px 20px 20px;
+            }
+            #damage-and-losses .chart-canvas-container {
+                margin: 0 20px 0px 20px;
+            }
+
+            /* PARCEL */
+
+            #parcel .horizontal-bars-chart .chart-canvas-container,
+            #parcel .vertical-bars-chart .chart-canvas-container {
+                margin: 0 20px 20px 20px;
+            }
+
+            /* RELATÓRIO FINAL  */
+
+            #overall-analysis .horizontal-bars-chart > .chart-canvas-container {
+                height: 320px !important;
+                margin: 20px;
+            }
+
+/* ESTILOS ÚNICOS PARA CADA RELATÓRIO */
+
+    /* PROCESSAMENTO */
+
+        #receipt #receiptWindowInput {
+            width: 100%;
+        }
+        #receipt #receiptWindowInput + .select2-container {
+            width: 100% !important;
+        }
+        #receipt #receiptLinehaulWindowInput {
+            width: 100%;
+        }
+        #receipt #receiptLinehaulWindowInput + .select2-container {
+            width: 100% !important;
+        }
+
+        /* CONTROLES */
+
+        #receipt-controls #receipt-controls-1 .input-group {
+            max-height: 542px;
+        }
+        #receipt-controls #receipt-controls-2 .input-group {
+            max-height: 559px;
+        }
+        #receipt-controls.input-group .flex-box-start input[data-receipt-operator-field="labeler"] {
+            flex: 1 1 0 !important;
+        }
+        #receipt-controls .input-group:last-of-type {
+            overflow-y: auto;
+            padding-right: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(100%, 1fr)) !important;
+        }
+        #receipt-controls .input-group:last-of-type::-webkit-scrollbar-track {
+            background-color: transparent;
+        }
+        #receipt-controls .input-group:last-of-type::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+            background-color: transparent;
+        }
+        #receipt-controls .input-group:last-of-type::-webkit-scrollbar-thumb {
+            border-radius: 5px;
+            background-color: var(--color-border);
+        }
+        .receipt-linehaul-controls .flex-box-between {
+            align-items: center;
+            column-gap: 10px;
+            margin: 15px 0;
+        }
+        .receipt-linehaul-controls .flex-box-between input:first-of-type{
+            flex: 1 1 0;
+        }
+        .receipt-linehaul-controls div > div:last-of-type {
+            display: flex;
+            gap: 10px;
+        }
+        .receipt-linehaul-controls div > div:last-of-type input:last-of-type {
+            flex: 0 0 86px;
+            text-align: center;
+        }
+        #receipt-controls .erro-checkbox {
+            display: flex;
+            align-items: center;
+            user-select: none;
+            gap: 10px;
+            width: 100%;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid var(--color-border);
+            cursor: pointer;
+        }
+        #receipt-controls .erro-checkbox input {
+            flex: 0 0 auto;
+        }
+        #receipt-controls .erro-checkbox span {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        #receipt-controls .erro-checkbox p {
+            color: var(--color-text);
+            margin: 0;
+            font-size: 14px;
+        }
+        #receipt-controls .erro-checkbox small {
+            color: var(--color-gray-p);
+            font-size: 12px;
+            line-height: 1.4;
+        }
+        #receipt-controls .erro-checkbox :has(input:disabled) {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+    /* EXPEDIÇÃO */
+
+        /* TABELAS */
+
+        #expedition .expedition-operator-table .operator-name-column {
+            width: 40%;
+        }
+        #expedition .expedition-operator-table .operator-metric-column {
+            width: 15%;
+        }
+        #expedition .expedition-operator-table th:first-child,
+        #expedition .expedition-operator-table td:first-child {
+            padding-left: 15px;
+            text-align: left;
+            white-space: normal;
+            overflow-wrap: anywhere;
+        }
+
+        /* CONTROLES */
+
+        #expedition .report-controls .input-group:first-of-type {
+            grid-template-columns: repeat(auto-fit, minmax(117px, 1fr));
+            border-bottom: 2px solid var(--color-border);
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+        #expedition .report-controls .input-group:last-of-type {
+            grid-template-columns: repeat(auto-fit, minmax(100%, 1fr)) !important;
+            padding-bottom: 0;
+            margin-bottom: 0;
+            border-bottom: none;
+            text-transform: capitalize;
+        }
+        #expedition .report-controls .input-group:last-of-type::-webkit-scrollbar-track {
+            background-color: transparent;
+        }
+        #expedition .report-controls .input-group:last-of-type::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+            background-color: transparent;
+        }
+        #expedition .report-controls .input-group:last-of-type::-webkit-scrollbar-thumb {
+            border-radius: 5px;
+            background-color: var(--color-border);
+        }
+        #expedition #expeditionOperatorControls {
+            height: 1251px;
+            overflow: auto;
+            padding-right: 15px;
+        }
+        #expedition #expeditionStreetGuardianControls {
+            max-height: 830px;
+            overflow-y: auto;
+            padding-right: 15px;
+        }
+        #expedition #expeditionStreetGuardianControls.is-errors-tab-active {
+            max-height: 465px;
+        }
+        #expedition #expeditionWindowInput {
+            width: 100%;
+        }
+        #expedition #expeditionWindowInput + .select2-container {
+            width: 100% !important;
+        }
+
+    /* PLANEJAMENTO */
+
+        /* ESTRUTURA DA PLANILHA */
+
+        #planning .planning-sheet-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 3fr) minmax(300px, 2fr);
+            gap: 20px;
+            align-items: stretch;
+        }
+        #planning .planning-sheet-main,
+        #planning .planning-sheet-sidebar {
+            min-width: 0;
+        }
+        .planning-sheet-table tr td:first-of-type {
+            text-align: left !important;
         }
         
-        /* AVARIAS E PERDAS */
+        /* LAYOUT ENTRE PRÉVIA E CONTROLES */
 
-        #damage-and-losses .horizontal-bars-chart .chart-canvas-container {
-            height: 304px !important;
-            margin: 0 20px 20px 20px;
-        }
-        #damage-and-losses .chart-canvas-container {
-            margin: 0 20px 0px 20px;
+        #planning .planning-report-layout {
+            align-items: flex-start !important;
         }
 
-        /* PARCEL */
+        /* COLUNAS DAS TABELAS */
 
-        #parcel .horizontal-bars-chart .chart-canvas-container,
-        #parcel .vertical-bars-chart .chart-canvas-container {
-            margin: 0 20px 20px 20px;
+        #planning .planning-main-table th:nth-child(3),
+        #planning .planning-main-table td:nth-child(3) {
+            width: 90px;
+            text-align: center;
+        }
+        #planning .planning-segregated-table th:nth-child(3),
+        #planning .planning-segregated-table td:nth-child(3),
+        #planning .planning-segregated-table th:nth-child(4),
+        #planning .planning-segregated-table td:nth-child(4) {
+            width: 90px;
+            text-align: center;
+        }
+        #planning .planning-pool-table th:last-child,
+        #planning .planning-pool-table td:nth-child(2),
+        #planning .planning-pool-table td:nth-child(3) {
+            width: 75px;
+            text-align: center;
+        }
+        #planning .planning-segregated-tos-table th:nth-child(3),
+        #planning .planning-segregated-tos-table td:nth-child(3) {
+            width: 75px;
+            text-align: center;
+        }
+        #planning .planning-cp-summary-table .planning-quantity-column {
+            width: 90px;
         }
 
-        /* RELATÓRIO FINAL  */
+        /* DISTRIBUIÇÃO VERTICAL */
 
-        .final-report-receipt > .horizontal-bars-chart > .chart-canvas-container,
-        .final-report-expedition > .horizontal-bars-chart > .chart-canvas-container {
-            height: 320px !important;
-            margin: 20px;
+        #planning .planning-sheet-main,
+        #planning .planning-sheet-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            min-width: 0;
+            min-height: 0;
+        }
+        #planning #planningSegregatedSection[hidden],
+        #planning #planningSegregatedTosSection[hidden] {
+            display: none;
         }
 
-    /* GRAFICOS - BARRA ÚNICA HORRIZONTAL DE PROGRESSO */
+        /* LISTA DINÂMICA DE LHS */
 
-    .chart-progress {
-        padding: 18px 20px;
-        border: 1px solid var(--color-border);
-        background-color: var(--color-container);
-    }
-    .chart-progress-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 20px;
-    }
-    .chart-progress-header h4 {
-        margin: 0 0 5px;
-    }
-    .chart-progress-header p {
-        margin: 0;
-        color: var(--color-text);
-        font-size: 14px;
-    }
-    .chart-progress-percentage {
-        color: var(--color-text) !important;
-        font-size: 16px !important;
-        font-weight: 600;
-        white-space: nowrap;
-    }
-    .chart-progress-track {
-        position: relative;
-        height: 15px;
-        margin-top: 18px;
-        overflow: hidden;
-        background-color: var(--color-progress-bar);
-    }
-    .chart-progress-fill {
-        position: absolute;
-        inset: 0 auto 0 0;
-        width: 0;
-        background-color: #007A48;
-    }
+        .lhs-list {
+            display: flex;
+            flex-direction: column;
+            row-gap: 20px;
+            overflow: auto;
+            padding-right: 15px;
+            max-height: 420px !important;
+        }
+        .lhs-list label {
+            display: flex;
+            align-items: center;
+            column-gap: 6px;
+            font-size: 14px;
+            color: var(--color-text);
+            cursor: pointer;
+            user-select: none;
+            margin-bottom: 15px;
+        }
+        .lhs-list h4 {
+            margin-bottom: 15px;
+        }
+        .lhs-list .lhs-inputs {
+            display: flex;
+            gap: 10px;
+        }
+        .lhs-list .lhs-inputs input:last-of-type{
+            flex: 0 0 86px;
+            text-align: center;
+        }
+        .lhs-list::-webkit-scrollbar-track {
+            background-color: transparent;
+        }
+        .lhs-list::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+            background-color: transparent;
+        }
+        .lhs-list::-webkit-scrollbar-thumb {
+            border-radius: 5px;
+            background-color: var(--color-border);
+        }
 
-    /* AJUSTES ESPECÍFICOS PARA CADA RELATÓRIO */
+        /* LISTA DINÂMICA DE TOS */
 
-    #receipt .tabs,
-    #planning .tabs {
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    }
-    #planning #planningGeneralControls > .input-group:first-of-type {
-        padding-bottom: 20px;
-        border-bottom: 2px solid var(--color-border);
-        margin-bottom: 15px;
-    }
-    #losses-rate .tabs {
-        grid-template-columns: repeat(auto-fit, minmax(115px, 1fr));
-    }
-    #receipt .report-controls .input-group {
-        padding-bottom: 20px;
-        margin-bottom: 20px;
-        border-bottom: 2px solid var(--color-border);
-    }
-    #receipt .report-controls .input-group:last-of-type {
-        padding-bottom: 0;
-        margin-bottom: 0;
-        border-bottom: none;
-    }
-    #reports #receipt .report-controls .input-group .flex-box-start input[data-receipt-operator-field="labeler"] {
-        flex: 1 1 0;
-    }
-    #receipt select[data-receipt-operator-field="errorQuantity"] {
-        width: 86px;
-        flex: 0 0 86px;
-        padding-left: 12px;
-        text-align: center;
-    }
-    #receipt td {
-        text-align: center;
-    }
-    #expedition .tabs {
-        grid-template-columns: repeat(auto-fit, minmax(299px, 1fr));
-    }
-    #expedition .report-controls .input-group {
-        grid-template-columns: repeat(auto-fit, minmax(117px, 1fr));
-        border-bottom: 2px solid var(--color-border);
-        padding-bottom: 20px;
-        margin-bottom: 20px;
-    }
-    #expedition .report-controls .input-group:last-of-type {
-        padding-bottom: 0;
-        margin-bottom: 0;
-        border-bottom: none;
-    }
-    #expedition td {
-        text-align: center;
-    }
-    #expedition .expedition-guardian-name {
-        text-transform: capitalize;
-    }
-    #overall-analysis td {
-        text-align: center;
-    }
-    #damage-and-losses .tabs {
-        grid-template-columns: repeat(auto-fit, minmax(299px, 1fr));
+        .to-list {
+            display: flex;
+            flex-direction: column;
+            row-gap: 20px;
+            height: auto;
+        }
+        .to-list {
+            column-gap: 10px;
+        }
+        .to-list .flex-box-start {
+            column-gap: 10px;
+        }
+        .to-list .flex-box-start input:first-of-type {
+            flex: 1 1 0;
+        }
+        .to-list .flex-box-start input:last-of-type {
+            flex: 0 0 86px;
+            text-align: center;
+        }
+
+        /* SEGREGAÇÃO */
+
+        #planning .planning-lh-item-actions {
+            align-items: center;
+            flex-wrap: nowrap;
+            column-gap: 10px;
+            max-height: 38px;
+            overflow: hidden;
+        }
+        #planning .planning-lh-segregate-toggle,
+        #planning .planning-lh-segregate-to-toggle {
+            display: flex;
+            align-items: center;
+            column-gap: 6px;
+            margin: 0;
+            font-size: 13px;
+            color: var(--color-text);
+            cursor: pointer;
+            user-select: none;
+        }
+        #planning .planning-lh-segregate-toggle input,
+        #planning .planning-lh-segregate-to-toggle input {
+            margin: 0;
+            cursor: pointer;
+        }
+        #planning .planning-lh-segregate-to-toggle {
+            min-height: 40px;
+            padding: 8px 12px;
+            border: 1px solid var(--color-border);
+            border-radius: 5px;
+        }
+        #planning .planning-lh-segregate-to-toggle[hidden] {
+            display: none;
+        }
+        #planning .planning-lh-segregate-to-toggle:has(input:disabled) {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        #planning .planning-lh-segregate-to-toggle input:disabled {
+            cursor: not-allowed;
+        }
+
+        /* COLLECTION POOL E INDICADORES */
+
+        #collection-indicators .operations, #collection-indicators .fleet {
+            grid-template-columns: repeat(auto-fit, minmax(162px, 1fr)) !important;
+            border-top: 2px solid var(--color-border);
+            padding-top: 20px;
+        }
+        #collection-indicators .padding {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        #collection-indicators p {
+            margin: 0;
+            color: var(--color-gray-p);
+            font-size: 14px;
+        }
+        #collection-indicators input[readonly] {
+            cursor: not-allowed;
+        }
+        #collection-indicators > a {
+            font-size: 13px;
+            transition: color 0.2s ease;
+        }
+        #collection-indicators > a:hover,
+        #collection-indicators > a:focus-visible {
+            color: #1a73e8;
+        }
+
+        /* BACKLOG */
+
+        #planning-backlog textarea {
+            min-height: 403px;
+        }
+
+        /* SELEÇÃO DE JANELA PARA IMPORTAR */
+
+        #planningImportWindowOptions,
+        #receiptLinehaulImportWindowOptions {
+            margin: 20px 0;
+            display: flex;
+            flex-direction: column;
+            row-gap: 10px;
+            padding: 20px 0;
+            border-top: 2px solid var(--color-border);
+            border-bottom: 2px solid var(--color-border);
+        }
+        #planningImportWindowOptions div,
+        #receiptLinehaulImportWindowOptions div {
+            cursor: pointer;
+            width: max-content;
+        }
+        #planningImportWindowOptions input,
+        #receiptLinehaulImportWindowOptions input {
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        /* RESPONSIVIDADE */
+
+        @media screen and (max-width: 1500px) {
+            #planning .planning-sheet-layout {
+                grid-template-columns: minmax(0, 1fr);
+            }
+        }
+        @media screen and (max-width: 800px) {
+            #planning .planning-sheet-metrics {
+                grid-template-columns: minmax(0, 1fr);
+            }
+        }
+
+    /* AVARIAS E PERDAS */
+
+    #reports #damage-and-losses .cards > div > .flex-box-start > img {
+        width: 35px;
     }
     #damage-and-losses .damage-chart-period-selector {
         display: grid;
@@ -582,10 +861,7 @@
         line-height: 1.35;
         text-align: center;
         cursor: pointer;
-        transition:
-            color 160ms ease,
-            background-color 160ms ease,
-            border-color 160ms ease;
+        transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease;
     }
     #damage-and-losses .damage-chart-period-selector button::before {
         position: absolute;
@@ -611,308 +887,15 @@
         opacity: 0.45;
         cursor: default;
     }
-    #reports #losses-rate .preview {
-        flex: 1 1 0 !important;
+    .damage-and-losses-charts {
+        gap: 15px;
+        flex-direction: row-reverse;
     }
-        
-/* ESTILOS ÚNICOS DE CADA RELATÓRIO */
-
-    /* PLANEJAMENTO - ESTRUTURA DA PLANILHA */
-
-    #planning .planning-sheet-layout {
-        display: grid;
-        grid-template-columns: minmax(0, 3fr) minmax(300px, 2fr);
-        gap: 20px;
-        align-items: stretch;
-    }
-    #planning .planning-sheet-main,
-    #planning .planning-sheet-sidebar {
-        min-width: 0;
-    }
-    .planning-sheet-table tr td:first-of-type {
-        text-align: left !important;
-    }
-    
-    /* PLANEJAMENTO - LAYOUT ENTRE PRÉVIA E CONTROLES */
-
-    #planning .planning-report-layout {
-        align-items: flex-start !important;
-    }
-
-    /* PLANEJAMENTO - COLUNAS DAS TABELAS */
-
-    #planning .planning-main-table th:nth-child(3),
-    #planning .planning-main-table td:nth-child(3) {
-        width: 90px;
-        text-align: center;
-    }
-    #planning .planning-segregated-table th:nth-child(3),
-    #planning .planning-segregated-table td:nth-child(3),
-    #planning .planning-segregated-table th:nth-child(4),
-    #planning .planning-segregated-table td:nth-child(4) {
-        width: 90px;
-        text-align: center;
-    }
-    #planning .planning-pool-table th:last-child,
-    #planning .planning-pool-table td:nth-child(2),
-    #planning .planning-pool-table td:nth-child(3) {
-        width: 75px;
-        text-align: center;
-    }
-    #planning .planning-segregated-tos-table th:nth-child(3),
-    #planning .planning-segregated-tos-table td:nth-child(3) {
-        width: 75px;
-        text-align: center;
-    }
-    #planning .planning-cp-summary-table .planning-quantity-column {
-        width: 90px;
-    }
-
-    /* PLANEJAMENTO - DISTRIBUIÇÃO VERTICAL */
-
-    #planning .planning-sheet-main,
-    #planning .planning-sheet-sidebar {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-        min-width: 0;
-        min-height: 0;
-    }
-    #planning #planningSegregatedSection[hidden],
-    #planning #planningSegregatedTosSection[hidden] {
-        display: none;
-    }
-
-    /* PLANEJAMENTO - LISTA DINÂMICA DE LHS */
-
-    .lhs-list {
-        display: flex;
-        flex-direction: column;
-        row-gap: 20px;
-        overflow: auto;
-        padding-right: 15px;
-        max-height: 420px !important;
-    }
-    .lhs-list label {
-        display: flex;
-        align-items: center;
-        column-gap: 6px;
-        font-size: 14px;
-        color: var(--color-text);
-        cursor: pointer;
-        user-select: none;
-        margin-bottom: 15px;
-    }
-    .lhs-list h4 {
-        margin-bottom: 15px;
-    }
-    .lhs-list .lhs-inputs {
-        display: flex;
-        gap: 10px;
-    }
-    .lhs-list .lhs-inputs input:last-of-type{
-        flex: 0 0 86px;
-        text-align: center;
-    }
-    .lhs-list::-webkit-scrollbar-track {
-        background-color: transparent;
-    }
-    .lhs-list::-webkit-scrollbar {
-        width: 5px;
-        height: 5px;
-        background-color: transparent;
-    }
-    .lhs-list::-webkit-scrollbar-thumb {
-        border-radius: 5px;
-        background-color: var(--color-border);
-    }
-
-    /* PLANEJAMENTO - LISTA DINÂMICA DE TOS */
-
-    .to-list {
-        display: flex;
-        flex-direction: column;
-        row-gap: 20px;
-        height: auto;
-    }
-    .to-list {
-        column-gap: 10px;
-    }
-    .to-list .flex-box-start {
-        column-gap: 10px;
-    }
-    .to-list .flex-box-start input:first-of-type {
+    .damage-and-losses-charts > div {
         flex: 1 1 0;
     }
-    .to-list .flex-box-start input:last-of-type {
-        flex: 0 0 86px;
-        text-align: center;
-    }
 
-    /* PLANEJAMENTO - SEGREGAÇÃO */
-
-    #planning .planning-lh-item-actions {
-        align-items: center;
-        flex-wrap: nowrap;
-        column-gap: 10px;
-        max-height: 38px;
-        overflow: hidden;
-    }
-    #planning .planning-lh-segregate-toggle,
-    #planning .planning-lh-segregate-to-toggle {
-        display: flex;
-        align-items: center;
-        column-gap: 6px;
-        margin: 0;
-        font-size: 13px;
-        color: var(--color-text);
-        cursor: pointer;
-        user-select: none;
-    }
-    #planning .planning-lh-segregate-toggle input,
-    #planning .planning-lh-segregate-to-toggle input {
-        margin: 0;
-        cursor: pointer;
-    }
-    #planning .planning-lh-segregate-to-toggle {
-        min-height: 40px;
-        padding: 8px 12px;
-        border: 1px solid var(--color-border);
-        border-radius: 5px;
-    }
-    #planning .planning-lh-segregate-to-toggle[hidden] {
-        display: none;
-    }
-    #planning .planning-lh-segregate-to-toggle:has(input:disabled) {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
-    #planning .planning-lh-segregate-to-toggle input:disabled {
-        cursor: not-allowed;
-    }
-
-    /* PLANEJAMENTO - COLLECTION POOL E INDICADORES */
-
-    #collection-indicators .operations, #collection-indicators .fleet {
-        grid-template-columns: repeat(auto-fit, minmax(162px, 1fr)) !important;
-        border-top: 2px solid var(--color-border);
-        padding-top: 20px;
-    }
-    #collection-indicators .padding {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-    }
-    #collection-indicators p {
-        margin: 0;
-        color: var(--color-gray-p);
-        font-size: 14px;
-    }
-    #collection-indicators input[readonly] {
-        cursor: not-allowed;
-    }
-    #collection-indicators > a {
-        font-size: 13px;
-        transition: color 0.2s ease;
-    }
-    #collection-indicators > a:hover,
-    #collection-indicators > a:focus-visible {
-        color: #1a73e8;
-    }
-
-    /* PLANEJAMENTO - BACKLOG */
-
-    #planning-backlog textarea {
-        min-height: 403px;
-    }
-
-    /* SPX - SELEÇÃO DE JANELA */
-
-    #planningImportWindowOptions,
-    #receiptLinehaulImportWindowOptions {
-        margin: 20px 0;
-        display: flex;
-        flex-direction: column;
-        row-gap: 10px;
-        padding: 20px 0;
-        border-top: 2px solid var(--color-border);
-        border-bottom: 2px solid var(--color-border);
-    }
-    #planningImportWindowOptions div,
-    #receiptLinehaulImportWindowOptions div {
-        cursor: pointer;
-        width: max-content;
-    }
-    #planningImportWindowOptions input,
-    #receiptLinehaulImportWindowOptions input {
-        margin-right: 10px;
-        cursor: pointer;
-    }
-
-    /* PLANEJAMENTO - RESPONSIVIDADE */
-
-    @media screen and (max-width: 1500px) {
-        #planning .planning-sheet-layout {
-            grid-template-columns: minmax(0, 1fr);
-        }
-    }
-    @media screen and (max-width: 800px) {
-        #planning .planning-sheet-metrics {
-            grid-template-columns: minmax(0, 1fr);
-        }
-    }
-
-    /* TAXAS DE PERDAS BOTÃO DE IMPORTAÇÃO */
-
-    #losses-rate .losses-rate-identification {
-        padding-bottom: 20px;
-        margin-bottom: 20px;
-        border-bottom: 2px solid var(--color-border);
-    }
-    #losses-rate .losses-rate-identification div:first-of-type {
-        grid-column: 1 / -1;
-    }
-    #losses-rate .report-controls {
-        display: flex;
-        flex-direction: column;
-    }
-    #losses-rate .losses-rate-controls-summary {
-        margin-top: 20px;
-        padding-top: 20px;
-        border-top: 2px solid var(--color-border);
-    }
-    #losses-rate .losses-rate-controls-summary > h4 {
-        margin-bottom: 15px;
-    }
-    #losses-rate .losses-rate-controls-summary > div > span {
-        line-height: 1.6;
-        color: var(--color-text);
-        text-align: left;
-        font-size: 14px;
-        letter-spacing: 1px;
-        font-family: 'Open Sans', sans-serif;
-        font-weight: 400;
-        text-rendering: optimizeLegibility;
-    }
-    #losses-rate .losses-rate-controls-summary > div {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        min-height: 40px;
-        padding: 10px 12px;
-        border: 1px solid var(--color-border);
-        border-bottom: none;
-    }
-    #losses-rate .losses-rate-controls-summary > div:last-of-type {
-        border-bottom: 1px solid var(--color-border);
-        min-height: 72px;
-    }
-    #losses-rate .losses-rate-controls-summary > p {
-        margin: 15px 0 0;
-        color: var(--color-gray-p);
-    }
-
-    /* TAXA DE PERDAS - GRAFICOS */
+    /* TAXA DE PERDAS */
 
     #losses-rate .losses-rate-charts {
         gap: 15px;
@@ -922,511 +905,319 @@
         flex: 1 1 0;
     }
 
-    /* TAXA DE PERDAS - VALORES DA TABELA */
+    /* PARCEL SWEEPER */
 
-    #losses-rate #lossesRatePreview > table tbody td {
-        text-align: center;
-        vertical-align: middle;
-    }
+        #reports #parcel #parcelPreview > .flex-box-start {
+            gap: 15px;
+            align-items: flex-start;
+        }
+        #reports #parcel #parcelPreview > .distribution > .doughnut-chart {
+            flex: 1 1 0;
+        }
+        #reports #parcel #parcelPreview > .distribution > .distribution-by-operator {
+            flex: 1 1 0;
+        }
+        #parcel .data-selector {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+        }
+        #parcel .data-selector button {
+            position: relative;
+            display: flex;
+            min-height: 58px;
+            padding: 10px 12px;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: var(--color-gray-p);
+            background-color: var(--color-container);
+            border: 1px solid var(--color-border);
+            border-radius: 3px;
+            font: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            line-height: 1.35;
+            text-align: center;
+            cursor: pointer;
+            transition:
+                color 160ms ease,
+                background-color 160ms ease,
+                border-color 160ms ease;
+        }
+        #parcel .data-selector button::before {
+            position: absolute;
+            top: -1px;
+            right: -1px;
+            left: -1px;
+            height: 3px;
+            background-color: transparent;
+            border-radius: 3px 3px 0 0;
+            content: "";
+        }
+        #parcel .data-selector button:hover,
+        #parcel .data-selector button:focus-visible {
+            color: var(--color-text);
+            background-color: var(--color-container-houver);
+            border-color: var(--color-gray-p);
+        }
+        #parcel .data-selector button.is-active {
+            color: var(--color-text);
+            background-color: var(--color-container-houver);
+        }
+        #parcel .data-selector button:disabled {
+            opacity: 0.45;
+            cursor: default;
+        }
+        #reports #parcel #parcelPreview > .distribution-tables > div {
+            flex: 1 1 0;
+            max-height: 412px;
+            overflow: auto;
+            border: 1px solid var(--color-border);
+            border-radius: 4px;
+        }
+        #reports #parcel #parcelPreview > .distribution-tables > div::-webkit-scrollbar {
+            width: 7px;
+            height: 5px;
+            background-color: var(--color-container-focus);
+            border-left: 1px solid var(--color-border);
+        }
+        #reports #parcel #parcelPreview > .distribution-tables > div::-webkit-scrollbar-thumb {
+            border-radius: 0px 3px 3px 0px;
+            background-color: var(--color-text);
+        }
+        #reports #parcel #parcelPreview > .distribution-tables > div::-webkit-scrollbar-track {
+            background-color: transparent;
+        }
+        #reports #parcel #parcelPreview > .distribution-tables > div table thead {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            background-color: var(--color-table-th);
+        }
+        #reports #parcel caption .flex-box-start {
+            gap: 10px;
+            width: max-content;
+        }
+        #reports #parcel caption .flex-box-start button img {
+            width: 20px;
+            cursor: pointer;
+        }
+        #parcel .flex-box-start > .horizontal-bars-chart {
+            flex: 1 1 0;
+        }
 
-    /* PROCESSAMENTO */
+        /* BOTÃO DE ORDENAÇÃO DA TABELA */
 
-    #receipt #receiptWindowInput {
-        width: 100%;
-    }
-    #receipt #receiptWindowInput + .select2-container {
-        width: 100% !important;
-    }
-    #receipt #receiptLinehaulWindowInput {
-        width: 100%;
-    }
-    #receipt #receiptLinehaulWindowInput + .select2-container {
-        width: 100% !important;
-    }
-    #receipt .receipt-operator-row {
-        grid-template-columns: minmax(0, 1fr);
-    }
-    #receipt .receipt-operator-row > div {
-        width: 100%;
-    }
+        #reports #parcel .parcel-sort-button {
+            width: 100%;
+            min-height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin: 0;
+            padding: 0;
+            color: inherit;
+            background: transparent;
+            border: 0;
+            font: inherit;
+            font-weight: 600;
+            letter-spacing: inherit;
+            text-align: left;
+            cursor: pointer;
+        }
+        #reports #parcel .parcel-sort-button:hover,
+        #reports #parcel .parcel-sort-button:focus-visible {
+            color: var(--color-button);
+        }
+        #reports #parcel .parcel-sort-indicator {
+            flex: 0 0 auto;
+            color: var(--color-gray-p);
+            font-size: 15px;
+        }
 
-    /* PROCESSAMENTO - CONTROLES */
+        /* CORREÇÃO DISCRETA DA CLASSIFICAÇÃO */
 
-    #receipt-controls #receipt-controls-1 .input-group {
-        max-height: 542px;
-        overflow-y: auto;
-        padding-right: 15px;
-        grid-template-columns: repeat(auto-fit, minmax(100%, 1fr)) !important;
-    }
-    #receipt-controls #receipt-controls-1 .input-group::-webkit-scrollbar-track {
-        background-color: transparent;
-    }
-    #receipt-controls #receipt-controls-1 .input-group::-webkit-scrollbar {
-        width: 5px;
-        height: 5px;
-        background-color: transparent;
-    }
-    #receipt-controls #receipt-controls-1 .input-group::-webkit-scrollbar-thumb {
-        border-radius: 5px;
-        background-color: var(--color-border);
-    }
-    #receipt-controls #receipt-controls-1 .padding .erro-checkbox {
-        display: flex;
-        align-items: center;
-        user-select: none;
-        gap: 10px;
-        width: 100%;
-        margin-top: 20px;
-        padding-top: 20px;
-        border-top: 2px solid var(--color-border);
-        cursor: pointer;
-    }
-    #receipt-controls #receipt-controls-1 .padding .erro-checkbox input {
-        flex: 0 0 auto;
-    }
-    #receipt-controls #receipt-controls-1 .padding .erro-checkbox span {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-    }
-    #receipt-controls #receipt-controls-1 .padding .erro-checkbox p {
-        color: var(--color-text);
-        margin: 0;
-        font-size: 14px;
-    }
-    #receipt-controls #receipt-controls-1 .padding .erro-checkbox small {
-        color: var(--color-gray-p);
-        font-size: 12px;
-        line-height: 1.4;
-    }
-    #receipt-controls #receipt-controls-1 .padding .erro-checkbox :has(input:disabled) {
-        opacity: 0.55;
-        cursor: not-allowed;
-    }
-    #receipt-controls #receipt-controls-2 .input-group:last-of-type {
-        max-height: 559px;
-        overflow-y: auto;
-        padding-right: 15px;
-        grid-template-columns: repeat(auto-fit, minmax(100%, 1fr)) !important;
-    }
-    #receipt-controls #receipt-controls-2 .input-group:last-of-type::-webkit-scrollbar-track {
-        background-color: transparent;
-    }
-    #receipt-controls #receipt-controls-2 .input-group:last-of-type::-webkit-scrollbar {
-        width: 5px;
-        height: 5px;
-        background-color: transparent;
-    }
-    #receipt-controls #receipt-controls-2 .input-group:last-of-type::-webkit-scrollbar-thumb {
-        border-radius: 5px;
-        background-color: var(--color-border);
-    }
-    .receipt-linehaul-controls .flex-box-between {
-        align-items: center;
-        column-gap: 10px;
-        margin: 15px 0;
-    }
-    .receipt-linehaul-controls .flex-box-between input:first-of-type{
-        flex: 1 1 0;
-    }
-    .receipt-linehaul-controls div > div:last-of-type {
-        display: flex;
-        gap: 10px;
-    }
-    .receipt-linehaul-controls div > div:last-of-type input:last-of-type {
-        flex: 0 0 86px;
-        text-align: center;
-    }
-    
-    /* EXPEDIÇÃO - TABELAS */
+        #reports #parcel .parcel-bulky-toggle {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            color: inherit;
+            background: transparent;
+            border: 0;
+            font: inherit;
+            letter-spacing: inherit;
+            text-align: inherit;
+            cursor: pointer;
+        }
+        #reports #parcel .parcel-bulky-toggle:hover {
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+        #reports #parcel .parcel-bulky-toggle:focus-visible {
+            outline: 1px solid var(--color-gray-p);
+            outline-offset: 2px;
+        }
 
-    #expedition .expedition-operator-table {
-        table-layout: fixed;
-    }
-    #expedition .expedition-operator-table .operator-name-column {
-        width: 40%;
-    }
-    #expedition .expedition-operator-table .operator-metric-column {
-        width: 15%;
-    }
-    #expedition .expedition-operator-table th:first-child,
-    #expedition .expedition-operator-table td:first-child {
-        padding-left: 15px;
-        text-align: left;
-        white-space: normal;
-        overflow-wrap: anywhere;
-    }
+        /* DISTRIBUIÇÃO POR STATUS E PRÓXIMA AÇÃO */
 
-    /* EXPEDIÇÃO - CONTROLES */
+        #reports #parcel #parcelStatusCharts {
+            display: flex;
+            gap: 15px;
+        }
+        #reports #parcel #parcelStatusCharts > .horizontal-bars-chart {
+            flex: 1 1 0;
+            min-width: 0;
+        }
 
-    #expedition #expeditionWindowInput {
-        width: 100%;
-    }
-    #expedition #expeditionWindowInput + .select2-container {
-        width: 100% !important;
-    }
-    #expedition #expeditionOperatorControls {
-        grid-template-columns: repeat(auto-fit, minmax(100%, 1fr)) !important;
-        height: 1251px;
-        overflow: auto;
-        padding-right: 15px;
-    }
-    #expedition #expeditionOperatorControls::-webkit-scrollbar-track {
-        background-color: transparent;
-    }
-    #expedition #expeditionOperatorControls::-webkit-scrollbar {
-        width: 5px;
-        height: 5px;
-        background-color: transparent;
-    }
-    #expedition #expeditionOperatorControls::-webkit-scrollbar-thumb {
-        border-radius: 5px;
-        background-color: var(--color-border);
-    }
-    #controls-mistakes .input-group:last-of-type {
-        grid-template-columns: repeat(auto-fit, minmax(100%, 1fr)) !important;
-    }
-    #expedition #expeditionStreetGuardianControls {
-        max-height: 830px;
-        overflow-y: auto;
-        padding-right: 15px;
-    }
-    #expedition #expeditionStreetGuardianControls::-webkit-scrollbar-track {
-        background-color: transparent;
-    }
-    #expedition #expeditionStreetGuardianControls::-webkit-scrollbar {
-        width: 5px;
-        height: 5px;
-        background-color: transparent;
-    }
-    #expedition #expeditionStreetGuardianControls::-webkit-scrollbar-thumb {
-        border-radius: 5px;
-        background-color: var(--color-border);
-    }
-    #expeditionStreetGuardianControls input {
-      text-transform: capitalize;
-    }
-    #expedition #expeditionStreetGuardianControls.is-errors-tab-active {
-        max-height: 465px;
-    }
+    /* RELATÓRIO FINAL */
 
-    /* EXPEDIÇÃO - REVEAL */
+        /* TITULOS */
 
-    .process-errors {
-        display: flex;
-        gap: 15px;
-    }
-    .process-errors > div {
-        flex: 1 1 0;
-    }
+        .final-report-title {
+            padding: 0.5rem 0.625rem 0.625rem;
+            background-color: var(--color-table-th);
+            border-right: 1px solid var(--color-border);
+            border-left: 1px solid var(--color-border);
+            border-top: 1px solid var(--color-border);
+        }
+        .final-report-title h4 {
+            letter-spacing: 1.5px;
+            font-size: 15px;
+            margin: 0;
+        }
 
-    /* RELATÓRIO AVARIAS E PERDAS */
+        /* HEADER */
 
-    #reports #damage-and-losses .preview {
-        flex: 1 1 0;
-    }
-    .damage-and-losses-charts {
-        gap: 15px;
-        flex-direction: row-reverse;
-    }
-    .damage-and-losses-charts > div {
-        flex: 1 1 0;
-    }
-    #reports #damage-and-losses .cards > div > .flex-box-start > img {
-        width: 35px;
-    }
+        .final-report-header {
+            padding: 15px 20px;
+            border: 1px solid var(--color-border);
+            align-items: center;
+        }
+        .final-report-header .flex-box-start {
+            column-gap: 15px;
+            align-items: center;
+        }
+        .final-report-header img {
+            width: 35px;
+        }
+        .final-report-header p {
+            margin-bottom: 0;
+            line-height: 1;
+        }
 
-    /* RELATÓRIO FINAL - TITULOS */
+        /* CARDS */
 
-    .final-report-title {
-        padding: 0.5rem 0.625rem 0.625rem;
-        background-color: var(--color-table-th);
-        border-right: 1px solid var(--color-border);
-        border-left: 1px solid var(--color-border);
-        border-top: 1px solid var(--color-border);
-    }
-    .final-report-title h4 {
-        letter-spacing: 1.5px;
-        font-size: 15px;
-        margin: 0;
-    }
+        .final-report-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            width: 100%;
+        }
+        .final-report-cards > div {
+            min-width: 0;
+            min-height: 125px;
+        }
+        .final-report-cards .final-report-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 11px;
+            padding: 25px;
+            border: 1px solid var(--color-border);
+        }
+        .final-report-cards .final-report-card h2 {
+            margin: 0;
+            font-weight: 600;
+        }
+        .final-report-cards .final-report-card p {
+            margin: 0;
+            text-align: center;
+        }
+        .final-report-cards .final-report-card .flex-box-start {
+            column-gap: 15px;
+            align-items: center;
+        }
+        .final-report-cards .final-report-card .flex-box-start > div {
+            text-align: center;
+        }
+        .final-report-cards .final-report-card .final-report-mini-chart {
+            width: 150px;
+            min-height: 150px;
+            height: 150px;
+            position: relative;
+        }
+        .final-report-cards .final-report-card .final-report-mini-chart canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        .final-report-cards .final-report-card .final-report-mini-chart img {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            z-index: 1;
+            width: 42px;
+            height: 42px;
+            object-fit: contain;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+        }
 
-    /* RELATÓRIO FINAL - HEADER */
+        /* FLUXO DA JANELA */
+        
+        .flow {
+            padding: 25px;
+            border: 1px solid var(--color-border);
+        }
+        .flow .mini-cards {
+            gap: 15px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(233px, 1fr));
+        }
+        .flow .mini-cards > div {
+            padding: 25px;
+            border: 1px solid var(--color-border);
+            gap: 10px;
+            align-items: center;
+            flex-direction: column;
+        }
+        .flow .mini-cards img {
+            width: 35px;
+            height: 35px;
+        }
+        .flow .mini-cards h4, .flow .mini-cards p {
+            margin: 0;
+            text-align: center;
+        }
+        .flow .dashed-border {
+            width: 80%;
+            height: 50px;
+            margin: 0 auto;
+            border-bottom: 2px dashed var(--color-border);
+            border-right: 2px dashed var(--color-border);
+            border-left: 2px dashed var(--color-border);
+        }
+        .flow h5 {
+            margin: 15px 0 0 0;
+            text-align: center;
+        }
 
-    .final-report-header {
-        padding: 15px 20px;
-        border: 1px solid var(--color-border);
-        align-items: center;
-    }
-    .final-report-header .flex-box-start {
-        column-gap: 15px;
-        align-items: center;
-    }
-    .final-report-header img {
-        width: 35px;
-    }
-    .final-report-header p {
-        margin-bottom: 0;
-        line-height: 1;
-    }
+        /* TABELAS + GRAFICOS */
 
-    /* RELATÓRIO FINAL - CARDS */
+        .flex-box-start {
+            gap: 15px;
+        }
+        .flex-box-start > div {
+            flex: 1 1 0;
+        }
+        .flex-box-start > div > .chart {
+            margin-top: 15px;
+        }
 
-    .final-report-cards {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 15px;
-        width: 100%;
-    }
-    .final-report-cards > div {
-        min-width: 0;
-        min-height: 125px;
-    }
-    .final-report-cards .final-report-card {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 11px;
-        padding: 25px;
-        border: 1px solid var(--color-border);
-    }
-    .final-report-cards .final-report-card h2 {
-        margin: 0;
-        font-weight: 600;
-    }
-    .final-report-cards .final-report-card p {
-        margin: 0;
-        text-align: center;
-    }
-    .final-report-cards .final-report-card .flex-box-start {
-        column-gap: 15px;
-        align-items: center;
-    }
-    .final-report-cards .final-report-card .flex-box-start > div {
-        text-align: center;
-    }
-    .final-report-cards .final-report-card .final-report-mini-chart {
-        width: 150px;
-        min-height: 150px;
-        height: 150px;
-        position: relative;
-    }
-    .final-report-cards .final-report-card .final-report-mini-chart canvas {
-        width: 100%;
-        height: 100%;
-        display: block;
-    }
-    .final-report-cards .final-report-card .final-report-mini-chart img {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        z-index: 1;
-        width: 42px;
-        height: 42px;
-        object-fit: contain;
-        pointer-events: none;
-        transform: translate(-50%, -50%);
-    }
-
-    /* RELATÓRIO FINAL - FLUXO DA JANELA */
-    
-    .final-report-flow {
-        flex: 1 1 0;
-    }
-    .final-report-flow .flow {
-        padding: 25px;
-        border: 1px solid var(--color-border);
-    }
-    .flow .mini-cards {
-        gap: 15px;
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(233px, 1fr));
-    }
-    .flow .mini-cards > div {
-        padding: 25px;
-        border: 1px solid var(--color-border);
-        gap: 10px;
-        align-items: center;
-        flex-direction: column;
-    }
-    .flow .mini-cards img {
-        width: 35px;
-    }
-    .flow .mini-cards h4, .flow .mini-cards p {
-        margin: 0;
-        text-align: center;
-    }
-    .flow .dashed-border {
-        width: 80%;
-        height: 50px;
-        margin: 0 auto;
-        border-bottom: 2px dashed var(--color-border);
-        border-right: 2px dashed var(--color-border);
-        border-left: 2px dashed var(--color-border);
-    }
-    .flow h5 {
-        margin: 15px 0 0 0;
-        text-align: center;
-    }
-
-    /* RELATÓRIO FINAL - DESTAQUES DA JANELA */
-
-    .final-report-highlights {
-        flex: 0 0 509px;
-    }
-    .final-report-highlights img {
-        width: 25px;
-    }
-    .final-report-highlights ul {
-        display: flex;
-        min-height: 237px;
-        row-gap: 21px;
-        padding: 25px;
-        border: 1px solid var(--color-border);
-        flex-direction: column;
-    }
-    .final-report-highlights ul li {
-        display: flex;
-        column-gap: 10px;
-        align-items: center;
-        padding-bottom: 23px;
-        border-bottom: 1px solid var(--color-border);
-    }
-    .final-report-highlights ul li:last-of-type {
-        padding-bottom: 0;
-        border-bottom: none;
-    }
-    .final-report-highlights ul li h5 {
-        margin: 0;
-    }
-    .final-report-receipt-and-expedition {
-        gap: 15px;
-    }
-    .final-report-receipt-and-expedition > div {
-        flex: 1 1 0;
-    }
-    .final-report-receipt .horizontal-bars-chart, .final-report-expedition .horizontal-bars-chart {
-        margin-top: 15px;
-    }
-    .final-report-parcel-and-reverse {
-        gap: 15px;
-    }
-    .final-report-parcel-and-reverse > div {
-        flex: 1 1 0;
-    }
-    .final-report-parcel-and-reverse .chart {
-        margin-top: 15px;
-    }
-
-    /* PARCEL */
-
-    #reports #parcel .preview {
-        flex: 1 1 0;
-    }
-    #reports #parcel .cards > div > .flex-box-start > img {
-        width: 35px;
-    }
-    #reports #parcel #parcelPreview > .flex-box-start {
-        gap: 15px;
-        align-items: flex-start;
-    }
-    #reports #parcel #parcelPreview > .distribution > .doughnut-chart {
-        flex: 1 1 0;
-    }
-    #reports #parcel #parcelPreview > .distribution > .distribution-by-operator {
-        flex: 1 1 0;
-    }
-    #parcel .data-selector {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 10px;
-    }
-    #parcel .data-selector button {
-        position: relative;
-        display: flex;
-        min-height: 58px;
-        padding: 10px 12px;
-        align-items: center;
-        justify-content: center;
-        flex-direction: column;
-        color: var(--color-gray-p);
-        background-color: var(--color-container);
-        border: 1px solid var(--color-border);
-        border-radius: 3px;
-        font: inherit;
-        font-size: 13px;
-        font-weight: 600;
-        letter-spacing: 1px;
-        line-height: 1.35;
-        text-align: center;
-        cursor: pointer;
-        transition:
-            color 160ms ease,
-            background-color 160ms ease,
-            border-color 160ms ease;
-    }
-    #parcel .data-selector button::before {
-        position: absolute;
-        top: -1px;
-        right: -1px;
-        left: -1px;
-        height: 3px;
-        background-color: transparent;
-        border-radius: 3px 3px 0 0;
-        content: "";
-    }
-    #parcel .data-selector button:hover,
-    #parcel .data-selector button:focus-visible {
-        color: var(--color-text);
-        background-color: var(--color-container-houver);
-        border-color: var(--color-gray-p);
-    }
-    #parcel .data-selector button.is-active {
-        color: var(--color-text);
-        background-color: var(--color-container-houver);
-    }
-    #parcel .data-selector button:disabled {
-        opacity: 0.45;
-        cursor: default;
-    }
-    #reports #parcel #parcelPreview > .distribution-tables > div {
-        flex: 1 1 0;
-        max-height: 412px;
-        overflow: auto;
-        border: 1px solid var(--color-border);
-        border-radius: 4px;
-    }
-    #reports #parcel #parcelPreview > .distribution-tables > div::-webkit-scrollbar {
-        width: 7px;
-        height: 5px;
-        background-color: var(--color-container-focus);
-        border-left: 1px solid var(--color-border);
-    }
-    #reports #parcel #parcelPreview > .distribution-tables > div::-webkit-scrollbar-thumb {
-        border-radius: 0px 3px 3px 0px;
-        background-color: var(--color-text);
-    }
-    #reports #parcel #parcelPreview > .distribution-tables > div::-webkit-scrollbar-track {
-        background-color: transparent;
-    }
-    #reports #parcel #parcelPreview > .distribution-tables > div table thead {
-        position: sticky;
-        top: 0;
-        z-index: 1;
-        background-color: var(--color-table-th);
-    }
-    #reports #parcel caption .flex-box-start {
-        gap: 10px;
-        width: max-content;
-    }
-    #reports #parcel caption .flex-box-start button img {
-        width: 20px;
-        cursor: pointer;
-    }
-    #parcel .flex-box-start > .horizontal-bars-chart {
-        flex: 1 1 0;
-    }
     /* REVERSA */
 
     #reports #reverse .preview {

@@ -369,26 +369,6 @@ function getOverallAnalysisViewElements(
                 "overallAnalysisFlowStatus",
             ),
 
-        fastestReceiver:
-            getElement(
-                "overallAnalysisFastestReceiver",
-            ),
-
-        mostPackages:
-            getElement(
-                "overallAnalysisMostPackages",
-            ),
-
-        fastestChecker:
-            getElement(
-                "overallAnalysisFastestChecker",
-            ),
-
-        mostRoutesChecker:
-            getElement(
-                "overallAnalysisMostRoutesChecker",
-            ),
-
         expectedVolume:
             getElement(
                 "overallAnalysisExpectedVolume",
@@ -712,31 +692,6 @@ function renderOverallAnalysisView(
                     ) +
                     " em relação ao planejamento"
                 );
-
-    elements.fastestReceiver.textContent =
-        data.highlights.fastestReceiver ||
-        "—";
-
-    elements.mostPackages.textContent =
-        data.highlights.mostPackages !==
-            null
-            ? (
-                formatOverallAnalysisQuantity(
-                    data.highlights
-                        .mostPackages,
-                ) +
-                " pacotes"
-            )
-            : "—";
-
-    elements.fastestChecker.textContent =
-        data.highlights.fastestChecker ||
-        "—";
-
-    elements.mostRoutesChecker.textContent =
-        data.highlights
-            .mostRoutesChecker ||
-        "—";
 
     elements.expectedVolume.textContent =
         formatOverallAnalysisQuantity(

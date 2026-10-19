@@ -133,7 +133,7 @@ test("o HTML apresenta os quatro controles e Retirados à direita de Exceção",
     assert.equal(Array.from(html.matchAll(/id="expeditionPreviewWithdrawn"/g)).length, 1);
     assert.match(html, /<th>Pacotes Exceção<\/th>\s*<th>Pacotes Retirados<\/th>/);
     assert.match(html, /<td id="expeditionPreviewException">—<\/td>\s*<td id="expeditionPreviewWithdrawn">—<\/td>/);
-    assert.match(css, /#expedition \.report-controls \.input-group\s*\{[^}]*grid-template-columns:\s*repeat\(auto-fit, minmax\(117px, 1fr\)\)/);
+    assert.match(css, /#expedition \.report-controls \.input-group:first-of-type\s*\{[^}]*grid-template-columns:\s*repeat\(auto-fit, minmax\(117px, 1fr\)\)/);
 });
 
 test("o CSV usa o total final sem descontar incorretos, ausentes ou retirados", async () => {

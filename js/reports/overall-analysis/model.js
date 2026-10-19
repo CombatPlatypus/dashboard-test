@@ -3,7 +3,6 @@ import {
 } from "../receipt/state.js";
 
 import {
-    getExpeditionOperatorRanking,
     getExpeditionSummary,
 } from "../expedition/state.js";
 
@@ -26,10 +25,6 @@ import {
 import {
     createReverseSummary,
 } from "../reverse/model.js";
-
-import {
-    formatReportPersonFirstName,
-} from "../core/person-name.js";
 
 const OVERALL_ANALYSIS_CAPACITY =
     20000;
@@ -56,159 +51,6 @@ function getOverallAnalysisContextQuantity(
     ) && value >= 0
         ? value
         : null;
-}
-
-/* NORMALIZA O NOME EXIBIDO NOS DESTAQUES */
-
-function getOverallAnalysisPersonName(
-    value,
-) {
-    return formatReportPersonFirstName(
-        value,
-        null,
-    );
-}
-
-/* OBTÉM O DESTAQUE DO RANK DE RECEBEDORES */
-
-function getReceiptHighlights(
-    state,
-) {
-    const topVolumeOperator =
-        (
-            Array.isArray(
-                state?.operators,
-            )
-                ? state.operators
-                : []
-        )
-            .filter(
-                function (operator) {
-                    return (
-                        operator.selected !==
-                            false &&
-                        operator.packagesReceived !==
-                            null &&
-                        operator.packagesReceived !==
-                            undefined
-                    );
-                },
-            )
-            .slice()
-            .sort(
-                function (
-                    first,
-                    second,
-                ) {
-                    return (
-                        Number(
-                            second.packagesReceived,
-                        ) -
-                        Number(
-                            first.packagesReceived,
-                        )
-                    );
-                },
-            )[0] || null;
-
-    return {
-        fastestReceiver:
-            topVolumeOperator
-                ? getOverallAnalysisPersonName(
-                    topVolumeOperator.receiver,
-                )
-                : null,
-
-        mostPackages:
-            topVolumeOperator
-                ? getOverallAnalysisPersonName(
-                    topVolumeOperator.receiver,
-                )
-                : null,
-    };
-}
-
-/* OBTÉM OS DESTAQUES DO RANK DE CONFERENTES */
-
-function getExpeditionHighlights(
-    state,
-) {
-    const operators =
-        getExpeditionOperatorRanking(
-            state,
-        ).filter(
-            function (operator) {
-                return operator.selected !==
-                    false;
-            },
-        );
-
-    const topRoutesOperator =
-        operators
-            .slice()
-            .sort(
-                function (
-                    first,
-                    second,
-                ) {
-                    return (
-                        second.routesChecked -
-                            first.routesChecked ||
-
-                        first.operator.localeCompare(
-                            second.operator,
-                            "pt-BR",
-                        )
-                    );
-                },
-            )[0] || null;
-
-    const fastestOperator =
-        operators
-            .filter(
-                function (operator) {
-                    return (
-                        operator.averageDurationSeconds !==
-                        null
-                    );
-                },
-            )
-            .slice()
-            .sort(
-                function (
-                    first,
-                    second,
-                ) {
-                    return (
-                        first.averageDurationSeconds -
-                            second.averageDurationSeconds ||
-
-                        second.routesChecked -
-                            first.routesChecked ||
-
-                        first.operator.localeCompare(
-                            second.operator,
-                            "pt-BR",
-                        )
-                    );
-                },
-            )[0] || null;
-
-    return {
-        fastestChecker:
-            fastestOperator
-                ? getOverallAnalysisPersonName(
-                    fastestOperator.operator,
-                )
-                : null,
-
-        mostRoutesChecker:
-            topRoutesOperator
-                ? getOverallAnalysisPersonName(
-                    topRoutesOperator.operator,
-                )
-                : null,
-    };
 }
 
 /* REÚNE AVARIAS E PERDAS NOS MESMOS PERÍODOS DA TABELA */
@@ -579,16 +421,6 @@ function createOverallAnalysisData(
                     .expeditionDurationSeconds,
         },
 
-        highlights: {
-            ...getReceiptHighlights(
-                receiptState,
-            ),
-
-            ...getExpeditionHighlights(
-                expeditionState,
-            ),
-        },
-
         damageAndLosses:
             damageAndLossesAnalysis,
 
@@ -613,5 +445,4 @@ function createOverallAnalysisData(
 
 export {
     createOverallAnalysisData,
-    getOverallAnalysisPersonName,
 };
