@@ -1309,6 +1309,15 @@
     .final-report-receipt .horizontal-bars-chart, .final-report-expedition .horizontal-bars-chart {
         margin-top: 15px;
     }
+    .final-report-parcel-and-reverse {
+        gap: 15px;
+    }
+    .final-report-parcel-and-reverse > div {
+        flex: 1 1 0;
+    }
+    .final-report-parcel-and-reverse .chart {
+        margin-top: 15px;
+    }
 
     /* PARCEL */
 
@@ -1431,7 +1440,6 @@
     #reports #reverse #reversePreview > .flex-box-start > div {
         flex: 1 1 0;
     }
-
     #reports #reverse #reversePreview > .distribution-tables > div {
         flex: 1 1 0;
         max-height: 412px;
