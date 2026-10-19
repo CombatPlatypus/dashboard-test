@@ -46,6 +46,7 @@ function getReverseViewElements(
 
     const packageBodies = {};
     const packageCopyButtons = {};
+    const packageSections = {};
 
     REVERSE_TYPE_KEYS.forEach(
         function (typeKey) {
@@ -61,6 +62,11 @@ function getReverseViewElements(
             packageCopyButtons[typeKey] =
                 getElement(
                     `reverseCopy${idSuffix}PackagesButton`,
+                );
+
+            packageSections[typeKey] =
+                getElement(
+                    `reverse${idSuffix}PackagesSection`,
                 );
         },
     );
@@ -96,8 +102,13 @@ function getReverseViewElements(
             getElement(
                 "reverseDistributionBody",
             ),
+        packageTables:
+            getElement(
+                "reversePackageTables",
+            ),
         packageBodies,
         packageCopyButtons,
+        packageSections,
     };
 }
 
@@ -111,7 +122,9 @@ function hasReverseViewElements(
                     return key !==
                             "packageBodies" &&
                         key !==
-                            "packageCopyButtons";
+                            "packageCopyButtons" &&
+                        key !==
+                            "packageSections";
                 },
             )
             .map(
@@ -127,6 +140,9 @@ function hasReverseViewElements(
         ),
         ...Object.values(
             elements.packageCopyButtons,
+        ),
+        ...Object.values(
+            elements.packageSections,
         ),
     ]
         .every(
@@ -240,7 +256,13 @@ function renderReversePackageTable(
     body,
     packageRows,
     copyButton = null,
+    section = null,
 ) {
+    if (section instanceof HTMLElement) {
+        section.hidden =
+            packageRows.length === 0;
+    }
+
     if (
         copyButton instanceof
             HTMLButtonElement
@@ -347,6 +369,16 @@ function renderReverseView(
         summary.transfers,
     );
 
+    reverseViewElements
+        .packageTables.hidden =
+        !REVERSE_TYPE_KEYS.some(
+            function (typeKey) {
+                return summary.packages[
+                    typeKey
+                ].length > 0;
+            },
+        );
+
     REVERSE_TYPE_KEYS.forEach(
         function (typeKey) {
             renderReversePackageTable(
@@ -359,6 +391,10 @@ function renderReverseView(
                 ],
                 reverseViewElements
                     .packageCopyButtons[
+                        typeKey
+                    ],
+                reverseViewElements
+                    .packageSections[
                         typeKey
                     ],
             );

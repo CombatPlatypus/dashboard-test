@@ -218,6 +218,8 @@ test(
             new Element("tbody");
         const button =
             new Button();
+        const section =
+            new Element();
 
         renderReversePackageTable(
             body,
@@ -236,9 +238,11 @@ test(
                 },
             ],
             button,
+            section,
         );
 
         assert.equal(button.disabled, false);
+        assert.equal(section.hidden, false);
         assert.deepEqual(
             body.children.map(
                 row => row.cells.map(
@@ -256,9 +260,11 @@ test(
             body,
             [],
             button,
+            section,
         );
 
         assert.equal(button.disabled, true);
+        assert.equal(section.hidden, true);
         assert.equal(
             body.children[0]
                 .children[0]
@@ -363,6 +369,8 @@ test(
                 `reverse${idSuffix}PackagesBody`;
             const buttonId =
                 `reverseCopy${idSuffix}PackagesButton`;
+            const sectionId =
+                `reverse${idSuffix}PackagesSection`;
 
             assert.equal(
                 html.split(
@@ -376,17 +384,29 @@ test(
                 ).length - 1,
                 1,
             );
+            assert.equal(
+                html.split(
+                    `id="${sectionId}"`,
+                ).length - 1,
+                1,
+            );
             assert.match(
                 html,
                 new RegExp(
                     `<button id="${buttonId}" type="button" data-reverse-copy="${typeKey}"`,
                 ),
             );
+            assert.match(
+                html,
+                new RegExp(
+                    `<div id="${sectionId}" hidden>`,
+                ),
+            );
         }
 
         assert.match(
             html,
-            /<!-- TABELA DE BRs DE CADA RESPETIVA TO -->\s*<div class="distribution-tables flex-box-start">/,
+            /<!-- TABELA DE BRs DE CADA RESPETIVA TO -->\s*<div id="reversePackageTables" class="distribution-tables flex-box-start" hidden>/,
         );
     },
 );
