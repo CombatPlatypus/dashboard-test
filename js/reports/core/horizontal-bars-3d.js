@@ -136,7 +136,7 @@ function getHorizontalBarLabelPosition(bar) {
 
     return {
         x: Math.max(x, base) + HORIZONTAL_BAR_3D_DEPTH.x + 10,
-        y,
+        y: y + 10.5,
     };
 }
 
