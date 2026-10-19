@@ -449,7 +449,7 @@
         /* CONTROLES */
 
         #receipt-controls #receipt-controls-1 .input-group {
-            max-height: 542px;
+            max-height: 544px;
         }
         #receipt-controls #receipt-controls-2 .input-group {
             max-height: 559px;
@@ -1075,7 +1075,7 @@
             flex: 1 1 0;
             min-width: 0;
         }
-        
+
     /* REVERSA */
 
     #reports #reverse .preview {
