@@ -389,6 +389,10 @@
 
             /* EXPEDIÇÃO */
 
+            #expeditionAlignedComparisonChartContainer {
+                height: 1224px;
+            }
+
             #expedition-mistakes .horizontal-bars-chart .chart-canvas-container {
                 height: 313px !important;
                 margin: 0 20px 20px 20px;
