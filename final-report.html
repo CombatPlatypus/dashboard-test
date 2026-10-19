@@ -20,918 +20,896 @@
 
        <style>
 
-        /* RESET */
+        /* RESET DE CSS */
 
-            /* DOCUMENTO */
+            html {
+                box-sizing: border-box;
+                font-family: sans-serif;
+                font-size: 100%;
+                line-height: 1.15;
+                -ms-text-size-adjust: 100%;
+                -webkit-text-size-adjust: 100%;
+            }
 
-                html {
-                    box-sizing: border-box;
-                    font-family: sans-serif;
-                    font-size: 100%;
-                    line-height: 1.15;
-                    -ms-text-size-adjust: 100%;
-                    -webkit-text-size-adjust: 100%;
-                }
+            *,
+            *::before,
+            *::after {
+                box-sizing: inherit;
+            }
 
-                *,
-                *::before,
-                *::after {
-                    box-sizing: inherit;
-                }
+            body {
+                margin: 0;
+                padding: 0;
+            }
 
-                body {
-                    margin: 0;
-                    padding: 0;
-                }
+            [hidden] {
+                display: none !important;
+            }
 
-                [hidden] {
-                    display: none !important;
-                }
+            article,
+            aside,
+            footer,
+            header,
+            nav,
+            section,
+            figcaption,
+            figure,
+            main {
+                display: block;
+            }
 
-                article,
-                aside,
-                footer,
-                header,
-                nav,
-                section,
-                figcaption,
-                figure,
-                main {
-                    display: block;
-                }
+            figure {
+                margin: 1em 40px;
+            }
 
-                figure {
-                    margin: 1em 40px;
-                }
-
-                hr {
-                    box-sizing: content-box;
-                    height: 0;
-                    overflow: visible;
-                }
+            hr {
+                box-sizing: content-box;
+                height: 0;
+                overflow: visible;
+            }
 
             /* TEXTO E CONTAINERS */
 
-                div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, form, p, blockquote, th, td {
-                    margin: 0;
-                    padding: 0;
-                }
+            div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, form, p, blockquote, th, td {
+                margin: 0;
+                padding: 0;
+            }
 
-                pre,
-                code,
-                kbd,
-                samp {
-                    font-family: monospace, monospace;
-                    font-size: 1em;
-                }
+            pre,
+            code,
+            kbd,
+            samp {
+                font-family: monospace, monospace;
+                font-size: 1em;
+            }
 
-                a {
-                    background-color: transparent;
-                    -webkit-text-decoration-skip: objects;
-                }
+            a {
+                background-color: transparent;
+                -webkit-text-decoration-skip: objects;
+            }
 
-                a:active,
-                a:hover {
-                    outline-width: 0;
-                }
+            a:active,
+            a:hover {
+                outline-width: 0;
+            }
 
-                abbr[title] {
-                    border-bottom: none;
-                    text-decoration: underline dotted;
-                }
+            abbr[title] {
+                border-bottom: none;
+                text-decoration: underline dotted;
+            }
 
-                dfn {
-                    font-style: italic;
-                }
+            dfn {
+                font-style: italic;
+            }
 
-                mark {
-                    color: #000;
-                    background-color: #ff0;
-                }
+            mark {
+                color: #000;
+                background-color: #ff0;
+            }
 
-                small {
-                    font-size: 80%;
-                }
+            small {
+                font-size: 80%;
+            }
 
-                sub,
-                sup {
-                    position: relative;
-                    font-size: 75%;
-                    line-height: 0;
-                    vertical-align: baseline;
-                }
+            sub,
+            sup {
+                position: relative;
+                font-size: 75%;
+                line-height: 0;
+                vertical-align: baseline;
+            }
 
-                sub {
-                    bottom: -0.25em;
-                }
+            sub {
+                bottom: -0.25em;
+            }
 
-                sup {
-                    top: -0.5em;
-                }
+            sup {
+                top: -0.5em;
+            }
 
             /* MÍDIA */
 
-                audio,
-                video {
-                    display: inline-block;
-                }
+            audio,
+            video {
+                display: inline-block;
+            }
 
-                audio:not([controls]) {
-                    display: none;
-                    height: 0;
-                }
+            audio:not([controls]) {
+                display: none;
+                height: 0;
+            }
 
-                img {
-                    border-style: none;
-                }
+            img {
+                border-style: none;
+            }
 
-                iframe {
-                    border: none;
-                }
+            iframe {
+                border: none;
+            }
 
-                svg:not(:root) {
-                    overflow: hidden;
-                }
+            svg:not(:root) {
+                overflow: hidden;
+            }
 
             /* TABELAS */
 
-                table {
-                    border-collapse: collapse;
-                }
+            table {
+                border-collapse: collapse;
+            }
 
             /* FORMULÁRIOS */
 
-                button,
-                input,
-                optgroup,
-                select,
-                textarea {
-                    margin: 0;
-                    font-size: 100%;
-                    line-height: 1.15;
-                }
+            button,
+            input,
+            optgroup,
+            select,
+            textarea {
+                margin: 0;
+                font-size: 100%;
+                line-height: 1.15;
+            }
 
-                button {
-                    padding: 0;
-                    overflow: visible;
-                    border: 0;
-                    border-radius: 0;
-                    background: transparent;
-                    font-family: sans-serif;
-                    line-height: 1;
-                    cursor: auto;
-                    -webkit-appearance: none;
-                    -moz-appearance: none;
-                    appearance: none;
-                }
+            button {
+                padding: 0;
+                overflow: visible;
+                border: 0;
+                border-radius: 0;
+                background: transparent;
+                font-family: sans-serif;
+                line-height: 1;
+                cursor: auto;
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                appearance: none;
+            }
 
-                input,
-                optgroup,
-                select,
-                textarea {
-                    font-family: inherit;
-                }
+            input,
+            optgroup,
+            select,
+            textarea {
+                font-family: inherit;
+            }
 
-                button,
-                select {
-                    text-transform: none;
-                }
+            button,
+            select {
+                text-transform: none;
+            }
 
-                button,
-                html [type="button"],
-                [type="reset"],
-                [type="submit"] {
-                    border-top: none;
-                    border-right: none;
-                    border-left: none;
-                    -webkit-appearance: button;
-                }
+            button,
+            html [type="button"],
+            [type="reset"],
+            [type="submit"] {
+                border-top: none;
+                border-right: none;
+                border-left: none;
+                -webkit-appearance: button;
+            }
 
-                [data-whatinput='mouse'] button {
-                    outline: 0;
-                }
+            [data-whatinput='mouse'] button {
+                outline: 0;
+            }
 
-                button::-moz-focus-inner,
-                [type="button"]::-moz-focus-inner,
-                [type="reset"]::-moz-focus-inner,
-                [type="submit"]::-moz-focus-inner {
-                    padding: 0;
-                    border-style: none;
-                }
+            button::-moz-focus-inner,
+            [type="button"]::-moz-focus-inner,
+            [type="reset"]::-moz-focus-inner,
+            [type="submit"]::-moz-focus-inner {
+                padding: 0;
+                border-style: none;
+            }
 
-                button:-moz-focusring,
-                [type="button"]:-moz-focusring,
-                [type="reset"]:-moz-focusring,
-                [type="submit"]:-moz-focusring {
-                    outline: 1px dotted ButtonText;
-                }
+            button:-moz-focusring,
+            [type="button"]:-moz-focusring,
+            [type="reset"]:-moz-focusring,
+            [type="submit"]:-moz-focusring {
+                outline: 1px dotted ButtonText;
+            }
 
-                ::-webkit-file-upload-button {
-                    font: inherit;
-                    -webkit-appearance: button;
-                }
+            ::-webkit-file-upload-button {
+                font: inherit;
+                -webkit-appearance: button;
+            }
 
-                fieldset {
-                    margin: 0 2px;
-                    padding: 0.35em 0.625em 0.75em;
-                    border: 1px solid #c0c0c0;
-                }
+            fieldset {
+                margin: 0 2px;
+                padding: 0.35em 0.625em 0.75em;
+                border: 1px solid #c0c0c0;
+            }
 
-                legend {
-                    box-sizing: border-box;
-                    display: table;
-                    max-width: 100%;
-                    padding: 0;
-                    color: inherit;
-                    white-space: normal;
-                }
+            legend {
+                box-sizing: border-box;
+                display: table;
+                max-width: 100%;
+                padding: 0;
+                color: inherit;
+                white-space: normal;
+            }
 
-                /* ESTILOS BASE */
+        /* ESTILOS DO RELATÓRIO FINAL */
 
-                    /* TEMAS DE CORES */
+            :root {
+                --color-body: #000000;
+                --color-container: #101010;
+                --color-container-iframe: #fff;
+                --color-container-houver: #262626;
+                --color-container-focus: #262626;
+                --color-border: #626262;
+                --color-text: #e4e6eb;
+                --color-table-title: #262626;
+                --color-table-th: #262626;
+                --color-table-tr: #1b1b1b;
+                --color-button: #e4e6eb;
+                --color-button-text: #000000;
+                --color-gray-p: #a8a9ad;
+                --color-progress-bar: #3e3e3e;
+                --color-close-button: #8f8d8d;
+            }
 
-                    :root {
-                        --color-body: #000000;
-                        --color-container: #101010;
-                        --color-container-iframe: #fff;
-                        --color-container-houver: #262626;
-                        --color-container-focus: #262626;
-                        --color-border: #626262;
-                        --color-text: #e4e6eb;
-                        --color-table-title: #262626;
-                        --color-table-th: #262626;
-                        --color-table-tr: #1b1b1b;
-                        --color-button: #e4e6eb;
-                        --color-button-text: #000000;
-                        --color-gray-p: #a8a9ad;
-                        --color-progress-bar: #3e3e3e;
-                        --color-close-button: #8f8d8d;
-                    }
+            body {
+                color: var(--color-text);
+                background-color: var(--color-body);
+                font-weight: normal;
+                line-height: 1.5;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+            .main-structure {
+                max-width: 1600px;
+                height: auto;
+                margin: 0 auto;
+                padding: 30px 30px;
+            }
+            .main-structure > div {
+                display: flex;
+                flex-direction: column;
+                row-gap: 20px;
+                padding: 20px;
+                background-color: var(--color-container);
+                border: 2px solid var(--color-border);
+                border-radius: 5px;
+            }
+            .main-structure > div .main-title {
+                width: 100%;
+                padding: 12px 20px;
+                text-align: center;
+                background-color: var(--color-table-title);
+                border: 1px solid var(--color-border);
+                border-radius: 5px 5px 0 0;
+            }
+            .main-structure > div .main-title > h2 {
+                margin-bottom: 0;
+                font-size: 20px;
+                text-transform: uppercase;
+                letter-spacing: 1.5px;
+            }
 
-                    /* DOCUMENTO */
+            /* MÍDIA */
 
-                        body {
-                            color: var(--color-text);
-                            background-color: var(--color-body);
-                            font-weight: normal;
-                            line-height: 1.5;
-                            -webkit-font-smoothing: antialiased;
-                            -moz-osx-font-smoothing: grayscale;
-                        }
+            img {
+                display: inline-block;
+                max-width: 100%;
+                height: auto;
+                vertical-align: middle;
+                -ms-interpolation-mode: bicubic;
+            }
 
-                    /* MÍDIA */
+            /* TIPOGRAFIA */
 
-                        img {
-                            display: inline-block;
-                            max-width: 100%;
-                            height: auto;
-                            vertical-align: middle;
-                            -ms-interpolation-mode: bicubic;
-                        }
+            canvas {
+                font-family: 'Open Sans', sans-serif;
+            }
 
-                    /* TIPOGRAFIA */
+            h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6 {
+                color: var(--color-text);
+                letter-spacing: 1px;
+                font-style: normal;
+                text-rendering: optimizeLegibility;
+                font-family: 'Open Sans', sans-serif;
+            }
+            h1, .h1 {
+                font-size: 3rem;
+                line-height: 1.3;
+                margin-top: 0;
+                margin-bottom: 0.5rem;
+                font-weight: 800;
+            }
+            h2, .h2 {
+                font-size: 32px;
+                line-height: 1.3;
+                margin-top: 0;
+                font-weight: 800;
+                margin-bottom: 0.5rem;
+            }
+            h3, .h3 {
+                font-size: 20px;
+                line-height: 1.3;
+                margin-top: 0;
+                margin-bottom: 0.5rem;
+                font-weight: 600;
+            }
+            h4, .h4 {
+                font-size: 16px;
+                line-height: 1.3;
+                margin-top: 0;
+                margin-bottom: 0.5rem;
+                font-weight: 600;
+            }
+            h5, .h5 {
+                font-size: 1.0625rem;
+                line-height: 1.3;
+                margin-top: 0;
+                margin-bottom: 0.5rem;
+                font-weight: 600;
+            }
+            h6, .h6 {
+                font-size: 1rem;
+                line-height: 1.3;
+                margin-top: 0;
+                margin-bottom: 0.5rem;
+            }
 
-                        canvas {
-                            font-family: 'Open Sans', sans-serif;
-                        }
+            p {
+                margin-bottom: 20px;
+                line-height: 1.6;
+                color: var(--color-text);
+                text-align: left;
+                font-size: 16px;
+                letter-spacing: 1px;
+                font-family: 'Open Sans', sans-serif;
+                font-weight: 400;
+                text-rendering: optimizeLegibility;
+            }
 
-                        h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6 {
-                            color: var(--color-text);
-                            letter-spacing: 1px;
-                            font-style: normal;
-                            text-rendering: optimizeLegibility;
-                            font-family: 'Open Sans', sans-serif;
-                        }
-                        h1, .h1 {
-                            font-size: 3rem;
-                            line-height: 1.3;
-                            margin-top: 0;
-                            margin-bottom: 0.5rem;
-                            font-weight: 800;
-                        }
-                        h2, .h2 {
-                            font-size: 32px;
-                            line-height: 1.3;
-                            margin-top: 0;
-                            font-weight: 800;
-                            margin-bottom: 0.5rem;
-                        }
-                        h3, .h3 {
-                            font-size: 20px;
-                            line-height: 1.3;
-                            margin-top: 0;
-                            margin-bottom: 0.5rem;
-                            font-weight: 600;
-                        }
-                        h4, .h4 {
-                            font-size: 16px;
-                            line-height: 1.3;
-                            margin-top: 0;
-                            margin-bottom: 0.5rem;
-                            font-weight: 600;
-                        }
-                        h5, .h5 {
-                            font-size: 1.0625rem;
-                            line-height: 1.3;
-                            margin-top: 0;
-                            margin-bottom: 0.5rem;
-                            font-weight: 600;
-                        }
-                        h6, .h6 {
-                            font-size: 1rem;
-                            line-height: 1.3;
-                            margin-top: 0;
-                            margin-bottom: 0.5rem;
-                        }
+            /* LISTAS E DIVISORES */
 
-                        p {
-                            margin-bottom: 20px;
-                            line-height: 1.6;
-                            color: var(--color-text);
-                            text-align: left;
-                            font-size: 16px;
-                            letter-spacing: 1px;
-                            font-family: 'Open Sans', sans-serif;
-                            font-weight: 400;
-                            text-rendering: optimizeLegibility;
-                        }
+            ul, ol, dl {
+                margin: 0;
+                list-style-position: outside;
+                line-height: 1.6;
+            }
+            li {
+                font-size: 14px;
+                color: var(--color-text);
+                letter-spacing: 1px;
+                font-family: 'Open Sans', sans-serif;
+                font-weight: 400;
+            }
+            ul {
+                margin-left: 0;
+                list-style-type: none;
+            }
+            ol {
+                margin-left: 1.25rem;
+            }
+            ul ul, ol ul, ul ol, ol ol {
+                margin-left: 0;
+                margin-bottom: 0;
+                color: var(--color-gray-p);
+            }
 
-                    /* LISTAS E DIVISORES */
+            hr {
+                clear: both;
+                max-width: 75rem;
+                height: 0;
+                margin: 30px auto;
+                border-top: 0;
+                border-right: 0;
+                border-bottom: 2px solid var(--color-border);
+                border-left: 0;
+            }
 
-                        ul, ol, dl {
-                            margin: 0;
-                            list-style-position: outside;
-                            line-height: 1.6;
-                        }
-                        li {
-                            font-size: 14px;
-                            color: var(--color-text);
-                            letter-spacing: 1px;
-                            font-family: 'Open Sans', sans-serif;
-                            font-weight: 400;
-                        }
-                        ul {
-                            margin-left: 0;
-                            list-style-type: none;
-                        }
-                        ol {
-                            margin-left: 1.25rem;
-                        }
-                        ul ul, ol ul, ul ol, ol ol {
-                            margin-left: 0;
-                            margin-bottom: 0;
-                            color: var(--color-gray-p);
-                        }
+            /* RÓTULOS */
 
-                        hr {
-                            clear: both;
-                            max-width: 75rem;
-                            height: 0;
-                            margin: 30px auto;
-                            border-top: 0;
-                            border-right: 0;
-                            border-bottom: 2px solid var(--color-border);
-                            border-left: 0;
-                        }
+            label {
+                display: block;
+                margin: 0;
+                font-size: 16px;
+                line-height: 1.2;
+                color: var(--color-text);
+                font-family: 'Open Sans', sans-serif;
+                font-weight: 600;
+                letter-spacing: 1px;
+            }
 
-                    /* RÓTULOS */
+            /* TABELAS */
 
-                        label {
-                            display: block;
-                            margin: 0;
-                            font-size: 16px;
-                            line-height: 1.2;
-                            color: var(--color-text);
-                            font-family: 'Open Sans', sans-serif;
-                            font-weight: 600;
-                            letter-spacing: 1px;
-                        }
+            table {
+                width: 100%;
+                margin: 0;
+                border-radius: 0;
+                color: var(--color-text);
+                letter-spacing: 1px;
+                table-layout: fixed;
+                border-collapse: collapse;
+                background-color: var(--color-container);
+            }
+            table thead, table tbody, table tfoot {
+                border: none;
+            }
+            table caption {
+                font-family: 'Open Sans', sans-serif;
+                padding: 0.5rem 0.625rem 0.625rem;
+                font-weight: 600;
+                letter-spacing: 1.5px;
+                font-size: 15px;
+                background-color: var(--color-table-th);
+                border-right: 1px solid var(--color-border);
+                border-left: 1px solid var(--color-border);
+                border-top: 1px solid var(--color-border);
+            }
+            table thead {
+                color: var(--color-text);
+            }
+            table tfoot {
+                background: var(--color-container);
+                color: var(--color-body);
+            }
+            table thead tr, table tfoot tr {
+                background: transparent;
+                border: none;
+            }
+            tr {
+                border-top: 1px solid var(--color-border);
+            }
+            table thead th, table thead td, table tfoot th, table tfoot td {
+                padding: 15px 20px;
+                font-size: 14px;
+                text-align: center;
+                font-family: 'Open Sans', sans-serif;
+                font-weight: 400;
+                background: transparent;
+                letter-spacing: 1px;
+            }
+            table tbody th, table tbody td {
+                padding: 10px 0;
+                font-size: 14px;
+                font-family: 'Open Sans', sans-serif;
+                font-weight: 400;
+                background: transparent;
+                text-align: center;
+            }
+            table tbody tr:nth-child(even) {
+                border-bottom: 0;
+            }
+            table.unstriped tbody {
+                background-color: var(--color-container);
+            }
+            table.unstriped tbody tr {
+                border-bottom: 1px solid var(--color-border);
+                background-color: var(--color-container);
+            }
 
-                    /* TABELAS */
+            .main-structure table td {
+                text-align: center;
+            }
+            .main-structure table th, .main-structure table td {
+                height: 38px;
+                padding: 8px 10px;
+                font-size: 13px;
+                color: var(--color-text);
+                border: 1px solid var(--color-border);
+                overflow-wrap: anywhere;
+            }
+            .main-structure table th {
+                font-weight: 600;
+                text-align: center;
+                background-color: var(--color-table-th);
+            }
 
-                        table {
-                            width: 100%;
-                            margin: 0;
-                            border-radius: 0;
-                            color: var(--color-text);
-                            letter-spacing: 1px;
-                            table-layout: fixed;
-                            border-collapse: collapse;
-                            background-color: var(--color-container);
-                        }
-                        table thead, table tbody, table tfoot {
-                            border: none;
-                        }
-                        table caption {
-                            font-family: 'Open Sans', sans-serif;
-                            padding: 0.5rem 0.625rem 0.625rem;
-                            font-weight: 600;
-                            letter-spacing: 1.5px;
-                            font-size: 15px;
-                            background-color: var(--color-table-th);
-                            border-right: 1px solid var(--color-border);
-                            border-left: 1px solid var(--color-border);
-                            border-top: 1px solid var(--color-border);
-                        }
-                        table thead {
-                            color: var(--color-text);
-                        }
-                        table tfoot {
-                            background: var(--color-container);
-                            color: var(--color-body);
-                        }
-                        table thead tr, table tfoot tr {
-                            background: transparent;
-                            border: none;
-                        }
-                        tr {
-                            border-top: 1px solid var(--color-border);
-                        }
-                        table thead th, table thead td, table tfoot th, table tfoot td {
-                            padding: 15px 20px;
-                            font-size: 14px;
-                            text-align: center;
-                            font-family: 'Open Sans', sans-serif;
-                            font-weight: 400;
-                            background: transparent;
-                            letter-spacing: 1px;
-                        }
-                        table tbody th, table tbody td {
-                            padding: 10px 0;
-                            font-size: 14px;
-                            font-family: 'Open Sans', sans-serif;
-                            font-weight: 400;
-                            background: transparent;
-                            text-align: center;
-                        }
-                        table tbody tr:nth-child(even) {
-                            border-bottom: 0;
-                        }
-                        table.unstriped tbody {
-                            background-color: var(--color-container);
-                        }
-                        table.unstriped tbody tr {
-                            border-bottom: 1px solid var(--color-border);
-                            background-color: var(--color-container);
-                        }
+            /* CONTAINERS FLEXÍVEIS */
 
-                    /* VISIBILIDADE */
+            .flex-box-between,
+            .flex-box-start,
+            .flex-box-center {
+                display: -webkit-flex;
+                display: flex;
+                -webkit-flex-wrap: wrap;
+                flex-wrap: wrap;
+            }
+            .flex-box-between {
+                -webkit-justify-content: space-between;
+                justify-content: space-between;
+            }
+            .flex-box-start {
+                -webkit-justify-content: flex-start;
+                justify-content: flex-start;
+            }
+            .flex-box-center {
+                -webkit-justify-content: center;
+                justify-content: center;
+            }
 
-                        .hide {
-                            display: none !important;
-                        }
+            /* GRAFICOS */
 
-                        .invisible {
-                            visibility: hidden;
-                        }
+            .chart {
+                background-color: var(--color-container);
+                border: 1px solid var(--color-border);
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+            }
+            .chart-title  {
+                padding: 0.5rem 0.625rem 0.625rem;
+                background-color: var(--color-table-th);
+                border-bottom: 1px solid var(--color-border);
+            }
+            .chart-title > h4 {
+                font-size: 15px;
+                margin: 0;
+                text-align: center;
+            }
+            .chart-padding {
+                padding: 25px;
+            }
+            .chart-canvas-container {
+                max-width: 100%;
+                position: relative;
+            }
+            .chart-label {
+                max-width: 100%;
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: center;
+                gap: 15px;
+                margin: 0 20px 20px 20px;
+            }
+            .chart-label .type {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            .chart-label .type > div {
+                width: 20px;
+                height: 20px;
+                border-radius: 3px;
+            }  
+            .chart-label p {
+                font-size: 14px;
+                color: var(--color-text);
+                line-height: 1;
+                margin: 0;
+            }
 
-                        .is-visible {
-                            display: block !important;
-                        }
+            /* TAMANHO DO CANVAS */
 
-                        .is-hidden {
-                            display: none !important;
-                        }
+            .chart canvas {
+                display: block;
+                width: 100% !important;
+                height: 100% !important;
+            }
+            .doughnut-chart .chart-canvas-container {
+                height: 264px;
+            }
+            .horizontal-bars-chart .chart-canvas-container {
+                height: 415px;
+            }
+            .vertical-bars-chart .chart-canvas-container {
+                height: 350px;
+                margin-bottom: 20px;
+            }
+            .line-chart .chart-canvas-container {
+                height: 304px;
+                margin: 0 20px 20px 20px;
+            }
 
-                    /* CONTAINERS FLEXÍVEIS */
+            /* TITULOS */
 
-                        .flex-box-between,
-                        .flex-box-start,
-                        .flex-box-end,
-                        .flex-box-center,
-                        .flex-box-around,
-                        .two-buttons {
-                            display: -webkit-flex;
-                            display: flex;
-                            -webkit-flex-wrap: wrap;
-                            flex-wrap: wrap;
-                        }
-                        .flex-box-between,
-                        .two-buttons {
-                            -webkit-justify-content: space-between;
-                            justify-content: space-between;
-                        }
-                        .flex-box-start {
-                            -webkit-justify-content: flex-start;
-                            justify-content: flex-start;
-                        }
-                        .flex-box-end {
-                            -webkit-justify-content: flex-end;
-                            justify-content: flex-end;
-                        }
-                        .flex-box-center {
-                            -webkit-justify-content: center;
-                            justify-content: center;
-                        }
-                        .flex-box-around {
-                            -webkit-justify-content: space-around;
-                            justify-content: space-around;
-                        }
-                        .flex-box-full-center {
-                            display: -webkit-flex;
-                            display: flex;
-                            -webkit-flex-direction: column;
-                            flex-direction: column;
-                            -webkit-align-items: stretch;
-                            align-items: center;
-                            align-content: center;
-                            justify-content: center;
-                        }
-                        .flex-box-column {
-                            display: -webkit-flex;
-                            display: flex;
-                            -webkit-flex-direction: column;
-                            flex-direction: column;
-                            -webkit-align-items: stretch;
-                            align-items: stretch;
-                        }
+            .title {
+                padding: 0.5rem 0.625rem 0.625rem;
+                background-color: var(--color-table-th);
+                border-right: 1px solid var(--color-border);
+                border-left: 1px solid var(--color-border);
+                border-top: 1px solid var(--color-border);
+            }
+            .title h4 {
+                letter-spacing: 1.5px;
+                font-size: 15px;
+                margin: 0;
+            }
 
+            /* HEADER */
 
-            /* ESTILOS DO RELATÓRIO FINAL */
+            .header {
+                padding: 15px 20px;
+                border: 1px solid var(--color-border);
+                align-items: center;
+            }
+            .header .flex-box-start {
+                column-gap: 15px;
+                align-items: center;
+            }
+            .header img {
+                width: 35px;
+            }
+            .header p {
+                margin-bottom: 0;
+                line-height: 1;
+            }
 
-                .main-structure {
-                    max-width: 1600px;
-                    height: auto;
-                    margin: 0 auto;
-                    padding: 30px 30px;
-                }
-                .main-structure .preview-style {
-                    display: flex;
-                    flex-direction: column;
-                    row-gap: 20px;
-                    padding: 20px;
-                    background-color: var(--color-container);
-                    border: 2px solid var(--color-border);
-                    border-radius: 5px;
-                }
-                .main-structure.title {
-                    width: 100%;
-                    padding: 12px 20px;
-                    text-align: center;
-                    background-color: var(--color-table-title);
-                    border: 1px solid var(--color-border);
-                    border-radius: 5px 5px 0 0;
-                }
-                .main-structure .title > h2 {
-                    margin-bottom: 0;
-                    font-size: 20px;
-                    text-transform: uppercase;
-                    letter-spacing: 1.5px;
-                }
+            /* CARDS */
 
-                #main-structure td {
-                    text-align: center;
-                }
-                #main-structure th, #main-structure td {
-                    height: 38px;
-                    padding: 8px 10px;
-                    font-size: 13px;
-                    color: var(--color-text);
-                    border: 1px solid var(--color-border);
-                    overflow-wrap: anywhere;
-                }
+            .cards {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 15px;
+                width: 100%;
+            }
+            .cards > div {
+                min-width: 0;
+                min-height: 125px;
+            }
+            .cards > div > .card {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 11px;
+                padding: 25px;
+                border: 1px solid var(--color-border);
+            }
+            .cards > div > .card h2 {
+                margin: 0;
+                font-weight: 600;
+            }
+            .cards > div > .card p {
+                margin: 0;
+                text-align: center;
+            }
+            .cards > div > .card .flex-box-start {
+                column-gap: 15px;
+                align-items: center;
+            }
+            .cards > div > .card .flex-box-start > div {
+                text-align: center;
+            }
+            .cards > div > .card .mini-chart {
+                width: 150px;
+                min-height: 150px;
+                height: 150px;
+                position: relative;
+            }
+            .cards > div > .card .mini-chart canvas {
+                width: 100%;
+                height: 100%;
+                display: block;
+            }
+            .cards > div > .card .mini-chart svg {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                z-index: 1;
+                width: 42px;
+                height: 42px;
+                object-fit: contain;
+                pointer-events: none;
+                transform: translate(-50%, -50%);
+            }
 
-                /* RELATÓRIO FINAL - TITULOS */
+            /* FLUXO DA JANELA */
+            
+            .flow {
+                padding: 25px;
+                border: 1px solid var(--color-border);
+            }
+            .flow .mini-cards {
+                gap: 15px;
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(233px, 1fr));
+            }
+            .flow .mini-cards > div {
+                padding: 25px;
+                border: 1px solid var(--color-border);
+                gap: 10px;
+                align-items: center;
+                flex-direction: column;
+            }
+            .flow .mini-cards svg {
+                width: 35px;
+                height: 35px;
+            }
+            .flow .mini-cards h4, .flow .mini-cards p {
+                margin: 0;
+                text-align: center;
+            }
+            .flow .dashed-border {
+                width: 80%;
+                height: 50px;
+                margin: 0 auto;
+                border-bottom: 2px dashed var(--color-border);
+                border-right: 2px dashed var(--color-border);
+                border-left: 2px dashed var(--color-border);
+            }
+            .flow h5 {
+                margin: 15px 0 0 0;
+                text-align: center;
+            }
 
-                .final-report-title {
-                    padding: 0.5rem 0.625rem 0.625rem;
-                    background-color: var(--color-table-th);
-                    border-right: 1px solid var(--color-border);
-                    border-left: 1px solid var(--color-border);
-                    border-top: 1px solid var(--color-border);
-                }
-                .final-report-title h4 {
-                    letter-spacing: 1.5px;
-                    font-size: 15px;
-                    margin: 0;
-                }
+            /* TABELAS + GRAFICOS */
 
-                /* RELATÓRIO FINAL - HEADER */
-
-                .final-report-header {
-                    padding: 15px 20px;
-                    border: 1px solid var(--color-border);
-                    align-items: center;
-                }
-                .final-report-header .flex-box-start {
-                    column-gap: 15px;
-                    align-items: center;
-                }
-                .final-report-header img {
-                    width: 35px;
-                }
-                .final-report-header p {
-                    margin-bottom: 0;
-                    line-height: 1;
-                }
-
-                /* RELATÓRIO FINAL - CARDS */
-
-                .final-report-cards {
-                    display: grid;
-                    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-                    gap: 15px;
-                    width: 100%;
-                }
-                .final-report-cards > div {
-                    min-width: 0;
-                    min-height: 125px;
-                }
-                .final-report-cards .final-report-card {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    justify-content: center;
-                    gap: 11px;
-                    padding: 25px;
-                    border: 1px solid var(--color-border);
-                }
-                .final-report-cards .final-report-card h2 {
-                    margin: 0;
-                    font-weight: 600;
-                }
-                .final-report-cards .final-report-card p {
-                    margin: 0;
-                    text-align: center;
-                }
-                .final-report-cards .final-report-card .flex-box-start {
-                    column-gap: 15px;
-                    align-items: center;
-                }
-                .final-report-cards .final-report-card .flex-box-start > div {
-                    text-align: center;
-                }
-                .final-report-cards .final-report-card .final-report-mini-chart {
-                    width: 150px;
-                    min-height: 150px;
-                    height: 150px;
-                    position: relative;
-                }
-                .final-report-cards .final-report-card .final-report-mini-chart canvas {
-                    width: 100%;
-                    height: 100%;
-                    display: block;
-                }
-                .final-report-cards .final-report-card .final-report-mini-chart img {
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    z-index: 1;
-                    width: 42px;
-                    height: 42px;
-                    object-fit: contain;
-                    pointer-events: none;
-                    transform: translate(-50%, -50%);
-                }
-
-                /* RELATÓRIO FINAL - FLUXO DA JANELA */
-                
-                .final-report-flow {
-                    flex: 1 1 0;
-                }
-                .final-report-flow .flow {
-                    padding: 25px;
-                    border: 1px solid var(--color-border);
-                }
-                .flow .mini-cards {
-                    gap: 15px;
-                    display: grid;
-                    grid-template-columns: repeat(auto-fit, minmax(233px, 1fr));
-                }
-                .flow .mini-cards > div {
-                    padding: 25px;
-                    border: 1px solid var(--color-border);
-                    gap: 10px;
-                    align-items: center;
-                    flex-direction: column;
-                }
-                .flow .mini-cards img {
-                    width: 35px;
-                }
-                .flow .mini-cards h4, .flow .mini-cards p {
-                    margin: 0;
-                    text-align: center;
-                }
-                .flow .dashed-border {
-                    width: 80%;
-                    height: 50px;
-                    margin: 0 auto;
-                    border-bottom: 2px dashed var(--color-border);
-                    border-right: 2px dashed var(--color-border);
-                    border-left: 2px dashed var(--color-border);
-                }
-                .flow h5 {
-                    margin: 15px 0 0 0;
-                    text-align: center;
-                }
-
-                /* RELATÓRIO FINAL - DESTAQUES DA JANELA */
-
-                .final-report-highlights {
-                    flex: 0 0 509px;
-                }
-                .final-report-highlights img {
-                    width: 25px;
-                }
-                .final-report-highlights ul {
-                    display: flex;
-                    min-height: 237px;
-                    row-gap: 21px;
-                    padding: 25px;
-                    border: 1px solid var(--color-border);
-                    flex-direction: column;
-                }
-                .final-report-highlights ul li {
-                    display: flex;
-                    column-gap: 10px;
-                    align-items: center;
-                    padding-bottom: 23px;
-                    border-bottom: 1px solid var(--color-border);
-                }
-                .final-report-highlights ul li:last-of-type {
-                    padding-bottom: 0;
-                    border-bottom: none;
-                }
-                .final-report-highlights ul li h5 {
-                    margin: 0;
-                }
-                .final-report-receipt-and-expedition {
-                    gap: 15px;
-                }
-                .final-report-receipt-and-expedition > div {
-                    flex: 1 1 0;
-                }
-                .final-report-receipt .horizontal-bars-chart, .final-report-expedition .horizontal-bars-chart {
-                    margin-top: 15px;
-                }
-                .final-report-parcel-and-reverse {
-                    gap: 15px;
-                }
-                .final-report-parcel-and-reverse > div {
-                    flex: 1 1 0;
-                }
-                .final-report-parcel-and-reverse .chart {
-                    margin-top: 15px;
-                }
-
+            .flex-box-start {
+                gap: 15px;
+            }
+            .flex-box-start > div {
+                flex: 1 1 0;
+            }
+            .flex-box-start > div > .chart {
+                margin-top: 15px;
+            }
 
        </style>
     </head>	
 
     <!-- CONTEÚDO DA PÁGINA -->
 
-    <body id="">
-
-        <!--  -->
-
+    <body>
         <div class="main-structure">
-            <div class="preview-style" id="">
-                <div class="title">
-                    <h2>Análise Geral</h2>
+            <div>
+                <!-- TITULO PRINCIPAL -->
+
+                <div class="main-title">
+                    <h2>Relatório Final - LM HUB SP Santos Praia Grande 02</h2>
                 </div>
 
-                <!-- HEADER -->
+                <!-- HEADER DO RELATÓRIO -->
 
-                <div class="final-report-header flex-box-between">
+                <div class="header flex-box-between">
                     <div class="flex-box-start">
                         <img src="images/geral-icons/calendar-icon.svg">
-                        <p id="overallAnalysisDate">—</p>
+                        <p><span id="finalReportWindow"></span> — <span id="finalReportDate"></span></p>
                     </div>
 
-                    <p>Janela do <span id="overallAnalysisWindow">—</span> — Analista do turno: <span id="overallAnalysisAnalyst">—</span></p>
+                    <p>Analista do turno: <span id="finalReportWindowAnalyst">—</span></p>
                 </div>
 
-                <!-- CARDS -->
+                <!-- CARDS PRINCIPAIS -->
 
-                <div class="final-report-cards">
+                <div class="cards">
                     <div>
-                        <div class="final-report-title">
+                        <div class="title">
                             <h4>Uso da Capacidade</h4>
                         </div>
 
-                        <div class="final-report-card">
+                        <div class="card">
                             <div class="flex-box-start">
-                                <div class="final-report-mini-chart">
-                                    <canvas id="overallAnalysisCapacityChart" role="img" aria-label="Uso da capacidade operacional">
+                                <div class="mini-chart">
+                                    <canvas id="finalReportCapacityChart" role="img">
                                         Seu navegador não suporta gráficos em canvas.
                                     </canvas>
 
-                                    <img src="images/geral-icons/box-icon.svg" alt="" aria-hidden="true">
+                                    <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="512" x="0" y="0" viewBox="0 0 484.373 484.373" style="enable-background:new 0 0 512 512" xml:space="preserve" class=""><g><path d="M473.61 119.808v-1.024c-.512-1.024-.512-2.048-1.024-3.072v-.512c-.512-1.024-1.536-2.048-2.048-2.56l-.512-.512c-.512-.512-1.536-1.024-2.048-1.536l-.512-.512h-.512l-.512-.512-217.6-108.032c-4.096-2.048-9.216-2.048-13.824 0l-73.216 36.352 218.624 112.128.512.512c.512 0 .512.512 1.024.512.512.512.512 1.024 1.024 1.536v120.32c0 2.048-1.024 3.584-2.56 4.608l-44.032 23.04c-2.56 1.536-5.632.512-7.168-2.048-.512-.512-.512-1.536-.512-2.56V179.712L107.53 65.536l-.512-.512-88.576 44.032-.512.512h-.512l-.512.512c-.512.512-1.536 1.024-2.048 1.536l-.512.512c-1.024 1.024-1.536 2.048-2.56 3.072v.512c-.512 1.024-1.024 2.048-1.024 3.072v1.024c0 1.024-.512 1.536-.512 2.56v239.104c0 5.632 3.072 11.264 8.704 13.824l215.552 107.52c3.072 1.536 6.656 2.048 10.24 1.024l1.024-.512c1.024 0 1.536-.512 2.56-1.024l217.088-107.52c5.12-2.56 8.704-7.68 8.704-13.824V122.368c-.512-1.024-.512-1.536-.512-2.56" fill="#e4e6eb" opacity="1" data-original="#000000"></path></g></svg>
                                 </div>
 
                                 <div>
-                                    <h2 id="overallAnalysisCapacityUsage">—</h2>
-                                    <p id="overallAnalysisCapacityStatus">Folga de — pacotes</p>
+                                    <h2 id="finalReportCapacityUsage">—</h2>
+                                    <p id="finalReportCapacityStatus">Folga de — pacotes</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <div>
-                        <div class="final-report-title">
+                        <div class="title">
                             <h4>Pacotes em Análise</h4>
                         </div>
 
-                        <div class="final-report-card">
+                        <div class="card">
                             <div class="flex-box-start">
-                                <div class="final-report-mini-chart">
-                                    <canvas id="overallAnalysisPackagesAnalysisChart" role="img" aria-label="Pacotes em análise">
+                                <div class="mini-chart">
+                                    <canvas id="finalReportPackagesChart" role="img">
                                         Seu navegador não suporta gráficos em canvas.
                                     </canvas>
 
-                                    <img src="images/geral-icons/clock-icon.svg" alt="" aria-hidden="true">
+                                    <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="512" x="0" y="0" viewBox="0 0 347.442 347.442" style="enable-background:new 0 0 512 512" xml:space="preserve"><g><path d="M173.721 347.442c95.919 0 173.721-77.802 173.721-173.721S269.64 0 173.721 0 0 77.802 0 173.721s77.802 173.721 173.721 173.721m-12.409-272.99c0-6.825 5.584-12.409 12.409-12.409s12.409 5.584 12.409 12.409v93.313l57.39 45.912c5.336 4.281 6.204 12.098 1.923 17.434a12.34 12.34 0 0 1-9.679 4.653c-2.73 0-5.46-.869-7.755-2.73L165.966 183.4c-2.916-2.358-4.653-5.894-4.653-9.679z" fill="#e4e6eb" opacity="1" data-original="#000000"></path></g></svg>
                                 </div>
 
                                 <div>
-                                    <h2 id="overallAnalysisPackagesAnalysisValue">—</h2>
-                                    <p id="overallAnalysisPackagesAnalysisStatus">—</p>
+                                    <h2 id="finalReportPackagesValue">—</h2>
+                                    <p id="finalReportPackagesStatus">—</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <div>
-                        <div class="final-report-title">
+                        <div class="title">
                             <h4>Taxa de Perdas</h4>
                         </div>
 
-                        <div class="final-report-card">
+                        <div class="card">
                             <div class="flex-box-start">
-                                <div class="final-report-mini-chart">
-                                    <canvas id="overallAnalysisLossRateChart" role="img" aria-label="Taxa de perdas em relação ao limite">
+                                <div class="mini-chart">
+                                    <canvas id="finalReportLossRateChart" role="img">
                                         Seu navegador não suporta gráficos em canvas.
                                     </canvas>
 
-                                    <img src="images/geral-icons/bars-icon.svg" alt="" aria-hidden="true">
+                                    <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="512" x="0" y="0" viewBox="0 0 24 24" style="enable-background:new 0 0 512 512" xml:space="preserve" class=""><g><path d="M7 13v9a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1m7-12h-4a1 1 0 0 0-1 1v20a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1m8 5h-4a1 1 0 0 0-1 1v15a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1" fill="#e4e6eb" opacity="1" data-original="#000000"></path></g></svg>
                                 </div>
 
                                 <div>
-                                    <h2 id="overallAnalysisLossRate">—</h2>
-                                    <p id="overallAnalysisLossRateStatus">—</p>
+                                    <h2 id="finalReportLossRate">—</h2>
+                                    <p id="finalReportLossRateStatus">—</p>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- FLUXO DO DIA E DASTAQUES DA OPERAÇÃO -->
+                <!-- FLUXO DA JANELA -->
 
-                <div class="flex-box-start" style="column-gap: 15px;">
-                    <div class="final-report-flow">
-                        <div class="final-report-title">
-                            <h4>Fluxo da Janela</h4>
-                        </div>
+                <div>
+                    <div class="title">
+                        <h4>Fluxo da Janela</h4>
+                    </div>
 
-                        <div class="flow">
-                            <div class="mini-cards">
-                                <div class="flex-box-center">
-                                    <img src="images/geral-icons/clipboard-icon.svg">
+                    <div class="flow">
+                        <div class="mini-cards">
+                            <div class="flex-box-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="512" x="0" y="0" viewBox="0 0 24 24" style="enable-background:new 0 0 512 512" xml:space="preserve" class=""><g><path d="M12.25 6h-6.5C4.785 6 4 5.215 4 4.25v-1.5A.75.75 0 0 1 4.75 2h1.604C6.682.847 7.743 0 9 0s2.318.847 2.646 2h1.604a.75.75 0 0 1 .75.75v1.5C14 5.215 13.215 6 12.25 6M22 21a.5.5 0 0 1-.447-.276l-1.289-2.578A2.5 2.5 0 0 1 20 17.028V8c0-1.103.897-2 2-2s2 .897 2 2v9.028c0 .386-.091.772-.264 1.118l-1.289 2.578A.5.5 0 0 1 22 21m1.289-3.078h.01z" fill="#e4e6eb" opacity="1" data-original="#000000" class=""></path><path d="M15.25 3H15v1.25A2.75 2.75 0 0 1 12.25 7h-6.5A2.75 2.75 0 0 1 3 4.25V3h-.25A2.75 2.75 0 0 0 0 5.75v15.5A2.75 2.75 0 0 0 2.75 24h12.5A2.75 2.75 0 0 0 18 21.25V5.75A2.75 2.75 0 0 0 15.25 3m-1 18H3.75a.75.75 0 0 1 0-1.5h10.5a.75.75 0 0 1 0 1.5m0-3H3.75a.75.75 0 0 1 0-1.5h10.5a.75.75 0 0 1 0 1.5m0-3H3.75a.75.75 0 0 1 0-1.5h10.5a.75.75 0 0 1 0 1.5m0-3H3.75a.75.75 0 0 1 0-1.5h10.5a.75.75 0 0 1 0 1.5" fill="#e4e6eb" opacity="1" data-original="#000000" class=""></path></g></svg>
 
-                                    <div>
-                                        <h4>Planejado</h4>
-                                        <p id="overallAnalysisPlanned">—</p>
-                                    </div>
-                                </div>
-
-                                <div class="flex-box-center">
-                                    <img src="images/geral-icons/barcode-scanner-icon.svg">
-
-                                    <div>
-                                        <h4>Processado</h4>
-                                        <p id="overallAnalysisProcessed">—</p>
-                                    </div>
-                                </div>
-
-                                <div class="flex-box-center">
-                                    <img src="images/geral-icons/van-icon.svg" style="width: 40px;">
-
-                                    <div>
-                                        <h4>Expedido</h4>
-                                        <p id="overallAnalysisExpedited">—</p>
-                                    </div>
-                                </div>
-
-                                <div class="flex-box-center">
-                                    <img src="images/geral-icons/forklift-icon.svg">
-
-                                    <div>
-                                        <h4>Backlog no Piso</h4>
-                                        <p id="overallAnalysisFloor">—</p>
-                                    </div>
+                                <div>
+                                    <h4>Planejado</h4>
+                                    <p id="finalReportPlanned">—</p>
                                 </div>
                             </div>
 
-                            <div class="dashed-border"></div>
+                            <div class="flex-box-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="512" x="0" y="0" viewBox="0 0 512 512" style="enable-background:new 0 0 512 512" xml:space="preserve" class=""><g transform="matrix(-0.99,-2.4405384255275053e-32,-2.4405384255275053e-32,0.99,509.4390055465698,2.559994697570801)"><path d="M296.746 296.831c-11.32.801-22.425.915-33.991-.381-12.038-1.417-21.244-11.057-21.844-22.933-1.362-27.073 1.635-57.034 9.261-91.134 47.539 115.169 45.283 108.003 46.574 114.448" fill="#e4e6eb" opacity="1" data-original="#000000" class=""></path><path d="M474.003 424.625v.054c-.599 16.615-6.428 32.249-16.287 44.069-18.303 21.79-48.481 39.002-75.064 42.925-9.45 1.349-18.626-1.549-25.493-7.463-14.04-12.19-13.148-32.833-6.755-50.171a145.6 145.6 0 0 1 9.261-20.699c2.561-7.517.381-10.023-.708-11.004-4.031-2.832-7.953-5.665-11.494-8.553-8.225-6.645-10.241-18.684-4.685-27.89a263 263 0 0 1 7.028-11.004c1.417-3.65-.436-7.191-3.05-8.824-8.225-4.63-15.634-11.167-21.245-18.739-16.056-21.615-12.823-43.106-21.353-63.135l-45.322-109.383c54.583-2.832 106.332-8.498 154.65-16.941-3.868 10.132-3.377 21.898 1.743 32.194 41.343 83.619 61.116 162.551 58.774 234.564M477.325 88.299c0-23.439-14.827-45.261-38.56-53.524C345.636 2.531 242.905-6.759 105.777 4.701 93.209 9.413 83.155 22.218 83.155 37.26c0 4.511.785 8.761 2.333 12.629 16.352 39.922 44.303 69.488 71.331 98.082 5.54 5.715 9.515 11.023 16.791 14.658 3.524 1.762 8.826 3.102 11.572 3.4 89.602-.525 172.689-8.147 246.974-22.662 26.17-5.145 45.169-28.304 45.169-55.068m-101.117.138H184.275a5.448 5.448 0 0 1 0-10.896h191.934a5.448 5.448 0 1 1-.001 10.896" fill="#e4e6eb" opacity="1" data-original="#000000" class=""></path><path d="M148.904 155.452c-27.715-29.316-56.376-59.633-73.513-101.476-2.082-5.2-3.13-10.812-3.13-16.717 0-11.211 4.367-22.356 11.775-30.588-6.283.607-12.754 1.256-19.489 1.96C47.518 10.42 34.674 24.669 34.674 41.78c0 32.46 56.558 90.969 77.452 113.389 6.065 6.482 14.605 10.299 23.439 10.486 8.245.165 16.089.279 23.619.345-.066-.057-.124-.124-.191-.182-2.927-2.562-3.769-3.755-10.089-10.366" fill="#e4e6eb" opacity="1" data-original="#000000" class=""></path></g></svg>
 
-                            <h5 id="overallAnalysisFlowStatus">—</h5>
+                                <div>
+                                    <h4>Processado</h4>
+                                    <p id="finalReportProcessed">—</p>
+                                </div>
+                            </div>
+
+                            <div class="flex-box-center">
+                                <svg style="width: 40px;height: 40px;" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="512" x="0" y="0" viewBox="0 0 406.783 406.783" style="enable-background:new 0 0 512 512" xml:space="preserve" class=""><g><path d="M127.12 256.572c-19.742 0-35.741 15.993-35.741 35.737 0 19.745 15.999 35.738 35.741 35.738 19.749 0 35.744-15.993 35.744-35.738s-15.995-35.737-35.744-35.737m0 51.274c-8.582 0-15.536-6.955-15.536-15.537 0-8.586 6.954-15.537 15.536-15.537s15.542 6.951 15.542 15.537c0 8.582-6.959 15.537-15.542 15.537M315.588 256.572c-19.742 0-35.74 15.993-35.74 35.737 0 19.745 15.998 35.738 35.74 35.738 19.75 0 35.744-15.993 35.744-35.738s-15.994-35.737-35.744-35.737m0 51.274c-8.582 0-15.535-6.955-15.535-15.537 0-8.586 6.953-15.537 15.535-15.537 8.584 0 15.543 6.951 15.543 15.537 0 8.582-6.959 15.537-15.543 15.537M167.329 146.759c0 5.008-4.098 9.105-9.105 9.105H32.579c-5.008 0-9.104-4.097-9.104-9.105v-5.463c0-5.007 4.097-9.104 9.104-9.104h125.645c5.008 0 9.105 4.097 9.105 9.104z" fill="#e4e6eb" opacity="1" data-original="#000000" class=""></path><path d="M385.623 200.066c-13.105-3.407-20.604-5.549-25.75-15.487l-17.207-34.839c-5.148-9.938-18.518-18.07-29.707-18.07h-23.535s-3.166.066-3.166-3.12V99.331c0-11.327-6.41-20.595-20.045-20.595H74.405c-19.521 0-28.789 9.269-28.789 20.595v18.311s0 5.446 5.271 5.446h107.337c10.041 0 18.21 8.168 18.21 18.209v5.463c0 10.041-8.169 18.209-18.21 18.209H50.887s-5.271-.438-5.271 5.252v6.297c0 5.008 6.864 5.005 6.864 5.005h72.254c10.041 0 18.21 8.169 18.21 18.209v5.463c0 10.041-8.169 18.209-18.21 18.209H53.62s-8.004-.148-8.004 6.225v44.246c0 11.326 9.268 20.595 20.595 20.595h11.376c2.58 0 2.96-1.437 2.96-2.159 0-25.679 20.894-46.568 46.574-46.568 25.682 0 46.575 20.891 46.575 46.568 0 .725-.206 2.159 1.767 2.159h91.806c1.82 0 1.746-1.534 1.746-2.159 0-25.679 20.893-46.568 46.574-46.568s46.574 20.891 46.574 46.568c0 .725-.018 2.159 1.121 2.159h23.146c11.195 0 20.352-9.157 20.352-20.351v-38.664c.001-32.561-10.28-32.561-21.159-35.389m-38.727-1.811h-57.928c-2.393 0-2.711-2.33-2.711-2.33V147.67s-.135-1.853 2.938-1.853h16.529c9.959 0 21.855 7.236 26.434 16.079l15.312 31a24 24 0 0 0 2.072 3.349c.544.728-.368 2.01-2.646 2.01" fill="#e4e6eb" opacity="1" data-original="#000000" class=""></path><path d="M133.838 205.195c0 5.008-4.097 9.105-9.104 9.105H9.104C4.096 214.3 0 210.203 0 205.195v-5.463c0-5.007 4.097-9.104 9.104-9.104h115.63c5.008 0 9.104 4.097 9.104 9.104z" fill="#e4e6eb" opacity="1" data-original="#000000" class=""></path></g></svg>
+
+                                <div>
+                                    <h4>Expedido</h4>
+                                    <p id="finalReportExpedited">—</p>
+                                </div>
+                            </div>
+
+                            <div class="flex-box-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="512" x="0" y="0" viewBox="0 0 64 64" style="enable-background:new 0 0 512 512" xml:space="preserve" class=""><g transform="matrix(1.0999999999999994,0,0,1.0999999999999994,-3.1999998807906778,-3.199999642372113)"><path d="M61 50v2c0 1.1-.9 2-2 2h-9c0-2.52-1.17-4.77-3-6.23V10c0-1.1.9-2 2-2h2c1.1 0 2 .9 2 2v38h6c1.1 0 2 .9 2 2M23.54 37l-2.82-4.22A4 4 0 0 0 17.39 31H6c-1.66 0-3 1.34-3 3v17a2.995 2.995 0 0 0 2.411 2.94A11 11 0 0 1 5 51c0-6.065 4.935-11 11-11s11 4.935 11 11c0 1.041-.155 2.045-.426 3H34c0-4.41 3.59-8 8-8 1.06 0 2.07.21 3 .59V37zM48 54c0 3.309-2.691 6-6 6s-6-2.691-6-6 2.691-6 6-6 6 2.691 6 6m-4 0c0-1.102-.897-2-2-2s-2 .898-2 2 .897 2 2 2 2-.897 2-2m-19-3c0 4.963-4.038 9-9 9s-9-4.037-9-9 4.038-9 9-9 9 4.037 9 9m-5 0c0-2.206-1.794-4-4-4s-4 1.794-4 4 1.794 4 4 4 4-1.794 4-4m-4-2c-1.103 0-2 .898-2 2s.897 2 2 2 2-.897 2-2-.897-2-2-2m28.83-22.56L30.42 5.31A2.99 2.99 0 0 0 27.94 4H9C7.35 4 6 5.35 6 7v22h4V9c0-.55.45-1 1-1h15.89c.33 0 .64.16.82.44l13.12 19.23c.11.17.17.36.17.56V29h-6.52l-3.07-3.84.88-.68c.43-.35.51-.97.16-1.41a1 1 0 0 0-1.4-.17l-1.67 1.32h-.01l-1.66 1.3c-.43.35-.51.97-.16 1.41.19.25.49.38.78.38.22 0 .44-.07.62-.21l.89-.7L33 30.35V35h12v-8c0-.2-.06-.4-.17-.56M13 19c-.55 0-1 .45-1 1v9h5.39c.2 0 .41.01.61.03V24c0-2.76-2.24-5-5-5" fill="#e4e6eb" opacity="1" data-original="#000000" class=""></path></g></svg>
+
+                                <div>
+                                    <h4>Backlog no Piso</h4>
+                                    <p id="finalReportFloor">—</p>
+                                </div>
+                            </div>
                         </div>
+
+                        <div class="dashed-border"></div>
+
+                        <h5 id="finalReportFlowStatus">—</h5>
                     </div>
                 </div>
 
                 <!-- RECEBIMENTO E EXPEDIÇÃO -->
 
-                <div class="final-report-receipt-and-expedition flex-box-start">
-                    <div class="final-report-receipt">
+                <div class="flex-box-start">
+                    <div>
                         <table>
                             <caption>Processamento</caption>
 
@@ -946,24 +924,24 @@
 
                             <tbody>
                                 <tr>
-                                    <td id="overallAnalysisExpectedVolume">—</td>
-                                    <td id="overallAnalysisReceivedVolume">—</td>
-                                    <td id="overallAnalysisReceiptErrors">—</td>
-                                    <td id="overallAnalysisReceiptErrorRate">—</td>
+                                    <td id="finalReportExpectedVolume">—</td>
+                                    <td id="finalReportReceivedVolume">—</td>
+                                    <td id="finalReportReceiptErrors">—</td>
+                                    <td id="finalReportReceiptErrorRate">—</td>
                                 </tr>
                             </tbody>
                         </table>
 
                         <div class="chart horizontal-bars-chart">
                             <div class="chart-canvas-container">
-                                <canvas id="overallAnalysisReceiptChart" role="img">
+                                <canvas id="finalReportReceiptChart" role="img">
                                     Seu navegador não suporta gráficos em canvas.
                                 </canvas>
                             </div>
                         </div>
                     </div>
 
-                    <div class="final-report-expedition">
+                    <div>
                         <table>
                             <caption>Expedição</caption>
 
@@ -978,17 +956,17 @@
 
                             <tbody>
                                 <tr>
-                                    <td id="overallAnalysisRoutesChecked">—</td>
-                                    <td id="overallAnalysisVolumeChecked">—</td>
-                                    <td id="overallAnalysisFloorVolume">—</td>
-                                    <td id="overallAnalysisExpeditionTime">—</td>
+                                    <td id="finalReportRoutesChecked">—</td>
+                                    <td id="finalReportVolumeChecked">—</td>
+                                    <td id="finalReportFloorVolume">—</td>
+                                    <td id="finalReportExpeditionTime">—</td>
                                 </tr>
                             </tbody>
                         </table>
 
                         <div class="chart horizontal-bars-chart">
                             <div class="chart-canvas-container">
-                                <canvas id="overallAnalysisExpeditionChart" role="img">
+                                <canvas id="finalReportExpeditionChart" role="img">
                                     Seu navegador não suporta gráficos em canvas.
                                 </canvas>
                             </div>
@@ -998,94 +976,94 @@
 
                 <!-- AVARIAS E PERDAS -->
 
-                <div class="final-report-damage-and-lost">
-                    <table id="overallAnalysisDamageAndLossesTable">
-                        <caption>Situação das Avarias e Perdas</caption>
+                <table id="finalReport-LossesTable">
+                    <caption>Situação das Avarias e Perdas</caption>
 
-                        <thead>
-                            <tr>
-                                <th scope="col" style="width: 230px;">Ocorrência</th>
-                                <th scope="col">Hoje</th>
-                                <th scope="col">Ontem</th>
-                                <th scope="col">Anteontem</th>
-                                <th scope="col">De 3 a 7<br>Dias Atrás</th>
-                                <th scope="col">De 8 a 14<br>Dias Atrás</th>
-                                <th scope="col">De 15 Dias Atrás<br>Até o Começo do Mês</th>
-                                <th scope="col">Total do Mês</th>
-                            </tr>
-                        </thead>
+                    <thead>
+                        <tr>
+                            <th scope="col" style="width: 230px;">Ocorrência</th>
+                            <th scope="col">Hoje</th>
+                            <th scope="col">Ontem</th>
+                            <th scope="col">Anteontem</th>
+                            <th scope="col">De 3 a 7<br>Dias Atrás</th>
+                            <th scope="col">De 8 a 14<br>Dias Atrás</th>
+                            <th scope="col">De 15 Dias Atrás<br>Até o Começo do Mês</th>
+                            <th scope="col">Total do Mês</th>
+                        </tr>
+                    </thead>
 
-                        <tbody>
-                            <tr data-overall-damage-losses-field="hub">
-                                <th scope="row">Avarias do Hub</th>
-                                <td>—</td>
-                                <td>—</td>
-                                <td>—</td>
-                                <td>—</td>
-                                <td>—</td>
-                                <td>—</td>
-                                <td>—</td>
-                            </tr>
-                        </tbody>
+                    <tbody>
+                        <tr data-overall-damage-losses-field="hub">
+                            <th scope="row">Avarias do Hub</th>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                        </tr>
+                    </tbody>
 
-                        <tbody>
-                            <tr data-overall-damage-losses-field="soc">
-                                <th scope="row">Avarias do SOC</th>
-                                <td>—</td>
-                                <td>—</td>
-                                <td>—</td>
-                                <td>—</td>
-                                <td>—</td>
-                                <td>—</td>
-                                <td>—</td>
-                            </tr>
-                        </tbody>
+                    <tbody>
+                        <tr data-overall-damage-losses-field="soc">
+                            <th scope="row">Avarias do SOC</th>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                        </tr>
+                    </tbody>
 
-                        <tbody>
-                            <tr data-overall-damage-losses-field="underReview">
-                                <th scope="row">Pacotes em Análise</th>
-                                <td>—</td>
-                                <td>—</td>
-                                <td>—</td>
-                                <td>—</td>
-                                <td>—</td>
-                                <td>—</td>
-                                <td>—</td>
-                            </tr>
-                        </tbody>
+                    <tbody>
+                        <tr data-overall-damage-losses-field="underReview">
+                            <th scope="row">Pacotes em Análise</th>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                        </tr>
+                    </tbody>
 
-                        <tbody>
-                            <tr data-overall-damage-losses-field="confirmedLosses">
-                                <th scope="row">Perdas Confirmadas</th>
-                                <td>—</td>
-                                <td>—</td>
-                                <td>—</td>
-                                <td>—</td>
-                                <td>—</td>
-                                <td>—</td>
-                                <td>—</td>
-                            </tr>
-                        </tbody>
+                    <tbody>
+                        <tr data-overall-damage-losses-field="confirmedLosses">
+                            <th scope="row">Perdas Confirmadas</th>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                        </tr>
+                    </tbody>
 
-                        <tbody>
-                            <tr data-overall-damage-losses-field="returnedPackages">
-                                <th scope="row">Pacotes Retornados</th>
-                                <td>—</td>
-                                <td>—</td>
-                                <td>—</td>
-                                <td>—</td>
-                                <td>—</td>
-                                <td>—</td>
-                                <td>—</td>
-                            </tr>
-                        </tbody>
-
-                    </table>
-                </div>
+                    <tbody>
+                        <tr data-overall-damage-losses-field="returnedPackages">
+                            <th scope="row">Pacotes Retornados</th>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                        </tr>
+                    </tbody>
+                </table>
 
                 <!-- PARCEL E REVERSA -->
 
-                <div class="final-report-parcel-and-reverse flex-box-start">
+                <div class="flex-box-start">
+
+                    <!-- DADOS DO PARCEL -->
+
                     <div>
                         <table>
                             <caption>Parcel Sweeper</caption>
@@ -1101,32 +1079,34 @@
 
                             <tbody>
                                 <tr>
-                                    <td id="overallAnalysisParcelScanned">—</td>
-                                    <td id="overallAnalysisParcelBacklog">—</td>
-                                    <td id="overallAnalysisParcelException">—</td>
-                                    <td id="overallAnalysisParcelMissorted">—</td>
+                                    <td id="finalReportParcelScanned">—</td>
+                                    <td id="finalReportParcelBacklog">—</td>
+                                    <td id="finalReportParcelException">—</td>
+                                    <td id="finalReportParcelMissorted">—</td>
                                 </tr>
                             </tbody>
                         </table>
 
                         <div class="chart doughnut-chart">
-                            <div class="chart-canvas-container" id="overallAnalysisParcelCoverageChartContainer">
-                                <canvas id="overallAnalysisParcelCoverageChart" role="img" aria-label="Cobertura da varredura entre pacotes escaneados e não escaneados"></canvas>
+                            <div class="chart-canvas-container" id="finalReport-ParcelChartContainer">
+                                <canvas id="finalReport-ParcelChart" role="img"></canvas>
                             </div>
 
                             <div class="chart-label">
                                 <div class="type">
                                     <div style="background-color: #2538a5;"></div>
-                                    <p>Escaneados <span id="overallAnalysisParcelCoverageScanned">—</span></p>
+                                    <p>Escaneados <span id="finalReport-ParcelCoverageScanned">—</span></p>
                                 </div>
 
                                 <div class="type">
                                     <div style="background-color: #e4e6eb;"></div>
-                                    <p>Não Escaneados <span id="overallAnalysisParcelCoverageUnscanned">—</span></p>
+                                    <p>Não Escaneados <span id="finalReport-ParcelCoverageUnscanned">—</span></p>
                                 </div>
                             </div>
                         </div>
                     </div>
+
+                    <!-- DADOS DA REVERSA -->
                     
                     <div>
                         <table>
@@ -1143,42 +1123,43 @@
 
                             <tbody>
                                 <tr>
-                                    <td id="overallAnalysisReverseReturn">—</td>
-                                    <td id="overallAnalysisReverseMissorted">—</td>
-                                    <td id="overallAnalysisReverseLiquidate">—</td>
-                                    <td id="overallAnalysisReverseConfiscated">—</td>
+                                    <td id="finalReportReverseReturn">—</td>
+                                    <td id="finalReportReverseMissorted">—</td>
+                                    <td id="finalReportReverseLiquidate">—</td>
+                                    <td id="finalReportReverseConfiscated">—</td>
                                 </tr>
                             </tbody>
                         </table>
 
                         <div class="chart doughnut-chart">
-                            <div class="chart-canvas-container" id="overallAnalysisReverseCompositionChartContainer">
-                                <canvas id="overallAnalysisReverseCompositionChart" role="img" aria-label="Composição da reversa por tipo"></canvas>
+                            <div class="chart-canvas-container" id="finalReport-ReverseChartContainer">
+                                <canvas id="finalReport-ReverseChart" role="img"></canvas>
                             </div>
 
                             <div class="chart-label">
                                 <div class="type">
                                     <div style="background-color: #007A48;"></div>
-                                    <p>Return <span id="overallAnalysisReverseCompositionReturn">—</span></p>
+                                    <p>Return <span id="finalReport-ReverseReturn">—</span></p>
                                 </div>
 
                                 <div class="type">
                                     <div style="background-color: #8B0000;"></div>
-                                    <p>Missorted <span id="overallAnalysisReverseCompositionMissorted">—</span></p>
+                                    <p>Missorted <span id="finalReport-ReverseMissorted">—</span></p>
                                 </div>
 
                                 <div class="type">
                                     <div style="background-color: #2538a5;"></div>
-                                    <p>Liquidate <span id="overallAnalysisReverseCompositionLiquidate">—</span></p>
+                                    <p>Liquidate <span id="finalReport-ReverseLiquidate">—</span></p>
                                 </div>
 
                                 <div class="type">
                                     <div style="background-color: #f99400;"></div>
-                                    <p>Confiscado <span id="overallAnalysisReverseCompositionConfiscated">—</span></p>
+                                    <p>Confiscado <span id="finalReport-ReverseConfiscated">—</span></p>
                                 </div>
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -1195,7 +1176,7 @@
 
         <!-- 2. Dados atuais coletados dos relatórios -->
 
-        <script id="overallAnalysisData" type="application/json">
+        <script id="finalReportData" type="application/json">
             {{REPORT_DATA}}
         </script>
 
