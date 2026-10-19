@@ -1,5 +1,5 @@
 import { CHART_COLORS, getChartPixelRatio } from "../../charts/theme.js";
-import { CHART_VALUE_FONT } from "../../charts/theme.js";
+import { CHART_TEXT_COLOR, CHART_VALUE_FONT } from "../../charts/theme.js";
 import { drawHorizontalBar3D, drawHorizontalBar3DBase } from "../core/horizontal-bars-3d.js";
 import { createDashboardChart } from "../../charts/standard.js";
 import {
@@ -291,7 +291,7 @@ function drawMetricLabel(
     positionX,
     positionY,
     alignment,
-    color = "#a8a9ad",
+    color = CHART_TEXT_COLOR,
 ) {
     context.textAlign =
         alignment;
@@ -450,7 +450,7 @@ function drawComparisonStructure(chart) {
         context.font =
             '600 14px "Open Sans", sans-serif';
         context.fillStyle =
-            "#a8a9ad";
+            CHART_TEXT_COLOR;
         context.textAlign =
             "center";
         context.textBaseline =
@@ -542,7 +542,7 @@ function drawComparisonStructure(chart) {
             context.font =
                 '600 14px "Open Sans", sans-serif';
             context.fillStyle =
-                "#a8a9ad";
+                CHART_TEXT_COLOR;
             context.textAlign =
                 "left";
             context.textBaseline =
@@ -612,7 +612,7 @@ function drawComparisonStructure(chart) {
 
             if (receivedTime === null) {
                 context.fillStyle =
-                    "#a8a9ad";
+                    CHART_TEXT_COLOR;
                 context.textAlign =
                     "left";
                 context.fillText(
@@ -629,10 +629,7 @@ function drawComparisonStructure(chart) {
                     timeBarEnd + 20,
                     positionY + 7,
                     "left",
-                    receivedTime >
-                        TIME_MAXIMUM_REFERENCE_SECONDS
-                        ? TIME_BAR_COLOR
-                        : "#e4e6eb",
+                    CHART_TEXT_COLOR,
                 );
             }
         },
@@ -677,7 +674,7 @@ function drawComparisonStructure(chart) {
         "#18191a";
     context.lineWidth = 3;
     context.fillStyle =
-        CHART_COLORS.red;
+        CHART_TEXT_COLOR;
     context.strokeText(
         "Máximo 10:00",
         maximumReferenceX - 6,

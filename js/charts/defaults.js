@@ -12,13 +12,13 @@
     chartLibrary.defaults.devicePixelRatio = function () {
         return Math.max(Number(window.devicePixelRatio) || 1, 2);
     };
-    chartLibrary.defaults.color = "#a8a9ad";
+    chartLibrary.defaults.color = "#e4e6eb";
 
     const tooltip = chartLibrary.defaults.plugins?.tooltip;
     if (tooltip) {
-        tooltip.titleColor = "#a8a9ad";
-        tooltip.bodyColor = "#a8a9ad";
-        tooltip.footerColor = "#a8a9ad";
+        tooltip.titleColor = "#e4e6eb";
+        tooltip.bodyColor = "#e4e6eb";
+        tooltip.footerColor = "#e4e6eb";
     }
 
     const fonts = document.fonts;

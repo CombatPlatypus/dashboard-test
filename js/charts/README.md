@@ -13,8 +13,8 @@ com 800 × 300 pixels de tamanho visual usa pelo menos 1600 × 600 pixels de des
 
 A fonte é Open Sans. Eixos e nomes usam 14px; os valores das barras, médias e pontos
 usam `CHART_VALUE_FONT`: 15px, peso 600. O centro das composições permanece em 15px
-com peso normal. Textos comuns usam `CHART_TEXT_COLOR` (`#a8a9ad`); referências de alerta
-podem usar a cor correspondente à ocorrência.
+com peso normal. Todos os textos usam `CHART_TEXT_COLOR` (`#e4e6eb`), incluindo valores,
+indicadores, eixos, legendas, títulos, tooltips e textos de referência.
 
 As barras horizontais usam faces 3D de 10 × 9px, espessura frontal de 24px, base opaca
 sobre o zero, grades verticais e nenhum trilho de fundo. Os valores ficam 10px após a

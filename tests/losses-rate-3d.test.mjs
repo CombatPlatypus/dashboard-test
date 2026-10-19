@@ -79,7 +79,7 @@ test("projeção preserva proporções e desenha somente o total no centro", t =
             ["Ocorrências", geometry.centerX, geometry.textCenterY + 10.5],
         ]);
         assert.equal(context.font, '15px "Open Sans", sans-serif');
-        assert.equal(context.fillStyle, "#a8a9ad");
+        assert.equal(context.fillStyle, "#e4e6eb");
         assert.equal(context.letterSpacing, "1px");
         assert.equal(context.balance, 0);
         assert.ok(context.fills > 2);

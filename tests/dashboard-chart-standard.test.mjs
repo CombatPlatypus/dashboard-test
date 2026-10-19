@@ -15,6 +15,12 @@ test("padrão preserva categorias e valores, atualiza tonalidades e usa fonte e 
     assert.deepEqual(config.data.datasets[0].backgroundColor, [CHART_COLORS.blue, CHART_COLORS.yellow, CHART_COLORS.green, CHART_COLORS.red, "#a0a4aa"]);
     assert.equal(config.options.scales.x.ticks.font.size, 14);
     assert.equal(config.options.scales.y.ticks.font.size, 14);
+    assert.equal(config.options.color, "#e4e6eb");
+    assert.equal(config.options.scales.x.ticks.color, "#e4e6eb");
+    assert.equal(config.options.scales.y.ticks.color, "#e4e6eb");
+    assert.equal(config.options.plugins.legend.labels.color, "#e4e6eb");
+    assert.equal(config.options.plugins.title.color, "#e4e6eb");
+    assert.equal(config.options.plugins.tooltip.bodyColor, "#e4e6eb");
     assert.equal(config.options.scales.x.ticks.callback(19), "19 unidades");
     assert.equal(config.options.scales.x.grid.color({ tick: { value: 0 } }), "rgba(0, 0, 0, 0)");
     assert.equal(config.options.scales.y.border.display, false);

@@ -193,13 +193,13 @@ test("valores ficam fora das barras com a tipografia e alinhamento do dashboard"
     chart.getDatasetMeta = () => ({ data: bars });
     chart.plugins[2].afterDatasetsDraw(chart);
     assert.deepEqual(texts, [
-        { text: "100", x: 132, y: 47, color: "#a8a9ad", align: "left",
+        { text: "100", x: 132, y: 47, color: "#e4e6eb", align: "left",
             baseline: "middle", font: '600 15px "Open Sans", sans-serif', spacing: "1px" },
-        { text: "74", x: 112, y: 97, color: "#a8a9ad", align: "left",
+        { text: "74", x: 112, y: 97, color: "#e4e6eb", align: "left",
             baseline: "middle", font: '600 15px "Open Sans", sans-serif', spacing: "1px" },
-        { text: "23", x: 82, y: 147, color: "#a8a9ad", align: "left",
+        { text: "23", x: 82, y: 147, color: "#e4e6eb", align: "left",
             baseline: "middle", font: '600 15px "Open Sans", sans-serif', spacing: "1px" },
-        { text: "151", x: 182, y: 197, color: "#a8a9ad", align: "left",
+        { text: "151", x: 182, y: 197, color: "#e4e6eb", align: "left",
             baseline: "middle", font: '600 15px "Open Sans", sans-serif', spacing: "1px" },
     ]);
 });

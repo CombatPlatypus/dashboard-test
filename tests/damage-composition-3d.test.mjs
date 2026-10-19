@@ -58,7 +58,7 @@ test("texto central fica frontal à projeção, inclusive com categoria única o
         assert.deepEqual(ctx.texts, [[text, geometry.centerX, geometry.textCenterY - 10.5],
             ["Classificadas", geometry.centerX, geometry.textCenterY + 10.5]]);
         assert.equal(ctx.font, '15px "Open Sans", sans-serif');
-        assert.equal(ctx.fillStyle, "#a8a9ad");
+        assert.equal(ctx.fillStyle, "#e4e6eb");
         assert.equal(ctx.letterSpacing, "1px");
         assert.ok(ctx.fills > 2);
         assert.equal(ctx.balance, 0);

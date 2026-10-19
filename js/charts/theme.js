@@ -1,4 +1,4 @@
-export const CHART_TEXT_COLOR = "#a8a9ad";
+export const CHART_TEXT_COLOR = "#e4e6eb";
 
 export const CHART_COLORS = Object.freeze({
     red: "#8B0000",

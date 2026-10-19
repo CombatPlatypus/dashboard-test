@@ -23,6 +23,20 @@ export function applyChartStandard(config) {
     const options = config.options ??= {};
     options.devicePixelRatio = getChartPixelRatio();
     options.font = { ...options.font, family: CHART_AXIS_FONT.family, size: 14 };
+    options.color = CHART_TEXT_COLOR;
+    if (options.plugins !== false) {
+        const plugins = options.plugins ??= {};
+        if (plugins.legend !== false) {
+            const legend = plugins.legend ??= {};
+            legend.labels = { ...legend.labels, color: CHART_TEXT_COLOR };
+        }
+        for (const key of ["title", "subtitle"]) {
+            if (plugins[key] !== false) plugins[key] = { ...plugins[key], color: CHART_TEXT_COLOR };
+        }
+        if (plugins.tooltip !== false) {
+            plugins.tooltip = { ...plugins.tooltip, titleColor: CHART_TEXT_COLOR, bodyColor: CHART_TEXT_COLOR, footerColor: CHART_TEXT_COLOR };
+        }
+    }
     config.data ??= { datasets: [] };
     normalizeChartDatasets(config.data);
 
@@ -30,6 +44,7 @@ export function applyChartStandard(config) {
         scale.ticks ??= {};
         scale.ticks.font = { ...scale.ticks.font, ...CHART_AXIS_FONT };
         scale.ticks.color = CHART_TEXT_COLOR;
+        if (scale.title) scale.title.color = CHART_TEXT_COLOR;
     }
 
     config.plugins ??= [];

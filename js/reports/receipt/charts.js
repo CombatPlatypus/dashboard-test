@@ -1,5 +1,5 @@
 import { CHART_COLORS, getChartPixelRatio } from "../../charts/theme.js";
-import { CHART_VALUE_FONT } from "../../charts/theme.js";
+import { CHART_TEXT_COLOR, CHART_VALUE_FONT } from "../../charts/theme.js";
 import { drawHorizontalBar3D, drawHorizontalBar3DBase } from "../core/horizontal-bars-3d.js";
 import { createDashboardChart } from "../../charts/standard.js";
 import {
@@ -912,7 +912,7 @@ function drawReceiptAlignedMetricLabel(
         "#18191a";
     context.lineWidth = 1;
     context.fillStyle =
-        "#a8a9ad";
+        CHART_TEXT_COLOR;
     context.strokeText(
         label,
         positionX,
@@ -995,7 +995,7 @@ function drawReceiptAlignedComparison(
     context.font =
         '500 14px "Open Sans", sans-serif';
     context.fillStyle =
-        "#a8a9ad";
+        CHART_TEXT_COLOR;
     context.strokeStyle =
         "rgba(82, 82, 82, 0.45)";
     context.lineWidth = 1;
@@ -1112,7 +1112,7 @@ function drawReceiptAlignedComparison(
         context.font =
             '600 14px "Open Sans", sans-serif';
         context.fillStyle =
-            "#a8a9ad";
+            CHART_TEXT_COLOR;
         context.textAlign =
             "center";
         context.fillText(
@@ -1202,7 +1202,7 @@ function drawReceiptAlignedComparison(
             context.font =
                 '600 14px "Open Sans", sans-serif';
             context.fillStyle =
-                "#a8a9ad";
+                CHART_TEXT_COLOR;
             context.textAlign =
                 "left";
             context.textBaseline =
@@ -1270,7 +1270,7 @@ function drawReceiptAlignedComparison(
 
             if (errorValue === null) {
                 context.fillStyle =
-                    "#a8a9ad";
+                    CHART_TEXT_COLOR;
                 context.textAlign =
                     "left";
                 context.fillText(

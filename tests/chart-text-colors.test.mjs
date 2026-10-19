@@ -136,17 +136,17 @@ test("eixos e indicadores manuais usam a cor compartilhada, preservando os dois 
         });
         chart.plugins.find(plugin => plugin.id === pluginId).beforeDatasetsDraw(chart);
         assert.ok(chart.ctx.texts.some(text => text.text === (id === "receipt" ? "Mariane" : "Rosa")
-            && text.color === "#a8a9ad"), `${id}: ${JSON.stringify(chart.ctx.texts)}`);
+            && text.color === "#e4e6eb"), `${id}: ${JSON.stringify(chart.ctx.texts)}`);
         if (id === "receipt") {
-            assert.ok(chart.ctx.texts.some(text => text.text === "20,00%" && text.color === "#a8a9ad"));
+            assert.ok(chart.ctx.texts.some(text => text.text === "20,00%" && text.color === "#e4e6eb"));
         } else {
-            assert.ok(chart.ctx.texts.some(text => text.text === "10:50" && text.color === "#f99400"));
-            assert.ok(chart.ctx.texts.some(text => text.text === "Máximo 10:00" && text.color === "#8B0000"));
+            assert.ok(chart.ctx.texts.some(text => text.text === "10:50" && text.color === "#e4e6eb"));
+            assert.ok(chart.ctx.texts.some(text => text.text === "Máximo 10:00" && text.color === "#e4e6eb"));
         }
     }
 });
 
-test("gráficos de análise usam cinza nos valores, percentuais, legendas, eixos e título", () => {
+test("gráficos de análise usam a cor padrão do dashboard nos valores, percentuais, legendas, eixos e título", () => {
     const source = readFileSync(new URL("../js/data-analysis/charts.js", import.meta.url), "utf8");
     const context = {
         document: { getElementById() { return {}; } },

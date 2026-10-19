@@ -40,5 +40,5 @@ test("texto central tem 15px, cor cinza, intervalo de 6px entre linhas e espaça
     assert.equal(texts[1].y, 110.5);
     assert.equal(texts[1].y - texts[0].y - 15, 6);
     assert.deepEqual(texts.map(value => [value.font, value.color, value.spacing]),
-        Array(2).fill(['15px "Open Sans", sans-serif', "#a8a9ad", "1px"]));
+        Array(2).fill(['15px "Open Sans", sans-serif', "#e4e6eb", "1px"]));
 });

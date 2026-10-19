@@ -126,7 +126,7 @@ test("canvas do ranking preserva o padding e a grade interna, sem desenhar borda
     chart.ctx = createContext();
     plugin.beforeDatasetsDraw(chart);
     assert.ok(chart.ctx.texts.some(label => label.text === "1" && label.x === routeStart + (routeLimit - routeStart) / 22 + 20));
-    assert.ok(chart.ctx.texts.some(label => label.text === "10:50" && label.color === "#f99400"));
+    assert.ok(chart.ctx.texts.some(label => label.text === "10:50" && label.color === "#e4e6eb"));
 
     chart.scales.y.getPixelForValue = index => 200 + index * 300;
     chart.ctx = createContext();
