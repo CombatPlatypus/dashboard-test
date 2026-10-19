@@ -543,16 +543,38 @@
                             align-items: stretch;
                         }
 
-                        /* BASE ESTRUTURAL */
-
-                        .main-structure {
-                            max-width: 1600px;
-                            height: auto;
-                            margin: 0 auto;
-                            padding: 30px 30px;
-                        }
 
             /* ESTILOS DO RELATÓRIO FINAL */
+
+                .main-structure {
+                    max-width: 1600px;
+                    height: auto;
+                    margin: 0 auto;
+                    padding: 30px 30px;
+                }
+                .main-structure .preview-style {
+                    display: flex;
+                    flex-direction: column;
+                    row-gap: 20px;
+                    padding: 20px;
+                    background-color: var(--color-container);
+                    border: 2px solid var(--color-border);
+                    border-radius: 5px;
+                }
+                .main-structure.title {
+                    width: 100%;
+                    padding: 12px 20px;
+                    text-align: center;
+                    background-color: var(--color-table-title);
+                    border: 1px solid var(--color-border);
+                    border-radius: 5px 5px 0 0;
+                }
+                .main-structure .title > h2 {
+                    margin-bottom: 0;
+                    font-size: 20px;
+                    text-transform: uppercase;
+                    letter-spacing: 1.5px;
+                }
 
                 /* RELATÓRIO FINAL - TITULOS */
 
