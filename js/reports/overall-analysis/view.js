@@ -570,15 +570,15 @@ function renderOverallParcelAndReverse(
 
 function renderOverallAnalysisView(
     data,
+    elements = overallAnalysisViewElements,
+    date = new Date(),
 ) {
-    if (!overallAnalysisViewElements) {
+    if (!elements) {
         return false;
     }
 
-    const elements =
-        overallAnalysisViewElements;
-
-    renderOverallAnalysisDate();
+    elements.date.textContent =
+        formatOverallAnalysisDate(date);
 
     elements.window.textContent =
         data.context?.window || "—";
@@ -780,6 +780,7 @@ export {
     formatOverallAnalysisDate,
     formatOverallAnalysisDuration,
     formatOverallAnalysisQuantity,
+    getOverallAnalysisViewElements,
     initializeOverallAnalysisView,
     renderOverallAnalysisView,
 };

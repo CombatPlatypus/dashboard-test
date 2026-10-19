@@ -70,10 +70,16 @@ function getOverallDamageAndLossesAnalysis(
         );
 
     const damageHasData =
-        damageSummary.hasData;
+        damageSummary.hasData ||
+        Boolean(damageSummary.traditionalAnalysis &&
+            damageState?.days?.some(day =>
+                Number.isFinite(day.hub) || Number.isFinite(day.soc)));
 
     const lossesHasData =
-        lossesSummary.hasData;
+        lossesSummary.hasData ||
+        Boolean(lossesSummary.traditionalAnalysis &&
+            lossesState?.days?.some(day =>
+                Number.isFinite(day.underReview) || Number.isFinite(day.confirmedLosses)));
 
     const returnedHasData =
         lossesHasData ||
@@ -285,9 +291,10 @@ function createOverallAnalysisData(
     const packagesAnalysisRate =
         damageAndLossesAnalysis
             .packagesUnderReview !== null &&
-        damageAndLossesAnalysis
-            .lossesTotal > 0
-            ? damageAndLossesAnalysis
+        damageAndLossesAnalysis.lossesTotal !== null
+            ? damageAndLossesAnalysis.lossesTotal === 0
+                ? 0
+                : damageAndLossesAnalysis
                 .packagesUnderReview /
                 damageAndLossesAnalysis
                     .lossesTotal

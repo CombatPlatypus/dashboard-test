@@ -663,6 +663,7 @@
             .header img,
             .header svg {
                 width: 35px;
+                height: 35px;
             }
             .header p {
                 margin-bottom: 0;
@@ -777,6 +778,13 @@
             }
             .tables-and-charts > div > .chart {
                 margin-top: 15px;
+            }
+
+            @media (max-width: 900px) {
+                .tables-and-charts > div {
+                    flex-basis: 100%;
+                    min-width: 0;
+                }
             }
 
        </style>

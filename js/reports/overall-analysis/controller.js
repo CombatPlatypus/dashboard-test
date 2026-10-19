@@ -92,6 +92,7 @@ function renderOverallAnalysisController() {
     const actionsRendered =
         renderOverallAnalysisActions(
             canExportOverallAnalysisController(data),
+            data,
         );
 
     return viewRendered &&
