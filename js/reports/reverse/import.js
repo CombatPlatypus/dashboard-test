@@ -1,5 +1,6 @@
 import {
     REVERSE_TYPE_DEFINITIONS,
+    createEmptyReversePackages,
     createEmptyReverseQuantities,
     createReverseTransfer,
     normalizeReverseSearchText,
@@ -190,6 +191,9 @@ function createReverseImportRecord(
     const quantities =
         createEmptyReverseQuantities();
 
+    const packages =
+        createEmptyReversePackages();
+
     const seenTrackingNumbers =
         new Set();
 
@@ -223,6 +227,10 @@ function createReverseImportRecord(
             trackingNumber,
         );
 
+        packages[typeKey].push(
+            trackingNumber,
+        );
+
         quantities[typeKey] += 1;
     }
 
@@ -235,6 +243,7 @@ function createReverseImportRecord(
     const transfer =
         createReverseTransfer({
             to,
+            packages,
             quantities,
             ...metadata,
             sourceFileName,

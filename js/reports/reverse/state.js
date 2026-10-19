@@ -14,6 +14,21 @@ function cloneReverseTransfer(
 ) {
     return {
         ...transfer,
+        packages:
+            Object.fromEntries(
+                Object.entries(
+                    transfer.packages,
+                ).map(
+                    function (
+                        [typeKey, trackingNumbers],
+                    ) {
+                        return [
+                            typeKey,
+                            trackingNumbers.slice(),
+                        ];
+                    },
+                ),
+            ),
         quantities: {
             ...transfer.quantities,
         },

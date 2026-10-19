@@ -14,6 +14,7 @@ import {
 import {
     getReverseState,
     resetReverseReport,
+    restoreReverseState,
     upsertReverseTransfer,
 } from "../js/reports/reverse/state.js";
 
@@ -103,6 +104,18 @@ test("lê a TO em B2 e classifica pacotes únicos pelo tipo escolhido, ignorando
         liquidate: 0,
         confiscated: 0,
     });
+    assert.deepEqual(transfer.packages, {
+        return: [],
+        missorted: [
+            "BR1",
+            "BR2",
+            "BR3",
+            "BR4",
+            "BR5",
+        ],
+        liquidate: [],
+        confiscated: [],
+    });
 });
 
 test("arquivo XLSX do SPX é lido de ponta a ponta", async () => {
@@ -155,6 +168,10 @@ test("arquivo XLSX do SPX é lido de ponta a ponta", async () => {
         );
         assert.equal(transfer.quantity, 3);
         assert.equal(transfer.quantities.liquidate, 3);
+        assert.deepEqual(
+            transfer.packages.liquidate,
+            ["BR1", "BR2", "BR3"],
+        );
     } finally {
         if (previousWindow === undefined) {
             delete globalThis.window;
@@ -209,6 +226,34 @@ test("uma TO nova é adicionada e a mesma TO é atualizada sem duplicar totais",
         liquidate: 2,
         confiscated: 0,
     });
+    assert.deepEqual(summary.packages, {
+        return: [
+            {
+                trackingNumber: "BR1",
+                to: "TO202610065X5E2",
+            },
+            {
+                trackingNumber: "BR2",
+                to: "TO202610065X5E2",
+            },
+            {
+                trackingNumber: "BR3",
+                to: "TO202610065X5E2",
+            },
+        ],
+        missorted: [],
+        liquidate: [
+            {
+                trackingNumber: "BR10",
+                to: "TO202610076ABC1",
+            },
+            {
+                trackingNumber: "BR11",
+                to: "TO202610076ABC1",
+            },
+        ],
+        confiscated: [],
+    });
 
     const updatedFirst =
         createReverseImportRecord(
@@ -243,6 +288,23 @@ test("uma TO nova é adicionada e a mesma TO é atualizada sem duplicar totais",
         liquidate: 2,
         confiscated: 3,
     });
+    assert.deepEqual(
+        summary.packages.confiscated,
+        [
+            {
+                trackingNumber: "BR20",
+                to: "TO202610065X5E2",
+            },
+            {
+                trackingNumber: "BR21",
+                to: "TO202610065X5E2",
+            },
+            {
+                trackingNumber: "BR22",
+                to: "TO202610065X5E2",
+            },
+        ],
+    );
 });
 
 test("os quatro tipos aceitam Forward, tipos desconhecidos e coluna Journey Type ausente", () => {
@@ -254,6 +316,60 @@ test("os quatro tipos aceitam Forward, tipos desconhecidos e coluna Journey Type
         assert.equal(transfer.quantities[reverseType], 3);
         assert.equal(Object.values(transfer.quantities).filter(value => value > 0).length, 1);
     }
+});
+
+test("sessão preserva a ordem dos BRs e continua aceitando dados antigos sem as listas", () => {
+    const transfer =
+        createReverseImportRecord(
+            createRows({
+                packages: [
+                    ["BR3", "Return"],
+                    ["BR1", "Return"],
+                    ["BR2", "Return"],
+                ],
+            }),
+            {
+                reverseType: "return",
+            },
+        );
+
+    upsertReverseTransfer(transfer);
+
+    const session =
+        getReverseState();
+
+    resetReverseReport();
+
+    assert.equal(
+        restoreReverseState(session),
+        true,
+    );
+    assert.deepEqual(
+        getReverseState()
+            .transfers[0]
+            .packages.return,
+        ["BR3", "BR1", "BR2"],
+    );
+
+    assert.equal(
+        restoreReverseState({
+            transfers: [
+                {
+                    to: "TOLEGADA1",
+                    quantities: {
+                        return: 2,
+                    },
+                },
+            ],
+        }),
+        true,
+    );
+    assert.deepEqual(
+        getReverseState()
+            .transfers[0]
+            .packages.return,
+        [],
+    );
 });
 
 test("exige tipo válido antes de ler ou analisar o arquivo", async () => {
