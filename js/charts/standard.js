@@ -34,7 +34,7 @@ export function applyChartStandard(config) {
             if (plugins[key] !== false) plugins[key] = { ...plugins[key], color: CHART_TEXT_COLOR };
         }
         if (plugins.tooltip !== false) {
-            plugins.tooltip = { ...plugins.tooltip, titleColor: CHART_TEXT_COLOR, bodyColor: CHART_TEXT_COLOR, footerColor: CHART_TEXT_COLOR };
+            plugins.tooltip = { enabled: false, ...plugins.tooltip, titleColor: CHART_TEXT_COLOR, bodyColor: CHART_TEXT_COLOR, footerColor: CHART_TEXT_COLOR };
         }
     }
     config.data ??= { datasets: [] };

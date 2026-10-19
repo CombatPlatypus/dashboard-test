@@ -16,13 +16,12 @@ const readResource = async url => ({ ok: true, text: () => readFile(url, "utf8")
 
 test("somente a análise completa libera HTML; cada bloco ausente bloqueia a geração", async () => {
     assert.equal(isOverallAnalysisComplete(createCompleteAnalysis()), true);
-    assert.equal(getOverallAnalysisMissingSections(null).length, 8);
+    assert.equal(getOverallAnalysisMissingSections(null).length, 6);
     const missingFields = [
         ["context", "analyst", ""], ["context", "window", ""],
         ["flow", "planned", null], ["processing", "totalErrors", null],
         ["processing", "expectedVolume", null], ["processing", "receivedVolume", null],
         ["expedition", "floorVolume", null], ["expedition", "durationSeconds", null],
-        ["parcel", "hasData", false], ["reverse", "hasData", false],
     ];
     for (const [section, field, value] of missingFields) {
         const data = createCompleteAnalysis();
@@ -38,6 +37,21 @@ test("somente a análise completa libera HTML; cada bloco ausente bloqueia a ger
     const analysis = createCompleteAnalysis();
     analysis.damageAndLosses.traditionalAnalysis.totalMonth.soc = null;
     assert.deepEqual(getOverallAnalysisMissingSections(analysis), ["Avarias e perdas"]);
+});
+
+test("Parcel e Reversa são opcionais, inclusive quando ambos estão vazios", async () => {
+    for (const [parcel, reverse] of [[false, true], [true, false], [false, false]]) {
+        const data = createCompleteAnalysis();
+        data.parcel.hasData = parcel;
+        data.reverse.hasData = reverse;
+        assert.equal(isOverallAnalysisComplete(data), true);
+        const html = await createStandaloneOverallAnalysisHtml(data, { fetchResource: readResource });
+        const payload = JSON.parse(html.match(/<script id="finalReportData"[^>]*>([\s\S]*?)<\/script>/)[1]);
+        assert.equal(payload.report.parcel.hasData, parcel);
+        assert.equal(payload.report.reverse.hasData, reverse);
+        data.processing.totalErrors = null;
+        assert.deepEqual(getOverallAnalysisMissingSections(data), ["Processamento"]);
+    }
 });
 
 test("zeros importados são válidos sem exigir ocorrências de avarias/perdas", () => {
@@ -88,7 +102,11 @@ test("exportação incorpora os recursos e congela dados antes do carregamento a
     assert.equal(scripts.length, 3);
     new Script(scripts[0][1]);
     new Script(scripts[2][1]);
-    assert.equal(createStandaloneOverallAnalysisFileName(new Date(2026, 9, 19)), "relatorio-final-2026-10-19.html");
+    for (const reportWindow of ["AM", "PM1", "PM2"]) {
+        assert.equal(createStandaloneOverallAnalysisFileName(new Date(2026, 9, 19), reportWindow),
+            `Relatório Final - ${reportWindow} 19.10.2026.html`);
+    }
+    assert.equal(createStandaloneOverallAnalysisFileName(new Date(2026, 0, 5)), "Relatório Final - AM 05.01.2026.html");
 });
 
 test("modelo incompleto ou recurso indisponível impede download e permite uma nova tentativa", async () => {

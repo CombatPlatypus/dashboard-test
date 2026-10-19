@@ -89,10 +89,10 @@ function buildStandaloneOverallAnalysisHtml({ template, chartSource, rendererSou
         (match, name) => replacements[name]);
 }
 
-function createStandaloneOverallAnalysisFileName(date = new Date()) {
-    const dateKey = [date.getFullYear(), String(date.getMonth() + 1).padStart(2, "0"),
-        String(date.getDate()).padStart(2, "0")].join("-");
-    return `relatorio-final-${dateKey}.html`;
+function createStandaloneOverallAnalysisFileName(date = new Date(), reportWindow = "AM") {
+    const dateKey = [String(date.getDate()).padStart(2, "0"),
+        String(date.getMonth() + 1).padStart(2, "0"), date.getFullYear()].join(".");
+    return `Relatório Final - ${reportWindow} ${dateKey}.html`;
 }
 
 async function createStandaloneOverallAnalysisHtml(data, {

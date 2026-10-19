@@ -73,6 +73,8 @@ try {
             title: document.getElementById("overallAnalysisExportHtmlButton").title };
     }, createCompleteAnalysis());
     assert.equal(completeness.disabled, false, completeness.title);
+    assert.equal(await page.evaluate(() => Object.values(Chart.instances)
+        .every(chart => chart.options.plugins.tooltip.enabled === false)), true);
 
     // A regra acompanha alterações do estado, sem precisar reabrir o painel.
     await page.evaluate(async () => {
@@ -86,7 +88,7 @@ try {
     const downloadEvent = page.waitForEvent("download");
     await button.click();
     const download = await downloadEvent;
-    assert.match(download.suggestedFilename(), /^relatorio-final-\d{4}-\d{2}-\d{2}\.html$/);
+    assert.match(download.suggestedFilename(), /^Relatório Final - AM \d{2}\.\d{2}\.\d{4}\.html$/);
     const downloadedPath = path.join(output, "relatorio-final-baixado.html");
     await download.saveAs(downloadedPath);
     const downloaded = await readFile(downloadedPath, "utf8");
@@ -95,7 +97,16 @@ try {
     await page.evaluate(async () => {
         (await import("/js/reports/reverse/state.js")).resetReverseReport();
     });
-    assert.equal(await button.isDisabled(), true);
+    assert.equal(await button.isDisabled(), false);
+    await page.evaluate(async () => {
+        (await import("/js/reports/parcel-sweeper/state.js")).resetParcelReport();
+    });
+    assert.equal(await button.isDisabled(), false);
+    const optionalDownloadEvent = page.waitForEvent("download");
+    await button.click();
+    const optionalDownload = await optionalDownloadEvent;
+    const optionalPath = path.join(output, "relatorio-final-sem-parcel-reversa.html");
+    await optionalDownload.saveAs(optionalPath);
     await context.close();
 
     const offline = await browser.newContext({ offline: true, timezoneId: "Pacific/Auckland",
@@ -115,6 +126,7 @@ try {
             expedited: text("finalReportVolumeChecked"), duration: text("finalReportExpeditionTime"),
             date: text("finalReportDate"), reverse: text("finalReport-ReverseConfiscated"),
             bars: Chart.getChart("finalReportReceiptChart").data.datasets[0].data,
+            tooltipsDisabled: Object.values(Chart.instances).every(chart => chart.options.plugins.tooltip.enabled === false),
             sizes: [...document.querySelectorAll("canvas")].map(canvas => [canvas.clientWidth, canvas.clientHeight]),
         };
     });
@@ -126,6 +138,7 @@ try {
     assert.equal(rendered.duration, "02:10:05");
     assert.equal(rendered.date, snapshot.dateLabel);
     assert.equal(rendered.reverse, "4 (40%)");
+    assert.equal(rendered.tooltipsDisabled, true);
     assert.deepEqual(rendered.bars, [12000, 11500, 500]);
     assert.ok(rendered.sizes.every(([width, height]) => width > 0 && height > 0));
     const legend = report.locator("#finalReport-ReverseChartContainer + .chart-label .type").first();
@@ -134,13 +147,10 @@ try {
     assert.equal(await report.evaluate(() => Chart.getChart("finalReport-ReverseChart").getDataVisibility(0)), false);
     await legend.press("Enter");
     assert.equal(await legend.getAttribute("aria-pressed"), "true");
-    const sort = report.locator("#finalReport-LossesTable thead th").last().locator("button");
-    await sort.click();
+    assert.equal(await report.locator("#finalReport-LossesTable thead button").count(), 0);
+    assert.equal(await report.locator("#finalReport-LossesTable [aria-sort]").count(), 0);
     assert.deepEqual(await report.locator("#finalReport-LossesTable tbody tr td:last-child").allTextContents(),
-        ["2", "2", "3", "5", "8"]);
-    await sort.click();
-    assert.deepEqual(await report.locator("#finalReport-LossesTable tbody tr td:last-child").allTextContents(),
-        ["8", "5", "3", "2", "2"]);
+        ["3", "2", "8", "2", "5"]);
     await report.screenshot({ path: path.join(output, "relatorio-final-desktop.png"), fullPage: true });
     await report.setViewportSize({ width: 800, height: 1000 });
     await report.screenshot({ path: path.join(output, "relatorio-final-800px.png"), fullPage: true });
@@ -159,6 +169,17 @@ try {
     await report.waitForFunction(() => document.documentElement.dataset.finalReportState === "ready");
     assert.equal(await report.locator("#finalReportWindowAnalyst").textContent(), hostile.context.analyst);
     assert.equal(await report.evaluate(() => window.injetado), undefined);
+
+    await report.goto(pathToFileURL(optionalPath).href);
+    await report.waitForFunction(() => document.documentElement.dataset.finalReportState === "ready");
+    assert.equal(await report.locator("#finalReportParcelScanned").textContent(), "—");
+    assert.equal(await report.locator("#finalReportReverseReturn").textContent(), "—");
+    assert.equal(await report.evaluate(() => Object.values(Chart.instances).length), 7);
+    assert.equal(await report.evaluate(() => Object.values(Chart.instances)
+        .every(chart => chart.options.plugins.tooltip.enabled === false)), true);
+    assert.deepEqual(await report.evaluate(() => Chart.getChart("finalReport-ReverseChart").data.datasets[0].data), [0, 0, 0, 0]);
+    assert.deepEqual(requests, []);
+    assert.deepEqual(errors, []);
     console.log(JSON.stringify({ output, ...rendered, externalRequests: requests.length, errors }, null, 2));
     await offline.close();
 } finally {

@@ -45,11 +45,7 @@ function createProgressChart(canvas, progress, color, label) {
         },
         options: {
             responsive: true, maintainAspectRatio: false, cutout: "72%", animation: false,
-            plugins: { legend: { display: false }, tooltip: { callbacks: {
-                label: context => `${context.label}: ${new Intl.NumberFormat("pt-BR", {
-                    style: "percent", maximumFractionDigits: 1,
-                }).format(context.raw)}`,
-            } } },
+            plugins: { legend: { display: false }, tooltip: { enabled: false } },
         },
     });
 }
@@ -78,9 +74,7 @@ function createBarChart(canvas, labels, values, colors) {
         plugins: [barValues],
         options: {
             indexAxis: "y", responsive: true, maintainAspectRatio: false, animation: false,
-            plugins: { legend: { display: false }, tooltip: { callbacks: {
-                label: context => `${context.label}: ${formatOverallAnalysisQuantity(context.raw)}`,
-            } } },
+            plugins: { legend: { display: false }, tooltip: { enabled: false } },
             scales: {
                 x: { beginAtZero: true, grace: "15%", ticks: { precision: 0,
                     callback: formatOverallAnalysisQuantity },
@@ -125,7 +119,6 @@ function createCompositionChart(canvas, labels, values, colors, centerText, cent
         item.setAttribute("role", "button");
         item.setAttribute("aria-label", `Mostrar ou ocultar ${labels[index]}`);
         item.setAttribute("aria-pressed", "true");
-        item.title = "Clique para mostrar ou ocultar no gráfico";
         item.style.cursor = "pointer";
         function toggle() {
             chart.toggleDataVisibility(index);
@@ -143,34 +136,6 @@ function createCompositionChart(canvas, labels, values, colors, centerText, cent
         });
     });
     return chart;
-}
-
-function enableTableSorting(root) {
-    const table = root.querySelector("#finalReport-LossesTable");
-    const rows = [...table.querySelectorAll("tbody tr")];
-    const headers = [...table.querySelectorAll("thead th")];
-    headers.forEach((header, column) => {
-        const button = document.createElement("button");
-        button.type = "button";
-        button.textContent = `${header.innerText.replace(/\s+/g, " ")} ↕`;
-        button.style.cssText = "color:inherit;font:inherit;letter-spacing:inherit;cursor:pointer;line-height:1.3";
-        button.title = "Ordenar por esta coluna";
-        header.replaceChildren(button);
-        header.setAttribute("aria-sort", "none");
-        button.addEventListener("click", () => {
-            const descending = header.getAttribute("aria-sort") === "ascending";
-            headers.forEach(item => item.setAttribute("aria-sort", "none"));
-            header.setAttribute("aria-sort", descending ? "descending" : "ascending");
-            const read = row => column === 0 ? row.cells[0].textContent :
-                Number(row.cells[column].textContent.replace(/\./g, "").replace(",", "."));
-            const sorted = rows.slice().sort((first, second) => {
-                const a = read(first), b = read(second);
-                const result = column === 0 ? a.localeCompare(b, "pt-BR") : a - b;
-                return descending ? -result : result;
-            });
-            for (const row of sorted) table.tBodies[0].appendChild(row);
-        });
-    });
 }
 
 async function renderStandaloneReport(snapshot, root = document) {
@@ -213,9 +178,8 @@ async function renderStandaloneReport(snapshot, root = document) {
             REVERSE_TYPE_KEYS.map(key => REVERSE_TYPE_DEFINITIONS[key].label),
             REVERSE_TYPE_KEYS.map(key => data.reverse.quantities[key]),
             REVERSE_TYPE_KEYS.map(key => REVERSE_TYPE_DEFINITIONS[key].color),
-            formatOverallAnalysisQuantity(data.reverse.total), "Pacotes"),
+            formatOverallAnalysisQuantity(data.reverse.hasData ? data.reverse.total : null), "Pacotes"),
     ];
-    enableTableSorting(root);
     window.addEventListener("beforeprint", () => charts.forEach(chart => chart.resize()));
     window.addEventListener("afterprint", () => charts.forEach(chart => chart.resize()));
     document.documentElement.dataset.finalReportState = "ready";

@@ -34,6 +34,7 @@ test("textos e tooltips dos gráficos atuais e futuros usam #e4e6eb por padrão"
     const { chartLibrary } = configure(undefined);
     assert.equal(CHART_TEXT_COLOR, "#e4e6eb");
     assert.equal(chartLibrary.defaults.color, CHART_TEXT_COLOR);
+    assert.equal(chartLibrary.defaults.plugins.tooltip.enabled, false);
     for (const property of ["titleColor", "bodyColor", "footerColor"]) {
         assert.equal(chartLibrary.defaults.plugins.tooltip[property], CHART_TEXT_COLOR);
     }

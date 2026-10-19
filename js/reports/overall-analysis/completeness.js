@@ -11,8 +11,8 @@ function isQuantity(value) {
     return typeof value === "number" && Number.isFinite(value) && value >= 0;
 }
 
-// A completude considera os campos exibidos na Análise Geral. Taxas sem
-// denominador (por exemplo, nenhum pacote esperado no Parcel) são não aplicáveis.
+// A completude considera os campos obrigatórios da Análise Geral.
+// Parcel Sweeper e Reversa são opcionais para a exportação.
 function getOverallAnalysisMissingSections(data) {
     const requirements = [
         ["Identificação do turno", Boolean(data?.context?.analyst?.trim()) &&
@@ -26,8 +26,6 @@ function getOverallAnalysisMissingSections(data) {
         ["Avarias e perdas", PERIOD_KEYS.every(period => OCCURRENCE_KEYS.every(key =>
             isQuantity(data?.damageAndLosses?.traditionalAnalysis?.[period]?.[key])))],
         ["Taxa de perdas", isQuantity(data?.cards?.lossesRate?.rate)],
-        ["Parcel Sweeper", data?.parcel?.hasData === true],
-        ["Reversa", data?.reverse?.hasData === true],
     ];
 
     return requirements.filter(([, complete]) => !complete).map(([label]) => label);

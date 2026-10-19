@@ -151,11 +151,14 @@ async function runOverallAnalysisHtmlExport() {
     overallAnalysisHtmlButton.setAttribute("aria-busy", "true");
     renderOverallAnalysisActions(overallAnalysisHasExportableData);
     const generatedAt = new Date();
+    const fileName = createStandaloneOverallAnalysisFileName(
+        generatedAt, overallAnalysisCurrentData.context.window,
+    );
 
     try {
         const html = await createStandaloneOverallAnalysisHtml(overallAnalysisCurrentData, { generatedAt });
         downloadReportBlob(new Blob([html], { type: "text/html;charset=utf-8" }),
-            createStandaloneOverallAnalysisFileName(generatedAt));
+            fileName);
         setReportNotification({
             reportId: "overall-analysis", type: "success",
             message: "Resumo HTML interativo baixado.",

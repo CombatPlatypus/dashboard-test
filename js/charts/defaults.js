@@ -16,6 +16,7 @@
 
     const tooltip = chartLibrary.defaults.plugins?.tooltip;
     if (tooltip) {
+        tooltip.enabled = false;
         tooltip.titleColor = "#e4e6eb";
         tooltip.bodyColor = "#e4e6eb";
         tooltip.footerColor = "#e4e6eb";

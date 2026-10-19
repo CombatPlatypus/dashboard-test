@@ -16,6 +16,11 @@ usam `CHART_VALUE_FONT`: 15px, peso 600. O centro das composições permanece em
 com peso normal. Todos os textos usam `CHART_TEXT_COLOR` (`#e4e6eb`), incluindo valores,
 indicadores, eixos, legendas, títulos, tooltips e textos de referência.
 
+Tooltips ficam desativados por padrão em todos os gráficos, inclusive nos arquivos
+HTML exportados. Só habilite quando solicitado para um gráfico específico, definindo
+`options.plugins.tooltip.enabled: true` na configuração desse gráfico. Configurar
+callbacks ou cores do tooltip não o habilita; a exceção deve ser explícita.
+
 As barras horizontais usam faces 3D de 10 × 9px, espessura frontal de 24px, base opaca
 sobre o zero, grades verticais e nenhum trilho de fundo. Os valores ficam 10px após a
 face lateral, com deslocamento vertical de +7px. Os nomes têm padding de 22px e há um

@@ -55,3 +55,19 @@ test("densidade mínima 2x respeita telas com densidade maior", t => {
         assert.equal(getChartPixelRatio(), expected);
     }
 });
+
+test("tooltips ficam desativados por padrão e exigem habilitação explícita por gráfico", () => {
+    const label = context => `Pacotes: ${context.raw}`;
+    for (const tooltip of [undefined, {}, { callbacks: { label } }, { enabled: false }, { enabled: true }, false]) {
+        const config = applyChartStandard({ type: "line", options: { plugins: { tooltip } } });
+        if (tooltip === false) {
+            assert.equal(config.options.plugins.tooltip, false);
+        } else {
+            assert.equal(config.options.plugins.tooltip.enabled, tooltip?.enabled === true);
+            if (tooltip?.callbacks) assert.equal(config.options.plugins.tooltip.callbacks.label, label);
+        }
+        applyChartStandard(config);
+        assert.equal(config.options.plugins.tooltip === false ? false : config.options.plugins.tooltip.enabled,
+            tooltip?.enabled === true);
+    }
+});
