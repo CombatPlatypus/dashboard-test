@@ -277,6 +277,17 @@ test(
                 .colSpan,
             2,
         );
+
+        renderReversePackageTable(
+            body,
+            [],
+            button,
+            section,
+            true,
+        );
+
+        assert.equal(section.hidden, false);
+        assert.equal(button.disabled, true);
     },
 );
 
@@ -399,14 +410,14 @@ test(
             assert.match(
                 html,
                 new RegExp(
-                    `<div id="${sectionId}" hidden>`,
+                    `<div id="${sectionId}">`,
                 ),
             );
         }
 
         assert.match(
             html,
-            /<!-- TABELA DE BRs DE CADA RESPETIVA TO -->\s*<div id="reversePackageTables" class="distribution-tables flex-box-start" hidden>/,
+            /<!-- TABELA DE BRs DE CADA RESPETIVA TO -->\s*<div id="reversePackageTables" class="distribution-tables flex-box-start">/,
         );
     },
 );

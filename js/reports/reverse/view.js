@@ -257,10 +257,12 @@ function renderReversePackageTable(
     packageRows,
     copyButton = null,
     section = null,
+    showWhenEmpty = false,
 ) {
     if (section instanceof HTMLElement) {
         section.hidden =
-            packageRows.length === 0;
+            packageRows.length === 0 &&
+            !showWhenEmpty;
     }
 
     if (
@@ -369,15 +371,17 @@ function renderReverseView(
         summary.transfers,
     );
 
-    reverseViewElements
-        .packageTables.hidden =
-        !REVERSE_TYPE_KEYS.some(
+    const hasPackageRows =
+        REVERSE_TYPE_KEYS.some(
             function (typeKey) {
                 return summary.packages[
                     typeKey
                 ].length > 0;
             },
         );
+
+    reverseViewElements
+        .packageTables.hidden = false;
 
     REVERSE_TYPE_KEYS.forEach(
         function (typeKey) {
@@ -397,6 +401,7 @@ function renderReverseView(
                     .packageSections[
                         typeKey
                     ],
+                !hasPackageRows,
             );
         },
     );
