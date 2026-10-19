@@ -1,20 +1,21 @@
+import { CHART_COLORS } from "../../charts/theme.js";
 const REVERSE_TYPE_DEFINITIONS =
     Object.freeze({
         return: {
             label: "Return",
-            color: "#4caf50",
+            color: CHART_COLORS.green,
         },
         missorted: {
             label: "Missorted",
-            color: "#FF5722",
+            color: CHART_COLORS.red,
         },
         liquidate: {
             label: "Liquidate",
-            color: "#3F51B5",
+            color: CHART_COLORS.blue,
         },
         confiscated: {
             label: "Confiscado",
-            color: "#f0ad4e",
+            color: CHART_COLORS.yellow,
         },
     });
 

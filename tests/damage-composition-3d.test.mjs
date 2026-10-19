@@ -30,7 +30,7 @@ test("composição de avarias usa a projeção 3D e mantém as cores, sem rótul
     assert.equal(config.options.animation, false);
     assert.deepEqual(config.options.events, []);
     assert.deepEqual(config.plugins.map(plugin => plugin.id), [
-        "damage-composition-3d", "damageCompositionCenter",
+        "damage-composition-3d", "damageCompositionCenter", "dashboardPalette",
     ]);
 });
 

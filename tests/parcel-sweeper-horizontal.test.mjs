@@ -84,7 +84,7 @@ test("agrupa espaços, maiúsculas e vazios, preserva nomes oficiais e ordena qu
     assert.equal(getParcelHorizontalChartHeight(10), 416);
 });
 
-test("barras horizontais seguem trilhos e valores do relatório de perdas, sem tooltips", t => {
+test("barras horizontais usam base 3D, grades e valores externos sem trilhos de fundo", t => {
     replaceGlobal(t, "window", { Chart: class { constructor(canvas, config) { return config; } } });
     const config = createParcelHorizontalChart({}, "#42A5F5");
     assert.equal(config.type, "bar");
@@ -98,18 +98,19 @@ test("barras horizontais seguem trilhos e valores do relatório de perdas, sem t
     const context = { rectangles: [], texts: [], balance: 0, letterSpacing: "0px", spacingStack: [],
         save() { this.balance += 1; this.spacingStack.push(this.letterSpacing); },
         restore() { this.balance -= 1; this.letterSpacing = this.spacingStack.pop(); },
+        beginPath() {}, closePath() {}, moveTo() {}, lineTo() {}, fill() {}, stroke() {},
         fillRect(...args) { this.rectangles.push(args); }, fillText(...args) { this.texts.push(args); } };
-    const chart = { ctx: context, chartArea: { left: 100, right: 400 },
-        $parcelHasDistribution: true, data: { datasets: [{ data: [2185, 30] }] },
-        getDatasetMeta: () => ({ data: [40, 80].map(y => ({ getProps: () => ({ y, height: 24 }) })) }) };
+    const chart = { ctx: context, chartArea: { left: 100, right: 400, top: 10, bottom: 110 },
+        $parcelHasDistribution: true, data: { datasets: [{ data: [2185, 30], backgroundColor: "#2538a5" }] },
+        getDatasetMeta: () => ({ data: [40, 80].map((y, index) => ({ getProps: () => ({ x: 250 - index * 110, base: 100, y, height: 24 }) })) }) };
     config.plugins.forEach(plugin => plugin.beforeLayout?.(chart));
     config.plugins.forEach(plugin => plugin.beforeDraw?.(chart));
-    assert.equal(context.letterSpacing, "1px");
+    assert.equal(context.letterSpacing, "0px");
     config.plugins.forEach(plugin => plugin.beforeDatasetsDraw?.(chart));
     config.plugins.forEach(plugin => plugin.afterDatasetsDraw?.(chart));
-    assert.equal(context.letterSpacing, "1px");
-    assert.deepEqual(context.rectangles, [[100, 28, 300, 24], [100, 68, 300, 24]]);
-    assert.deepEqual(context.texts, [["2.185", 412, 40], ["30", 412, 80]]);
+    assert.equal(context.letterSpacing, "0px");
+    assert.deepEqual(context.rectangles, []);
+    assert.deepEqual(context.texts, [["2.185", 270, 47], ["30", 160, 87]]);
     assert.equal(context.balance, 0);
     chart.$parcelHasDistribution = false;
     config.plugins.find(plugin => plugin.id === "parcelHorizontalValues").afterDatasetsDraw(chart);
@@ -118,7 +119,7 @@ test("barras horizontais seguem trilhos e valores do relatório de perdas, sem t
 
 test("largura dos indicadores inclui letter-spacing e todos os nomes, sem o corte automático do eixo", t => {
     replaceGlobal(t, "window", { Chart: class { constructor(canvas, config) { return config; } } });
-    const config = createParcelHorizontalChart({}, "#3F51B5");
+    const config = createParcelHorizontalChart({}, "#2538a5");
     const context = {
         letterSpacing: "0px", font: "10px Arial", stack: [], measurements: [],
         save() { this.stack.push({ letterSpacing: this.letterSpacing, font: this.font }); },
@@ -132,15 +133,15 @@ test("largura dos indicadores inclui letter-spacing e todos os nomes, sem o cort
     const scale = { ctx: context, width: 80, options: config.options.scales.y,
         ticks: labels.map(label => ({ label })) };
     config.options.scales.y.afterFit(scale);
-    assert.equal(scale.width, Math.max(...labels.map(label => label.length * 8)) + 32);
-    assert.ok(context.measurements.every(item => item.letterSpacing === "1px" && item.font.includes("14px")));
+    assert.equal(scale.width, Math.max(...labels.map(label => label.length * 7)) + 52);
+    assert.ok(context.measurements.every(item => item.letterSpacing === "0px" && item.font.includes("14px")));
     assert.deepEqual(scale.ticks.map(tick => tick.label), labels);
     assert.equal(context.letterSpacing, "0px");
     assert.equal(context.font, "10px Arial");
     scale.width = 40;
     scale.ticks = [{ label: "—" }];
     config.options.scales.y.afterFit(scale);
-    assert.equal(scale.width, 40);
+    assert.equal(scale.width, 59);
 });
 
 test("atualização limpa dados antigos, adapta altura e reserva espaço para quantidades grandes", t => {
@@ -191,7 +192,7 @@ test("os cinco gráficos inicializam uma vez e atualizam na importação, troca 
     assert.equal(initializeParcelCharts(panel), true);
     assert.equal(initializeParcelCharts(panel), true);
     assert.equal(charts.length, 5);
-    assert.equal(charts[1].data.datasets[0].backgroundColor, "#3F51B5");
+    assert.equal(charts[1].data.datasets[0].backgroundColor, "#2538a5");
     replaceParcelRows([
         { trackingNumber: "BR1", scannedStatus: "LMHub_Received", finalStatus: "LMHub_Received", nextStepAction: "Process for delivery" },
         { trackingNumber: "BR2", scannedStatus: "-", finalStatus: "LMHub_Received", nextStepAction: "Put in EHA" },
@@ -201,11 +202,11 @@ test("os cinco gráficos inicializam uma vez e atualizam na importação, troca 
     assert.equal(charts[3].canvas.id, "parcelFinalStatusChart");
     assert.deepEqual(charts[2].data.labels, ["LMHub_Received", "-"]);
     assert.deepEqual(charts[2].data.datasets[0].data, [2, 1]);
-    assert.deepEqual(charts[2].data.datasets[0].backgroundColor, ["#3F51B5", "#a8a9ad"]);
+    assert.deepEqual(charts[2].data.datasets[0].backgroundColor, ["#2538a5", "#a8a9ad"]);
     assert.deepEqual(charts[3].data.labels, ["LMHub_Received", "SOC_Packed"]);
     assert.deepEqual(charts[3].data.datasets[0].data, [2, 1]);
-    assert.deepEqual(charts[3].data.datasets[0].backgroundColor, ["#3F51B5", "#3F51B5"]);
-    assert.equal(charts[1].data.datasets[0].backgroundColor, "#3F51B5");
+    assert.deepEqual(charts[3].data.datasets[0].backgroundColor, ["#2538a5", "#2538a5"]);
+    assert.equal(charts[1].data.datasets[0].backgroundColor, "#2538a5");
     assert.equal(charts[1].data.datasets[0].data.length, 7);
     assert.equal(charts[4].canvas.id, "parcelNextStepActionChart");
     assert.equal(charts[4].type, "bar");
@@ -214,7 +215,7 @@ test("os cinco gráficos inicializam uma vez e atualizam na importação, troca 
     assert.deepEqual(charts[4].plugins, charts[1].plugins);
     assert.deepEqual(charts[4].data.labels, [["-", "33,3%"], ["Process for delivery", "33,3%"], ["Put in EHA", "33,3%"]]);
     assert.deepEqual(charts[4].data.datasets[0].data, [1, 1, 1]);
-    assert.equal(charts[4].data.datasets[0].backgroundColor, "#3F51B5");
+    assert.equal(charts[4].data.datasets[0].backgroundColor, "#2538a5");
     const resizeCount = charts[4].resizes ?? 0;
     visibilityChanged();
     assert.equal(charts[4].resizes, resizeCount + 1);
@@ -227,7 +228,7 @@ test("os cinco gráficos inicializam uma vez e atualizam na importação, troca 
     resetParcelReport();
     assert.deepEqual(charts[2].data.labels, ["—"]);
     assert.deepEqual(charts[3].data.datasets[0].data, [0]);
-    assert.equal(charts[1].data.datasets[0].backgroundColor, "#3F51B5");
+    assert.equal(charts[1].data.datasets[0].backgroundColor, "#2538a5");
     assert.deepEqual(charts[4].data.labels, []);
     assert.deepEqual(charts[4].data.datasets[0].data, []);
 });

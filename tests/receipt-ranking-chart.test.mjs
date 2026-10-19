@@ -17,6 +17,7 @@ function createContext() {
     context.save = () => { context.balance += 1; };
     context.restore = () => { context.balance -= 1; };
     context.beginPath = () => { path = []; };
+    context.closePath = () => {};
     context.moveTo = (...args) => path.push(["moveTo", ...args]);
     context.lineTo = (...args) => path.push(["lineTo", ...args]);
     context.quadraticCurveTo = () => {};
@@ -79,34 +80,38 @@ test("ranking de recebedores posiciona os textos acima das barras sem as bordas 
     chart.ctx = createContext();
     plugin.beforeDatasetsDraw(chart);
 
-    for (const [index, name, quantity, percentage] of [
-        [0, "Mariane", "1.949", "30,30%"], [1, "Tamires", "1.539", "15,15%"], [2, "Ana", "0", "—"],
+    const volumeStart = 26, volumeLimit = 367, errorStart = 481, errorLimit = 822;
+    for (const [index, name, quantity, percentage, volume, error] of [
+        [0, "Mariane", "1.949", "30,30%", 1949, 10 / 33],
+        [1, "Tamires", "1.539", "15,15%", 1539, 5 / 33],
+        [2, "Ana", "0", "—", 0, null],
     ]) {
         const rowTop = 70 + (index - 0.5) * 58;
-        const labelY = rowTop + 12 + 14;
-        for (const [text, x, alignment] of [[name, 26, "left"], [quantity, 431, "right"], [percentage, 481, "left"]]) {
-            assert.ok(chart.ctx.texts.some(label => label.text === text && label.x === x && label.y === labelY &&
-                label.alignment === alignment && label.baseline === "bottom"), `Posição acima da barra: ${text}`);
+        const barY = Math.max(70 + index * 58, rowTop + 12 + 14 + 8 + 12);
+        const nameLabel = chart.ctx.texts.find(label => label.text === name);
+        assert.equal(nameLabel.x, volumeStart);
+        assert.equal(nameLabel.y, rowTop + 26);
+        for (const [text, x] of [
+            [quantity, volumeStart + (volumeLimit - volumeStart) * volume / 2500 + 20],
+            [percentage, errorStart + (errorLimit - errorStart) * (error ?? 0) + 20],
+        ]) {
+            const label = chart.ctx.texts.find(label => label.text === text && Math.abs(label.x - x) < 1e-8);
+            assert.ok(label, "Valor fora da barra: " + text);
+            assert.equal(label.y, barY + 7);
+            assert.equal(label.alignment, "left");
         }
     }
-    const volumeBar = chart.ctx.fills.find(fill => fill.color === "#4caf50");
-    assert.deepEqual(volumeBar.path[0], ["moveTo", 29, 75]);
-    const volumeEnd = 26 + (431 - 26) * 1949 / 2500;
+    const volumeBar = chart.ctx.fills.find(fill => fill.color === "#007A48");
+    assert.deepEqual(volumeBar.path[0], ["moveTo", 26, 75]);
+    const volumeEnd = volumeStart + (volumeLimit - volumeStart) * 1949 / 2500;
     assert.ok(volumeBar.path.some(point => Math.abs(point[1] - volumeEnd) < 1e-9));
-    assert.equal(chart.ctx.strokes.length, 14);
-    // A grade ocupa o container; os textos e as barras têm padding interno de 10px.
-    for (const gridX of [101, 441, 471]) {
-        assert.ok(chart.ctx.strokes.some(stroke => JSON.stringify(stroke.path) ===
-            JSON.stringify([["moveTo", gridX, 38], ["lineTo", gridX, 340]])));
+    assert.equal(chart.ctx.fills.filter(fill => fill.color === "#29292a").length, 2);
+    assert.ok(!chart.ctx.fills.some(fill => fill.color === "rgba(228, 230, 235, 0.07)"));
+    for (const gridX of [volumeStart + (volumeLimit - volumeStart) / 5, volumeLimit, errorStart + (errorLimit - errorStart) * .2]) {
+        assert.ok(chart.ctx.strokes.some(stroke => stroke.path.length === 2 &&
+            stroke.path.every(point => Math.abs(point[1] - gridX) < 1e-8)));
     }
-    assert.ok(!chart.ctx.strokes.some(stroke => stroke.path.every(point => point[1] === chart.chartArea.left)));
-    assert.ok(chart.ctx.texts.some(label => label.text === "0" && label.x === chart.chartArea.left));
-    assert.ok(!chart.ctx.strokes.some(stroke => stroke.path.every(point => point[2] === chart.chartArea.top)));
-    assert.ok(!chart.ctx.strokes.some(stroke => stroke.path.every(point => point[1] === 886 || point[1] === 896)));
-    assert.ok(chart.ctx.strokes.some(stroke => JSON.stringify(stroke.path) ===
-        JSON.stringify([["moveTo", 16, 340], ["lineTo", 896, 340]])));
-    assert.ok(chart.ctx.texts.some(label => label.text === "100%" && label.x === 896));
-    assert.equal(chart.ctx.letterSpacing, "1px");
+    assert.ok(chart.ctx.texts.some(label => label.text === "100%" && label.x === errorLimit));
     assert.equal(chart.ctx.balance, 0);
 
     chart.$receiptAlignedRows = [{ receiver: "Mariane", packagesReceived: 2500, errorMetric: 1.2 }];
@@ -114,15 +119,14 @@ test("ranking de recebedores posiciona os textos acima das barras sem as bordas 
     chart.scales.y.getPixelForValue = index => 200 + index * 300;
     chart.ctx = createContext();
     plugin.beforeDatasetsDraw(chart);
-    assert.ok(chart.ctx.texts.some(label => label.text === "Mariane" && label.y === 182));
-    assert.ok(chart.ctx.texts.some(label => label.text === "120,00%" && label.y === 182));
-    assert.ok(chart.ctx.texts.some(label => label.text === "120%" && label.x === 896));
+    assert.ok(chart.ctx.texts.some(label => label.text === "Mariane" && label.y === 180));
+    assert.ok(chart.ctx.texts.some(label => label.text === "120,00%" && label.y === 207 && label.x === errorLimit + 20));
+    assert.ok(chart.ctx.texts.some(label => label.text === "120%" && label.x === errorLimit));
 
     chart.$receiptAlignedRows = [];
     chart.ctx = createContext();
     plugin.beforeDatasetsDraw(chart);
-    assert.equal(chart.ctx.fills.length, 0);
-    assert.ok(!chart.ctx.strokes.some(stroke => stroke.path.every(point => point[1] === chart.chartArea.left)));
+    assert.ok(!chart.ctx.fills.some(fill => fill.color === "#007A48" || fill.color === "#8B0000"));
     assert.ok(chart.ctx.texts.some(label => label.text === "Importe os dados para comparar os recebedores."));
     assert.equal(chart.ctx.balance, 0);
 });

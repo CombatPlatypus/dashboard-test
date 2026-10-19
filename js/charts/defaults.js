@@ -8,6 +8,10 @@
     }
 
     chartLibrary.defaults.font.family = "'Open Sans', sans-serif";
+    chartLibrary.defaults.font.size = 14;
+    chartLibrary.defaults.devicePixelRatio = function () {
+        return Math.max(Number(window.devicePixelRatio) || 1, 2);
+    };
     chartLibrary.defaults.color = "#a8a9ad";
 
     const tooltip = chartLibrary.defaults.plugins?.tooltip;

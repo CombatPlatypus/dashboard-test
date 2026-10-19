@@ -29,7 +29,7 @@ const chartState = {
 
     showValues: true,
 
-    color: "#ff5533",
+    color: "#8B0000",
 };
 
 /* FUNDO DO GRÁFICO E DA IMAGEM PNG */
@@ -90,7 +90,7 @@ const chartPercentagePlugin = {
         context.save();
 
         context.font =
-            '600 13px "Open Sans", sans-serif';
+            '600 15px "Open Sans", sans-serif';
 
         context.textAlign =
             "center";
@@ -187,7 +187,7 @@ const chartValueLabelsPlugin = {
         const context = chart.ctx;
 
         context.save();
-        context.font = "600 12px 'Open Sans', sans-serif";
+        context.font = "600 15px 'Open Sans', sans-serif";
         context.textAlign = "center";
         context.lineWidth = 3;
 
@@ -205,7 +205,7 @@ const chartValueLabelsPlugin = {
                 const positiveBar = element.y < element.base;
 
                 textPosition = positiveBar
-                    ? element.y - 8
+                    ? element.y - 15
                     : element.y + 8;
 
                 context.textBaseline = positiveBar
@@ -218,8 +218,8 @@ const chartValueLabelsPlugin = {
 
             context.strokeStyle = "#18191a";
             context.fillStyle = ANALYSIS_CHART_TEXT_COLOR;
-            context.strokeText(text, element.x, textPosition);
-            context.fillText(text, element.x, textPosition);
+            context.strokeText(text, element.x + (chart.config.type === "bar" ? 4 : 0), textPosition);
+            context.fillText(text, element.x + (chart.config.type === "bar" ? 4 : 0), textPosition);
         });
 
         context.restore();
@@ -829,6 +829,7 @@ function createChartScales(chartData) {
             ticks: {
                 color: ANALYSIS_CHART_TEXT_COLOR,
                 padding: 12,
+                font: { size: 14 },
                 maxRotation: 45,
                 minRotation: 0,
 
@@ -859,6 +860,7 @@ function createChartScales(chartData) {
             ticks: {
                 color: ANALYSIS_CHART_TEXT_COLOR,
                 padding: 12,
+                font: { size: 14 },
                 stepSize,
 
                 callback(value) {
@@ -901,7 +903,8 @@ function renderChart() {
 
     const pieChart = chartState.type === "pie";
 
-    chartState.instance = new window.Chart(chartCanvas, {
+    const createChart = window.DashboardCharts?.createChart ?? ((canvas, config) => new window.Chart(canvas, config));
+    chartState.instance = createChart(chartCanvas, {
         type: chartState.type,
         data: {
             labels: chartData.labels,
@@ -935,7 +938,7 @@ function renderChart() {
                         createPieLegendLabels,
                         font: {
                             family: "'Open Sans', sans-serif",
-                            size: 12,
+                            size: 14,
                         },
                     },
                 },

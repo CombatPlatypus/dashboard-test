@@ -15,7 +15,7 @@ import { createDoughnut3DSegments } from "../js/reports/core/doughnut-3d.js";
 import { drawParcelCoverage3D } from "../js/reports/parcel-sweeper/coverage-3d.js";
 import { drawDoughnut3D } from "../js/reports/core/doughnut-3d.js";
 
-const colors = ["#d9534f", "#f0ad4e", "#8b8d91"];
+const colors = ["#8B0000", "#f99400", "#8b8d91"];
 
 function replaceGlobal(t, name, value) {
     const original = Object.getOwnPropertyDescriptor(globalThis, name);
@@ -52,7 +52,7 @@ test("composição 3D mantém as cores e remove legenda e indicadores automátic
     assert.deepEqual(config.options.events, []);
     assert.equal(config.options.animation, false);
     assert.deepEqual(config.plugins.map(plugin => plugin.id), [
-        "losses-rate-composition-3d", "lossesRateCenterText",
+        "losses-rate-composition-3d", "lossesRateCenterText", "dashboardPalette",
     ]);
     assert.equal(drawParcelCoverage3D, drawDoughnut3D);
 });
@@ -102,7 +102,7 @@ test("histórico de taxa de perdas continua como linha com os indicadores existe
     assert.equal(history.type, "line");
     assert.equal(history.data.labels.length, 12);
     assert.deepEqual(history.plugins.map(plugin => plugin.id), [
-        "lossesRateMaximumReference", "lossesRateHistoryLabels",
+        "lossesRateMaximumReference", "lossesRateHistoryLabels", "dashboardPalette",
     ]);
     assert.equal(history.data.datasets[0].borderColor, "#e4e6eb");
     assert.equal(history.options.animation.duration, 250);
@@ -182,8 +182,8 @@ test("indicadores do HTML estão ligados aos três campos com as cores originais
     const composition = html.match(/<div class="tabs-panel" id="losses-rate">([\s\S]*?)<!-- RELATÓRIO DO PARCEL -->/)[1];
     for (const [color, label, id] of [
         ["#8b8d91", "Possíveis Perdas", "lossesRateCompositionPossibleLosses"],
-        ["#d9534f", "Lost", "lossesRateCompositionLost"],
-        ["#f0ad4e", "Avarias", "lossesRateCompositionDamage"],
+        ["#8B0000", "Lost", "lossesRateCompositionLost"],
+        ["#f99400", "Avarias", "lossesRateCompositionDamage"],
     ]) {
         assert.match(composition, new RegExp(`background-color: ${color};[\\s\\S]*?<p>${label}\\s+<span id="${id}">—</span>`));
         assert.equal(html.split(`id="${id}"`).length - 1, 1);

@@ -1,3 +1,5 @@
+import { getChartPixelRatio } from "../../charts/theme.js";
+import { createDashboardChart } from "../../charts/standard.js";
 import {
     REVERSE_TYPE_DEFINITIONS,
     REVERSE_TYPE_KEYS,
@@ -58,7 +60,7 @@ const reverseCenterTextPlugin = {
 function createReverseCompositionChart(
     canvas,
 ) {
-    return new window.Chart(
+    return createDashboardChart(
         canvas,
         {
             type: "doughnut",
@@ -97,10 +99,7 @@ function createReverseCompositionChart(
                 responsive: true,
                 maintainAspectRatio: false,
                 devicePixelRatio:
-                    Math.max(
-                        window.devicePixelRatio || 1,
-                        2,
-                    ),
+                    getChartPixelRatio(),
                 cutout: "66%",
                 events: [],
                 layout: {

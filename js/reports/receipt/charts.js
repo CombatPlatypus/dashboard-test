@@ -1,3 +1,7 @@
+import { CHART_COLORS, getChartPixelRatio } from "../../charts/theme.js";
+import { CHART_VALUE_FONT } from "../../charts/theme.js";
+import { drawHorizontalBar3D, drawHorizontalBar3DBase } from "../core/horizontal-bars-3d.js";
+import { createDashboardChart } from "../../charts/standard.js";
 import {
     getReceiptState,
     getReceiptSummary,
@@ -46,16 +50,7 @@ const receiptComparisonPercentageFormatter =
         },
     );
 
-const receiptDevicePixelRatio =
-    typeof window === "undefined"
-        ? 1
-        : window.devicePixelRatio || 1;
-
-const RECEIPT_CHART_PIXEL_RATIO =
-    Math.max(
-        receiptDevicePixelRatio,
-        3,
-    );
+const RECEIPT_CHART_PIXEL_RATIO = getChartPixelRatio();
 
 /* FORMATA UMA QUANTIDADE */
 
@@ -405,7 +400,7 @@ const receiptComparisonBarValuesPlugin = {
         }
 
         context.font =
-            '600 13px "Open Sans", sans-serif';
+            CHART_VALUE_FONT;
 
         context.textBaseline =
             "middle";
@@ -517,7 +512,7 @@ function applyReceiptCanvasTextSpacing(
         context
     ) {
         context.letterSpacing =
-            "1px";
+            "0px";
     }
 }
 
@@ -556,7 +551,7 @@ function createReceiptComparisonChart(
     const percentageMetric =
         metric === "error";
 
-    return new window.Chart(
+    return createDashboardChart(
         canvas,
         {
             type: "bar",
@@ -573,8 +568,8 @@ function createReceiptComparisonChart(
 
                         backgroundColor:
                             metric === "volume"
-                            ? "#4CAF50"
-                            : "#F44336",
+                            ? CHART_COLORS.green
+                            : CHART_COLORS.red,
 
                         borderWidth: 0,
                         barThickness: 22,
@@ -781,7 +776,7 @@ function createReceiptComparisonChart(
 const RECEIPT_ALIGNED_COLUMN_GAP = 30;
 const RECEIPT_ALIGNED_CONTENT_PADDING = Object.freeze({
     top: 12,
-    right: 10,
+    right: 74,
     left: 10,
 });
 const RECEIPT_ALIGNED_LABEL_HEIGHT = 14;
@@ -789,8 +784,8 @@ const RECEIPT_ALIGNED_LABEL_BAR_GAP = 8;
 const RECEIPT_ALIGNED_VOLUME_INTERVALS = 5;
 const RECEIPT_ALIGNED_ERROR_INTERVAL = 0.2;
 const RECEIPT_ALIGNED_INITIAL_ERROR_MAXIMUM = 1;
-const RECEIPT_ALIGNED_VOLUME_COLOR = "#4caf50";
-const RECEIPT_ALIGNED_ERROR_COLOR = "#f44336";
+const RECEIPT_ALIGNED_VOLUME_COLOR = CHART_COLORS.green;
+const RECEIPT_ALIGNED_ERROR_COLOR = CHART_COLORS.red;
 
 const receiptAlignedVolumeAxisFormatter =
     new Intl.NumberFormat(
@@ -898,77 +893,8 @@ function normalizeReceiptAlignedMetric(
         (end - start) * ratio;
 }
 
-function drawReceiptAlignedRoundedBar(
-    context,
-    positionX,
-    positionY,
-    width,
-    height,
-    fillStyle,
-) {
-    const safeWidth = Math.max(
-        Number(width) || 0,
-        0,
-    );
-
-    if (safeWidth === 0) {
-        return;
-    }
-
-    const radius = Math.min(
-        3,
-        safeWidth / 2,
-        height / 2,
-    );
-
-    context.fillStyle =
-        fillStyle;
-    context.beginPath();
-    context.moveTo(
-        positionX + radius,
-        positionY,
-    );
-    context.lineTo(
-        positionX + safeWidth - radius,
-        positionY,
-    );
-    context.quadraticCurveTo(
-        positionX + safeWidth,
-        positionY,
-        positionX + safeWidth,
-        positionY + radius,
-    );
-    context.lineTo(
-        positionX + safeWidth,
-        positionY + height - radius,
-    );
-    context.quadraticCurveTo(
-        positionX + safeWidth,
-        positionY + height,
-        positionX + safeWidth - radius,
-        positionY + height,
-    );
-    context.lineTo(
-        positionX + radius,
-        positionY + height,
-    );
-    context.quadraticCurveTo(
-        positionX,
-        positionY + height,
-        positionX,
-        positionY + height - radius,
-    );
-    context.lineTo(
-        positionX,
-        positionY + radius,
-    );
-    context.quadraticCurveTo(
-        positionX,
-        positionY,
-        positionX + radius,
-        positionY,
-    );
-    context.fill();
+function drawReceiptAlignedRoundedBar(context, positionX, positionY, width, height, fillStyle) {
+    drawHorizontalBar3D(context, positionX, positionY, width, height, fillStyle);
 }
 
 function drawReceiptAlignedMetricLabel(
@@ -981,12 +907,12 @@ function drawReceiptAlignedMetricLabel(
     context.textAlign =
         textAlign;
     context.textBaseline =
-        "bottom";
+        "middle";
     context.strokeStyle =
         "#18191a";
     context.lineWidth = 1;
     context.fillStyle =
-        "#e4e6eb";
+        "#a8a9ad";
     context.strokeText(
         label,
         positionX,
@@ -1061,7 +987,7 @@ function drawReceiptAlignedComparison(
         RECEIPT_ALIGNED_CONTENT_PADDING.right;
     const axisY =
         chartArea.bottom + 8;
-    const barHeight = 20;
+    const barHeight = 24;
 
     context.save();
     context.textBaseline =
@@ -1069,7 +995,7 @@ function drawReceiptAlignedComparison(
     context.font =
         '500 14px "Open Sans", sans-serif';
     context.fillStyle =
-        "#bfc2c8";
+        "#a8a9ad";
     context.strokeStyle =
         "rgba(82, 82, 82, 0.45)";
     context.lineWidth = 1;
@@ -1086,8 +1012,8 @@ function drawReceiptAlignedComparison(
             volumeMaximum *
             ratio;
         const positionX =
-            volumeStart +
-            (volumeEnd - volumeStart) * ratio;
+            volumeBarStart +
+            (volumeBarLimit - volumeBarStart) * ratio;
 
         if (index > 0) {
             context.beginPath();
@@ -1136,11 +1062,11 @@ function drawReceiptAlignedComparison(
             value /
             errorMaximum;
         const positionX =
-            errorStart +
-            (errorEnd - errorStart) *
+            errorBarStart +
+            (errorBarLimit - errorBarStart) *
                 ratio;
 
-        if (index < errorIntervalCount) {
+        if (index > 0 && index < errorIntervalCount) {
             context.beginPath();
             context.moveTo(
                 positionX,
@@ -1179,11 +1105,14 @@ function drawReceiptAlignedComparison(
     );
     context.stroke();
 
+    drawHorizontalBar3DBase(context, { left: volumeBarStart, top: chartArea.top, bottom: chartArea.bottom });
+    drawHorizontalBar3DBase(context, { left: errorBarStart, top: chartArea.top, bottom: chartArea.bottom });
+
     if (rows.length === 0) {
         context.font =
             '600 14px "Open Sans", sans-serif';
         context.fillStyle =
-            "#bfc2c8";
+            "#a8a9ad";
         context.textAlign =
             "center";
         context.fillText(
@@ -1273,7 +1202,7 @@ function drawReceiptAlignedComparison(
             context.font =
                 '600 14px "Open Sans", sans-serif';
             context.fillStyle =
-                "#e4e6eb";
+                "#a8a9ad";
             context.textAlign =
                 "left";
             context.textBaseline =
@@ -1328,26 +1257,26 @@ function drawReceiptAlignedComparison(
             }
 
             context.font =
-                '600 14px "Open Sans", sans-serif';
+                CHART_VALUE_FONT;
             drawReceiptAlignedMetricLabel(
                 context,
                 formatReceiptProgressQuantity(
                     volumeValue,
                 ),
-                volumeBarLimit,
-                labelY,
-                "right",
+                volumeBarEnd + 20,
+                positionY + 7,
+                "left",
             );
 
             if (errorValue === null) {
                 context.fillStyle =
-                    "#bfc2c8";
+                    "#a8a9ad";
                 context.textAlign =
                     "left";
                 context.fillText(
                     "—",
-                    errorBarStart,
-                    labelY,
+                    errorBarStart + 20,
+                    positionY + 7,
                 );
             } else {
                 drawReceiptAlignedMetricLabel(
@@ -1355,8 +1284,8 @@ function drawReceiptAlignedComparison(
                     formatReceiptComparisonPercentage(
                         errorValue,
                     ),
-                    errorBarStart,
-                    labelY,
+                    errorBarEnd + 20,
+                    positionY + 7,
                     "left",
                 );
             }
@@ -1379,7 +1308,7 @@ const receiptAlignedComparisonPlugin = {
 function createReceiptAlignedComparisonChart(
     canvas,
 ) {
-    return new window.Chart(
+    return createDashboardChart(
         canvas,
         {
             type: "scatter",
@@ -1651,7 +1580,7 @@ function updateReceiptAlignedComparisonChart(
 
     const chartHeight = Math.max(
         470,
-        rows.length * 58 +
+        rows.length * 74 +
             85,
     );
 

@@ -1,4 +1,6 @@
-import { CHART_TEXT_COLOR } from "../../charts/theme.js";
+import { createHorizontalBars3DPlugin, getHorizontalBarLabelPosition } from "../core/horizontal-bars-3d.js";
+import { createDashboardChart } from "../../charts/standard.js";
+import { CHART_TEXT_COLOR, CHART_VALUE_FONT } from "../../charts/theme.js";
 
 const parcelHorizontalQuantityFormatter = new Intl.NumberFormat("pt-BR", {
     maximumFractionDigits: 0,
@@ -13,7 +15,7 @@ function fitParcelHorizontalLabels(scale) {
     const context = scale.ctx;
     context.save();
     context.font = `${parcelHorizontalLabelFont.size}px ${parcelHorizontalLabelFont.family}`;
-    if ("letterSpacing" in context) context.letterSpacing = "1px";
+    if ("letterSpacing" in context) context.letterSpacing = "0px";
 
     const labelWidths = scale.ticks.flatMap(tick =>
         (Array.isArray(tick.label) ? tick.label : [tick.label])
@@ -30,28 +32,11 @@ const parcelHorizontalTextStyle = {
     id: "parcelHorizontalTextStyle",
     beforeLayout(chart) {
         if ("letterSpacing" in chart.ctx) {
-            chart.ctx.letterSpacing = "1px";
+            chart.ctx.letterSpacing = "0px";
         }
     },
     beforeDraw(chart) {
         this.beforeLayout(chart);
-    },
-};
-
-const parcelHorizontalTracks = {
-    id: "parcelHorizontalTracks",
-    beforeDatasetsDraw(chart) {
-        const area = chart.chartArea;
-        if (!area) return;
-
-        const context = chart.ctx;
-        context.save();
-        context.fillStyle = "rgba(82, 82, 82, 0.34)";
-        chart.getDatasetMeta(0).data.forEach(bar => {
-            const { y, height } = bar.getProps(["y", "height"], true);
-            context.fillRect(area.left, y - height / 2, area.right - area.left, height);
-        });
-        context.restore();
     },
 };
 
@@ -64,16 +49,16 @@ const parcelHorizontalValues = {
         const context = chart.ctx;
         context.save();
         if ("letterSpacing" in context) context.letterSpacing = "0px";
-        context.font = '600 14px "Open Sans", sans-serif';
+        context.font = CHART_VALUE_FONT;
         context.fillStyle = CHART_TEXT_COLOR;
         context.textAlign = "left";
         context.textBaseline = "middle";
         chart.getDatasetMeta(0).data.forEach((bar, index) => {
-            const { y } = bar.getProps(["y"], true);
+            const { x, y } = getHorizontalBarLabelPosition(bar);
             const value = chart.data.datasets[0].data[index];
             context.fillText(chart.$parcelHasDistribution
                 ? parcelHorizontalQuantityFormatter.format(value)
-                : "—", area.right + 12, y);
+                : "—", x, y);
         });
         context.restore();
     },
@@ -84,7 +69,7 @@ function getParcelHorizontalChartHeight(categoryCount) {
 }
 
 function createParcelHorizontalChart(canvas, color) {
-    return new window.Chart(canvas, {
+    return createDashboardChart(canvas, {
         type: "bar",
         data: {
             labels: ["—"],
@@ -123,7 +108,7 @@ function createParcelHorizontalChart(canvas, color) {
                 },
             },
         },
-        plugins: [parcelHorizontalTextStyle, parcelHorizontalTracks, parcelHorizontalValues],
+        plugins: [parcelHorizontalTextStyle, createHorizontalBars3DPlugin({ id: "parcelHorizontalBars3D" }), parcelHorizontalValues],
     });
 }
 
@@ -145,7 +130,7 @@ function updateParcelHorizontalChart(chart, distribution, { title, color, height
         ? labels.map(label => label === "-" ? "#a8a9ad" : color)
         : ["#a8a9ad"];
     chart.options.scales.x.suggestedMax = maximum > 0 ? Math.ceil(maximum * 1.15) : 1;
-    chart.options.layout.padding.right = Math.max(52, quantityText.length * 9 + 16);
+    chart.options.layout.padding.right = Math.max(64, quantityText.length * 10 + 24);
     chart.canvas.setAttribute("aria-label", `${title}: ${distribution.length > 0
         ? distribution.map(item => `${item.label}: ${parcelHorizontalQuantityFormatter.format(item.count)}`).join("; ")
         : "sem pacotes importados"}.`);

@@ -1,4 +1,5 @@
-import { CHART_TEXT_COLOR } from "../../charts/theme.js";
+import { createDashboardChart } from "../../charts/standard.js";
+import { CHART_TEXT_COLOR, CHART_VALUE_FONT } from "../../charts/theme.js";
 
 import {
     DAMAGE_AND_LOSSES_RED,
@@ -109,7 +110,7 @@ function drawDamageChartText(
         color = CHART_TEXT_COLOR,
         align = "center",
         font =
-            '600 15px "Open Sans", sans-serif',
+            CHART_VALUE_FONT,
     } = {},
 ) {
     context.font = font;
@@ -202,7 +203,7 @@ const damageChartAveragePlugin = {
             {
                 align: "center",
                 font:
-                    '600 15px "Open Sans", sans-serif',
+                    CHART_VALUE_FONT,
             },
         );
 
@@ -459,7 +460,7 @@ const damageSocLabelsPlugin = {
 function createDamageCompositionChart(
     canvas,
 ) {
-    return new window.Chart(
+    return createDashboardChart(
         canvas,
         {
             type: "doughnut",
@@ -532,7 +533,7 @@ function createDamageCompositionChart(
 function createDamageLastSevenDaysChart(
     canvas,
 ) {
-    return new window.Chart(
+    return createDashboardChart(
         canvas,
         {
             type: "bar",
@@ -670,7 +671,7 @@ function createDamageLastSevenDaysChart(
 function createDamageSocChart(
     canvas,
 ) {
-    return new window.Chart(
+    return createDashboardChart(
         canvas,
         {
             type: "bar",

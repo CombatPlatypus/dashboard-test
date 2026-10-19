@@ -48,7 +48,7 @@ test("centro da cobertura preserva dois decimais sobre o total esperado, como no
     ]) {
         const context = createCanvasContext();
         const chart = { ctx: context, chartArea: { left: 0, top: 0, right: 450, bottom: 270 },
-            data: { datasets: [{ data: [scanned, total - scanned], backgroundColor: ["#3F51B5", "#e4e6eb"] }] },
+            data: { datasets: [{ data: [scanned, total - scanned], backgroundColor: ["#2538a5", "#e4e6eb"] }] },
             $parcelTotal: total, $parcelScanned: scanned };
         projection.beforeDatasetDraw(chart, { index: 0 });
         center.afterDraw(chart);
@@ -92,7 +92,7 @@ test("canvas desenha superfície, laterais e estado vazio sem perder o contexto"
         const context = createCanvasContext();
         const geometry = drawParcelCoverage3D({ context,
             area: { left: 0, top: 0, right: 450, bottom: 270 },
-            values, colors: ["#3F51B5", "#e4e6eb"] });
+            values, colors: ["#2538a5", "#e4e6eb"] });
         assert.ok(geometry);
         assert.ok(context.fills > 2);
         assert.equal(context.balance, 0);
@@ -105,14 +105,14 @@ test("somente gráficos do Parcel desativam tooltips e hover; texto central fica
     replaceGlobal(t, "window", { Chart: class { constructor(canvas, config) { return config; } } });
     const coverage = createParcelCoverageChart({});
     const aging = createParcelAgingChart({});
-    assert.equal(aging.data.datasets[0].backgroundColor, "#3F51B5");
+    assert.equal(aging.data.datasets[0].backgroundColor, "#2538a5");
     for (const config of [coverage, aging]) {
         assert.equal(config.options.plugins.tooltip.enabled, false);
         assert.deepEqual(config.options.events, []);
     }
     const context = createCanvasContext();
     const chart = { ctx: context, chartArea: { left: 0, top: 0, right: 450, bottom: 270 },
-        data: { datasets: [{ data: [2, 1], backgroundColor: ["#3F51B5", "#e4e6eb"] }] },
+        data: { datasets: [{ data: [2, 1], backgroundColor: ["#2538a5", "#e4e6eb"] }] },
         $parcelTotal: 3, $parcelScanned: 2 };
     const plugin = coverage.plugins.find(item => item.id === "parcel-coverage-3d");
     assert.equal(plugin.beforeDatasetDraw(chart, { index: 0 }), false);
@@ -155,7 +155,7 @@ test("Next Step Action conserva ações completas e percentuais em rótulos com 
     chart.data.datasets[0].data = [2185, 0, 7];
     chart.getDatasetMeta = () => ({ data: [{ x: 50, y: 25 }, { x: 100, y: 120 }, { x: 150, y: 80 }] });
     chart.plugins.forEach(plugin => plugin.afterDatasetsDraw?.(chart));
-    assert.deepEqual(context.texts, [["2.185", 50, 19], ["7", 150, 74]]);
+    assert.deepEqual(context.texts, [["2.185", 54, 10], ["7", 154, 65]]);
     assert.equal(context.balance, 0);
 });
 

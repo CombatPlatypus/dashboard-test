@@ -1,3 +1,7 @@
+import { CHART_COLORS, getChartPixelRatio } from "../../charts/theme.js";
+import { CHART_VALUE_FONT } from "../../charts/theme.js";
+import { drawHorizontalBar3D, drawHorizontalBar3DBase } from "../core/horizontal-bars-3d.js";
+import { createDashboardChart } from "../../charts/standard.js";
 import {
     getExpeditionOperatorRanking,
     getExpeditionState,
@@ -12,12 +16,7 @@ let comparisonChart = null;
 let visibilityObserver = null;
 let resizeFrame = null;
 
-const CHART_PIXEL_RATIO = Math.max(
-    typeof window !== "undefined"
-        ? window.devicePixelRatio || 1
-        : 1,
-    4,
-);
+const CHART_PIXEL_RATIO = getChartPixelRatio();
 
 const ROUTES_SCALE_START = 0;
 const ROUTES_SCALE_END = 49;
@@ -34,13 +33,13 @@ const TIME_AXIS_INTERVAL_SECONDS =
 const COMPARISON_COLUMN_GAP = 30;
 const COMPARISON_CONTENT_PADDING = Object.freeze({
     top: 12,
-    right: 10,
+    right: 74,
     left: 10,
 });
 const COMPARISON_LABEL_HEIGHT = 14;
 const COMPARISON_LABEL_BAR_GAP = 8;
 const ROUTES_BAR_COLOR = "#e4e6eb";
-const TIME_BAR_COLOR = "#ffc107";
+const TIME_BAR_COLOR = CHART_COLORS.yellow;
 
 const quantityFormatter =
     new Intl.NumberFormat(
@@ -213,7 +212,7 @@ function applyTextSpacing(chart) {
         chart.ctx
     ) {
         chart.ctx.letterSpacing =
-            "1px";
+            "0px";
     }
 }
 
@@ -282,77 +281,8 @@ function normalizeMetric(
         ) * ratio;
 }
 
-function drawRoundedBar(
-    context,
-    positionX,
-    positionY,
-    width,
-    height,
-    fillStyle,
-) {
-    const safeWidth = Math.max(
-        Number(width) || 0,
-        0,
-    );
-
-    if (safeWidth === 0) {
-        return;
-    }
-
-    const radius = Math.min(
-        3,
-        safeWidth / 2,
-        height / 2,
-    );
-
-    context.fillStyle =
-        fillStyle;
-    context.beginPath();
-    context.moveTo(
-        positionX + radius,
-        positionY,
-    );
-    context.lineTo(
-        positionX + safeWidth - radius,
-        positionY,
-    );
-    context.quadraticCurveTo(
-        positionX + safeWidth,
-        positionY,
-        positionX + safeWidth,
-        positionY + radius,
-    );
-    context.lineTo(
-        positionX + safeWidth,
-        positionY + height - radius,
-    );
-    context.quadraticCurveTo(
-        positionX + safeWidth,
-        positionY + height,
-        positionX + safeWidth - radius,
-        positionY + height,
-    );
-    context.lineTo(
-        positionX + radius,
-        positionY + height,
-    );
-    context.quadraticCurveTo(
-        positionX,
-        positionY + height,
-        positionX,
-        positionY + height - radius,
-    );
-    context.lineTo(
-        positionX,
-        positionY + radius,
-    );
-    context.quadraticCurveTo(
-        positionX,
-        positionY,
-        positionX + radius,
-        positionY,
-    );
-    context.fill();
+function drawRoundedBar(context, positionX, positionY, width, height, fillStyle) {
+    drawHorizontalBar3D(context, positionX, positionY, width, height, fillStyle);
 }
 
 function drawMetricLabel(
@@ -361,12 +291,12 @@ function drawMetricLabel(
     positionX,
     positionY,
     alignment,
-    color = "#e4e6eb",
+    color = "#a8a9ad",
 ) {
     context.textAlign =
         alignment;
     context.textBaseline =
-        "bottom";
+        "middle";
 
     context.strokeStyle =
         "#18191a";
@@ -446,7 +376,7 @@ function drawComparisonStructure(chart) {
     const timeEnd =
         timeGridEnd -
         COMPARISON_CONTENT_PADDING.right;
-    const barHeight = 20;
+    const barHeight = 24;
 
     context.save();
     context.strokeStyle =
@@ -462,8 +392,8 @@ function drawComparisonStructure(chart) {
             routeValue /
             routeMaximum;
         const positionX =
-            volumeStart +
-            (volumeEnd - volumeStart) *
+            routeStart +
+            (routeEnd - routeStart) *
                 ratio;
 
         context.beginPath();
@@ -490,10 +420,10 @@ function drawComparisonStructure(chart) {
             }
 
             const positionX =
-                timeGridStart +
+                timeStart +
                 (
-                    timeGridEnd -
-                    timeGridStart
+                    timeEnd -
+                    timeStart
                 ) *
                 (
                     timeValue /
@@ -513,11 +443,14 @@ function drawComparisonStructure(chart) {
         },
     );
 
+    drawHorizontalBar3DBase(context, { left: routeStart, top: chartArea.top, bottom: chartArea.bottom });
+    drawHorizontalBar3DBase(context, { left: timeStart, top: chartArea.top, bottom: chartArea.bottom });
+
     if (rows.length === 0) {
         context.font =
             '600 14px "Open Sans", sans-serif';
         context.fillStyle =
-            "#bfc2c8";
+            "#a8a9ad";
         context.textAlign =
             "center";
         context.textBaseline =
@@ -609,7 +542,7 @@ function drawComparisonStructure(chart) {
             context.font =
                 '600 14px "Open Sans", sans-serif';
             context.fillStyle =
-                "#e4e6eb";
+                "#a8a9ad";
             context.textAlign =
                 "left";
             context.textBaseline =
@@ -666,26 +599,26 @@ function drawComparisonStructure(chart) {
             }
 
             context.font =
-                '600 14px "Open Sans", sans-serif';
+                CHART_VALUE_FONT;
             drawMetricLabel(
                 context,
                 formatQuantity(
                     operator.routesChecked,
                 ),
-                routeEnd,
-                labelY,
-                "right",
+                routeBarEnd + 20,
+                positionY + 7,
+                "left",
             );
 
             if (receivedTime === null) {
                 context.fillStyle =
-                    "#bfc2c8";
+                    "#a8a9ad";
                 context.textAlign =
                     "left";
                 context.fillText(
                     "—",
-                    timeStart,
-                    labelY,
+                    timeStart + 20,
+                    positionY + 7,
                 );
             } else {
                 drawMetricLabel(
@@ -693,8 +626,8 @@ function drawComparisonStructure(chart) {
                     formatDuration(
                         receivedTime,
                     ),
-                    timeStart,
-                    labelY,
+                    timeBarEnd + 20,
+                    positionY + 7,
                     "left",
                     receivedTime >
                         TIME_MAXIMUM_REFERENCE_SECONDS
@@ -716,7 +649,7 @@ function drawComparisonStructure(chart) {
         );
 
     context.strokeStyle =
-        "#d9534f";
+        CHART_COLORS.red;
     context.lineWidth = 1;
     context.setLineDash([
         6,
@@ -744,7 +677,7 @@ function drawComparisonStructure(chart) {
         "#18191a";
     context.lineWidth = 3;
     context.fillStyle =
-        "#d9534f";
+        CHART_COLORS.red;
     context.strokeText(
         "Máximo 10:00",
         maximumReferenceX - 6,
@@ -770,7 +703,7 @@ const alignedComparisonPlugin = {
 };
 
 function createComparisonChart(canvas) {
-    return new window.Chart(
+    return createDashboardChart(
         canvas,
         {
             type: "scatter",
@@ -1049,7 +982,7 @@ function updateComparisonChart(
 
     const chartHeight = Math.max(
         470,
-        operators.length * 58 +
+        operators.length * 74 +
             105,
     );
 

@@ -54,7 +54,7 @@ test("ocorrências por rua exibe o valor acima de cada barra das duas séries", 
     assert.ok(!balance.plugins.includes(plugin));
     assert.ok(!balance.plugins.includes(projection));
     assert.equal(chart.options.scales.y.grace, "15%");
-    assert.deepEqual(chart.options.layout.padding, { top: 7, right: 8 });
+    assert.deepEqual(chart.options.layout.padding, { top: 24, right: 8, bottom: 0 });
     const faces = [];
     chart.chartArea = { left: 10, top: 10, right: 250, bottom: 250 };
     chart.ctx = {
@@ -77,11 +77,11 @@ test("ocorrências por rua exibe o valor acima de cada barra das duas séries", 
     assert.deepEqual(faces, [
         {
             points: [[60, 40], [68, 33], [68, 133], [60, 140]],
-            color: "#947004",
+            color: "#905600",
         },
         {
             points: [[40, 40], [60, 40], [68, 33], [48, 33]],
-            color: "#ffd24c",
+            color: "#fbb247",
         },
     ]);
     chart.chartArea = { top: 10, bottom: 250 };

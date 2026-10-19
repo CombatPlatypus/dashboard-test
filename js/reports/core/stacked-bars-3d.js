@@ -84,7 +84,10 @@ function isDatasetVisible(
 function getTopDatasetIndex(
     chart,
     dataIndex,
+    sourceIndex,
 ) {
+    const source = chart.data.datasets[sourceIndex];
+    if (chart.options && !chart.options.scales?.y?.stacked && source.stack === undefined) return sourceIndex;
     for (
         let datasetIndex =
             chart.data.datasets.length - 1;
@@ -95,6 +98,7 @@ function getTopDatasetIndex(
             chart.data.datasets[datasetIndex];
 
         if (
+            dataset.stack !== source.stack ||
             !isDatasetVisible(
                 chart,
                 datasetIndex,
@@ -263,6 +267,7 @@ function createStackedBars3DPlugin({
                     getTopDatasetIndex(
                         chart,
                         dataIndex,
+                        args.index,
                     )
                 ) {
                     return;

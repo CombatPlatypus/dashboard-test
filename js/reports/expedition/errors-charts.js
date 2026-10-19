@@ -1,4 +1,7 @@
-import { CHART_TEXT_COLOR } from "../../charts/theme.js";
+import { CHART_COLORS, getChartPixelRatio } from "../../charts/theme.js";
+import { createHorizontalBars3DPlugin, getHorizontalBarLabelPosition } from "../core/horizontal-bars-3d.js";
+import { createDashboardChart } from "../../charts/standard.js";
+import { CHART_TEXT_COLOR, CHART_VALUE_FONT } from "../../charts/theme.js";
 
 import {
     getExpeditionErrorAnalysis,
@@ -11,13 +14,7 @@ let streetOccurrencesChart = null;
 let errorsVisibilityObserver = null;
 let errorsResizeFrame = null;
 
-const ERROR_CHART_PIXEL_RATIO =
-    Math.max(
-        typeof window !== "undefined"
-            ? window.devicePixelRatio || 1
-            : 1,
-        4,
-    );
+const ERROR_CHART_PIXEL_RATIO = getChartPixelRatio();
 
 const ERROR_CHART_FONT = {
     family: '"Open Sans", sans-serif',
@@ -29,21 +26,13 @@ const ERROR_BALANCE_3D_DEPTH = {
     y: 9,
 };
 
-const ERROR_BALANCE_3D_BASE_COLOR =
-    "rgba(168, 169, 173, 0.16)";
-
-const ERROR_BALANCE_3D_BASE_BORDER_COLOR =
-    "rgba(168, 169, 173, 0.34)";
-
 const ERROR_BALANCE_VALUE_FONT =
-    '600 16px "Open Sans", sans-serif';
+    CHART_VALUE_FONT;
 
 const ERROR_BALANCE_VALUE_COLOR =
-    "#e4e6eb";
+    CHART_TEXT_COLOR;
 
-const ERROR_BALANCE_VALUE_GAP = 10;
-
-const ERROR_BALANCE_VALUE_RIGHT_PADDING = 56;
+const ERROR_BALANCE_VALUE_RIGHT_PADDING = 64;
 
 const STREET_OCCURRENCES_3D_DEPTH = {
     x: 8,
@@ -314,204 +303,7 @@ function drawErrorChartFace(
     }
 }
 
-const expeditionErrorBalance3DPlugin = {
-    id: "expeditionErrorBalance3D",
-
-    beforeDatasetsDraw(chart) {
-        const area = chart.chartArea;
-
-        if (!area) {
-            return;
-        }
-
-        const context = chart.ctx;
-        const depthX =
-            ERROR_BALANCE_3D_DEPTH.x;
-
-        const depthY =
-            ERROR_BALANCE_3D_DEPTH.y;
-
-        context.save();
-
-        drawErrorChartFace(
-            context,
-            [
-                {
-                    x: area.left - depthX,
-                    y: area.top - depthY,
-                },
-                {
-                    x: area.left + depthX,
-                    y: area.top + depthY,
-                },
-                {
-                    x: area.left + depthX,
-                    y: area.bottom + depthY,
-                },
-                {
-                    x: area.left - depthX,
-                    y: area.bottom - depthY,
-                },
-            ],
-            ERROR_BALANCE_3D_BASE_COLOR,
-            ERROR_BALANCE_3D_BASE_BORDER_COLOR,
-        );
-
-        context.restore();
-    },
-
-    beforeDatasetDraw(
-        chart,
-        args,
-    ) {
-        if (
-            args.index !== 0 ||
-            !chart.chartArea
-        ) {
-            return;
-        }
-
-        const dataset =
-            chart.data.datasets[
-                args.index
-            ];
-
-        const bars =
-            args.meta?.data ??
-            chart.getDatasetMeta(
-                args.index,
-            ).data;
-
-        const context = chart.ctx;
-
-        context.save();
-
-        bars.forEach(function (
-            bar,
-            index,
-        ) {
-            const properties =
-                typeof bar.getProps ===
-                "function"
-                    ? bar.getProps(
-                        [
-                            "x",
-                            "y",
-                            "base",
-                            "height",
-                        ],
-                        false,
-                    )
-                    : bar;
-
-            const values = [
-                properties.x,
-                properties.y,
-                properties.base,
-                properties.height,
-            ].map(Number);
-
-            if (
-                values.some(function (value) {
-                    return !Number.isFinite(value);
-                })
-            ) {
-                return;
-            }
-
-            const [
-                x,
-                y,
-                base,
-                height,
-            ] = values;
-
-            const left =
-                Math.min(base, x);
-
-            const right =
-                Math.max(base, x);
-
-            if (
-                right - left < 0.5 ||
-                height <= 0
-            ) {
-                return;
-            }
-
-            const top =
-                y - height / 2;
-
-            const bottom =
-                y + height / 2;
-
-            const colors =
-                dataset.backgroundColor;
-
-            const frontColor =
-                Array.isArray(colors)
-                    ? colors[index]
-                    : colors;
-
-            if (
-                typeof frontColor !==
-                "string"
-            ) {
-                return;
-            }
-
-            const depthX =
-                ERROR_BALANCE_3D_DEPTH.x;
-
-            const depthY =
-                ERROR_BALANCE_3D_DEPTH.y;
-
-            drawErrorChartFace(
-                context,
-                [
-                    { x: left, y: bottom },
-                    { x: right, y: bottom },
-                    {
-                        x: right + depthX,
-                        y: bottom + depthY,
-                    },
-                    {
-                        x: left + depthX,
-                        y: bottom + depthY,
-                    },
-                ],
-                mixErrorChartColor(
-                    frontColor,
-                    "dark",
-                    0.42,
-                ),
-            );
-
-            drawErrorChartFace(
-                context,
-                [
-                    { x: right, y: top },
-                    {
-                        x: right + depthX,
-                        y: top + depthY,
-                    },
-                    {
-                        x: right + depthX,
-                        y: bottom + depthY,
-                    },
-                    { x: right, y: bottom },
-                ],
-                mixErrorChartColor(
-                    frontColor,
-                    "light",
-                    0.28,
-                ),
-            );
-        });
-
-        context.restore();
-    },
-};
+const expeditionErrorBalance3DPlugin = createHorizontalBars3DPlugin({ id: "expeditionErrorBalance3D" });
 
 const expeditionErrorBalanceValuesPlugin = {
     id: "expeditionErrorBalanceValues",
@@ -557,21 +349,7 @@ const expeditionErrorBalanceValuesPlugin = {
                 return;
             }
 
-            const properties =
-                bar.getProps(
-                    [
-                        "x",
-                        "y",
-                        "base",
-                    ],
-                    false,
-                );
-
-            const right =
-                Math.max(
-                    properties.base,
-                    properties.x,
-                );
+            const position = getHorizontalBarLabelPosition(bar);
 
             const label =
                 formatErrorChartQuantity(
@@ -581,10 +359,8 @@ const expeditionErrorBalanceValuesPlugin = {
             context.textAlign = "left";
             context.fillText(
                 label,
-                right +
-                    ERROR_BALANCE_3D_DEPTH.x +
-                    ERROR_BALANCE_VALUE_GAP,
-                properties.y,
+                position.x,
+                position.y,
             );
         });
 
@@ -757,7 +533,7 @@ const expeditionStreetBarValuesPlugin = {
         context.save();
         applyExpeditionErrorsTextSpacing(chart);
         context.font =
-            '600 14px "Open Sans", sans-serif';
+            CHART_VALUE_FONT;
         context.textAlign = "center";
         context.textBaseline = "bottom";
         context.fillStyle = CHART_TEXT_COLOR;
@@ -807,7 +583,7 @@ const expeditionStreetBarValuesPlugin = {
 function createErrorBalanceChart(
     canvas,
 ) {
-    return new window.Chart(
+    return createDashboardChart(
         canvas,
         {
             type: "bar",
@@ -824,10 +600,10 @@ function createErrorBalanceChart(
                     {
                         data: [0, 0, 0, 0],
                         backgroundColor: [
-                            "#3F51B5",
-                            "#f0ad4e",
-                            "#8BC34A",
-                            "#FF5722",
+                            CHART_COLORS.blue,
+                            CHART_COLORS.yellow,
+                            CHART_COLORS.green,
+                            CHART_COLORS.red,
                         ],
                         borderWidth: 0,
                         maxBarThickness: 42,
@@ -956,7 +732,7 @@ function createErrorBalanceChart(
 function createStreetOccurrencesChart(
     canvas,
 ) {
-    return new window.Chart(
+    return createDashboardChart(
         canvas,
         {
             type: "bar",
@@ -968,7 +744,7 @@ function createStreetOccurrencesChart(
                     {
                         label: "Pacotes Ausentes",
                         data: [],
-                        backgroundColor: "#ffc107",
+                        backgroundColor: CHART_COLORS.yellow,
                         borderWidth: 0,
                         maxBarThickness: 28,
                         categoryPercentage: 0.9,
@@ -978,7 +754,7 @@ function createStreetOccurrencesChart(
                     {
                         label: "Erros da Rua",
                         data: [],
-                        backgroundColor: "#F44336",
+                        backgroundColor: CHART_COLORS.red,
                         borderWidth: 0,
                         maxBarThickness: 28,
                         categoryPercentage: 0.9,

@@ -22,9 +22,10 @@ function configure(fonts, instances = {}) {
     return { chartLibrary, frames, warnings };
 }
 
-test("Open Sans é o padrão global antes da criação dos gráficos, sem alterar tamanho ou peso", () => {
+test("Open Sans 14px e densidade mínima 2x são o padrão antes da criação dos gráficos", () => {
     const { chartLibrary, frames } = configure(undefined);
-    assert.deepEqual(chartLibrary.defaults.font, { family: "'Open Sans', sans-serif", size: 12, weight: null });
+    assert.deepEqual(chartLibrary.defaults.font, { family: "'Open Sans', sans-serif", size: 14, weight: null });
+    assert.equal(chartLibrary.defaults.devicePixelRatio(), 2);
     assert.equal(frames.length, 0);
     assert.doesNotThrow(() => runInNewContext(source, { window: {}, document: {} }));
 });

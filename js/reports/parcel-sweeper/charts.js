@@ -1,4 +1,6 @@
-import { CHART_TEXT_COLOR } from "../../charts/theme.js";
+import { CHART_COLORS, getChartPixelRatio } from "../../charts/theme.js";
+import { createDashboardChart } from "../../charts/standard.js";
+import { CHART_TEXT_COLOR, CHART_VALUE_FONT } from "../../charts/theme.js";
 
 import {
     createParcelSummary,
@@ -24,7 +26,7 @@ import {
     updateParcelHorizontalChart,
 } from "./horizontal-charts.js";
 
-const PARCEL_BAR_COLOR = "#3F51B5";
+const PARCEL_BAR_COLOR = CHART_COLORS.blue;
 
 const parcelChartIntegerFormatter =
     new Intl.NumberFormat(
@@ -156,7 +158,7 @@ const parcelAgingValueLabels = {
         context.save();
         context.fillStyle = CHART_TEXT_COLOR;
         context.font =
-            '600 11px "Open Sans", sans-serif';
+            CHART_VALUE_FONT;
         context.textAlign = "center";
         context.textBaseline = "bottom";
 
@@ -184,8 +186,8 @@ const parcelAgingValueLabels = {
                         .format(
                             value,
                         ),
-                    bar.x,
-                    bar.y - 6,
+                    bar.x + 4,
+                    bar.y - 15,
                 );
             },
         );
@@ -211,7 +213,7 @@ const parcelAgingTextSpacing = {
 function createParcelCoverageChart(
     canvas,
 ) {
-    return new window.Chart(
+    return createDashboardChart(
         canvas,
         {
             type: "doughnut",
@@ -226,7 +228,7 @@ function createParcelCoverageChart(
                         0,
                     ],
                     backgroundColor: [
-                        "#3F51B5",
+                        CHART_COLORS.blue,
                         "#e4e6eb",
                     ],
                     borderWidth: 0,
@@ -240,7 +242,7 @@ function createParcelCoverageChart(
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                devicePixelRatio: Math.max(window.devicePixelRatio || 1, 2),
+                devicePixelRatio: getChartPixelRatio(),
                 layout: {
                     padding: { ...DOUGHNUT_3D_PADDING },
                 },
@@ -263,7 +265,7 @@ function createParcelCoverageChart(
 function createParcelVerticalChart(
     canvas,
 ) {
-    return new window.Chart(
+    return createDashboardChart(
         canvas,
         {
             type: "bar",

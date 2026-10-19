@@ -1,4 +1,5 @@
-import { CHART_TEXT_COLOR } from "../../charts/theme.js";
+import { createDashboardChart } from "../../charts/standard.js";
+import { CHART_TEXT_COLOR, CHART_VALUE_FONT } from "../../charts/theme.js";
 
 import {
     DAMAGE_AND_LOSSES_RED,
@@ -69,7 +70,7 @@ function drawLossesChartText(
     {
         color = CHART_TEXT_COLOR,
         align = "center",
-        font = '600 15px "Open Sans", sans-serif',
+        font = CHART_VALUE_FONT,
         outline = true,
     } = {},
 ) {
@@ -145,7 +146,7 @@ const lossesAveragePlugin = {
             positionY + 10,
             {
                 align: "center",
-                font: '600 15px "Open Sans", sans-serif',
+                font: CHART_VALUE_FONT,
             },
         );
 
@@ -311,7 +312,7 @@ const lossesRecoveryLabelsPlugin = {
 };
 
 function createLossesPeriodChart(canvas) {
-    return new window.Chart(canvas, {
+    return createDashboardChart(canvas, {
         type: "bar",
         data: {
             labels: [],
@@ -393,7 +394,7 @@ function createLossesPeriodChart(canvas) {
 }
 
 function createLossesPackRecoveryChart(canvas) {
-    return new window.Chart(canvas, {
+    return createDashboardChart(canvas, {
         type: "bar",
         data: {
             labels: [
@@ -478,7 +479,7 @@ function createLossesPackRecoveryChart(canvas) {
 }
 
 function createLossesReturnedComparisonChart(canvas) {
-    return new window.Chart(canvas, {
+    return createDashboardChart(canvas, {
         type: "bar",
         data: {
             labels: [

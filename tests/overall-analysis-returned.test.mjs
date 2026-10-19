@@ -126,17 +126,17 @@ test("linha acompanha importação, reimportação e limpeza com a formatação 
     assert.deepEqual(values(), periodKeys.map(() => "—"));
 });
 
-test("gráfico do card de pacotes em análise mantém #f0ad4e na criação e atualização", t => {
+test("gráfico do card de pacotes em análise mantém #f99400 na criação e atualização", t => {
     const { root, charts } = createElements(t);
     assert.equal(initializeOverallAnalysisCharts(root), true);
     const chart = charts.find(item => item.canvas === root.querySelector("#overallAnalysisPackagesAnalysisChart"));
-    assert.deepEqual(chart.data.datasets[0].backgroundColor, ["#f0ad4e", "#4b4b4b"]);
+    assert.deepEqual(chart.data.datasets[0].backgroundColor, ["#f99400", "#4b4b4b"]);
     assert.equal(renderOverallAnalysisCharts(getData(sample)), true);
-    assert.deepEqual(chart.data.datasets[0].backgroundColor, ["#f0ad4e", "#4b4b4b"]);
-    assert.deepEqual(chart.data.datasets[0].hoverBackgroundColor, ["#f0ad4e", "#4b4b4b"]);
+    assert.deepEqual(chart.data.datasets[0].backgroundColor, ["#f99400", "#4b4b4b"]);
+    assert.deepEqual(chart.data.datasets[0].hoverBackgroundColor, ["#f99400", "#4b4b4b"]);
     assert.equal(chart.data.datasets[0].data[0], .88);
     assert.equal(renderOverallAnalysisCharts(getData({ ...sample, days: [] })), true);
-    assert.deepEqual(chart.data.datasets[0].backgroundColor, ["#f0ad4e", "#4b4b4b"]);
+    assert.deepEqual(chart.data.datasets[0].backgroundColor, ["#f99400", "#4b4b4b"]);
     assert.deepEqual(chart.data.datasets[0].data, [0, 1]);
 });
 
@@ -145,8 +145,8 @@ test("card de capacidade fica verde até 100% e vermelho somente acima, sem recr
     assert.equal(initializeOverallAnalysisCharts(root), true);
     const chart = charts.find(item => item.canvas === root.querySelector("#overallAnalysisCapacityChart"));
     for (const [plannedVolume, color] of [
-        [0, "#4caf50"], [10000, "#4caf50"], [19999, "#4caf50"], [20000, "#4caf50"],
-        [20001, "#d9534f"], [23000, "#d9534f"], [20000, "#4caf50"],
+        [0, "#007A48"], [10000, "#007A48"], [19999, "#007A48"], [20000, "#007A48"],
+        [20001, "#8B0000"], [23000, "#8B0000"], [20000, "#007A48"],
     ]) {
         const data = getCardData(plannedVolume);
         assert.equal(renderOverallAnalysisCharts(data), true);
@@ -163,9 +163,9 @@ test("taxa de perdas usa verde abaixo de 0,025%, amarelo até 0,030% e vermelho 
     assert.equal(initializeOverallAnalysisCharts(root), true);
     const chart = charts.find(item => item.canvas === root.querySelector("#overallAnalysisLossRateChart"));
     for (const [lost, color] of [
-        [0, "#4caf50"], [240, "#4caf50"], [249, "#4caf50"],
-        [250, "#f0ad4e"], [251, "#f0ad4e"], [299, "#f0ad4e"], [300, "#f0ad4e"],
-        [301, "#d9534f"], [350, "#d9534f"], [300, "#f0ad4e"], [249, "#4caf50"],
+        [0, "#007A48"], [240, "#007A48"], [249, "#007A48"],
+        [250, "#f99400"], [251, "#f99400"], [299, "#f99400"], [300, "#f99400"],
+        [301, "#8B0000"], [350, "#8B0000"], [300, "#f99400"], [249, "#007A48"],
     ]) {
         const data = getCardData(null, lost);
         assert.equal(data.cards.lossesRate.limit, 0.0003);

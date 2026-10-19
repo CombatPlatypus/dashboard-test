@@ -55,12 +55,7 @@ function createHorizontalBars3DPlugin({ id }) {
 
             const context = chart.ctx;
             context.save();
-            drawFace(context, [
-                [area.left - depthX, area.top - depthY],
-                [area.left + depthX, area.top + depthY],
-                [area.left + depthX, area.bottom + depthY],
-                [area.left - depthX, area.bottom - depthY],
-            ], "#29292a", "rgba(168, 169, 173, 0.34)");
+            drawHorizontalBar3DBase(context, { left: area.left, top: area.top, bottom: area.bottom });
             context.restore();
         },
 
@@ -125,6 +120,24 @@ function createHorizontalBars3DPlugin({ id }) {
     };
 }
 
+function drawHorizontalBar3DBase(context, { left, top, bottom }) {
+    const { x, y } = HORIZONTAL_BAR_3D_DEPTH;
+    drawFace(context, [
+        [left - x, top - y], [left + x, top + y],
+        [left + x, bottom + y], [left - x, bottom - y],
+    ], "#29292a", "rgba(168, 169, 173, 0.34)");
+}
+
+function drawHorizontalBar3D(context, left, top, width, height, color) {
+    if (width <= 0 || height <= 0 || !/^#[\da-f]{6}$/i.test(color)) return;
+    const { x, y } = HORIZONTAL_BAR_3D_DEPTH;
+    const right = left + width;
+    const bottom = top + height;
+    drawFace(context, [[left, bottom], [right, bottom], [right + x, bottom + y], [left + x, bottom + y]], shadeColor(color, 0, 0.42));
+    drawFace(context, [[right, top], [right + x, top + y], [right + x, bottom + y], [right, bottom]], shadeColor(color, 255, 0.28));
+    drawFace(context, [[left, top], [right, top], [right, bottom], [left, bottom]], color);
+}
+
 function horizontalBarGridColor(context) {
     return Number(context.tick?.value) === 0
         ? "rgba(0, 0, 0, 0)"
@@ -145,4 +158,6 @@ export {
     createHorizontalBars3DPlugin,
     horizontalBarGridColor,
     getHorizontalBarLabelPosition,
+    drawHorizontalBar3D,
+    drawHorizontalBar3DBase,
 };

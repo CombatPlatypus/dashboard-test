@@ -17,7 +17,7 @@ import {
 } from "../js/reports/expedition/view.js";
 
 const labels = ["Erros de Etiqueta", "Erros de Sorting", "Revertidos", "Saldo Final"];
-const colors = ["#3F51B5", "#f0ad4e", "#8BC34A", "#FF5722"];
+const colors = ["#2538a5", "#f99400", "#007A48", "#8B0000"];
 
 function replaceGlobal(t, name, value) {
     const original = Object.getOwnPropertyDescriptor(globalThis, name);
@@ -83,12 +83,13 @@ test("gráfico usa o novo título e mantém Etiqueta, Sorting, Revertidos e Sald
         "expeditionErrorsTextSpacing",
         "expeditionErrorBalance3D",
         "expeditionErrorBalanceValues",
+        "dashboardPalette",
     ]);
     assert.deepEqual(chart.options.scales.y.ticks.font, {
         family: '"Open Sans", sans-serif',
         size: 14,
     });
-    assert.equal(chart.options.scales.y.ticks.padding, 12);
+    assert.equal(chart.options.scales.y.ticks.padding, 22);
     const textContext = { letterSpacing: "0px" };
     chart.ctx = textContext;
     chart.plugins[0].beforeDraw(chart);
@@ -99,7 +100,7 @@ test("gráfico usa o novo título e mantém Etiqueta, Sorting, Revertidos e Sald
     assert.equal(chart.options.scales.y.border.display, false);
     assert.equal(chart.options.scales.x.ticks.padding, 10);
     assert.equal(chart.options.scales.x.grid.color({ tick: { value: 0 } }), "rgba(0, 0, 0, 0)");
-    assert.equal(chart.options.scales.x.grid.color({ tick: { value: 20 } }), "rgba(82, 82, 82, 0.45)");
+    assert.equal(chart.options.scales.x.grid.color({ tick: { value: 20 } }), "rgba(82, 82, 82, 0.35)");
     const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
     assert.match(html, /<h4>Acompanhamento dos Erros<\/h4>/);
     assert.doesNotMatch(html, /(?:Identificados|Erros de Etiqueta x Erros de Sorting) x? Revertidos x Saldo Final/);
@@ -133,31 +134,32 @@ test("projeção 3D desenha a base e as faces inferior e lateral de cada barra",
         },
     };
     chart.ctx = context;
+    chart.data.datasets[0].data = [100];
     chart.chartArea = { left: 12, top: 10, right: 300, bottom: 220 };
     chart.plugins[1].beforeDatasetsDraw(chart);
     chart.plugins[1].beforeDatasetDraw(chart, { index: 0, meta: { data: [bar] } });
     assert.deepEqual(paths, [
         {
             points: [[2, 1], [22, 19], [22, 229], [2, 211]],
-            color: "rgba(168, 169, 173, 0.16)",
+            color: "#29292a",
         },
         {
             points: [[12, 66], [112, 66], [122, 75], [22, 75]],
-            color: "#252f69",
+            color: "#152060",
         },
         {
             points: [[112, 34], [122, 43], [122, 75], [112, 66]],
-            color: "#7582ca",
+            color: "#6270be",
         },
     ]);
     assert.deepEqual(context.strokes, [{
         color: "rgba(168, 169, 173, 0.34)",
         width: 1,
     }]);
-    assert.deepEqual(chart.options.layout.padding, { right: 56, bottom: 9 });
+    assert.deepEqual(chart.options.layout.padding, { top: 9, right: 64, bottom: 9 });
 });
 
-test("valores ficam fora das barras com tipografia branca uniforme", t => {
+test("valores ficam fora das barras com a tipografia e alinhamento do dashboard", t => {
     const { chart } = createCharts(t);
     const texts = [];
     const context = {
@@ -191,14 +193,14 @@ test("valores ficam fora das barras com tipografia branca uniforme", t => {
     chart.getDatasetMeta = () => ({ data: bars });
     chart.plugins[2].afterDatasetsDraw(chart);
     assert.deepEqual(texts, [
-        { text: "100", x: 132, y: 40, color: "#e4e6eb", align: "left",
-            baseline: "middle", font: '600 16px "Open Sans", sans-serif', spacing: "1px" },
-        { text: "74", x: 112, y: 90, color: "#e4e6eb", align: "left",
-            baseline: "middle", font: '600 16px "Open Sans", sans-serif', spacing: "1px" },
-        { text: "23", x: 82, y: 140, color: "#e4e6eb", align: "left",
-            baseline: "middle", font: '600 16px "Open Sans", sans-serif', spacing: "1px" },
-        { text: "151", x: 182, y: 190, color: "#e4e6eb", align: "left",
-            baseline: "middle", font: '600 16px "Open Sans", sans-serif', spacing: "1px" },
+        { text: "100", x: 132, y: 47, color: "#a8a9ad", align: "left",
+            baseline: "middle", font: '600 15px "Open Sans", sans-serif', spacing: "1px" },
+        { text: "74", x: 112, y: 97, color: "#a8a9ad", align: "left",
+            baseline: "middle", font: '600 15px "Open Sans", sans-serif', spacing: "1px" },
+        { text: "23", x: 82, y: 147, color: "#a8a9ad", align: "left",
+            baseline: "middle", font: '600 15px "Open Sans", sans-serif', spacing: "1px" },
+        { text: "151", x: 182, y: 197, color: "#a8a9ad", align: "left",
+            baseline: "middle", font: '600 15px "Open Sans", sans-serif', spacing: "1px" },
     ]);
 });
 

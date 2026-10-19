@@ -1,4 +1,6 @@
-import { CHART_TEXT_COLOR } from "../../charts/theme.js";
+import { CHART_COLORS, getChartPixelRatio } from "../../charts/theme.js";
+import { createDashboardChart } from "../../charts/standard.js";
+import { CHART_TEXT_COLOR, CHART_VALUE_FONT } from "../../charts/theme.js";
 
 import {
     LOSSES_RATE_MONTHS,
@@ -151,7 +153,7 @@ const lossesRateMaximumReferencePlugin = {
         context.save();
 
         context.strokeStyle =
-            "#d9534f";
+            CHART_COLORS.red;
 
         context.lineWidth =
             1.5;
@@ -178,7 +180,7 @@ const lossesRateMaximumReferencePlugin = {
         context.setLineDash([]);
 
         context.font =
-            '600 11px "Open Sans", sans-serif';
+            CHART_VALUE_FONT;
 
         context.textAlign =
             "right";
@@ -230,7 +232,7 @@ const lossesRateHistoryLabelsPlugin = {
         context.save();
 
         context.font =
-            '600 11px "Open Sans", sans-serif';
+            CHART_VALUE_FONT;
 
         context.textAlign =
             "center";
@@ -324,7 +326,7 @@ const lossesRateHistoryLabelsPlugin = {
 function createLossesRateCompositionChart(
     canvas,
 ) {
-    return new window.Chart(
+    return createDashboardChart(
         canvas,
         {
             type: "doughnut",
@@ -345,8 +347,8 @@ function createLossesRateCompositionChart(
                         ],
 
                         backgroundColor: [
-                            "#d9534f",
-                            "#f0ad4e",
+                            CHART_COLORS.red,
+                            CHART_COLORS.yellow,
                             "#8b8d91",
                         ],
 
@@ -363,10 +365,7 @@ function createLossesRateCompositionChart(
                 maintainAspectRatio: false,
 
                 devicePixelRatio:
-                    Math.max(
-                        window.devicePixelRatio || 1,
-                        2,
-                    ),
+                    getChartPixelRatio(),
 
                 cutout: "66%",
                 events: [],
@@ -407,7 +406,7 @@ function createLossesRateCompositionChart(
 function createLossesRateHistoryChart(
     canvas,
 ) {
-    return new window.Chart(
+    return createDashboardChart(
         canvas,
         {
             type: "line",
@@ -464,10 +463,7 @@ function createLossesRateHistoryChart(
                 maintainAspectRatio: false,
 
                 devicePixelRatio:
-                    Math.max(
-                        window.devicePixelRatio || 1,
-                        2,
-                    ),
+                    getChartPixelRatio(),
 
                 interaction: {
                     intersect: false,
@@ -702,7 +698,7 @@ function updateLossesRateHistoryChart(
             ) {
                 return monthIndex ===
                     state.activeMonth
-                    ? "#f0ad4e"
+                    ? CHART_COLORS.yellow
                     : "#e4e6eb";
             },
         );

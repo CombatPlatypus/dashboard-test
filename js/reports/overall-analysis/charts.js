@@ -1,4 +1,7 @@
-import { CHART_TEXT_COLOR } from "../../charts/theme.js";
+import { CHART_COLORS, getChartPixelRatio } from "../../charts/theme.js";
+import { getHorizontalBarLabelPosition } from "../core/horizontal-bars-3d.js";
+import { createDashboardChart } from "../../charts/standard.js";
+import { CHART_TEXT_COLOR, CHART_VALUE_FONT } from "../../charts/theme.js";
 
 import {
     formatOverallAnalysisQuantity,
@@ -28,13 +31,7 @@ let overallAnalysisVisibilityObserver =
 let overallAnalysisResizeFrame =
     null;
 
-const OVERALL_ANALYSIS_CHART_PIXEL_RATIO =
-    Math.max(
-        typeof window !== "undefined"
-            ? window.devicePixelRatio || 1
-            : 1,
-        2,
-    );
+const OVERALL_ANALYSIS_CHART_PIXEL_RATIO = getChartPixelRatio();
 
 const OVERALL_ANALYSIS_CHART_FONT = {
     family: '"Open Sans", sans-serif',
@@ -42,9 +39,9 @@ const OVERALL_ANALYSIS_CHART_FONT = {
 };
 
 const OVERALL_ANALYSIS_CARD_COLORS = Object.freeze({
-    normal: "#4caf50",
-    warning: "#f0ad4e",
-    exceeded: "#d9534f",
+    normal: CHART_COLORS.green,
+    warning: CHART_COLORS.yellow,
+    exceeded: CHART_COLORS.red,
     empty: "#e4e6eb",
 });
 
@@ -99,7 +96,7 @@ function createOverallAnalysisMiniChart(
     canvas,
     activeColor,
 ) {
-    return new window.Chart(
+    return createDashboardChart(
         canvas,
         {
             type: "doughnut",
@@ -224,7 +221,7 @@ const overallAnalysisBarValuesPlugin = {
         }
 
         context.font =
-            '600 14px "Open Sans", sans-serif';
+            CHART_VALUE_FONT;
         context.textBaseline =
             "middle";
         context.lineWidth = 3;
@@ -266,44 +263,20 @@ const overallAnalysisBarValuesPlugin = {
                                 value,
                             );
 
-                        const textWidth =
-                            context
-                                .measureText(
-                                    label,
-                                )
-                                .width;
-
-                        let positionX =
-                            bar.x + 8;
-
-                        let textAlign =
-                            "left";
-
-                        if (
-                            positionX +
-                                textWidth >
-                            chartArea.right
-                        ) {
-                            positionX =
-                                bar.x - 8;
-
-                            textAlign =
-                                "right";
-                        }
-
-                        context.textAlign =
-                            textAlign;
+                        const position = getHorizontalBarLabelPosition(bar);
+                        const positionX = position.x;
+                        context.textAlign = "left";
 
                         context.strokeText(
                             label,
                             positionX,
-                            bar.y,
+                            position.y,
                         );
 
                         context.fillText(
                             label,
                             positionX,
-                            bar.y,
+                            position.y,
                         );
                     },
                 );
@@ -322,7 +295,7 @@ function createOverallAnalysisChart(
     colors,
 ) {
     const chart =
-        new window.Chart(
+        createDashboardChart(
             canvas,
             {
                 type: "bar",
@@ -628,7 +601,7 @@ function renderOverallAnalysisCharts(
     updateOverallAnalysisMiniChart(
         overallAnalysisPackagesAnalysisChart,
         packagesAnalysisProgress,
-        "#f0ad4e",
+        CHART_COLORS.yellow,
         updateMode,
     );
 
@@ -734,7 +707,7 @@ function initializeOverallAnalysisCharts(
     overallAnalysisPackagesAnalysisChart =
         createOverallAnalysisMiniChart(
             packagesAnalysisCanvas,
-            "#f0ad4e",
+            CHART_COLORS.yellow,
         );
 
     overallAnalysisLossRateChart =
@@ -753,8 +726,8 @@ function initializeOverallAnalysisCharts(
             ],
             [
                 "#bdbdbd",
-                "#63b967",
-                "#f2c94c",
+                CHART_COLORS.green,
+                CHART_COLORS.yellow,
             ],
         );
 
@@ -766,8 +739,8 @@ function initializeOverallAnalysisCharts(
                 "Volume no Piso",
             ],
             [
-                "#63b967",
-                "#f2c94c",
+                CHART_COLORS.green,
+                CHART_COLORS.yellow,
             ],
         );
 

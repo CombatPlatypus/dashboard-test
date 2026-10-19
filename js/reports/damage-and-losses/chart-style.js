@@ -1,15 +1,10 @@
-const DAMAGE_AND_LOSSES_RED = "#8B0000";
-const DAMAGE_AND_LOSSES_YELLOW = "#f99400";
-const DAMAGE_AND_LOSSES_GREEN = "#007A48";
-const DAMAGE_AND_LOSSES_BLUE = "#2538a5";
+import { CHART_COLORS, getChartPixelRatio } from "../../charts/theme.js";
 
-function getDamageAndLossesPixelRatio() {
-    const screenRatio = typeof window !== "undefined"
-        ? Number(window.devicePixelRatio) || 1
-        : 1;
-
-    return Math.max(screenRatio, 2);
-}
+const DAMAGE_AND_LOSSES_RED = CHART_COLORS.red;
+const DAMAGE_AND_LOSSES_YELLOW = CHART_COLORS.yellow;
+const DAMAGE_AND_LOSSES_GREEN = CHART_COLORS.green;
+const DAMAGE_AND_LOSSES_BLUE = CHART_COLORS.blue;
+const getDamageAndLossesPixelRatio = getChartPixelRatio;
 
 export {
     DAMAGE_AND_LOSSES_RED,

@@ -136,12 +136,12 @@ test("eixos e indicadores manuais usam a cor compartilhada, preservando os dois 
         });
         chart.plugins.find(plugin => plugin.id === pluginId).beforeDatasetsDraw(chart);
         assert.ok(chart.ctx.texts.some(text => text.text === (id === "receipt" ? "Mariane" : "Rosa")
-            && text.color === "#e4e6eb"), `${id}: ${JSON.stringify(chart.ctx.texts)}`);
+            && text.color === "#a8a9ad"), `${id}: ${JSON.stringify(chart.ctx.texts)}`);
         if (id === "receipt") {
-            assert.ok(chart.ctx.texts.some(text => text.text === "20,00%" && text.color === "#e4e6eb"));
+            assert.ok(chart.ctx.texts.some(text => text.text === "20,00%" && text.color === "#a8a9ad"));
         } else {
-            assert.ok(chart.ctx.texts.some(text => text.text === "10:50" && text.color === "#ffc107"));
-            assert.ok(chart.ctx.texts.some(text => text.text === "Máximo 10:00" && text.color === "#d9534f"));
+            assert.ok(chart.ctx.texts.some(text => text.text === "10:50" && text.color === "#f99400"));
+            assert.ok(chart.ctx.texts.some(text => text.text === "Máximo 10:00" && text.color === "#8B0000"));
         }
     }
 });
@@ -161,7 +161,7 @@ test("gráficos de análise usam cinza nos valores, percentuais, legendas, eixos
     for (const type of ["pie", "bar", "line"]) {
         const ctx = createContext();
         const chart = {
-            ctx, config: { type }, data: { labels: ["Rua A"], datasets: [{ data: [5], backgroundColor: ["#ff5533"] }] },
+            ctx, config: { type }, data: { labels: ["Rua A"], datasets: [{ data: [5], backgroundColor: ["#8B0000"] }] },
             getDatasetMeta: () => ({ data: [{ x: 50, y: 50, base: 150, tooltipPosition: () => ({ x: 50, y: 50 }) }] }),
             getDataVisibility: () => true,
         };

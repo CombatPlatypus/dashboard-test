@@ -19,6 +19,7 @@ function createContext() {
     context.restore = () => { context.balance -= 1; };
     context.beginPath = () => { path = []; };
     context.moveTo = (...args) => path.push(["moveTo", ...args]);
+    context.closePath = () => {};
     context.lineTo = (...args) => path.push(["lineTo", ...args]);
     context.quadraticCurveTo = () => {};
     context.setLineDash = value => { dash = [...value]; };
@@ -87,76 +88,55 @@ test("canvas do ranking preserva o padding e a grade interna, sem desenhar borda
     chart.ctx = createContext();
     plugin.beforeDatasetsDraw(chart);
 
-    const referenceX = 481 + (886 - 481) * (600 / 960);
-    assert.deepEqual(chart.ctx.strokes.filter(stroke => stroke.color === "#d9534f"), [{
+    const routeStart = 26, routeLimit = 367, timeStart = 481, timeLimit = 822;
+    const referenceX = timeStart + (timeLimit - timeStart) * (600 / 960);
+    assert.deepEqual(chart.ctx.strokes.filter(stroke => stroke.color === "#8B0000"), [{
         path: [["moveTo", referenceX, 34], ["lineTo", referenceX, 340]],
-        color: "#d9534f",
-        dash: [6, 5],
+        color: "#8B0000", dash: [6, 5],
     }]);
-    assert.equal(chart.ctx.strokes.length, 20);
-    // As bordas dos dois conjuntos de barras não fazem parte da grade interna.
-    for (const borderX of [16, 441, 471, 896]) {
-        assert.ok(!chart.ctx.strokes.some(stroke => stroke.path.every(point => point[1] === borderX)));
+    for (const gridX of [routeStart + (routeLimit - routeStart) * 2 / 22, timeStart + (timeLimit - timeStart) * 2 / 16]) {
+        assert.ok(chart.ctx.strokes.some(stroke => stroke.path.length === 2 &&
+            stroke.path.every(point => Math.abs(point[1] - gridX) < 1e-8)));
     }
-    for (const borderY of [38, 340]) {
-        assert.ok(!chart.ctx.strokes.some(stroke => stroke.path.every(point => point[2] === borderY)));
-    }
-    assert.ok(!chart.ctx.strokes.some(stroke =>
-        JSON.stringify(stroke.path) === JSON.stringify([["moveTo", 16, 215], ["lineTo", 896, 215]])));
-    for (const gridX of [16 + 425 * 2 / 22, 471 + 425 * 2 / 16]) {
-        assert.ok(chart.ctx.strokes.some(stroke =>
-            stroke.path.every(point => Math.abs(point[1] - gridX) < 1e-9) &&
-            stroke.path[0][2] === 38 && stroke.path[1][2] === 340));
-    }
-    assert.ok(chart.ctx.strokes.some(stroke =>
-        JSON.stringify(stroke.path) === JSON.stringify([["moveTo", 16, 99], ["lineTo", 896, 99]])));
-    assert.equal(chart.ctx.fills, 11);
-    const getHorizontalBounds = path => {
-        const points = path.filter(([command]) => command === "moveTo" || command === "lineTo");
-        return [Math.min(...points.map(point => point[1])), Math.max(...points.map(point => point[1]))];
-    };
-    assert.deepEqual(getHorizontalBounds(chart.ctx.filledPaths[0]), [26, 431]);
-    assert.deepEqual(getHorizontalBounds(chart.ctx.filledPaths[2]), [481, 886]);
-    const firstRouteBounds = getHorizontalBounds(chart.ctx.filledPaths[1]);
-    assert.equal(firstRouteBounds[0], 26);
-    assert.ok(Math.abs(firstRouteBounds[1] - (26 + (431 - 26) * 21 / 22)) < 1e-9);
-    for (const [index, name, routes, time] of [
-        [0, "Rosa", "21", "06:34"], [1, "Gabriel", "20", "06:24"], [2, "Ana", "19", "—"],
+    assert.equal(chart.ctx.fills, 17);
+    const firstFront = chart.ctx.filledPaths[4];
+    assert.deepEqual(firstFront[0], ["moveTo", routeStart, 75]);
+    const routeEnd = routeStart + (routeLimit - routeStart) * 21 / 22;
+    assert.ok(firstFront.some(point => Math.abs(point[1] - routeEnd) < 1e-8));
+    for (const [index, name, routes, time, routeValue, timeValue] of [
+        [0, "Rosa", "21", "06:34", 21, 394],
+        [1, "Gabriel", "20", "06:24", 20, 384],
+        [2, "Ana", "19", "—", 19, null],
     ]) {
-        const rowTop = 70 + (index - 0.5) * 58;
-        const labelY = rowTop + 12 + 14;
-        for (const [text, x, alignment] of [[name, 26, "left"], [routes, 431, "right"], [time, 481, "left"]]) {
-            const label = chart.ctx.texts.find(label => label.text === text);
-            assert.ok(label, `Texto preservado: ${text}`);
-            assert.equal(label.x, x);
-            assert.equal(label.y, labelY);
-            assert.equal(label.alignment, alignment);
-            assert.equal(label.baseline, "bottom");
-            assert.equal(label.y - 14 - rowTop, 12);
+        const rowTop = 70 + (index - .5) * 58;
+        const barY = Math.max(70 + index * 58, rowTop + 12 + 14 + 8 + 12);
+        assert.ok(chart.ctx.texts.some(label => label.text === name && label.x === routeStart && label.y === rowTop + 26));
+        for (const [text, x] of [
+            [routes, routeStart + (routeLimit - routeStart) * routeValue / 22 + 20],
+            [time, timeStart + (timeLimit - timeStart) * (timeValue ?? 0) / 960 + 20],
+        ]) {
+            assert.ok(chart.ctx.texts.some(label => label.text === text &&
+                Math.abs(label.x - x) < 1e-8 && label.y === barY + 7 && label.alignment === "left"), text);
         }
     }
-    assert.equal(chart.ctx.texts.length, 10);
     assert.ok(chart.ctx.texts.some(label => label.text === "Máximo 10:00"));
-    assert.ok(chart.ctx.texts.every(label => label.y < chart.chartArea.bottom));
     assert.equal(chart.ctx.balance, 0);
 
     chart.$expeditionRows = [{ operator: "Rosa", routesChecked: 1, averageDurationSeconds: 650 }];
     chart.ctx = createContext();
     plugin.beforeDatasetsDraw(chart);
-    assert.ok(chart.ctx.texts.some(label => label.text === "1" && label.x === 431 && label.alignment === "right"));
-    assert.ok(chart.ctx.texts.some(label => label.text === "10:50" && label.x === 481 && label.color === "#ffc107"));
-    assert.ok(chart.ctx.strokes.every(stroke => stroke.path[0][2] !== stroke.path[1][2]));
+    assert.ok(chart.ctx.texts.some(label => label.text === "1" && label.x === routeStart + (routeLimit - routeStart) / 22 + 20));
+    assert.ok(chart.ctx.texts.some(label => label.text === "10:50" && label.color === "#f99400"));
 
-    // A single operator in a tall row keeps its vertical centering.
     chart.scales.y.getPixelForValue = index => 200 + index * 300;
     chart.ctx = createContext();
     plugin.beforeDatasetsDraw(chart);
-    assert.ok(chart.ctx.texts.some(label => label.text === "Rosa" && label.y === 182));
+    assert.ok(chart.ctx.texts.some(label => label.text === "Rosa" && label.y === 180));
 
     chart.$expeditionRows = [];
     chart.ctx = createContext();
     plugin.beforeDatasetsDraw(chart);
-    assert.equal(chart.ctx.strokes.length, 17);
+    assert.equal(chart.ctx.fills, 2);
     assert.equal(chart.ctx.texts.length, 1);
     assert.equal(chart.ctx.texts[0].text, "Importe os dados para comparar os conferentes.");
     assert.equal(chart.ctx.balance, 0);
