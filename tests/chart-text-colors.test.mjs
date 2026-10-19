@@ -80,7 +80,7 @@ test("eixos e indicadores manuais usam a cor compartilhada, preservando os dois 
         elements.set(id, root);
         assert.equal(initialize(root), true, `Inicialização de ${id}`);
     }
-    assert.equal(charts.length, 20);
+    assert.equal(charts.length, 22);
     const testedPlugins = new Set();
     for (const chart of charts) {
         for (const [axis, scale] of Object.entries(chart.options.scales ?? {})) {

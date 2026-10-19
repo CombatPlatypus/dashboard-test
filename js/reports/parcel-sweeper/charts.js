@@ -338,6 +338,20 @@ function createParcelAgingChart(canvas) {
     return createParcelVerticalChart(canvas);
 }
 
+function updateParcelCoverageChart(
+    chart,
+    summary,
+    updateMode,
+) {
+    chart.data.datasets[0].data = [
+        summary.expectedScannedCount,
+        summary.expectedUnscannedCount,
+    ];
+    chart.$parcelTotal = summary.expectedTotalCount;
+    chart.$parcelScanned = summary.expectedScannedCount;
+    chart.update(updateMode);
+}
+
 function updateParcelCharts(
     state,
 ) {
@@ -357,23 +371,10 @@ function updateParcelCharts(
             state.operatorKindOverrides,
         );
 
-    parcelCoverageChart
-        .data
-        .datasets[0]
-        .data = [
-            summary.expectedScannedCount,
-            summary.expectedUnscannedCount,
-        ];
-
-    parcelCoverageChart
-        .$parcelTotal =
-            summary.expectedTotalCount;
-
-    parcelCoverageChart
-        .$parcelScanned =
-            summary.expectedScannedCount;
-
-    parcelCoverageChart.update();
+    updateParcelCoverageChart(
+        parcelCoverageChart,
+        summary,
+    );
 
     parcelAgingChart.data.labels =
         summary.agingDistribution
@@ -562,6 +563,7 @@ export {
     createParcelNextStepActionChartLabel,
     createParcelVerticalChart,
     createParcelCoverageChart,
+    updateParcelCoverageChart,
     initializeParcelCharts,
     updateParcelCharts,
 };

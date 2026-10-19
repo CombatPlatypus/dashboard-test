@@ -4,6 +4,16 @@ import { createDashboardChart } from "../../charts/standard.js";
 import { CHART_TEXT_COLOR, CHART_VALUE_FONT } from "../../charts/theme.js";
 
 import {
+    createParcelCoverageChart,
+    updateParcelCoverageChart,
+} from "../parcel-sweeper/charts.js";
+
+import {
+    createReverseCompositionChart,
+    updateReverseCompositionChart,
+} from "../reverse/charts.js";
+
+import {
     formatOverallAnalysisQuantity,
 } from "./view.js";
 
@@ -20,6 +30,12 @@ let overallAnalysisReceiptChart =
     null;
 
 let overallAnalysisExpeditionChart =
+    null;
+
+let overallAnalysisParcelCoverageChart =
+    null;
+
+let overallAnalysisReverseCompositionChart =
     null;
 
 let overallAnalysisPanel =
@@ -471,6 +487,8 @@ function resizeOverallAnalysisCharts() {
                     overallAnalysisLossRateChart,
                     overallAnalysisReceiptChart,
                     overallAnalysisExpeditionChart,
+                    overallAnalysisParcelCoverageChart,
+                    overallAnalysisReverseCompositionChart,
                 ].forEach(
                     function (chart) {
                         if (!chart) {
@@ -527,7 +545,9 @@ function renderOverallAnalysisCharts(
         !overallAnalysisPackagesAnalysisChart ||
         !overallAnalysisLossRateChart ||
         !overallAnalysisReceiptChart ||
-        !overallAnalysisExpeditionChart
+        !overallAnalysisExpeditionChart ||
+        !overallAnalysisParcelCoverageChart ||
+        !overallAnalysisReverseCompositionChart
     ) {
         return false;
     }
@@ -643,6 +663,18 @@ function renderOverallAnalysisCharts(
         updateMode,
     );
 
+    updateParcelCoverageChart(
+        overallAnalysisParcelCoverageChart,
+        data.parcel,
+        updateMode,
+    );
+
+    updateReverseCompositionChart(
+        overallAnalysisReverseCompositionChart,
+        data.reverse,
+        updateMode,
+    );
+
     return true;
 }
 
@@ -674,6 +706,16 @@ function initializeOverallAnalysisCharts(
             "#overallAnalysisExpeditionChart",
         );
 
+    const parcelCoverageCanvas =
+        rootElement.querySelector(
+            "#overallAnalysisParcelCoverageChart",
+        );
+
+    const reverseCompositionCanvas =
+        rootElement.querySelector(
+            "#overallAnalysisReverseCompositionChart",
+        );
+
     if (
         !(capacityCanvas instanceof
             HTMLCanvasElement) ||
@@ -684,6 +726,10 @@ function initializeOverallAnalysisCharts(
         !(receiptCanvas instanceof
             HTMLCanvasElement) ||
         !(expeditionCanvas instanceof
+            HTMLCanvasElement) ||
+        !(parcelCoverageCanvas instanceof
+            HTMLCanvasElement) ||
+        !(reverseCompositionCanvas instanceof
             HTMLCanvasElement) ||
         typeof window.Chart !==
             "function"
@@ -742,6 +788,16 @@ function initializeOverallAnalysisCharts(
                 CHART_COLORS.green,
                 CHART_COLORS.yellow,
             ],
+        );
+
+    overallAnalysisParcelCoverageChart =
+        createParcelCoverageChart(
+            parcelCoverageCanvas,
+        );
+
+    overallAnalysisReverseCompositionChart =
+        createReverseCompositionChart(
+            reverseCompositionCanvas,
         );
 
     observeOverallAnalysisVisibility();

@@ -1945,7 +1945,7 @@ function filterRows() {
                                     valueIndex
                                 ]
                                 : purpose.unmatchedCellValue ??
-                                    "-";
+                                    "—";
                         },
                     );
                 },

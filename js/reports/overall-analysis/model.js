@@ -20,6 +20,14 @@ import {
 } from "../damage-and-losses/losses-state.js";
 
 import {
+    createParcelSummary,
+} from "../parcel-sweeper/model.js";
+
+import {
+    createReverseSummary,
+} from "../reverse/model.js";
+
+import {
     formatReportPersonFirstName,
 } from "../core/person-name.js";
 
@@ -312,6 +320,8 @@ function createOverallAnalysisData(
     reportContext = {},
     damageState = null,
     lossesState = null,
+    parcelState = null,
+    reverseState = null,
 ) {
     const receiptSummary =
         getReceiptSummary(
@@ -440,6 +450,17 @@ function createOverallAnalysisData(
                 damageAndLossesAnalysis
                     .lossesTotal
             : null;
+
+    const parcelSummary =
+        createParcelSummary(
+            parcelState?.rows,
+            parcelState?.operatorKindOverrides,
+        );
+
+    const reverseSummary =
+        createReverseSummary(
+            reverseState?.transfers,
+        );
 
     return {
         context: {
@@ -570,6 +591,23 @@ function createOverallAnalysisData(
 
         damageAndLosses:
             damageAndLossesAnalysis,
+
+        parcel: {
+            hasData: parcelSummary.hasData,
+            scannedCount: parcelSummary.scannedCount,
+            backlogCount: parcelSummary.backlogCount,
+            exceptionCount: parcelSummary.exceptionCount,
+            missortedCount: parcelSummary.missortedCount,
+            expectedTotalCount: parcelSummary.expectedTotalCount,
+            expectedScannedCount: parcelSummary.expectedScannedCount,
+            expectedUnscannedCount: parcelSummary.expectedUnscannedCount,
+        },
+
+        reverse: {
+            hasData: reverseSummary.hasData,
+            total: reverseSummary.total,
+            quantities: reverseSummary.quantities,
+        },
     };
 }
 

@@ -23,9 +23,9 @@ const sample = {
         })),
 };
 
-function getData(lossesState = getLossesState()) {
+function getData(lossesState = getLossesState(), parcelState = null, reverseState = null) {
     return createOverallAnalysisData(getReceiptState(), getExpeditionState(), null, {},
-        getDamageAndLossesState(), lossesState);
+        getDamageAndLossesState(), lossesState, parcelState, reverseState);
 }
 
 function getCardData(plannedVolume = null, lost = null) {
@@ -76,7 +76,7 @@ function createElements(t) {
     elements.get("overallAnalysisDamageAndLossesTable").querySelectorAll = () => [...rows.values()];
     const root = new Element();
     root.querySelector = selector => elements.get(selector.slice(1));
-    return { root, rows, charts };
+    return { root, rows, charts, elements };
 }
 
 test("HTML adiciona retornados abaixo de perdas confirmadas com sete períodos", () => {
@@ -84,7 +84,7 @@ test("HTML adiciona retornados abaixo de perdas confirmadas com sete períodos",
         ["hub", "soc", "underReview", "confirmedLosses", "returnedPackages"]);
     const returnedRow = tableHtml.match(/<tr data-overall-damage-losses-field="returnedPackages">([\s\S]*?)<\/tr>/)[1];
     assert.match(returnedRow, /<th scope="row">Pacotes Retornados<\/th>/);
-    assert.equal([...returnedRow.matchAll(/<td>-<\/td>/g)].length, 7);
+    assert.equal([...returnedRow.matchAll(/<td>—<\/td>/g)].length, 7);
 });
 
 test("Análise Geral reutiliza os retornados de todos os períodos sem somá-los às perdas", () => {
@@ -154,7 +154,7 @@ test("card de capacidade fica verde até 100% e vermelho somente acima, sem recr
         assert.deepEqual(chart.data.datasets[0].hoverBackgroundColor, [color, "#4b4b4b"]);
         assert.equal(chart.data.datasets[0].data[0], Math.min(plannedVolume / 20000, 1));
         assert.equal(data.cards.capacity.used, plannedVolume);
-        assert.equal(charts.length, 5);
+        assert.equal(charts.length, 7);
     }
 });
 
@@ -174,7 +174,7 @@ test("taxa de perdas usa verde abaixo de 0,025%, amarelo até 0,030% e vermelho 
         assert.deepEqual(chart.data.datasets[0].backgroundColor, [color, "#4b4b4b"], `Perdas: ${lost} em 1.000.000`);
         assert.deepEqual(chart.data.datasets[0].hoverBackgroundColor, [color, "#4b4b4b"]);
         assert.equal(chart.data.datasets[0].data[0], Math.min(data.cards.lossesRate.rate / 0.0003, 1));
-        assert.equal(charts.length, 5);
+        assert.equal(charts.length, 7);
     }
 });
 
@@ -193,4 +193,49 @@ test("limpar os dados mantém os cards de capacidade e perdas vazios e neutros",
         assert.deepEqual(chart.data.datasets[0].hoverBackgroundColor, ["#e4e6eb", "#4b4b4b"]);
         assert.deepEqual(chart.data.datasets[0].data, [0, 1]);
     }
+});
+
+test("Parcel e Reversa exibem totais, cobertura de esperados e composição e voltam ao estado vazio", t => {
+    const { root, charts, elements } = createElements(t);
+    assert.equal(initializeOverallAnalysisView(root), true);
+    assert.equal(initializeOverallAnalysisCharts(root), true);
+    const parcelChart = charts.find(chart => chart.canvas === elements.get("overallAnalysisParcelCoverageChart"));
+    const reverseChart = charts.find(chart => chart.canvas === elements.get("overallAnalysisReverseCompositionChart"));
+    const render = (parcel, reverse) => {
+        const data = getData(undefined, parcel, reverse);
+        assert.equal(renderOverallAnalysisView(data), true);
+        assert.equal(renderOverallAnalysisCharts(data), true);
+    };
+    const text = suffix => elements.get(`overallAnalysis${suffix}`).textContent;
+    render();
+    assert.equal(text("ParcelScanned"), "—");
+    assert.equal(text("ReverseReturn"), "—");
+    const rows = [
+        ["Backlog", "Y"], ["Exception", "Y"], ["Mis-sorted", "Y"],
+        ["Missing", "Y"], ["Missing", "Y"], ["Backlog", "N"],
+    ].map(([countType, expected], index) => ({ trackingNumber: `BR${index}`, countType, expected }));
+    const transfers = [{ to: "TO1", quantities: { return: 3, missorted: 2, liquidate: 1, confiscated: 4 } }];
+    render({ rows }, { transfers });
+    assert.deepEqual(["ParcelScanned", "ParcelBacklog", "ParcelException", "ParcelMissorted"].map(text),
+        ["4", "2", "1", "1"]);
+    assert.deepEqual([text("ParcelCoverageScanned"), text("ParcelCoverageUnscanned")], ["60,00%", "40,00%"]);
+    assert.deepEqual(parcelChart.data.datasets[0].data, [3, 2]);
+    assert.equal(parcelChart.$parcelTotal, 5);
+    assert.equal(parcelChart.$parcelScanned, 3);
+    assert.deepEqual(["Return", "Missorted", "Liquidate", "Confiscated"].map(type => text(`Reverse${type}`)),
+        ["3", "2", "1", "4"]);
+    assert.deepEqual(["Return", "Missorted", "Liquidate", "Confiscated"].map(type => text(`ReverseComposition${type}`)),
+        ["3 (30%)", "2 (20%)", "1 (10%)", "4 (40%)"]);
+    assert.deepEqual(reverseChart.data.datasets[0].data, [3, 2, 1, 4]);
+    assert.equal(reverseChart.options.plugins.reverseCenterText.text, "10");
+    render({ rows: rows.map(row => ({ ...row, expected: "N" })) }, { transfers: [] });
+    assert.equal(text("ParcelCoverageScanned"), "—");
+    assert.equal(text("ReverseReturn"), "—");
+    render();
+    assert.equal(text("ParcelScanned"), "—");
+    assert.equal(text("ReverseCompositionReturn"), "—");
+    assert.deepEqual(parcelChart.data.datasets[0].data, [0, 0]);
+    assert.deepEqual(reverseChart.data.datasets[0].data, [0, 0, 0, 0]);
+    assert.equal(reverseChart.options.plugins.reverseCenterText.text, "—");
+    assert.equal(charts.length, 7);
 });

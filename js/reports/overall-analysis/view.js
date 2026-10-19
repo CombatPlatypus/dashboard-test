@@ -1,3 +1,7 @@
+import {
+    REVERSE_TYPE_KEYS,
+} from "../reverse/model.js";
+
 const overallAnalysisNumberFormatter =
     new Intl.NumberFormat(
         "pt-BR",
@@ -20,6 +24,15 @@ const overallAnalysisCapacityRateFormatter =
             style: "percent",
             minimumFractionDigits: 1,
             maximumFractionDigits: 1,
+        },
+    );
+
+const overallAnalysisCompositionRateFormatter =
+    new Intl.NumberFormat(
+        "pt-BR",
+        {
+            style: "percent",
+            maximumFractionDigits: 0,
         },
     );
 
@@ -271,7 +284,21 @@ function getOverallAnalysisViewElements(
             );
         };
 
+    const parcelAndReverseElements = {};
+
+    [
+        "ParcelScanned", "ParcelBacklog", "ParcelException", "ParcelMissorted",
+        "ParcelCoverageScanned", "ParcelCoverageUnscanned",
+        "ReverseReturn", "ReverseMissorted", "ReverseLiquidate", "ReverseConfiscated",
+        "ReverseCompositionReturn", "ReverseCompositionMissorted",
+        "ReverseCompositionLiquidate", "ReverseCompositionConfiscated",
+    ].forEach(function (suffix) {
+        parcelAndReverseElements[suffix] =
+            getElement(`overallAnalysis${suffix}`);
+    });
+
     return {
+        ...parcelAndReverseElements,
         date:
             getElement(
                 "overallAnalysisDate",
@@ -513,6 +540,54 @@ function renderOverallDamageAndLossesTable(
 
 /* RENDERIZAÇÃO */
 
+function renderOverallParcelAndReverse(
+    elements,
+    parcel,
+    reverse,
+) {
+    [
+        ["ParcelScanned", "scannedCount"],
+        ["ParcelBacklog", "backlogCount"],
+        ["ParcelException", "exceptionCount"],
+        ["ParcelMissorted", "missortedCount"],
+    ].forEach(function ([elementKey, field]) {
+        elements[elementKey].textContent =
+            formatOverallAnalysisQuantity(
+                parcel.hasData ? parcel[field] : null,
+            );
+    });
+
+    [
+        ["ParcelCoverageScanned", "expectedScannedCount"],
+        ["ParcelCoverageUnscanned", "expectedUnscannedCount"],
+    ].forEach(function ([elementKey, field]) {
+        elements[elementKey].textContent =
+            formatOverallAnalysisRate(
+                parcel.expectedTotalCount > 0
+                    ? parcel[field] / parcel.expectedTotalCount
+                    : null,
+            );
+    });
+
+    REVERSE_TYPE_KEYS.forEach(function (typeKey) {
+        const suffix =
+            `${typeKey[0].toUpperCase()}${typeKey.slice(1)}`;
+        const quantity = reverse.quantities[typeKey];
+
+        elements[`Reverse${suffix}`].textContent =
+            formatOverallAnalysisQuantity(
+                reverse.hasData ? quantity : null,
+            );
+
+        elements[`ReverseComposition${suffix}`].textContent =
+            reverse.hasData
+                ? `${formatOverallAnalysisQuantity(quantity)} (${overallAnalysisCompositionRateFormatter.format(
+                    reverse.total > 0 ? quantity / reverse.total : 0,
+                )})`
+                : "—";
+    });
+}
+
 function renderOverallAnalysisView(
     data,
 ) {
@@ -706,6 +781,12 @@ function renderOverallAnalysisView(
     renderOverallDamageAndLossesTable(
         elements.damageAndLossesTable,
         data.damageAndLosses,
+    );
+
+    renderOverallParcelAndReverse(
+        elements,
+        data.parcel,
+        data.reverse,
     );
 
     return true;

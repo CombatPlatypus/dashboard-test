@@ -26,6 +26,8 @@ const OVERALL_ANALYSIS_SOURCE_REPORT_IDS =
         "expedition",
         "damage-and-losses",
         "losses-rate",
+        "parcel",
+        "reverse",
     ]);
 
 let overallAnalysisActionsInitialized =

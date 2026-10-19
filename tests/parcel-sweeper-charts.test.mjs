@@ -186,7 +186,7 @@ test("distribuição mantém 8 linhas de 4 células com classificação clicáve
         assert.ok(body.children.every(row => row.children.length === 4));
         body.children.forEach((row, index) => {
             if (index >= count) {
-                assert.deepEqual(row.children.map(cell => cell.textContent), ["-", "-", "-", "-"]);
+                assert.deepEqual(row.children.map(cell => cell.textContent), ["—", "—", "—", "—"]);
                 assert.ok(row.children.every(cell => cell.children.length === 0));
             } else {
                 assert.equal(row.children[0].textContent, `[Ops${index + 1}] Operador`);
@@ -202,11 +202,11 @@ test("distribuição mantém 8 linhas de 4 células com classificação clicáve
     }
 });
 
-test("HTML inicial da distribuição também contém 8 linhas com hífens", () => {
+test("HTML inicial da distribuição também contém 8 linhas com travessões", () => {
     const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
     const body = html.match(/<tbody id="parcelOperatorDistributionBody">([\s\S]*?)<\/tbody>/)[1];
     assert.equal((body.match(/<tr/g) ?? []).length, 8);
-    assert.equal((body.match(/<td>-<\/td>/g) ?? []).length, 32);
+    assert.equal((body.match(/<td>—<\/td>/g) ?? []).length, 32);
     assert.match(html, /<th>Volumoso\?<\/th>/);
     assert.doesNotMatch(body, /colspan/);
 });

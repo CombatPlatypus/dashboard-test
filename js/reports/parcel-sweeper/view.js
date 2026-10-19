@@ -210,7 +210,7 @@ function renderParcelOperatorTable(
 
         for (let column = 0; column < 4; column += 1) {
             const cell = document.createElement("td");
-            cell.textContent = "-";
+            cell.textContent = "—";
             row.appendChild(cell);
         }
 

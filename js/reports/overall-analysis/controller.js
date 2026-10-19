@@ -24,6 +24,16 @@ import {
 } from "../damage-and-losses/losses-state.js";
 
 import {
+    getParcelState,
+    subscribeParcelState,
+} from "../parcel-sweeper/state.js";
+
+import {
+    getReverseState,
+    subscribeReverseState,
+} from "../reverse/state.js";
+
+import {
     createOverallAnalysisData,
 } from "./model.js";
 
@@ -60,6 +70,8 @@ function getCurrentOverallAnalysisData() {
         getReportContext(),
         getDamageAndLossesState(),
         getLossesState(),
+        getParcelState(),
+        getReverseState(),
     );
 }
 
@@ -79,7 +91,7 @@ function renderOverallAnalysisController() {
 
     const actionsRendered =
         renderOverallAnalysisActions(
-            canExportOverallAnalysisController(),
+            canExportOverallAnalysisController(data),
         );
 
     return viewRendered &&
@@ -141,6 +153,14 @@ function initializeOverallAnalysisController() {
         renderOverallAnalysisController,
     );
 
+    subscribeParcelState(
+        renderOverallAnalysisController,
+    );
+
+    subscribeReverseState(
+        renderOverallAnalysisController,
+    );
+
     subscribeReportContext(
         renderOverallAnalysisController,
     );
@@ -167,10 +187,9 @@ function importOverallAnalysisSession() {
     return renderOverallAnalysisController();
 }
 
-function canExportOverallAnalysisController() {
-    const data =
-        getCurrentOverallAnalysisData();
-
+function canExportOverallAnalysisController(
+    data = getCurrentOverallAnalysisData(),
+) {
     return [
         data.flow.planned,
         data.flow.processed,
@@ -181,6 +200,8 @@ function canExportOverallAnalysisController() {
             .hasData
             ? 1
             : null,
+        data.parcel.hasData ? 1 : null,
+        data.reverse.hasData ? 1 : null,
     ].some(
         function (value) {
             return value !== null;

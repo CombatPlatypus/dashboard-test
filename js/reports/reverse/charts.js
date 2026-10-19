@@ -127,19 +127,12 @@ function createReverseCompositionChart(
     );
 }
 
-function renderReverseCharts(
-    state = getReverseState(),
+function updateReverseCompositionChart(
+    chart,
+    summary,
+    updateMode,
 ) {
-    if (!reverseCompositionChart) {
-        return false;
-    }
-
-    const summary =
-        createReverseSummary(
-            state.transfers,
-        );
-
-    reverseCompositionChart
+    chart
         .data.datasets[0].data =
         REVERSE_TYPE_KEYS.map(
             function (typeKey) {
@@ -149,7 +142,7 @@ function renderReverseCharts(
             },
         );
 
-    reverseCompositionChart
+    chart
         .options.plugins
         .reverseCenterText.text =
         summary.hasData
@@ -158,7 +151,22 @@ function renderReverseCharts(
             )
             : "—";
 
-    reverseCompositionChart.update();
+    chart.update(updateMode);
+}
+
+function renderReverseCharts(
+    state = getReverseState(),
+) {
+    if (!reverseCompositionChart) {
+        return false;
+    }
+
+    updateReverseCompositionChart(
+        reverseCompositionChart,
+        createReverseSummary(
+            state.transfers,
+        ),
+    );
 
     return true;
 }
@@ -197,6 +205,7 @@ function initializeReverseCharts(
 
 export {
     createReverseCompositionChart,
+    updateReverseCompositionChart,
     initializeReverseCharts,
     renderReverseCharts,
 };
