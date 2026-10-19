@@ -31,7 +31,20 @@
         <link rel="stylesheet" href="css/docs.css">
         <link rel="stylesheet" href="css/filter.css">
 
-        <style></style>
+        <style>
+
+            .final-report-parcel-and-reverse {
+                gap: 15px;
+            }
+            .final-report-parcel-and-reverse > div {
+                flex: 1 1 0;
+            }
+            .final-report-parcel-and-reverse .chart {
+                margin-top: 15px;
+            }
+
+
+        </style>
     </head>
 
     <!-- CONTEÚDO DA PÁGINA -->
@@ -2879,6 +2892,104 @@
                                             </tbody>
 
                                         </table>
+                                    </div>
+
+                                    <!-- PARCEL E REVERSA -->
+
+                                    <div class="final-report-parcel-and-reverse flex-box-start">
+                                        <div>
+                                            <table>
+                                                <caption>Parcel Sweeper</caption>
+
+                                                <thead>
+                                                    <tr>
+                                                        <th>Total de Bipado</th>
+                                                        <th>Pacotes Backlog</th>
+                                                        <th>Pacotes Exception</th>
+                                                        <th>Pacotes Missorted</th>
+                                                    </tr>
+                                                </thead>
+
+                                                <tbody>
+                                                    <tr>
+                                                        <td id="">—</td>
+                                                        <td id="">—</td>
+                                                        <td id="">—</td>
+                                                        <td id="">—</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+
+                                            <div class="chart doughnut-chart">
+                                                <div class="chart-canvas-container">
+                                                    <canvas id="" role="img" aria-label="Cobertura da varredura entre pacotes escaneados e não escaneados"></canvas>
+                                                </div>
+
+                                                <div class="chart-label">
+                                                    <div class="type">
+                                                        <div style="background-color: #2538a5;"></div>
+                                                        <p>Escaneados <span id="">—</span></p>
+                                                    </div>
+
+                                                    <div class="type">
+                                                        <div style="background-color: #e4e6eb;"></div>
+                                                        <p>Não Escaneados <span id="">—</span></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div>
+                                            <table>
+                                                <caption>Reversa</caption>
+
+                                                <thead>
+                                                    <tr>
+                                                        <th>Return</th>
+                                                        <th>Missorted</th>
+                                                        <th>Liquidate</th>
+                                                        <th>Confiscado</th>
+                                                    </tr>
+                                                </thead>
+
+                                                <tbody>
+                                                    <tr>
+                                                        <td id="">—</td>
+                                                        <td id="">—</td>
+                                                        <td id="">—</td>
+                                                        <td id="">—</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+
+                                            <div class="chart doughnut-chart">
+                                                <div class="chart-canvas-container" id="">
+                                                    <canvas id="" role="img" aria-label="Composição da reversa por tipo"></canvas>
+                                                </div>
+
+                                                <div class="chart-label">
+                                                    <div class="type">
+                                                        <div style="background-color: #007A48;"></div>
+                                                        <p>Return <span id="finalReport-reverseCompositionReturn">—</span></p>
+                                                    </div>
+
+                                                    <div class="type">
+                                                        <div style="background-color: #8B0000;"></div>
+                                                        <p>Missorted <span id="finalReport-reverseCompositionMissorted">—</span></p>
+                                                    </div>
+
+                                                    <div class="type">
+                                                        <div style="background-color: #2538a5;"></div>
+                                                        <p>Liquidate <span id="finalReport-reverseCompositionLiquidate">—</span></p>
+                                                    </div>
+
+                                                    <div class="type">
+                                                        <div style="background-color: #f99400;"></div>
+                                                        <p>Confiscado <span id="finalReport-reverseCompositionConfiscated">—</span></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
