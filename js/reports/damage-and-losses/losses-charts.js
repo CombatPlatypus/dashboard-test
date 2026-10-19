@@ -183,6 +183,9 @@ const lossesPeriodLabelsPlugin = {
                     day.underReview,
                     day.confirmedLosses,
                 ];
+                const hasMultipleTypes =
+                    day.underReview > 0 &&
+                    day.confirmedLosses > 0;
                 const bars = [
                     reviewBars[index],
                     confirmedBars[index],
@@ -192,7 +195,7 @@ const lossesPeriodLabelsPlugin = {
                     function (value, valueIndex) {
                         const bar = bars[valueIndex];
 
-                        if (value <= 0 || !bar) {
+                        if (!hasMultipleTypes || value <= 0 || !bar) {
                             return;
                         }
 

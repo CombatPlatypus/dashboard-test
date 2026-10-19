@@ -246,6 +246,9 @@ const damageChartLabelsPlugin = {
                     day.soc +
                     day.hub;
 
+                const hasMultipleTypes =
+                    day.soc > 0 && day.hub > 0;
+
                 const socElement =
                     socElements[index];
 
@@ -253,7 +256,7 @@ const damageChartLabelsPlugin = {
                     hubElements[index];
 
                 if (
-                    day.soc > 0 &&
+                    hasMultipleTypes &&
                     socElement
                 ) {
                     const properties =
@@ -288,7 +291,7 @@ const damageChartLabelsPlugin = {
                 }
 
                 if (
-                    day.hub > 0 &&
+                    hasMultipleTypes &&
                     hubElement
                 ) {
                     const properties =
