@@ -391,6 +391,7 @@
 
             #expeditionAlignedComparisonChartContainer {
                 height: 1224px !important;
+                padding: 20px;
             }
             #expedition-mistakes .horizontal-bars-chart .chart-canvas-container {
                 height: 313px !important;
