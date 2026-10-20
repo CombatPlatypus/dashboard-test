@@ -76,11 +76,11 @@ const FALLBACK_SPREADSHEET_SETTINGS =
             menuName: "Controle Operacional",
         },
         {
-            spreadsheetId: "19mhzxy8xih2yPfxX6f8ILQJWTgRMhSXv",
+            spreadsheetId: "1FisKLnYYdqg94k6ZFENFIj8nJaCv4-rr4TeCHm4mCSw",
             menuName: "Stuck Orders",
         },
         {
-            spreadsheetId: "1pmKMyhiQdRU787MHdKFZEjwVqG6IIeLB6glOK3m-uMc",
+            spreadsheetId: "18jFdAElZYUlGEQaAMrUdqLu6Ux_LyQupyq9N-m-jLg0",
             menuName: "Controle de Endereços",
         },
         {
