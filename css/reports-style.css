@@ -390,7 +390,7 @@
             /* EXPEDIÇÃO */
 
             #expeditionAlignedComparisonChartContainer {
-                height: 1224px !important;
+                min-height: 1224px !important;
                 padding: 20px;
             }
             #expedition-mistakes .horizontal-bars-chart .chart-canvas-container {
@@ -449,7 +449,7 @@
         /* CONTROLES */
 
         #receipt-controls #receipt-controls-1 .input-group {
-            max-height: 544px;
+            max-height: 542px;
         }
         #receipt-controls #receipt-controls-2 .input-group {
             max-height: 559px;
