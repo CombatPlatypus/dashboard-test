@@ -26,16 +26,13 @@ const DAMAGE_HUB_STATION =
     "LM Hub_SP_Santos_PraiaGrande_02";
 
 const DAMAGE_HISTORY_SHEET_NAME =
-    "historico de avarias";
+    "historico de avarias e perdas";
 
 const DAMAGE_PRODUCT_SHEET_NAME =
     "avarias recebidas";
 
 const DAMAGE_BASE_SHEET_NAME =
     "base de avarias";
-
-const LOSSES_HISTORY_SHEET_NAME =
-    "historico de analises";
 
 const LOSSES_BASE_SHEET_NAME =
     "base de analises";
@@ -209,25 +206,9 @@ function findColumnsByAliases(
 }
 
 function isDamageHistorySheetName(value) {
-    const normalizedValue =
-        normalizeDamageSearchText(value);
-
-    return normalizedValue ===
-        DAMAGE_HISTORY_SHEET_NAME ||
-        /^hist.*avarias$/.test(
-            normalizedValue,
-        );
-}
-
-function isLossesHistorySheetName(value) {
-    const normalizedValue =
-        normalizeDamageSearchText(value);
-
-    return normalizedValue ===
-        LOSSES_HISTORY_SHEET_NAME ||
-        /^hist.*an.*lises$/.test(
-            normalizedValue,
-        );
+    return normalizeDamageSearchText(
+        value,
+    ) === DAMAGE_HISTORY_SHEET_NAME;
 }
 
 function isDamageProductSheetName(value) {
@@ -275,15 +256,6 @@ function incrementDamageSocStation(
             name: stationName,
             count: 1,
         },
-    );
-}
-
-function findDamageColumns(
-    row,
-) {
-    return findColumnsByAliases(
-        row,
-        damageColumnAliases,
     );
 }
 
@@ -461,8 +433,10 @@ function findDamageProductSource(
     );
 }
 
-function findDamageMonthSource(
+function findHistorySectionSource(
     workbook,
+    sectionName,
+    aliasesByField,
     {
         required = true,
     } = {},
@@ -482,7 +456,7 @@ function findDamageMonthSource(
         }
 
         throw new Error(
-            "O arquivo não possui a aba Histórico de Avarias.",
+            "O arquivo não possui a aba Histórico de Avarias e Perdas.",
         );
     }
 
@@ -509,38 +483,109 @@ function findDamageMonthSource(
             MAX_DAMAGE_HEADER_SEARCH_ROWS,
         );
 
+    const normalizedSectionName =
+        normalizeDamageSearchText(sectionName);
+
+    let sectionRowIndex = -1;
+    let startColumn = -1;
+    let endColumn;
+
     for (
         let rowIndex = 0;
         rowIndex < searchLimit;
         rowIndex += 1
     ) {
+        const titleRow = rows[rowIndex];
+        startColumn = titleRow.findIndex(
+            function (value) {
+                return normalizeDamageSearchText(value) ===
+                    normalizedSectionName;
+            },
+        );
+
+        if (startColumn < 0) {
+            continue;
+        }
+
+        sectionRowIndex = rowIndex;
+
+        // Os blocos lado a lado repetem os mesmos cabeçalhos.
+        // Limite a busca às colunas do título correspondente.
+        const nextTitleColumn = titleRow.findIndex(
+            function (value, columnIndex) {
+                return columnIndex > startColumn &&
+                    normalizeDamageText(value) !== "";
+            },
+        );
+        endColumn = nextTitleColumn < 0
+            ? undefined
+            : nextTitleColumn;
+        break;
+    }
+
+    if (sectionRowIndex < 0) {
+        throw new Error(
+            `A aba ${sheetName} não possui o bloco ${sectionName}.`,
+        );
+    }
+
+    for (
+        let rowIndex = sectionRowIndex + 1;
+        rowIndex < searchLimit;
+        rowIndex += 1
+    ) {
         const columns =
-            findDamageColumns(
-                rows[rowIndex],
+            findColumnsByAliases(
+                rows[rowIndex].slice(
+                    startColumn,
+                    endColumn,
+                ),
+                aliasesByField,
             );
 
         if (columns) {
             return {
                 sheetName,
                 rows,
-                columns,
+                columns: Object.fromEntries(
+                    Object.entries(columns).map(
+                        function ([field, columnIndex]) {
+                            return [
+                                field,
+                                startColumn + columnIndex,
+                            ];
+                        },
+                    ),
+                ),
                 headerRowIndex:
                     rowIndex,
-                baseSource:
-                    findDamageBaseSource(
-                        workbook,
-                    ),
-                productSource:
-                    findDamageProductSource(
-                        workbook,
-                    ),
             };
         }
     }
 
     throw new Error(
-        `A aba ${sheetName} não possui as colunas Data e Código BR.`,
+        `O bloco ${sectionName} da aba ${sheetName} não possui as colunas necessárias: Data, Código BR${aliasesByField.situation ? " e Situação" : ""}.`,
     );
+}
+
+function findDamageMonthSource(
+    workbook,
+    options,
+) {
+    const source = findHistorySectionSource(
+        workbook,
+        "Histórico de Avarias",
+        damageColumnAliases,
+        options,
+    );
+
+    return source
+        ? {
+            ...source,
+            baseSource: findDamageBaseSource(workbook),
+            productSource: findDamageProductSource(workbook),
+        }
+        : null;
 }
 
 function classifyDamageProductType(
@@ -714,13 +759,6 @@ function parseDamageDate(
         : null;
 }
 
-function findLossesColumns(row) {
-    return findColumnsByAliases(
-        row,
-        lossesColumnAliases,
-    );
-}
-
 function findLossesRecoveryColumns(row) {
     return findColumnsByAliases(
         row,
@@ -883,86 +921,22 @@ function findLossesReturnedSource(workbook) {
 
 function findLossesMonthSource(
     workbook,
-    {
-        required = true,
-    } = {},
+    options,
 ) {
-    const sheetName =
-        workbook.SheetNames.find(
-            function (receivedSheetName) {
-                return isLossesHistorySheetName(
-                    receivedSheetName,
-                );
-            },
-        );
+    const source = findHistorySectionSource(
+        workbook,
+        "Histórico de Perdas",
+        lossesColumnAliases,
+        options,
+    );
 
-    if (!sheetName) {
-        if (!required) {
-            return null;
+    return source
+        ? {
+            ...source,
+            recoverySource: findLossesRecoverySource(workbook),
+            returnedSource: findLossesReturnedSource(workbook),
         }
-
-        throw new Error(
-            "O arquivo não possui a aba Histórico de Análises.",
-        );
-    }
-
-    const worksheet =
-        workbook.Sheets[sheetName];
-    const rows =
-        window.XLSX.utils.sheet_to_json(
-            worksheet,
-            {
-                header: 1,
-                defval: "",
-                raw: true,
-                blankrows: false,
-            },
-        );
-    const searchLimit =
-        Math.min(
-            rows.length,
-            MAX_DAMAGE_HEADER_SEARCH_ROWS,
-        );
-    let columns = null;
-    let headerRowIndex = -1;
-
-    for (
-        let rowIndex = 0;
-        rowIndex < searchLimit;
-        rowIndex += 1
-    ) {
-        columns =
-            findLossesColumns(rows[rowIndex]);
-
-        if (columns) {
-            headerRowIndex = rowIndex;
-            break;
-        }
-    }
-
-    if (!columns) {
-        throw new Error(
-            `A aba ${sheetName} não possui as colunas Data, Código BR e Situação.`,
-        );
-    }
-
-    const recoverySource =
-        findLossesRecoverySource(
-            workbook,
-        );
-    const returnedSource =
-        findLossesReturnedSource(
-            workbook,
-        );
-
-    return {
-        sheetName,
-        rows,
-        columns,
-        headerRowIndex,
-        recoverySource,
-        returnedSource,
-    };
+        : null;
 }
 
 function classifyLossesRecovery(value) {

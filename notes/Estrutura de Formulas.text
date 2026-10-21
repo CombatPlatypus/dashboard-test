@@ -81,3 +81,41 @@ CONDIÇÕES E LÓGICA
             "Acompanhar";
             "Outros"
         )
+    
+PROCX
+
+    A estrutura principal:
+
+    =PROCX(
+        valor_procurado;
+        intervalo_de_busca;
+        intervalo_de_retorno;
+        valor_se_não_encontrar
+    )
+
+    Vamos buscar a estação de um BR:
+
+    =PROCX(
+        A2;
+        'Base de Avarias'!A2:A;
+        'Base de Avarias'!C2:C;
+        "" // "", indica que a função deve retornar vazio caso não encontre o BR.
+    )
+
+    Por padrão, PROCX procura da primeira linha para a última. Portanto, se o BR aparecer três vezes, normalmente a função retornará o resultado da primeira ocorrência.
+
+    =PROCX(
+        A2;
+        'Base de Avarias'!A2:A;
+        'Base de Avarias'!B2:B;
+        "";
+        0;
+        -1
+    )
+
+    Os dois novos argumentos significam:
+
+        - 0: correspondência exata.
+        - -1: pesquisar de baixo para cima.
+
+        Assim, você obtém a última ocorrência física da tabela.

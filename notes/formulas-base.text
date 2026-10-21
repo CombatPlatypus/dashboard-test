@@ -181,43 +181,6 @@ IMPORTRANGE (FÓRMULA PARA IMPORTAR DADOS DE OUTRA PLANILHA)
         0
     )
 
-PROCX
-
-    A estrutura principal:
-
-    =PROCX(
-        valor_procurado;
-        intervalo_de_busca;
-        intervalo_de_retorno;
-        valor_se_não_encontrar
-    )
-
-    Vamos buscar a estação de um BR:
-
-    =PROCX(
-        A2;
-        'Base de Avarias'!A2:A;
-        'Base de Avarias'!C2:C;
-        "" // "", indica que a função deve retornar vazio caso não encontre o BR.
-    )
-
-    Por padrão, PROCX procura da primeira linha para a última. Portanto, se o BR aparecer três vezes, normalmente a função retornará o resultado da primeira ocorrência.
-
-    =PROCX(
-        A2;
-        'Base de Avarias'!A2:A;
-        'Base de Avarias'!B2:B;
-        "";
-        0;
-        -1
-    )
-
-    Os dois novos argumentos significam:
-
-        - 0: correspondência exata.
-        - -1: pesquisar de baixo para cima.
-
-        Assim, você obtém a última ocorrência física da tabela.
 
 ARRAYFORMULA
 
@@ -763,6 +726,9 @@ EXEMPLOS PRATICOS
 ={"Taxa de Erros"; SEERRO(MAP(J10:J;L10:L;LAMBDA(rua;erros;SE(rua="";""; SEERRO(erros/E3;0))))) }
 
 
+={'Taxa de Perdas'!K10 }
+
+
 ='Análise de Erros'!B2
 
 =SORT(
@@ -774,3 +740,38 @@ EXEMPLOS PRATICOS
     FALSO
 )
 
+
+
+={"Situação"; QUERY(
+
+    { ARRAYFORMULA(ESQUERDA('Base de Expedição'!B2:B;1)) \ }
+
+)
+
+    PROCX(C3:C;'Base de Avarias'!B3:B;'Base de Avarias'!C3:C;"")
+    
+}
+
+
+={
+    "Situação";
+
+    ARRAYFORMULA(
+        SE(
+            C3:C="";
+            "";
+            PROCX(
+                
+                C3:C;
+
+                'Base de Avarias'!A3:A;
+                
+                ARRAYFORMULA(SE('Base de Avarias'!C3:C<>"LM Hub_SP_Santos_PraiaGrande_02";"Não Recebido";"Recebido"));
+
+                ""
+            )
+        )
+    )
+}
+
+LM Hub_SP_Santos_PraiaGrande_02

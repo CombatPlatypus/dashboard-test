@@ -2,6 +2,9 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { beforeEach, test } from "node:test";
+import {
+    createDamageAndLossesWorkbook as createLossesWorkbook,
+} from "./fixtures/damage-and-losses-workbook.mjs";
 
 import {
     createLossesMonthData,
@@ -16,59 +19,6 @@ import { initializeLossesCharts } from "../js/reports/damage-and-losses/losses-c
 
 const require = createRequire(import.meta.url);
 const XLSX = require("../js/libraries/xlsx.full.min.js");
-
-function createLossesWorkbook(
-    returnedSheetName = "Históricos de Retornados",
-) {
-    const workbook = XLSX.utils.book_new();
-    const history = XLSX.utils.aoa_to_sheet([
-        ["Data", "Código BR", "Situação"],
-        [new Date(2026, 9, 1, 12), "BR1", "Lost"],
-        [new Date(2026, 9, 2, 12), "BR2", "Em Análise"],
-        [new Date(2026, 9, 3, 12), "BR3", "Lost"],
-        [new Date(2026, 9, 3, 12), "BR4", "Lost"],
-    ]);
-    const base = XLSX.utils.aoa_to_sheet([
-        [
-            "Data",
-            "Código BR",
-            "Situação",
-            "Rota",
-            "AT",
-            "ID do Motorista",
-            "Motorista",
-            "Produto",
-            "Pack Recovery",
-        ],
-        [new Date(2026, 9, 1, 12), "BR1", "Lost", "", "", "", "", "", "Feito"],
-        [new Date(2026, 9, 2, 12), "BR2", "Em Análise", "", "", "", "", "", "Não Feito"],
-        [new Date(2026, 9, 3, 12), "BR3", "Lost", "", "", "", "", "", "ID Inválido"],
-        [new Date(2026, 9, 3, 12), "BR4", "Lost", "", "", "", "", "", "-"],
-    ]);
-    const returned = XLSX.utils.aoa_to_sheet([
-        ["Semana", "Devolução", "Expedição", "Código BR"],
-        ["W40", new Date(2026, 9, 2, 12), new Date(2026, 9, 1, 12), "RET1"],
-        ["W40", new Date(2026, 9, 3, 12), new Date(2026, 9, 2, 12), "RET2"],
-    ]);
-
-    XLSX.utils.book_append_sheet(
-        workbook,
-        history,
-        "Histórico de Análises",
-    );
-    XLSX.utils.book_append_sheet(
-        workbook,
-        base,
-        "Base de Análises",
-    );
-    XLSX.utils.book_append_sheet(
-        workbook,
-        returned,
-        returnedSheetName,
-    );
-
-    return workbook;
-}
 
 beforeEach(() => {
     globalThis.window = { XLSX };
