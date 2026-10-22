@@ -33,6 +33,12 @@ function isLossesReportActive(panel) {
 }
 
 function canExportDamageReport(panel) {
+    if (panel?.querySelector("#consolidated-history")?.classList.contains("is-active")) {
+        const damage = getDamageAndLossesState();
+        const losses = getLossesState();
+        return getDamageAndLossesSummary(damage).hasData ||
+            getLossesSummary(losses).hasData || damage.history.length > 0 || losses.history.length > 0;
+    }
     return isLossesReportActive(panel)
         ? getLossesSummary(
             getLossesState(),
@@ -61,6 +67,7 @@ function renderDamageActionButtons(
 
 function createDamageReportFileName(
     isLossesReport,
+    isConsolidatedReport = false,
 ) {
     const date =
         new Intl.DateTimeFormat(
@@ -69,7 +76,9 @@ function createDamageReportFileName(
             .format(new Date())
             .replace(/\//g, "-");
 
-    return `relatorio-de-${isLossesReport ? "perdas" : "avarias"}-${date}.png`;
+    return isConsolidatedReport
+        ? `historico-consolidado-${date}.png`
+        : `relatorio-de-${isLossesReport ? "perdas" : "avarias"}-${date}.png`;
 }
 
 async function runDamageReportExport({
@@ -93,8 +102,16 @@ async function runDamageReportExport({
     const isLossesReport =
         isLossesReportActive(panel);
 
+    const isConsolidatedReport =
+        panel.querySelector("#consolidated-history")?.classList.contains("is-active") === true;
+    const reportLabel = isConsolidatedReport
+        ? "histórico consolidado"
+        : isLossesReport ? "perdas" : "avarias";
+
     const exportArea =
-        isLossesReport
+        isConsolidatedReport
+            ? panel.querySelector("#consolidatedExportArea")
+            : isLossesReport
             ? lossesExportArea
             : damageExportArea;
 
@@ -138,6 +155,7 @@ async function runDamageReportExport({
                 blob,
                 createDamageReportFileName(
                     isLossesReport,
+                    isConsolidatedReport,
                 ),
             );
         }
@@ -148,8 +166,8 @@ async function runDamageReportExport({
             type: "success",
             message:
                 isCopy
-                    ? `Relatório de ${isLossesReport ? "perdas" : "avarias"} copiado.`
-                    : `Relatório de ${isLossesReport ? "perdas" : "avarias"} baixado.`,
+                    ? `Relatório de ${reportLabel} copiado.`
+                    : `Relatório de ${reportLabel} baixado.`,
         });
     } catch (error) {
         console.error(
@@ -162,7 +180,7 @@ async function runDamageReportExport({
                 "damage-and-losses",
             type: "error",
             message:
-                `Não foi possível exportar o relatório de ${isLossesReport ? "perdas" : "avarias"}.`,
+                `Não foi possível exportar o relatório de ${reportLabel}.`,
         });
     } finally {
         damageExportBusy = false;

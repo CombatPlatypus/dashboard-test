@@ -1,3 +1,5 @@
+import { normalizeOccurrenceHistory } from "./history.js";
+
 const DAMAGE_MONTH_NAMES =
     Object.freeze([
         "Janeiro",
@@ -227,6 +229,7 @@ function createInitialDamageState() {
         sourceSheetName: "",
         days: [],
         socStations: [],
+        history: [],
     };
 }
 
@@ -235,6 +238,7 @@ const damageAndLossesState =
 
 function getDamageAndLossesState() {
     return {
+        history: damageAndLossesState.history.map(record => ({ ...record })),
         monthIndex:
             damageAndLossesState
                 .monthIndex,
@@ -515,6 +519,8 @@ function replaceDamageAndLossesData(
                     ]
             ),
         );
+
+    damageAndLossesState.history = normalizeOccurrenceHistory(values.history);
 
     notifyDamageAndLossesState({
         type: "damage-data-replaced",

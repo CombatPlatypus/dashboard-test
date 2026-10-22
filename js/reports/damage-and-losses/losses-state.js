@@ -2,6 +2,8 @@ import {
     DAMAGE_MONTH_NAMES,
 } from "./state.js";
 
+import { normalizeOccurrenceHistory } from "./history.js";
+
 const lossesStateListeners =
     new Set();
 
@@ -74,6 +76,7 @@ function createInitialLossesState() {
         sourceFileName: "",
         sourceSheetName: "",
         days: [],
+        history: [],
     };
 }
 
@@ -82,6 +85,7 @@ const lossesState =
 
 function getLossesState() {
     return {
+        history: lossesState.history.map(record => ({ ...record })),
         monthIndex: lossesState.monthIndex,
         monthName: lossesState.monthName,
         year: lossesState.year,
@@ -205,6 +209,8 @@ function replaceLossesData(values = {}) {
                 );
             },
         );
+
+    lossesState.history = normalizeOccurrenceHistory(values.history);
 
     notifyLossesState({
         type: "losses-data-replaced",

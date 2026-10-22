@@ -59,6 +59,11 @@ const damageColumnAliases =
             "package code",
             "tracking number",
         ],
+
+        situation: [
+            "situacao",
+            "status",
+        ],
     });
 
 const damageBaseColumnAliases =
@@ -1515,6 +1520,22 @@ function createDamageMonthData(
     );
 }
 
+function createOccurrenceHistory(source) {
+    const history = [];
+    for (const row of source.rows.slice(source.headerRowIndex + 1)) {
+        const date = parseDamageDate(row?.[source.columns.date]);
+        const packageCode = normalizeDamageText(row?.[source.columns.packageCode]);
+        if (date && packageCode) {
+            history.push({
+                date: date.key,
+                packageCode,
+                situation: normalizeDamageText(row?.[source.columns.situation]),
+            });
+        }
+    }
+    return history;
+}
+
 async function readDamageAndLossesFile(
     file,
     date = new Date(),
@@ -1584,6 +1605,8 @@ async function readDamageAndLossesFile(
                 date,
             ),
 
+            history: createOccurrenceHistory(source),
+
             sourceFileName:
                 file.name,
 
@@ -1597,6 +1620,8 @@ async function readDamageAndLossesFile(
                 lossesSource,
                 date,
             ),
+
+            history: createOccurrenceHistory(lossesSource),
 
             sourceFileName:
                 file.name,
@@ -1629,6 +1654,7 @@ function synchronizeLossesRateReport(
 ) {
     return replaceLossesRateHistory(
         result.lossesRate.history,
+        { year: Math.max(result.damage.year, result.losses.year) },
     );
 }
 

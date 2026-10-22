@@ -270,6 +270,7 @@ function getLossesRateMonthSummary(
 
 function replaceLossesRateHistory(
     months,
+    { year = lossesRateState.year } = {},
 ) {
     if (
         !Array.isArray(
@@ -277,6 +278,10 @@ function replaceLossesRateHistory(
         )
     ) {
         return false;
+    }
+
+    if (Number.isSafeInteger(year) && year >= 2000) {
+        lossesRateState.year = year;
     }
 
     lossesRateState.months =

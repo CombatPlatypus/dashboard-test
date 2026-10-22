@@ -39,15 +39,40 @@
             }
             .consolidated-history > div {
                 flex: 1 1 0;
+                max-height: 412px;
+                overflow: auto;
+                border: 1px solid var(--color-border);
+                border-radius: 4px;
             }
-            #consolidated-history > div caption .flex-box-start button img {
+            .consolidated-history > div::-webkit-scrollbar {
+                width: 7px;
+                height: 5px;
+                background-color: var(--color-container-focus);
+                border-left: 1px solid var(--color-border);
+            }
+            .consolidated-history > div::-webkit-scrollbar-thumb {
+                border-radius: 0px 3px 3px 0px;
+                background-color: var(--color-text);
+            }
+            .consolidated-history > div::-webkit-scrollbar-track {
+                background-color: transparent;
+            }
+            .consolidated-history > div caption .flex-box-start button img {
                 width: 20px;
                 cursor: pointer;
             }
-            #consolidated-history > div caption .flex-box-start {
+            .consolidated-history > div caption .flex-box-start {
                 gap: 10px;
                 width: max-content;
             }
+            .consolidated-history div table thead {
+                position: sticky;
+                top: 0;
+                z-index: 1;
+                background-color: var(--color-table-th);
+            }
+
+
         </style>
     </head>
 
@@ -1738,17 +1763,18 @@
 
                                     <!-- HISTÓRICO CONSOLIDADO -->
 
-                                    <div class="tabs-panel is-active" id="consolidated-history">
+                                    <div class="tabs-panel" id="consolidated-history">
                                         <div class="preview-style" id="consolidatedExportArea">
                                             <div class="title">
                                                 <h2>Histórico Consolidado</h2>
+                                                <p id="consolidatedPeriodLabel">Indicadores do mês atual</p>
                                             </div>
 
                                             <div class="cards">
                                                 <div>
                                                     <div class="flex-box-start">
                                                         <img src="images/geral-icons/hub-icon.svg">
-                                                        <h4 id="">—</h4>
+                                                        <h4 id="consolidatedHubValue">—</h4>
                                                     </div>
 
                                                     <p id="">Avarias do Hub</p>
@@ -1757,7 +1783,7 @@
                                                 <div>
                                                     <div class="flex-box-start">
                                                         <img src="images/geral-icons/truck-icon.svg">
-                                                        <h4 id="">—</h4>
+                                                        <h4 id="consolidatedSocValue">—</h4>
                                                     </div>
 
                                                     <p id="">Avarias do SOC</p>
@@ -1767,7 +1793,7 @@
                                                 <div>
                                                     <div class="flex-box-start">
                                                         <img src="images/geral-icons/percentage-icon.svg">
-                                                        <h4 id="">—</h4>
+                                                        <h4 id="consolidatedLossRateValue">—</h4>
                                                     </div>
 
                                                     <p id="">Taxa de Perdas</p>
@@ -1777,7 +1803,7 @@
                                                 <div>
                                                     <div class="flex-box-start">
                                                         <img src="images/geral-icons/clock-icon.svg">
-                                                        <h4 id="">—</h4>
+                                                        <h4 id="consolidatedUnderReviewValue">—</h4>
                                                     </div>
 
                                                     <p>Pacotes em Análise</p>
@@ -1786,7 +1812,7 @@
                                                 <div>
                                                     <div class="flex-box-start">
                                                         <img src="images/geral-icons/alert-icon.svg">
-                                                        <h4 id="">—</h4>
+                                                        <h4 id="consolidatedConfirmedLossesValue">—</h4>
                                                     </div>
 
                                                     <p>Perdas Confirmadas</p>
@@ -1797,15 +1823,15 @@
 
                                                 <!-- HISTÓRICO DE AVARIAS -->
 
-                                                <div>
-                                                    <table id="">
+                                                <div class="consolidated-history-table" tabindex="0" role="region" aria-label="Histórico completo de avarias">
+                                                    <table id="consolidatedDamageHistoryTable">
                                                         <caption>
                                                             <div class="flex-box-start">
 
                                                                 <span>Histórico de Avarias</span>
 
-                                                                <button id="" type="button" disabled>
-                                                                    <img src="images/geral-icons/copy-mini-icon.svg">
+                                                                <button id="consolidatedCopyDamageButton" type="button" title="Copiar todo o histórico de avarias" aria-label="Copiar todo o histórico de avarias" data-html2canvas-ignore="true" disabled>
+                                                                    <img src="images/geral-icons/copy-mini-icon.svg" alt="">
                                                                 </button>
                                                             </div>
                                                         </caption>
@@ -1818,7 +1844,7 @@
                                                             </tr>
                                                         </thead>
 
-                                                        <tbody id="">
+                                                        <tbody id="consolidatedDamageHistoryBody">
                                                             <tr class="empty-row">
                                                                 <td colspan="3">—</td>
                                                             </tr>
@@ -1835,7 +1861,7 @@
                                                         </div>
 
                                                         <div class="chart-canvas-container">
-                                                            <canvas id="consolidatedCompositionChart">
+                                                            <canvas id="consolidatedCompositionChart" role="img" aria-label="Composição das ocorrências: sem dados importados.">
                                                                 Seu navegador não suporta gráficos em canvas.
                                                             </canvas>
                                                         </div>
@@ -1853,27 +1879,23 @@
 
                                                             <div class="type">
                                                                 <div style="background-color: #f99400;"></div>
-                                                                <p>Avarias <span id="consolidatedCompositionDamage">—</span></p>
+                                                                <p>Avarias (Hub) <span id="consolidatedCompositionDamage">—</span></p>
                                                             </div>
                                                         </div>
                                                     </div>
-
-
-
-
                                                 </div>
 
                                                 <!-- HISTÓRICO DE PERDAS -->
 
-                                                <div>
-                                                    <table id="">
+                                                <div class="consolidated-history-table" tabindex="0" role="region" aria-label="Histórico completo de perdas">
+                                                    <table id="consolidatedLossesHistoryTable">
                                                         <caption>
                                                             <div class="flex-box-start">
 
                                                                 <span>Histórico de Perdas</span>
 
-                                                                <button id="" type="button" disabled>
-                                                                    <img src="images/geral-icons/copy-mini-icon.svg">
+                                                                <button id="consolidatedCopyLossesButton" type="button" title="Copiar todo o histórico de perdas" aria-label="Copiar todo o histórico de perdas" data-html2canvas-ignore="true" disabled>
+                                                                    <img src="images/geral-icons/copy-mini-icon.svg" alt="">
                                                                 </button>
                                                             </div>
                                                         </caption>
@@ -1886,7 +1908,7 @@
                                                             </tr>
                                                         </thead>
 
-                                                        <tbody id="">
+                                                        <tbody id="consolidatedLossesHistoryBody">
                                                             <tr class="empty-row">
                                                                 <td colspan="3">—</td>
                                                             </tr>

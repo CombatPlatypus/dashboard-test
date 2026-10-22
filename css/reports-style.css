@@ -838,6 +838,74 @@
 
     /* AVARIAS E PERDAS */
 
+    #reports #consolidated-history .cards {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+    #reports #consolidatedPeriodLabel {
+        margin: 8px 0 0;
+        color: var(--color-gray-p);
+        font-size: 13px;
+        text-align: center;
+    }
+    #reports .consolidated-history {
+        align-items: flex-start;
+    }
+    #reports .consolidated-history > div {
+        min-width: 0;
+    }
+    #reports .consolidated-history-table table {
+        width: 100%;
+    }
+    #reports .consolidated-history-table caption {
+        position: sticky;
+        top: 0;
+        height: 42px;
+        z-index: 2;
+    }
+    #reports .consolidated-history-table thead th {
+        position: sticky;
+        top: 42px;
+        z-index: 1;
+    }
+    #reports .consolidated-history-table th:first-child {
+        width: 25%;
+    }
+    #reports .consolidated-history-table th:nth-child(2) {
+        width: 43%;
+    }
+    #reports .consolidated-history-table caption .flex-box-start {
+        margin-inline: auto;
+    }
+    #reports .consolidated-history-table button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    #reports .consolidated-history-table button:disabled {
+        opacity: 0.4;
+        cursor: default;
+    }
+    #reports .consolidated-history-table button:focus-visible,
+    #reports .consolidated-history-table:focus-visible {
+        outline: 2px solid var(--color-text);
+        outline-offset: -2px;
+    }
+    #reports #consolidated-history .chart-label {
+        flex-wrap: wrap;
+    }
+    @media screen and (max-width: 1100px) {
+        #reports .consolidated-history {
+            flex-direction: column;
+        }
+        #reports .consolidated-history > div {
+            flex: auto;
+            width: 100%;
+        }
+        #reports #consolidated-history .cards {
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        }
+    }
+
     #reports #damage-and-losses .cards > div > .flex-box-start > img {
         width: 35px;
     }

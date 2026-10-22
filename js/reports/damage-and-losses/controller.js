@@ -42,6 +42,8 @@ import {
     initializeDamageAndLossesActions,
 } from "./actions.js";
 
+import { initializeConsolidatedView, renderConsolidatedView } from "./consolidated-view.js";
+
 let damageAndLossesControllerInitialized =
     false;
 
@@ -69,6 +71,7 @@ function initializeDamageAndLossesController() {
             initializeDamageAndLossesCharts,
             initializeLossesView,
             initializeLossesCharts,
+            initializeConsolidatedView,
             initializeDamageAndLossesImport,
             initializeDamageAndLossesActions,
         ]
@@ -107,7 +110,8 @@ function renderDamageAndLossesController() {
         ) &&
         renderLossesCharts(
             getLossesState(),
-        )
+        ) &&
+        renderConsolidatedView()
     );
 }
 
