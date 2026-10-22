@@ -850,13 +850,13 @@
     #reports .consolidated-history-table table {
         width: 100%;
     }
-    #reports .consolidated-history-table caption {
+    /* #reports .consolidated-history-table caption {
         position: sticky;
         top: 0;
         height: 42px;
         z-index: 2;
         border-bottom: 1px solid var(--color-border);
-    }
+    } */
     #reports .consolidated-history-table thead th {
         position: sticky;
         top: 42px;
@@ -868,9 +868,9 @@
     #reports .consolidated-history-table th:nth-child(2) {
         width: 43%;
     }
-    #reports .consolidated-history-table caption .flex-box-start {
+    /* #reports .consolidated-history-table caption .flex-box-start {
         margin-inline: auto;
-    }
+    } */
     #reports .consolidated-history-table button {
         display: inline-flex;
         align-items: center;
