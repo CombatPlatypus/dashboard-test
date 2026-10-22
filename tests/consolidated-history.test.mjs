@@ -10,7 +10,7 @@ import {
 import { getDamageAndLossesState } from "../js/reports/damage-and-losses/state.js";
 import { getLossesState } from "../js/reports/damage-and-losses/losses-state.js";
 import { getConsolidatedSummary } from "../js/reports/damage-and-losses/consolidated-model.js";
-import { createHistoryClipboardText, normalizeOccurrenceHistory } from "../js/reports/damage-and-losses/history.js";
+import { createHistoryClipboardText, getMonthlyOccurrenceHistory, normalizeOccurrenceHistory } from "../js/reports/damage-and-losses/history.js";
 import { createConsolidatedCompositionChart } from "../js/reports/damage-and-losses/consolidated-charts.js";
 import { getLossesRateState, replaceLossesRateHistory, resetLossesRateReport } from "../js/reports/losses-rate/state.js";
 
@@ -29,7 +29,7 @@ async function importWorkbook(workbook = createDamageAndLossesWorkbook()) {
     return readDamageAndLossesFile({ name: "teste.xlsx", arrayBuffer: async () => bytes }, referenceDate);
 }
 
-test("mantém todo o histórico das duas tabelas, inclusive meses anteriores e avarias sem estação", async () => {
+test("preserva todos os meses no estado, inclusive avarias sem estação, para filtrar a exibição", async () => {
     const workbook = createDamageAndLossesWorkbook();
     const sheet = workbook.Sheets["Histórico de Avarias e Perdas"];
     XLSX.utils.sheet_add_aoa(sheet, [
@@ -47,6 +47,48 @@ test("mantém todo o histórico das duas tabelas, inclusive meses anteriores e a
     assert.equal(damageHistory.at(-1).situation, "Não Recebido");
     assert.equal(lossesHistory.length, 5);
     assert.deepEqual(lossesHistory.at(-1), { date: "2026-01-02", packageCode: "PERDA-ANTIGA", situation: "Lost" });
+});
+
+test("histórico mensal prioriza o mês atual e mantém data decrescente sem alterar a origem", () => {
+    const records = Object.freeze([
+        { date: "2026-09-30", packageCode: "BR-ANTERIOR" },
+        { date: "2026-10-01", packageCode: "BR-PRIMEIRO" },
+        { date: "2026-11-01", packageCode: "BR-FUTURO" },
+        { date: "2026-10-21", packageCode: "BR-ULTIMO" },
+    ].map(Object.freeze));
+    assert.deepEqual(getMonthlyOccurrenceHistory(records, referenceDate).map(row => row.packageCode),
+        ["BR-ULTIMO", "BR-PRIMEIRO"]);
+    assert.equal(records[0].packageCode, "BR-ANTERIOR");
+    assert.equal(records.length, 4);
+});
+
+test("histórico mensal considera só datas reais e BR preenchido antes de decidir o mês anterior", () => {
+    const records = [
+        { date: "2026-10-32", packageCode: "BR-DATA-INVALIDA" },
+        { date: "2026-10-20", packageCode: "  " },
+        { date: "2026-10-15" },
+        { date: "2026-09-30", packageCode: "BR-VALIDO", situation: "Não Recebido" },
+        { date: "2026-08-31", packageCode: "BR-ANTIGO" },
+    ];
+    assert.deepEqual(getMonthlyOccurrenceHistory(records, referenceDate), [
+        { date: "2026-09-30", packageCode: "BR-VALIDO", situation: "Não Recebido" },
+    ]);
+    assert.deepEqual(getMonthlyOccurrenceHistory(records.slice(0, 3), referenceDate), []);
+    assert.deepEqual(getMonthlyOccurrenceHistory([records.at(-1)], referenceDate), []);
+    assert.deepEqual(getMonthlyOccurrenceHistory(null, referenceDate), []);
+});
+
+test("histórico mensal trata dezembro do ano anterior e ignora o mesmo mês de outro ano", () => {
+    const records = [
+        { date: "2025-12-31", packageCode: "BR-DEZEMBRO" },
+        { date: "2025-01-10", packageCode: "BR-OUTRO-ANO" },
+    ];
+    assert.equal(getMonthlyOccurrenceHistory(records, new Date(2026, 0, 31, 12))[0].packageCode, "BR-DEZEMBRO");
+    assert.deepEqual(getMonthlyOccurrenceHistory([records[1]], new Date(2026, 0, 1, 12)), []);
+    assert.deepEqual(getMonthlyOccurrenceHistory([
+        { date: "2026-02-29", packageCode: "BR-DATA-INVALIDA" },
+        { date: "2026-01-31", packageCode: "BR-JANEIRO" },
+    ], new Date(2026, 1, 1, 12)).map(row => row.packageCode), ["BR-JANEIRO"]);
 });
 
 test("salva, restaura e limpa os históricos sem perder os totais nem alterar os snapshots", async () => {

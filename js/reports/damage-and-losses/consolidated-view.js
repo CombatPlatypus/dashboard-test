@@ -2,7 +2,7 @@ import { getDamageAndLossesState, subscribeDamageAndLossesState } from "./state.
 import { getLossesState, subscribeLossesState } from "./losses-state.js";
 import { subscribeLossesRateState } from "../losses-rate/state.js";
 import { setReportNotification } from "../report-notifications.js";
-import { createHistoryClipboardText, formatOccurrenceDate } from "./history.js";
+import { createHistoryClipboardText, formatOccurrenceDate, getMonthlyOccurrenceHistory } from "./history.js";
 import { getConsolidatedSummary } from "./consolidated-model.js";
 import { createConsolidatedCompositionChart } from "./consolidated-charts.js";
 
@@ -52,7 +52,8 @@ function renderConsolidatedView() {
     if (!elements || !compositionChart) return false;
     const damage = getDamageAndLossesState();
     const losses = getLossesState();
-    const summary = getConsolidatedSummary(damage, losses);
+    const referenceDate = new Date();
+    const summary = getConsolidatedSummary(damage, losses, undefined, referenceDate);
     for (const [key, value, available] of [
         ["hub", summary.hub, summary.hasDamageData],
         ["soc", summary.soc, summary.hasDamageData],
@@ -63,10 +64,12 @@ function renderConsolidatedView() {
     }
     elements.lossRate.textContent = summary.lossRate === null ? "—" : lossRate.format(summary.lossRate);
 
-    renderHistory(elements.damageBody, damage.history);
-    renderHistory(elements.lossesBody, losses.history);
-    elements.copyDamage.disabled = damage.history.length === 0 || copyingButtons.has(elements.copyDamage);
-    elements.copyLosses.disabled = losses.history.length === 0 || copyingButtons.has(elements.copyLosses);
+    const damageHistory = getMonthlyOccurrenceHistory(damage.history, referenceDate);
+    const lossesHistory = getMonthlyOccurrenceHistory(losses.history, referenceDate);
+    renderHistory(elements.damageBody, damageHistory);
+    renderHistory(elements.lossesBody, lossesHistory);
+    elements.copyDamage.disabled = damageHistory.length === 0 || copyingButtons.has(elements.copyDamage);
+    elements.copyLosses.disabled = lossesHistory.length === 0 || copyingButtons.has(elements.copyLosses);
 
     [elements.compositionUnderReview, elements.compositionLost, elements.compositionDamage]
         .forEach((element, index) => {
@@ -133,9 +136,9 @@ function initializeConsolidatedView(rootElement = document.getElementById("damag
     compositionChart = createConsolidatedCompositionChart(elements.canvas);
     panel.dataset.consolidatedInitialized = "true";
     elements.copyDamage.addEventListener("click", () =>
-        copyHistory(elements.copyDamage, () => getDamageAndLossesState().history, "avarias"));
+        copyHistory(elements.copyDamage, () => renderedHistories.get(elements.damageBody) ?? [], "avarias"));
     elements.copyLosses.addEventListener("click", () =>
-        copyHistory(elements.copyLosses, () => getLossesState().history, "perdas"));
+        copyHistory(elements.copyLosses, () => renderedHistories.get(elements.lossesBody) ?? [], "perdas"));
     subscribeDamageAndLossesState(renderConsolidatedView);
     subscribeLossesState(renderConsolidatedView);
     subscribeLossesRateState(renderConsolidatedView);

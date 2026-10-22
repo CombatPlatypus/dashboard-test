@@ -27,6 +27,18 @@ function formatOccurrenceDate(date) {
     return date.split("-").reverse().join("/");
 }
 
+function getMonthlyOccurrenceHistory(records, referenceDate = new Date()) {
+    const history = normalizeOccurrenceHistory(records);
+    const period = new Date(referenceDate.getFullYear(), referenceDate.getMonth(), 1, 12);
+    for (let offset = 0; offset < 2; offset += 1) {
+        const prefix = `${period.getFullYear()}-${String(period.getMonth() + 1).padStart(2, "0")}-`;
+        const selected = history.filter(record => record.date.startsWith(prefix));
+        if (selected.length > 0) return selected;
+        period.setMonth(period.getMonth() - 1);
+    }
+    return [];
+}
+
 function createHistoryClipboardText(records) {
     return [
         ["Data", "Código BR", "Situação"],
@@ -36,4 +48,4 @@ function createHistoryClipboardText(records) {
     ].map(row => row.join("\t")).join("\n");
 }
 
-export { createHistoryClipboardText, formatOccurrenceDate, normalizeOccurrenceHistory };
+export { createHistoryClipboardText, formatOccurrenceDate, getMonthlyOccurrenceHistory, normalizeOccurrenceHistory };
