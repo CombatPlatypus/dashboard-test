@@ -24,13 +24,16 @@ function renderHistory(body, records) {
     }
     const fragment = document.createDocumentFragment();
     if (records.length === 0) {
-        const row = document.createElement("tr");
-        row.className = "empty-row";
-        const cell = document.createElement("td");
-        cell.colSpan = 3;
-        cell.textContent = "—";
-        row.appendChild(cell);
-        fragment.appendChild(row);
+        for (let index = 0; index < 8; index += 1) {
+            const row = document.createElement("tr");
+            row.className = "empty-row";
+            for (let column = 0; column < 3; column += 1) {
+                const cell = document.createElement("td");
+                cell.textContent = "—";
+                row.appendChild(cell);
+            }
+            fragment.appendChild(row);
+        }
     }
     for (const record of records) {
         const row = document.createElement("tr");
@@ -50,9 +53,6 @@ function renderConsolidatedView() {
     const damage = getDamageAndLossesState();
     const losses = getLossesState();
     const summary = getConsolidatedSummary(damage, losses);
-    elements.period.textContent = summary.hasData
-        ? `Indicadores de ${summary.monthName} de ${summary.year}${summary.fallbackUsed ? " (mês anterior)" : ""}`
-        : "Indicadores do mês atual";
     for (const [key, value, available] of [
         ["hub", summary.hub, summary.hasDamageData],
         ["soc", summary.soc, summary.hasDamageData],
@@ -119,7 +119,6 @@ function initializeConsolidatedView(rootElement = document.getElementById("damag
     if (!(panel instanceof HTMLElement) || typeof window.Chart !== "function") return false;
     if (panel.dataset.consolidatedInitialized === "true") return true;
     const ids = {
-        period: "consolidatedPeriodLabel",
         hub: "consolidatedHubValue", soc: "consolidatedSocValue", lossRate: "consolidatedLossRateValue",
         underReview: "consolidatedUnderReviewValue", confirmedLosses: "consolidatedConfirmedLossesValue",
         damageBody: "consolidatedDamageHistoryBody", lossesBody: "consolidatedLossesHistoryBody",

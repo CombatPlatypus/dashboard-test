@@ -841,12 +841,6 @@
     #reports #consolidated-history .cards {
         grid-template-columns: repeat(5, minmax(0, 1fr));
     }
-    #reports #consolidatedPeriodLabel {
-        margin: 8px 0 0;
-        color: var(--color-gray-p);
-        font-size: 13px;
-        text-align: center;
-    }
     #reports .consolidated-history {
         align-items: flex-start;
     }
