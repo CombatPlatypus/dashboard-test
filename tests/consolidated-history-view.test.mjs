@@ -5,7 +5,7 @@ import { getDamageAndLossesState, replaceDamageAndLossesData, resetDamageAndLoss
 import { getLossesState, replaceLossesData, resetLossesState } from "../js/reports/damage-and-losses/losses-state.js";
 import { formatOccurrenceDate } from "../js/reports/damage-and-losses/history.js";
 
-test("tabelas e cópia usam o mês válido de cada histórico e limpam registros antigos ao atualizar", async t => {
+test("tabelas e cópia seguem o mês dos cards e limpam registros antigos ao atualizar", async t => {
     const previousGlobals = new Map();
     t.after(() => {
         resetDamageAndLossesState();
@@ -28,13 +28,25 @@ test("tabelas e cópia usam o mês válido de cada histórico e limpam registros
             else this.children.push(child);
         }
         replaceChildren(fragment) { this.children = [...fragment.children]; }
+        querySelectorAll(selector) {
+            return this.children.filter(child => selector === "td"
+                ? child.id === "td"
+                : child.dataset.consolidatedAnalysisField);
+        }
     }
     const ids = ["consolidatedHubValue", "consolidatedSocValue", "consolidatedLossRateValue",
         "consolidatedUnderReviewValue", "consolidatedConfirmedLossesValue", "consolidatedDamageHistoryBody",
         "consolidatedLossesHistoryBody", "consolidatedCopyDamageButton", "consolidatedCopyLossesButton",
         "consolidatedCompositionChart", "consolidatedCompositionUnderReview", "consolidatedCompositionLost",
-        "consolidatedCompositionDamage"];
+        "consolidatedCompositionDamage", "consolidatedCompositionSoc", "consolidatedTraditionalAnalysisTable"];
     const elements = new Map(ids.map(id => [id, new Element(id)]));
+    const analysisRows = ["hub", "soc", "underReview", "confirmedLosses"].map(field => {
+        const row = new Element("tr");
+        row.dataset.consolidatedAnalysisField = field;
+        for (let index = 0; index < 7; index += 1) row.appendChild(new Element("td"));
+        elements.get("consolidatedTraditionalAnalysisTable").appendChild(row);
+        return row;
+    });
     const panel = new Element("consolidated-history");
     panel.querySelector = selector => elements.get(selector.slice(1));
     const root = new Element("damage-and-losses");
@@ -64,13 +76,17 @@ test("tabelas e cópia usam o mês válido de cada histórico e limpam registros
         return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
     };
     const current = dateKey(0), previous = dateKey(-1), older = dateKey(-2);
-    replaceDamageAndLossesData({ ...period, history: [
+    replaceDamageAndLossesData({ ...period, days: [
+        { date: current, hub: 1 }, { date: dateKey(0, 2), soc: 1 },
+    ], history: [
         { date: current, packageCode: "AV-ATUAL-1", situation: "Recebido" },
         { date: dateKey(0, 2), packageCode: "AV-ATUAL-2", situation: "Não Recebido" },
         { date: previous, packageCode: "AV-ANTERIOR" },
         { date: older, packageCode: "AV-ANTIGO" },
     ] });
-    replaceLossesData({ ...period, history: [
+    const previousDate = new Date(`${previous}T12:00:00`);
+    replaceLossesData({ ...period, monthIndex: previousDate.getMonth(), year: previousDate.getFullYear(),
+        days: [{ date: previous, confirmedLosses: 1 }], history: [
         { date: previous, packageCode: "PERDA-ANTERIOR", situation: "Lost" },
         { date: older, packageCode: "PERDA-ANTIGA" },
     ] });
@@ -80,32 +96,35 @@ test("tabelas e cópia usam o mês válido de cada histórico e limpam registros
     const damageBody = "consolidatedDamageHistoryBody", lossesBody = "consolidatedLossesHistoryBody";
     const damageCopy = body("consolidatedCopyDamageButton"), lossesCopy = body("consolidatedCopyLossesButton");
     assert.deepEqual(codes(damageBody), ["AV-ATUAL-2", "AV-ATUAL-1"]);
-    assert.deepEqual(codes(lossesBody), ["PERDA-ANTERIOR"]);
+    assert.deepEqual(codes(lossesBody), Array(8).fill("—"));
+    assert.equal(lossesCopy.disabled, true);
+    assert.deepEqual(analysisRows.map(row => row.children.at(-1).textContent), ["1", "1", "0", "0"]);
     assert.equal(getDamageAndLossesState().history.length, 4);
     assert.equal(getLossesState().history.length, 2);
     await damageCopy.handlers.get("click")();
     await lossesCopy.handlers.get("click")();
     assert.equal(copied[0], `Data\tCódigo BR\tSituação\n${formatOccurrenceDate(dateKey(0, 2))}\tAV-ATUAL-2\tNão Recebido\n${formatOccurrenceDate(current)}\tAV-ATUAL-1\tRecebido`);
-    assert.equal(copied[1], `Data\tCódigo BR\tSituação\n${formatOccurrenceDate(previous)}\tPERDA-ANTERIOR\tLost`);
-    replaceLossesData({ ...period, history: [
+    assert.equal(copied.length, 1);
+    replaceLossesData({ ...period, days: [{ date: current, underReview: 1 }], history: [
         { date: previous, packageCode: "PERDA-ANTERIOR" },
         { date: current, packageCode: "PERDA-ATUAL", situation: "Em Análise" },
     ] });
     assert.deepEqual(codes(lossesBody), ["PERDA-ATUAL"]);
     await lossesCopy.handlers.get("click")();
-    assert.match(copied[2], /PERDA-ATUAL/);
-    assert.doesNotMatch(copied[2], /PERDA-ANTERIOR/);
+    assert.match(copied[1], /PERDA-ATUAL/);
+    assert.doesNotMatch(copied[1], /PERDA-ANTERIOR/);
     replaceDamageAndLossesData({ ...period, history: [
         { date: current, packageCode: " " },
         { date: previous, packageCode: "AV-ANTERIOR" },
     ] });
-    assert.deepEqual(codes(damageBody), ["AV-ANTERIOR"]);
+    assert.deepEqual(codes(damageBody), Array(8).fill("—"));
+    assert.equal(damageCopy.disabled, true);
     replaceDamageAndLossesData({ ...period, history: [{ date: older, packageCode: "AV-ANTIGO" }] });
     assert.equal(damageCopy.disabled, true);
     assert.deepEqual(codes(damageBody), Array(8).fill("—"));
     assert.equal(getDamageAndLossesState().history.length, 1);
     await damageCopy.handlers.get("click")();
-    assert.equal(copied.length, 3);
+    assert.equal(copied.length, 2);
     resetLossesState();
     assert.equal(lossesCopy.disabled, true);
     assert.deepEqual(codes(lossesBody), Array(8).fill("—"));

@@ -2,8 +2,8 @@ import { getDamageAndLossesState, subscribeDamageAndLossesState } from "./state.
 import { getLossesState, subscribeLossesState } from "./losses-state.js";
 import { subscribeLossesRateState } from "../losses-rate/state.js";
 import { setReportNotification } from "../report-notifications.js";
-import { createHistoryClipboardText, formatOccurrenceDate, getMonthlyOccurrenceHistory } from "./history.js";
-import { getConsolidatedSummary } from "./consolidated-model.js";
+import { createHistoryClipboardText, formatOccurrenceDate, getOccurrenceHistoryForPeriod } from "./history.js";
+import { CONSOLIDATED_ANALYSIS_PERIODS, getConsolidatedSummary } from "./consolidated-model.js";
 import { createConsolidatedCompositionChart } from "./consolidated-charts.js";
 
 const quantity = new Intl.NumberFormat("pt-BR");
@@ -64,17 +64,17 @@ function renderConsolidatedView() {
     }
     elements.lossRate.textContent = summary.lossRate === null ? "—" : lossRate.format(summary.lossRate);
 
-    const damageHistory = getMonthlyOccurrenceHistory(damage.history, referenceDate);
-    const lossesHistory = getMonthlyOccurrenceHistory(losses.history, referenceDate);
+    const damageHistory = getOccurrenceHistoryForPeriod(damage.history, summary);
+    const lossesHistory = getOccurrenceHistoryForPeriod(losses.history, summary);
     renderHistory(elements.damageBody, damageHistory);
     renderHistory(elements.lossesBody, lossesHistory);
     elements.copyDamage.disabled = damageHistory.length === 0 || copyingButtons.has(elements.copyDamage);
     elements.copyLosses.disabled = lossesHistory.length === 0 || copyingButtons.has(elements.copyLosses);
 
-    [elements.compositionUnderReview, elements.compositionLost, elements.compositionDamage]
+    [elements.compositionUnderReview, elements.compositionLost, elements.compositionDamage, elements.compositionSoc]
         .forEach((element, index) => {
             const value = summary.composition[index];
-            const available = index === 2 ? summary.hasDamageData : summary.hasLossesData;
+            const available = index >= 2 ? summary.hasDamageData : summary.hasLossesData;
             element.textContent = available
                 ? `${quantity.format(value)} (${percentage.format(summary.total ? value / summary.total : 0)})`
                 : "—";
@@ -83,9 +83,19 @@ function renderConsolidatedView() {
     compositionChart.options.plugins.consolidatedCenterText.text =
         summary.hasData ? quantity.format(summary.total) : "—";
     elements.canvas.setAttribute("aria-label", summary.hasData
-        ? `Composição das ocorrências de ${summary.monthName} de ${summary.year}: ${summary.underReview} em análise, ${summary.confirmedLosses} perdas confirmadas e ${summary.hub} avarias do Hub.`
+        ? `Composição das ocorrências de ${summary.monthName} de ${summary.year}: ${summary.underReview} em análise, ${summary.confirmedLosses} perdas confirmadas, ${summary.hub} avarias do Hub e ${summary.soc} avarias do SOC.`
         : "Composição das ocorrências: sem dados importados.");
     compositionChart.update("none");
+
+    elements.traditionalAnalysisTable.querySelectorAll("[data-consolidated-analysis-field]")
+        .forEach(row => {
+            const field = row.dataset.consolidatedAnalysisField;
+            const available = ["hub", "soc"].includes(field) ? summary.hasDamageData : summary.hasLossesData;
+            row.querySelectorAll("td").forEach((cell, index) => {
+                const value = summary.traditionalAnalysis[CONSOLIDATED_ANALYSIS_PERIODS[index]]?.[field] ?? 0;
+                cell.textContent = available ? quantity.format(value) : "—";
+            });
+        });
     return true;
 }
 
@@ -129,6 +139,8 @@ function initializeConsolidatedView(rootElement = document.getElementById("damag
         canvas: "consolidatedCompositionChart",
         compositionUnderReview: "consolidatedCompositionUnderReview",
         compositionLost: "consolidatedCompositionLost", compositionDamage: "consolidatedCompositionDamage",
+        compositionSoc: "consolidatedCompositionSoc",
+        traditionalAnalysisTable: "consolidatedTraditionalAnalysisTable",
     };
     const found = Object.fromEntries(Object.entries(ids).map(([key, id]) => [key, panel.querySelector(`#${id}`)]));
     if (!Object.values(found).every(element => element instanceof HTMLElement)) return false;

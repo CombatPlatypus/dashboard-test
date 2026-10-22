@@ -2,6 +2,18 @@ import { DAMAGE_MONTH_NAMES, getDamageAndLossesState, getDamageAndLossesSummary 
 import { getLossesState, getLossesSummary } from "./losses-state.js";
 import { getLossesRateState, getLossesRateMonthSummary } from "../losses-rate/state.js";
 
+const CONSOLIDATED_ANALYSIS_PERIODS = Object.freeze([
+    "today", "yesterday", "dayBeforeYesterday", "days3to7",
+    "days8to14", "days15toMonthStart", "totalMonth",
+]);
+
+function alignAnalysisDays(days, latestDate) {
+    // Os dois históricos usam a mesma data de referência nos períodos relativos.
+    return latestDate && !days.some(day => day.date === latestDate)
+        ? [...days, { date: latestDate }]
+        : days;
+}
+
 function getConsolidatedSummary(
     damageState = getDamageAndLossesState(),
     lossesState = getLossesState(),
@@ -17,11 +29,14 @@ function getConsolidatedSummary(
     const monthIndex = period.getMonth();
     const year = period.getFullYear();
     const monthKey = `${year}-${String(monthIndex + 1).padStart(2, "0")}-`;
+    const damageDays = damageState.days.filter(day => day.date.startsWith(monthKey));
+    const lossesDays = lossesState.days.filter(day => day.date.startsWith(monthKey));
+    const latestDate = [...damageDays, ...lossesDays].map(day => day.date).sort().at(-1);
     const damage = getDamageAndLossesSummary({
-        ...damageState, days: damageState.days.filter(day => day.date.startsWith(monthKey)),
+        ...damageState, days: alignAnalysisDays(damageDays, latestDate),
     });
     const losses = getLossesSummary({
-        ...lossesState, days: lossesState.days.filter(day => day.date.startsWith(monthKey)),
+        ...lossesState, days: alignAnalysisDays(lossesDays, latestDate),
     });
     const hasDamageData = Boolean(damageState.sourceFileName || damageState.days.length || damageState.history?.length);
     const hasLossesData = Boolean(lossesState.sourceFileName || lossesState.days.length || lossesState.history?.length);
@@ -30,8 +45,13 @@ function getConsolidatedSummary(
         ? getLossesRateMonthSummary(monthIndex, rateState)?.lossRate
         : null;
 
-    // A composição da planilha considera as avarias do Hub, sem as do SOC.
-    const composition = [losses.underReview, losses.confirmedLosses, damage.hub];
+    const composition = [losses.underReview, losses.confirmedLosses, damage.hub, damage.soc];
+    const traditionalAnalysis = Object.fromEntries(CONSOLIDATED_ANALYSIS_PERIODS.map(key => [key, {
+        hub: damage.traditionalAnalysis?.[key]?.hub ?? 0,
+        soc: damage.traditionalAnalysis?.[key]?.soc ?? 0,
+        underReview: losses.traditionalAnalysis?.[key]?.underReview ?? 0,
+        confirmedLosses: losses.traditionalAnalysis?.[key]?.confirmedLosses ?? 0,
+    }]));
     return {
         hasData,
         monthIndex,
@@ -46,8 +66,9 @@ function getConsolidatedSummary(
         confirmedLosses: losses.confirmedLosses,
         lossRate: hasData ? rate ?? null : null,
         composition,
+        traditionalAnalysis,
         total: composition.reduce((sum, value) => sum + value, 0),
     };
 }
 
-export { getConsolidatedSummary };
+export { CONSOLIDATED_ANALYSIS_PERIODS, getConsolidatedSummary };

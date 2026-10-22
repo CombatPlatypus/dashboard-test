@@ -29,10 +29,10 @@ function createConsolidatedCompositionChart(canvas) {
     return createDashboardChart(canvas, {
         type: "doughnut",
         data: {
-            labels: ["Em Análise", "Lost", "Avarias"],
+            labels: ["Em Análise", "Lost", "Avarias do Hub", "Avarias do SOC"],
             datasets: [{
-                data: [0, 0, 0],
-                backgroundColor: ["#2538a5", "#8B0000", "#f99400"],
+                data: [0, 0, 0, 0],
+                backgroundColor: ["#2538a5", "#8B0000", "#007A48", "#f99400"],
                 borderColor: "transparent",
                 borderWidth: 0,
             }],

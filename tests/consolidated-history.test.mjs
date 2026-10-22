@@ -9,8 +9,11 @@ import {
 } from "../js/reports/damage-and-losses/controller.js";
 import { getDamageAndLossesState } from "../js/reports/damage-and-losses/state.js";
 import { getLossesState } from "../js/reports/damage-and-losses/losses-state.js";
-import { getConsolidatedSummary } from "../js/reports/damage-and-losses/consolidated-model.js";
-import { createHistoryClipboardText, getMonthlyOccurrenceHistory, normalizeOccurrenceHistory } from "../js/reports/damage-and-losses/history.js";
+import { CONSOLIDATED_ANALYSIS_PERIODS, getConsolidatedSummary } from "../js/reports/damage-and-losses/consolidated-model.js";
+import {
+    createHistoryClipboardText, getMonthlyOccurrenceHistory,
+    getOccurrenceHistoryForPeriod, normalizeOccurrenceHistory,
+} from "../js/reports/damage-and-losses/history.js";
 import { createConsolidatedCompositionChart } from "../js/reports/damage-and-losses/consolidated-charts.js";
 import { getLossesRateState, replaceLossesRateHistory, resetLossesRateReport } from "../js/reports/losses-rate/state.js";
 
@@ -110,20 +113,20 @@ test("salva, restaura e limpa os históricos sem perder os totais nem alterar os
     assert.equal(getConsolidatedSummary(undefined, undefined, undefined, referenceDate).hub, 2);
 });
 
-test("rosca usa avarias do Hub e exclui SOC e retornados; taxa usa o mês correspondente", async () => {
+test("rosca separa avarias do Hub e do SOC e exclui retornados; taxa usa o mês correspondente", async () => {
     const result = await importWorkbook();
     importDamageAndLossesData(result);
     const rateState = { year: 2026, activeMonth: 0, months: result.lossesRate.history };
     const summary = getConsolidatedSummary(getDamageAndLossesState(), getLossesState(), rateState, referenceDate);
     assert.equal(summary.hub, 2);
     assert.equal(summary.soc, 1);
-    assert.deepEqual(summary.composition, [1, 3, 2]);
-    assert.equal(summary.total, 6);
+    assert.deepEqual(summary.composition, [1, 3, 2, 1]);
+    assert.equal(summary.total, 7);
     assert.equal(summary.lossRate, 86 / 356741);
     assert.equal(getConsolidatedSummary(getDamageAndLossesState(), getLossesState(), { ...rateState, year: 2025 }, referenceDate).lossRate, null);
     resetDamageAndLossesController();
     assert.equal(getConsolidatedSummary(undefined, undefined, rateState).lossRate, null);
-    assert.deepEqual(getConsolidatedSummary().composition, [0, 0, 0]);
+    assert.deepEqual(getConsolidatedSummary().composition, [0, 0, 0, 0]);
 });
 
 test("cards e rosca usam o mês anterior quando não há registros atuais, sem misturar períodos", async () => {
@@ -132,8 +135,8 @@ test("cards e rosca usam o mês anterior quando não há registros atuais, sem m
     assert.equal(summary.hasDamageData, true);
     assert.equal(summary.hasLossesData, true);
     assert.deepEqual([summary.hub, summary.soc, summary.underReview, summary.confirmedLosses], [2, 1, 1, 3]);
-    assert.deepEqual(summary.composition, [1, 3, 2]);
-    assert.equal(summary.total, 6);
+    assert.deepEqual(summary.composition, [1, 3, 2, 1]);
+    assert.equal(summary.total, 7);
     assert.equal(summary.monthIndex, 9);
     assert.equal(summary.fallbackUsed, true);
     assert.equal(summary.lossRate, null);
@@ -142,10 +145,10 @@ test("cards e rosca usam o mês anterior quando não há registros atuais, sem m
     const mixed = getConsolidatedSummary(undefined, {
         ...getLossesState(), days: [{ date: "2026-11-01", underReview: 4 }],
     }, undefined, new Date(2026, 10, 1, 12));
-    assert.deepEqual(mixed.composition, [4, 0, 0]);
+    assert.deepEqual(mixed.composition, [4, 0, 0, 0]);
     assert.equal(mixed.fallbackUsed, false);
     const stale = getConsolidatedSummary(undefined, undefined, undefined, new Date(2026, 11, 1, 12));
-    assert.deepEqual(stale.composition, [0, 0, 0]);
+    assert.deepEqual(stale.composition, [0, 0, 0, 0]);
 });
 
 test("cópia inclui cabeçalho e todos os registros, preservando datas e códigos como texto", () => {
@@ -173,14 +176,68 @@ test("o mês anterior pode ser dezembro do ano anterior, inclusive para a taxa d
     assert.equal(summary.year, 2025);
     assert.equal(summary.fallbackUsed, true);
     assert.equal(summary.lossRate, 0.007);
-    assert.deepEqual(summary.composition, [3, 2, 5]);
+    assert.deepEqual(summary.composition, [3, 2, 5, 2]);
 });
 
 test("a rosca consolidada usa o mesmo renderizador 3D do dashboard", () => {
     window.Chart = class { constructor(canvas, config) { return config; } };
     const chart = createConsolidatedCompositionChart({});
-    assert.deepEqual(chart.data.labels, ["Em Análise", "Lost", "Avarias"]);
-    assert.deepEqual(chart.data.datasets[0].backgroundColor, ["#2538a5", "#8B0000", "#f99400"]);
+    assert.deepEqual(chart.data.labels, ["Em Análise", "Lost", "Avarias do Hub", "Avarias do SOC"]);
+    assert.deepEqual(chart.data.datasets[0].data, [0, 0, 0, 0]);
+    assert.deepEqual(chart.data.datasets[0].backgroundColor, ["#2538a5", "#8B0000", "#007A48", "#f99400"]);
     assert.equal(chart.plugins[0].id, "consolidated-composition-3d");
     assert.equal(chart.options.animation, false);
+});
+
+test("análise tradicional usa uma data comum quando avarias e perdas terminam em dias diferentes", async () => {
+    importDamageAndLossesData(await importWorkbook());
+    const summary = getConsolidatedSummary(undefined, undefined, undefined, referenceDate);
+    assert.deepEqual(summary.traditionalAnalysis.today, { hub: 1, soc: 0, underReview: 0, confirmedLosses: 0 });
+    assert.deepEqual(summary.traditionalAnalysis.yesterday, { hub: 0, soc: 1, underReview: 0, confirmedLosses: 0 });
+    assert.deepEqual(summary.traditionalAnalysis.days3to7, { hub: 1, soc: 0, underReview: 1, confirmedLosses: 3 });
+    assert.deepEqual(summary.traditionalAnalysis.totalMonth, {
+        hub: summary.hub, soc: summary.soc,
+        underReview: summary.underReview, confirmedLosses: summary.confirmedLosses,
+    });
+});
+
+test("análise tradicional distribui os sete períodos sem sobreposição nem registros de outro mês", () => {
+    const dates = [22, 21, 20, 19, 15, 14, 8, 7, 1];
+    const damage = { ...getDamageAndLossesState(), days: [
+        { date: "2026-09-30", hub: 999, soc: 999 },
+        ...dates.map((day, index) => ({ date: `2026-10-${String(day).padStart(2, "0")}`, hub: 2 ** index, soc: 2 ** (index + 1) })),
+    ].sort((a, b) => a.date.localeCompare(b.date)) };
+    const losses = { ...getLossesState(), days: [
+        { date: "2026-09-30", underReview: 999, confirmedLosses: 999 },
+        { date: "2026-10-07", underReview: 7, confirmedLosses: 8 },
+        { date: "2026-10-15", underReview: 5, confirmedLosses: 6 },
+        { date: "2026-10-21", underReview: 3, confirmedLosses: 4 },
+    ] };
+    const summary = getConsolidatedSummary(damage, losses, undefined, new Date(2026, 9, 22, 12));
+    for (const [field, expected] of Object.entries({
+        hub: [1, 2, 4, 24, 96, 384, 511], soc: [2, 4, 8, 48, 192, 768, 1022],
+        underReview: [0, 3, 0, 5, 0, 7, 15], confirmedLosses: [0, 4, 0, 6, 0, 8, 18],
+    })) {
+        const values = CONSOLIDATED_ANALYSIS_PERIODS.map(period => summary.traditionalAnalysis[period][field]);
+        assert.deepEqual(values, expected, field);
+        assert.equal(values.slice(0, -1).reduce((sum, value) => sum + value, 0), summary[field]);
+    }
+});
+
+test("históricos exibidos e copiados seguem o período dos cards quando só uma origem tem dados atuais", () => {
+    const damage = { ...getDamageAndLossesState(), days: [{ date: "2026-10-21", hub: 1 }], history: [
+        { date: "2026-09-30", packageCode: "AV-ANTIGO" },
+        { date: "2026-10-21", packageCode: "AV-ATUAL" },
+    ] };
+    const losses = { ...getLossesState(), days: [{ date: "2026-09-30", underReview: 2 }], history: [
+        { date: "2026-09-30", packageCode: "PERDA-ANTIGA" },
+    ] };
+    const current = getConsolidatedSummary(damage, losses, undefined, referenceDate);
+    assert.equal(current.monthIndex, 9);
+    assert.deepEqual(getOccurrenceHistoryForPeriod(damage.history, current).map(row => row.packageCode), ["AV-ATUAL"]);
+    assert.deepEqual(getOccurrenceHistoryForPeriod(losses.history, current), []);
+    const fallback = getConsolidatedSummary(damage, losses, undefined, new Date(2026, 10, 1, 12));
+    assert.equal(fallback.fallbackUsed, true);
+    assert.deepEqual(getOccurrenceHistoryForPeriod(damage.history, fallback).map(row => row.packageCode), ["AV-ATUAL"]);
+    assert.deepEqual(getOccurrenceHistoryForPeriod(losses.history, fallback), []);
 });
