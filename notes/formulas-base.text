@@ -774,4 +774,32 @@ EXEMPLOS PRATICOS
     )
 }
 
+=SEERRO(
+  QUERY(
+    FILTER(
+
+      { 'Base de Retornados'!D3:D \LIN('Base de Retornados'!D3:D) };
+
+      'Base de Retornados'!B3:B<>"";
+      'Base de Retornados'!C3:C<>"";
+      'Base de Retornados'!D3:D<>"";
+      'Base de Retornados'!E3:E<>"";
+      'Base de Retornados'!F3:F<>"";
+      'Base de Retornados'!G3:G<>"";
+      'Base de Retornados'!H3:H<>"";
+      'Base de Retornados'!I3:I<>""
+    );
+
+    "SELECT Col1 ORDER BY Col2 DESC LABEL Col1 'Código BR'";
+    0
+  );
+
+  ""
+)
+
+={"Data";ARRAYFORMULA(SE(M3:M="";"";PROCX(M3:M;'Base de Análises'!B3:B;'Base de Análises'!A3:A;"")))}
+
+
+
+
 LM Hub_SP_Santos_PraiaGrande_02
