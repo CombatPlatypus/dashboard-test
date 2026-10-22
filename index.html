@@ -44,7 +44,10 @@
                 width: 20px;
                 cursor: pointer;
             }
-
+            #consolidated-history > div caption .flex-box-start {
+                gap: 10px;
+                width: max-content;
+            }
         </style>
     </head>
 
@@ -1768,11 +1771,10 @@
 
                                                         <tbody id="">
                                                             <tr class="empty-row">
-                                                                <td colspan="2">—</td>
+                                                                <td colspan="3">—</td>
                                                             </tr>
                                                         </tbody>
                                                     </table>
-
                                                 </div>
 
                                                 <!-- GRÁFICO DE ROSCA E INCADORES -->
@@ -1814,8 +1816,34 @@
 
                                                 <!-- HISTÓRICO DE PERDAS -->
 
-                                                <div></div>
+                                                <div>
+                                                    <table id="">
+                                                        <caption>
+                                                            <div class="flex-box-start">
 
+                                                                <span>Histórico de Perdas</span>
+
+                                                                <button id="" type="button" disabled>
+                                                                    <img src="images/geral-icons/copy-mini-icon.svg">
+                                                                </button>
+                                                            </div>
+                                                        </caption>
+
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Data</th>
+                                                                <th>Código BR</th>
+                                                                <th>Situação</th>
+                                                            </tr>
+                                                        </thead>
+
+                                                        <tbody id="">
+                                                            <tr class="empty-row">
+                                                                <td colspan="3">—</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
