@@ -96,7 +96,7 @@ test("tabelas e cópia seguem o mês dos cards e limpam registros antigos ao atu
     const damageBody = "consolidatedDamageHistoryBody", lossesBody = "consolidatedLossesHistoryBody";
     const damageCopy = body("consolidatedCopyDamageButton"), lossesCopy = body("consolidatedCopyLossesButton");
     assert.deepEqual(codes(damageBody), ["AV-ATUAL-2", "AV-ATUAL-1"]);
-    assert.deepEqual(codes(lossesBody), Array(8).fill("—"));
+    assert.deepEqual(codes(lossesBody), Array(9).fill("—"));
     assert.equal(lossesCopy.disabled, true);
     assert.deepEqual(analysisRows.map(row => row.children.at(-1).textContent), ["1", "1", "0", "0"]);
     assert.equal(getDamageAndLossesState().history.length, 4);
@@ -117,15 +117,15 @@ test("tabelas e cópia seguem o mês dos cards e limpam registros antigos ao atu
         { date: current, packageCode: " " },
         { date: previous, packageCode: "AV-ANTERIOR" },
     ] });
-    assert.deepEqual(codes(damageBody), Array(8).fill("—"));
+    assert.deepEqual(codes(damageBody), Array(9).fill("—"));
     assert.equal(damageCopy.disabled, true);
     replaceDamageAndLossesData({ ...period, history: [{ date: older, packageCode: "AV-ANTIGO" }] });
     assert.equal(damageCopy.disabled, true);
-    assert.deepEqual(codes(damageBody), Array(8).fill("—"));
+    assert.deepEqual(codes(damageBody), Array(9).fill("—"));
     assert.equal(getDamageAndLossesState().history.length, 1);
     await damageCopy.handlers.get("click")();
     assert.equal(copied.length, 2);
     resetLossesState();
     assert.equal(lossesCopy.disabled, true);
-    assert.deepEqual(codes(lossesBody), Array(8).fill("—"));
+    assert.deepEqual(codes(lossesBody), Array(9).fill("—"));
 });

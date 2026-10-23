@@ -24,7 +24,7 @@ function renderHistory(body, records) {
     }
     const fragment = document.createDocumentFragment();
     if (records.length === 0) {
-        for (let index = 0; index < 8; index += 1) {
+        for (let index = 0; index < 9; index += 1) {
             const row = document.createElement("tr");
             row.className = "empty-row";
             for (let column = 0; column < 3; column += 1) {
