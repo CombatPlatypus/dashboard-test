@@ -54,6 +54,7 @@ function renderConsolidatedView() {
     const losses = getLossesState();
     const referenceDate = new Date();
     const summary = getConsolidatedSummary(damage, losses, undefined, referenceDate);
+    elements.compositionLegend.style.maxWidth = summary.hasData ? "max-content" : "385px";
     for (const [key, value, available] of [
         ["hub", summary.hub, summary.hasDamageData],
         ["soc", summary.soc, summary.hasDamageData],
@@ -137,6 +138,7 @@ function initializeConsolidatedView(rootElement = document.getElementById("damag
         damageBody: "consolidatedDamageHistoryBody", lossesBody: "consolidatedLossesHistoryBody",
         copyDamage: "consolidatedCopyDamageButton", copyLosses: "consolidatedCopyLossesButton",
         canvas: "consolidatedCompositionChart",
+        compositionLegend: "consolidatedCompositionLegend",
         compositionUnderReview: "consolidatedCompositionUnderReview",
         compositionLost: "consolidatedCompositionLost", compositionDamage: "consolidatedCompositionDamage",
         compositionSoc: "consolidatedCompositionSoc",

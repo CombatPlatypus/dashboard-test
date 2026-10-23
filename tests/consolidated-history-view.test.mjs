@@ -17,7 +17,7 @@ test("tabelas e cópia seguem o mês dos cards e limpam registros antigos ao atu
     });
     class Element {
         constructor(id = "") {
-            this.id = id; this.dataset = {}; this.children = []; this.textContent = "";
+            this.id = id; this.dataset = {}; this.children = []; this.textContent = ""; this.style = {};
             this.handlers = new Map(); this.classList = { contains: () => true };
         }
         addEventListener(name, handler) { this.handlers.set(name, handler); }
@@ -38,7 +38,8 @@ test("tabelas e cópia seguem o mês dos cards e limpam registros antigos ao atu
         "consolidatedUnderReviewValue", "consolidatedConfirmedLossesValue", "consolidatedDamageHistoryBody",
         "consolidatedLossesHistoryBody", "consolidatedCopyDamageButton", "consolidatedCopyLossesButton",
         "consolidatedCompositionChart", "consolidatedCompositionUnderReview", "consolidatedCompositionLost",
-        "consolidatedCompositionDamage", "consolidatedCompositionSoc", "consolidatedTraditionalAnalysisTable"];
+        "consolidatedCompositionDamage", "consolidatedCompositionSoc", "consolidatedTraditionalAnalysisTable",
+        "consolidatedCompositionLegend"];
     const elements = new Map(ids.map(id => [id, new Element(id)]));
     const analysisRows = ["hub", "soc", "underReview", "confirmedLosses"].map(field => {
         const row = new Element("tr");
