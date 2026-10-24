@@ -29,7 +29,7 @@ function createClipboardTable(rows) {
     ).join("\t")).join("\n");
     const html = '<meta charset="utf-8"><table>' + rows.map(row =>
         "<tr>" + row.map(({ value, span }) =>
-            `<td colspan="${span}">${escapeHtml(value)}</td>`,
+            `<td colspan="${span}" align="center" valign="middle" style="text-align:center;vertical-align:middle">${escapeHtml(value)}</td>`,
         ).join("") + "</tr>",
     ).join("") + "</table>";
     return { text, html };
