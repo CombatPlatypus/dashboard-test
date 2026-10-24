@@ -8,6 +8,8 @@ const shiftRows = { AM: 1, PM1: 22, PM2: 43 };
 const rateFormatter = new Intl.NumberFormat("pt-BR", {
     style: "percent", minimumFractionDigits: 2, maximumFractionDigits: 2,
 });
+// Sheets' clipboard format: enable horizontal/vertical alignment (64 | 128), both centered.
+const sheetsCenteredFormat = '{"2":192,"9":1,"10":1}';
 
 function formatDuration(seconds) {
     if (seconds === null || seconds === undefined) return "";
@@ -27,11 +29,12 @@ function createClipboardTable(rows) {
     const text = rows.map(row => row.flatMap(({ value, span }) =>
         [String(value ?? ""), ...Array(span - 1).fill("")],
     ).join("\t")).join("\n");
-    const html = '<meta charset="utf-8"><table>' + rows.map(row =>
+    // Sheets only applies data-sheets-* formatting when its clipboard origin marker is present.
+    const html = '<meta charset="utf-8"><google-sheets-html-origin><table data-sheets-root="1">' + rows.map(row =>
         "<tr>" + row.map(({ value, span }) =>
-            `<td colspan="${span}" align="center" valign="middle" style="text-align:center;vertical-align:middle">${escapeHtml(value)}</td>`,
+            `<td colspan="${span}" data-sheets-userformat='${sheetsCenteredFormat}' align="center" valign="middle" style="text-align:center;vertical-align:middle">${escapeHtml(value)}</td>`,
         ).join("") + "</tr>",
-    ).join("") + "</table>";
+    ).join("") + "</table></google-sheets-html-origin>";
     return { text, html };
 }
 

@@ -93,6 +93,23 @@ test("expedição reproduz A7:D20 com os erros e taxas calculados pelo relatóri
     assert.doesNotMatch(payload.text, /Processamento|Volume Recebido/);
 });
 
+test("formato de colagem do Planilhas centraliza as duas direções em títulos, dados e células vazias", () => {
+    populate();
+    for (const kind of ["receipt", "expedition"]) {
+        const { html } = createReportSummaryClipboard(kind);
+        assert.match(html, /<google-sheets-html-origin><table\b[^>]*data-sheets-root="1"/);
+        assert.ok(html.endsWith("</table></google-sheets-html-origin>"));
+        const cells = [...html.matchAll(/<td\b([^>]*)>([^<]*)<\/td>/g)];
+        assert.equal(cells.length, kind === "receipt" ? 9 : 26);
+        for (const [, attributes] of cells) {
+            const format = JSON.parse(attributes.match(/data-sheets-userformat='([^']+)'/)[1]);
+            assert.equal(format["2"] & (64 | 128), 64 | 128);
+            assert.equal(format["9"], 1);
+            assert.equal(format["10"], 1);
+        }
+    }
+});
+
 test("os intervalos de processamento e expedição não se sobrepõem em nenhum turno", () => {
     for (const [window, firstRow] of [["AM", 1], ["PM1", 22], ["PM2", 43]]) {
         const options = { context: { window } };
