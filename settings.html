@@ -32,7 +32,7 @@
             body {
 
             }
-            .settings > .flex-box-start {
+            .settings {
                 width: 100%;
                 height: 100vh;
                 user-select: none;
@@ -42,6 +42,7 @@
                 display: flex;
                 flex-direction: column;
                 gap: 10px;
+                margin: 35px;
             }
             .settings > ul:first-of-type > .tabs-title {
                 width: 100%;
@@ -51,8 +52,8 @@
                 display: flex;
                 flex-direction: column;
                 background-color: var(--color-container);
-                border: 2px solid var(--color-border);
-                border-radius: 5px;
+                border-left: 2px solid var(--color-border);
+                padding: 35px;
             }
             .settings > div:last-of-type .title {
                 border-bottom: 2px solid var(--color-border);
@@ -88,16 +89,18 @@
             <ul class="tabs" data-tabs id="settings">
 
                 <li class="tabs-title is-active">
-                    <a href="#settings-links">Link das Planilhas</a>
+                    <a href="#settings-links">Perfil do Analista</a>
                 </li>
 
                 <li class="tabs-title">
-                    <a href="#another-links">Outros Links do Dashboard</a>
+                    <a href="#another-links">Botões do Footer</a>
                 </li> 
                                 
                 <li class="tabs-title">
-                    <a href="#settings-themes">Temas do Dashboard</a>
+                    <a href="#settings-themes">Aparência do Dash</a>
                 </li> 
+
+                <button class="link-button">Salvar e Voltar</button>
             </ul>
 
             <div>
