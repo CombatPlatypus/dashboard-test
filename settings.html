@@ -1,0 +1,175 @@
+<!doctype html>
+<html class="no-js" lang="pt-br">
+
+    <!-- METADADOS DA PÁGINA -->
+
+    <head>
+
+        <!-- TAGS META -->
+
+        <meta charset="utf-8" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="robots" content="nofollow, noindex, noimageindex, noarchive, nocache, nosnippet, notranslate" />
+
+        <!-- TÍTULO DA PÁGINA -->
+
+        <title>Configurações - Dashboard de Inventário</title>
+
+        <!-- ICONE DO DASHBOARD -->
+
+        <link rel="icon" href="images/geral-icons/hub-logo.svg">
+
+        <!-- ARQUIVOS CSS -->
+
+        <link rel="stylesheet" href="css/font-face.css">
+        <link rel="stylesheet" href="css/reset-style.css">
+        <link rel="stylesheet" href="css/dashboard-style.css">
+        <link rel="stylesheet" href="css/settings.css">
+
+        <style>
+            
+            body {
+
+            }
+            .settings > .flex-box-start {
+                width: 100%;
+                height: 100vh;
+                user-select: none;
+            }
+            .settings > ul:first-of-type {
+                flex: 0 0 300px;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+            .settings > ul:first-of-type > .tabs-title {
+                width: 100%;
+            }
+            .settings > div:last-of-type {
+                flex: 1 1 0;
+                display: flex;
+                flex-direction: column;
+                background-color: var(--color-container);
+                border: 2px solid var(--color-border);
+                border-radius: 5px;
+            }
+            .settings > div:last-of-type .title {
+                border-bottom: 2px solid var(--color-border);
+                padding: 20px;
+            }
+            .settings > div:last-of-type .title h3 {
+                margin: 0;
+            }
+            .settings > div:last-of-type h4 {
+                margin: 0;
+            }
+            .settings > div:last-of-type p {
+                margin: 15px 25px 0 25px;
+                text-align: justify;
+            }
+            .settings > div:last-of-type hr {
+                max-width: 100%;;
+            }
+            .settings > div:last-of-type > .flex-box-start {
+                gap: 15px;
+            }
+            .settings > div:last-of-type .padding {
+                padding: 20px;
+            }
+
+        </style>
+    </head>	
+
+    <!-- CONTEÚDO DA PÁGINA -->
+
+    <body>
+        <div class="settings flex-box-start">
+            <ul class="tabs" data-tabs id="settings">
+
+                <li class="tabs-title is-active">
+                    <a href="#settings-links">Link das Planilhas</a>
+                </li>
+
+                <li class="tabs-title">
+                    <a href="#another-links">Outros Links do Dashboard</a>
+                </li> 
+                                
+                <li class="tabs-title">
+                    <a href="#settings-themes">Temas do Dashboard</a>
+                </li> 
+            </ul>
+
+            <div>
+                <div class="tabs-content" data-tabs-content="settings">
+
+                    <div class="tabs-panel is-active" id="settings-links">
+
+                        <!-- LISTA DINÂMICA DE LINKS -->
+
+                        <div class="spreadsheets-links" id="settingsSpreadsheetRows">
+                            <div>
+                                <h4>Primeira Planilha</h4>
+
+                                <div data-dashboard-spreadsheet-row="0">
+                                    <input type="url" inputmode="none" autocomplete="off" placeholder="Cole o Link da Planilha" id="settingsSpreadsheetLink1" data-dashboard-spreadsheet-field="link" aria-label="Link da planilha 1">
+                                    <input type="text" placeholder="Nome no Menu" maxlength="22" id="settingsSpreadsheetName1" data-dashboard-spreadsheet-field="menuName" aria-label="Nome da planilha 1 no menu">
+
+                                    <div>
+                                        <select class="standard-select" style="width: 100%;" id="settingsSpreadsheetVisibility1" data-dashboard-spreadsheet-field="visible" aria-label="Visibilidade da planilha 1">
+                                            <option value="show">Visível</option>
+                                            <option value="hide">Oculta</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tabs-panel" id="another-links">
+                        <div>
+                            <div>
+                                <h4>Forms da Reversa</h4>
+                                <input type="url" id="settingsReverseFormLink" data-dashboard-external-link="reverseForm" aria-label="Link do Forms da Reversa">
+                            </div>
+        
+                            <div>
+                                <h4>Pack Recovery</h4>
+                                <input type="url" id="settingsPackRecoveryLink" data-dashboard-external-link="packRecovery" aria-label="Link do Pack Recovery">
+                            </div>
+        
+                            <div>
+                                <h4>Avarias AppSheet</h4>
+                                <input type="url" id="settingsDamageAppLink" data-dashboard-external-link="damageApp" aria-label="Link do Avarias AppSheet">
+                            </div>
+        
+                            <div>
+                                <h4>Coletas AppSheet</h4>
+                                <input type="url" id="settingsCollectionAppLink" data-dashboard-external-link="collectionApp" aria-label="Link do Coletas AppSheet">
+                            </div>
+        
+                        </div>
+                    </div>
+
+                    <div class="tabs-panel" id="settings-themes"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- JS - BARRA DE CARREGAMENTO -->  
+
+        <script src="js/pace.min.js" async></script>
+
+        <!-- JS - VERSÃO DO JQUERY -->  
+
+        <script src="js/jquery/jquery-3.2.1.min.js"></script>
+
+        <!-- JS - RECURSOS DO FOUNDATION -->  
+
+        <script src="js/foundation/foundation.min.js" defer></script>
+
+        <!-- PONTO DE ENTRADA DA APLICAÇÃO -->
+
+        <script src="js/foundation/app.js" defer></script>
+    </body>
+</html>
