@@ -67,7 +67,7 @@
             }
             .settings > div:last-of-type {
                 flex: 1 1 0;
-                height: calc(100dvh - 162px - 117px);
+                height: auto;
                 min-width: 0;
                 display: flex;
                 flex-direction: column;
@@ -163,7 +163,7 @@
 
             .colors-templates  {
                 display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
                 gap: 15px;
             }
             .colors-templates  h4,
@@ -172,7 +172,7 @@
                 margin: 10px 0 0 0;
             }
             .colors-templates > div {
-                height: 100px;
+                height: 200px;
                 border-radius: 5px;
             }
             .colors-templates > div > div {
@@ -211,6 +211,22 @@
             .colors-templates .purple > div {
                 background-color: var(--purple-color-table-title);
                 border-bottom: 1px solid var(--purple-color-border);
+            }
+            .colors-templates .rose {
+                background-color: var(--rose-color-container);
+                border: 1px solid var(--rose-color-border);
+            }
+            .colors-templates .rose > div {
+                background-color: var(--rose-color-table-title);
+                border-bottom: 1px solid var(--rose-color-border);
+            }
+            .colors-templates .green {
+                background-color: var(--green-color-container);
+                border: 1px solid var(--green-color-border);
+            }
+            .colors-templates .green > div {
+                background-color: var(--green-color-table-title);
+                border-bottom: 1px solid var(--green-color-border);
             }
 
 
