@@ -90,20 +90,24 @@ try {
     const unnamedDownloadEvent = page.waitForEvent("download");
     await page.locator("#settingsSaveButton").click();
     assert.equal((await unnamedDownloadEvent).suggestedFilename(), "configurações-dashboard.js");
-    for (const [name, email] of [
-        ["Caio Vinicius", "caio.vinicius@shopee.com"],
-        ["Fernando Ferrari", "fernando.ferrari@shopee.com"],
-        ["Thamyris Dias", "thamyris.ribeiro@shopee.com"],
+    for (const [name, email, shift] of [
+        ["Caio Vinicius", "caio.vinicius@shopee.com", "AM"],
+        ["Fernando Ferrari", "fernando.ferrari@shopee.com", "PM2"],
+        ["Thamyris Dias", "thamyris.ribeiro@shopee.com", "PM1"],
     ]) {
         await choose("settingsAnalystName", name);
         assert.equal(await page.locator("#settingsAnalystEmail").inputValue(), email);
+        assert.equal(await page.locator("#settingsAnalystShift").inputValue(), shift);
+        assert.equal(await page.locator("#select2-settingsAnalystShift-container").textContent(), shift);
         const profile = await page.evaluate(async () =>
             (await import("/js/spreadsheets/load-spreadsheets.js")).exportDashboardSettings().profile);
         assert.equal(profile.name, name);
         assert.equal(profile.email, email);
+        assert.equal(profile.shift, shift);
     }
     await choose("settingsAnalystName", "Escolha um Analista");
     assert.equal(await page.locator("#settingsAnalystEmail").inputValue(), "");
+    assert.equal(await page.locator("#settingsAnalystShift").inputValue(), "AM");
     await choose("settingsAnalystName", "Caio Vinicius");
     await choose("settingsAnalystShift", "PM2");
     await choose("settingsAnalystIcon", "Coruja");

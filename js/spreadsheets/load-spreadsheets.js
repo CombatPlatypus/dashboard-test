@@ -1592,10 +1592,18 @@ function bindDashboardSettingsEvents() {
             const field = input.dataset.dashboardProfileField;
             dashboardSettingsState.profile[field] = input.value;
             if (field === "name") {
-                const email = input.selectedOptions[0]?.dataset.email || "";
+                const selectedOption = input.selectedOptions[0];
+                const email = selectedOption?.dataset.email || "";
                 dashboardSettingsState.profile.email = email;
                 const emailInput = document.querySelector('[data-dashboard-profile-field="email"]');
                 if (emailInput) emailInput.value = email;
+                const shift = selectedOption?.dataset.shift || DEFAULT_DASHBOARD_PROFILE.shift;
+                dashboardSettingsState.profile.shift = shift;
+                const shiftInput = document.querySelector('[data-dashboard-profile-field="shift"]');
+                if (shiftInput) {
+                    shiftInput.value = shift;
+                    window.jQuery?.(shiftInput).trigger("change.select2");
+                }
             }
             renderDashboardProfile();
         };
