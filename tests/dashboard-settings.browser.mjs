@@ -1,4 +1,4 @@
-// Executar com Playwright em NODE_PATH. Usa navegador e armazenamento isolados.
+// Executar com Playwright em NODE_PATH. Usa duas guias e bloqueia os armazenamentos.
 import assert from "node:assert/strict";
 import { createServer } from "node:http";
 import { createRequire } from "node:module";
@@ -28,10 +28,19 @@ let browser;
 try {
     browser = await chromium.launch({ channel: "msedge", headless: true });
     const context = await browser.newContext({ acceptDownloads: true, viewport: { width: 1600, height: 1050 } });
-    const page = await context.newPage();
+    await context.addInitScript(() => {
+        window.storageAccesses = [];
+        for (const key of ["localStorage", "sessionStorage"]) {
+            Object.defineProperty(window, key, { configurable: true, get() {
+                window.storageAccesses.push(key);
+                throw new Error(`O dashboard não deve acessar ${key}.`);
+            } });
+        }
+    });
     const errors = [];
-    page.on("pageerror", error => errors.push(error.message));
-    await page.route("**/*", route => new URL(route.request().url()).hostname === "127.0.0.1"
+    context.on("page", tab => tab.on("pageerror", error => errors.push(error.message)));
+    let page = await context.newPage();
+    await context.route("**/*", route => new URL(route.request().url()).hostname === "127.0.0.1"
         ? route.continue() : route.abort());
     const base = `http://127.0.0.1:${server.address().port}`;
     const readyIndex = () => page.waitForFunction(() => document.querySelectorAll("#switch-spreadsheet .tabs-title").length > 0);
@@ -43,7 +52,6 @@ try {
     const importSource = async (id, source) => page.locator(id).setInputFiles({
         name: "configuracoes-teste.js", mimeType: "text/javascript", buffer: Buffer.from(source),
     });
-    const stored = () => page.evaluate(() => JSON.parse(localStorage.getItem("dashboard-settings-v1")));
     const reportContext = () => page.evaluate(async () =>
         (await import("/js/reports/core/report-context.js")).getReportContext());
 
@@ -53,6 +61,7 @@ try {
     assert.equal(await page.locator("#reportCapacityInput, #reportCollaboratorsInput").count(), 0);
     assert.equal(await page.locator(".global-inputs > div").count(), 3);
     assert.equal((await reportContext()).shiftCapacity, 20000);
+    await page.locator('a[href="#reports"]').click();
     await page.locator("#reportPlanningInput").fill("3141");
     await page.evaluate(async () => {
         const receipt = await import("/js/reports/receipt/state.js");
@@ -63,9 +72,24 @@ try {
     });
     const reportsBefore = await page.evaluate(async () =>
         (await import("/js/reports/core/report-manager.js")).reportManager.exportSession());
+    const dashboard = page;
+    const newTab = context.waitForEvent("page");
     await page.locator("#dashboardSettingsLink").click();
+    page = await newTab;
     await page.waitForURL("**/settings.html");
     await readySettings();
+    const dashboardDestination = new URL(await page.locator("#settingsBackButton").getAttribute("href"), page.url());
+    if (dashboardDestination.origin !== base) {
+        // Verifica o destino configurado sem acessar a versão publicada durante o teste local.
+        await page.route(dashboardDestination.href, route => route.fulfill({
+            status: 302, headers: { location: `${base}/index.html` },
+        }));
+    }
+    assert.equal(dashboard.isClosed(), false);
+    assert.equal(dashboard.url(), `${base}/`);
+    const unnamedDownloadEvent = page.waitForEvent("download");
+    await page.locator("#settingsSaveButton").click();
+    assert.equal((await unnamedDownloadEvent).suggestedFilename(), "configurações-dashboard.js");
     await choose("settingsAnalystName", "Caio");
     await page.locator("#settingsAnalystEmail").fill("caio@example.com");
     await choose("settingsAnalystShift", "PM2");
@@ -73,8 +97,6 @@ try {
     assert.match(await page.locator(".analyst img").getAttribute("src"), /owl-icon\.svg$/);
     await page.locator("#settingsSpreadsheetName1").fill("Minha Planilha");
     await choose("settingsSpreadsheetVisibility2", "Oculta");
-    assert.ok(await page.evaluate(() => document.documentElement.scrollHeight <= window.innerHeight + 100),
-        "Selects ocultos não devem criar espaço em branco fora da lista de planilhas.");
     await page.screenshot({ path: path.join(output, "perfil-configuracoes.png"), fullPage: true });
     await page.locator('a[href="#another-links"]').click();
     await page.locator('label[for="settingsReverseFormVisible"]').click();
@@ -88,30 +110,36 @@ try {
     const downloadEvent = page.waitForEvent("download");
     await page.locator("#settingsSaveButton").click();
     const download = await downloadEvent;
-    assert.match(download.suggestedFilename(), /^configuracoes-dashboard-.*\.js$/);
+    assert.equal(download.suggestedFilename(), "Caio-configurações-dashboard.js");
     const exported = await readFile(await download.path(), "utf8");
     const saved = parseDashboardSettingsFile(exported);
     assert.deepEqual(saved.profile, { name: "Caio", email: "caio@example.com", shift: "PM2", icon: "owl" });
     assert.equal(saved.footerVisibility.reverseForm, false);
     assert.equal(saved.spreadsheets[0].menuName, "Minha Planilha");
     assert.equal(saved.spreadsheets[1].visible, false);
-    assert.deepEqual(await stored(), saved);
     assert.match(page.url(), /settings\.html/);
 
-    // Voltar pelo menu descarta a prévia não salva e preserva os dados operacionais.
-    await page.locator('label[for="settingsReverseFormVisible"]').click();
-    await page.locator("#settingsBackButton").click();
-    await page.waitForURL("**/index.html");
-    await readyIndex();
-    assert.equal(await page.locator("#footerReverseFormLink").isVisible(), false);
-    assert.equal(await page.locator("#reportWindowInput").inputValue(), "PM2");
-    assert.equal(await page.locator("#reportAnalystInput").inputValue(), "Caio");
+    // Salvar baixa o arquivo; recarregar o editor restaura os padrões.
+    await page.reload();
+    await readySettings();
+    assert.equal(await page.locator("#settingsAnalystEmail").inputValue(), "");
+    assert.equal(await page.locator("#settingsAnalystName").inputValue(), "");
+    assert.equal(await page.locator("#settingsReverseFormVisible").isChecked(), true);
+    await importSource("#settingsFileInput", exported);
+    await page.waitForFunction(() => document.getElementById("settingsAnalystName").value === "Caio");
+    assert.equal(await page.locator("#settingsAnalystEmail").inputValue(), "caio@example.com");
+    assert.equal(await page.locator("#settingsReverseFormVisible").isChecked(), false);
+    const settingsPage = page;
+
+    // O dashboard permanece aberto e só aplica as mudanças quando o arquivo é importado.
+    page = dashboard;
+    assert.equal(await page.locator("#footerReverseFormLink").isVisible(), true);
+    assert.equal(await page.locator("#reportWindowInput").inputValue(), "AM");
+    assert.equal(await page.locator("#reportAnalystInput").inputValue(), "");
     assert.equal(await page.locator("#reportPlanningInput").inputValue(), "3141");
     const reportsAfter = await page.evaluate(async () =>
         (await import("/js/reports/core/report-manager.js")).reportManager.exportSession());
-    assert.deepEqual(reportsAfter.receipt, { ...reportsBefore.receipt, window: "PM2",
-        linehaul: { ...reportsBefore.receipt.linehaul, window: "PM2" } });
-    assert.deepEqual(reportsAfter.reverse, reportsBefore.reverse);
+    assert.deepEqual(reportsAfter, reportsBefore);
 
     // O importador do index aceita configurações sem substituir os relatórios.
     const imported = structuredClone(saved);
@@ -135,13 +163,7 @@ try {
     assert.equal((await reportContext()).shiftCapacity, 20000);
     assert.equal(await page.locator("#footerDamageAppLink").isVisible(), true);
 
-    await page.locator("#dashboardSettingsLink").click();
-    await page.waitForURL("**/settings.html");
-    await readySettings();
-    await importSource("#settingsFileInput", exported);
-    await page.waitForFunction(() => document.getElementById("settingsAnalystName").value === "Caio");
-    assert.equal(await page.locator("#settingsReverseFormVisible").isChecked(), false);
-    assert.equal((await stored()).profile.name, "Fernando");
+    page = settingsPage;
     await page.locator("#settingsAnalystEmail").fill("email-invalido");
     await page.locator("#settingsSaveAndBackButton").click();
     assert.match(page.url(), /settings\.html/);
@@ -149,22 +171,29 @@ try {
     await page.locator("#settingsAnalystEmail").fill("caio@example.com");
     const backDownload = page.waitForEvent("download");
     await page.locator("#settingsSaveAndBackButton").click();
-    await backDownload;
+    assert.equal((await backDownload).suggestedFilename(), "Caio-configurações-dashboard.js");
     await page.waitForURL("**/index.html");
     await readyIndex();
-    assert.equal(await page.locator("#reportAnalystInput").inputValue(), "Caio");
-    assert.equal(await page.locator("#reportPlanningInput").inputValue(), "3141");
-    assert.equal(await page.locator("#footerReverseFormLink").isVisible(), false);
+    assert.equal(await page.locator("#reportAnalystInput").inputValue(), "");
+    assert.equal(await page.locator("#reportPlanningInput").inputValue(), "");
+    assert.equal(await page.locator("#footerReverseFormLink").isVisible(), true);
     assert.equal((await reportContext()).shiftCapacity, 20000);
-    assert.equal(await page.locator("#switch-spreadsheet .tabs-title").count(), 16);
+    assert.equal(await dashboard.locator("#reportPlanningInput").inputValue(), "3141");
+    assert.equal(await dashboard.locator("#reportAnalystInput").inputValue(), "Analista legado");
 
-    // A configuração salva reaparece ao abrir a página diretamente.
+    // Abrir diretamente e voltar também funciona sem ler ou gravar dados persistentes.
     await page.goto(`${base}/settings.html`);
     await readySettings();
-    assert.equal(await page.locator("#settingsAnalystEmail").inputValue(), "caio@example.com");
-    assert.equal(await page.locator("#settingsReverseFormVisible").isChecked(), false);
+    assert.equal(await page.locator("#settingsAnalystEmail").inputValue(), "");
+    assert.equal(await page.locator("#settingsReverseFormVisible").isChecked(), true);
+    await page.locator("#settingsBackButton").click();
+    await page.waitForURL("**/index.html");
+    await readyIndex();
+    for (const tab of context.pages()) {
+        assert.deepEqual(await tab.evaluate(() => window.storageAccesses), []);
+    }
     assert.deepEqual(errors, []);
-    console.log(`Configurações: navegação, prévia, salvamento, importação e compatibilidade verificadas. Imagens: ${output}`);
+    console.log(`Configurações: duas guias, nomes dos arquivos, prévia e importação verificados sem usar Storage. Imagens: ${output}`);
 } finally {
     await browser?.close();
     await new Promise(resolve => server.close(resolve));

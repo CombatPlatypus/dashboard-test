@@ -1,10 +1,11 @@
 import {
     exportDashboardSettings,
     importDashboardSettings,
-    saveDashboardSettings,
+    validateDashboardSettings,
 } from "../spreadsheets/load-spreadsheets.js";
 import { downloadReportBlob } from "../reports/export.js";
 import {
+    createDashboardSettingsFileName,
     parseDashboardSettingsFile,
     readDashboardSettingsFile,
     serializeDashboardSettingsFile,
@@ -35,13 +36,14 @@ function validateInputs() {
 function saveSettings(returnToDashboard = false) {
     if (!validateInputs()) return;
     try {
-        const content = serializeDashboardSettingsFile(exportDashboardSettings());
-        saveDashboardSettings();
-        const fileName = `configuracoes-dashboard-${new Date().toISOString().slice(0, 10)}.js`;
+        const settings = exportDashboardSettings();
+        validateDashboardSettings(settings);
+        const content = serializeDashboardSettingsFile(settings);
+        const fileName = createDashboardSettingsFileName(settings.profile.name);
         downloadReportBlob(new Blob([content], { type: "text/javascript;charset=utf-8" }), fileName);
         if (returnToDashboard) {
             // Permite que o navegador inicie o download antes de sair da página.
-            window.setTimeout(() => window.location.assign("index.html"), 150);
+            window.setTimeout(() => window.location.assign(document.getElementById("settingsBackButton").href), 150);
         } else {
             notify(`Configurações salvas em ${fileName}.`);
         }
@@ -62,7 +64,7 @@ fileInput.addEventListener("change", async () => {
     try {
         const source = await readDashboardSettingsFile(file);
         importDashboardSettings(parseDashboardSettingsFile(source));
-        notify(`Configurações importadas de ${file.name}. Salve para aplicá-las ao dashboard.`);
+        notify(`Configurações importadas de ${file.name}.`);
     } catch (error) {
         notify(error.message || "Não foi possível importar as configurações.", "error");
     } finally {

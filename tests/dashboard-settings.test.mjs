@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
+    createDashboardSettingsFileName,
     parseDashboardSettingsFile, readDashboardSettingsFile, serializeDashboardSettingsFile,
 } from "../js/settings/settings-file.js";
 import {
@@ -17,6 +18,14 @@ const settings = {
         damageApp: "https://example.com/avarias", collectionApp: "" },
     footerVisibility: { reverseForm: false, packRecovery: true, damageApp: false, collectionApp: true },
 };
+
+test("nome do arquivo inclui o analista quando escolhido e dispensa a data", () => {
+    assert.equal(createDashboardSettingsFileName(), "configurações-dashboard.js");
+    assert.equal(createDashboardSettingsFileName("   "), "configurações-dashboard.js");
+    assert.equal(createDashboardSettingsFileName("Caio"), "Caio-configurações-dashboard.js");
+    assert.equal(createDashboardSettingsFileName("  João da Silva  "), "João da Silva-configurações-dashboard.js");
+    assert.equal(createDashboardSettingsFileName("Caio/Teste:*?"), "CaioTeste-configurações-dashboard.js");
+});
 
 test("arquivo preserva perfil, nomes, links e escolhas do footer sem executar código", () => {
     assert.deepEqual(parseDashboardSettingsFile(serializeDashboardSettingsFile(settings)), settings);

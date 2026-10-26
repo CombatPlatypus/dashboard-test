@@ -3,8 +3,6 @@ import {
 } from "./default-spreadsheets.js";
 import { updateReportContextField } from "../reports/core/report-context.js";
 
-const DASHBOARD_SETTINGS_STORAGE_KEY = "dashboard-settings-v1";
-const DASHBOARD_SETTINGS_DRAFT_KEY = "dashboard-settings-draft";
 const DEFAULT_DASHBOARD_PROFILE = Object.freeze({
     name: "", email: "", shift: "AM", icon: "default",
 });
@@ -1530,29 +1528,6 @@ function renderDashboardProfile(applyToReports = true) {
     }
 }
 
-function saveDashboardSettings() {
-    const settings = exportDashboardSettings();
-    validateDashboardSettings(settings);
-    window.localStorage.setItem(DASHBOARD_SETTINGS_STORAGE_KEY, JSON.stringify(settings));
-    return settings;
-}
-
-function readSavedDashboardSettings() {
-    try {
-        const draft = dashboardSettingsElements?.spreadsheetRows
-            ? window.sessionStorage.getItem(DASHBOARD_SETTINGS_DRAFT_KEY) : null;
-        if (draft) window.sessionStorage.removeItem(DASHBOARD_SETTINGS_DRAFT_KEY);
-        const source = draft || window.localStorage.getItem(DASHBOARD_SETTINGS_STORAGE_KEY);
-        if (!source) return null;
-        const settings = JSON.parse(source);
-        validateDashboardSettings(settings);
-        return normalizeDashboardSettings(settings);
-    } catch (error) {
-        console.warn("Não foi possível carregar as configurações salvas.", error);
-        return null;
-    }
-}
-
 /* APLICA AS CONFIGURAÇÕES IMPORTADAS */
 
 function renderDashboardSettings(applyProfileToReports = true) {
@@ -1995,7 +1970,7 @@ async function initializeDashboardSettings() {
             FALLBACK_SPREADSHEET_SETTINGS;
     }
 
-    const initialSettings = readSavedDashboardSettings() || createDefaultDashboardSettings();
+    const initialSettings = createDefaultDashboardSettings();
 
     Object.assign(dashboardSettingsState, initialSettings);
 
@@ -2016,10 +1991,8 @@ async function initializeDashboardSettings() {
 if (globalThis.document) await initializeDashboardSettings();
 
 export {
-    DASHBOARD_SETTINGS_DRAFT_KEY,
     exportDashboardSettings,
     importDashboardSettings,
     initializeDashboardSettings,
     validateDashboardSettings,
-    saveDashboardSettings,
 };

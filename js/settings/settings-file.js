@@ -35,6 +35,14 @@ function serializeDashboardSettingsFile(settings, date = new Date()) {
         .replace(/\u2028/g, "\\u2028").replace(/\u2029/g, "\\u2029")};\n`;
 }
 
+function createDashboardSettingsFileName(analystName = "") {
+    const name = String(analystName ?? "")
+        .replace(/[<>:"/\\|?*\u0000-\u001f]/g, "")
+        .replace(/\s+/g, " ")
+        .replace(/^[. ]+|[. ]+$/g, "");
+    return `${name ? `${name}-` : ""}configurações-dashboard.js`;
+}
+
 async function readDashboardSettingsFile(file) {
     if (!file || typeof file.text !== "function" || !/\.js$/i.test(file.name)) {
         throw new TypeError("Selecione um arquivo .js de configurações ou sessão.");
@@ -47,6 +55,7 @@ async function readDashboardSettingsFile(file) {
 
 export {
     DASHBOARD_SETTINGS_SCHEMA,
+    createDashboardSettingsFileName,
     parseDashboardDataFile,
     parseDashboardSettingsFile,
     readDashboardSettingsFile,
