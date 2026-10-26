@@ -1,6 +1,21 @@
 import {
     loadDefaultSpreadsheetSettings,
 } from "./default-spreadsheets.js";
+import { updateReportContextField } from "../reports/core/report-context.js";
+
+const DASHBOARD_SETTINGS_STORAGE_KEY = "dashboard-settings-v1";
+const DASHBOARD_SETTINGS_DRAFT_KEY = "dashboard-settings-draft";
+const DEFAULT_DASHBOARD_PROFILE = Object.freeze({
+    name: "", email: "", shift: "AM", icon: "default",
+});
+const DASHBOARD_PROFILE_ICONS = Object.freeze({
+    default: "images/geral-icons/hub-logo-menu.svg",
+    owl: "images/profile-icons/owl-icon.svg",
+    platypus: "images/profile-icons/platypus-icon.svg",
+    elephant: "images/profile-icons/elephant-icon.svg",
+    snake: "images/profile-icons/snake-icon.svg",
+    cat: "images/profile-icons/cat-icon.svg",
+});
 
 const DASHBOARD_SPREADSHEET_LIMIT = 20;
 
@@ -167,6 +182,8 @@ const DEFAULT_DASHBOARD_EXTERNAL_LINKS =
     });
 
 const dashboardSettingsState = {
+    profile: { ...DEFAULT_DASHBOARD_PROFILE },
+    footerVisibility: Object.fromEntries(DASHBOARD_EXTERNAL_LINK_KEYS.map(key => [key, true])),
     spreadsheets: [],
 
     externalLinks: {
@@ -214,6 +231,8 @@ function createDefaultSpreadsheetSetting(
 
 function createDefaultDashboardSettings() {
     return {
+        profile: { ...DEFAULT_DASHBOARD_PROFILE },
+        footerVisibility: Object.fromEntries(DASHBOARD_EXTERNAL_LINK_KEYS.map(key => [key, true])),
         spreadsheets:
             Array.from(
                 {
@@ -342,6 +361,15 @@ function normalizeDashboardSettings(
             : {};
 
     return {
+        profile: {
+            name: normalizeSettingsText(value.profile?.name, 60),
+            email: normalizeSettingsText(value.profile?.email, 254),
+            shift: value.profile?.shift || DEFAULT_DASHBOARD_PROFILE.shift,
+            icon: value.profile?.icon || DEFAULT_DASHBOARD_PROFILE.icon,
+        },
+        footerVisibility: Object.fromEntries(
+            DASHBOARD_EXTERNAL_LINK_KEYS.map(key => [key, value.footerVisibility?.[key] !== false]),
+        ),
         spreadsheets:
             Array.from(
                 {
@@ -473,6 +501,24 @@ function validateDashboardSettings(
         );
     }
 
+    if (value.profile !== undefined) {
+        const profile = value.profile;
+        if (!profile || typeof profile !== "object" || Array.isArray(profile) ||
+            typeof profile.name !== "string" || profile.name.length > 60 ||
+            typeof profile.email !== "string" || profile.email.length > 254 ||
+            !["AM", "PM1", "PM2"].includes(profile.shift) ||
+            !Object.hasOwn(DASHBOARD_PROFILE_ICONS, profile.icon)) {
+            throw new TypeError("O perfil do analista é inválido.");
+        }
+    }
+    if (value.footerVisibility !== undefined && (
+        !value.footerVisibility || typeof value.footerVisibility !== "object" ||
+        Array.isArray(value.footerVisibility) || DASHBOARD_EXTERNAL_LINK_KEYS.some(key =>
+            Object.hasOwn(value.footerVisibility, key) && typeof value.footerVisibility[key] !== "boolean")
+    )) {
+        throw new TypeError("A visibilidade dos links do footer é inválida.");
+    }
+
     return true;
 }
 
@@ -480,6 +526,8 @@ function validateDashboardSettings(
 
 function exportDashboardSettings() {
     return {
+        profile: { ...dashboardSettingsState.profile },
+        footerVisibility: { ...dashboardSettingsState.footerVisibility },
         spreadsheets:
             dashboardSettingsState
                 .spreadsheets
@@ -819,7 +867,7 @@ function initializeFoundationTabs(
 /* MONTA TODO O PAINEL DE PLANILHAS */
 
 function renderSpreadsheetInterface() {
-    if (!dashboardSettingsElements) {
+    if (!dashboardSettingsElements?.tabs || !dashboardSettingsElements?.panels) {
         return false;
     }
 
@@ -904,6 +952,7 @@ function renderSpreadsheetInterface() {
 function renderSpreadsheetMenuName(
     index,
 ) {
+    if (!dashboardSettingsElements?.tabs || !dashboardSettingsElements?.panels) return false;
     if (!dashboardSettingsElements) {
         return false;
     }
@@ -1089,7 +1138,7 @@ function initializeSpreadsheetNavigation(
     return true;
 }
 
-/* CRIA AS 20 LINHAS DO REVEAL */
+/* CRIA AS 20 LINHAS DAS CONFIGURAÇÕES */
 
 function createSpreadsheetSettingsRow(
     index,
@@ -1272,7 +1321,7 @@ function renderUrlInputValidity(
 /* RENDERIZA OS VALORES NOS INPUTS */
 
 function renderSettingsInputs() {
-    if (!dashboardSettingsElements) {
+    if (!dashboardSettingsElements?.spreadsheetRows) {
         return;
     }
 
@@ -1363,6 +1412,18 @@ function renderSettingsInputs() {
                 );
             },
         );
+
+    document.querySelectorAll("[data-dashboard-footer-visible]").forEach(input => {
+        input.checked = dashboardSettingsState.footerVisibility[input.dataset.dashboardFooterVisible];
+    });
+    document.querySelectorAll("[data-dashboard-profile-field]").forEach(input => {
+        const value = dashboardSettingsState.profile[input.dataset.dashboardProfileField];
+        if (input instanceof HTMLSelectElement && !Array.from(input.options).some(option => option.value === value)) {
+            input.add(new Option(value, value));
+        }
+        input.value = value;
+        window.jQuery?.(input).trigger("change.select2");
+    });
 }
 
 /* ATUALIZA OS LINKS FORA DO PAINEL */
@@ -1411,26 +1472,34 @@ function renderExternalLinks() {
         [
             reverseFormButton,
             reverseFormUrl,
+            "reverseForm",
         ],
         [
             packRecoveryButton,
             packRecoveryUrl,
+            "packRecovery",
         ],
         [
             damageAppButton,
             damageAppUrl,
+            "damageApp",
         ],
         [
             collectionAppButton,
             collectionAppUrl,
+            "collectionApp",
         ],
     ].forEach(
         function (
             [
                 button,
                 url,
+                key,
             ],
         ) {
+            if (!button) return;
+            const item = button.closest("footer > div > div");
+            if (item) item.hidden = !dashboardSettingsState.footerVisibility[key];
             button.dataset.url = url;
             button.disabled = !url;
             button.setAttribute(
@@ -1442,13 +1511,54 @@ function renderExternalLinks() {
         },
     );
 
+    const visibleItems = [...document.querySelectorAll("footer > div > div")].filter(item => !item.hidden);
+    document.querySelectorAll("footer > div > div").forEach(item => item.classList.remove("footer-last-visible"));
+    visibleItems.at(-1)?.classList.add("footer-last-visible");
+
+}
+
+function renderDashboardProfile(applyToReports = true) {
+    if (!globalThis.document) return;
+    const profile = dashboardSettingsState.profile;
+    document.querySelectorAll("[data-dashboard-profile-icon]").forEach(image => {
+        image.src = DASHBOARD_PROFILE_ICONS[profile.icon];
+        image.alt = profile.name ? `Perfil de ${profile.name}` : "Ícone do dashboard";
+    });
+    if (applyToReports && document.getElementById("reportWindowInput")) {
+        updateReportContextField("window", profile.shift);
+        updateReportContextField("analyst", profile.name);
+    }
+}
+
+function saveDashboardSettings() {
+    const settings = exportDashboardSettings();
+    validateDashboardSettings(settings);
+    window.localStorage.setItem(DASHBOARD_SETTINGS_STORAGE_KEY, JSON.stringify(settings));
+    return settings;
+}
+
+function readSavedDashboardSettings() {
+    try {
+        const draft = dashboardSettingsElements?.spreadsheetRows
+            ? window.sessionStorage.getItem(DASHBOARD_SETTINGS_DRAFT_KEY) : null;
+        if (draft) window.sessionStorage.removeItem(DASHBOARD_SETTINGS_DRAFT_KEY);
+        const source = draft || window.localStorage.getItem(DASHBOARD_SETTINGS_STORAGE_KEY);
+        if (!source) return null;
+        const settings = JSON.parse(source);
+        validateDashboardSettings(settings);
+        return normalizeDashboardSettings(settings);
+    } catch (error) {
+        console.warn("Não foi possível carregar as configurações salvas.", error);
+        return null;
+    }
 }
 
 /* APLICA AS CONFIGURAÇÕES IMPORTADAS */
 
-function renderDashboardSettings() {
+function renderDashboardSettings(applyProfileToReports = true) {
     renderSettingsInputs();
     renderExternalLinks();
+    renderDashboardProfile(applyProfileToReports);
     renderSpreadsheetInterface();
 }
 
@@ -1464,13 +1574,11 @@ function importDashboardSettings(
             value,
         );
 
-    dashboardSettingsState.spreadsheets =
-        normalizedSettings.spreadsheets;
+    if (value.profile === undefined) normalizedSettings.profile = { ...dashboardSettingsState.profile };
 
-    dashboardSettingsState.externalLinks =
-        normalizedSettings.externalLinks;
+    Object.assign(dashboardSettingsState, normalizedSettings);
 
-    renderDashboardSettings();
+    renderDashboardSettings(value.profile !== undefined);
 
     return true;
 }
@@ -1494,13 +1602,33 @@ function scheduleSpreadsheetRender() {
         );
 }
 
-/* CONECTA OS INPUTS DO REVEAL */
+/* CONECTA OS INPUTS DA PÁGINA DE CONFIGURAÇÕES */
 
 function bindDashboardSettingsEvents() {
     const {
         spreadsheetRows,
         anotherLinks,
     } = dashboardSettingsElements;
+
+    if (!spreadsheetRows || !anotherLinks) return;
+
+    document.querySelectorAll("[data-dashboard-profile-field]").forEach(input => {
+        const update = () => {
+            const field = input.dataset.dashboardProfileField;
+            dashboardSettingsState.profile[field] = input.value;
+            renderDashboardProfile();
+        };
+        input.addEventListener(input.tagName === "SELECT" ? "change" : "input", update);
+        if (input.tagName === "SELECT" && window.jQuery) {
+            window.jQuery(input).on("change.dashboardProfile", update);
+        }
+    });
+    anotherLinks.addEventListener("change", event => {
+        const input = event.target.closest("[data-dashboard-footer-visible]");
+        if (!input) return;
+        dashboardSettingsState.footerVisibility[input.dataset.dashboardFooterVisible] = input.checked;
+        renderExternalLinks();
+    });
 
     const getSpreadsheetLinkInput =
         function (target) {
@@ -1817,23 +1945,11 @@ function getDashboardSettingsElements() {
 function hasDashboardSettingsElements(
     elements,
 ) {
-    return (
+    return Boolean(elements.spreadsheetRows && elements.anotherLinks) || (
         elements.tabs instanceof
             HTMLElement &&
         elements.panels instanceof
             HTMLElement &&
-        elements.spreadsheetRows instanceof
-            HTMLElement &&
-        elements.anotherLinks instanceof
-            HTMLElement &&
-        elements.externalLinkInputs.length ===
-            DASHBOARD_EXTERNAL_LINK_KEYS.length &&
-        elements.externalLinkInputs.every(
-            function (input) {
-                return input instanceof
-                    HTMLInputElement;
-            },
-        ) &&
         elements.reverseFormButton instanceof
             HTMLButtonElement &&
         elements.packRecoveryButton instanceof
@@ -1879,20 +1995,13 @@ async function initializeDashboardSettings() {
             FALLBACK_SPREADSHEET_SETTINGS;
     }
 
-    const initialSettings =
-        createDefaultDashboardSettings();
+    const initialSettings = readSavedDashboardSettings() || createDefaultDashboardSettings();
 
-    dashboardSettingsState.spreadsheets =
-        initialSettings.spreadsheets;
+    Object.assign(dashboardSettingsState, initialSettings);
 
-    dashboardSettingsState.externalLinks =
-        initialSettings.externalLinks;
+    if (elements.spreadsheetRows) createSpreadsheetSettingsRows(elements.spreadsheetRows);
 
-    createSpreadsheetSettingsRows(
-        elements.spreadsheetRows,
-    );
-
-    initializeSpreadsheetNavigation(
+    if (elements.tabs && elements.panels) initializeSpreadsheetNavigation(
         elements.tabs,
         elements.panels,
     );
@@ -1904,11 +2013,13 @@ async function initializeDashboardSettings() {
     return true;
 }
 
-await initializeDashboardSettings();
+if (globalThis.document) await initializeDashboardSettings();
 
 export {
+    DASHBOARD_SETTINGS_DRAFT_KEY,
     exportDashboardSettings,
     importDashboardSettings,
     initializeDashboardSettings,
     validateDashboardSettings,
+    saveDashboardSettings,
 };

@@ -30,16 +30,6 @@ const reportGlobalInputDefinitions = [
         field: "plannedVolume",
         characterType: "numbers",
     },
-    {
-        id: "reportCollaboratorsInput",
-        field: "collaboratorCount",
-        characterType: "numbers",
-    },
-    {
-        id: "reportCapacityInput",
-        field: "shiftCapacity",
-        characterType: "numbers",
-    },
 ];
 
 const reportQuantityFormatter =

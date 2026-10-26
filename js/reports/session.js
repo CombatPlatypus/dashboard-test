@@ -16,10 +16,19 @@ import {
 } from "./core/report-context.js";
 
 import {
+    DASHBOARD_SETTINGS_DRAFT_KEY,
     exportDashboardSettings,
     importDashboardSettings,
+    saveDashboardSettings,
     validateDashboardSettings,
 } from "../spreadsheets/load-spreadsheets.js";
+import {
+    DASHBOARD_SETTINGS_SCHEMA,
+    parseDashboardDataFile,
+    parseDashboardSettingsFile,
+} from "../settings/settings-file.js";
+
+const REPORT_NAVIGATION_STORAGE_KEY = "dashboard-settings-report-return";
 
 const REPORT_SESSION_SCHEMA =
     "dashboard-report-session";
@@ -930,19 +939,23 @@ function initializeReportSession() {
                         file,
                     );
 
-                const payload =
-                    parseReportSession(
-                        source,
-                    );
-
-                restoreReportSession(
-                    payload,
-                );
+                const data = parseDashboardDataFile(source);
+                const settingsOnly = data?.schema === DASHBOARD_SETTINGS_SCHEMA;
+                if (settingsOnly) {
+                    importDashboardSettings(parseDashboardSettingsFile(source));
+                    saveDashboardSettings();
+                } else {
+                    const payload = parseReportSession(source);
+                    restoreReportSession(payload);
+                    if (payload.settings !== undefined) saveDashboardSettings();
+                }
 
                 setReportSessionNotification({
                     type: "success",
                     message:
-                        `Sessão restaurada de ${file.name}.`,
+                        settingsOnly
+                            ? `Configurações importadas de ${file.name}.`
+                            : `Sessão restaurada de ${file.name}.`,
                 });
             } catch (error) {
                 console.error(
@@ -965,6 +978,39 @@ function initializeReportSession() {
             }
         },
     );
+
+    // A página dedicada não deve descartar os relatórios ao sair e voltar.
+    document.getElementById("dashboardSettingsLink")?.addEventListener("click", event => {
+        try {
+            const payload = createReportSessionPayload();
+            payload.reports = reportManager.exportSession();
+            window.sessionStorage.setItem(REPORT_NAVIGATION_STORAGE_KEY, serializeReportSession(payload));
+            window.sessionStorage.setItem(DASHBOARD_SETTINGS_DRAFT_KEY, JSON.stringify(exportDashboardSettings()));
+        } catch (error) {
+            event.preventDefault();
+            setReportSessionNotification({ type: "error", message:
+                "Não foi possível preservar a sessão para abrir as configurações. Salve a sessão e tente novamente." });
+        }
+    });
+
+    try {
+        const source = window.sessionStorage.getItem(REPORT_NAVIGATION_STORAGE_KEY);
+        if (source) {
+            const payload = parseReportSession(source);
+            const currentSettings = exportDashboardSettings();
+            restoreReportSession({ ...payload, settings: undefined });
+            reportManager.importSession(Object.fromEntries(Object.entries(payload.reports)
+                .filter(([id]) => !REPORT_SESSION_IDS.includes(id))));
+            if (JSON.stringify(currentSettings) !== JSON.stringify(payload.settings)) {
+                importDashboardSettings(currentSettings);
+            }
+            window.sessionStorage.removeItem(REPORT_NAVIGATION_STORAGE_KEY);
+        }
+    } catch (error) {
+        console.error("Não foi possível restaurar a sessão ao voltar das configurações.", error);
+        setReportSessionNotification({ type: "error", message:
+            "Não foi possível restaurar automaticamente os relatórios ao voltar das configurações." });
+    }
 
     reportSessionInitialized = true;
 

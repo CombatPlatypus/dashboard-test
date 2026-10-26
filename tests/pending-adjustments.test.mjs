@@ -10,7 +10,7 @@ import {
     getLossesRateMonthSummary,
 } from "../js/reports/losses-rate/state.js";
 
-test("capacidade global começa em 20.000 e usa o nome Capacidade do Hub", () => {
+test("capacidade permanece em 20.000 sem os inputs globais removidos", () => {
     const html = readFileSync(
         new URL(
             "../index.html",
@@ -24,9 +24,9 @@ test("capacidade global começa em 20.000 e usa o nome Capacidade do Hub", () =>
             .shiftCapacity,
         20000,
     );
-    assert.match(
+    assert.doesNotMatch(
         html,
-        /<h4>Capacidade do Hub<\/h4>\s*<input\b[^>]*\bid="reportCapacityInput"[^>]*>/,
+        /id="report(?:Capacity|Collaborators)Input"/,
     );
 });
 

@@ -27,102 +27,151 @@
         <link rel="stylesheet" href="css/dashboard-style.css">
         <link rel="stylesheet" href="css/settings.css">
 
-        <style>
-            
-            body {
 
-            }
-            .settings {
-                width: 100%;
-                height: 100vh;
-                user-select: none;
-            }
-            .settings > ul:first-of-type {
-                flex: 0 0 300px;
-                display: flex;
-                flex-direction: column;
-                gap: 10px;
-                margin: 35px;
-            }
-            .settings > ul:first-of-type > .tabs-title {
-                width: 100%;
-            }
-            .settings > div:last-of-type {
-                flex: 1 1 0;
-                display: flex;
-                flex-direction: column;
-                background-color: var(--color-container);
-                border-left: 2px solid var(--color-border);
-                padding: 35px;
-            }
-            .settings > div:last-of-type .title {
-                border-bottom: 2px solid var(--color-border);
-                padding: 20px;
-            }
-            .settings > div:last-of-type .title h3 {
-                margin: 0;
-            }
-            .settings > div:last-of-type h4 {
-                margin: 0;
-            }
-            .settings > div:last-of-type p {
-                margin: 15px 25px 0 25px;
-                text-align: justify;
-            }
-            .settings > div:last-of-type hr {
-                max-width: 100%;;
-            }
-            .settings > div:last-of-type > .flex-box-start {
-                gap: 15px;
-            }
-            .settings > div:last-of-type .padding {
-                padding: 20px;
-            }
-
-        </style>
-    </head>	
+    </head>
 
     <!-- CONTEÚDO DA PÁGINA -->
 
     <body>
+
+        <!-- MENU PRINCIPAL -->
+
+        <nav class="main-menu">
+            <div class="flex-box-between">
+
+                <!-- FOTO, NOME DO SISTEMA E VERSÃO -->
+
+                <div class="flex-box-start">
+                    <img src="images/geral-icons/hub-logo-menu.svg" data-dashboard-profile-icon alt="Ícone do dashboard">
+
+                    <div>
+                        <h3>Configurações do Dashboard</h3>
+                        <p><i>Versão 1.5 - Operações Last Mile</i></p>
+                    </div>
+                </div>
+
+                <!-- OPÇÕES DO MENU -->
+
+                <ul class="flex-box-start">
+
+                    <a href="index.html" class="link-button" id="settingsBackButton">Voltar ao Dashboard</a>
+
+                    <!-- LISTA DE BOTÕES PRINCIPAIS DO MENU -->
+
+                    <div class="nav-actions">
+                        <button id="settingsSaveButton" type="button" title="Salvar configurações" aria-label="Salvar configurações">
+                            <img src="images/geral-icons/save-icon.svg" aria-hidden="true">
+                        </button>
+
+                        <button id="settingsImportButton" type="button" title="Importar configurações" aria-label="Importar configurações">
+                            <img src="images/geral-icons/import-icon.svg" aria-hidden="true">
+                        </button>
+
+                        <input id="settingsFileInput" type="file" accept=".js,text/javascript,application/javascript" hidden>
+
+                        <a href="https://chat.whatsapp.com/Kr5rdRRfJjiKbzHhPK3geA">
+                            <img src="images/menu-icons/support-icon.svg">
+                        </a>
+                    </div>
+                </ul>
+            </div>
+        </nav>
+
+        <p id="settingsFeedback" class="settings-feedback" role="status" aria-live="polite" aria-atomic="true" hidden></p>
+
         <div class="settings flex-box-start">
-            <ul class="tabs" data-tabs id="settings">
+            <div>
+                <ul class="tabs" data-tabs id="settings">
+                    <li class="tabs-title is-active">
+                        <a href="#profile">Perfil do Analista</a>
+                    </li>
 
-                <li class="tabs-title is-active">
-                    <a href="#settings-links">Perfil do Analista</a>
-                </li>
+                    <li class="tabs-title">
+                        <a href="#another-links">Botões do Footer</a>
+                    </li>
 
-                <li class="tabs-title">
-                    <a href="#another-links">Botões do Footer</a>
-                </li> 
-                                
-                <li class="tabs-title">
-                    <a href="#settings-themes">Aparência do Dash</a>
-                </li> 
+                    <li class="tabs-title">
+                        <a href="#settings-themes">Aparência do Dash</a>
+                    </li>
 
-                <button class="link-button">Salvar e Voltar</button>
-            </ul>
+                    <hr>
+
+                    <button class="link-button" id="settingsSaveAndBackButton" type="button">Salvar e Voltar</button>
+                </ul>
+            </div>
 
             <div>
                 <div class="tabs-content" data-tabs-content="settings">
+                    <div class="tabs-panel is-active" id="profile">
+                        <div class="title">
+                            <h4>Perfil do Analista</h4>
+                        </div>
 
-                    <div class="tabs-panel is-active" id="settings-links">
+                        <div style="padding: 35px;">
 
-                        <!-- LISTA DINÂMICA DE LINKS -->
+                            <!-- INFORMAÇÕES DO PEFIL DO ANALISTA -->
 
-                        <div class="spreadsheets-links" id="settingsSpreadsheetRows">
-                            <div>
-                                <h4>Primeira Planilha</h4>
+                            <div class="analyst flex-box-start">
+                                <img src="images/geral-icons/hub-logo-menu.svg" data-dashboard-profile-icon alt="Ícone do analista">
 
-                                <div data-dashboard-spreadsheet-row="0">
-                                    <input type="url" inputmode="none" autocomplete="off" placeholder="Cole o Link da Planilha" id="settingsSpreadsheetLink1" data-dashboard-spreadsheet-field="link" aria-label="Link da planilha 1">
-                                    <input type="text" placeholder="Nome no Menu" maxlength="22" id="settingsSpreadsheetName1" data-dashboard-spreadsheet-field="menuName" aria-label="Nome da planilha 1 no menu">
+                                <div class="flex-box-start">
+                                    <div>
+                                        <h4>Analista</h4>
+
+                                        <select id="settingsAnalystName" data-dashboard-profile-field="name" class="search-select-3" style="width: 100%;" aria-label="Nome do analista">
+                                            <option value="">Selecione um analista</option>
+                                            <option value="Caio">Caio</option>
+                                            <option value="Fernando">Fernando</option>
+                                            <option value="Thamyres">Thamyres</option>
+                                        </select>
+                                    </div>
 
                                     <div>
-                                        <select class="standard-select" style="width: 100%;" id="settingsSpreadsheetVisibility1" data-dashboard-spreadsheet-field="visible" aria-label="Visibilidade da planilha 1">
-                                            <option value="show">Visível</option>
-                                            <option value="hide">Oculta</option>
+                                        <h4>Email de Contato</h4>
+                                        <input type="email" id="settingsAnalystEmail" data-dashboard-profile-field="email" maxlength="254" autocomplete="email" aria-label="Email de contato">
+                                    </div>
+
+                                    <div>
+                                        <h4>Turno</h4>
+                                        <select id="settingsAnalystShift" data-dashboard-profile-field="shift" class="standard-select" style="width: 100%;" aria-label="Turno do analista">
+                                            <option value="AM">AM</option>
+                                            <option value="PM1">PM1</option>
+                                            <option value="PM2">PM2</option>
                                         </select>
+                                    </div>
+
+                                    <div>
+                                        <h4>Ícone</h4>
+                                        <select id="settingsAnalystIcon" data-dashboard-profile-field="icon" class="standard-select" style="width: 100%;" aria-label="Ícone do analista">
+                                            <option value="default">Padrão 63</option>
+                                            <option value="owl">Coruja</option>
+                                            <option value="platypus">Ornitorrinco</option>
+                                            <option value="elephant">Elefante</option>
+                                            <option value="snake">Cobra</option>
+                                            <option value="cat">Gato</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr>
+
+                            <!-- LISTA DINÂMICA DE PLANILHAS -->
+
+                            <div class="spreadsheets-links" id="settingsSpreadsheetRows">
+                                <div>
+                                    <h4>Primeira Planilha</h4>
+
+                                    <div data-dashboard-spreadsheet-row="0">
+                                        <input type="url" inputmode="none" autocomplete="off" placeholder="Cole o Link da Planilha" id="settingsSpreadsheetLink1" data-dashboard-spreadsheet-field="link" aria-label="Link da planilha 1">
+                                        <input type="text" placeholder="Nome no Menu" maxlength="22" id="settingsSpreadsheetName1" data-dashboard-spreadsheet-field="menuName" aria-label="Nome da planilha 1 no menu">
+
+                                        <div>
+                                            <select class="standard-select" style="width: 100%;" id="settingsSpreadsheetVisibility1" data-dashboard-spreadsheet-field="visible" aria-label="Visibilidade da planilha 1">
+                                                <option value="show">Visível</option>
+                                                <option value="hide">Oculta</option>
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -130,27 +179,62 @@
                     </div>
 
                     <div class="tabs-panel" id="another-links">
-                        <div>
+                        <div class="title">
+                            <h4>Botões do Footer</h4>
+                        </div>
+
+                        <div style="padding: 35px;">
                             <div>
                                 <h4>Forms da Reversa</h4>
-                                <input type="url" id="settingsReverseFormLink" data-dashboard-external-link="reverseForm" aria-label="Link do Forms da Reversa">
+
+                                <div class="flex-box-start">
+                                    <input type="url" id="settingsReverseFormLink" data-dashboard-external-link="reverseForm" aria-label="Link do Forms da Reversa">
+
+                                    <div class="checkbox">
+                                        <input type="checkbox" id="settingsReverseFormVisible" data-dashboard-footer-visible="reverseForm" checked aria-label="Mostrar Forms de Reversa no footer">
+                                        <label for="settingsReverseFormVisible" title="Mostrar no footer"></label>
+                                    </div>
+                                </div>
                             </div>
-        
+
                             <div>
                                 <h4>Pack Recovery</h4>
-                                <input type="url" id="settingsPackRecoveryLink" data-dashboard-external-link="packRecovery" aria-label="Link do Pack Recovery">
+
+                                <div class="flex-box-start">
+                                    <input type="url" id="settingsPackRecoveryLink" data-dashboard-external-link="packRecovery" aria-label="Link do Pack Recovery">
+
+                                    <div class="checkbox">
+                                        <input type="checkbox" id="settingsPackRecoveryVisible" data-dashboard-footer-visible="packRecovery" checked aria-label="Mostrar Pack Recovery no footer">
+                                        <label for="settingsPackRecoveryVisible" title="Mostrar no footer"></label>
+                                    </div>
+                                </div>
                             </div>
-        
+
                             <div>
                                 <h4>Avarias AppSheet</h4>
-                                <input type="url" id="settingsDamageAppLink" data-dashboard-external-link="damageApp" aria-label="Link do Avarias AppSheet">
+                                <div class="flex-box-start">
+                                    <input type="url" id="settingsDamageAppLink" data-dashboard-external-link="damageApp" aria-label="Link do Avarias AppSheet">
+
+                                    <div class="checkbox">
+                                        <input type="checkbox" id="settingsDamageAppVisible" data-dashboard-footer-visible="damageApp" checked aria-label="Mostrar App das Avarias no footer">
+                                        <label for="settingsDamageAppVisible" title="Mostrar no footer"></label>
+                                    </div>
+                                </div>
                             </div>
-        
+
                             <div>
                                 <h4>Coletas AppSheet</h4>
-                                <input type="url" id="settingsCollectionAppLink" data-dashboard-external-link="collectionApp" aria-label="Link do Coletas AppSheet">
+
+                                <div class="flex-box-start">
+                                    <input type="url" id="settingsCollectionAppLink" data-dashboard-external-link="collectionApp" aria-label="Link do Coletas AppSheet">
+
+                                    <div class="checkbox">
+                                        <input type="checkbox" id="settingsCollectionAppVisible" data-dashboard-footer-visible="collectionApp" checked aria-label="Mostrar App das Coletas no footer">
+                                        <label for="settingsCollectionAppVisible" title="Mostrar no footer"></label>
+                                    </div>
+                                </div>
                             </div>
-        
+
                         </div>
                     </div>
 
@@ -159,20 +243,87 @@
             </div>
         </div>
 
-        <!-- JS - BARRA DE CARREGAMENTO -->  
+        <!-- FOOTER DO DASHBOARD -->
+
+        <footer>
+            <div>
+                <div>
+                    <img src="images/geral-icons/docs-icon.svg">
+
+                    <button type="button" class="external-link" data-url="https://combatplatypus.github.io/dashboard/docs.html">
+                        Documentação ↗
+                    </button>
+                </div>
+
+                <div>
+                    <img src="images/links-icons/box-icon.svg">
+
+                    <button type="button" class="external-link" data-url="https://spx.shopee.com.br/">
+                        Sistema SPX ↗
+                    </button>
+                </div>
+
+                <div>
+                    <img src="images/geral-icons/sheets-icon.svg">
+
+                    <button type="button" class="external-link" data-url="https://docs.google.com/spreadsheets/d/1jSYbHh2vq96RA3z0GQQNR8oLZULFvJF-v4_Qc8y5ZDo/edit?gid=354393054#gid=354393054">
+                        Planilhas Base ↗
+                    </button>
+                </div>
+
+                <div>
+                    <img src="images/links-icons/forms-icon.svg">
+                    <button id="footerReverseFormLink" type="button" class="external-link" data-url="" disabled>
+                        Forms de Reversa ↗
+                    </button>
+                </div>
+
+                <div>
+                    <img src="images/links-icons/recovery-icon.svg">
+
+                    <button id="footerPackRecoveryLink" type="button" class="external-link" data-url="" disabled>
+                        Pack Recovery ↗
+                    </button>
+                </div>
+
+                <div>
+                    <img src="images/links-icons/avarias-icon.svg">
+
+                    <button id="footerDamageAppLink" type="button" class="external-link" data-url="" disabled>
+                        App das Avarias ↗
+                    </button>
+                </div>
+
+                <div>
+                    <img src="images/links-icons/coleta-icon.svg">
+
+                    <button id="footerCollectionAppLink" type="button" class="external-link" data-url="" disabled>
+                        App das Coletas ➚
+                    </button>
+                </div>
+            </div>
+        </footer>
+
+        <!-- JS - BARRA DE CARREGAMENTO -->
 
         <script src="js/pace.min.js" async></script>
 
-        <!-- JS - VERSÃO DO JQUERY -->  
+        <!-- JS - VERSÃO DO JQUERY -->
 
         <script src="js/jquery/jquery-3.2.1.min.js"></script>
 
-        <!-- JS - RECURSOS DO FOUNDATION -->  
+        <!-- JS - SELECT2 -->
+
+        <script src="js/select2/select2.min.js" defer></script>
+        <script src="js/select2/options-select2.js" defer></script>
+
+        <!-- JS - RECURSOS DO FOUNDATION -->
 
         <script src="js/foundation/foundation.min.js" defer></script>
 
         <!-- PONTO DE ENTRADA DA APLICAÇÃO -->
 
         <script src="js/foundation/app.js" defer></script>
+        <script type="module" src="js/settings/page.js"></script>
     </body>
 </html>

@@ -1,12 +1,14 @@
 const reportContextListeners =
     new Set();
 
+const TEMPORARY_HUB_CAPACITY = 20000;
+
 const reportContext = {
     window: "AM",
     analyst: "",
     plannedVolume: null,
     collaboratorCount: null,
-    shiftCapacity: 20000,
+    shiftCapacity: TEMPORARY_HUB_CAPACITY,
 };
 
 const reportContextTextFields =
@@ -166,7 +168,9 @@ function updateReportContextField(
 
     let normalizedValue;
 
-    if (field === "window") {
+    if (field === "shiftCapacity") {
+        normalizedValue = TEMPORARY_HUB_CAPACITY;
+    } else if (field === "window") {
         normalizedValue =
             normalizeReportContextWindow(
                 value,
@@ -233,10 +237,7 @@ function restoreReportContext(
             receivedContext.collaboratorCount,
         );
 
-    reportContext.shiftCapacity =
-        normalizeReportContextQuantity(
-            receivedContext.shiftCapacity,
-        );
+    reportContext.shiftCapacity = TEMPORARY_HUB_CAPACITY;
 
     notifyReportContext({
         type: "report-context-restored",

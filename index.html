@@ -91,11 +91,11 @@
                 <!-- FOTO, NOME DO SISTEMA E VERSÃO -->
 
                 <div class="flex-box-start">
-                    <img src="images/geral-icons/hub-logo-menu.svg">
+                    <img src="images/geral-icons/hub-logo-menu.svg" data-dashboard-profile-icon alt="Ícone do dashboard">
 
                     <div>
                         <h3>Dashboard do Inventário</h3>
-                        <p><i>Versão 1.4 - Operações Last Mile</i></p>
+                        <p><i>Versão 1.5 - Operações Last Mile</i></p>
                     </div>
                 </div>
 
@@ -160,7 +160,7 @@
 
                         <input id="reportSessionFileInput" type="file" accept=".js,text/javascript,application/javascript" hidden>
 
-                        <a data-open="settings">
+                        <a href="settings.html" id="dashboardSettingsLink" aria-label="Configurações do dashboard" title="Configurações do dashboard">
                             <img src="images/menu-icons/settings-icon.svg">
                         </a>
 
@@ -227,15 +227,6 @@
                             <input type="text" id="reportPlanningInput" maxlength="9" autocomplete="off" inputmode="numeric" pattern="[0-9]*">
                         </div>
 
-                        <div>
-                            <h4>Total de Colaboradores</h4>
-                            <input type="text" id="reportCollaboratorsInput" maxlength="5" autocomplete="off" inputmode="numeric" pattern="[0-9]*">
-                        </div>
-
-                        <div>
-                            <h4>Capacidade do Hub</h4>
-                            <input type="text" id="reportCapacityInput" maxlength="9" autocomplete="off" inputmode="numeric" pattern="[0-9]*">
-                        </div>
                     </div>
 
                     <!-- NAVEGAÇÃO ENTRE OS RELATÓRIOS -->
@@ -3805,86 +3796,6 @@
             </div>
 
             <button class="close-button" data-close type="button" aria-label="Cancelar importação">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-
-        <!-- REVEAL - CONFIGURAÇÕES -->
-
-        <div class="reveal small" id="settings" data-reveal data-close-on-click="true">
-            <div class="title">
-                <h4>Configurações do Dashboard</h4>
-            </div>
-
-            <div class="padding">
-                <ul class="tabs" data-tabs id="settings-tabs">
-                    <li class="tabs-title is-active">
-                        <a href="#settings-links">Link das Planilhas</a>
-                    </li>
-
-                    <li class="tabs-title">
-                        <a href="#another-links">Outros Links do Dashboard</a>
-                    </li> 
-                                    
-                    <li class="tabs-title" style="display: none;">
-                        <a href="#settings-themes">Temas do Dashboard</a>
-                    </li> 
-                </ul> 
-
-                <div class="tabs-content" data-tabs-content="settings-tabs">
-                    <div class="tabs-panel is-active" id="settings-links">
-
-                        <!-- LISTA DINÂMICA DE LINKS -->
-
-                        <div class="spreadsheets-links" id="settingsSpreadsheetRows">
-                            <div>
-                                <h4>Primeira Planilha</h4>
-
-                                <div data-dashboard-spreadsheet-row="0">
-                                    <input type="url" inputmode="none" autocomplete="off" placeholder="Cole o Link da Planilha" id="settingsSpreadsheetLink1" data-dashboard-spreadsheet-field="link" aria-label="Link da planilha 1">
-                                    <input type="text" placeholder="Nome no Menu" maxlength="22" id="settingsSpreadsheetName1" data-dashboard-spreadsheet-field="menuName" aria-label="Nome da planilha 1 no menu">
-
-                                    <div>
-                                        <select class="standard-select" style="width: 100%;" id="settingsSpreadsheetVisibility1" data-dashboard-spreadsheet-field="visible" aria-label="Visibilidade da planilha 1">
-                                            <option value="show">Visível</option>
-                                            <option value="hide">Oculta</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="tabs-panel" id="another-links">
-                        <div>
-                            <div>
-                                <h4>Forms da Reversa</h4>
-                                <input type="url" id="settingsReverseFormLink" data-dashboard-external-link="reverseForm" aria-label="Link do Forms da Reversa">
-                            </div>
-        
-                            <div>
-                                <h4>Pack Recovery</h4>
-                                <input type="url" id="settingsPackRecoveryLink" data-dashboard-external-link="packRecovery" aria-label="Link do Pack Recovery">
-                            </div>
-        
-                            <div>
-                                <h4>Avarias AppSheet</h4>
-                                <input type="url" id="settingsDamageAppLink" data-dashboard-external-link="damageApp" aria-label="Link do Avarias AppSheet">
-                            </div>
-        
-                            <div>
-                                <h4>Coletas AppSheet</h4>
-                                <input type="url" id="settingsCollectionAppLink" data-dashboard-external-link="collectionApp" aria-label="Link do Coletas AppSheet">
-                            </div>
-        
-                        </div>
-                    </div>
-
-                    <div class="tabs-panel" id="settings-themes"></div>
-                </div>
-            </div>
-
-            <button class="close-button" data-close aria-label="Close modal" type="button">
                 <span aria-hidden="true">&times;</span>
             </button>
         </div>
