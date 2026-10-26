@@ -425,7 +425,7 @@
 
         <p id="settingsFeedback" class="settings-feedback" role="status" aria-live="polite" aria-atomic="true" hidden></p>
 
-        <div class="settings">
+        <div style="margin: 0 auto; max-width: 1600px;">
             <div class="warning" id="" role="status" aria-live="polite" aria-atomic="true" data-notification-type="idle">
                 <div class="flex-box-start">
                     <img id="" src="images/geral-icons/bell-icon.svg" aria-hidden="true">
@@ -433,242 +433,242 @@
                     <h4 id="">Selecione a finalidade para definir como os dados serão importados.</h4>
                 </div>
             </div>
+        </div>
         
-            <div class="flex-box-start">
-                <div>
-                    <ul class="tabs" data-tabs id="settings">
-                        <li class="tabs-title is-active">
-                            <a href="#profile">Perfil do Analista</a>
-                        </li>
+        <div class="settings flex-box-start">
+            <div>
+                <ul class="tabs" data-tabs id="settings">
+                    <li class="tabs-title is-active">
+                        <a href="#profile">Perfil do Analista</a>
+                    </li>
 
-                        <li class="tabs-title">
-                            <a href="#another-links">Botões do Footer</a>
-                        </li>
+                    <li class="tabs-title">
+                        <a href="#another-links">Botões do Footer</a>
+                    </li>
 
-                        <li class="tabs-title">
-                            <a href="#settings-themes">Aparência do Dash</a>
-                        </li>
+                    <li class="tabs-title">
+                        <a href="#settings-themes">Aparência do Dash</a>
+                    </li>
 
-                        <hr>
+                    <hr>
 
-                        <button class="link-button" id="settingsSaveAndBackButton" type="button">Salvar e Voltar</button>
-                    </ul>
-                </div>
+                    <button class="link-button" id="settingsSaveAndBackButton" type="button">Salvar e Voltar</button>
+                </ul>
+            </div>
 
-                <div>
-                    <div class="tabs-content" data-tabs-content="settings">
-                        <div class="tabs-panel is-active" id="profile">
-                            <div class="title">
-                                <h4>Perfil do Analista</h4>
-                            </div>
+            <div>
+                <div class="tabs-content" data-tabs-content="settings">
+                    <div class="tabs-panel is-active" id="profile">
+                        <div class="title">
+                            <h4>Perfil do Analista</h4>
+                        </div>
 
-                            <div style="padding: 35px;">
+                        <div style="padding: 35px;">
 
-                                <!-- INFORMAÇÕES DO PEFIL DO ANALISTA -->
+                            <!-- INFORMAÇÕES DO PEFIL DO ANALISTA -->
 
-                                <div class="analyst flex-box-start">
-                                    <img src="images/geral-icons/hub-logo-menu.svg" data-dashboard-profile-icon alt="Ícone do analista">
+                            <div class="analyst flex-box-start">
+                                <img src="images/geral-icons/hub-logo-menu.svg" data-dashboard-profile-icon alt="Ícone do analista">
 
-                                    <div class="flex-box-start">
-                                        <div>
-                                            <h4>Analista</h4>
-
-                                            <select id="settingsAnalystName" data-dashboard-profile-field="name" class="standard-select" style="width: 100%;" aria-label="Nome do analista">
-                                                <option value="">Escolha um Analista</option>
-                                                <option value="Caio Vinicius" data-email="caio.vinicius@shopee.com" data-shift="AM">Caio Vinicius</option>
-                                                <option value="Fernando Ferrari" data-email="fernando.ferrari@shopee.com" data-shift="PM2">Fernando Ferrari</option>
-                                                <option value="Thamyris Dias" data-email="thamyris.ribeiro@shopee.com" data-shift="PM1">Thamyris Dias</option>
-                                            </select>
-                                        </div>
-
-                                        <div>
-                                            <h4>Email de Contato</h4>
-                                            <input type="email" id="settingsAnalystEmail" data-dashboard-profile-field="email" maxlength="254" autocomplete="email" aria-label="Email de contato" style="flex: 0 0 250px;">
-                                        </div>
-
-                                        <div>
-                                            <h4>Turno</h4>
-                                            <select id="settingsAnalystShift" data-dashboard-profile-field="shift" class="standard-select" style="width: 100%;" aria-label="Turno do analista">
-                                                <option value="AM">AM</option>
-                                                <option value="PM1">PM1</option>
-                                                <option value="PM2">PM2</option>
-                                            </select>
-                                        </div>
-
-                                        <div>
-                                            <h4>Ícone</h4>
-                                            <select id="settingsAnalystIcon" data-dashboard-profile-field="icon" class="standard-select" style="width: 100%;" aria-label="Ícone do analista">
-                                                <option value="default">Padrão</option>
-                                                <option value="owl">Coruja</option>
-                                                <option value="platypus">Ornitorrinco</option>
-                                                <option value="elephant">Elefante</option>
-                                                <option value="snake">Cobra</option>
-                                                <option value="cat">Gato</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <hr>
-
-                                <!-- LISTA DINÂMICA DE PLANILHAS -->
-
-                                <div class="spreadsheets-links" id="settingsSpreadsheetRows">
+                                <div class="flex-box-start">
                                     <div>
-                                        <h4>Primeira Planilha</h4>
+                                        <h4>Analista</h4>
 
-                                        <div data-dashboard-spreadsheet-row="0">
-                                            <input type="url" inputmode="none" autocomplete="off" placeholder="Cole o Link da Planilha" id="settingsSpreadsheetLink1" data-dashboard-spreadsheet-field="link" aria-label="Link da planilha 1">
-                                            <input type="text" placeholder="Nome no Menu" maxlength="22" id="settingsSpreadsheetName1" data-dashboard-spreadsheet-field="menuName" aria-label="Nome da planilha 1 no menu">
+                                        <select id="settingsAnalystName" data-dashboard-profile-field="name" class="standard-select" style="width: 100%;" aria-label="Nome do analista">
+                                            <option value="">Escolha um Analista</option>
+                                            <option value="Caio Vinicius" data-email="caio.vinicius@shopee.com" data-shift="AM">Caio Vinicius</option>
+                                            <option value="Fernando Ferrari" data-email="fernando.ferrari@shopee.com" data-shift="PM2">Fernando Ferrari</option>
+                                            <option value="Thamyris Dias" data-email="thamyris.ribeiro@shopee.com" data-shift="PM1">Thamyris Dias</option>
+                                        </select>
+                                    </div>
 
-                                            <div>
-                                                <select class="standard-select" style="width: 100%;" id="settingsSpreadsheetVisibility1" data-dashboard-spreadsheet-field="visible" aria-label="Visibilidade da planilha 1">
-                                                    <option value="show">Visível</option>
-                                                    <option value="hide">Oculta</option>
-                                                </select>
-                                            </div>
+                                    <div>
+                                        <h4>Email de Contato</h4>
+                                        <input type="email" id="settingsAnalystEmail" data-dashboard-profile-field="email" maxlength="254" autocomplete="email" aria-label="Email de contato" style="flex: 0 0 250px;">
+                                    </div>
+
+                                    <div>
+                                        <h4>Turno</h4>
+                                        <select id="settingsAnalystShift" data-dashboard-profile-field="shift" class="standard-select" style="width: 100%;" aria-label="Turno do analista">
+                                            <option value="AM">AM</option>
+                                            <option value="PM1">PM1</option>
+                                            <option value="PM2">PM2</option>
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <h4>Ícone</h4>
+                                        <select id="settingsAnalystIcon" data-dashboard-profile-field="icon" class="standard-select" style="width: 100%;" aria-label="Ícone do analista">
+                                            <option value="default">Padrão</option>
+                                            <option value="owl">Coruja</option>
+                                            <option value="platypus">Ornitorrinco</option>
+                                            <option value="elephant">Elefante</option>
+                                            <option value="snake">Cobra</option>
+                                            <option value="cat">Gato</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr>
+
+                            <!-- LISTA DINÂMICA DE PLANILHAS -->
+
+                            <div class="spreadsheets-links" id="settingsSpreadsheetRows">
+                                <div>
+                                    <h4>Primeira Planilha</h4>
+
+                                    <div data-dashboard-spreadsheet-row="0">
+                                        <input type="url" inputmode="none" autocomplete="off" placeholder="Cole o Link da Planilha" id="settingsSpreadsheetLink1" data-dashboard-spreadsheet-field="link" aria-label="Link da planilha 1">
+                                        <input type="text" placeholder="Nome no Menu" maxlength="22" id="settingsSpreadsheetName1" data-dashboard-spreadsheet-field="menuName" aria-label="Nome da planilha 1 no menu">
+
+                                        <div>
+                                            <select class="standard-select" style="width: 100%;" id="settingsSpreadsheetVisibility1" data-dashboard-spreadsheet-field="visible" aria-label="Visibilidade da planilha 1">
+                                                <option value="show">Visível</option>
+                                                <option value="hide">Oculta</option>
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                    </div>
 
-                        <div class="tabs-panel" id="another-links">
-                            <div class="title">
-                                <h4>Botões do Footer</h4>
-                            </div>
-
-                            <div style="padding: 35px;">
-                                <div>
-                                    <h4>Forms da Reversa</h4>
-
-                                    <div class="flex-box-start">
-                                        <input type="url" id="settingsReverseFormLink" data-dashboard-external-link="reverseForm" aria-label="Link do Forms da Reversa">
-
-                                        <div class="checkbox">
-                                            <input type="checkbox" id="settingsReverseFormVisible" data-dashboard-footer-visible="reverseForm" checked aria-label="Mostrar Forms de Reversa no footer">
-                                            <label for="settingsReverseFormVisible" title="Mostrar no footer"></label>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <h4>Pack Recovery</h4>
-
-                                    <div class="flex-box-start">
-                                        <input type="url" id="settingsPackRecoveryLink" data-dashboard-external-link="packRecovery" aria-label="Link do Pack Recovery">
-
-                                        <div class="checkbox">
-                                            <input type="checkbox" id="settingsPackRecoveryVisible" data-dashboard-footer-visible="packRecovery" checked aria-label="Mostrar Pack Recovery no footer">
-                                            <label for="settingsPackRecoveryVisible" title="Mostrar no footer"></label>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <h4>Avarias AppSheet</h4>
-                                    <div class="flex-box-start">
-                                        <input type="url" id="settingsDamageAppLink" data-dashboard-external-link="damageApp" aria-label="Link do Avarias AppSheet">
-
-                                        <div class="checkbox">
-                                            <input type="checkbox" id="settingsDamageAppVisible" data-dashboard-footer-visible="damageApp" checked aria-label="Mostrar App das Avarias no footer">
-                                            <label for="settingsDamageAppVisible" title="Mostrar no footer"></label>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <h4>Coletas AppSheet</h4>
-
-                                    <div class="flex-box-start">
-                                        <input type="url" id="settingsCollectionAppLink" data-dashboard-external-link="collectionApp" aria-label="Link do Coletas AppSheet">
-
-                                        <div class="checkbox">
-                                            <input type="checkbox" id="settingsCollectionAppVisible" data-dashboard-footer-visible="collectionApp" checked aria-label="Mostrar App das Coletas no footer">
-                                            <label for="settingsCollectionAppVisible" title="Mostrar no footer"></label>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
+                    <div class="tabs-panel" id="another-links">
+                        <div class="title">
+                            <h4>Botões do Footer</h4>
                         </div>
 
-                        <div class="tabs-panel" id="settings-themes">
-                            <div class="title">
-                                <h4>Aparência do Dash</h4>
+                        <div style="padding: 35px;">
+                            <div>
+                                <h4>Forms da Reversa</h4>
+
+                                <div class="flex-box-start">
+                                    <input type="url" id="settingsReverseFormLink" data-dashboard-external-link="reverseForm" aria-label="Link do Forms da Reversa">
+
+                                    <div class="checkbox">
+                                        <input type="checkbox" id="settingsReverseFormVisible" data-dashboard-footer-visible="reverseForm" checked aria-label="Mostrar Forms de Reversa no footer">
+                                        <label for="settingsReverseFormVisible" title="Mostrar no footer"></label>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div style="padding: 35px;">
+                            <div>
+                                <h4>Pack Recovery</h4>
 
-                                <div class="colors-templates">
+                                <div class="flex-box-start">
+                                    <input type="url" id="settingsPackRecoveryLink" data-dashboard-external-link="packRecovery" aria-label="Link do Pack Recovery">
 
-                                    <div class="template default">
-                                        <div></div>
-
-                                        <div class="flex-box-start">
-                                            <div></div>
-                                            <div></div>
-                                        </div>
-
-                                        <div></div>
+                                    <div class="checkbox">
+                                        <input type="checkbox" id="settingsPackRecoveryVisible" data-dashboard-footer-visible="packRecovery" checked aria-label="Mostrar Pack Recovery no footer">
+                                        <label for="settingsPackRecoveryVisible" title="Mostrar no footer"></label>
                                     </div>
-
-                                    <div class="template red">
-                                        <div></div>
-
-                                        <div class="flex-box-start">
-                                            <div></div>
-                                            <div></div>
-                                        </div>
-
-                                        <div></div>
-                                    </div>
-
-                                    <div class="template blue">
-                                        <div></div>
-
-                                        <div class="flex-box-start">
-                                            <div></div>
-                                            <div></div>
-                                        </div>
-
-                                        <div></div>
-                                    </div>
-
-                                    <div class="template green">
-                                        <div></div>
-
-                                        <div class="flex-box-start">
-                                            <div></div>
-                                            <div></div>
-                                        </div>
-
-                                        <div></div>
-                                    </div>
-
-                                    <div class="template rose">
-                                        <div></div>
-
-                                        <div class="flex-box-start">
-                                            <div></div>
-                                            <div></div>
-                                        </div>
-
-                                        <div></div>
-                                    </div>
-
-                                    <div class="template purple">
-                                        <div></div>
-
-                                        <div class="flex-box-start">
-                                            <div></div>
-                                            <div></div>
-                                        </div>
-
-                                        <div></div>
-                                    </div>
-
                                 </div>
+                            </div>
+
+                            <div>
+                                <h4>Avarias AppSheet</h4>
+                                <div class="flex-box-start">
+                                    <input type="url" id="settingsDamageAppLink" data-dashboard-external-link="damageApp" aria-label="Link do Avarias AppSheet">
+
+                                    <div class="checkbox">
+                                        <input type="checkbox" id="settingsDamageAppVisible" data-dashboard-footer-visible="damageApp" checked aria-label="Mostrar App das Avarias no footer">
+                                        <label for="settingsDamageAppVisible" title="Mostrar no footer"></label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h4>Coletas AppSheet</h4>
+
+                                <div class="flex-box-start">
+                                    <input type="url" id="settingsCollectionAppLink" data-dashboard-external-link="collectionApp" aria-label="Link do Coletas AppSheet">
+
+                                    <div class="checkbox">
+                                        <input type="checkbox" id="settingsCollectionAppVisible" data-dashboard-footer-visible="collectionApp" checked aria-label="Mostrar App das Coletas no footer">
+                                        <label for="settingsCollectionAppVisible" title="Mostrar no footer"></label>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="tabs-panel" id="settings-themes">
+                        <div class="title">
+                            <h4>Aparência do Dash</h4>
+                        </div>
+
+                        <div style="padding: 35px;">
+
+                            <div class="colors-templates">
+
+                                <div class="template default">
+                                    <div></div>
+
+                                    <div class="flex-box-start">
+                                        <div></div>
+                                        <div></div>
+                                    </div>
+
+                                    <div></div>
+                                </div>
+
+                                <div class="template red">
+                                    <div></div>
+
+                                    <div class="flex-box-start">
+                                        <div></div>
+                                        <div></div>
+                                    </div>
+
+                                    <div></div>
+                                </div>
+
+                                <div class="template blue">
+                                    <div></div>
+
+                                    <div class="flex-box-start">
+                                        <div></div>
+                                        <div></div>
+                                    </div>
+
+                                    <div></div>
+                                </div>
+
+                                <div class="template green">
+                                    <div></div>
+
+                                    <div class="flex-box-start">
+                                        <div></div>
+                                        <div></div>
+                                    </div>
+
+                                    <div></div>
+                                </div>
+
+                                <div class="template rose">
+                                    <div></div>
+
+                                    <div class="flex-box-start">
+                                        <div></div>
+                                        <div></div>
+                                    </div>
+
+                                    <div></div>
+                                </div>
+
+                                <div class="template purple">
+                                    <div></div>
+
+                                    <div class="flex-box-start">
+                                        <div></div>
+                                        <div></div>
+                                    </div>
+
+                                    <div></div>
+                                </div>
+
                             </div>
                         </div>
                     </div>
