@@ -3,6 +3,9 @@
     /* TEMAS DE CORES */
 
     :root {
+
+        /* TEMA PADRÃO */
+
         --color-body: #000000;
         --color-container: #101010;
         --color-container-iframe: #fff;
@@ -18,6 +21,117 @@
         --color-gray-p: #a8a9ad;
         --color-progress-bar: #3e3e3e;
         --color-close-button: #8f8d8d;
+
+        /* TEMA ROXO */
+
+        --purple-color-body: #150721;
+        --purple-color-container: #200b32;
+        --purple-color-container-iframe: #fff;
+        --purple-color-container-houver: #32114e;
+        --purple-color-container-focus: #32114e;
+        --color-container-input: #150721;
+        --purple-color-border: #632599;
+        --purple-color-text: #e4e6eb;
+        --purple-color-table-title: #371356;
+        --purple-color-table-th: #371356;
+        --purple-color-table-tr: #2b0f42;
+        --purple-color-button: #e4e6eb;
+        --purple-color-button-text: #000000;
+        --purple-color-gray-p: #e4e6eb;
+        --purple-color-progress-bar: #371356;
+        --purple-color-close-button: #e4e6eb;
+
+        /* TEMA AZUL */
+
+        --blue-color-body: #17294e;
+        --blue-color-container: #1c3978;
+        --blue-color-container-iframe: #fff;
+        --blue-color-container-houver: #224593;
+        --blue-color-container-focus: #224593;
+        --blue-color-container-input: #17294e;
+        --blue-color-border: #4472db;
+        --blue-color-text: #e4e6eb;
+        --blue-color-table-title: #234797;
+        --blue-color-table-th: #234797;
+        --blue-color-table-tr: #24448d;
+        --blue-color-button: #e4e6eb;
+        --blue-color-button-text: #000000;
+        --blue-color-gray-p: #e4e6eb;
+        --blue-color-progress-bar: #234797;
+        --blue-color-close-button: #e4e6eb;
+
+        /* TEMA AZUL */
+
+        --blue-color-body: #17294e;
+        --blue-color-container: #1c3978;
+        --blue-color-container-iframe: #fff;
+        --blue-color-container-houver: #224593;
+        --blue-color-container-focus: #224593;
+        --blue-color-container-input: #17294e;
+        --blue-color-border: #4472db;
+        --blue-color-text: #e4e6eb;
+        --blue-color-table-title: #234797;
+        --blue-color-table-th: #234797;
+        --blue-color-table-tr: #24448d;
+        --blue-color-button: #e4e6eb;
+        --blue-color-button-text: #000000;
+        --blue-color-gray-p: #e4e6eb;
+        --blue-color-progress-bar: #234797;
+        --blue-color-close-button: #e4e6eb;
+
+        /* TEMA VERMELHO */
+
+        --red-color-body: #290000;
+        --red-color-container: #3d0000;
+        --red-color-container-iframe: #fff;
+        --red-color-container-houver: #500202;
+        --red-color-container-focus: #500202;
+        --red-color-border: #910000;
+        --red-color-text: #e4e6eb;
+        --red-color-table-title: #480101;
+        --red-color-table-th: #480101;
+        --red-color-table-tr: #330000;
+        --red-color-button: #e4e6eb;
+        --red-color-button-text: #000000;
+        --red-color-gray-p: #e4e6eb;
+        --red-color-progress-bar: #480101;
+        --red-color-close-button: #8f8d8d;
+
+        /* TEMA VERDE */
+
+        --green-color-body: #062308;
+        --green-color-container: #09340d;
+        --green-color-container-iframe: #fff;
+        --green-color-container-houver: #0f5114;
+        --green-color-container-focus: #0f5114;
+        --green-color-border: #15791e;
+        --green-color-text: #e4e6eb;
+        --green-color-table-title: #0d4613;
+        --green-color-table-th: #0d4613;
+        --green-color-table-tr: #0c3e11;
+        --green-color-button: #e4e6eb;
+        --green-color-button-text: #000000;
+        --green-color-gray-p: #e4e6eb;
+        --green-color-progress-bar: #0c3e11;
+        --green-color-close-button: #8f8d8d;
+
+        /* TEMA ROSA */
+
+        --pink-color-body: #1d0c13;
+        --pink-color-container: #2b121c;
+        --pink-color-container-iframe: #fff;
+        --pink-color-container-houver: #3e1a29;
+        --pink-color-container-focus: #3e1a29;
+        --pink-color-border: #bc5369;
+        --pink-color-text: #e4e6eb;
+        --pink-color-table-title: #421c2b;
+        --pink-color-table-th: #421c2b;
+        --pink-color-table-tr: #361723;
+        --pink-color-button: #e4e6eb;
+        --pink-color-button-text: #000000;
+        --pink-color-gray-p: #a8a9ad;
+        --pink-color-progress-bar: #421c2b;
+        --pink-color-close-button: #e4e6eb;
     }
 
     /* DOCUMENTO */
