@@ -1591,6 +1591,12 @@ function bindDashboardSettingsEvents() {
         const update = () => {
             const field = input.dataset.dashboardProfileField;
             dashboardSettingsState.profile[field] = input.value;
+            if (field === "name") {
+                const email = input.selectedOptions[0]?.dataset.email || "";
+                dashboardSettingsState.profile.email = email;
+                const emailInput = document.querySelector('[data-dashboard-profile-field="email"]');
+                if (emailInput) emailInput.value = email;
+            }
             renderDashboardProfile();
         };
         input.addEventListener(input.tagName === "SELECT" ? "change" : "input", update);

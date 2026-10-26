@@ -90,8 +90,21 @@ try {
     const unnamedDownloadEvent = page.waitForEvent("download");
     await page.locator("#settingsSaveButton").click();
     assert.equal((await unnamedDownloadEvent).suggestedFilename(), "configurações-dashboard.js");
-    await choose("settingsAnalystName", "Caio");
-    await page.locator("#settingsAnalystEmail").fill("caio@example.com");
+    for (const [name, email] of [
+        ["Caio Vinicius", "caio.vinicius@shopee.com"],
+        ["Fernando Ferrari", "fernando.ferrari@shopee.com"],
+        ["Thamyris Dias", "thamyris.ribeiro@shopee.com"],
+    ]) {
+        await choose("settingsAnalystName", name);
+        assert.equal(await page.locator("#settingsAnalystEmail").inputValue(), email);
+        const profile = await page.evaluate(async () =>
+            (await import("/js/spreadsheets/load-spreadsheets.js")).exportDashboardSettings().profile);
+        assert.equal(profile.name, name);
+        assert.equal(profile.email, email);
+    }
+    await choose("settingsAnalystName", "Escolha um Analista");
+    assert.equal(await page.locator("#settingsAnalystEmail").inputValue(), "");
+    await choose("settingsAnalystName", "Caio Vinicius");
     await choose("settingsAnalystShift", "PM2");
     await choose("settingsAnalystIcon", "Coruja");
     assert.match(await page.locator(".analyst img").getAttribute("src"), /owl-icon\.svg$/);
@@ -110,10 +123,10 @@ try {
     const downloadEvent = page.waitForEvent("download");
     await page.locator("#settingsSaveButton").click();
     const download = await downloadEvent;
-    assert.equal(download.suggestedFilename(), "Caio-configurações-dashboard.js");
+    assert.equal(download.suggestedFilename(), "Caio Vinicius-configurações-dashboard.js");
     const exported = await readFile(await download.path(), "utf8");
     const saved = parseDashboardSettingsFile(exported);
-    assert.deepEqual(saved.profile, { name: "Caio", email: "caio@example.com", shift: "PM2", icon: "owl" });
+    assert.deepEqual(saved.profile, { name: "Caio Vinicius", email: "caio.vinicius@shopee.com", shift: "PM2", icon: "owl" });
     assert.equal(saved.footerVisibility.reverseForm, false);
     assert.equal(saved.spreadsheets[0].menuName, "Minha Planilha");
     assert.equal(saved.spreadsheets[1].visible, false);
@@ -126,8 +139,8 @@ try {
     assert.equal(await page.locator("#settingsAnalystName").inputValue(), "");
     assert.equal(await page.locator("#settingsReverseFormVisible").isChecked(), true);
     await importSource("#settingsFileInput", exported);
-    await page.waitForFunction(() => document.getElementById("settingsAnalystName").value === "Caio");
-    assert.equal(await page.locator("#settingsAnalystEmail").inputValue(), "caio@example.com");
+    await page.waitForFunction(() => document.getElementById("settingsAnalystName").value === "Caio Vinicius");
+    assert.equal(await page.locator("#settingsAnalystEmail").inputValue(), "caio.vinicius@shopee.com");
     assert.equal(await page.locator("#settingsReverseFormVisible").isChecked(), false);
     const settingsPage = page;
 
@@ -143,10 +156,10 @@ try {
 
     // O importador do index aceita configurações sem substituir os relatórios.
     const imported = structuredClone(saved);
-    imported.profile = { name: "Fernando", email: "fernando@example.com", shift: "PM1", icon: "cat" };
+    imported.profile = { name: "Fernando Ferrari", email: "fernando.ferrari@shopee.com", shift: "PM1", icon: "cat" };
     imported.footerVisibility.damageApp = false;
     await importSource("#reportSessionFileInput", serializeDashboardSettingsFile(imported));
-    await page.waitForFunction(() => document.getElementById("reportAnalystInput").value === "Fernando");
+    await page.waitForFunction(() => document.getElementById("reportAnalystInput").value === "Fernando Ferrari");
     assert.equal(await page.locator("#footerDamageAppLink").isVisible(), false);
     assert.equal(await page.locator("#reportPlanningInput").inputValue(), "3141");
     assert.match(await page.locator(".main-menu [data-dashboard-profile-icon]").getAttribute("src"), /cat-icon\.svg$/);
@@ -168,10 +181,10 @@ try {
     await page.locator("#settingsSaveAndBackButton").click();
     assert.match(page.url(), /settings\.html/);
     assert.match(await page.locator("#settingsFeedback").textContent(), /Confira/);
-    await page.locator("#settingsAnalystEmail").fill("caio@example.com");
+    await page.locator("#settingsAnalystEmail").fill("caio.vinicius@shopee.com");
     const backDownload = page.waitForEvent("download");
     await page.locator("#settingsSaveAndBackButton").click();
-    assert.equal((await backDownload).suggestedFilename(), "Caio-configurações-dashboard.js");
+    assert.equal((await backDownload).suggestedFilename(), "Caio Vinicius-configurações-dashboard.js");
     await page.waitForURL("**/index.html");
     await readyIndex();
     assert.equal(await page.locator("#reportAnalystInput").inputValue(), "");

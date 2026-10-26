@@ -33,10 +33,8 @@
             }
             .settings {
                 max-width: 1600px;
-                height: calc(100dvh - 162px - 117px);
+                height: auto;
                 margin: 0 auto;
-                flex: 1 0 auto;
-                align-items: stretch;
                 user-select: none;
                 gap: 30px;
                 padding: 30px;
@@ -65,9 +63,11 @@
 
             .settings > div:first-of-type {
                 flex: 0 0 400px;
+                height: calc(100dvh - 162px - 117px);
             }
             .settings > div:last-of-type {
                 flex: 1 1 0;
+                height: calc(100dvh - 162px - 117px);
                 min-width: 0;
                 display: flex;
                 flex-direction: column;
@@ -303,9 +303,9 @@
 
                                         <select id="settingsAnalystName" data-dashboard-profile-field="name" class="standard-select" style="width: 100%;" aria-label="Nome do analista">
                                             <option value="">Escolha um Analista</option>
-                                            <option value="Caio">Caio</option>
-                                            <option value="Fernando">Fernando</option>
-                                            <option value="Thamyres">Thamyres</option>
+                                            <option value="Caio Vinicius" data-email="caio.vinicius@shopee.com">Caio Vinicius</option>
+                                            <option value="Fernando Ferrari" data-email="fernando.ferrari@shopee.com">Fernando Ferrari</option>
+                                            <option value="Thamyris Dias" data-email="thamyris.ribeiro@shopee.com">Thamyris Dias</option>
                                         </select>
                                     </div>
 
@@ -326,7 +326,7 @@
                                     <div>
                                         <h4>Ícone</h4>
                                         <select id="settingsAnalystIcon" data-dashboard-profile-field="icon" class="standard-select" style="width: 100%;" aria-label="Ícone do analista">
-                                            <option value="default">Padrão 63</option>
+                                            <option value="default">Padrão</option>
                                             <option value="owl">Coruja</option>
                                             <option value="platypus">Ornitorrinco</option>
                                             <option value="elephant">Elefante</option>
