@@ -850,14 +850,12 @@
     #reports .consolidated-history-table table {
         width: 100%;
     }
-
     #reports .consolidated-history-table th:first-child {
         width: 25%;
     }
     #reports .consolidated-history-table th:nth-child(2) {
         width: 43%;
     }
-
     #reports .consolidated-history-table button {
         display: inline-flex;
         align-items: center;
@@ -947,6 +945,46 @@
     }
     .damage-and-losses-charts > div {
         flex: 1 1 0;
+    }
+    .consolidated-history {
+        gap: 15px
+    }
+    .consolidated-history > div {
+        flex: 1 1 0;
+    }
+    .consolidated-history > div:first-of-type,
+    .consolidated-history > div:last-of-type {
+        max-height: 429px;
+        overflow: auto;
+        border: 1px solid var(--color-border);
+        border-radius: 4px;
+    }
+    .consolidated-history > div::-webkit-scrollbar {
+        width: 7px;
+        height: 5px;
+        background-color: var(--color-container-focus);
+        border-left: 1px solid var(--color-border);
+    }
+    .consolidated-history > div::-webkit-scrollbar-thumb {
+        border-radius: 0px 3px 3px 0px;
+        background-color: var(--color-text);
+    }
+    .consolidated-history > div::-webkit-scrollbar-track {
+        background-color: transparent;
+    }
+    .consolidated-history > div caption .flex-box-start button img {
+        width: 20px;
+        cursor: pointer;
+    }
+    .consolidated-history > div caption .flex-box-start {
+        gap: 10px;
+        width: max-content;
+    }
+    .consolidated-history div table thead {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background-color: var(--color-table-th);
     }
 
     /* TAXA DE PERDAS */
