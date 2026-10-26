@@ -161,20 +161,36 @@
             }
 
 
-            .colors-templates  {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-                gap: 15px;
-            }
+ 
             .colors-templates  h4,
             .colors-templates  p {
                 text-align: center;
                 margin: 10px 0 0 0;
             }
-            .colors-templates > div {
+
+
+            .colors-templates  {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+                gap: 15px;
+            }
+            .colors-templates > template {
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+            }
+            .colors-templates > template > div:first-of-type {
                 height: 200px;
                 border-radius: 5px;
             }
+            .colors-templates > template > div:last-of-type {
+                height: 200px;
+                border-radius: 5px;
+                margin-top: auto;
+            }
+
+
+
             .colors-templates > div > div {
                 width: 100%;
                 height: 20px;
@@ -488,37 +504,42 @@
 
                             <div class="colors-templates">
 
-                                <div class="default">
+                                <div class="template default">
+                                    <div></div>
+
+                                    <div class="flex-box-start">
+                                        <div></div>
+                                        <div></div>
+                                    </div>
+
+                                    <div></div>
+                                </div>
+
+                                <div class="template red">
                                     <div></div>
                                     <h4>Lorem Ipsum</h4>
                                     <p>Is simply dummy text</p>
                                 </div>
 
-                                <div class="red">
+                                <div class="template blue">
                                     <div></div>
                                     <h4>Lorem Ipsum</h4>
                                     <p>Is simply dummy text</p>
                                 </div>
 
-                                <div class="blue">
+                                <div class="template green">
                                     <div></div>
                                     <h4>Lorem Ipsum</h4>
                                     <p>Is simply dummy text</p>
                                 </div>
 
-                                <div class="green">
+                                <div class="template rose">
                                     <div></div>
                                     <h4>Lorem Ipsum</h4>
                                     <p>Is simply dummy text</p>
                                 </div>
 
-                                <div class="rose">
-                                    <div></div>
-                                    <h4>Lorem Ipsum</h4>
-                                    <p>Is simply dummy text</p>
-                                </div>
-
-                                <div class="purple">
+                                <div class="template purple">
                                     <div></div>
                                     <h4>Lorem Ipsum</h4>
                                     <p>Is simply dummy text</p>
