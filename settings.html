@@ -164,8 +164,8 @@
             .colors-templates  {
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 15px;
             }
-
             .colors-templates  h4,
             .colors-templates  p {
                 text-align: center;
@@ -180,7 +180,6 @@
                 height: 20px;
                 background-color: var(--color-table-title);
             }
-
             .colors-templates .default {
                 background-color: var(--color-container);
                 border: 2px solid var(--color-border);
@@ -189,13 +188,29 @@
                 background-color: var(--color-table-title);
                 border-bottom: 1px solid var(--color-border);
             }
-
             .colors-templates .red {
-
+                background-color: var(--red-color-container);
+                border: 1px solid var(--red-color-border);
             }
-
+            .colors-templates .red > div {
+                background-color: var(--red-color-table-title);
+                border-bottom: 1px solid var(--red-color-border);
+            }
             .colors-templates .blue {
-
+                background-color: var(--blue-color-container);
+                border: 1px solid var(--blue-color-border);
+            }
+            .colors-templates .blue > div {
+                background-color: var(--blue-color-table-title);
+                border-bottom: 1px solid var(--blue-color-border);
+            }
+            .colors-templates .purple {
+                background-color: var(--purple-color-container);
+                border: 1px solid var(--purple-color-border);
+            }
+            .colors-templates .purple > div {
+                background-color: var(--purple-color-table-title);
+                border-bottom: 1px solid var(--purple-color-border);
             }
 
 
@@ -465,10 +480,32 @@
 
                                 <div class="red">
                                     <div></div>
+                                    <h4>Lorem Ipsum</h4>
+                                    <p>Is simply dummy text</p>
                                 </div>
 
                                 <div class="blue">
                                     <div></div>
+                                    <h4>Lorem Ipsum</h4>
+                                    <p>Is simply dummy text</p>
+                                </div>
+
+                                <div class="green">
+                                    <div></div>
+                                    <h4>Lorem Ipsum</h4>
+                                    <p>Is simply dummy text</p>
+                                </div>
+
+                                <div class="rose">
+                                    <div></div>
+                                    <h4>Lorem Ipsum</h4>
+                                    <p>Is simply dummy text</p>
+                                </div>
+
+                                <div class="purple">
+                                    <div></div>
+                                    <h4>Lorem Ipsum</h4>
+                                    <p>Is simply dummy text</p>
                                 </div>
 
                             </div>
