@@ -3,6 +3,8 @@ import {
 } from "./default-spreadsheets.js";
 import { updateReportContextField } from "../reports/core/report-context.js";
 
+const DASHBOARD_SETTINGS_SESSION_KEY = "dashboard-settings-session-v1";
+
 const DEFAULT_DASHBOARD_PROFILE = Object.freeze({
     name: "", email: "", shift: "AM", icon: "default",
 });
@@ -1539,6 +1541,7 @@ function renderDashboardSettings(applyProfileToReports = true) {
 
 function importDashboardSettings(
     value,
+    { applyProfileToReports = value.profile !== undefined } = {},
 ) {
     validateDashboardSettings(
         value,
@@ -1553,9 +1556,27 @@ function importDashboardSettings(
 
     Object.assign(dashboardSettingsState, normalizedSettings);
 
-    renderDashboardSettings(value.profile !== undefined);
+    renderDashboardSettings(applyProfileToReports);
 
     return true;
+}
+
+function saveDashboardSettingsToSession(settings = exportDashboardSettings(), storage) {
+    validateDashboardSettings(settings);
+    (storage ?? window.sessionStorage).setItem(DASHBOARD_SETTINGS_SESSION_KEY, JSON.stringify(settings));
+}
+
+function readDashboardSettingsFromSession(storage) {
+    try {
+        const source = (storage ?? window.sessionStorage).getItem(DASHBOARD_SETTINGS_SESSION_KEY);
+        if (!source) return null;
+        const settings = JSON.parse(source);
+        validateDashboardSettings(settings);
+        return normalizeDashboardSettings(settings);
+    } catch (error) {
+        console.warn("Não foi possível recuperar as configurações da sessão da aba.", error);
+        return null;
+    }
 }
 
 /* AGENDA A ATUALIZAÇÃO DO PAINEL */
@@ -1984,7 +2005,7 @@ async function initializeDashboardSettings() {
             FALLBACK_SPREADSHEET_SETTINGS;
     }
 
-    const initialSettings = createDefaultDashboardSettings();
+    const initialSettings = readDashboardSettingsFromSession() || createDefaultDashboardSettings();
 
     Object.assign(dashboardSettingsState, initialSettings);
 
@@ -2005,8 +2026,11 @@ async function initializeDashboardSettings() {
 if (globalThis.document) await initializeDashboardSettings();
 
 export {
+    DASHBOARD_SETTINGS_SESSION_KEY,
     exportDashboardSettings,
     importDashboardSettings,
     initializeDashboardSettings,
     validateDashboardSettings,
+    saveDashboardSettingsToSession,
+    readDashboardSettingsFromSession,
 };

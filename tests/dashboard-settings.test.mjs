@@ -5,6 +5,7 @@ import {
     parseDashboardSettingsFile, readDashboardSettingsFile, serializeDashboardSettingsFile,
 } from "../js/settings/settings-file.js";
 import {
+    DASHBOARD_SETTINGS_SESSION_KEY, readDashboardSettingsFromSession, saveDashboardSettingsToSession,
     exportDashboardSettings, importDashboardSettings, validateDashboardSettings,
 } from "../js/spreadsheets/load-spreadsheets.js";
 import {
@@ -31,6 +32,26 @@ test("arquivo preserva perfil, nomes, links e escolhas do footer sem executar c�
     assert.deepEqual(parseDashboardSettingsFile(serializeDashboardSettingsFile(settings)), settings);
     assert.throws(() => parseDashboardSettingsFile(serializeDashboardSettingsFile(settings) + "alert(1);"));
     assert.throws(() => parseDashboardSettingsFile('const DASHBOARD_SETTINGS = {"version":99};'));
+});
+
+test("cópia na sessão preserva os mesmos dados do arquivo e fica independente das edições", () => {
+    importDashboardSettings(settings);
+    const snapshot = exportDashboardSettings();
+    const values = new Map();
+    const storage = { getItem: key => values.get(key) ?? null, setItem: (key, value) => values.set(key, value) };
+    saveDashboardSettingsToSession(snapshot, storage);
+    const fileSettings = parseDashboardSettingsFile(serializeDashboardSettingsFile(snapshot));
+    assert.deepEqual(JSON.parse(values.get(DASHBOARD_SETTINGS_SESSION_KEY)), fileSettings);
+    snapshot.profile.name = "Rascunho não salvo";
+    assert.deepEqual(readDashboardSettingsFromSession(storage), fileSettings);
+});
+
+test("sessão inválida usa os padrões e falha de gravação não altera a cópia anterior", t => {
+    t.mock.method(console, "warn", () => {});
+    assert.equal(readDashboardSettingsFromSession({ getItem: () => "conteúdo inválido" }), null);
+    assert.equal(readDashboardSettingsFromSession({ getItem: () => JSON.stringify({ spreadsheets: [] }) }), null);
+    const storage = { setItem() { throw new Error("QuotaExceededError"); } };
+    assert.throws(() => saveDashboardSettingsToSession(settings, storage), /QuotaExceededError/);
 });
 
 test("importação antiga mantém o perfil atual e usa footer visível por padrão", () => {

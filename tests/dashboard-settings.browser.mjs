@@ -1,4 +1,4 @@
-// Executar com Playwright em NODE_PATH. Usa duas guias e bloqueia os armazenamentos.
+// Executar com Playwright em NODE_PATH. Usa duas guias, sessionStorage e bloqueia localStorage.
 import assert from "node:assert/strict";
 import { createServer } from "node:http";
 import { createRequire } from "node:module";
@@ -11,6 +11,8 @@ import { parseDashboardSettingsFile, serializeDashboardSettingsFile } from "../j
 const { chromium } = createRequire(import.meta.url)("playwright");
 const root = fileURLToPath(new URL("../", import.meta.url));
 const output = process.env.SETTINGS_QA_OUTPUT || await mkdtemp(path.join(tmpdir(), "dashboard-settings-"));
+const settingsSessionKey = "dashboard-settings-session-v1";
+const reportsSessionKey = "dashboard-report-session-v1";
 await mkdir(output, { recursive: true });
 const server = createServer(async (request, response) => {
     try {
@@ -30,7 +32,7 @@ try {
     const context = await browser.newContext({ acceptDownloads: true, viewport: { width: 1600, height: 1050 } });
     await context.addInitScript(() => {
         window.storageAccesses = [];
-        for (const key of ["localStorage", "sessionStorage"]) {
+        for (const key of ["localStorage"]) {
             Object.defineProperty(window, key, { configurable: true, get() {
                 window.storageAccesses.push(key);
                 throw new Error(`O dashboard não deve acessar ${key}.`);
@@ -54,6 +56,8 @@ try {
     });
     const reportContext = () => page.evaluate(async () =>
         (await import("/js/reports/core/report-context.js")).getReportContext());
+    const sessionSettings = tab => tab.evaluate(key => JSON.parse(sessionStorage.getItem(key)), settingsSessionKey);
+    const sessionReports = tab => tab.evaluate(key => JSON.parse(sessionStorage.getItem(key)), reportsSessionKey);
 
     await page.goto(base);
     await readyIndex();
@@ -72,6 +76,26 @@ try {
     });
     const reportsBefore = await page.evaluate(async () =>
         (await import("/js/reports/core/report-manager.js")).reportManager.exportSession());
+    const reportFileEvent = page.waitForEvent("download");
+    await page.locator("#reportDownloadButton").click();
+    const reportFile = await reportFileEvent;
+    assert.match(reportFile.suggestedFilename(), /^sessao-dashboard-.*\.js$/);
+    const reportFileSource = await readFile(await reportFile.path(), "utf8");
+    const fileSnapshot = JSON.parse(reportFileSource.match(/^const DASHBOARD_REPORT_SESSION = ([\s\S]*);\s*$/)[1]);
+    const savedReports = await sessionReports(page);
+    assert.deepEqual(savedReports.reports, reportsBefore);
+    for (const id of Object.keys(fileSnapshot.reports)) {
+        assert.deepEqual(savedReports.reports[id], fileSnapshot.reports[id]);
+    }
+    assert.deepEqual(savedReports.context, fileSnapshot.context);
+    await page.locator("#reportPlanningInput").fill("9999");
+    await page.reload();
+    await readyIndex();
+    await page.waitForFunction(() => document.getElementById("reportPlanningInput").value === "3141");
+    assert.equal(await page.locator("#reportAnalystInput").inputValue(), "");
+    assert.deepEqual(await page.evaluate(async () =>
+        (await import("/js/reports/core/report-manager.js")).reportManager.exportSession()), reportsBefore);
+    await page.locator('a[href="#reports"]').click();
     const dashboard = page;
     const newTab = context.waitForEvent("page");
     await page.locator("#dashboardSettingsLink").click();
@@ -80,6 +104,7 @@ try {
     await readySettings();
     assert.equal(await page.locator("#settingsFeedback, .settings-feedback").count(), 0);
     assert.equal(await page.locator("#settingsNotification").isVisible(), true);
+    assert.equal(await sessionSettings(page), null, "Uma nova guia tem sua própria sessão.");
     assert.equal(await page.locator("#settingsNotification").getAttribute("data-notification-type"), "idle");
     assert.match(await page.locator("#settingsNotificationText").textContent(), /Monte uma configuração personalizada/);
     const dashboardDestination = new URL(await page.locator("#settingsBackButton").getAttribute("href"), page.url());
@@ -141,19 +166,23 @@ try {
     assert.equal(saved.footerVisibility.reverseForm, false);
     assert.equal(saved.spreadsheets[0].menuName, "Minha Planilha");
     assert.equal(saved.spreadsheets[1].visible, false);
+    assert.deepEqual(await sessionSettings(page), saved);
     assert.match(page.url(), /settings\.html/);
 
-    // Salvar baixa o arquivo; recarregar o editor restaura os padrões.
+    // Recarregar restaura a última cópia salva e descarta apenas o rascunho.
+    await page.locator('a[href="#profile"]').click();
+    await page.locator("#settingsAnalystEmail").fill("rascunho@example.com");
     await page.reload();
     await readySettings();
-    assert.equal(await page.locator("#settingsAnalystEmail").inputValue(), "");
-    assert.equal(await page.locator("#settingsAnalystName").inputValue(), "");
-    assert.equal(await page.locator("#settingsReverseFormVisible").isChecked(), true);
+    assert.equal(await page.locator("#settingsAnalystEmail").inputValue(), "caio.vinicius@shopee.com");
+    assert.equal(await page.locator("#settingsAnalystName").inputValue(), "Caio Vinicius");
+    assert.equal(await page.locator("#settingsAnalystShift").inputValue(), "PM2");
+    assert.equal(await page.locator("#settingsReverseFormVisible").isChecked(), false);
     await importSource("#settingsFileInput", "arquivo inválido");
     await page.waitForFunction(() => document.getElementById("settingsNotification").dataset.notificationType === "error");
     assert.match(await page.locator("#settingsNotificationText").textContent(), /formato/);
     assert.match(await page.locator("#settingsNotificationIcon").getAttribute("src"), /error-icon\.svg$/);
-    assert.equal(await page.locator("#settingsAnalystName").inputValue(), "");
+    assert.equal(await page.locator("#settingsAnalystName").inputValue(), "Caio Vinicius");
     await importSource("#settingsFileInput", exported);
     await page.waitForFunction(() => document.getElementById("settingsAnalystName").value === "Caio Vinicius");
     assert.equal(await page.locator("#settingsAnalystEmail").inputValue(), "caio.vinicius@shopee.com");
@@ -182,6 +211,13 @@ try {
     assert.equal(await page.locator("#footerDamageAppLink").isVisible(), false);
     assert.equal(await page.locator("#reportPlanningInput").inputValue(), "3141");
     assert.match(await page.locator(".main-menu [data-dashboard-profile-icon]").getAttribute("src"), /cat-icon\.svg$/);
+    assert.deepEqual(await sessionSettings(page), imported);
+    await page.reload();
+    await readyIndex();
+    await page.waitForFunction(() => document.getElementById("reportAnalystInput").value === "Fernando Ferrari");
+    assert.equal(await page.locator("#reportPlanningInput").inputValue(), "3141");
+    assert.equal(await page.locator("#reportWindowInput").inputValue(), "PM1");
+    assert.equal(await page.locator("#footerDamageAppLink").isVisible(), false);
 
     // Sessões antigas continuam legíveis e não restauram capacidades antigas.
     const legacy = await page.evaluate(async () =>
@@ -194,6 +230,10 @@ try {
     await page.waitForFunction(() => document.getElementById("reportAnalystInput").value === "Analista legado");
     assert.equal((await reportContext()).shiftCapacity, 20000);
     assert.equal(await page.locator("#footerDamageAppLink").isVisible(), true);
+    await page.reload();
+    await readyIndex();
+    await page.waitForFunction(() => document.getElementById("reportAnalystInput").value === "Analista legado");
+    assert.equal(await page.locator("#reportPlanningInput").inputValue(), "3141");
 
     page = settingsPage;
     await page.locator("#settingsAnalystEmail").fill("email-invalido");
@@ -208,26 +248,50 @@ try {
     assert.equal((await backDownload).suggestedFilename(), "Caio Vinicius-configurações-dashboard.js");
     await page.waitForURL("**/index.html");
     await readyIndex();
-    assert.equal(await page.locator("#reportAnalystInput").inputValue(), "");
+    assert.equal(await page.locator("#reportAnalystInput").inputValue(), "Caio Vinicius");
     assert.equal(await page.locator("#reportPlanningInput").inputValue(), "");
-    assert.equal(await page.locator("#footerReverseFormLink").isVisible(), true);
+    assert.equal(await page.locator("#footerReverseFormLink").isVisible(), false);
     assert.equal((await reportContext()).shiftCapacity, 20000);
     assert.equal(await dashboard.locator("#reportPlanningInput").inputValue(), "3141");
     assert.equal(await dashboard.locator("#reportAnalystInput").inputValue(), "Analista legado");
 
-    // Abrir diretamente e voltar também funciona sem ler ou gravar dados persistentes.
+    // A mesma aba compartilha as configurações entre o dashboard e o editor.
     await page.goto(`${base}/settings.html`);
     await readySettings();
-    assert.equal(await page.locator("#settingsAnalystEmail").inputValue(), "");
-    assert.equal(await page.locator("#settingsReverseFormVisible").isChecked(), true);
+    assert.equal(await page.locator("#settingsAnalystEmail").inputValue(), "caio.vinicius@shopee.com");
+    assert.equal(await page.locator("#settingsReverseFormVisible").isChecked(), false);
     await page.locator("#settingsBackButton").click();
     await page.waitForURL("**/index.html");
     await readyIndex();
+    assert.equal(await page.locator("#reportAnalystInput").inputValue(), "Caio Vinicius");
+    await page.evaluate(() => sessionStorage.clear());
+    await page.reload();
+    await readyIndex();
+    assert.equal(await page.locator("#reportAnalystInput").inputValue(), "");
+    assert.equal(await page.locator("#footerReverseFormLink").isVisible(), true);
+
+    // Falhas do armazenamento não impedem baixar o arquivo nem indicam sucesso da cópia na aba.
+    await page.goto(`${base}/settings.html`);
+    await readySettings();
+    await page.evaluate(key => {
+        const original = Storage.prototype.setItem;
+        Storage.prototype.setItem = function (name, value) {
+            if (name === key) throw new DOMException("Limite de armazenamento", "QuotaExceededError");
+            return original.call(this, name, value);
+        };
+    }, settingsSessionKey);
+    const fallbackDownload = page.waitForEvent("download");
+    await page.locator("#settingsSaveAndBackButton").click();
+    assert.equal((await fallbackDownload).suggestedFilename(), "configurações-dashboard.js");
+    assert.match(page.url(), /settings\.html/);
+    assert.equal(await page.locator("#settingsNotification").getAttribute("data-notification-type"), "warning");
+    assert.match(await page.locator("#settingsNotificationText").textContent(), /Arquivo .* salvo.*Não foi possível/);
+    assert.equal(await sessionSettings(page), null);
     for (const tab of context.pages()) {
         assert.deepEqual(await tab.evaluate(() => window.storageAccesses), []);
     }
     assert.deepEqual(errors, []);
-    console.log(`Configurações: duas guias, nomes dos arquivos, prévia e importação verificados sem usar Storage. Imagens: ${output}`);
+    console.log(`Configurações e relatórios: arquivos, sessionStorage, restauração, prioridade das preferências e falha de armazenamento verificados. Imagens: ${output}`);
 } finally {
     await browser?.close();
     await new Promise(resolve => server.close(resolve));

@@ -1,6 +1,7 @@
 import {
     exportDashboardSettings,
     importDashboardSettings,
+    saveDashboardSettingsToSession,
     validateDashboardSettings,
 } from "../spreadsheets/load-spreadsheets.js";
 import { downloadReportBlob } from "../reports/export.js";
@@ -17,6 +18,7 @@ const notificationText = document.getElementById("settingsNotificationText");
 const notificationIcons = {
     info: "images/geral-icons/bell-icon.svg",
     success: "images/geral-icons/success-icon.svg",
+    warning: "images/geral-icons/alert-icon.svg",
     error: "images/geral-icons/error-icon.svg",
 };
 const importButton = document.getElementById("settingsImportButton");
@@ -49,7 +51,14 @@ function saveSettings(returnToDashboard = false) {
         const content = serializeDashboardSettingsFile(settings);
         const fileName = createDashboardSettingsFileName(settings.profile.name);
         downloadReportBlob(new Blob([content], { type: "text/javascript;charset=utf-8" }), fileName);
-        notify(`Configurações salvas em ${fileName}.`);
+        try {
+            saveDashboardSettingsToSession(settings);
+        } catch (error) {
+            console.warn("O arquivo foi salvo, mas não foi possível salvar as configurações na sessão.", error);
+            notify(`Arquivo ${fileName} salvo. Não foi possível guardar as configurações na sessão desta aba.`, "warning");
+            return;
+        }
+        notify(`Configurações salvas em ${fileName} e na sessão desta aba.`);
         if (returnToDashboard) {
             // Permite que o navegador inicie o download antes de sair da página.
             window.setTimeout(() => window.location.assign(document.getElementById("settingsBackButton").href), 150);
