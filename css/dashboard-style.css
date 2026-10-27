@@ -6,12 +6,16 @@
 
         /* TEMA PADRÃO */
 
-        --color-body: #000000;
-        --color-container: #101010;
+        --default-color-body: #000000;
+        --default-color-container: #101010;
+        --default-color-border: #626262;
+        --color-body: var(--default-color-body);
+        --color-container: var(--default-color-container);
+        --color-container-input: #101010;
         --color-container-iframe: #fff;
         --color-container-houver: #262626;
         --color-container-focus: #262626;
-        --color-border: #626262;
+        --color-border: var(--default-color-border);
         --color-text: #e4e6eb;
         --color-table-title: #262626;
         --color-table-th: #262626;
@@ -29,7 +33,7 @@
         --purple-color-container-iframe: #fff;
         --purple-color-container-houver: #32114e;
         --purple-color-container-focus: #32114e;
-        --color-container-input: #150721;
+        --purple-color-container-input: #150721;
         --purple-color-border: #632599;
         --purple-color-text: #e4e6eb;
         --purple-color-table-title: #371356;
@@ -60,29 +64,11 @@
         --blue-color-progress-bar: #234797;
         --blue-color-close-button: #e4e6eb;
 
-        /* TEMA AZUL */
-
-        --blue-color-body: #17294e;
-        --blue-color-container: #1c3978;
-        --blue-color-container-iframe: #fff;
-        --blue-color-container-houver: #224593;
-        --blue-color-container-focus: #224593;
-        --blue-color-container-input: #17294e;
-        --blue-color-border: #4472db;
-        --blue-color-text: #e4e6eb;
-        --blue-color-table-title: #234797;
-        --blue-color-table-th: #234797;
-        --blue-color-table-tr: #24448d;
-        --blue-color-button: #e4e6eb;
-        --blue-color-button-text: #000000;
-        --blue-color-gray-p: #e4e6eb;
-        --blue-color-progress-bar: #234797;
-        --blue-color-close-button: #e4e6eb;
-
         /* TEMA VERMELHO */
 
         --red-color-body: #290000;
         --red-color-container: #3d0000;
+        --red-color-container-input: #290000;
         --red-color-container-iframe: #fff;
         --red-color-container-houver: #500202;
         --red-color-container-focus: #500202;
@@ -101,6 +87,7 @@
 
         --green-color-body: #062308;
         --green-color-container: #09340d;
+        --green-color-container-input: #062308;
         --green-color-container-iframe: #fff;
         --green-color-container-houver: #0f5114;
         --green-color-container-focus: #0f5114;
@@ -119,6 +106,7 @@
 
         --pink-color-body: #1d0c13;
         --pink-color-container: #2b121c;
+        --pink-color-container-input: #1d0c13;
         --pink-color-container-iframe: #fff;
         --pink-color-container-houver: #3e1a29;
         --pink-color-container-focus: #3e1a29;
@@ -132,6 +120,103 @@
         --pink-color-gray-p: #a8a9ad;
         --pink-color-progress-bar: #421c2b;
         --pink-color-close-button: #e4e6eb;
+    }
+
+    /* O TEMA ALTERA AS VARIÁVEIS COMPARTILHADAS POR TODOS OS COMPONENTES. */
+
+    :root[data-theme="red"] {
+        --color-body: var(--red-color-body);
+        --color-container: var(--red-color-container);
+        --color-container-iframe: var(--red-color-container-iframe);
+        --color-container-houver: var(--red-color-container-houver);
+        --color-container-focus: var(--red-color-container-focus);
+        --color-container-input: var(--red-color-container-input);
+        --color-border: var(--red-color-border);
+        --color-text: var(--red-color-text);
+        --color-table-title: var(--red-color-table-title);
+        --color-table-th: var(--red-color-table-th);
+        --color-table-tr: var(--red-color-table-tr);
+        --color-button: var(--red-color-button);
+        --color-button-text: var(--red-color-button-text);
+        --color-gray-p: var(--red-color-gray-p);
+        --color-progress-bar: var(--red-color-progress-bar);
+        --color-close-button: var(--red-color-close-button);
+    }
+
+    :root[data-theme="blue"] {
+        --color-body: var(--blue-color-body);
+        --color-container: var(--blue-color-container);
+        --color-container-iframe: var(--blue-color-container-iframe);
+        --color-container-houver: var(--blue-color-container-houver);
+        --color-container-focus: var(--blue-color-container-focus);
+        --color-container-input: var(--blue-color-container-input);
+        --color-border: var(--blue-color-border);
+        --color-text: var(--blue-color-text);
+        --color-table-title: var(--blue-color-table-title);
+        --color-table-th: var(--blue-color-table-th);
+        --color-table-tr: var(--blue-color-table-tr);
+        --color-button: var(--blue-color-button);
+        --color-button-text: var(--blue-color-button-text);
+        --color-gray-p: var(--blue-color-gray-p);
+        --color-progress-bar: var(--blue-color-progress-bar);
+        --color-close-button: var(--blue-color-close-button);
+    }
+
+    :root[data-theme="green"] {
+        --color-body: var(--green-color-body);
+        --color-container: var(--green-color-container);
+        --color-container-iframe: var(--green-color-container-iframe);
+        --color-container-houver: var(--green-color-container-houver);
+        --color-container-focus: var(--green-color-container-focus);
+        --color-container-input: var(--green-color-container-input);
+        --color-border: var(--green-color-border);
+        --color-text: var(--green-color-text);
+        --color-table-title: var(--green-color-table-title);
+        --color-table-th: var(--green-color-table-th);
+        --color-table-tr: var(--green-color-table-tr);
+        --color-button: var(--green-color-button);
+        --color-button-text: var(--green-color-button-text);
+        --color-gray-p: var(--green-color-gray-p);
+        --color-progress-bar: var(--green-color-progress-bar);
+        --color-close-button: var(--green-color-close-button);
+    }
+
+    :root[data-theme="pink"] {
+        --color-body: var(--pink-color-body);
+        --color-container: var(--pink-color-container);
+        --color-container-iframe: var(--pink-color-container-iframe);
+        --color-container-houver: var(--pink-color-container-houver);
+        --color-container-focus: var(--pink-color-container-focus);
+        --color-container-input: var(--pink-color-container-input);
+        --color-border: var(--pink-color-border);
+        --color-text: var(--pink-color-text);
+        --color-table-title: var(--pink-color-table-title);
+        --color-table-th: var(--pink-color-table-th);
+        --color-table-tr: var(--pink-color-table-tr);
+        --color-button: var(--pink-color-button);
+        --color-button-text: var(--pink-color-button-text);
+        --color-gray-p: var(--pink-color-gray-p);
+        --color-progress-bar: var(--pink-color-progress-bar);
+        --color-close-button: var(--pink-color-close-button);
+    }
+
+    :root[data-theme="purple"] {
+        --color-body: var(--purple-color-body);
+        --color-container: var(--purple-color-container);
+        --color-container-iframe: var(--purple-color-container-iframe);
+        --color-container-houver: var(--purple-color-container-houver);
+        --color-container-focus: var(--purple-color-container-focus);
+        --color-container-input: var(--purple-color-container-input);
+        --color-border: var(--purple-color-border);
+        --color-text: var(--purple-color-text);
+        --color-table-title: var(--purple-color-table-title);
+        --color-table-th: var(--purple-color-table-th);
+        --color-table-tr: var(--purple-color-table-tr);
+        --color-button: var(--purple-color-button);
+        --color-button-text: var(--purple-color-button-text);
+        --color-gray-p: var(--purple-color-gray-p);
+        --color-progress-bar: var(--purple-color-progress-bar);
+        --color-close-button: var(--purple-color-close-button);
     }
 
     /* DOCUMENTO */
@@ -383,10 +468,10 @@
             text-align: center;
             font-size: 1rem;
             line-height: 1.5;
-            box-shadow: inset 0 1px 2px var(--color-container);
+            box-shadow: inset 0 1px 2px var(--color-container-input);
             border-radius: 5px;
             color: var(--color-text);
-            background-color: var(--color-container);
+            background-color: var(--color-container-input);
             border: 1px solid var(--color-border);
             height: 50px;
             letter-spacing: 1px;
@@ -439,7 +524,7 @@
             box-shadow: none;
             border-radius: 5px;
             color: var(--color-text);
-            background-color: var(--color-container);
+            background-color: var(--color-container-input);
             border: 1px solid var(--color-border);
             letter-spacing: 1px;
             padding: 10px;
@@ -862,7 +947,7 @@
     .select2-container--default
     .select2-selection--single {
         color: var(--color-text);
-        background-color: var(--color-container);
+        background-color: var(--color-container-input);
         border: 1px solid var(--color-border);
         border-radius: 5px;
         outline: none;

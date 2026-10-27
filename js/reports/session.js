@@ -656,9 +656,13 @@ function restoreSavedReportSession() {
     restoreReportSession({ ...payload, settings: undefined }, { includeAllReports: true });
     const settings = savedSettings ?? payload.settings;
     if (settings) {
-        const preferencesChanged = savedSettings !== null &&
-            JSON.stringify(savedSettings) !== JSON.stringify(payload.settings);
-        importDashboardSettings(settings, { applyProfileToReports: preferencesChanged });
+        const previousProfile = payload.settings?.profile;
+        // Alterar apenas a aparência ou os links não substitui os campos operacionais salvos.
+        const profileChanged = savedSettings !== null && (
+            savedSettings.profile.name !== (previousProfile?.name ?? "") ||
+            savedSettings.profile.shift !== (previousProfile?.shift ?? "AM")
+        );
+        importDashboardSettings(settings, { applyProfileToReports: profileChanged });
     }
     setReportSessionNotification({ type: "success", message: "Relatórios recuperados da sessão desta aba." });
     return true;

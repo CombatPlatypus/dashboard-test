@@ -4,6 +4,7 @@ import {
 import { updateReportContextField } from "../reports/core/report-context.js";
 
 const DASHBOARD_SETTINGS_SESSION_KEY = "dashboard-settings-session-v1";
+const DASHBOARD_THEMES = Object.freeze(["default", "red", "blue", "green", "pink", "purple"]);
 
 const DEFAULT_DASHBOARD_PROFILE = Object.freeze({
     name: "", email: "", shift: "AM", icon: "default",
@@ -182,6 +183,7 @@ const DEFAULT_DASHBOARD_EXTERNAL_LINKS =
     });
 
 const dashboardSettingsState = {
+    theme: "default",
     profile: { ...DEFAULT_DASHBOARD_PROFILE },
     footerVisibility: Object.fromEntries(DASHBOARD_EXTERNAL_LINK_KEYS.map(key => [key, true])),
     spreadsheets: [],
@@ -231,6 +233,7 @@ function createDefaultSpreadsheetSetting(
 
 function createDefaultDashboardSettings() {
     return {
+        theme: "default",
         profile: { ...DEFAULT_DASHBOARD_PROFILE },
         footerVisibility: Object.fromEntries(DASHBOARD_EXTERNAL_LINK_KEYS.map(key => [key, true])),
         spreadsheets:
@@ -361,6 +364,7 @@ function normalizeDashboardSettings(
             : {};
 
     return {
+        theme: value.theme ?? "default",
         profile: {
             name: normalizeSettingsText(value.profile?.name, 60),
             email: normalizeSettingsText(value.profile?.email, 254),
@@ -501,6 +505,9 @@ function validateDashboardSettings(
         );
     }
 
+    if (value.theme !== undefined && !DASHBOARD_THEMES.includes(value.theme)) {
+        throw new TypeError("O tema do dashboard é inválido.");
+    }
     if (value.profile !== undefined) {
         const profile = value.profile;
         if (!profile || typeof profile !== "object" || Array.isArray(profile) ||
@@ -526,6 +533,7 @@ function validateDashboardSettings(
 
 function exportDashboardSettings() {
     return {
+        theme: dashboardSettingsState.theme,
         profile: { ...dashboardSettingsState.profile },
         footerVisibility: { ...dashboardSettingsState.footerVisibility },
         spreadsheets:
@@ -1530,9 +1538,21 @@ function renderDashboardProfile(applyToReports = true) {
     }
 }
 
+function renderDashboardTheme() {
+    if (!globalThis.document?.documentElement) return;
+    document.documentElement.dataset.theme = dashboardSettingsState.theme;
+    document.querySelectorAll("[data-dashboard-theme]").forEach(card => {
+        const selected = card.dataset.dashboardTheme === dashboardSettingsState.theme;
+        card.classList.toggle("is-selected", selected);
+        card.setAttribute("aria-checked", String(selected));
+        card.tabIndex = selected ? 0 : -1;
+    });
+}
+
 /* APLICA AS CONFIGURAÇÕES IMPORTADAS */
 
 function renderDashboardSettings(applyProfileToReports = true) {
+    renderDashboardTheme();
     renderSettingsInputs();
     renderExternalLinks();
     renderDashboardProfile(applyProfileToReports);
@@ -1607,6 +1627,28 @@ function bindDashboardSettingsEvents() {
     } = dashboardSettingsElements;
 
     if (!spreadsheetRows || !anotherLinks) return;
+
+    const themeCards = [...document.querySelectorAll("[data-dashboard-theme]")];
+    const chooseTheme = card => {
+        const theme = card.dataset.dashboardTheme;
+        if (!DASHBOARD_THEMES.includes(theme)) return;
+        dashboardSettingsState.theme = theme;
+        renderDashboardTheme();
+        card.focus();
+    };
+    themeCards.forEach((card, index) => {
+        card.addEventListener("click", () => chooseTheme(card));
+        card.addEventListener("keydown", event => {
+            let next = index;
+            if (["ArrowRight", "ArrowDown"].includes(event.key)) next = (index + 1) % themeCards.length;
+            else if (["ArrowLeft", "ArrowUp"].includes(event.key)) next = (index + themeCards.length - 1) % themeCards.length;
+            else if (event.key === "Home") next = 0;
+            else if (event.key === "End") next = themeCards.length - 1;
+            else if (![" ", "Enter"].includes(event.key)) return;
+            event.preventDefault();
+            chooseTheme(themeCards[next]);
+        });
+    });
 
     document.querySelectorAll("[data-dashboard-profile-field]").forEach(input => {
         const update = () => {

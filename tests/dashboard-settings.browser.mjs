@@ -58,6 +58,14 @@ try {
         (await import("/js/reports/core/report-context.js")).getReportContext());
     const sessionSettings = tab => tab.evaluate(key => JSON.parse(sessionStorage.getItem(key)), settingsSessionKey);
     const sessionReports = tab => tab.evaluate(key => JSON.parse(sessionStorage.getItem(key)), reportsSessionKey);
+    const themeColors = () => page.evaluate(() => ({
+        theme: document.documentElement.dataset.theme,
+        body: getComputedStyle(document.body).backgroundColor,
+        menu: getComputedStyle(document.querySelector(".main-menu")).backgroundColor,
+        notification: getComputedStyle(document.querySelector(".warning")).backgroundColor,
+        footer: getComputedStyle(document.querySelector("footer")).backgroundColor,
+        input: getComputedStyle(document.getElementById("settingsAnalystEmail") ?? document.getElementById("reportAnalystInput")).backgroundColor,
+    }));
 
     await page.goto(base);
     await readyIndex();
@@ -156,12 +164,44 @@ try {
     await page.locator("#settingsDamageAppLink").fill("https://example.com/avarias");
     assert.equal(await page.locator("#footerDamageAppLink").getAttribute("data-url"), "https://example.com/avarias");
     await page.screenshot({ path: path.join(output, "footer-configuracoes.png"), fullPage: true });
+    await page.locator('a[href="#settings-themes"]').click();
+    const previewColors = await page.locator("[data-dashboard-theme]").evaluateAll(cards =>
+        cards.map(card => getComputedStyle(card).backgroundColor));
+    for (const [theme, body, container] of [
+        ["default", "rgb(0, 0, 0)", "rgb(16, 16, 16)"],
+        ["red", "rgb(41, 0, 0)", "rgb(61, 0, 0)"],
+        ["blue", "rgb(23, 41, 78)", "rgb(28, 57, 120)"],
+        ["green", "rgb(6, 35, 8)", "rgb(9, 52, 13)"],
+        ["pink", "rgb(29, 12, 19)", "rgb(43, 18, 28)"],
+        ["purple", "rgb(21, 7, 33)", "rgb(32, 11, 50)"],
+    ]) {
+        await page.locator(`[data-dashboard-theme="${theme}"] > div`).first().click();
+        const colors = await themeColors();
+        assert.deepEqual(colors, { theme, body, menu: container, notification: container,
+            footer: container, input: theme === "default" ? container : body });
+        assert.equal(await page.locator('[data-dashboard-theme][aria-checked="true"]').count(), 1);
+        assert.equal(await page.locator(`[data-dashboard-theme="${theme}"]`).getAttribute("aria-checked"), "true");
+        assert.deepEqual(await page.locator("[data-dashboard-theme]").evaluateAll(cards =>
+            cards.map(card => getComputedStyle(card).backgroundColor)), previewColors);
+    }
+    await page.locator('[data-dashboard-theme="purple"]').press("ArrowRight");
+    assert.equal((await themeColors()).theme, "default");
+    await page.locator('[data-dashboard-theme="default"]').press("End");
+    assert.equal((await themeColors()).theme, "purple");
+    await page.locator('[data-dashboard-theme="pink"]').focus();
+    await page.locator('[data-dashboard-theme="pink"]').press("Enter");
+    assert.equal((await themeColors()).theme, "pink");
+    await page.locator('[data-dashboard-theme="purple"]').focus();
+    await page.locator('[data-dashboard-theme="purple"]').press("Space");
+    assert.equal((await themeColors()).theme, "purple");
+    await page.screenshot({ path: path.join(output, "tema-roxo-configuracoes.png"), fullPage: true });
     const downloadEvent = page.waitForEvent("download");
     await page.locator("#settingsSaveButton").click();
     const download = await downloadEvent;
     assert.equal(download.suggestedFilename(), "Caio Vinicius-configurações-dashboard.js");
     const exported = await readFile(await download.path(), "utf8");
     const saved = parseDashboardSettingsFile(exported);
+    assert.equal(saved.theme, "purple");
     assert.deepEqual(saved.profile, { name: "Caio Vinicius", email: "caio.vinicius@shopee.com", shift: "PM2", icon: "owl" });
     assert.equal(saved.footerVisibility.reverseForm, false);
     assert.equal(saved.spreadsheets[0].menuName, "Minha Planilha");
@@ -170,10 +210,13 @@ try {
     assert.match(page.url(), /settings\.html/);
 
     // Recarregar restaura a última cópia salva e descarta apenas o rascunho.
+    await page.locator('[data-dashboard-theme="green"]').click();
     await page.locator('a[href="#profile"]').click();
     await page.locator("#settingsAnalystEmail").fill("rascunho@example.com");
     await page.reload();
     await readySettings();
+    assert.equal((await themeColors()).theme, "purple");
+    assert.equal(await page.locator('[data-dashboard-theme="purple"]').getAttribute("aria-checked"), "true");
     assert.equal(await page.locator("#settingsAnalystEmail").inputValue(), "caio.vinicius@shopee.com");
     assert.equal(await page.locator("#settingsAnalystName").inputValue(), "Caio Vinicius");
     assert.equal(await page.locator("#settingsAnalystShift").inputValue(), "PM2");
@@ -206,34 +249,49 @@ try {
     const imported = structuredClone(saved);
     imported.profile = { name: "Fernando Ferrari", email: "fernando.ferrari@shopee.com", shift: "PM1", icon: "cat" };
     imported.footerVisibility.damageApp = false;
+    imported.theme = "blue";
     await importSource("#reportSessionFileInput", serializeDashboardSettingsFile(imported));
     await page.waitForFunction(() => document.getElementById("reportAnalystInput").value === "Fernando Ferrari");
     assert.equal(await page.locator("#footerDamageAppLink").isVisible(), false);
     assert.equal(await page.locator("#reportPlanningInput").inputValue(), "3141");
     assert.match(await page.locator(".main-menu [data-dashboard-profile-icon]").getAttribute("src"), /cat-icon\.svg$/);
     assert.deepEqual(await sessionSettings(page), imported);
+    assert.equal((await themeColors()).theme, "blue");
     await page.reload();
     await readyIndex();
     await page.waitForFunction(() => document.getElementById("reportAnalystInput").value === "Fernando Ferrari");
     assert.equal(await page.locator("#reportPlanningInput").inputValue(), "3141");
     assert.equal(await page.locator("#reportWindowInput").inputValue(), "PM1");
     assert.equal(await page.locator("#footerDamageAppLink").isVisible(), false);
+    assert.equal((await themeColors()).theme, "blue");
 
     // Sessões antigas continuam legíveis e não restauram capacidades antigas.
     const legacy = await page.evaluate(async () =>
         (await import("/js/reports/session.js")).createReportSessionPayload());
     delete legacy.settings.profile;
     delete legacy.settings.footerVisibility;
+    delete legacy.settings.theme;
     legacy.context.analyst = "Analista legado";
     legacy.context.shiftCapacity = 5000;
     await importSource("#reportSessionFileInput", `const DASHBOARD_REPORT_SESSION = ${JSON.stringify(legacy)};`);
     await page.waitForFunction(() => document.getElementById("reportAnalystInput").value === "Analista legado");
     assert.equal((await reportContext()).shiftCapacity, 20000);
     assert.equal(await page.locator("#footerDamageAppLink").isVisible(), true);
+    assert.equal((await themeColors()).theme, "default");
+    // Um novo tema sobre uma sessão antiga não altera o analista e o turno dos relatórios.
+    await page.evaluate(([settingsKey, reportsKey]) => {
+        const settings = JSON.parse(sessionStorage.getItem(settingsKey));
+        settings.theme = "green";
+        sessionStorage.setItem(settingsKey, JSON.stringify(settings));
+        const reports = JSON.parse(sessionStorage.getItem(reportsKey));
+        delete reports.settings.theme;
+        sessionStorage.setItem(reportsKey, JSON.stringify(reports));
+    }, [settingsSessionKey, reportsSessionKey]);
     await page.reload();
     await readyIndex();
     await page.waitForFunction(() => document.getElementById("reportAnalystInput").value === "Analista legado");
     assert.equal(await page.locator("#reportPlanningInput").inputValue(), "3141");
+    assert.equal((await themeColors()).theme, "green");
 
     page = settingsPage;
     await page.locator("#settingsAnalystEmail").fill("email-invalido");
@@ -249,6 +307,7 @@ try {
     await page.waitForURL("**/index.html");
     await readyIndex();
     assert.equal(await page.locator("#reportAnalystInput").inputValue(), "Caio Vinicius");
+    assert.equal((await themeColors()).theme, "purple");
     assert.equal(await page.locator("#reportPlanningInput").inputValue(), "");
     assert.equal(await page.locator("#footerReverseFormLink").isVisible(), false);
     assert.equal((await reportContext()).shiftCapacity, 20000);
@@ -268,6 +327,7 @@ try {
     await page.reload();
     await readyIndex();
     assert.equal(await page.locator("#reportAnalystInput").inputValue(), "");
+    assert.equal((await themeColors()).theme, "default");
     assert.equal(await page.locator("#footerReverseFormLink").isVisible(), true);
 
     // Falhas do armazenamento não impedem baixar o arquivo nem indicam sucesso da cópia na aba.

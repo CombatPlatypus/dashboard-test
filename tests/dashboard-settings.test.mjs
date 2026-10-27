@@ -34,6 +34,20 @@ test("arquivo preserva perfil, nomes, links e escolhas do footer sem executar c�
     assert.throws(() => parseDashboardSettingsFile('const DASHBOARD_SETTINGS = {"version":99};'));
 });
 
+test("tema acompanha as configurações no arquivo e na sessão; arquivos antigos usam o padrão", () => {
+    const values = new Map();
+    const storage = { getItem: key => values.get(key) ?? null, setItem: (key, value) => values.set(key, value) };
+    for (const theme of ["default", "red", "blue", "green", "pink", "purple"]) {
+        importDashboardSettings({ ...settings, theme });
+        const snapshot = exportDashboardSettings();
+        saveDashboardSettingsToSession(snapshot, storage);
+        assert.equal(parseDashboardSettingsFile(serializeDashboardSettingsFile(snapshot)).theme, theme);
+        assert.equal(readDashboardSettingsFromSession(storage).theme, theme);
+    }
+    importDashboardSettings(settings);
+    assert.equal(exportDashboardSettings().theme, "default");
+});
+
 test("cópia na sessão preserva os mesmos dados do arquivo e fica independente das edições", () => {
     importDashboardSettings(settings);
     const snapshot = exportDashboardSettings();
@@ -77,6 +91,8 @@ test("perfil e visibilidade inválidos são rejeitados antes de alterar o estado
         { ...settings, profile: { ...settings.profile, icon: "../../arquivo.svg" } },
         { ...settings, profile: { ...settings.profile, shift: "XX" } },
         { ...settings, footerVisibility: { damageApp: "false" } },
+        { ...settings, theme: "tema-desconhecido" },
+        { ...settings, theme: { name: "purple" } },
     ]) {
         assert.throws(() => importDashboardSettings(invalid), TypeError);
         assert.deepEqual(exportDashboardSettings(), previous);
