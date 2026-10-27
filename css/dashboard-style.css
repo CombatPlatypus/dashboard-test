@@ -28,21 +28,21 @@
 
         /* TEMA ROXO */
 
-        --purple-color-body: #130b1b;
-        --purple-color-container: #22162e;
+        --purple-color-body: #150721;
+        --purple-color-container: #230c36;
         --purple-color-container-iframe: #fff;
-        --purple-color-container-houver: #30213f;
-        --purple-color-container-focus: #39264b;
-        --purple-color-container-input: #1b1025;
-        --purple-color-border: #795a96;
+        --purple-color-container-houver: #35124f;
+        --purple-color-container-focus: #40175f;
+        --purple-color-container-input: #1c082c;
+        --purple-color-border: #8c43c7;
         --purple-color-text: #e4e6eb;
-        --purple-color-table-title: #3b2950;
-        --purple-color-table-th: #3b2950;
-        --purple-color-table-tr: #2b1c3a;
-        --purple-color-button: #30213f;
+        --purple-color-table-title: #461969;
+        --purple-color-table-th: #461969;
+        --purple-color-table-tr: #2d1045;
+        --purple-color-button: #35124f;
         --purple-color-button-text: #e4e6eb;
         --purple-color-gray-p: #e4e6eb;
-        --purple-color-progress-bar: #2b1c3a;
+        --purple-color-progress-bar: #2d1045;
         --purple-color-close-button: #e4e6eb;
 
         /* TEMA AZUL */

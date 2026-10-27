@@ -178,7 +178,7 @@ try {
         ["blue", "rgb(23, 41, 78)", "rgb(28, 57, 120)"],
         ["green", "rgb(6, 35, 8)", "rgb(9, 52, 13)"],
         ["pink", "rgb(29, 12, 19)", "rgb(43, 18, 28)"],
-        ["purple", "rgb(19, 11, 27)", "rgb(34, 22, 46)", "rgb(27, 16, 37)"],
+        ["purple", "rgb(21, 7, 33)", "rgb(35, 12, 54)", "rgb(28, 8, 44)"],
     ]) {
         await page.locator(`[data-dashboard-theme="${theme}"] > div`).first().click();
         const colors = await themeColors();
@@ -255,8 +255,8 @@ try {
     await page.waitForFunction(() => document.documentElement.dataset.theme === "purple");
     await page.locator('a[href="#reports"]').click();
     await page.waitForFunction(() =>
-        getComputedStyle(document.querySelector("#receiptLinehaulControls input")).backgroundColor === "rgb(27, 16, 37)" &&
-        getComputedStyle(document.querySelector("#reportWindowInput + .select2-container .select2-selection")).backgroundColor === "rgb(27, 16, 37)");
+        getComputedStyle(document.querySelector("#receiptLinehaulControls input")).backgroundColor === "rgb(28, 8, 44)" &&
+        getComputedStyle(document.querySelector("#reportWindowInput + .select2-container .select2-selection")).backgroundColor === "rgb(28, 8, 44)");
     const purplePalette = await page.evaluate(() => {
         const styles = element => getComputedStyle(element);
         const root = styles(document.documentElement);
@@ -280,14 +280,14 @@ try {
         };
     });
     assert.deepEqual(purplePalette, {
-        body: "rgb(19, 11, 27)", container: "rgb(34, 22, 46)", input: "rgb(27, 16, 37)",
-        select: "rgb(27, 16, 37)", row: "rgb(43, 28, 58)", header: "rgb(59, 41, 80)",
-        headerText: "rgb(228, 230, 235)", rowText: "rgb(228, 230, 235)", border: "rgb(121, 90, 150)",
-        rootScrollbar: "rgb(121, 90, 150)", controlsScrollbar: "rgb(121, 90, 150)",
-        analysisScrollbar: "rgb(121, 90, 150)", hover: "#30213f", focus: "#39264b",
+        body: "rgb(21, 7, 33)", container: "rgb(35, 12, 54)", input: "rgb(28, 8, 44)",
+        select: "rgb(28, 8, 44)", row: "rgb(45, 16, 69)", header: "rgb(70, 25, 105)",
+        headerText: "rgb(228, 230, 235)", rowText: "rgb(228, 230, 235)", border: "rgb(140, 67, 199)",
+        rootScrollbar: "rgb(140, 67, 199)", controlsScrollbar: "rgb(140, 67, 199)",
+        analysisScrollbar: "rgb(140, 67, 199)", hover: "#35124f", focus: "#40175f",
     });
     await page.locator('a[href="#analysis"]').hover();
-    assert.equal(await page.locator('a[href="#analysis"]').evaluate(link => getComputedStyle(link).backgroundColor), "rgb(48, 33, 63)");
+    assert.equal(await page.locator('a[href="#analysis"]').evaluate(link => getComputedStyle(link).backgroundColor), "rgb(53, 18, 79)");
     await page.evaluate(() => {
         const button = document.createElement("button");
         button.id = "purpleButtonProbe";
