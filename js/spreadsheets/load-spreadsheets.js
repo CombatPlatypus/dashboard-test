@@ -1618,13 +1618,30 @@ function scheduleSpreadsheetRender() {
         );
 }
 
-/* CONECTA OS INPUTS DA PÁGINA DE CONFIGURAÇÕES */
+/* CONECTA A NAVEGAÇÃO E OS INPUTS DAS CONFIGURAÇÕES */
 
 function bindDashboardSettingsEvents() {
     const {
         spreadsheetRows,
         anotherLinks,
     } = dashboardSettingsElements;
+
+    const settingsLink = document.getElementById("dashboardSettingsLink");
+    if (settingsLink && settingsLink.dataset.settingsNavigationInitialized !== "true") {
+        // A nova guia herda uma cópia da sessão da guia de origem, atualizada antes da abertura.
+        const prepareSettingsPage = () => {
+            try {
+                saveDashboardSettingsToSession();
+            } catch (error) {
+                console.warn("Não foi possível preparar as configurações para a nova guia.", error);
+            }
+        };
+        settingsLink.addEventListener("click", prepareSettingsPage);
+        settingsLink.addEventListener("auxclick", event => {
+            if (event.button === 1) prepareSettingsPage();
+        });
+        settingsLink.dataset.settingsNavigationInitialized = "true";
+    }
 
     if (!spreadsheetRows || !anotherLinks) return;
 

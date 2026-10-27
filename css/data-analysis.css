@@ -176,7 +176,6 @@
 #analysis .filters .numeric-filter > input {
     flex: 0 0 69px;
     text-align: center;
-    height: 40px;
 }
 #analysis #analysis-tabs .tabs-title.is-disabled > a,
 #analysis #analysis-tabs a[aria-disabled="true"] {
