@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="purple">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dashboard — conferência dos temas dos gráficos</title>
+    <link rel="stylesheet" href="../../css/font-face.css">
+    <link rel="stylesheet" href="../../css/dashboard-style.css?chart-theme=20261027">
+    <link rel="stylesheet" href="../../css/reports-style.css">
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; padding: 24px 30px; font: 14px "Open Sans", sans-serif; }
+        header { display: flex; justify-content: space-between; align-items: center; gap: 20px; margin-bottom: 20px; }
+        h1 { font-size: 22px; margin: 0 0 8px; }
+        header p { font-size: 14px; margin: 0; color: var(--color-gray-p); }
+        nav { display: flex; flex-wrap: wrap; gap: 8px; }
+        button { font: inherit; padding: 9px 12px; border: 1px solid var(--color-border); border-radius: 4px;
+            color: var(--color-text); background: var(--color-container); cursor: pointer; }
+        button[aria-pressed="true"] { background: var(--color-container-focus); box-shadow: inset 0 0 0 1px var(--color-border); }
+        .theme-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+        .theme-card { background: var(--color-container); border: 1px solid var(--color-border); border-radius: 4px; overflow: hidden; }
+        .theme-card h2 { background: var(--color-table-title); font-size: 15px; margin: 0; padding: 13px; text-align: center; }
+        .theme-card .chart-canvas-container { height: 285px; margin: 10px 20px 0; }
+        .theme-card footer { border-top: 1px solid var(--color-border); padding: 10px; text-align: center; font-size: 13px; }
+        @media (max-width: 800px) { header { flex-direction: column; align-items: flex-start; } .theme-grid { grid-template-columns: 1fr; } }
+    </style>
+    <!-- Version only this visual fixture's dependencies, so an older cached dashboard cannot mask the result. -->
+    <script type="importmap">
+        { "imports": {
+            "../../js/charts/theme.js": "../../js/charts/theme.js?chart-theme=20261027",
+            "../../js/charts/standard.js": "../../js/charts/standard.js?chart-theme=20261027",
+            "../../js/reports/core/horizontal-bars-3d.js": "../../js/reports/core/horizontal-bars-3d.js?chart-theme=20261027",
+            "../../js/reports/core/doughnut-3d.js": "../../js/reports/core/doughnut-3d.js?chart-theme=20261027"
+        } }
+    </script>
+</head>
+<body>
+    <header>
+        <div><h1>Dashboard do Inventário</h1><p>Temas dos gráficos · Dados fictícios para conferência visual</p></div>
+        <nav aria-label="Tema da prévia">
+            <button data-theme="default" aria-pressed="false">Padrão</button>
+            <button data-theme="red" aria-pressed="false">Vermelho</button>
+            <button data-theme="blue" aria-pressed="false">Azul</button>
+            <button data-theme="green" aria-pressed="false">Verde</button>
+            <button data-theme="pink" aria-pressed="false">Rosa</button>
+            <button data-theme="purple" aria-pressed="true">Roxo</button>
+        </nav>
+    </header>
+    <main id="reports" class="theme-grid">
+        <section class="theme-card chart">
+            <h2>Rosca 3D sem dados</h2>
+            <div class="chart-canvas-container"><canvas id="emptyChart" aria-label="Rosca sem dados"></canvas></div>
+            <footer>Cor do tema com contraste em relação ao fundo</footer>
+        </section>
+        <section class="theme-card chart">
+            <h2>Histórico · Eixos e grades</h2>
+            <div class="chart-canvas-container"><canvas id="lineChart" aria-label="Histórico com dados fictícios"></canvas></div>
+            <footer>Grades e eixos acompanham as bordas do tema</footer>
+        </section>
+        <section class="theme-card chart">
+            <h2>Ranking · Barras e base 3D</h2>
+            <div class="chart-canvas-container"><canvas id="barChart" aria-label="Ranking com dados fictícios"></canvas></div>
+            <footer>Base acompanha o tema · Cores dos dados preservadas</footer>
+        </section>
+        <section class="theme-card chart">
+            <h2>Rosca 3D com dados</h2>
+            <div class="chart-canvas-container"><canvas id="dataChart" aria-label="Composição com dados fictícios"></canvas></div>
+            <footer>Em Análise · Lost · Avarias</footer>
+        </section>
+    </main>
+    <script src="../../js/libraries/chart.umd.min.js"></script>
+    <script src="../../js/charts/defaults.js"></script>
+    <script type="module">
+        import { createDashboardChart } from "../../js/charts/standard.js";
+        import { CHART_COLORS, getChartTheme } from "../../js/charts/theme.js";
+        import { DOUGHNUT_3D_PADDING, drawDoughnut3D, drawDoughnut3DCenterText } from "../../js/reports/core/doughnut-3d.js";
+
+        const observedDraws = { id: "themePreviewDraws", afterDraw(chart) {
+            chart.canvas.dataset.drawCount = String(Number(chart.canvas.dataset.drawCount || 0) + 1);
+            chart.canvas.dataset.theme = document.documentElement.dataset.theme;
+            chart.canvas.dataset.border = getChartTheme().border;
+        } };
+        const projection = { id: "themePreviewDoughnut", beforeDatasetDraw(chart, args) {
+            if (args.index !== 0) return;
+            const dataset = chart.data.datasets[0];
+            chart.$geometry = drawDoughnut3D({ context: chart.ctx, area: chart.chartArea,
+                values: dataset.data, colors: dataset.backgroundColor });
+            return false;
+        }, afterDraw(chart) {
+            drawDoughnut3DCenterText(chart, chart.$geometry, {
+                text: chart.data.datasets[0].data.reduce((sum, value) => sum + value, 0) || "—", label: "Ocorrências",
+            });
+        } };
+        const colors = [CHART_COLORS.blue, CHART_COLORS.red, CHART_COLORS.yellow];
+        function doughnut(id, values) {
+            createDashboardChart(document.getElementById(id), { type: "doughnut",
+                data: { labels: ["Em Análise", "Lost", "Avarias"], datasets: [{ data: values, backgroundColor: colors, borderWidth: 0 }] },
+                plugins: [projection, observedDraws], options: { responsive: true, maintainAspectRatio: false,
+                    animation: false, events: [], layout: { padding: { ...DOUGHNUT_3D_PADDING } }, plugins: { legend: { display: false } } } });
+        }
+        doughnut("emptyChart", [0, 0, 0]);
+        doughnut("dataChart", [52, 18, 30]);
+        const baseOptions = { responsive: true, maintainAspectRatio: false, animation: false, plugins: { legend: { display: false } } };
+        createDashboardChart(document.getElementById("lineChart"), { type: "line",
+            data: { labels: ["21/10", "22/10", "23/10", "24/10", "25/10", "26/10", "27/10"], datasets: [
+                { label: "Hub", data: [8, 13, 9, 17, 12, 20, 16], borderColor: CHART_COLORS.red, tension: .25 },
+                { label: "SOC", data: [18, 22, 15, 25, 19, 28, 23], borderColor: CHART_COLORS.yellow, tension: .25 },
+            ] }, plugins: [observedDraws], options: { ...baseOptions, scales: { y: { beginAtZero: true } } } });
+        createDashboardChart(document.getElementById("barChart"), { type: "bar",
+            data: { labels: ["Operador A", "Operador B", "Operador C", "Operador D"], datasets: [
+                { data: [84, 65, 52, 36], backgroundColor: CHART_COLORS.green },
+            ] }, plugins: [observedDraws], options: { ...baseOptions, indexAxis: "y", scales: { y: { ticks: { autoSkip: false } } } } });
+        for (const button of document.querySelectorAll("button[data-theme]")) button.addEventListener("click", () => {
+            document.documentElement.dataset.theme = button.dataset.theme;
+            for (const item of document.querySelectorAll("button[data-theme]")) item.setAttribute("aria-pressed", String(item === button));
+        });
+    </script>
+</body>
+</html>
