@@ -196,6 +196,23 @@
                 height: 150px;
                 border-radius: 5px;
             }
+            .colors-templates > .template.is-selected,
+            .colors-templates > .template:focus-visible {
+                outline: 2px solid var(--color-text);
+                outline-offset: 2px;
+            }
+            .colors-templates > .template.is-selected::after {
+                content: '✓ Selecionado';
+                position: absolute;
+                right: 10px;
+                bottom: 5px;
+                color: var(--color-text);
+                background-color: var(--color-container);
+                padding: 0 5px;
+                border-radius: 3px;
+                font: 600 13px 'Open Sans', sans-serif;
+                letter-spacing: 1px;
+            }
 
             /* MODELO COR PADRÃO DO DASHBOARD */
 
@@ -218,23 +235,6 @@
             .colors-templates > .template > .flex-box-start > div:last-of-type {
                 background-color: var(--default-color-container);
                 border: 2px solid var(--default-color-border);
-            }
-
-            .colors-templates > .template.is-selected,
-            .colors-templates > .template:focus-visible {
-                outline: 3px solid var(--color-text);
-                outline-offset: 3px;
-            }
-            .colors-templates > .template.is-selected::after {
-                content: '✓ Selecionado';
-                position: absolute;
-                right: 10px;
-                bottom: 4px;
-                color: var(--color-text);
-                background-color: var(--color-container);
-                padding: 0 5px;
-                border-radius: 3px;
-                font: 600 13px 'Open Sans', sans-serif;
             }
 
             /* MODELO COR VERMELHA */
