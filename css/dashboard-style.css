@@ -28,21 +28,21 @@
 
         /* TEMA ROXO */
 
-        --purple-color-body: #150721;
-        --purple-color-container: #200b32;
+        --purple-color-body: #130b1b;
+        --purple-color-container: #22162e;
         --purple-color-container-iframe: #fff;
-        --purple-color-container-houver: #32114e;
-        --purple-color-container-focus: #32114e;
-        --purple-color-container-input: #150721;
-        --purple-color-border: #632599;
+        --purple-color-container-houver: #30213f;
+        --purple-color-container-focus: #39264b;
+        --purple-color-container-input: #1b1025;
+        --purple-color-border: #795a96;
         --purple-color-text: #e4e6eb;
-        --purple-color-table-title: #371356;
-        --purple-color-table-th: #371356;
-        --purple-color-table-tr: #2b0f42;
-        --purple-color-button: #e4e6eb;
-        --purple-color-button-text: #000000;
+        --purple-color-table-title: #3b2950;
+        --purple-color-table-th: #3b2950;
+        --purple-color-table-tr: #2b1c3a;
+        --purple-color-button: #30213f;
+        --purple-color-button-text: #e4e6eb;
         --purple-color-gray-p: #e4e6eb;
-        --purple-color-progress-bar: #371356;
+        --purple-color-progress-bar: #2b1c3a;
         --purple-color-close-button: #e4e6eb;
 
         /* TEMA AZUL */
@@ -424,7 +424,7 @@
         }
         table tfoot {
             background: var(--color-container);
-            color: var(--color-body);
+            color: var(--color-text);
         }
         table thead tr, table tfoot tr {
             background: transparent;
@@ -496,7 +496,7 @@
             transition: background-color 0s;
         }
         select:disabled {
-            background-color: var(--color-container);
+            background-color: var(--color-container-input);
             cursor: not-allowed;
         }
         select::-ms-expand {
@@ -635,7 +635,7 @@
                 transition: all 0.3s;
             }
             .button:not(:disabled):hover, .button:not(:disabled):focus {
-                color: var(--color-body);
+                color: var(--color-button-text);
                 background-color: var(--color-button);
                 border-radius: 5px;
                 top: 2px;
@@ -671,7 +671,7 @@
                 cursor: pointer;
                 letter-spacing: 1px;
                 border: 2px solid var(--color-border);
-                color: var(--color-button);
+                color: var(--color-text);
                 font-family: 'Open Sans', sans-serif;
                 font-weight: 600;
 
@@ -761,6 +761,18 @@
         }
 
 /* BARRAS DE ROLAGEM */
+
+    html::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    html::-webkit-scrollbar-track {
+        background-color: var(--color-body);
+    }
+    html::-webkit-scrollbar-thumb {
+        background-color: var(--color-border);
+        border-radius: 5px;
+    }
 
     .select2-results__options::-webkit-scrollbar-track,
     .main-structure #spreadsheets .tabs::-webkit-scrollbar-track,
@@ -856,7 +868,7 @@
             right: 100%;
             width: 100%;
             height: 5px;
-            background: var(--color-button);
+            background: var(--color-border);
         }
 
 /* CAIXA DE NOTIFICAÇÕES */
@@ -1007,7 +1019,7 @@
         .select2-results__option--selected
     ) {
         color: var(--color-text);
-        background-color: var(--color-container-focus);
+        background-color: var(--color-container-houver);
     }
 
     /* GARANTE QUE A SELECIONADA MANTENHA SUA COR */
@@ -1078,7 +1090,7 @@
 
     .select2-container--default.select2-container--disabled
     .select2-selection--single {
-        background-color: var(--color-container);
+        background-color: var(--color-container-input);
         cursor: default;
         opacity: 0.5;
     }
@@ -1131,7 +1143,7 @@
         margin: 0;
         padding: 7px 10px;
         color: var(--color-text);
-        background-color: var(--color-container);
+        background-color: var(--color-container-input);
         border: 1px solid var(--color-border);
         border-radius: 3px;
         box-shadow: none;
@@ -1143,7 +1155,7 @@
     .select2-search__field:focus {
         color: var(--color-text);
         background-color: var(--color-container-focus);
-        border-color: var(--color-gray-p);
+        border-color: var(--color-border);
         box-shadow: none;
     }
     .select2-search--dropdown
@@ -1223,7 +1235,7 @@
     height: 43px;
     transition: all 0s;
     border-radius: 3px;
-    background-color: var(--color-container);
+    background-color: var(--color-container-input);
     border: 1px solid var(--color-border);
 }
 .checkbox > label::after {
@@ -1529,7 +1541,7 @@ footer > div > div.footer-last-visible {
     .breadcrumbs li {
         float: left;
         font-size: 16px;
-        color: var(--color-body);
+        color: var(--color-text);
         cursor: default;
     }
     .breadcrumbs li:not(:last-child)::after {

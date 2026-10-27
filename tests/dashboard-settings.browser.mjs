@@ -79,6 +79,11 @@ try {
         const receipt = await import("/js/reports/receipt/state.js");
         receipt.restoreReceiptState({ operators: [{ receiver: "Operador teste", selected: true,
             packagesReceived: 321, errorQuantity: 2 }] });
+        const linehaul = await import("/js/reports/receipt/linehaul-state.js");
+        linehaul.restoreReceiptLinehaulState({ manualEntryEnabled: true, linehauls: [
+            { code: "LH-001", driver: "Ana", origin: "Campinas", loadedOrders: 1800, selected: true },
+            { code: "LH-002", driver: "João", origin: "Jundiaí", loadedOrders: 1300, selected: true },
+        ] });
         const reverse = await import("/js/reports/reverse/state.js");
         reverse.restoreReverseState({ transfers: [{ to: "TESTE", quantities: { damaged: 3 } }] });
     });
@@ -167,18 +172,18 @@ try {
     await page.locator('a[href="#settings-themes"]').click();
     const previewColors = await page.locator("[data-dashboard-theme]").evaluateAll(cards =>
         cards.map(card => getComputedStyle(card).backgroundColor));
-    for (const [theme, body, container] of [
+    for (const [theme, body, container, input = theme === "default" ? container : body] of [
         ["default", "rgb(0, 0, 0)", "rgb(16, 16, 16)"],
         ["red", "rgb(41, 0, 0)", "rgb(61, 0, 0)"],
         ["blue", "rgb(23, 41, 78)", "rgb(28, 57, 120)"],
         ["green", "rgb(6, 35, 8)", "rgb(9, 52, 13)"],
         ["pink", "rgb(29, 12, 19)", "rgb(43, 18, 28)"],
-        ["purple", "rgb(21, 7, 33)", "rgb(32, 11, 50)"],
+        ["purple", "rgb(19, 11, 27)", "rgb(34, 22, 46)", "rgb(27, 16, 37)"],
     ]) {
         await page.locator(`[data-dashboard-theme="${theme}"] > div`).first().click();
         const colors = await themeColors();
         assert.deepEqual(colors, { theme, body, menu: container, notification: container,
-            footer: container, input: theme === "default" ? container : body });
+            footer: container, input });
         assert.equal(await page.locator('[data-dashboard-theme][aria-checked="true"]').count(), 1);
         assert.equal(await page.locator(`[data-dashboard-theme="${theme}"]`).getAttribute("aria-checked"), "true");
         assert.deepEqual(await page.locator("[data-dashboard-theme]").evaluateAll(cards =>
@@ -244,6 +249,59 @@ try {
     const reportsAfter = await page.evaluate(async () =>
         (await import("/js/reports/core/report-manager.js")).reportManager.exportSession());
     assert.deepEqual(reportsAfter, reportsBefore);
+
+    // A paleta roxa distingue superfícies e mantém texto e bordas consistentes nos relatórios.
+    await importSource("#reportSessionFileInput", exported);
+    await page.waitForFunction(() => document.documentElement.dataset.theme === "purple");
+    await page.locator('a[href="#reports"]').click();
+    await page.waitForFunction(() =>
+        getComputedStyle(document.querySelector("#receiptLinehaulControls input")).backgroundColor === "rgb(27, 16, 37)" &&
+        getComputedStyle(document.querySelector("#reportWindowInput + .select2-container .select2-selection")).backgroundColor === "rgb(27, 16, 37)");
+    const purplePalette = await page.evaluate(() => {
+        const styles = element => getComputedStyle(element);
+        const root = styles(document.documentElement);
+        const row = document.querySelector("#receiptLinehaulPreviewBody tr:nth-child(2)");
+        const header = row.closest("table").querySelector("thead th");
+        return {
+            body: styles(document.body).backgroundColor,
+            container: styles(document.getElementById("receiptLinehaulExportArea")).backgroundColor,
+            input: styles(document.querySelector("#receiptLinehaulControls input")).backgroundColor,
+            select: styles(document.querySelector("#reportWindowInput + .select2-container .select2-selection")).backgroundColor,
+            row: styles(row).backgroundColor,
+            header: styles(header).backgroundColor,
+            headerText: styles(header).color,
+            rowText: styles(row.querySelector("td")).color,
+            border: styles(header).borderTopColor,
+            rootScrollbar: getComputedStyle(document.documentElement, "::-webkit-scrollbar-thumb").backgroundColor,
+            controlsScrollbar: getComputedStyle(document.querySelector("#receipt-controls .input-group:last-of-type"), "::-webkit-scrollbar-thumb").backgroundColor,
+            analysisScrollbar: getComputedStyle(document.querySelector("#analysis .analysis-table-container"), "::-webkit-scrollbar-thumb").backgroundColor,
+            hover: root.getPropertyValue("--color-container-houver").trim(),
+            focus: root.getPropertyValue("--color-container-focus").trim(),
+        };
+    });
+    assert.deepEqual(purplePalette, {
+        body: "rgb(19, 11, 27)", container: "rgb(34, 22, 46)", input: "rgb(27, 16, 37)",
+        select: "rgb(27, 16, 37)", row: "rgb(43, 28, 58)", header: "rgb(59, 41, 80)",
+        headerText: "rgb(228, 230, 235)", rowText: "rgb(228, 230, 235)", border: "rgb(121, 90, 150)",
+        rootScrollbar: "rgb(121, 90, 150)", controlsScrollbar: "rgb(121, 90, 150)",
+        analysisScrollbar: "rgb(121, 90, 150)", hover: "#30213f", focus: "#39264b",
+    });
+    await page.locator('a[href="#analysis"]').hover();
+    assert.equal(await page.locator('a[href="#analysis"]').evaluate(link => getComputedStyle(link).backgroundColor), "rgb(48, 33, 63)");
+    await page.evaluate(() => {
+        const button = document.createElement("button");
+        button.id = "purpleButtonProbe";
+        button.className = "button";
+        button.textContent = "Ação";
+        document.getElementById("receiptLinehaulExportArea").append(button);
+    });
+    await page.locator("#purpleButtonProbe").hover();
+    assert.equal(await page.locator("#purpleButtonProbe").evaluate(button => getComputedStyle(button).color), "rgb(228, 230, 235)");
+    await page.locator("#purpleButtonProbe").evaluate(button => button.remove());
+    await page.setViewportSize({ width: 1920, height: 1200 });
+    await page.mouse.move(0, 0);
+    await page.screenshot({ path: path.join(output, "tema-roxo-relatorios-refinado.png"), fullPage: true });
+    await page.setViewportSize({ width: 1600, height: 1050 });
 
     // O importador do index aceita configurações sem substituir os relatórios.
     const imported = structuredClone(saved);

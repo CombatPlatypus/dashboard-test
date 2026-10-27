@@ -213,7 +213,7 @@
 }
 #analysis .analysis-table-container::-webkit-scrollbar-thumb {
     border-radius: 0px 3px 3px 0px;
-    background-color: var(--color-text);
+    background-color: var(--color-border);
 }
 #analysis #analysisPreviewTable {
     width: max-content;
@@ -264,7 +264,7 @@
 }
 #analysis .analysis-sort-button:hover,
 #analysis .analysis-sort-button:focus-visible {
-    color: var(--color-button);
+    color: var(--color-text);
 }
 #analysis .analysis-sort-indicator {
     flex: 0 0 auto;
@@ -466,7 +466,7 @@
 }
 #analysis #comparison-module textarea:focus {
     outline: none;
-    border-color: var(--color-gray-p);
+    border-color: var(--color-border);
 }
 #analysis .textarea-results {
     margin: 10px 0;

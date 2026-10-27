@@ -929,7 +929,7 @@
     #damage-and-losses .damage-chart-period-selector button:focus-visible {
         color: var(--color-text);
         background-color: var(--color-container-houver);
-        border-color: var(--color-gray-p);
+        border-color: var(--color-border);
     }
     #damage-and-losses .damage-chart-period-selector button.is-active {
         color: var(--color-text);
@@ -967,7 +967,7 @@
     }
     .consolidated-history > div::-webkit-scrollbar-thumb {
         border-radius: 0px 3px 3px 0px;
-        background-color: var(--color-text);
+        background-color: var(--color-border);
     }
     .consolidated-history > div::-webkit-scrollbar-track {
         background-color: transparent;
@@ -1052,7 +1052,7 @@
         #parcel .data-selector button:focus-visible {
             color: var(--color-text);
             background-color: var(--color-container-houver);
-            border-color: var(--color-gray-p);
+            border-color: var(--color-border);
         }
         #parcel .data-selector button.is-active {
             color: var(--color-text);
@@ -1077,7 +1077,7 @@
         }
         #reports #parcel #parcelPreview > .distribution-tables > div::-webkit-scrollbar-thumb {
             border-radius: 0px 3px 3px 0px;
-            background-color: var(--color-text);
+            background-color: var(--color-border);
         }
         #reports #parcel #parcelPreview > .distribution-tables > div::-webkit-scrollbar-track {
             background-color: transparent;
@@ -1122,7 +1122,7 @@
         }
         #reports #parcel .parcel-sort-button:hover,
         #reports #parcel .parcel-sort-button:focus-visible {
-            color: var(--color-button);
+            color: var(--color-text);
         }
         #reports #parcel .parcel-sort-indicator {
             flex: 0 0 auto;
@@ -1192,7 +1192,7 @@
     }
     #reports #reverse #reversePreview > .distribution-tables > div::-webkit-scrollbar-thumb {
         border-radius: 0px 3px 3px 0px;
-        background-color: var(--color-text);
+        background-color: var(--color-border);
     }
     #reports #reverse #reversePreview > .distribution-tables > div::-webkit-scrollbar-track {
         background-color: transparent;
