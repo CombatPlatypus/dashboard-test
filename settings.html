@@ -335,24 +335,9 @@
             }
 
 
-            .settings-feedback {
-                width: calc(100% - 60px);
-                max-width: 1540px;
-                margin: 20px auto 0;
-                padding: 12px 20px;
-                border: 1px solid var(--color-border);
-                border-radius: 5px;
-                background: var(--color-container);
-            }
             .settings #settingsSaveAndBackButton {
                 border: 2px solid var(--color-border);
                 border-radius: 5px;
-            }
-            .settings-feedback[hidden] {
-                display: none;
-            }
-            .settings-feedback[data-notification-type="error"] {
-                border-color: #e47777;
             }
 
             @media (max-width: 1200px) {
@@ -423,14 +408,12 @@
             </div>
         </nav>
 
-        <p id="settingsFeedback" class="settings-feedback" role="status" aria-live="polite" aria-atomic="true" hidden></p>
-
         <div style="margin: 0 auto;max-width: 1600px;padding: 30px 30px 0px 30px;">
-            <div class="warning" id="" role="status" aria-live="polite" aria-atomic="true" data-notification-type="idle">
+            <div class="warning" id="settingsNotification" role="status" aria-live="polite" aria-atomic="true" data-notification-type="idle">
                 <div class="flex-box-start">
-                    <img id="" src="images/geral-icons/bell-icon.svg" aria-hidden="true">
+                    <img id="settingsNotificationIcon" src="images/geral-icons/bell-icon.svg" aria-hidden="true">
 
-                    <h4 id="">Monte uma configuração personalizada do dashboard para o seu uso.</h4>
+                    <h4 id="settingsNotificationText">Monte uma configuração personalizada do dashboard para o seu uso.</h4>
                 </div>
             </div>
         </div>

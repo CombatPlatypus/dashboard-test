@@ -78,6 +78,10 @@ try {
     page = await newTab;
     await page.waitForURL("**/settings.html");
     await readySettings();
+    assert.equal(await page.locator("#settingsFeedback, .settings-feedback").count(), 0);
+    assert.equal(await page.locator("#settingsNotification").isVisible(), true);
+    assert.equal(await page.locator("#settingsNotification").getAttribute("data-notification-type"), "idle");
+    assert.match(await page.locator("#settingsNotificationText").textContent(), /Monte uma configuração personalizada/);
     const dashboardDestination = new URL(await page.locator("#settingsBackButton").getAttribute("href"), page.url());
     if (dashboardDestination.origin !== base) {
         // Verifica o destino configurado sem acessar a versão publicada durante o teste local.
@@ -90,6 +94,9 @@ try {
     const unnamedDownloadEvent = page.waitForEvent("download");
     await page.locator("#settingsSaveButton").click();
     assert.equal((await unnamedDownloadEvent).suggestedFilename(), "configurações-dashboard.js");
+    assert.equal(await page.locator("#settingsNotification").getAttribute("data-notification-type"), "success");
+    assert.match(await page.locator("#settingsNotificationText").textContent(), /Configurações salvas em configurações-dashboard\.js/);
+    assert.match(await page.locator("#settingsNotificationIcon").getAttribute("src"), /success-icon\.svg$/);
     for (const [name, email, shift] of [
         ["Caio Vinicius", "caio.vinicius@shopee.com", "AM"],
         ["Fernando Ferrari", "fernando.ferrari@shopee.com", "PM2"],
@@ -142,10 +149,18 @@ try {
     assert.equal(await page.locator("#settingsAnalystEmail").inputValue(), "");
     assert.equal(await page.locator("#settingsAnalystName").inputValue(), "");
     assert.equal(await page.locator("#settingsReverseFormVisible").isChecked(), true);
+    await importSource("#settingsFileInput", "arquivo inválido");
+    await page.waitForFunction(() => document.getElementById("settingsNotification").dataset.notificationType === "error");
+    assert.match(await page.locator("#settingsNotificationText").textContent(), /formato/);
+    assert.match(await page.locator("#settingsNotificationIcon").getAttribute("src"), /error-icon\.svg$/);
+    assert.equal(await page.locator("#settingsAnalystName").inputValue(), "");
     await importSource("#settingsFileInput", exported);
     await page.waitForFunction(() => document.getElementById("settingsAnalystName").value === "Caio Vinicius");
     assert.equal(await page.locator("#settingsAnalystEmail").inputValue(), "caio.vinicius@shopee.com");
     assert.equal(await page.locator("#settingsReverseFormVisible").isChecked(), false);
+    assert.equal(await page.locator("#settingsNotification").getAttribute("data-notification-type"), "success");
+    assert.match(await page.locator("#settingsNotificationText").textContent(), /Configurações importadas/);
+    assert.match(await page.locator("#settingsNotificationIcon").getAttribute("src"), /success-icon\.svg$/);
     const settingsPage = page;
 
     // O dashboard permanece aberto e só aplica as mudanças quando o arquivo é importado.
@@ -184,7 +199,9 @@ try {
     await page.locator("#settingsAnalystEmail").fill("email-invalido");
     await page.locator("#settingsSaveAndBackButton").click();
     assert.match(page.url(), /settings\.html/);
-    assert.match(await page.locator("#settingsFeedback").textContent(), /Confira/);
+    assert.match(await page.locator("#settingsNotificationText").textContent(), /Confira/);
+    assert.equal(await page.locator("#settingsNotification").getAttribute("data-notification-type"), "error");
+    assert.match(await page.locator("#settingsNotificationIcon").getAttribute("src"), /error-icon\.svg$/);
     await page.locator("#settingsAnalystEmail").fill("caio.vinicius@shopee.com");
     const backDownload = page.waitForEvent("download");
     await page.locator("#settingsSaveAndBackButton").click();

@@ -11,14 +11,22 @@ import {
     serializeDashboardSettingsFile,
 } from "./settings-file.js";
 
-const feedback = document.getElementById("settingsFeedback");
+const notification = document.getElementById("settingsNotification");
+const notificationIcon = document.getElementById("settingsNotificationIcon");
+const notificationText = document.getElementById("settingsNotificationText");
+const notificationIcons = {
+    info: "images/geral-icons/bell-icon.svg",
+    success: "images/geral-icons/success-icon.svg",
+    error: "images/geral-icons/error-icon.svg",
+};
 const importButton = document.getElementById("settingsImportButton");
 const fileInput = document.getElementById("settingsFileInput");
 
 function notify(message, type = "success") {
-    feedback.textContent = message;
-    feedback.dataset.notificationType = type;
-    feedback.hidden = false;
+    const notificationType = Object.hasOwn(notificationIcons, type) ? type : "info";
+    notificationText.textContent = message;
+    notification.dataset.notificationType = notificationType;
+    notificationIcon.src = notificationIcons[notificationType];
 }
 
 function validateInputs() {
@@ -41,11 +49,10 @@ function saveSettings(returnToDashboard = false) {
         const content = serializeDashboardSettingsFile(settings);
         const fileName = createDashboardSettingsFileName(settings.profile.name);
         downloadReportBlob(new Blob([content], { type: "text/javascript;charset=utf-8" }), fileName);
+        notify(`Configurações salvas em ${fileName}.`);
         if (returnToDashboard) {
             // Permite que o navegador inicie o download antes de sair da página.
             window.setTimeout(() => window.location.assign(document.getElementById("settingsBackButton").href), 150);
-        } else {
-            notify(`Configurações salvas em ${fileName}.`);
         }
     } catch (error) {
         console.error("Não foi possível salvar as configurações.", error);
@@ -61,6 +68,7 @@ fileInput.addEventListener("change", async () => {
     fileInput.value = "";
     if (!file) return;
     importButton.disabled = true;
+    notify(`Importando configurações de ${file.name}...`, "info");
     try {
         const source = await readDashboardSettingsFile(file);
         importDashboardSettings(parseDashboardSettingsFile(source));
