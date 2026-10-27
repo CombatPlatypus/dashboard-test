@@ -1,4 +1,4 @@
-import { CHART_COLORS, getChartPixelRatio } from "../../charts/theme.js";
+import { CHART_COLORS, getChartBorderColor, getChartPixelRatio } from "../../charts/theme.js";
 import { CHART_TEXT_COLOR, CHART_VALUE_FONT } from "../../charts/theme.js";
 import { drawHorizontalBar3D, drawHorizontalBar3DBase } from "../core/horizontal-bars-3d.js";
 import { createDashboardChart } from "../../charts/standard.js";
@@ -380,7 +380,7 @@ function drawComparisonStructure(chart) {
 
     context.save();
     context.strokeStyle =
-        "rgba(82, 82, 82, 0.45)";
+        getChartBorderColor();
     context.lineWidth = 1;
 
     for (
@@ -525,7 +525,7 @@ function drawComparisonStructure(chart) {
 
             if (index < rows.length - 1) {
                 context.strokeStyle =
-                    "rgba(82, 82, 82, 0.4)";
+                    getChartBorderColor();
                 context.lineWidth = 1;
                 context.beginPath();
                 context.moveTo(

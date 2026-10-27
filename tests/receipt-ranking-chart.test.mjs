@@ -105,7 +105,7 @@ test("ranking de recebedores posiciona os textos acima das barras sem as bordas 
     assert.deepEqual(volumeBar.path[0], ["moveTo", 26, 75]);
     const volumeEnd = volumeStart + (volumeLimit - volumeStart) * 1949 / 2500;
     assert.ok(volumeBar.path.some(point => Math.abs(point[1] - volumeEnd) < 1e-9));
-    assert.equal(chart.ctx.fills.filter(fill => fill.color === "#29292a").length, 2);
+    assert.equal(chart.ctx.fills.filter(fill => fill.color === "#262626").length, 2);
     assert.ok(!chart.ctx.fills.some(fill => fill.color === "rgba(228, 230, 235, 0.07)"));
     for (const gridX of [volumeStart + (volumeLimit - volumeStart) / 5, volumeLimit, errorStart + (errorLimit - errorStart) * .2]) {
         assert.ok(chart.ctx.strokes.some(stroke => stroke.path.length === 2 &&

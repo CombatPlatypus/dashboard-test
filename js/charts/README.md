@@ -8,6 +8,12 @@ os dados, as categorias, as escalas e os formatos de quantidade, duração e per
 e azul `#2538a5`. Cinzas e outras categorias distintas são preservados. O padrão converte
 as tonalidades antigas na criação e nas atualizações; legendas HTML devem usar as mesmas cores.
 
+As grades e os eixos acompanham `--color-border`. As bases 3D usam `--color-chart-base`
+(por padrão, `--color-container-focus`); roscas sem dados e o restante dos indicadores
+usam `--color-chart-empty` (por padrão, `--color-border`), para se destacar do container.
+Essas cores são lidas do CSS ativo, sem substituir as cores das séries. A mudança de
+tema redesenha as instâncias existentes, sem reimportar ou recriar os relatórios.
+
 Todos os gráficos renderizam com `max(devicePixelRatio da tela, 2)`. Assim, um canvas
 com 800 × 300 pixels de tamanho visual usa pelo menos 1600 × 600 pixels de desenho.
 

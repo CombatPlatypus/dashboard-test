@@ -16,6 +16,8 @@
         --color-container-houver: #262626;
         --color-container-focus: #262626;
         --color-border: var(--default-color-border);
+        --color-chart-base: var(--color-container-focus);
+        --color-chart-empty: var(--color-border);
         --color-text: #e4e6eb;
         --color-table-title: #262626;
         --color-table-th: #262626;

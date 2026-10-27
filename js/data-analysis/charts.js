@@ -44,7 +44,7 @@ const chartBackgroundPlugin = {
 
         context.globalCompositeOperation = "destination-over";
 
-        context.fillStyle = options.color ?? "#18191a";
+        context.fillStyle = window.DashboardCharts?.getTheme?.().background ?? options.color ?? "#101010";
 
         context.fillRect(0, 0, chart.width, chart.height);
 

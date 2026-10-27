@@ -1,3 +1,5 @@
+import { getChartBorderColor, getChartTheme } from "../../charts/theme.js";
+
 const HORIZONTAL_BAR_3D_DEPTH = Object.freeze({ x: 10, y: 9 });
 
 function shadeColor(color, target, ratio) {
@@ -122,10 +124,11 @@ function createHorizontalBars3DPlugin({ id }) {
 
 function drawHorizontalBar3DBase(context, { left, top, bottom }) {
     const { x, y } = HORIZONTAL_BAR_3D_DEPTH;
+    const theme = getChartTheme();
     drawFace(context, [
         [left - x, top - y], [left + x, top + y],
         [left + x, bottom + y], [left - x, bottom - y],
-    ], "#29292a", "rgba(168, 169, 173, 0.34)");
+    ], theme.base, theme.border);
 }
 
 function drawHorizontalBar3D(context, left, top, width, height, color) {
@@ -141,7 +144,7 @@ function drawHorizontalBar3D(context, left, top, width, height, color) {
 function horizontalBarGridColor(context) {
     return Number(context.tick?.value) === 0
         ? "rgba(0, 0, 0, 0)"
-        : "rgba(82, 82, 82, 0.35)";
+        : getChartBorderColor();
 }
 
 function getHorizontalBarLabelPosition(bar) {

@@ -1,4 +1,4 @@
-import { CHART_AXIS_FONT, CHART_TEXT_COLOR, getChartPixelRatio, normalizeChartColor } from "./theme.js";
+import { CHART_AXIS_FONT, CHART_TEXT_COLOR, getChartBorderColor, getChartTheme, getChartPixelRatio, normalizeChartColor } from "./theme.js";
 import { createHorizontalBars3DPlugin, horizontalBarGridColor } from "../reports/core/horizontal-bars-3d.js";
 import { createStackedBars3DPlugin } from "../reports/core/stacked-bars-3d.js";
 
@@ -18,6 +18,18 @@ const palettePlugin = {
 };
 const horizontalProjection = createHorizontalBars3DPlugin({ id: "dashboardHorizontalBars3D" });
 const verticalProjection = createStackedBars3DPlugin({ id: "dashboardVerticalBars3D" });
+const themeObservers = new WeakMap();
+
+function observeChartTheme() {
+    const root = globalThis.document?.documentElement;
+    if (!root || typeof MutationObserver !== "function" || themeObservers.has(root)) return;
+    const observer = new MutationObserver(() => {
+        // Canvas drawings do not inherit CSS changes: redraw existing charts too.
+        for (const chart of Object.values(window.Chart.instances ?? {})) chart.update("none");
+    });
+    observer.observe(root, { attributes: true, attributeFilter: ["data-theme", "class", "style"] });
+    themeObservers.set(root, observer);
+}
 
 export function applyChartStandard(config) {
     const options = config.options ??= {};
@@ -40,11 +52,25 @@ export function applyChartStandard(config) {
     config.data ??= { datasets: [] };
     normalizeChartDatasets(config.data);
 
+    if (config.type === "bar" || config.type === "line") {
+        options.scales ??= {};
+        options.scales.x ??= {};
+        options.scales.y ??= {};
+    }
     for (const scale of Object.values(options.scales ?? {})) {
         scale.ticks ??= {};
         scale.ticks.font = { ...scale.ticks.font, ...CHART_AXIS_FONT };
         scale.ticks.color = CHART_TEXT_COLOR;
         if (scale.title) scale.title.color = CHART_TEXT_COLOR;
+        if (scale.grid !== false) {
+            scale.grid ??= {};
+            scale.grid.color = getChartBorderColor;
+            scale.grid.tickColor = getChartBorderColor;
+        }
+        if (scale.border !== false) {
+            scale.border ??= {};
+            scale.border.color = getChartBorderColor;
+        }
     }
 
     config.plugins ??= [];
@@ -81,7 +107,7 @@ export function applyChartStandard(config) {
         x.grace ??= "15%";
         x.ticks = { ...x.ticks, color: CHART_TEXT_COLOR, font: { ...CHART_AXIS_FONT }, padding: 10 };
         x.grid = { ...x.grid, display: true, color: horizontalBarGridColor };
-        x.border = { ...x.border, color: "#525252" };
+        x.border = { ...x.border, color: getChartBorderColor };
         const y = scales.y ??= {};
         y.ticks = { ...y.ticks, color: CHART_TEXT_COLOR, font: { ...CHART_AXIS_FONT }, padding: 22 };
         y.grid = { display: false };
@@ -95,9 +121,10 @@ export function applyChartStandard(config) {
 }
 
 export function createDashboardChart(canvas, config) {
+    observeChartTheme();
     return new window.Chart(canvas, applyChartStandard(config));
 }
 
 if (typeof window !== "undefined") {
-    window.DashboardCharts = { createChart: createDashboardChart };
+    window.DashboardCharts = { createChart: createDashboardChart, getTheme: getChartTheme };
 }

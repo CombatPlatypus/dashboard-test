@@ -100,7 +100,7 @@ test("gráfico usa o novo título e mantém Etiqueta, Sorting, Revertidos e Sald
     assert.equal(chart.options.scales.y.border.display, false);
     assert.equal(chart.options.scales.x.ticks.padding, 10);
     assert.equal(chart.options.scales.x.grid.color({ tick: { value: 0 } }), "rgba(0, 0, 0, 0)");
-    assert.equal(chart.options.scales.x.grid.color({ tick: { value: 20 } }), "rgba(82, 82, 82, 0.35)");
+    assert.equal(chart.options.scales.x.grid.color({ tick: { value: 20 } }), "#626262");
     const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
     assert.match(html, /<h4>Acompanhamento dos Erros<\/h4>/);
     assert.doesNotMatch(html, /(?:Identificados|Erros de Etiqueta x Erros de Sorting) x? Revertidos x Saldo Final/);
@@ -141,7 +141,7 @@ test("projeção 3D desenha a base e as faces inferior e lateral de cada barra",
     assert.deepEqual(paths, [
         {
             points: [[2, 1], [22, 19], [22, 229], [2, 211]],
-            color: "#29292a",
+            color: "#262626",
         },
         {
             points: [[12, 66], [112, 66], [122, 75], [22, 75]],
@@ -153,7 +153,7 @@ test("projeção 3D desenha a base e as faces inferior e lateral de cada barra",
         },
     ]);
     assert.deepEqual(context.strokes, [{
-        color: "rgba(168, 169, 173, 0.34)",
+        color: "#626262",
         width: 1,
     }]);
     assert.deepEqual(chart.options.layout.padding, { top: 9, right: 64, bottom: 9 });

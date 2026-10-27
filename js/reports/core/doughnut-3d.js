@@ -1,4 +1,4 @@
-import { CHART_TEXT_COLOR } from "../../charts/theme.js";
+import { CHART_TEXT_COLOR, getChartEmptyColor } from "../../charts/theme.js";
 
 const fullCircle = Math.PI * 2;
 const startAngle = -Math.PI / 2;
@@ -106,6 +106,7 @@ function drawDoughnut3D({ context, area, values, colors }) {
 
     const segments = createDoughnut3DSegments(values);
     const hasData = segments.length > 0;
+    const emptyColor = hasData ? null : getChartEmptyColor();
     const visibleSegments = hasData ? segments : [{
         index: 0,
         startAngle,
@@ -113,7 +114,7 @@ function drawDoughnut3D({ context, area, values, colors }) {
     }];
     const getColor = segment => hasData
         ? colors?.[segment.index] ?? "#3f51b5"
-        : "#393c46";
+        : emptyColor;
     const { centerX, centerY, outerRadius, innerRadius, ellipseScale, depth } = geometry;
 
     context.save();

@@ -1,4 +1,4 @@
-import { CHART_COLORS, getChartPixelRatio } from "../../charts/theme.js";
+import { CHART_COLORS, getChartEmptyColor, getChartPixelRatio } from "../../charts/theme.js";
 import { getHorizontalBarLabelPosition } from "../core/horizontal-bars-3d.js";
 import { createDashboardChart } from "../../charts/standard.js";
 import { CHART_TEXT_COLOR, CHART_VALUE_FONT } from "../../charts/theme.js";
@@ -125,15 +125,9 @@ function createOverallAnalysisMiniChart(
                             1,
                         ],
 
-                        backgroundColor: [
-                            activeColor,
-                            "#4b4b4b",
-                        ],
+                        backgroundColor: context => context.dataIndex === 0 ? activeColor : getChartEmptyColor(),
 
-                        hoverBackgroundColor: [
-                            activeColor,
-                            "#4b4b4b",
-                        ],
+                        hoverBackgroundColor: context => context.dataIndex === 0 ? activeColor : getChartEmptyColor(),
 
                         borderWidth: 0,
                     },
@@ -195,10 +189,7 @@ function updateOverallAnalysisMiniChart(
         1 - normalizedProgress,
     ];
 
-    dataset.backgroundColor = [
-        activeColor,
-        "#4b4b4b",
-    ];
+    dataset.backgroundColor = context => context.dataIndex === 0 ? activeColor : getChartEmptyColor();
 
     dataset.hoverBackgroundColor =
         dataset.backgroundColor;

@@ -1,4 +1,4 @@
-import { CHART_COLORS, CHART_TEXT_COLOR, CHART_VALUE_FONT } from "../../charts/theme.js";
+import { CHART_COLORS, CHART_TEXT_COLOR, CHART_VALUE_FONT, getChartEmptyColor } from "../../charts/theme.js";
 import { createDashboardChart } from "../../charts/standard.js";
 import { getHorizontalBarLabelPosition } from "../core/horizontal-bars-3d.js";
 import { DOUGHNUT_3D_PADDING, drawDoughnut3D, drawDoughnut3DCenterText } from "../core/doughnut-3d.js";
@@ -41,7 +41,7 @@ function createProgressChart(canvas, progress, color, label) {
         type: "doughnut",
         data: {
             labels: [label, "Restante até o limite"],
-            datasets: [{ data: [ratio, 1 - ratio], backgroundColor: [color, "#4b4b4b"], borderWidth: 0 }],
+            datasets: [{ data: [ratio, 1 - ratio], backgroundColor: context => context.dataIndex === 0 ? color : getChartEmptyColor(), borderWidth: 0 }],
         },
         options: {
             responsive: true, maintainAspectRatio: false, cutout: "72%", animation: false,

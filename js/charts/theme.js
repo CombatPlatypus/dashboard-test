@@ -10,6 +10,30 @@ export const CHART_COLORS = Object.freeze({
 export const CHART_AXIS_FONT = Object.freeze({ family: '"Open Sans", sans-serif', size: 14 });
 export const CHART_VALUE_FONT = '600 15px "Open Sans", sans-serif';
 
+// Read the active CSS variables at draw time, including after a theme switch.
+export function getChartTheme() {
+    const root = globalThis.document?.documentElement;
+    const style = root && typeof globalThis.getComputedStyle === "function"
+        ? globalThis.getComputedStyle(root)
+        : null;
+    const read = (name, fallback) => style?.getPropertyValue(name)?.trim() || fallback;
+    const border = read("--color-border", "#626262");
+    return {
+        border,
+        background: read("--color-container", "#101010"),
+        base: read("--color-chart-base", read("--color-container-focus", "#262626")),
+        empty: read("--color-chart-empty", border),
+    };
+}
+
+export function getChartBorderColor() {
+    return getChartTheme().border;
+}
+
+export function getChartEmptyColor() {
+    return getChartTheme().empty;
+}
+
 export function getChartPixelRatio() {
     const screenRatio = typeof window !== "undefined" ? Number(window.devicePixelRatio) || 1 : 1;
     return Math.max(screenRatio, 2);

@@ -130,13 +130,13 @@ test("gráfico do card de pacotes em análise mantém #f99400 na criação e atu
     const { root, charts } = createElements(t);
     assert.equal(initializeOverallAnalysisCharts(root), true);
     const chart = charts.find(item => item.canvas === root.querySelector("#overallAnalysisPackagesAnalysisChart"));
-    assert.deepEqual(chart.data.datasets[0].backgroundColor, ["#f99400", "#4b4b4b"]);
+    assert.deepEqual([0, 1].map(dataIndex => chart.data.datasets[0].backgroundColor({ dataIndex })), ["#f99400", "#626262"]);
     assert.equal(renderOverallAnalysisCharts(getData(sample)), true);
-    assert.deepEqual(chart.data.datasets[0].backgroundColor, ["#f99400", "#4b4b4b"]);
-    assert.deepEqual(chart.data.datasets[0].hoverBackgroundColor, ["#f99400", "#4b4b4b"]);
+    assert.deepEqual([0, 1].map(dataIndex => chart.data.datasets[0].backgroundColor({ dataIndex })), ["#f99400", "#626262"]);
+    assert.deepEqual([0, 1].map(dataIndex => chart.data.datasets[0].hoverBackgroundColor({ dataIndex })), ["#f99400", "#626262"]);
     assert.equal(chart.data.datasets[0].data[0], .88);
     assert.equal(renderOverallAnalysisCharts(getData({ ...sample, days: [] })), true);
-    assert.deepEqual(chart.data.datasets[0].backgroundColor, ["#f99400", "#4b4b4b"]);
+    assert.deepEqual([0, 1].map(dataIndex => chart.data.datasets[0].backgroundColor({ dataIndex })), ["#f99400", "#626262"]);
     assert.deepEqual(chart.data.datasets[0].data, [0, 1]);
 });
 
@@ -150,8 +150,8 @@ test("card de capacidade fica verde até 100% e vermelho somente acima, sem recr
     ]) {
         const data = getCardData(plannedVolume);
         assert.equal(renderOverallAnalysisCharts(data), true);
-        assert.deepEqual(chart.data.datasets[0].backgroundColor, [color, "#4b4b4b"], `Planejamento: ${plannedVolume}`);
-        assert.deepEqual(chart.data.datasets[0].hoverBackgroundColor, [color, "#4b4b4b"]);
+        assert.deepEqual([0, 1].map(dataIndex => chart.data.datasets[0].backgroundColor({ dataIndex })), [color, "#626262"], `Planejamento: ${plannedVolume}`);
+        assert.deepEqual([0, 1].map(dataIndex => chart.data.datasets[0].hoverBackgroundColor({ dataIndex })), [color, "#626262"]);
         assert.equal(chart.data.datasets[0].data[0], Math.min(plannedVolume / 20000, 1));
         assert.equal(data.cards.capacity.used, plannedVolume);
         assert.equal(charts.length, 7);
@@ -171,8 +171,8 @@ test("taxa de perdas usa verde abaixo de 0,025%, amarelo até 0,030% e vermelho 
         assert.equal(data.cards.lossesRate.limit, 0.0003);
         assert.equal(data.cards.lossesRate.rate, lost / 1000000);
         assert.equal(renderOverallAnalysisCharts(data), true);
-        assert.deepEqual(chart.data.datasets[0].backgroundColor, [color, "#4b4b4b"], `Perdas: ${lost} em 1.000.000`);
-        assert.deepEqual(chart.data.datasets[0].hoverBackgroundColor, [color, "#4b4b4b"]);
+        assert.deepEqual([0, 1].map(dataIndex => chart.data.datasets[0].backgroundColor({ dataIndex })), [color, "#626262"], `Perdas: ${lost} em 1.000.000`);
+        assert.deepEqual([0, 1].map(dataIndex => chart.data.datasets[0].hoverBackgroundColor({ dataIndex })), [color, "#626262"]);
         assert.equal(chart.data.datasets[0].data[0], Math.min(data.cards.lossesRate.rate / 0.0003, 1));
         assert.equal(charts.length, 7);
     }
@@ -184,13 +184,13 @@ test("limpar os dados mantém os cards de capacidade e perdas vazios e neutros",
     const cardCharts = ["#overallAnalysisCapacityChart", "#overallAnalysisLossRateChart"]
         .map(selector => charts.find(item => item.canvas === root.querySelector(selector)));
     for (const chart of cardCharts) {
-        assert.deepEqual(chart.data.datasets[0].backgroundColor, ["#e4e6eb", "#4b4b4b"]);
+        assert.deepEqual([0, 1].map(dataIndex => chart.data.datasets[0].backgroundColor({ dataIndex })), ["#e4e6eb", "#626262"]);
     }
     renderOverallAnalysisCharts(getCardData(23000, 350));
     renderOverallAnalysisCharts(getCardData());
     for (const chart of cardCharts) {
-        assert.deepEqual(chart.data.datasets[0].backgroundColor, ["#e4e6eb", "#4b4b4b"]);
-        assert.deepEqual(chart.data.datasets[0].hoverBackgroundColor, ["#e4e6eb", "#4b4b4b"]);
+        assert.deepEqual([0, 1].map(dataIndex => chart.data.datasets[0].backgroundColor({ dataIndex })), ["#e4e6eb", "#626262"]);
+        assert.deepEqual([0, 1].map(dataIndex => chart.data.datasets[0].hoverBackgroundColor({ dataIndex })), ["#e4e6eb", "#626262"]);
         assert.deepEqual(chart.data.datasets[0].data, [0, 1]);
     }
 });
