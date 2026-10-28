@@ -449,6 +449,8 @@
         /* CONTROLES */
 
         #receipt-controls #receipt-controls-1 .input-group {
+            /* Contém os selects ocultos do Select2 na área de rolagem. */
+            position: relative;
             max-height: 542px;
         }
         #receipt-controls #receipt-controls-2 .input-group {
