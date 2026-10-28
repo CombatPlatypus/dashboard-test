@@ -90,9 +90,9 @@ test("canvas do ranking preserva o padding e a grade interna, sem desenhar borda
 
     const routeStart = 26, routeLimit = 367, timeStart = 481, timeLimit = 822;
     const referenceX = timeStart + (timeLimit - timeStart) * (600 / 960);
-    assert.deepEqual(chart.ctx.strokes.filter(stroke => stroke.color === "#8B0000"), [{
+    assert.deepEqual(chart.ctx.strokes.filter(stroke => stroke.dash.length > 0), [{
         path: [["moveTo", referenceX, 34], ["lineTo", referenceX, 340]],
-        color: "#8B0000", dash: [6, 5],
+        color: "#e4e6eb", dash: [6, 5],
     }]);
     for (const gridX of [routeStart + (routeLimit - routeStart) * 2 / 22, timeStart + (timeLimit - timeStart) * 2 / 16]) {
         assert.ok(chart.ctx.strokes.some(stroke => stroke.path.length === 2 &&

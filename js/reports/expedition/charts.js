@@ -646,7 +646,7 @@ function drawComparisonStructure(chart) {
         );
 
     context.strokeStyle =
-        CHART_COLORS.red;
+        CHART_TEXT_COLOR;
     context.lineWidth = 1;
     context.setLineDash([
         6,

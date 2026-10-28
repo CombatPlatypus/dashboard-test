@@ -153,7 +153,7 @@ const lossesRateMaximumReferencePlugin = {
         context.save();
 
         context.strokeStyle =
-            CHART_COLORS.red;
+            CHART_TEXT_COLOR;
 
         context.lineWidth =
             1.5;
