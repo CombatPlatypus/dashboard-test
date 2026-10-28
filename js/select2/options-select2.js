@@ -24,6 +24,30 @@
         return $descendants;
     }
 
+    /* CONFIRMA A INSTÂNCIA, NÃO APENAS A MARCAÇÃO COPIADA DO HTML */
+
+    function getSelect2Instance(selectElement) {
+        const instance = $(selectElement).data("select2");
+
+        return instance?.$element?.[0] === selectElement
+            ? instance
+            : null;
+    }
+
+    function clearClonedSelect2Markup(selectElement) {
+        const $select = $(selectElement);
+
+        $select.next(".select2-container").remove();
+        $select.removeClass("select2-hidden-accessible");
+        $select.removeAttr("aria-hidden data-select2-id");
+        $select.find("[data-select2-id]").removeAttr("data-select2-id");
+        $select.removeData("select2");
+
+        if ($select.attr("tabindex") === "-1") {
+            $select.removeAttr("tabindex");
+        }
+    }
+
     /* INICIALIZA SOMENTE SELECTS AINDA NÃO INICIALIZADOS */
 
     function initializeSelect(
@@ -32,12 +56,13 @@
     ) {
         const $select = $(selectElement);
 
-        if (
-            $select.hasClass(
-                "select2-hidden-accessible",
-            )
-        ) {
+        if (getSelect2Instance(selectElement)) {
             return;
+        }
+
+        if ($select.hasClass("select2-hidden-accessible") ||
+            selectElement.hasAttribute("data-select2-id")) {
+            clearClonedSelect2Markup(selectElement);
         }
 
         $select.select2(options);
@@ -185,9 +210,14 @@
 
         getSelectElements(
             context,
-            "select.select2-hidden-accessible",
+            "select",
         ).each(function () {
-            $(this).select2("destroy");
+            if (getSelect2Instance(this)) {
+                $(this).select2("destroy");
+            } else if (this.classList.contains("select2-hidden-accessible") ||
+                this.hasAttribute("data-select2-id")) {
+                clearClonedSelect2Markup(this);
+            }
         });
     }
 

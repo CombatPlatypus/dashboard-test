@@ -600,9 +600,6 @@ function renderReceiptOperatorControls(
         return;
     }
 
-    receiptOperatorStructureSignature =
-        currentSignature;
-
     if (
         typeof window.destroySelect2Fields ===
             "function"
@@ -664,6 +661,8 @@ function renderReceiptOperatorControls(
             elements.operatorControls,
         );
     }
+
+    receiptOperatorStructureSignature = currentSignature;
 }
 
 /* PRÉVIA DOS OPERADORES */
@@ -1359,6 +1358,11 @@ function initializeReceiptView(
         )
     ) {
         return false;
+    }
+
+    // Clone the plain controls, without Select2 containers or instance IDs.
+    if (typeof window.destroySelect2Fields === "function") {
+        window.destroySelect2Fields(elements.operatorControls);
     }
 
     const operatorTemplate =
