@@ -1224,6 +1224,7 @@
             border-right: 1px solid var(--color-border);
             border-left: 1px solid var(--color-border);
             border-top: 1px solid var(--color-border);
+            text-align: center;
         }
         .final-report-title h4 {
             letter-spacing: 1.5px;

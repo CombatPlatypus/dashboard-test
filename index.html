@@ -1999,7 +1999,6 @@
                                                     </tr>
                                                 </tbody>
                                             </table>
-
                                         </div>
                                     </div>
 
@@ -2863,7 +2862,7 @@
                                     <!-- CARDS -->
 
                                     <div class="final-report-cards">
-                                        <div>
+                                        <div style="display: none;">
                                             <div class="final-report-title">
                                                 <h4>Uso da Capacidade</h4>
                                             </div>
@@ -2871,7 +2870,7 @@
                                             <div class="final-report-card">
                                                 <div class="flex-box-start">
                                                     <div class="final-report-mini-chart">
-                                                        <canvas id="overallAnalysisCapacityChart" role="img">
+                                                        <canvas id="overallAnalysisCapacityChart" role="img" height="300" style="display: block; box-sizing: border-box; height: 150px; width: 150px;" width="300">
                                                             Seu navegador não suporta gráficos em canvas.
                                                         </canvas>
 
@@ -2888,26 +2887,33 @@
 
                                         <div>
                                             <div class="final-report-title">
-                                                <h4>Pacotes em Análise</h4>
+                                                <h4>Avarias do Soc e Hub</h4>
                                             </div>
 
                                             <div class="final-report-card">
                                                 <div class="flex-box-start">
                                                     <div class="final-report-mini-chart">
-                                                        <canvas id="overallAnalysisPackagesAnalysisChart" role="img">
+                                                        <canvas id="" role="img">
                                                             Seu navegador não suporta gráficos em canvas.
                                                         </canvas>
 
-                                                        <img src="images/geral-icons/clock-icon.svg" aria-hidden="true">
+                                                        <img src="images/geral-icons/damage-icon.svg aria-hidden="true">
                                                     </div>
 
-                                                    <div>
-                                                        <h2 id="overallAnalysisPackagesAnalysisValue">—</h2>
-                                                        <p id="overallAnalysisPackagesAnalysisStatus">—</p>
+                                                    <div class="chart-label">
+                                                        <div class="type">
+                                                            <div style="background-color: #f99400;"></div>
+                                                            <p>Avarias do SOC</p>
+                                                        </div>
+
+                                                        <div class="type">
+                                                            <div style="background-color: #8B0000;"></div>
+                                                            <p>Avarias do Hub</p>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </div> 
 
                                         <div>
                                             <div class="final-report-title">
@@ -2924,13 +2930,49 @@
                                                         <img src="images/geral-icons/bars-icon.svg" aria-hidden="true">
                                                     </div>
 
-                                                    <div>
+                                                    <div style="display: none;">
                                                         <h2 id="overallAnalysisLossRate">—</h2>
                                                         <p id="overallAnalysisLossRateStatus">—</p>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
+
+                                        <div>
+                                            <div class="final-report-title">
+                                                <h4>Análises e Perdas Confimadas</h4>
+                                            </div>
+
+                                            <div class="final-report-card">
+                                                <div class="flex-box-start">
+                                                    <div class="final-report-mini-chart">
+                                                        <canvas id="overallAnalysisPackagesAnalysisChart" role="img">
+                                                            Seu navegador não suporta gráficos em canvas.
+                                                        </canvas>
+
+                                                        <img src="images/geral-icons/clock-icon.svg" aria-hidden="true">
+                                                    </div>
+
+                                                    <div style="display: none;">
+                                                        <h2 id="overallAnalysisPackagesAnalysisValue">—</h2>
+                                                        <p id="overallAnalysisPackagesAnalysisStatus">—</p>
+                                                    </div>
+
+                                                    <div class="chart-label">
+                                                        <div class="type">
+                                                            <div style="background-color: #f99400;"></div>
+                                                            <p>Em Análise</p>
+                                                        </div>
+
+                                                        <div class="type">
+                                                            <div style="background-color: #8B0000;"></div>
+                                                            <p>Perdas Confirmadas</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                     </div>
 
                                     <!-- FLUXO DO DIA E DASTAQUES DA OPERAÇÃO -->
