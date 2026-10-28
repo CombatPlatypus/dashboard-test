@@ -1281,11 +1281,13 @@
             text-align: center;
         }
         .final-report-cards .final-report-card .flex-box-column {
-            gap: 15px;
+            gap: 20px;
             align-items: center;
         }
         .final-report-cards .final-report-card .flex-box-column > div {
             text-align: center;
+            margin: 0 auto;
+            
         }
         .final-report-cards .final-report-card .final-report-mini-chart {
             width: 150px;
