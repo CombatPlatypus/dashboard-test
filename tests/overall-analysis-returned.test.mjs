@@ -7,6 +7,7 @@ import { getDamageAndLossesState } from "../js/reports/damage-and-losses/state.j
 import {
     getLossesState, getLossesSummary, replaceLossesData, resetLossesState, subscribeLossesState,
 } from "../js/reports/damage-and-losses/losses-state.js";
+import { createCompleteAnalysis } from "./fixtures/overall-analysis-complete.mjs";
 import { createOverallAnalysisData } from "../js/reports/overall-analysis/model.js";
 import { initializeOverallAnalysisView, renderOverallAnalysisView } from "../js/reports/overall-analysis/view.js";
 import { initializeOverallAnalysisCharts, renderOverallAnalysisCharts } from "../js/reports/overall-analysis/charts.js";
@@ -37,7 +38,7 @@ function getCardData(plannedVolume = null, lost = null) {
     };
     return createOverallAnalysisData(getReceiptState(), getExpeditionState(),
         { activeMonth: 9, year: 2026, months }, { plannedVolume, shiftCapacity: 20000 },
-        getDamageAndLossesState(), getLossesState());
+        getDamageAndLossesState(), getLossesState(), null, null, new Date(2026, 9, 28, 12));
 }
 
 function replaceGlobal(t, name, value) {
@@ -126,73 +127,73 @@ test("linha acompanha importação, reimportação e limpeza com a formatação 
     assert.deepEqual(values(), periodKeys.map(() => "—"));
 });
 
-test("gráfico do card de pacotes em análise mantém #f99400 na criação e atualização", t => {
-    const { root, charts } = createElements(t);
+test("card de análises mostra o total e a composição das análises e perdas confirmadas", t => {
+    const { root, charts, elements } = createElements(t);
+    assert.equal(initializeOverallAnalysisView(root), true);
     assert.equal(initializeOverallAnalysisCharts(root), true);
     const chart = charts.find(item => item.canvas === root.querySelector("#overallAnalysisPackagesAnalysisChart"));
-    assert.deepEqual([0, 1].map(dataIndex => chart.data.datasets[0].backgroundColor({ dataIndex })), ["#f99400", "#626262"]);
-    assert.equal(renderOverallAnalysisCharts(getData(sample)), true);
-    assert.deepEqual([0, 1].map(dataIndex => chart.data.datasets[0].backgroundColor({ dataIndex })), ["#f99400", "#626262"]);
-    assert.deepEqual([0, 1].map(dataIndex => chart.data.datasets[0].hoverBackgroundColor({ dataIndex })), ["#f99400", "#626262"]);
-    assert.equal(chart.data.datasets[0].data[0], .88);
-    assert.equal(renderOverallAnalysisCharts(getData({ ...sample, days: [] })), true);
-    assert.deepEqual([0, 1].map(dataIndex => chart.data.datasets[0].backgroundColor({ dataIndex })), ["#f99400", "#626262"]);
-    assert.deepEqual(chart.data.datasets[0].data, [0, 1]);
+    const data = getData(sample);
+    assert.equal(renderOverallAnalysisCharts(data), true);
+    assert.equal(renderOverallAnalysisView(data), true);
+    assert.deepEqual(chart.data.datasets[0].data, [88, 12]);
+    assert.deepEqual([0, 1].map(dataIndex => chart.data.datasets[0].backgroundColor({ dataIndex })), ["#f99400", "#8B0000"]);
+    assert.equal(elements.get("overallAnalysisPackagesAnalysisValue").textContent, "100");
+    assert.equal(elements.get("overallAnalysisPackagesUnderReview").textContent, "88");
+    assert.equal(elements.get("overallAnalysisConfirmedLosses").textContent, "12");
 });
 
-test("card de capacidade fica verde até 100% e vermelho somente acima, sem recriar gráficos", t => {
-    const { root, charts } = createElements(t);
+test("card de avarias substitui capacidade com o total e os valores de SOC e Hub", t => {
+    const { root, charts, elements } = createElements(t);
+    assert.equal(initializeOverallAnalysisView(root), true);
     assert.equal(initializeOverallAnalysisCharts(root), true);
-    const chart = charts.find(item => item.canvas === root.querySelector("#overallAnalysisCapacityChart"));
-    for (const [plannedVolume, color] of [
-        [0, "#007A48"], [10000, "#007A48"], [19999, "#007A48"], [20000, "#007A48"],
-        [20001, "#8B0000"], [23000, "#8B0000"], [20000, "#007A48"],
-    ]) {
-        const data = getCardData(plannedVolume);
-        assert.equal(renderOverallAnalysisCharts(data), true);
-        assert.deepEqual([0, 1].map(dataIndex => chart.data.datasets[0].backgroundColor({ dataIndex })), [color, "#626262"], `Planejamento: ${plannedVolume}`);
-        assert.deepEqual([0, 1].map(dataIndex => chart.data.datasets[0].hoverBackgroundColor({ dataIndex })), [color, "#626262"]);
-        assert.equal(chart.data.datasets[0].data[0], Math.min(plannedVolume / 20000, 1));
-        assert.equal(data.cards.capacity.used, plannedVolume);
-        assert.equal(charts.length, 7);
-    }
+    const chart = charts.find(item => item.canvas === root.querySelector("#overallAnalysisDamageChart"));
+    const data = createCompleteAnalysis();
+    assert.equal(renderOverallAnalysisCharts(data), true);
+    assert.equal(renderOverallAnalysisView(data), true);
+    assert.deepEqual(chart.data.datasets[0].data, [2, 3]);
+    assert.deepEqual([0, 1].map(dataIndex => chart.data.datasets[0].backgroundColor({ dataIndex })), ["#f99400", "#8B0000"]);
+    assert.equal(elements.get("overallAnalysisDamageTotal").textContent, "5");
+    assert.equal(elements.get("overallAnalysisDamageSoc").textContent, "2");
+    assert.equal(elements.get("overallAnalysisDamageHub").textContent, "3");
+    assert.equal(elements.has("overallAnalysisCapacityChart"), false);
+    assert.equal(elements.has("overallAnalysisPackagesAnalysisStatus"), false);
+    assert.equal(charts.length, 7);
 });
 
-test("taxa de perdas usa verde abaixo de 0,025%, amarelo até 0,030% e vermelho acima", t => {
-    const { root, charts } = createElements(t);
+test("card de perdas representa o volume movimentado sem somar as perdas ao denominador", t => {
+    const { root, charts, elements } = createElements(t);
+    assert.equal(initializeOverallAnalysisView(root), true);
     assert.equal(initializeOverallAnalysisCharts(root), true);
     const chart = charts.find(item => item.canvas === root.querySelector("#overallAnalysisLossRateChart"));
-    for (const [lost, color] of [
-        [0, "#007A48"], [240, "#007A48"], [249, "#007A48"],
-        [250, "#f99400"], [251, "#f99400"], [299, "#f99400"], [300, "#f99400"],
-        [301, "#8B0000"], [350, "#8B0000"], [300, "#f99400"], [249, "#007A48"],
-    ]) {
+    for (const lost of [0, 240, 300, 350]) {
         const data = getCardData(null, lost);
-        assert.equal(data.cards.lossesRate.limit, 0.0003);
         assert.equal(data.cards.lossesRate.rate, lost / 1000000);
         assert.equal(renderOverallAnalysisCharts(data), true);
-        assert.deepEqual([0, 1].map(dataIndex => chart.data.datasets[0].backgroundColor({ dataIndex })), [color, "#626262"], `Perdas: ${lost} em 1.000.000`);
-        assert.deepEqual([0, 1].map(dataIndex => chart.data.datasets[0].hoverBackgroundColor({ dataIndex })), [color, "#626262"]);
-        assert.equal(chart.data.datasets[0].data[0], Math.min(data.cards.lossesRate.rate / 0.0003, 1));
+        assert.equal(renderOverallAnalysisView(data), true);
+        assert.deepEqual(chart.data.datasets[0].data, [1000000 - lost, lost]);
+        assert.deepEqual([0, 1].map(dataIndex => chart.data.datasets[0].backgroundColor({ dataIndex })), ["#2538a5", "#8B0000"]);
+        assert.equal(elements.get("overallAnalysisLossRateMoved").textContent, "1.000.000");
+        assert.equal(elements.get("overallAnalysisLossRateTotalLosses").textContent, String(lost));
         assert.equal(charts.length, 7);
     }
 });
 
-test("limpar os dados mantém os cards de capacidade e perdas vazios e neutros", t => {
-    const { root, charts } = createElements(t);
+test("limpar os dados mantém os três cards vazios e neutros sem recriar gráficos", t => {
+    const { root, charts, elements } = createElements(t);
+    assert.equal(initializeOverallAnalysisView(root), true);
     assert.equal(initializeOverallAnalysisCharts(root), true);
-    const cardCharts = ["#overallAnalysisCapacityChart", "#overallAnalysisLossRateChart"]
-        .map(selector => charts.find(item => item.canvas === root.querySelector(selector)));
-    for (const chart of cardCharts) {
-        assert.deepEqual([0, 1].map(dataIndex => chart.data.datasets[0].backgroundColor({ dataIndex })), ["#e4e6eb", "#626262"]);
-    }
-    renderOverallAnalysisCharts(getCardData(23000, 350));
-    renderOverallAnalysisCharts(getCardData());
-    for (const chart of cardCharts) {
-        assert.deepEqual([0, 1].map(dataIndex => chart.data.datasets[0].backgroundColor({ dataIndex })), ["#e4e6eb", "#626262"]);
-        assert.deepEqual([0, 1].map(dataIndex => chart.data.datasets[0].hoverBackgroundColor({ dataIndex })), ["#e4e6eb", "#626262"]);
+    renderOverallAnalysisCharts(createCompleteAnalysis());
+    renderOverallAnalysisCharts(getData());
+    renderOverallAnalysisView(getData());
+    for (const id of ["overallAnalysisDamageChart", "overallAnalysisPackagesAnalysisChart", "overallAnalysisLossRateChart"]) {
+        const chart = charts.find(item => item.canvas === elements.get(id));
+        assert.deepEqual([0, 1].map(dataIndex => chart.data.datasets[0].backgroundColor({ dataIndex })), ["#626262", "#626262"]);
         assert.deepEqual(chart.data.datasets[0].data, [0, 1]);
     }
+    for (const id of ["DamageTotal", "DamageSoc", "DamageHub", "PackagesAnalysisValue", "PackagesUnderReview", "ConfirmedLosses", "LossRate", "LossRateMoved", "LossRateTotalLosses"]) {
+        assert.equal(elements.get("overallAnalysis" + id).textContent, "—");
+    }
+    assert.equal(charts.length, 7);
 });
 
 test("Parcel e Reversa exibem totais, cobertura de esperados e composição e voltam ao estado vazio", t => {

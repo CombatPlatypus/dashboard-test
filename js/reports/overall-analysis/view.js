@@ -17,16 +17,6 @@ const overallAnalysisRateFormatter =
         },
     );
 
-const overallAnalysisCapacityRateFormatter =
-    new Intl.NumberFormat(
-        "pt-BR",
-        {
-            style: "percent",
-            minimumFractionDigits: 1,
-            maximumFractionDigits: 1,
-        },
-    );
-
 const overallAnalysisCompositionRateFormatter =
     new Intl.NumberFormat(
         "pt-BR",
@@ -118,25 +108,6 @@ function formatOverallAnalysisRate(
     }
 
     return overallAnalysisRateFormatter
-        .format(
-            Number(value),
-        );
-}
-
-function formatOverallAnalysisCapacityRate(
-    value,
-) {
-    if (
-        value === null ||
-        value === undefined ||
-        !Number.isFinite(
-            Number(value),
-        )
-    ) {
-        return "—";
-    }
-
-    return overallAnalysisCapacityRateFormatter
         .format(
             Number(value),
         );
@@ -314,24 +285,17 @@ function getOverallAnalysisViewElements(
                 "overallAnalysisAnalyst",
             ),
 
-        capacityUsage:
-            getElement(
-                "overallAnalysisCapacityUsage",
-            ),
-
-        capacityStatus:
-            getElement(
-                "overallAnalysisCapacityStatus",
-            ),
+        damageTotal: getElement("overallAnalysisDamageTotal"),
+        damageSoc: getElement("overallAnalysisDamageSoc"),
+        damageHub: getElement("overallAnalysisDamageHub"),
+        packagesUnderReview: getElement("overallAnalysisPackagesUnderReview"),
+        confirmedLosses: getElement("overallAnalysisConfirmedLosses"),
+        lossRateMoved: getElement("overallAnalysisLossRateMoved"),
+        lossRateTotalLosses: getElement("overallAnalysisLossRateTotalLosses"),
 
         packagesAnalysisValue:
             getElement(
                 "overallAnalysisPackagesAnalysisValue",
-            ),
-
-        packagesAnalysisStatus:
-            getElement(
-                "overallAnalysisPackagesAnalysisStatus",
             ),
 
         lossRate:
@@ -586,55 +550,19 @@ function renderOverallAnalysisView(
     elements.analyst.textContent =
         data.context?.analyst || "—";
 
-    elements.capacityUsage.textContent =
-        formatOverallAnalysisCapacityRate(
-            data.cards.capacity.usageRate,
-        );
-
-    if (
-        data.cards.capacity.balance ===
-        null
-    ) {
-        elements.capacityStatus.textContent =
-            "Folga de — pacotes";
-    } else if (
-        data.cards.capacity.balance >= 0
-    ) {
-        elements.capacityStatus.textContent =
-            "Folga de " +
-            formatOverallAnalysisQuantity(
-                data.cards.capacity.balance,
-            ) +
-            " pacotes";
-    } else {
-        elements.capacityStatus.textContent =
-            "Excesso de " +
-            formatOverallAnalysisQuantity(
-                Math.abs(
-                    data.cards.capacity.balance,
-                ),
-            ) +
-            " pacotes";
-    }
+    elements.damageTotal.textContent = formatOverallAnalysisQuantity(data.cards.damage.total);
+    elements.damageSoc.textContent = formatOverallAnalysisQuantity(data.cards.damage.soc);
+    elements.damageHub.textContent = formatOverallAnalysisQuantity(data.cards.damage.hub);
+    elements.packagesUnderReview.textContent = formatOverallAnalysisQuantity(data.cards.packagesAnalysis.value);
+    elements.confirmedLosses.textContent = formatOverallAnalysisQuantity(data.cards.packagesAnalysis.confirmedLosses);
+    elements.lossRateMoved.textContent = formatOverallAnalysisQuantity(data.cards.lossesRate.moved);
+    elements.lossRateTotalLosses.textContent = formatOverallAnalysisQuantity(data.cards.lossesRate.totalLosses);
 
     elements.packagesAnalysisValue.textContent =
         formatOverallAnalysisQuantity(
             data.cards.packagesAnalysis
-                .value,
+                .total,
         );
-
-    elements.packagesAnalysisStatus.textContent =
-        data.cards.packagesAnalysis.rate ===
-            null
-            ? "—"
-            : (
-                formatOverallAnalysisCapacityRate(
-                    data.cards
-                        .packagesAnalysis
-                        .rate,
-                ) +
-                " dos registros"
-            );
 
     elements.lossRate.textContent =
         formatOverallAnalysisLossRate(

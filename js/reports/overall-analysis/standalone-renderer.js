@@ -1,4 +1,5 @@
-import { CHART_COLORS, CHART_TEXT_COLOR, CHART_VALUE_FONT, getChartEmptyColor } from "../../charts/theme.js";
+import { createOverallAnalysisCardChart, getOverallAnalysisCardCharts, updateOverallAnalysisCardChart } from "./card-charts.js";
+import { CHART_COLORS, CHART_TEXT_COLOR, CHART_VALUE_FONT } from "../../charts/theme.js";
 import { createDashboardChart } from "../../charts/standard.js";
 import { getHorizontalBarLabelPosition } from "../core/horizontal-bars-3d.js";
 import { DOUGHNUT_3D_PADDING, drawDoughnut3D, drawDoughnut3DCenterText } from "../core/doughnut-3d.js";
@@ -9,7 +10,7 @@ import { getOverallAnalysisViewElements, renderOverallAnalysisView, formatOveral
 // preenchem os campos por este adaptador, sem alterar os IDs do documento.
 const FIELD_IDS = {
     Date: "Date", Window: "Window", Analyst: "WindowAnalyst",
-    PackagesAnalysisValue: "PackagesValue", PackagesAnalysisStatus: "PackagesStatus",
+    PackagesAnalysisValue: "PackagesValue",
     DamageAndLossesTable: "-LossesTable",
     ParcelCoverageScanned: "-ParcelCoverageScanned",
     ParcelCoverageUnscanned: "-ParcelCoverageUnscanned",
@@ -33,21 +34,6 @@ function fillStandaloneFields(data, snapshot, root) {
     renderOverallAnalysisView(data, elements, new Date(snapshot.generatedAt));
     // O destinatário pode estar em outro fuso; preserva a data da geração.
     elements.date.textContent = snapshot.dateLabel;
-}
-
-function createProgressChart(canvas, progress, color, label) {
-    const ratio = Math.max(0, Math.min(progress ?? 0, 1));
-    return createDashboardChart(canvas, {
-        type: "doughnut",
-        data: {
-            labels: [label, "Restante até o limite"],
-            datasets: [{ data: [ratio, 1 - ratio], backgroundColor: context => context.dataIndex === 0 ? color : getChartEmptyColor(), borderWidth: 0 }],
-        },
-        options: {
-            responsive: true, maintainAspectRatio: false, cutout: "72%", animation: false,
-            plugins: { legend: { display: false }, tooltip: { enabled: false } },
-        },
-    });
 }
 
 const barValues = {
@@ -154,16 +140,15 @@ async function renderStandaloneReport(snapshot, root = document) {
         if (!element) throw new Error(`Gráfico ${id} não encontrado no modelo.`);
         return element;
     };
-    const capacity = data.cards.capacity;
-    const loss = data.cards.lossesRate;
+    const cardDefinitions = getOverallAnalysisCardCharts(data);
     const charts = [
-        createProgressChart(canvas("finalReportCapacityChart"), capacity.usageRate,
-            capacity.usageRate > 1 ? CHART_COLORS.red : CHART_COLORS.green, "Uso da capacidade"),
-        createProgressChart(canvas("finalReportPackagesChart"), data.cards.packagesAnalysis.rate,
-            CHART_COLORS.yellow, "Pacotes em análise"),
-        createProgressChart(canvas("finalReportLossRateChart"), loss.rate / loss.limit,
-            loss.rate > loss.limit ? CHART_COLORS.red : loss.rate >= 0.00025 ? CHART_COLORS.yellow : CHART_COLORS.green,
-            "Uso do limite de perdas"),
+        ...[["finalReportDamageChart", cardDefinitions.damage],
+            ["finalReportLossRateChart", cardDefinitions.lossesRate],
+            ["finalReportPackagesChart", cardDefinitions.packagesAnalysis]].map(([id, definition]) => {
+                const chart = createOverallAnalysisCardChart(canvas(id), false);
+                updateOverallAnalysisCardChart(chart, definition, "none");
+                return chart;
+            }),
         createBarChart(canvas("finalReportReceiptChart"), ["Volume Esperado", "Volume Recebido", "Gap"],
             [data.processing.expectedVolume, data.processing.receivedVolume, data.processing.gap],
             ["#bdbdbd", CHART_COLORS.green, CHART_COLORS.yellow]),

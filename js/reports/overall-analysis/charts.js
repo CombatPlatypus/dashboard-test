@@ -1,4 +1,5 @@
-import { CHART_COLORS, getChartEmptyColor, getChartPixelRatio } from "../../charts/theme.js";
+import { createOverallAnalysisCardChart, getOverallAnalysisCardCharts, updateOverallAnalysisCardChart } from "./card-charts.js";
+import { CHART_COLORS, getChartPixelRatio } from "../../charts/theme.js";
 import { getHorizontalBarLabelPosition } from "../core/horizontal-bars-3d.js";
 import { createDashboardChart } from "../../charts/standard.js";
 import { CHART_TEXT_COLOR, CHART_VALUE_FONT } from "../../charts/theme.js";
@@ -17,7 +18,7 @@ import {
     formatOverallAnalysisQuantity,
 } from "./view.js";
 
-let overallAnalysisCapacityChart =
+let overallAnalysisDamageChart =
     null;
 
 let overallAnalysisPackagesAnalysisChart =
@@ -53,16 +54,6 @@ const OVERALL_ANALYSIS_CHART_FONT = {
     family: '"Open Sans", sans-serif',
     size: 14,
 };
-
-const OVERALL_ANALYSIS_CARD_COLORS = Object.freeze({
-    normal: CHART_COLORS.green,
-    warning: CHART_COLORS.yellow,
-    exceeded: CHART_COLORS.red,
-    empty: "#e4e6eb",
-});
-
-// Taxas são armazenadas como proporção: 0,025% = 0.00025.
-const OVERALL_ANALYSIS_LOSS_RATE_WARNING = 0.00025;
 
 /* ESPAÇAMENTO DOS TEXTOS DO CANVAS */
 
@@ -105,99 +96,6 @@ const overallAnalysisTextSpacingPlugin = {
         );
     },
 };
-
-/* GRÁFICOS DE ROSCA DOS CARDS */
-
-function createOverallAnalysisMiniChart(
-    canvas,
-    activeColor,
-) {
-    return createDashboardChart(
-        canvas,
-        {
-            type: "doughnut",
-
-            data: {
-                datasets: [
-                    {
-                        data: [
-                            0,
-                            1,
-                        ],
-
-                        backgroundColor: context => context.dataIndex === 0 ? activeColor : getChartEmptyColor(),
-
-                        hoverBackgroundColor: context => context.dataIndex === 0 ? activeColor : getChartEmptyColor(),
-
-                        borderWidth: 0,
-                    },
-                ],
-            },
-
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                devicePixelRatio:
-                    OVERALL_ANALYSIS_CHART_PIXEL_RATIO,
-                cutout: "72%",
-                events: [],
-
-                animation: {
-                    duration: 250,
-                },
-
-                plugins: {
-                    legend: {
-                        display: false,
-                    },
-
-                    tooltip: {
-                        enabled: false,
-                    },
-                },
-            },
-        },
-    );
-}
-
-function updateOverallAnalysisMiniChart(
-    chart,
-    progress,
-    activeColor,
-    updateMode,
-) {
-    const normalizedProgress =
-        progress === null ||
-        progress === undefined ||
-        !Number.isFinite(
-            Number(progress),
-        )
-            ? 0
-            : Math.min(
-                Math.max(
-                    Number(progress),
-                    0,
-                ),
-                1,
-            );
-
-    const dataset =
-        chart.data.datasets[0];
-
-    dataset.data = [
-        normalizedProgress,
-        1 - normalizedProgress,
-    ];
-
-    dataset.backgroundColor = context => context.dataIndex === 0 ? activeColor : getChartEmptyColor();
-
-    dataset.hoverBackgroundColor =
-        dataset.backgroundColor;
-
-    chart.update(
-        updateMode,
-    );
-}
 
 /* VALORES AO FINAL DAS BARRAS */
 
@@ -473,7 +371,7 @@ function resizeOverallAnalysisCharts() {
                     null;
 
                 [
-                    overallAnalysisCapacityChart,
+                    overallAnalysisDamageChart,
                     overallAnalysisPackagesAnalysisChart,
                     overallAnalysisLossRateChart,
                     overallAnalysisReceiptChart,
@@ -532,7 +430,7 @@ function renderOverallAnalysisCharts(
     data,
 ) {
     if (
-        !overallAnalysisCapacityChart ||
+        !overallAnalysisDamageChart ||
         !overallAnalysisPackagesAnalysisChart ||
         !overallAnalysisLossRateChart ||
         !overallAnalysisReceiptChart ||
@@ -569,82 +467,10 @@ function renderOverallAnalysisCharts(
             ? undefined
             : "none";
 
-    const capacityProgress =
-        data.cards.capacity.usageRate;
-
-    const packagesAnalysisProgress =
-        data.cards.packagesAnalysis.rate;
-
-    const capacityColor =
-        capacityProgress === null
-            ? OVERALL_ANALYSIS_CARD_COLORS.empty
-            : capacityProgress > 1
-                ? OVERALL_ANALYSIS_CARD_COLORS.exceeded
-                : OVERALL_ANALYSIS_CARD_COLORS.normal;
-
-    const lossRate =
-        data.cards.lossesRate.rate;
-
-    const lossRateColor =
-        lossRate === null
-            ? OVERALL_ANALYSIS_CARD_COLORS.empty
-            : lossRate > data.cards.lossesRate.limit
-                ? OVERALL_ANALYSIS_CARD_COLORS.exceeded
-                : lossRate >= OVERALL_ANALYSIS_LOSS_RATE_WARNING
-                    ? OVERALL_ANALYSIS_CARD_COLORS.warning
-                    : OVERALL_ANALYSIS_CARD_COLORS.normal;
-
-    const lossRateProgress =
-        data.cards.lossesRate.rate !==
-            null &&
-        data.cards.lossesRate.limit > 0
-            ? data.cards.lossesRate.rate /
-                data.cards.lossesRate.limit
-            : null;
-
-    updateOverallAnalysisMiniChart(
-        overallAnalysisCapacityChart,
-        capacityProgress,
-        capacityColor,
-        updateMode,
-    );
-
-    updateOverallAnalysisMiniChart(
-        overallAnalysisPackagesAnalysisChart,
-        packagesAnalysisProgress,
-        CHART_COLORS.yellow,
-        updateMode,
-    );
-
-    overallAnalysisPackagesAnalysisChart
-        .canvas
-        .setAttribute(
-            "aria-label",
-            data.cards.packagesAnalysis
-                .value === null
-                ? "Pacotes em análise, sem dados importados"
-                : (
-                    formatOverallAnalysisQuantity(
-                        data.cards
-                            .packagesAnalysis
-                            .value,
-                    ) +
-                    " pacotes em análise de " +
-                    formatOverallAnalysisQuantity(
-                        data.cards
-                            .packagesAnalysis
-                            .total,
-                    ) +
-                    " registros"
-                ),
-        );
-
-    updateOverallAnalysisMiniChart(
-        overallAnalysisLossRateChart,
-        lossRateProgress,
-        lossRateColor,
-        updateMode,
-    );
+    const cardCharts = getOverallAnalysisCardCharts(data);
+    updateOverallAnalysisCardChart(overallAnalysisDamageChart, cardCharts.damage, updateMode);
+    updateOverallAnalysisCardChart(overallAnalysisPackagesAnalysisChart, cardCharts.packagesAnalysis, updateMode);
+    updateOverallAnalysisCardChart(overallAnalysisLossRateChart, cardCharts.lossesRate, updateMode);
 
     overallAnalysisReceiptChart.update(
         updateMode,
@@ -672,9 +498,9 @@ function renderOverallAnalysisCharts(
 function initializeOverallAnalysisCharts(
     rootElement,
 ) {
-    const capacityCanvas =
+    const damageCanvas =
         rootElement.querySelector(
-            "#overallAnalysisCapacityChart",
+            "#overallAnalysisDamageChart",
         );
 
     const lossRateCanvas =
@@ -708,7 +534,7 @@ function initializeOverallAnalysisCharts(
         );
 
     if (
-        !(capacityCanvas instanceof
+        !(damageCanvas instanceof
             HTMLCanvasElement) ||
         !(packagesAnalysisCanvas instanceof
             HTMLCanvasElement) ||
@@ -735,23 +561,14 @@ function initializeOverallAnalysisCharts(
     overallAnalysisPanel =
         rootElement;
 
-    overallAnalysisCapacityChart =
-        createOverallAnalysisMiniChart(
-            capacityCanvas,
-            "#e4e6eb",
-        );
+    overallAnalysisDamageChart =
+        createOverallAnalysisCardChart(damageCanvas);
 
     overallAnalysisPackagesAnalysisChart =
-        createOverallAnalysisMiniChart(
-            packagesAnalysisCanvas,
-            CHART_COLORS.yellow,
-        );
+        createOverallAnalysisCardChart(packagesAnalysisCanvas);
 
     overallAnalysisLossRateChart =
-        createOverallAnalysisMiniChart(
-            lossRateCanvas,
-            "#e4e6eb",
-        );
+        createOverallAnalysisCardChart(lossRateCanvas);
 
     overallAnalysisReceiptChart =
         createOverallAnalysisChart(

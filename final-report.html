@@ -681,8 +681,15 @@
             .cards > div {
                 min-width: 0;
                 min-height: 125px;
+                display: flex;
+                flex-direction: column;
+            }
+            .cards .title {
+                text-align: center;
             }
             .cards > div > .card {
+                flex: 1;
+                min-width: 0;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
@@ -698,6 +705,16 @@
             .cards > div > .card p {
                 margin: 0;
                 text-align: center;
+            }
+            .cards .flex-box-column {
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+                align-items: center;
+            }
+            .cards .chart-label {
+                flex-wrap: wrap;
+                row-gap: 10px;
             }
             .cards > div > .card .flex-box-start {
                 column-gap: 15px;
@@ -817,45 +834,35 @@
                 <div class="cards">
                     <div>
                         <div class="title">
-                            <h4>Uso da Capacidade</h4>
+                            <h4>Avarias do SOC e Hub</h4>
                         </div>
 
                         <div class="card">
-                            <div class="flex-box-start">
-                                <div class="mini-chart">
-                                    <canvas id="finalReportCapacityChart" role="img">
-                                        Seu navegador não suporta gráficos em canvas.
-                                    </canvas>
+                            <div class="flex-box-column">
+                                <div class="flex-box-start">
+                                    <div class="mini-chart">
+                                        <canvas id="finalReportDamageChart" role="img">
+                                            Seu navegador não suporta gráficos em canvas.
+                                        </canvas>
 
-                                    <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="512" x="0" y="0" viewBox="0 0 484.373 484.373" style="enable-background:new 0 0 512 512" xml:space="preserve" class=""><g><path d="M473.61 119.808v-1.024c-.512-1.024-.512-2.048-1.024-3.072v-.512c-.512-1.024-1.536-2.048-2.048-2.56l-.512-.512c-.512-.512-1.536-1.024-2.048-1.536l-.512-.512h-.512l-.512-.512-217.6-108.032c-4.096-2.048-9.216-2.048-13.824 0l-73.216 36.352 218.624 112.128.512.512c.512 0 .512.512 1.024.512.512.512.512 1.024 1.024 1.536v120.32c0 2.048-1.024 3.584-2.56 4.608l-44.032 23.04c-2.56 1.536-5.632.512-7.168-2.048-.512-.512-.512-1.536-.512-2.56V179.712L107.53 65.536l-.512-.512-88.576 44.032-.512.512h-.512l-.512.512c-.512.512-1.536 1.024-2.048 1.536l-.512.512c-1.024 1.024-1.536 2.048-2.56 3.072v.512c-.512 1.024-1.024 2.048-1.024 3.072v1.024c0 1.024-.512 1.536-.512 2.56v239.104c0 5.632 3.072 11.264 8.704 13.824l215.552 107.52c3.072 1.536 6.656 2.048 10.24 1.024l1.024-.512c1.024 0 1.536-.512 2.56-1.024l217.088-107.52c5.12-2.56 8.704-7.68 8.704-13.824V122.368c-.512-1.024-.512-1.536-.512-2.56" fill="#e4e6eb" opacity="1" data-original="#000000"></path></g></svg>
+                                        <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="512" x="0" y="0" viewBox="0 0 64 64" style="enable-background:new 0 0 512 512" xml:space="preserve" class=""><g transform="matrix(1.379999999999999,0,0,1.379999999999999,-12.160011596679666,-12.159999275207454)"><path d="M41.822 25.76V13.22h-14.65l-2.12 6.07 3.57 2.27-9 10.21 1.86-11.04-4.17-1.37 2.88-6.14H9.032V46h18.26c.03-.06.06-.11.09-.16l.55-.89 10.57-17.24c.73-1.22 1.97-1.95 3.32-1.95M43.442 28.75c-.4-.66-1.01-.99-1.62-.99-.6 0-1.22.33-1.62.99L29.632 46l-.55.89c-.99 1.61-.04 3.89 1.62 3.89h22.24c1.66 0 2.61-2.28 1.63-3.89zm-3.02 6.13a1.404 1.404 0 0 1 2.81 0v5.77c0 .78-.63 1.41-1.41 1.41-.77 0-1.4-.63-1.4-1.41zm1.4 13.01c-.91 0-1.65-.74-1.65-1.65 0-.92.74-1.65 1.65-1.65s1.65.73 1.65 1.65c0 .91-.74 1.65-1.65 1.65" fill="#e4e6eb" opacity="1" data-original="#000000" class=""></path></g></svg>
+                                    </div>
+
+                                    <div>
+                                        <h2 id="finalReportDamageTotal">—</h2>
+                                    </div>
                                 </div>
 
-                                <div>
-                                    <h2 id="finalReportCapacityUsage">—</h2>
-                                    <p id="finalReportCapacityStatus">Folga de — pacotes</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                                <div class="chart-label">
+                                    <div class="type">
+                                        <div style="background-color: #f99400;"></div>
+                                        <p>Avarias do SOC <span id="finalReportDamageSoc">—</span></p>
+                                    </div>
 
-                    <div>
-                        <div class="title">
-                            <h4>Pacotes em Análise</h4>
-                        </div>
-
-                        <div class="card">
-                            <div class="flex-box-start">
-                                <div class="mini-chart">
-                                    <canvas id="finalReportPackagesChart" role="img">
-                                        Seu navegador não suporta gráficos em canvas.
-                                    </canvas>
-
-                                    <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="512" x="0" y="0" viewBox="0 0 347.442 347.442" style="enable-background:new 0 0 512 512" xml:space="preserve"><g><path d="M173.721 347.442c95.919 0 173.721-77.802 173.721-173.721S269.64 0 173.721 0 0 77.802 0 173.721s77.802 173.721 173.721 173.721m-12.409-272.99c0-6.825 5.584-12.409 12.409-12.409s12.409 5.584 12.409 12.409v93.313l57.39 45.912c5.336 4.281 6.204 12.098 1.923 17.434a12.34 12.34 0 0 1-9.679 4.653c-2.73 0-5.46-.869-7.755-2.73L165.966 183.4c-2.916-2.358-4.653-5.894-4.653-9.679z" fill="#e4e6eb" opacity="1" data-original="#000000"></path></g></svg>
-                                </div>
-
-                                <div>
-                                    <h2 id="finalReportPackagesValue">—</h2>
-                                    <p id="finalReportPackagesStatus">—</p>
+                                    <div class="type">
+                                        <div style="background-color: #8B0000;"></div>
+                                        <p>Avarias do Hub <span id="finalReportDamageHub">—</span></p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -867,22 +874,74 @@
                         </div>
 
                         <div class="card">
-                            <div class="flex-box-start">
-                                <div class="mini-chart">
-                                    <canvas id="finalReportLossRateChart" role="img">
-                                        Seu navegador não suporta gráficos em canvas.
-                                    </canvas>
+                            <div class="flex-box-column">
 
-                                    <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="512" x="0" y="0" viewBox="0 0 24 24" style="enable-background:new 0 0 512 512" xml:space="preserve" class=""><g><path d="M7 13v9a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1m7-12h-4a1 1 0 0 0-1 1v20a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1m8 5h-4a1 1 0 0 0-1 1v15a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1" fill="#e4e6eb" opacity="1" data-original="#000000"></path></g></svg>
+                                <div class="flex-box-start">
+                                    <div class="mini-chart">
+                                        <canvas id="finalReportLossRateChart" role="img">
+                                            Seu navegador não suporta gráficos em canvas.
+                                        </canvas>
+
+                                        <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="512" x="0" y="0" viewBox="0 0 100 100" style="enable-background:new 0 0 512 512" xml:space="preserve" class=""><g><circle cx="19.551" cy="19.551" r="17.051" fill="#e4e6eb" opacity="1" data-original="#000000" class=""></circle><circle cx="80.449" cy="80.449" r="17.051" fill="#e4e6eb" opacity="1" data-original="#000000" class=""></circle><path d="M90.857 9.143c-4.43-4.429-11.737-4.429-16.166 0L9.365 74.691c-4.43 4.429-4.43 11.737 0 16.166 2.214 2.214 5.093 3.321 7.972 3.321s5.757-1.107 7.972-3.321l65.548-65.548c4.429-4.429 4.429-11.515 0-16.166" fill="#e4e6eb" opacity="1" data-original="#000000" class=""></path></g></svg>
+                                    </div>
+
+                                    <div>
+                                        <h2 id="finalReportLossRate">—</h2>
+                                        <p id="finalReportLossRateStatus">—</p>
+                                    </div>
                                 </div>
 
-                                <div>
-                                    <h2 id="finalReportLossRate">—</h2>
-                                    <p id="finalReportLossRateStatus">—</p>
+                                <div class="chart-label">
+                                    <div class="type">
+                                        <div style="background-color: #2538a5;"></div>
+                                        <p>Volume Movimentado <span id="finalReportLossRateMoved">—</span></p>
+                                    </div>
+
+                                    <div class="type">
+                                        <div style="background-color: #8B0000;"></div>
+                                        <p>Total de Perdas <span id="finalReportLossRateTotalLosses">—</span></p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+
+                    <div>
+                        <div class="title">
+                            <h4>Análises e Perdas Confirmadas</h4>
+                        </div>
+
+                        <div class="card">
+                            <div class="flex-box-column">
+                                <div class="flex-box-start">
+                                    <div class="mini-chart">
+                                        <canvas id="finalReportPackagesChart" role="img">
+                                            Seu navegador não suporta gráficos em canvas.
+                                        </canvas>
+
+                                        <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="512" x="0" y="0" viewBox="0 0 347.442 347.442" style="enable-background:new 0 0 512 512" xml:space="preserve"><g><path d="M173.721 347.442c95.919 0 173.721-77.802 173.721-173.721S269.64 0 173.721 0 0 77.802 0 173.721s77.802 173.721 173.721 173.721m-12.409-272.99c0-6.825 5.584-12.409 12.409-12.409s12.409 5.584 12.409 12.409v93.313l57.39 45.912c5.336 4.281 6.204 12.098 1.923 17.434a12.34 12.34 0 0 1-9.679 4.653c-2.73 0-5.46-.869-7.755-2.73L165.966 183.4c-2.916-2.358-4.653-5.894-4.653-9.679z" fill="#e4e6eb" opacity="1" data-original="#000000"></path></g></svg>
+                                    </div>
+
+                                    <div>
+                                        <h2 id="finalReportPackagesValue">—</h2>
+                                    </div>
+                                </div>
+
+                                <div class="chart-label">
+                                    <div class="type">
+                                        <div style="background-color: #f99400;"></div>
+                                        <p>Em Análise <span id="finalReportPackagesUnderReview">—</span></p>
+                                    </div>
+
+                                    <div class="type">
+                                        <div style="background-color: #8B0000;"></div>
+                                        <p>Perdas Confirmadas <span id="finalReportConfirmedLosses">—</span></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
 
                 <!-- FLUXO DA JANELA -->

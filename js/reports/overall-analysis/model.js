@@ -170,6 +170,7 @@ function createOverallAnalysisData(
     lossesState = null,
     parcelState = null,
     reverseState = null,
+    referenceDate = new Date(),
 ) {
     const receiptSummary =
         getReceiptSummary(
@@ -263,9 +264,9 @@ function createOverallAnalysisData(
             : null;
 
     const lossesRateSummary =
-        lossesRateState
+        lossesRateState?.year === referenceDate.getFullYear()
             ? getLossesRateMonthSummary(
-                lossesRateState.activeMonth,
+                referenceDate.getMonth(),
                 lossesRateState,
             )
             : null;
@@ -362,9 +363,23 @@ function createOverallAnalysisData(
 
                 rate:
                     packagesAnalysisRate,
+
+                confirmedLosses:
+                    damageAndLossesAnalysis.traditionalAnalysis.totalMonth.confirmedLosses,
+            },
+
+            damage: {
+                hub: damageAndLossesAnalysis.traditionalAnalysis.totalMonth.hub,
+                soc: damageAndLossesAnalysis.traditionalAnalysis.totalMonth.soc,
+                total: damageAndLossesAnalysis.damageHasData
+                    ? damageAndLossesAnalysis.traditionalAnalysis.totalMonth.hub +
+                        damageAndLossesAnalysis.traditionalAnalysis.totalMonth.soc
+                    : null,
             },
 
             lossesRate: {
+                moved: lossesRateSummary?.moved ?? null,
+                totalLosses: lossesRateSummary?.totalLosses ?? null,
                 rate:
                     lossRate,
 

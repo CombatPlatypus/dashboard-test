@@ -2862,39 +2862,16 @@
                                     <!-- CARDS -->
 
                                     <div class="final-report-cards">
-                                        <div style="display: none;">
-                                            <div class="final-report-title">
-                                                <h4>Uso da Capacidade</h4>
-                                            </div>
-
-                                            <div class="final-report-card">
-                                                <div class="flex-box-start">
-                                                    <div class="final-report-mini-chart">
-                                                        <canvas id="overallAnalysisCapacityChart" role="img" height="300" style="display: block; box-sizing: border-box; height: 150px; width: 150px;" width="300">
-                                                            Seu navegador não suporta gráficos em canvas.
-                                                        </canvas>
-
-                                                        <img src="images/geral-icons/box-icon.svg" aria-hidden="true">
-                                                    </div>
-
-                                                    <div>
-                                                        <h2 id="overallAnalysisCapacityUsage">—</h2>
-                                                        <p id="overallAnalysisCapacityStatus">Folga de — pacotes</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
                                         <div>
                                             <div class="final-report-title">
-                                                <h4>Avarias do Soc e Hub</h4>
+                                                <h4>Avarias do SOC e Hub</h4>
                                             </div>
 
                                             <div class="final-report-card">
                                                 <div class="flex-box-column">
                                                     <div class="flex-box-start">
                                                         <div class="final-report-mini-chart">
-                                                            <canvas id="" role="img">
+                                                            <canvas id="overallAnalysisDamageChart" role="img">
                                                                 Seu navegador não suporta gráficos em canvas.
                                                             </canvas>
 
@@ -2902,19 +2879,19 @@
                                                         </div>
 
                                                         <div>
-                                                            <h2 id="">— <!-- AQUI VAI O TOTAL DE AVARIAS DO HUB E SOC --></h2>
+                                                            <h2 id="overallAnalysisDamageTotal">—</h2>
                                                         </div>
                                                     </div>
 
                                                     <div class="chart-label">
                                                         <div class="type">
                                                             <div style="background-color: #f99400;"></div>
-                                                            <p>Avarias do SOC <span id="">—</span></p>
+                                                            <p>Avarias do SOC <span id="overallAnalysisDamageSoc">—</span></p>
                                                         </div>
 
                                                         <div class="type">
                                                             <div style="background-color: #8B0000;"></div>
-                                                            <p>Avarias do Hub <span id="">—</span></p>
+                                                            <p>Avarias do Hub <span id="overallAnalysisDamageHub">—</span></p>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -2947,12 +2924,12 @@
                                                     <div class="chart-label">
                                                         <div class="type">
                                                             <div style="background-color: #2538a5;"></div>
-                                                            <p>Volume Movimentado <span id="">—</span></p>
+                                                            <p>Volume Movimentado <span id="overallAnalysisLossRateMoved">—</span></p>
                                                         </div>
 
                                                         <div class="type">
                                                             <div style="background-color: #8B0000;"></div>
-                                                            <p>Total do Perdas <span id="">—</span></p>
+                                                            <p>Total de Perdas <span id="overallAnalysisLossRateTotalLosses">—</span></p>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -2961,7 +2938,7 @@
 
                                         <div>
                                             <div class="final-report-title">
-                                                <h4>Análises e Perdas Confimadas</h4>
+                                                <h4>Análises e Perdas Confirmadas</h4>
                                             </div>
 
                                             <div class="final-report-card">
@@ -2976,20 +2953,19 @@
                                                         </div>
 
                                                         <div>
-                                                            <h2 id="overallAnalysisPackagesAnalysisValue">— <!-- AQUI VAI O TOTAL DE PERDAS E ANALISES --></h2>
-                                                            <p id="overallAnalysisPackagesAnalysisStatus" style="display: none;">—</p>
+                                                            <h2 id="overallAnalysisPackagesAnalysisValue">—</h2>
                                                         </div>
                                                     </div>
 
                                                     <div class="chart-label">
                                                         <div class="type">
                                                             <div style="background-color: #f99400;"></div>
-                                                            <p>Em Análise <span id="">—</span></p>
+                                                            <p>Em Análise <span id="overallAnalysisPackagesUnderReview">—</span></p>
                                                         </div>
 
                                                         <div class="type">
                                                             <div style="background-color: #8B0000;"></div>
-                                                            <p>Perdas Confirmadas <span id="">—</span></p>
+                                                            <p>Perdas Confirmadas <span id="overallAnalysisConfirmedLosses">—</span></p>
                                                         </div>
                                                     </div>
                                                 </div>

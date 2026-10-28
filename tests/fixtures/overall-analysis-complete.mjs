@@ -26,6 +26,7 @@ function createCompleteAnalysis() {
             { trackingNumber: "BR4", countType: "Mis-sorted", expected: "N" },
         ] },
         { transfers: [{ to: "TOTEST", quantities: { return: 3, missorted: 2, liquidate: 1, confiscated: 4 } }] },
+        new Date(2026, 9, 19, 12),
     );
 }
 

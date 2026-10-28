@@ -61,11 +61,12 @@ test("zeros importados são válidos sem exigir ocorrências de avarias/perdas",
         { expectedVolume: 0, operators: [{ packagesReceived: 0, errorQuantity: 0 }] },
         { routes: [{ status: "Validated", finalOrders: 0,
             validationStartTime: "2026-10-19 01:00:00", validationEndTime: "2026-10-19 01:00:00" }], floorVolume: 0 },
-        { activeMonth: 0, months }, { ...base.context, plannedVolume: 0 },
+        { activeMonth: 0, year: 2026, months }, { ...base.context, plannedVolume: 0 },
         { days: [{ date: "2026-10-19", hub: 0, soc: 0 }] },
         { days: [{ date: "2026-10-19", underReview: 0, confirmedLosses: 0, returnedPackages: 0 }] },
         { rows: [{ countType: "Missing", expected: "N" }] },
         { transfers: [{ to: "TOZERO", quantities: { return: 1, missorted: 0, liquidate: 0, confiscated: 0 } }] },
+        new Date(2026, 0, 19, 12),
     );
     assert.equal(data.cards.packagesAnalysis.value, 0);
     assert.equal(data.cards.packagesAnalysis.rate, 0);

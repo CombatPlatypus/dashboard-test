@@ -1262,8 +1262,12 @@
         .final-report-cards > div {
             min-width: 0;
             min-height: 125px;
+            display: flex;
+            flex-direction: column;
         }
         .final-report-cards .final-report-card {
+            flex: 1;
+            min-width: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -1291,6 +1295,10 @@
         .final-report-cards .final-report-card .flex-box-column > div {
             text-align: center;
             margin: 0 auto;
+        }
+        .final-report-cards .chart-label {
+            flex-wrap: wrap;
+            row-gap: 10px;
         }
         .final-report-cards .final-report-card .final-report-mini-chart {
             width: 150px;
