@@ -64,6 +64,13 @@ try {
     assert.equal(await cardText("LossRateMoved"), "356.741", "O seletor mensal não altera o mês atual do card.");
     assert.deepEqual(await page.evaluate(() => Chart.getChart("overallAnalysisDamageChart").data.datasets[0].data), [1, 2]);
     await page.evaluate(() => Object.values(Chart.instances).forEach(chart => { chart.stop(); chart.update("none"); }));
+    const lossDetails = page.locator("#overallAnalysisLossRate").locator("..");
+    assert.deepEqual(await lossDetails.locator("p").allTextContents(),
+        ["0,006 p.p. abaixo do limite", "Movimentado: 356.741", "Total de Perdas: 86"]);
+    assert.equal(await lossDetails.locator("#overallAnalysisLossRateMoved, #overallAnalysisLossRateTotalLosses").count(), 2);
+    assert.equal(await page.locator(".final-report-card").filter({ has: page.locator("#overallAnalysisLossRateChart") }).locator(".chart-label").count(), 0);
+    assert.equal(await page.evaluate(() => ["overallAnalysisDamageChart", "overallAnalysisLossRateChart", "overallAnalysisPackagesAnalysisChart"]
+        .every(id => Chart.getChart(id).$overallCardGeometry?.depth > 0)), true);
     await page.locator(".final-report-cards").screenshot({ path: path.join(output, "cards-importacao-dashboard.png") });
     const completeness = await page.evaluate(async data => {
         const [context, receipt, expedition, damage, losses, rate, parcel, reverse] = await Promise.all([
@@ -159,6 +166,8 @@ try {
                 .map(id => Chart.getChart(id).getDatasetMeta(0).data.map(arc => arc.options.backgroundColor)),
             cardProportions: ["finalReportDamageChart", "finalReportLossRateChart", "finalReportPackagesChart"]
                 .map(id => Chart.getChart(id).getDatasetMeta(0).data.map(arc => arc.circumference / (2 * Math.PI))),
+            cards3D: ["finalReportDamageChart", "finalReportLossRateChart", "finalReportPackagesChart"]
+                .every(id => Chart.getChart(id).$overallCardGeometry?.depth > 0),
             sizes: [...document.querySelectorAll("canvas")].map(canvas => [canvas.clientWidth, canvas.clientHeight]),
         };
     });
@@ -177,6 +186,9 @@ try {
     assert.equal(rendered.date, snapshot.dateLabel);
     assert.equal(rendered.reverse, "4 (40%)");
     assert.equal(rendered.tooltipsDisabled, true);
+    assert.equal(rendered.cards3D, true);
+    assert.deepEqual(await report.locator("#finalReportLossRate").locator("..").locator("p").allTextContents(),
+        ["0,015 p.p. abaixo do limite", "Movimentado: 1.000.000", "Total de Perdas: 150"]);
     assert.deepEqual(rendered.cardColors, [["#f99400", "#8B0000"], ["#007A48", "#626262"], ["#f99400", "#8B0000"]]);
     for (const [index, expected] of [0.4, 0.5, 0.8].entries()) {
         assert.ok(Math.abs(rendered.cardProportions[index][0] - expected) < 1e-8);

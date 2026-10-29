@@ -1,5 +1,20 @@
 import { CHART_COLORS, getChartEmptyColor } from "../../charts/theme.js";
 import { createDashboardChart } from "../../charts/standard.js";
+import { drawDoughnut3D } from "../core/doughnut-3d.js";
+
+const overallAnalysisCard3DPlugin = {
+    id: "overallAnalysisCard3D",
+    beforeDatasetDraw(chart, args) {
+        if (args.index !== 0) return;
+        chart.$overallCardGeometry = drawDoughnut3D({
+            context: chart.ctx,
+            area: chart.chartArea,
+            values: chart.data.datasets[0].data,
+            colors: chart.getDatasetMeta(0).data.map(arc => arc.options.backgroundColor),
+        });
+        return false;
+    },
+};
 
 function getOverallAnalysisCardCharts(data) {
     const damage = data.cards.damage;
@@ -32,6 +47,7 @@ function getOverallAnalysisCardCharts(data) {
 function createOverallAnalysisCardChart(canvas, animation = { duration: 250 }) {
     return createDashboardChart(canvas, {
         type: "doughnut",
+        plugins: [overallAnalysisCard3DPlugin],
         data: { labels: [], datasets: [{ data: [0, 1], backgroundColor: () => getChartEmptyColor(), borderWidth: 0 }] },
         options: {
             responsive: true, maintainAspectRatio: false, cutout: "72%", events: [],

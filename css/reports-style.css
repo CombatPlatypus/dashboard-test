@@ -1289,7 +1289,7 @@
             align-items: center;
         }
         .final-report-cards .final-report-card .flex-box-start {
-            column-gap: 15px;
+            column-gap: 30px;
             align-items: center;
         }
         .final-report-cards .final-report-card .flex-box-column > div {
@@ -1301,9 +1301,9 @@
             row-gap: 10px;
         }
         .final-report-cards .final-report-card .final-report-mini-chart {
-            width: 150px;
-            min-height: 150px;
-            height: 150px;
+            width: 180px;
+            min-height: 180px;
+            height: 180px;
             position: relative;
         }
         .final-report-cards .final-report-card .final-report-mini-chart canvas {
