@@ -637,7 +637,6 @@
             /* TITULOS */
 
             .title {
-                text-align: center;
                 padding: 0.5rem 0.625rem 0.625rem;
                 background-color: var(--color-table-th);
                 border-right: 1px solid var(--color-border);
@@ -678,6 +677,10 @@
                 grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
                 gap: 15px;
                 width: 100%;
+            }
+            #finalReportIndicators {
+                padding: 25px;
+                border: 1px solid var(--color-border);
             }
             .cards > div {
                 display: flex;
@@ -797,7 +800,7 @@
 
                 <div>
                     <div class="title">
-                        <h4>Indicadores de Avarias e Perdas</h4>
+                        <h4>Análise das Avarias e Perdas</h4>
                     </div>
 
                     <div class="cards" id="finalReportIndicators">

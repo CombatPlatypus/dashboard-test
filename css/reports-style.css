@@ -1224,7 +1224,6 @@
             border-right: 1px solid var(--color-border);
             border-left: 1px solid var(--color-border);
             border-top: 1px solid var(--color-border);
-            text-align: center;
         }
         .final-report-title h4 {
             letter-spacing: 1.5px;
@@ -1255,6 +1254,8 @@
 
         #overall-analysis #overallAnalysisIndicators {
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            padding: 25px;
+            border: 1px solid var(--color-border);
         }
 
         /* FLUXO DA JANELA */

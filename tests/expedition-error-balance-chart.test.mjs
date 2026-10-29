@@ -16,7 +16,7 @@ import {
     setExpeditionInputValue,
 } from "../js/reports/expedition/view.js";
 
-const labels = ["Erros de Etiqueta", "Erros de Sorting", "Revertidos", "Saldo Final"];
+const labels = ["Erros de Etiquetagem", "Erros de Sorting", "Revertidos", "Saldo Final"];
 const colors = ["#2538a5", "#f99400", "#007A48", "#8B0000"];
 
 function replaceGlobal(t, name, value) {
@@ -72,7 +72,7 @@ function createInput(field) {
     return input;
 }
 
-test("gráfico usa o novo título e mantém Etiqueta, Sorting, Revertidos e Saldo Final", t => {
+test("gráfico usa o novo título e mantém Etiquetagem, Sorting, Revertidos e Saldo Final", t => {
     const { chart } = createCharts(t);
     assert.equal(chart.type, "bar");
     assert.equal(chart.options.indexAxis, "y");

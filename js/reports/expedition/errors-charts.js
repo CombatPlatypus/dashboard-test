@@ -590,7 +590,7 @@ function createErrorBalanceChart(
 
             data: {
                 labels: [
-                    "Erros de Etiqueta",
+                    "Erros de Etiquetagem",
                     "Erros de Sorting",
                     "Revertidos",
                     "Saldo Final",
