@@ -29,18 +29,6 @@ function getData(lossesState = getLossesState(), parcelState = null, reverseStat
         getDamageAndLossesState(), lossesState, parcelState, reverseState);
 }
 
-function getCardData(plannedVolume = null, lost = null) {
-    const months = Array.from({ length: 12 }, () => ({
-        moved: null, lost: null, damage: null, possibleLosses: null,
-    }));
-    months[9] = {
-        moved: 1000000, lost, damage: lost === null ? null : 0, possibleLosses: 0,
-    };
-    return createOverallAnalysisData(getReceiptState(), getExpeditionState(),
-        { activeMonth: 9, year: 2026, months }, { plannedVolume, shiftCapacity: 20000 },
-        getDamageAndLossesState(), getLossesState(), null, null, new Date(2026, 9, 28, 12));
-}
-
 function replaceGlobal(t, name, value) {
     const original = Object.getOwnPropertyDescriptor(globalThis, name);
     Object.defineProperty(globalThis, name, { configurable: true, writable: true, value });
@@ -127,75 +115,32 @@ test("linha acompanha importação, reimportação e limpeza com a formatação 
     assert.deepEqual(values(), periodKeys.map(() => "—"));
 });
 
-test("card de análises mostra o total e a composição das análises e perdas confirmadas", t => {
+test("os cinco cards tradicionais exibem os dados atuais sem depender dos mini gráficos removidos", t => {
     const { root, charts, elements } = createElements(t);
     assert.equal(initializeOverallAnalysisView(root), true);
     assert.equal(initializeOverallAnalysisCharts(root), true);
-    const chart = charts.find(item => item.canvas === root.querySelector("#overallAnalysisPackagesAnalysisChart"));
-    const data = getData(sample);
-    assert.equal(renderOverallAnalysisCharts(data), true);
-    assert.equal(renderOverallAnalysisView(data), true);
-    assert.deepEqual(chart.data.datasets[0].data, [88, 12]);
-    assert.deepEqual([0, 1].map(dataIndex => chart.data.datasets[0].backgroundColor({ dataIndex })), ["#f99400", "#8B0000"]);
-    assert.equal(elements.get("overallAnalysisPackagesAnalysisValue").textContent, "100");
-    assert.equal(elements.get("overallAnalysisPackagesUnderReview").textContent, "88");
-    assert.equal(elements.get("overallAnalysisConfirmedLosses").textContent, "12");
-});
-
-test("card de avarias substitui capacidade com o total e os valores de SOC e Hub", t => {
-    const { root, charts, elements } = createElements(t);
-    assert.equal(initializeOverallAnalysisView(root), true);
-    assert.equal(initializeOverallAnalysisCharts(root), true);
-    const chart = charts.find(item => item.canvas === root.querySelector("#overallAnalysisDamageChart"));
     const data = createCompleteAnalysis();
     assert.equal(renderOverallAnalysisCharts(data), true);
     assert.equal(renderOverallAnalysisView(data), true);
-    assert.deepEqual(chart.data.datasets[0].data, [2, 3]);
-    assert.deepEqual([0, 1].map(dataIndex => chart.data.datasets[0].backgroundColor({ dataIndex })), ["#f99400", "#8B0000"]);
-    assert.equal(elements.get("overallAnalysisDamageTotal").textContent, "5");
-    assert.equal(elements.get("overallAnalysisDamageSoc").textContent, "2");
-    assert.equal(elements.get("overallAnalysisDamageHub").textContent, "3");
-    assert.equal(elements.has("overallAnalysisCapacityChart"), false);
-    assert.equal(elements.has("overallAnalysisPackagesAnalysisStatus"), false);
-    assert.equal(charts.length, 7);
+    assert.deepEqual(["DamageHub", "DamageSoc", "LossRate", "PackagesUnderReview", "ConfirmedLosses"]
+        .map(suffix => elements.get("overallAnalysis" + suffix).textContent), ["3", "2", "0,015%", "8", "2"]);
+    for (const id of ["DamageChart", "PackagesAnalysisChart", "LossRateChart", "DamageTotal", "PackagesAnalysisValue", "LossRateStatus"]) {
+        assert.equal(elements.has("overallAnalysis" + id), false);
+    }
+    assert.equal(charts.length, 4);
 });
 
-test("mini gráfico de perdas indica o uso do limite com verde, amarelo e vermelho, mantendo as legendas", t => {
+test("limpar os dados retorna os cinco indicadores ao estado vazio sem recriar os gráficos restantes", t => {
     const { root, charts, elements } = createElements(t);
     assert.equal(initializeOverallAnalysisView(root), true);
     assert.equal(initializeOverallAnalysisCharts(root), true);
-    const chart = charts.find(item => item.canvas === root.querySelector("#overallAnalysisLossRateChart"));
-    for (const [lost, color] of [[0, "#007A48"], [240, "#007A48"], [249, "#007A48"],
-        [250, "#f99400"], [299, "#f99400"], [300, "#f99400"], [301, "#8B0000"], [350, "#8B0000"]]) {
-        const data = getCardData(null, lost);
-        assert.equal(data.cards.lossesRate.rate, lost / 1000000);
-        assert.equal(renderOverallAnalysisCharts(data), true);
-        assert.equal(renderOverallAnalysisView(data), true);
-        const progress = Math.min(data.cards.lossesRate.rate / data.cards.lossesRate.limit, 1);
-        assert.deepEqual(chart.data.datasets[0].data, [progress, 1 - progress]);
-        assert.deepEqual([0, 1].map(dataIndex => chart.data.datasets[0].backgroundColor({ dataIndex })), [color, "#626262"]);
-        assert.equal(elements.get("overallAnalysisLossRateMoved").textContent, "1.000.000");
-        assert.equal(elements.get("overallAnalysisLossRateTotalLosses").textContent, String(lost));
-        assert.equal(charts.length, 7);
-    }
-});
-
-test("limpar os dados mantém os três cards vazios e neutros sem recriar gráficos", t => {
-    const { root, charts, elements } = createElements(t);
-    assert.equal(initializeOverallAnalysisView(root), true);
-    assert.equal(initializeOverallAnalysisCharts(root), true);
-    renderOverallAnalysisCharts(createCompleteAnalysis());
-    renderOverallAnalysisCharts(getData());
-    renderOverallAnalysisView(getData());
-    for (const id of ["overallAnalysisDamageChart", "overallAnalysisPackagesAnalysisChart", "overallAnalysisLossRateChart"]) {
-        const chart = charts.find(item => item.canvas === elements.get(id));
-        assert.deepEqual([0, 1].map(dataIndex => chart.data.datasets[0].backgroundColor({ dataIndex })), ["#626262", "#626262"]);
-        assert.deepEqual(chart.data.datasets[0].data, [0, 1]);
-    }
-    for (const id of ["DamageTotal", "DamageSoc", "DamageHub", "PackagesAnalysisValue", "PackagesUnderReview", "ConfirmedLosses", "LossRate", "LossRateMoved", "LossRateTotalLosses"]) {
+    renderOverallAnalysisView(createCompleteAnalysis());
+    assert.equal(renderOverallAnalysisCharts(getData()), true);
+    assert.equal(renderOverallAnalysisView(getData()), true);
+    for (const id of ["DamageSoc", "DamageHub", "PackagesUnderReview", "ConfirmedLosses", "LossRate"]) {
         assert.equal(elements.get("overallAnalysis" + id).textContent, "—");
     }
-    assert.equal(charts.length, 7);
+    assert.equal(charts.length, 4);
 });
 
 test("Parcel e Reversa exibem totais, cobertura de esperados e composição e voltam ao estado vazio", t => {
@@ -240,5 +185,5 @@ test("Parcel e Reversa exibem totais, cobertura de esperados e composição e vo
     assert.deepEqual(parcelChart.data.datasets[0].data, [0, 0]);
     assert.deepEqual(reverseChart.data.datasets[0].data, [0, 0, 0, 0]);
     assert.equal(reverseChart.options.plugins.reverseCenterText.text, "—");
-    assert.equal(charts.length, 7);
+    assert.equal(charts.length, 4);
 });

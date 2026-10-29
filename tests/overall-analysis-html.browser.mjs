@@ -55,23 +55,14 @@ try {
     await page.waitForFunction(() => document.getElementById("damageAndLossesNotification").dataset.notificationType === "success");
     await page.locator('a[href="#overall-analysis"]').click();
     const cardText = suffix => page.locator(`#overallAnalysis${suffix}`).textContent();
-    assert.equal(await page.locator(".final-report-cards > div").count(), 3);
-    assert.equal(await page.locator("#overallAnalysisCapacityChart, #overallAnalysisPackagesAnalysisStatus").count(), 0);
-    assert.deepEqual(await Promise.all(["DamageTotal", "DamageSoc", "DamageHub", "PackagesAnalysisValue",
-        "PackagesUnderReview", "ConfirmedLosses", "LossRateMoved", "LossRateTotalLosses", "LossRate"].map(cardText)),
-        ["3", "1", "2", "4", "1", "3", "356.741", "86", "0,024%"]);
+    assert.equal(await page.locator("#overallAnalysisIndicators > div").count(), 5);
+    assert.equal(await page.locator(".final-report-cards, #overallAnalysisDamageChart, #overallAnalysisLossRateChart, #overallAnalysisPackagesAnalysisChart").count(), 0);
+    assert.deepEqual(await Promise.all(["DamageHub", "DamageSoc", "LossRate", "PackagesUnderReview", "ConfirmedLosses"].map(cardText)),
+        ["2", "1", "0,024%", "1", "3"]);
     await page.evaluate(async () => (await import("/js/reports/losses-rate/state.js")).setActiveLossesRateMonth(0));
-    assert.equal(await cardText("LossRateMoved"), "356.741", "O seletor mensal não altera o mês atual do card.");
-    assert.deepEqual(await page.evaluate(() => Chart.getChart("overallAnalysisDamageChart").data.datasets[0].data), [1, 2]);
-    await page.evaluate(() => Object.values(Chart.instances).forEach(chart => { chart.stop(); chart.update("none"); }));
-    const lossDetails = page.locator("#overallAnalysisLossRate").locator("..");
-    assert.deepEqual(await lossDetails.locator("p").allTextContents(),
-        ["0,006 p.p. abaixo do limite", "Movimentado: 356.741", "Total de Perdas: 86"]);
-    assert.equal(await lossDetails.locator("#overallAnalysisLossRateMoved, #overallAnalysisLossRateTotalLosses").count(), 2);
-    assert.equal(await page.locator(".final-report-card").filter({ has: page.locator("#overallAnalysisLossRateChart") }).locator(".chart-label").count(), 0);
-    assert.equal(await page.evaluate(() => ["overallAnalysisDamageChart", "overallAnalysisLossRateChart", "overallAnalysisPackagesAnalysisChart"]
-        .every(id => Chart.getChart(id).$overallCardGeometry?.depth > 0)), true);
-    await page.locator(".final-report-cards").screenshot({ path: path.join(output, "cards-importacao-dashboard.png") });
+    assert.equal(await cardText("LossRate"), "0,024%", "O seletor mensal não altera o mês atual do card.");
+    assert.equal(await page.evaluate(() => Object.values(Chart.instances).filter(chart => chart.canvas.closest("#overall-analysis")).length), 4);
+    await page.locator("#overallAnalysisIndicators").screenshot({ path: path.join(output, "cards-importacao-dashboard.png") });
     const completeness = await page.evaluate(async data => {
         const [context, receipt, expedition, damage, losses, rate, parcel, reverse] = await Promise.all([
             import("/js/reports/core/report-context.js"), import("/js/reports/receipt/state.js"),
@@ -154,31 +145,24 @@ try {
         return {
             count: Object.values(Chart.instances).length,
             fonts: [400, 600, 800].every(weight => document.fonts.check(`${weight} 14px "Open Sans"`)),
-            damage: text("finalReportDamageTotal"), processed: text("finalReportReceivedVolume"),
+            processed: text("finalReportReceivedVolume"),
             damageSoc: text("finalReportDamageSoc"), damageHub: text("finalReportDamageHub"),
-            packages: text("finalReportPackagesValue"), moved: text("finalReportLossRateMoved"),
-            totalLosses: text("finalReportLossRateTotalLosses"), lossRate: text("finalReportLossRate"),
+            underReview: text("finalReportPackagesUnderReview"), confirmedLosses: text("finalReportConfirmedLosses"),
+            lossRate: text("finalReportLossRate"), indicatorCount: document.querySelectorAll("#finalReportIndicators > div").length,
             expedited: text("finalReportVolumeChecked"), duration: text("finalReportExpeditionTime"),
             date: text("finalReportDate"), reverse: text("finalReport-ReverseConfiscated"),
             bars: Chart.getChart("finalReportReceiptChart").data.datasets[0].data,
             tooltipsDisabled: Object.values(Chart.instances).every(chart => chart.options.plugins.tooltip.enabled === false),
-            cardColors: ["finalReportDamageChart", "finalReportLossRateChart", "finalReportPackagesChart"]
-                .map(id => Chart.getChart(id).getDatasetMeta(0).data.map(arc => arc.options.backgroundColor)),
-            cardProportions: ["finalReportDamageChart", "finalReportLossRateChart", "finalReportPackagesChart"]
-                .map(id => Chart.getChart(id).getDatasetMeta(0).data.map(arc => arc.circumference / (2 * Math.PI))),
-            cards3D: ["finalReportDamageChart", "finalReportLossRateChart", "finalReportPackagesChart"]
-                .every(id => Chart.getChart(id).$overallCardGeometry?.depth > 0),
             sizes: [...document.querySelectorAll("canvas")].map(canvas => [canvas.clientWidth, canvas.clientHeight]),
         };
     });
-    assert.equal(rendered.count, 7);
+    assert.equal(rendered.count, 4);
+    assert.equal(rendered.indicatorCount, 5);
     assert.equal(rendered.fonts, true);
-    assert.equal(rendered.damage, "5");
     assert.equal(rendered.damageSoc, "2");
     assert.equal(rendered.damageHub, "3");
-    assert.equal(rendered.packages, "10");
-    assert.equal(rendered.moved, "1.000.000");
-    assert.equal(rendered.totalLosses, "150");
+    assert.equal(rendered.underReview, "8");
+    assert.equal(rendered.confirmedLosses, "2");
     assert.equal(rendered.lossRate, "0,015%");
     assert.equal(rendered.processed, "11.500");
     assert.equal(rendered.expedited, "11.000");
@@ -186,14 +170,6 @@ try {
     assert.equal(rendered.date, snapshot.dateLabel);
     assert.equal(rendered.reverse, "4 (40%)");
     assert.equal(rendered.tooltipsDisabled, true);
-    assert.equal(rendered.cards3D, true);
-    assert.deepEqual(await report.locator("#finalReportLossRate").locator("..").locator("p").allTextContents(),
-        ["0,015 p.p. abaixo do limite", "Movimentado: 1.000.000", "Total de Perdas: 150"]);
-    assert.deepEqual(rendered.cardColors, [["#f99400", "#8B0000"], ["#007A48", "#626262"], ["#f99400", "#8B0000"]]);
-    for (const [index, expected] of [0.4, 0.5, 0.8].entries()) {
-        assert.ok(Math.abs(rendered.cardProportions[index][0] - expected) < 1e-8);
-        assert.ok(Math.abs(rendered.cardProportions[index][0] + rendered.cardProportions[index][1] - 1) < 1e-8);
-    }
     assert.deepEqual(rendered.bars, [12000, 11500, 500]);
     assert.ok(rendered.sizes.every(([width, height]) => width > 0 && height > 0));
     const legend = report.locator("#finalReport-ReverseChartContainer + .chart-label .type").first();
@@ -230,7 +206,7 @@ try {
     await report.waitForFunction(() => document.documentElement.dataset.finalReportState === "ready");
     assert.equal(await report.locator("#finalReportParcelScanned").textContent(), "—");
     assert.equal(await report.locator("#finalReportReverseReturn").textContent(), "—");
-    assert.equal(await report.evaluate(() => Object.values(Chart.instances).length), 7);
+    assert.equal(await report.evaluate(() => Object.values(Chart.instances).length), 4);
     assert.equal(await report.evaluate(() => Object.values(Chart.instances)
         .every(chart => chart.options.plugins.tooltip.enabled === false)), true);
     assert.deepEqual(await report.evaluate(() => Chart.getChart("finalReport-ReverseChart").data.datasets[0].data), [0, 0, 0, 0]);

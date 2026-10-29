@@ -36,15 +36,6 @@ const overallAnalysisLossRateFormatter =
         },
     );
 
-const overallAnalysisPercentagePointFormatter =
-    new Intl.NumberFormat(
-        "pt-BR",
-        {
-            minimumFractionDigits: 3,
-            maximumFractionDigits: 3,
-        },
-    );
-
 const overallAnalysisWeekdays =
     Object.freeze([
         "Domingo",
@@ -127,25 +118,6 @@ function formatOverallAnalysisLossRate(
     }
 
     return overallAnalysisLossRateFormatter
-        .format(
-            Number(value),
-        );
-}
-
-function formatOverallAnalysisPercentagePoints(
-    value,
-) {
-    if (
-        value === null ||
-        value === undefined ||
-        !Number.isFinite(
-            Number(value),
-        )
-    ) {
-        return "—";
-    }
-
-    return overallAnalysisPercentagePointFormatter
         .format(
             Number(value),
         );
@@ -285,27 +257,14 @@ function getOverallAnalysisViewElements(
                 "overallAnalysisAnalyst",
             ),
 
-        damageTotal: getElement("overallAnalysisDamageTotal"),
         damageSoc: getElement("overallAnalysisDamageSoc"),
         damageHub: getElement("overallAnalysisDamageHub"),
         packagesUnderReview: getElement("overallAnalysisPackagesUnderReview"),
         confirmedLosses: getElement("overallAnalysisConfirmedLosses"),
-        lossRateMoved: getElement("overallAnalysisLossRateMoved"),
-        lossRateTotalLosses: getElement("overallAnalysisLossRateTotalLosses"),
-
-        packagesAnalysisValue:
-            getElement(
-                "overallAnalysisPackagesAnalysisValue",
-            ),
 
         lossRate:
             getElement(
                 "overallAnalysisLossRate",
-            ),
-
-        lossRateStatus:
-            getElement(
-                "overallAnalysisLossRateStatus",
             ),
 
         planned:
@@ -550,43 +509,15 @@ function renderOverallAnalysisView(
     elements.analyst.textContent =
         data.context?.analyst || "—";
 
-    elements.damageTotal.textContent = formatOverallAnalysisQuantity(data.cards.damage.total);
     elements.damageSoc.textContent = formatOverallAnalysisQuantity(data.cards.damage.soc);
     elements.damageHub.textContent = formatOverallAnalysisQuantity(data.cards.damage.hub);
     elements.packagesUnderReview.textContent = formatOverallAnalysisQuantity(data.cards.packagesAnalysis.value);
     elements.confirmedLosses.textContent = formatOverallAnalysisQuantity(data.cards.packagesAnalysis.confirmedLosses);
-    elements.lossRateMoved.textContent = formatOverallAnalysisQuantity(data.cards.lossesRate.moved);
-    elements.lossRateTotalLosses.textContent = formatOverallAnalysisQuantity(data.cards.lossesRate.totalLosses);
-
-    elements.packagesAnalysisValue.textContent =
-        formatOverallAnalysisQuantity(
-            data.cards.packagesAnalysis
-                .total,
-        );
 
     elements.lossRate.textContent =
         formatOverallAnalysisLossRate(
             data.cards.lossesRate.rate,
         );
-
-    elements.lossRateStatus.textContent =
-        data.cards.lossesRate.rate ===
-            null
-            ? "—"
-            : (
-                formatOverallAnalysisPercentagePoints(
-                    data.cards.lossesRate
-                        .differencePercentagePoints,
-                ) +
-                " p.p. " +
-                (
-                    data.cards.lossesRate
-                        .withinLimit
-                        ? "abaixo"
-                        : "acima"
-                ) +
-                " do limite"
-            );
 
     elements.planned.textContent =
         formatOverallAnalysisQuantity(

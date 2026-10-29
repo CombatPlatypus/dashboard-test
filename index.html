@@ -2866,40 +2866,40 @@
                                             <h4>Indicadores de Avarias e Perdas</h4>
                                         </div>
 
-                                        <div class="cards">
+                                        <div class="cards" id="overallAnalysisIndicators">
                                             <div>
                                                 <div class="flex-box-start">
                                                     <img src="images/geral-icons/hub-icon.svg">
-                                                    <h4 id="">—</h4>
+                                                    <h4 id="overallAnalysisDamageHub">—</h4>
                                                 </div>
 
-                                                <p id="">Avarias do Hub</p>
+                                                <p>Avarias do Hub</p>
                                             </div>
 
                                             <div>
                                                 <div class="flex-box-start">
                                                     <img src="images/geral-icons/truck-icon.svg">
-                                                    <h4 id="">—</h4>
+                                                    <h4 id="overallAnalysisDamageSoc">—</h4>
                                                 </div>
 
-                                                <p id="">Avarias do SOC</p>
+                                                <p>Avarias do SOC</p>
                                             </div>
 
 
                                             <div>
                                                 <div class="flex-box-start">
                                                     <img src="images/geral-icons/percentage-icon.svg">
-                                                    <h4 id="">0,—%</h4>
+                                                    <h4 id="overallAnalysisLossRate">—</h4>
                                                 </div>
 
-                                                <p id="">Taxa de Perdas</p>
+                                                <p>Taxa de Perdas</p>
                                             </div>
 
 
                                             <div>
                                                 <div class="flex-box-start">
                                                     <img src="images/geral-icons/clock-icon.svg">
-                                                    <h4 id="">—</h4>
+                                                    <h4 id="overallAnalysisPackagesUnderReview">—</h4>
                                                 </div>
 
                                                 <p>Pacotes em Análise</p>
@@ -2908,14 +2908,13 @@
                                             <div>
                                                 <div class="flex-box-start">
                                                     <img src="images/geral-icons/alert-icon.svg">
-                                                    <h4 id="">—</h4>
+                                                    <h4 id="overallAnalysisConfirmedLosses">—</h4>
                                                 </div>
 
                                                 <p>Perdas Confirmadas</p>
                                             </div>
                                         </div>
                                     </div>
-
 
                                     <!-- AVARIAS E PERDAS -->
 
@@ -3001,109 +3000,6 @@
                                         </tbody>
 
                                     </table>
-
-                                    <div class="final-report-cards" style="display: none;">
-                                        <div>
-                                            <div class="final-report-title">
-                                                <h4>Avarias do SOC e Hub</h4>
-                                            </div>
-
-                                            <div class="final-report-card">
-                                                <div class="flex-box-column">
-                                                    <div class="flex-box-start">
-                                                        <div class="final-report-mini-chart">
-                                                            <canvas id="overallAnalysisDamageChart" role="img">
-                                                                Seu navegador não suporta gráficos em canvas.
-                                                            </canvas>
-
-                                                            <img src="images/geral-icons/damage-icon.svg" aria-hidden="true">
-                                                        </div>
-
-                                                        <div>
-                                                            <h2 id="overallAnalysisDamageTotal">—</h2>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="chart-label">
-                                                        <div class="type">
-                                                            <div style="background-color: #f99400;"></div>
-                                                            <p>Avarias do SOC <span id="overallAnalysisDamageSoc">—</span></p>
-                                                        </div>
-
-                                                        <div class="type">
-                                                            <div style="background-color: #8B0000;"></div>
-                                                            <p>Avarias do Hub <span id="overallAnalysisDamageHub">—</span></p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div> 
-
-                                        <div>
-                                            <div class="final-report-title">
-                                                <h4>Taxa de Perdas</h4>
-                                            </div>
-
-                                            <div class="final-report-card">
-                                                <div class="flex-box-column">
-
-                                                    <div class="flex-box-start">
-                                                        <div class="final-report-mini-chart">
-                                                            <canvas id="overallAnalysisLossRateChart" role="img">
-                                                                Seu navegador não suporta gráficos em canvas.
-                                                            </canvas>
-
-                                                            <img src="images/geral-icons/percentage-icon.svg" aria-hidden="true">
-                                                        </div>
-
-                                                        <div>
-                                                            <h2 id="overallAnalysisLossRate">—</h2>
-                                                            <p id="overallAnalysisLossRateStatus">—</p>
-                                                            <p>Movimentado: <span id="overallAnalysisLossRateMoved">—</span></p>
-                                                            <p>Total de Perdas: <span id="overallAnalysisLossRateTotalLosses">—</span></p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <div class="final-report-title">
-                                                <h4>Análises e Perdas Confirmadas</h4>
-                                            </div>
-
-                                            <div class="final-report-card">
-                                                <div class="flex-box-column">
-                                                    <div class="flex-box-start">
-                                                        <div class="final-report-mini-chart">
-                                                            <canvas id="overallAnalysisPackagesAnalysisChart" role="img">
-                                                                Seu navegador não suporta gráficos em canvas.
-                                                            </canvas>
-
-                                                            <img src="images/geral-icons/clock-icon.svg" aria-hidden="true">
-                                                        </div>
-
-                                                        <div>
-                                                            <h2 id="overallAnalysisPackagesAnalysisValue">—</h2>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="chart-label">
-                                                        <div class="type">
-                                                            <div style="background-color: #f99400;"></div>
-                                                            <p>Em Análise <span id="overallAnalysisPackagesUnderReview">—</span></p>
-                                                        </div>
-
-                                                        <div class="type">
-                                                            <div style="background-color: #8B0000;"></div>
-                                                            <p>Perdas Confirmadas <span id="overallAnalysisConfirmedLosses">—</span></p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                    </div>
 
                                     <!-- FLUXO DO DIA E DASTAQUES DA OPERAÇÃO -->
 

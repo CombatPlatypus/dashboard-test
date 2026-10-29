@@ -1,4 +1,3 @@
-import { createOverallAnalysisCardChart, getOverallAnalysisCardCharts, updateOverallAnalysisCardChart } from "./card-charts.js";
 import { CHART_COLORS, CHART_TEXT_COLOR, CHART_VALUE_FONT } from "../../charts/theme.js";
 import { createDashboardChart } from "../../charts/standard.js";
 import { getHorizontalBarLabelPosition } from "../core/horizontal-bars-3d.js";
@@ -10,7 +9,6 @@ import { getOverallAnalysisViewElements, renderOverallAnalysisView, formatOveral
 // preenchem os campos por este adaptador, sem alterar os IDs do documento.
 const FIELD_IDS = {
     Date: "Date", Window: "Window", Analyst: "WindowAnalyst",
-    PackagesAnalysisValue: "PackagesValue",
     DamageAndLossesTable: "-LossesTable",
     ParcelCoverageScanned: "-ParcelCoverageScanned",
     ParcelCoverageUnscanned: "-ParcelCoverageUnscanned",
@@ -140,15 +138,7 @@ async function renderStandaloneReport(snapshot, root = document) {
         if (!element) throw new Error(`Gráfico ${id} não encontrado no modelo.`);
         return element;
     };
-    const cardDefinitions = getOverallAnalysisCardCharts(data);
     const charts = [
-        ...[["finalReportDamageChart", cardDefinitions.damage],
-            ["finalReportLossRateChart", cardDefinitions.lossesRate],
-            ["finalReportPackagesChart", cardDefinitions.packagesAnalysis]].map(([id, definition]) => {
-                const chart = createOverallAnalysisCardChart(canvas(id), false);
-                updateOverallAnalysisCardChart(chart, definition, "none");
-                return chart;
-            }),
         createBarChart(canvas("finalReportReceiptChart"), ["Volume Esperado", "Volume Recebido", "Gap"],
             [data.processing.expectedVolume, data.processing.receivedVolume, data.processing.gap],
             ["#bdbdbd", CHART_COLORS.green, CHART_COLORS.yellow]),

@@ -637,6 +637,7 @@
             /* TITULOS */
 
             .title {
+                text-align: center;
                 padding: 0.5rem 0.625rem 0.625rem;
                 background-color: var(--color-table-th);
                 border-right: 1px solid var(--color-border);
@@ -674,86 +675,39 @@
 
             .cards {
                 display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
                 gap: 15px;
                 width: 100%;
             }
             .cards > div {
-                min-width: 0;
-                min-height: 125px;
-                display: flex;
-                flex-direction: column;
-            }
-            .cards .title {
-                text-align: center;
-            }
-            .cards > div > .card {
-                flex: 1;
-                min-width: 0;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
                 justify-content: center;
                 gap: 11px;
+                min-width: 0;
                 padding: 25px;
+                background-color: var(--color-container);
                 border: 1px solid var(--color-border);
             }
-            .cards > div > .card h2 {
-                margin: 0;
-                font-weight: 600;
+            .cards .flex-box-start {
+                align-items: center;
+                column-gap: 10px;
             }
-            .cards > div > .card p {
+            .cards h4 {
+                margin: 0;
+                line-height: 1;
+            }
+            .cards svg {
+                width: 25px;
+                height: 25px;
+            }
+            .cards p {
+                font-size: 14px;
+                color: var(--color-gray-p);
+                line-height: 1;
                 margin: 0;
                 text-align: center;
-            }
-            .cards .flex-box-column {
-                display: flex;
-                flex-direction: column;
-                gap: 20px;
-                align-items: center;
-            }
-            .cards .chart-label {
-                flex-wrap: wrap;
-                row-gap: 10px;
-            }
-            .cards > div > .card .flex-box-start {
-                width: 100%;
-                max-width: 100%;
-                column-gap: 30px;
-                row-gap: 10px;
-                align-items: center;
-                justify-content: center;
-            }
-            .cards > div > .card .flex-box-start > div:last-child {
-                flex: 1;
-                min-width: 145px;
-            }
-            .cards > div > .card .flex-box-start > div {
-                text-align: center;
-            }
-            .cards > div > .card .mini-chart {
-                flex: 0 1 220px;
-                width: 220px;
-                max-width: 100%;
-                min-height: 220px;
-                height: 220px;
-                position: relative;
-            }
-            .cards > div > .card .mini-chart canvas {
-                width: 100%;
-                height: 100%;
-                display: block;
-            }
-            .cards > div > .card .mini-chart svg {
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                z-index: 1;
-                width: 42px;
-                height: 42px;
-                object-fit: contain;
-                pointer-events: none;
-                transform: translate(-50%, -50%);
             }
 
             /* FLUXO DA JANELA */
@@ -841,108 +795,181 @@
 
                 <!-- CARDS PRINCIPAIS -->
 
-                <div class="cards">
-                    <div>
-                        <div class="title">
-                            <h4>Avarias do SOC e Hub</h4>
-                        </div>
-
-                        <div class="card">
-                            <div class="flex-box-column">
-                                <div class="flex-box-start">
-                                    <div class="mini-chart">
-                                        <canvas id="finalReportDamageChart" role="img">
-                                            Seu navegador não suporta gráficos em canvas.
-                                        </canvas>
-
-                                        <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="512" x="0" y="0" viewBox="0 0 64 64" style="enable-background:new 0 0 512 512" xml:space="preserve" class=""><g transform="matrix(1.379999999999999,0,0,1.379999999999999,-12.160011596679666,-12.159999275207454)"><path d="M41.822 25.76V13.22h-14.65l-2.12 6.07 3.57 2.27-9 10.21 1.86-11.04-4.17-1.37 2.88-6.14H9.032V46h18.26c.03-.06.06-.11.09-.16l.55-.89 10.57-17.24c.73-1.22 1.97-1.95 3.32-1.95M43.442 28.75c-.4-.66-1.01-.99-1.62-.99-.6 0-1.22.33-1.62.99L29.632 46l-.55.89c-.99 1.61-.04 3.89 1.62 3.89h22.24c1.66 0 2.61-2.28 1.63-3.89zm-3.02 6.13a1.404 1.404 0 0 1 2.81 0v5.77c0 .78-.63 1.41-1.41 1.41-.77 0-1.4-.63-1.4-1.41zm1.4 13.01c-.91 0-1.65-.74-1.65-1.65 0-.92.74-1.65 1.65-1.65s1.65.73 1.65 1.65c0 .91-.74 1.65-1.65 1.65" fill="#e4e6eb" opacity="1" data-original="#000000" class=""></path></g></svg>
-                                    </div>
-
-                                    <div>
-                                        <h2 id="finalReportDamageTotal">—</h2>
-                                    </div>
-                                </div>
-
-                                <div class="chart-label">
-                                    <div class="type">
-                                        <div style="background-color: #f99400;"></div>
-                                        <p>Avarias do SOC <span id="finalReportDamageSoc">—</span></p>
-                                    </div>
-
-                                    <div class="type">
-                                        <div style="background-color: #8B0000;"></div>
-                                        <p>Avarias do Hub <span id="finalReportDamageHub">—</span></p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                <div>
+                    <div class="title">
+                        <h4>Indicadores de Avarias e Perdas</h4>
                     </div>
 
-                    <div>
-                        <div class="title">
-                            <h4>Taxa de Perdas</h4>
+                    <div class="cards" id="finalReportIndicators">
+                        <div>
+                            <div class="flex-box-start">
+                                <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="512" x="0" y="0" viewBox="0 0 100 100" style="enable-background:new 0 0 512 512" xml:space="preserve" class=""><g transform="matrix(1.04,0,0,1.04,-1.999999999999993,-2.0000051498413143)"><path d="M97.5 34.69v54.678a2.38 2.38 0 0 1-2.378 2.379H78.488v-49.68H21.492v49.68H4.878A2.38 2.38 0 0 1 2.5 89.368V34.69c0-.879.484-1.685 1.259-2.099L48.87 8.524c.7-.373 1.54-.373 2.24 0L96.24 32.59a2.38 2.38 0 0 1 1.26 2.099" fill="#e4e6eb" opacity="1" data-original="#000000" class=""></path><path d="M30.21 72.757h14.243a2.38 2.38 0 0 1 2.378 2.378v14.243a2.38 2.38 0 0 1-2.378 2.378H30.21a2.38 2.38 0 0 1-2.378-2.378V75.135a2.38 2.38 0 0 1 2.378-2.378M55.543 72.757h14.242a2.38 2.38 0 0 1 2.378 2.378v14.243a2.38 2.38 0 0 1-2.378 2.378H55.543a2.38 2.38 0 0 1-2.379-2.378V75.135a2.38 2.38 0 0 1 2.379-2.378M42.879 49.995H57.12a2.38 2.38 0 0 1 2.379 2.379v14.242a2.38 2.38 0 0 1-2.379 2.378H42.88a2.38 2.38 0 0 1-2.379-2.378V52.374a2.38 2.38 0 0 1 2.379-2.379" fill="#e4e6eb" opacity="1" data-original="#000000" class=""></path></g></svg>
+                                <h4 id="finalReportDamageHub">—</h4>
+                            </div>
+
+                            <p>Avarias do Hub</p>
                         </div>
 
-                        <div class="card">
-                            <div class="flex-box-column">
-
-                                <div class="flex-box-start">
-                                    <div class="mini-chart">
-                                        <canvas id="finalReportLossRateChart" role="img">
-                                            Seu navegador não suporta gráficos em canvas.
-                                        </canvas>
-
-                                        <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="512" x="0" y="0" viewBox="0 0 100 100" style="enable-background:new 0 0 512 512" xml:space="preserve" class=""><g><circle cx="19.551" cy="19.551" r="17.051" fill="#e4e6eb" opacity="1" data-original="#000000" class=""></circle><circle cx="80.449" cy="80.449" r="17.051" fill="#e4e6eb" opacity="1" data-original="#000000" class=""></circle><path d="M90.857 9.143c-4.43-4.429-11.737-4.429-16.166 0L9.365 74.691c-4.43 4.429-4.43 11.737 0 16.166 2.214 2.214 5.093 3.321 7.972 3.321s5.757-1.107 7.972-3.321l65.548-65.548c4.429-4.429 4.429-11.515 0-16.166" fill="#e4e6eb" opacity="1" data-original="#000000" class=""></path></g></svg>
-                                    </div>
-
-                                    <div>
-                                        <h2 id="finalReportLossRate">—</h2>
-                                        <p id="finalReportLossRateStatus">—</p>
-                                        <p>Movimentado: <span id="finalReportLossRateMoved">—</span></p>
-                                        <p>Total de Perdas: <span id="finalReportLossRateTotalLosses">—</span></p>
-                                    </div>
-                                </div>
+                        <div>
+                            <div class="flex-box-start">
+                                <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="512" x="0" y="0" viewBox="0 0 612 612" style="enable-background:new 0 0 512 512" xml:space="preserve" class=""><g><path d="M504.9 395.756c-28.684 0-52.02 23.342-52.02 52.02 0 28.684 23.336 52.02 52.02 52.02 28.678 0 52.02-23.336 52.02-52.02 0-28.678-23.342-52.02-52.02-52.02m0 67.32c-8.439 0-15.3-6.861-15.3-15.3s6.861-15.3 15.3-15.3 15.3 6.861 15.3 15.3-6.861 15.3-15.3 15.3" fill="#e4e6eb" opacity="1" data-original="#000000"></path><path d="M499.918 179.518H410.04c-6.763 0-12.24 5.484-12.24 12.24v238.68c0 6.756 5.477 12.24 12.24 12.24h12.981c6.059 0 11.426-4.364 12.209-10.373 4.804-36.806 34.162-59.633 69.676-59.633s64.872 22.828 69.676 59.633c.783 6.01 6.144 10.373 12.209 10.373h12.968c6.756 0 12.24-5.484 12.24-12.24v-119.34c0-2.876-1.01-5.655-2.852-7.852l-99.842-119.34a12.25 12.25 0 0 0-9.387-4.388m-77.638 97.92v-61.2c0-6.756 5.477-12.24 12.24-12.24h53.917c3.629 0 7.075 1.616 9.4 4.406l50.998 61.2c6.64 7.974.973 20.074-9.406 20.074H434.52c-6.763 0-12.24-5.477-12.24-12.24M12.24 442.684h31.341c6.059 0 11.426-4.364 12.209-10.373 4.804-36.806 34.162-59.633 69.676-59.633s64.872 22.828 69.676 59.633c.783 6.01 6.144 10.373 12.209 10.373H361.08c6.757 0 12.24-5.484 12.24-12.24v-306c0-6.756-5.484-12.24-12.24-12.24H12.24c-6.763 0-12.24 5.484-12.24 12.24v306c0 6.757 5.477 12.24 12.24 12.24" fill="#e4e6eb" opacity="1" data-original="#000000"></path><path d="M125.46 395.756c-28.684 0-52.02 23.342-52.02 52.02 0 28.684 23.336 52.02 52.02 52.02 28.678 0 52.02-23.336 52.02-52.02 0-28.678-23.342-52.02-52.02-52.02m0 67.32c-8.439 0-15.3-6.861-15.3-15.3s6.861-15.3 15.3-15.3 15.3 6.861 15.3 15.3-6.861 15.3-15.3 15.3" fill="#e4e6eb" opacity="1" data-original="#000000"></path></g></svg>
+                                <h4 id="finalReportDamageSoc">—</h4>
                             </div>
+
+                            <p>Avarias do SOC</p>
+                        </div>
+
+
+                        <div>
+                            <div class="flex-box-start">
+                                <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="512" x="0" y="0" viewBox="0 0 100 100" style="enable-background:new 0 0 512 512" xml:space="preserve" class=""><g><circle cx="19.551" cy="19.551" r="17.051" fill="#e4e6eb" opacity="1" data-original="#000000" class=""></circle><circle cx="80.449" cy="80.449" r="17.051" fill="#e4e6eb" opacity="1" data-original="#000000" class=""></circle><path d="M90.857 9.143c-4.43-4.429-11.737-4.429-16.166 0L9.365 74.691c-4.43 4.429-4.43 11.737 0 16.166 2.214 2.214 5.093 3.321 7.972 3.321s5.757-1.107 7.972-3.321l65.548-65.548c4.429-4.429 4.429-11.515 0-16.166" fill="#e4e6eb" opacity="1" data-original="#000000" class=""></path></g></svg>
+                                <h4 id="finalReportLossRate">—</h4>
+                            </div>
+
+                            <p>Taxa de Perdas</p>
+                        </div>
+
+
+                        <div>
+                            <div class="flex-box-start">
+                                <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="512" x="0" y="0" viewBox="0 0 347.442 347.442" style="enable-background:new 0 0 512 512" xml:space="preserve"><g><path d="M173.721 347.442c95.919 0 173.721-77.802 173.721-173.721S269.64 0 173.721 0 0 77.802 0 173.721s77.802 173.721 173.721 173.721m-12.409-272.99c0-6.825 5.584-12.409 12.409-12.409s12.409 5.584 12.409 12.409v93.313l57.39 45.912c5.336 4.281 6.204 12.098 1.923 17.434a12.34 12.34 0 0 1-9.679 4.653c-2.73 0-5.46-.869-7.755-2.73L165.966 183.4c-2.916-2.358-4.653-5.894-4.653-9.679z" fill="#e4e6eb" opacity="1" data-original="#000000"></path></g></svg>
+                                <h4 id="finalReportPackagesUnderReview">—</h4>
+                            </div>
+
+                            <p>Pacotes em Análise</p>
+                        </div>
+
+                        <div>
+                            <div class="flex-box-start">
+                                <?xml version="1.0"?>
+<svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.com/svgjs" version="1.1" width="512" height="512" x="0" y="0" viewBox="0 0 512 512" style="enable-background:new 0 0 512 512" xml:space="preserve" class=""><g>
+<g xmlns="http://www.w3.org/2000/svg">
+	<g>
+		<path d="M501.362,383.95L320.497,51.474c-29.059-48.921-99.896-48.986-128.994,0L10.647,383.95    c-29.706,49.989,6.259,113.291,64.482,113.291h361.736C495.039,497.241,531.068,433.99,501.362,383.95z M256,437.241    c-16.538,0-30-13.462-30-30c0-16.538,13.462-30,30-30c16.538,0,30,13.462,30,30C286,423.779,272.538,437.241,256,437.241z     M286,317.241c0,16.538-13.462,30-30,30c-16.538,0-30-13.462-30-30v-150c0-16.538,13.462-30,30-30c16.538,0,30,13.462,30,30    V317.241z" fill="#e4e6eb" data-original="#000000" style="" class=""/>
+	</g>
+</g>
+<g xmlns="http://www.w3.org/2000/svg">
+</g>
+<g xmlns="http://www.w3.org/2000/svg">
+</g>
+<g xmlns="http://www.w3.org/2000/svg">
+</g>
+<g xmlns="http://www.w3.org/2000/svg">
+</g>
+<g xmlns="http://www.w3.org/2000/svg">
+</g>
+<g xmlns="http://www.w3.org/2000/svg">
+</g>
+<g xmlns="http://www.w3.org/2000/svg">
+</g>
+<g xmlns="http://www.w3.org/2000/svg">
+</g>
+<g xmlns="http://www.w3.org/2000/svg">
+</g>
+<g xmlns="http://www.w3.org/2000/svg">
+</g>
+<g xmlns="http://www.w3.org/2000/svg">
+</g>
+<g xmlns="http://www.w3.org/2000/svg">
+</g>
+<g xmlns="http://www.w3.org/2000/svg">
+</g>
+<g xmlns="http://www.w3.org/2000/svg">
+</g>
+<g xmlns="http://www.w3.org/2000/svg">
+</g>
+</g></svg>
+                                <h4 id="finalReportConfirmedLosses">—</h4>
+                            </div>
+
+                            <p>Perdas Confirmadas</p>
                         </div>
                     </div>
-
-                    <div>
-                        <div class="title">
-                            <h4>Análises e Perdas Confirmadas</h4>
-                        </div>
-
-                        <div class="card">
-                            <div class="flex-box-column">
-                                <div class="flex-box-start">
-                                    <div class="mini-chart">
-                                        <canvas id="finalReportPackagesChart" role="img">
-                                            Seu navegador não suporta gráficos em canvas.
-                                        </canvas>
-
-                                        <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="512" x="0" y="0" viewBox="0 0 347.442 347.442" style="enable-background:new 0 0 512 512" xml:space="preserve"><g><path d="M173.721 347.442c95.919 0 173.721-77.802 173.721-173.721S269.64 0 173.721 0 0 77.802 0 173.721s77.802 173.721 173.721 173.721m-12.409-272.99c0-6.825 5.584-12.409 12.409-12.409s12.409 5.584 12.409 12.409v93.313l57.39 45.912c5.336 4.281 6.204 12.098 1.923 17.434a12.34 12.34 0 0 1-9.679 4.653c-2.73 0-5.46-.869-7.755-2.73L165.966 183.4c-2.916-2.358-4.653-5.894-4.653-9.679z" fill="#e4e6eb" opacity="1" data-original="#000000"></path></g></svg>
-                                    </div>
-
-                                    <div>
-                                        <h2 id="finalReportPackagesValue">—</h2>
-                                    </div>
-                                </div>
-
-                                <div class="chart-label">
-                                    <div class="type">
-                                        <div style="background-color: #f99400;"></div>
-                                        <p>Em Análise <span id="finalReportPackagesUnderReview">—</span></p>
-                                    </div>
-
-                                    <div class="type">
-                                        <div style="background-color: #8B0000;"></div>
-                                        <p>Perdas Confirmadas <span id="finalReportConfirmedLosses">—</span></p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
+
+                <!-- AVARIAS E PERDAS -->
+
+                <table id="finalReport-LossesTable">
+                    <caption>Situação das Avarias e Perdas</caption>
+
+                    <thead>
+                        <tr>
+                            <th scope="col" style="width: 230px;">Ocorrência</th>
+                            <th scope="col">Hoje</th>
+                            <th scope="col">Ontem</th>
+                            <th scope="col">Anteontem</th>
+                            <th scope="col">De 3 a 7<br>Dias Atrás</th>
+                            <th scope="col">De 8 a 14<br>Dias Atrás</th>
+                            <th scope="col">De 15 Dias Atrás<br>Até o Começo do Mês</th>
+                            <th scope="col">Total do Mês</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr data-overall-damage-losses-field="hub">
+                            <th scope="row">Avarias do Hub</th>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                        </tr>
+                    </tbody>
+
+                    <tbody>
+                        <tr data-overall-damage-losses-field="soc">
+                            <th scope="row">Avarias do SOC</th>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                        </tr>
+                    </tbody>
+
+                    <tbody>
+                        <tr data-overall-damage-losses-field="underReview">
+                            <th scope="row">Pacotes em Análise</th>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                        </tr>
+                    </tbody>
+
+                    <tbody>
+                        <tr data-overall-damage-losses-field="confirmedLosses">
+                            <th scope="row">Perdas Confirmadas</th>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                        </tr>
+                    </tbody>
+
+                    <tbody>
+                        <tr data-overall-damage-losses-field="returnedPackages">
+                            <th scope="row">Pacotes Retornados</th>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                        </tr>
+                    </tbody>
+                </table>
 
                 <!-- FLUXO DA JANELA -->
 
@@ -1063,90 +1090,6 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- AVARIAS E PERDAS -->
-
-                <table id="finalReport-LossesTable">
-                    <caption>Situação das Avarias e Perdas</caption>
-
-                    <thead>
-                        <tr>
-                            <th scope="col" style="width: 230px;">Ocorrência</th>
-                            <th scope="col">Hoje</th>
-                            <th scope="col">Ontem</th>
-                            <th scope="col">Anteontem</th>
-                            <th scope="col">De 3 a 7<br>Dias Atrás</th>
-                            <th scope="col">De 8 a 14<br>Dias Atrás</th>
-                            <th scope="col">De 15 Dias Atrás<br>Até o Começo do Mês</th>
-                            <th scope="col">Total do Mês</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        <tr data-overall-damage-losses-field="hub">
-                            <th scope="row">Avarias do Hub</th>
-                            <td>—</td>
-                            <td>—</td>
-                            <td>—</td>
-                            <td>—</td>
-                            <td>—</td>
-                            <td>—</td>
-                            <td>—</td>
-                        </tr>
-                    </tbody>
-
-                    <tbody>
-                        <tr data-overall-damage-losses-field="soc">
-                            <th scope="row">Avarias do SOC</th>
-                            <td>—</td>
-                            <td>—</td>
-                            <td>—</td>
-                            <td>—</td>
-                            <td>—</td>
-                            <td>—</td>
-                            <td>—</td>
-                        </tr>
-                    </tbody>
-
-                    <tbody>
-                        <tr data-overall-damage-losses-field="underReview">
-                            <th scope="row">Pacotes em Análise</th>
-                            <td>—</td>
-                            <td>—</td>
-                            <td>—</td>
-                            <td>—</td>
-                            <td>—</td>
-                            <td>—</td>
-                            <td>—</td>
-                        </tr>
-                    </tbody>
-
-                    <tbody>
-                        <tr data-overall-damage-losses-field="confirmedLosses">
-                            <th scope="row">Perdas Confirmadas</th>
-                            <td>—</td>
-                            <td>—</td>
-                            <td>—</td>
-                            <td>—</td>
-                            <td>—</td>
-                            <td>—</td>
-                            <td>—</td>
-                        </tr>
-                    </tbody>
-
-                    <tbody>
-                        <tr data-overall-damage-losses-field="returnedPackages">
-                            <th scope="row">Pacotes Retornados</th>
-                            <td>—</td>
-                            <td>—</td>
-                            <td>—</td>
-                            <td>—</td>
-                            <td>—</td>
-                            <td>—</td>
-                            <td>—</td>
-                        </tr>
-                    </tbody>
-                </table>
 
                 <!-- PARCEL E REVERSA -->
 

@@ -1,4 +1,3 @@
-import { createOverallAnalysisCardChart, getOverallAnalysisCardCharts, updateOverallAnalysisCardChart } from "./card-charts.js";
 import { CHART_COLORS, getChartPixelRatio } from "../../charts/theme.js";
 import { getHorizontalBarLabelPosition } from "../core/horizontal-bars-3d.js";
 import { createDashboardChart } from "../../charts/standard.js";
@@ -17,15 +16,6 @@ import {
 import {
     formatOverallAnalysisQuantity,
 } from "./view.js";
-
-let overallAnalysisDamageChart =
-    null;
-
-let overallAnalysisPackagesAnalysisChart =
-    null;
-
-let overallAnalysisLossRateChart =
-    null;
 
 let overallAnalysisReceiptChart =
     null;
@@ -371,9 +361,6 @@ function resizeOverallAnalysisCharts() {
                     null;
 
                 [
-                    overallAnalysisDamageChart,
-                    overallAnalysisPackagesAnalysisChart,
-                    overallAnalysisLossRateChart,
                     overallAnalysisReceiptChart,
                     overallAnalysisExpeditionChart,
                     overallAnalysisParcelCoverageChart,
@@ -430,9 +417,6 @@ function renderOverallAnalysisCharts(
     data,
 ) {
     if (
-        !overallAnalysisDamageChart ||
-        !overallAnalysisPackagesAnalysisChart ||
-        !overallAnalysisLossRateChart ||
         !overallAnalysisReceiptChart ||
         !overallAnalysisExpeditionChart ||
         !overallAnalysisParcelCoverageChart ||
@@ -467,11 +451,6 @@ function renderOverallAnalysisCharts(
             ? undefined
             : "none";
 
-    const cardCharts = getOverallAnalysisCardCharts(data);
-    updateOverallAnalysisCardChart(overallAnalysisDamageChart, cardCharts.damage, updateMode);
-    updateOverallAnalysisCardChart(overallAnalysisPackagesAnalysisChart, cardCharts.packagesAnalysis, updateMode);
-    updateOverallAnalysisCardChart(overallAnalysisLossRateChart, cardCharts.lossesRate, updateMode);
-
     overallAnalysisReceiptChart.update(
         updateMode,
     );
@@ -498,21 +477,6 @@ function renderOverallAnalysisCharts(
 function initializeOverallAnalysisCharts(
     rootElement,
 ) {
-    const damageCanvas =
-        rootElement.querySelector(
-            "#overallAnalysisDamageChart",
-        );
-
-    const lossRateCanvas =
-        rootElement.querySelector(
-            "#overallAnalysisLossRateChart",
-        );
-
-    const packagesAnalysisCanvas =
-        rootElement.querySelector(
-            "#overallAnalysisPackagesAnalysisChart",
-        );
-
     const receiptCanvas =
         rootElement.querySelector(
             "#overallAnalysisReceiptChart",
@@ -534,12 +498,6 @@ function initializeOverallAnalysisCharts(
         );
 
     if (
-        !(damageCanvas instanceof
-            HTMLCanvasElement) ||
-        !(packagesAnalysisCanvas instanceof
-            HTMLCanvasElement) ||
-        !(lossRateCanvas instanceof
-            HTMLCanvasElement) ||
         !(receiptCanvas instanceof
             HTMLCanvasElement) ||
         !(expeditionCanvas instanceof
@@ -560,15 +518,6 @@ function initializeOverallAnalysisCharts(
 
     overallAnalysisPanel =
         rootElement;
-
-    overallAnalysisDamageChart =
-        createOverallAnalysisCardChart(damageCanvas);
-
-    overallAnalysisPackagesAnalysisChart =
-        createOverallAnalysisCardChart(packagesAnalysisCanvas);
-
-    overallAnalysisLossRateChart =
-        createOverallAnalysisCardChart(lossRateCanvas);
 
     overallAnalysisReceiptChart =
         createOverallAnalysisChart(
