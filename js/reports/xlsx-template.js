@@ -1074,8 +1074,6 @@ async function createXlsxTemplateBlob({
     sheetName,
     outputSheetName,
     cells,
-    sheets,
-    afterUpdate,
     fetchFunction =
         globalThis.fetch,
     jsZipLibrary =
@@ -1114,23 +1112,23 @@ async function createXlsxTemplateBlob({
             await response.arrayBuffer(),
         );
 
-    const updates = sheets ?? [{ sheetName, outputSheetName, cells }];
-    if (!Array.isArray(updates) || updates.length === 0) {
-        throw new TypeError("Informe as abas que devem ser preenchidas no modelo XLSX.");
-    }
+    await updateXlsxTemplateArchive({
+        archive,
+        sheetName,
+        cells,
+    });
 
-    for (const update of updates) {
-        await updateXlsxTemplateArchive({ archive, sheetName: update.sheetName, cells: update.cells });
-        if (update.outputSheetName !== null && update.outputSheetName !== undefined) {
-            await renameXlsxTemplateWorksheet({
-                archive,
-                sheetName: update.sheetName,
-                newSheetName: update.outputSheetName,
-            });
-        }
+    if (
+        outputSheetName !== null &&
+        outputSheetName !== undefined
+    ) {
+        await renameXlsxTemplateWorksheet({
+            archive,
+            sheetName,
+            newSheetName:
+                outputSheetName,
+        });
     }
-
-    if (typeof afterUpdate === "function") await afterUpdate(archive);
 
     return archive.generateAsync({
         type: "blob",

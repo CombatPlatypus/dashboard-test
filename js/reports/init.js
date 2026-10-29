@@ -50,8 +50,6 @@ import {
     initializeReportSummaryCopy,
 } from "./summary-copy.js";
 
-import { initializeReportSpreadsheetDownloads } from "./spreadsheet-export.js";
-
 /* INICIALIZA O PAINEL DE RELATÓRIOS */
 
 function initializeReportsPanel() {
@@ -101,8 +99,6 @@ function initializeReportsPanel() {
     reportManager.initializeAll();
 
     initializeReportSummaryCopy();
-
-    initializeReportSpreadsheetDownloads();
 
     // SESSÃO DOS RELATÓRIOS
 
