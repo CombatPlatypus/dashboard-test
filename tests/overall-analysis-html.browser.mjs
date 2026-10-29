@@ -177,8 +177,8 @@ try {
     assert.equal(rendered.date, snapshot.dateLabel);
     assert.equal(rendered.reverse, "4 (40%)");
     assert.equal(rendered.tooltipsDisabled, true);
-    assert.deepEqual(rendered.cardColors, [["#f99400", "#8B0000"], ["#2538a5", "#8B0000"], ["#f99400", "#8B0000"]]);
-    for (const [index, expected] of [0.4, 0.99985, 0.8].entries()) {
+    assert.deepEqual(rendered.cardColors, [["#f99400", "#8B0000"], ["#007A48", "#626262"], ["#f99400", "#8B0000"]]);
+    for (const [index, expected] of [0.4, 0.5, 0.8].entries()) {
         assert.ok(Math.abs(rendered.cardProportions[index][0] - expected) < 1e-8);
         assert.ok(Math.abs(rendered.cardProportions[index][0] + rendered.cardProportions[index][1] - 1) < 1e-8);
     }

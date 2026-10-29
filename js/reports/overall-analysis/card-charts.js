@@ -5,7 +5,10 @@ function getOverallAnalysisCardCharts(data) {
     const damage = data.cards.damage;
     const packages = data.cards.packagesAnalysis;
     const losses = data.cards.lossesRate;
-    const hasLossRate = losses.moved > 0 && losses.totalLosses !== null;
+    const hasLossRate = typeof losses.rate === "number" && Number.isFinite(losses.rate) && losses.limit > 0;
+    const lossRateProgress = hasLossRate ? Math.max(0, Math.min(losses.rate / losses.limit, 1)) : null;
+    const lossRateColor = losses.rate > losses.limit ? CHART_COLORS.red
+        : losses.rate >= 0.00025 ? CHART_COLORS.yellow : CHART_COLORS.green;
 
     return {
         damage: {
@@ -19,10 +22,9 @@ function getOverallAnalysisCardCharts(data) {
             colors: [CHART_COLORS.yellow, CHART_COLORS.red],
         },
         lossesRate: {
-            // As perdas fazem parte do volume movimentado, sem contar duas vezes.
-            labels: ["Volume sem perdas", "Total de Perdas"],
-            values: hasLossRate ? [Math.max(0, losses.moved - losses.totalLosses), losses.totalLosses] : [null, null],
-            colors: [CHART_COLORS.blue, CHART_COLORS.red],
+            labels: ["Uso do limite de perdas", "Restante até o limite"],
+            values: hasLossRate ? [lossRateProgress, 1 - lossRateProgress] : [null, null],
+            colors: [lossRateColor, null],
         },
     };
 }
@@ -45,7 +47,7 @@ function updateOverallAnalysisCardChart(chart, definition, updateMode) {
     const hasVolume = hasData && values.some(value => value > 0);
     chart.data.labels = labels;
     chart.data.datasets[0].data = hasVolume ? values : [0, 1];
-    chart.data.datasets[0].backgroundColor = context => hasVolume ? colors[context.dataIndex] : getChartEmptyColor();
+    chart.data.datasets[0].backgroundColor = context => hasVolume ? colors[context.dataIndex] ?? getChartEmptyColor() : getChartEmptyColor();
     chart.data.datasets[0].hoverBackgroundColor = chart.data.datasets[0].backgroundColor;
     chart.canvas.setAttribute("aria-label", hasData
         ? labels.map((label, index) => `${label}: ${new Intl.NumberFormat("pt-BR").format(values[index])}`).join("; ")

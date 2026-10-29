@@ -160,18 +160,20 @@ test("card de avarias substitui capacidade com o total e os valores de SOC e Hub
     assert.equal(charts.length, 7);
 });
 
-test("card de perdas representa o volume movimentado sem somar as perdas ao denominador", t => {
+test("mini gráfico de perdas indica o uso do limite com verde, amarelo e vermelho, mantendo as legendas", t => {
     const { root, charts, elements } = createElements(t);
     assert.equal(initializeOverallAnalysisView(root), true);
     assert.equal(initializeOverallAnalysisCharts(root), true);
     const chart = charts.find(item => item.canvas === root.querySelector("#overallAnalysisLossRateChart"));
-    for (const lost of [0, 240, 300, 350]) {
+    for (const [lost, color] of [[0, "#007A48"], [240, "#007A48"], [249, "#007A48"],
+        [250, "#f99400"], [299, "#f99400"], [300, "#f99400"], [301, "#8B0000"], [350, "#8B0000"]]) {
         const data = getCardData(null, lost);
         assert.equal(data.cards.lossesRate.rate, lost / 1000000);
         assert.equal(renderOverallAnalysisCharts(data), true);
         assert.equal(renderOverallAnalysisView(data), true);
-        assert.deepEqual(chart.data.datasets[0].data, [1000000 - lost, lost]);
-        assert.deepEqual([0, 1].map(dataIndex => chart.data.datasets[0].backgroundColor({ dataIndex })), ["#2538a5", "#8B0000"]);
+        const progress = Math.min(data.cards.lossesRate.rate / data.cards.lossesRate.limit, 1);
+        assert.deepEqual(chart.data.datasets[0].data, [progress, 1 - progress]);
+        assert.deepEqual([0, 1].map(dataIndex => chart.data.datasets[0].backgroundColor({ dataIndex })), [color, "#626262"]);
         assert.equal(elements.get("overallAnalysisLossRateMoved").textContent, "1.000.000");
         assert.equal(elements.get("overallAnalysisLossRateTotalLosses").textContent, String(lost));
         assert.equal(charts.length, 7);
