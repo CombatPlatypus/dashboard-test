@@ -163,6 +163,10 @@ function renderReceiptClearStatus(
 function renderReceiptExportStatus(
     state,
 ) {
+    if (state.operators.length === 0 && getReceiptLinehaulState().linehauls.length === 0) {
+        receiptReportHasActivity = false;
+    }
+
     const pendingMessage =
         getActiveReceiptExportPendingMessage(
             state,
