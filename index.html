@@ -2861,7 +2861,148 @@
 
                                     <!-- CARDS -->
 
-                                    <div class="final-report-cards">
+                                    <div>
+                                        <div class="final-report-title">
+                                            <h4>Indicadores de Avarias e Perdas</h4>
+                                        </div>
+
+                                        <div class="cards">
+                                            <div>
+                                                <div class="flex-box-start">
+                                                    <img src="images/geral-icons/hub-icon.svg">
+                                                    <h4 id="">—</h4>
+                                                </div>
+
+                                                <p id="">Avarias do Hub</p>
+                                            </div>
+
+                                            <div>
+                                                <div class="flex-box-start">
+                                                    <img src="images/geral-icons/truck-icon.svg">
+                                                    <h4 id="">—</h4>
+                                                </div>
+
+                                                <p id="">Avarias do SOC</p>
+                                            </div>
+
+
+                                            <div>
+                                                <div class="flex-box-start">
+                                                    <img src="images/geral-icons/percentage-icon.svg">
+                                                    <h4 id="">0,—%</h4>
+                                                </div>
+
+                                                <p id="">Taxa de Perdas</p>
+                                            </div>
+
+
+                                            <div>
+                                                <div class="flex-box-start">
+                                                    <img src="images/geral-icons/clock-icon.svg">
+                                                    <h4 id="">—</h4>
+                                                </div>
+
+                                                <p>Pacotes em Análise</p>
+                                            </div>
+
+                                            <div>
+                                                <div class="flex-box-start">
+                                                    <img src="images/geral-icons/alert-icon.svg">
+                                                    <h4 id="">—</h4>
+                                                </div>
+
+                                                <p>Perdas Confirmadas</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <!-- AVARIAS E PERDAS -->
+
+                                    <table id="overallAnalysisDamageAndLossesTable">
+                                        <caption>Situação das Avarias e Perdas</caption>
+
+                                        <thead>
+                                            <tr>
+                                                <th scope="col" style="width: 230px;">Ocorrência</th>
+                                                <th scope="col">Hoje</th>
+                                                <th scope="col">Ontem</th>
+                                                <th scope="col">Anteontem</th>
+                                                <th scope="col">De 3 a 7<br>Dias Atrás</th>
+                                                <th scope="col">De 8 a 14<br>Dias Atrás</th>
+                                                <th scope="col">De 15 Dias Atrás<br>Até o Começo do Mês</th>
+                                                <th scope="col">Total do Mês</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            <tr data-overall-damage-losses-field="hub">
+                                                <th scope="row">Avarias do Hub</th>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                            </tr>
+                                        </tbody>
+
+                                        <tbody>
+                                            <tr data-overall-damage-losses-field="soc">
+                                                <th scope="row">Avarias do SOC</th>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                            </tr>
+                                        </tbody>
+
+                                        <tbody>
+                                            <tr data-overall-damage-losses-field="underReview">
+                                                <th scope="row">Pacotes em Análise</th>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                            </tr>
+                                        </tbody>
+
+                                        <tbody>
+                                            <tr data-overall-damage-losses-field="confirmedLosses">
+                                                <th scope="row">Perdas Confirmadas</th>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                            </tr>
+                                        </tbody>
+
+                                        <tbody>
+                                            <tr data-overall-damage-losses-field="returnedPackages">
+                                                <th scope="row">Pacotes Retornados</th>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                            </tr>
+                                        </tbody>
+
+                                    </table>
+
+                                    <div class="final-report-cards" style="display: none;">
                                         <div>
                                             <div class="final-report-title">
                                                 <h4>Avarias do SOC e Hub</h4>
@@ -3083,91 +3224,6 @@
                                             </div>
                                         </div>
                                     </div>
-
-                                    <!-- AVARIAS E PERDAS -->
-
-                                    <table id="overallAnalysisDamageAndLossesTable">
-                                        <caption>Situação das Avarias e Perdas</caption>
-
-                                        <thead>
-                                            <tr>
-                                                <th scope="col" style="width: 230px;">Ocorrência</th>
-                                                <th scope="col">Hoje</th>
-                                                <th scope="col">Ontem</th>
-                                                <th scope="col">Anteontem</th>
-                                                <th scope="col">De 3 a 7<br>Dias Atrás</th>
-                                                <th scope="col">De 8 a 14<br>Dias Atrás</th>
-                                                <th scope="col">De 15 Dias Atrás<br>Até o Começo do Mês</th>
-                                                <th scope="col">Total do Mês</th>
-                                            </tr>
-                                        </thead>
-
-                                        <tbody>
-                                            <tr data-overall-damage-losses-field="hub">
-                                                <th scope="row">Avarias do Hub</th>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                            </tr>
-                                        </tbody>
-
-                                        <tbody>
-                                            <tr data-overall-damage-losses-field="soc">
-                                                <th scope="row">Avarias do SOC</th>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                            </tr>
-                                        </tbody>
-
-                                        <tbody>
-                                            <tr data-overall-damage-losses-field="underReview">
-                                                <th scope="row">Pacotes em Análise</th>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                            </tr>
-                                        </tbody>
-
-                                        <tbody>
-                                            <tr data-overall-damage-losses-field="confirmedLosses">
-                                                <th scope="row">Perdas Confirmadas</th>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                            </tr>
-                                        </tbody>
-
-                                        <tbody>
-                                            <tr data-overall-damage-losses-field="returnedPackages">
-                                                <th scope="row">Pacotes Retornados</th>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                            </tr>
-                                        </tbody>
-
-                                    </table>
 
                                     <!-- PARCEL E REVERSA -->
 
