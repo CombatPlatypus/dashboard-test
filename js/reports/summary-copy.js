@@ -4,7 +4,7 @@ import { getReceiptLinehaulState, getReceiptLinehaulSummary, subscribeReceiptLin
 import { getExpeditionState, getExpeditionSummary, getExpeditionErrorAnalysis, subscribeExpeditionState } from "./expedition/state.js";
 import { setReportNotification } from "./report-notifications.js";
 
-const shiftRows = { AM: 1, PM1: 22, PM2: 43 };
+const shiftColumns = { AM: "A", PM1: "F", PM2: "K" };
 const rateFormatter = new Intl.NumberFormat("pt-BR", {
     style: "percent", minimumFractionDigits: 2, maximumFractionDigits: 2,
 });
@@ -45,7 +45,7 @@ function createReportSummaryClipboard(kind, {
     expedition = getExpeditionState(),
 } = {}) {
     const shift = context.window;
-    const firstRow = shiftRows[shift];
+    const firstColumn = shiftColumns[shift];
     const cell = (value, span = 2) => ({ value, span });
     const pair = (...values) => values.map(value => cell(value));
     const rate = value => value === null || value === undefined ? "" : rateFormatter.format(value);
@@ -65,7 +65,7 @@ function createReportSummaryClipboard(kind, {
             pair("Volume Esperado", "Volume Recebido"),
             pair(receipt.expectedVolume, received.receivedVolume),
         ];
-        target = `A${firstRow + 1}`;
+        target = `${firstColumn}3`;
         label = "Resumo de processamento";
         hasData = unloaded.hasData || received.receivedVolume !== null;
     } else if (kind === "expedition") {
@@ -89,7 +89,7 @@ function createReportSummaryClipboard(kind, {
             pair("Total Final de Erros", "Taxa Final"),
             pair(analysis.finalErrors, rate(analysis.finalRate)),
         ];
-        target = `A${firstRow + 6}`;
+        target = `${firstColumn}8`;
         label = "Resumo de expedição e erros";
         hasData = analysis.hasSpXData || analysis.hasErrorData;
     } else {

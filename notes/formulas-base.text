@@ -807,3 +807,40 @@ LM Hub_SP_Santos_PraiaGrande_02
 
 =
 =SEERRO('Base do Resumo'!A4; "-")
+
+
+={
+    "Está Presente Aqui?";
+
+    ARRAYFORMULA(
+        SE(
+            G3:G="";
+            "";
+            PROCX(
+                
+                G3:G;
+                A3:A;
+    
+                ARRAYFORMULA(SE(A3:A<>"";"Sim";"Não"));
+
+                "Não"
+            )
+        )
+    )
+}
+
+={
+    "Está Presente Aqui?";
+
+    ARRAYFORMULA(
+        SE(
+            G3:G="";
+            "";
+            SE(
+                CONT.SE(A3:A;G3:G)>0;
+                "Sim";
+                "Não"
+            )
+        )
+    )
+}

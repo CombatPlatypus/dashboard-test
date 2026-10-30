@@ -241,7 +241,6 @@
     }
     #reports .cards > div > p {
         font-size: 14px;
-        color: var(--color-gray-p);
         line-height: 1;
         margin: 0;
     }

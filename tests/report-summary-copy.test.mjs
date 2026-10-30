@@ -43,10 +43,10 @@ function populate() {
     });
 }
 
-test("processamento reproduz A2:D6 com títulos, cabeçalhos e somente os dados selecionados", () => {
+test("processamento reproduz A3:D7 com títulos, cabeçalhos e somente os dados selecionados", () => {
     populate();
     const payload = createReportSummaryClipboard("receipt");
-    assert.equal(payload.target, "A2");
+    assert.equal(payload.target, "A3");
     assert.equal(payload.hasData, true);
     assert.deepEqual(matrix(payload), [
         ["Último Processamento", "", "", ""],
@@ -64,10 +64,10 @@ test("processamento reproduz A2:D6 com títulos, cabeçalhos e somente os dados 
     assert.equal(sheet.C3.v, 1200);
 });
 
-test("expedição reproduz A7:D20 com os erros e taxas calculados pelo relatório", () => {
+test("expedição reproduz A8:D21 com os erros e taxas calculados pelo relatório", () => {
     populate();
     const payload = createReportSummaryClipboard("expedition");
-    assert.equal(payload.target, "A7");
+    assert.equal(payload.target, "A8");
     assert.equal(payload.hasData, true);
     assert.deepEqual(matrix(payload), [
         ["Última Expedição", "", "", ""],
@@ -110,18 +110,41 @@ test("formato de colagem do Planilhas centraliza as duas direções em títulos,
     }
 });
 
-test("os intervalos de processamento e expedição não se sobrepõem em nenhum turno", () => {
-    for (const [window, firstRow] of [["AM", 1], ["PM1", 22], ["PM2", 43]]) {
+test("os turnos ocupam blocos lado a lado sem atingir os cabeçalhos, as divisórias ou outro relatório", () => {
+    populate();
+    const occupied = new Set();
+    for (const [window, firstColumn] of [["AM", "A"], ["PM1", "F"], ["PM2", "K"]]) {
         const options = { context: { window } };
         const receipt = createReportSummaryClipboard("receipt", options);
         const expedition = createReportSummaryClipboard("expedition", options);
-        assert.equal(receipt.target, `A${firstRow + 1}`);
-        assert.equal(expedition.target, `A${firstRow + 6}`);
+        assert.equal(receipt.target, `${firstColumn}3`);
+        assert.equal(expedition.target, `${firstColumn}8`);
         assert.equal(matrix(receipt).length, 5);
         assert.equal(matrix(expedition).length, 14);
         for (const payload of [receipt, expedition]) {
             assert.ok(matrix(payload).every(row => row.length === 4));
+            const [, column, firstRow] = payload.target.match(/^([A-Z]+)(\d+)$/);
+            const pasted = new Map(matrix(payload).flatMap((row, rowOffset) => row.map((value, columnOffset) => {
+                const cell = `${String.fromCharCode(column.charCodeAt(0) + columnOffset)}${Number(firstRow) + rowOffset}`;
+                assert.equal(occupied.has(cell), false, `${window}: sobreposição em ${cell}`);
+                occupied.add(cell);
+                return [cell, value];
+            })));
+            // The "Último" sheets read these rows in the new Base do Resumo layout.
+            const valuesByRow = payload === receipt
+                ? [[5, "2", "1200"], [7, "1500", "1100"]]
+                : [[10, "1", "1000"], [12, "100", "01:05:30"], [15, "30", "20"],
+                    [17, "10", "20,00%"], [19, "50", "5,00%"], [21, "40", "4,00%"]];
+            const secondColumn = String.fromCharCode(firstColumn.charCodeAt(0) + 2);
+            for (const [row, left, right] of valuesByRow) {
+                assert.equal(pasted.get(`${firstColumn}${row}`), left);
+                assert.equal(pasted.get(`${secondColumn}${row}`), right);
+            }
         }
+    }
+    for (const cell of occupied) {
+        assert.doesNotMatch(cell, /^[EJ]/);
+        assert.ok(Number(cell.match(/\d+$/)[0]) >= 3);
     }
 });
 
@@ -202,18 +225,18 @@ test("clique grava apenas os dados e cabeçalhos do relatório em HTML e TSV", a
     assert.equal(await writes[0]["text/plain"].text(), createReportSummaryClipboard("receipt").text);
     assert.equal(await writes[0]["text/html"].text(), createReportSummaryClipboard("receipt").html);
     assert.equal(notification.dataset.notificationType, "success");
-    assert.match(text.textContent, /Cole em A2/);
+    assert.match(text.textContent, /Cole em A3/);
     updateReportContextField("window", "PM1");
     await button.fire("contextmenu");
     assert.equal(writes.length, 1);
     await button.fire();
     assert.equal(await writes[1]["text/plain"].text(), createReportSummaryClipboard("receipt").text);
-    assert.match(text.textContent, /Cole em A23/);
+    assert.match(text.textContent, /Cole em F3/);
     updateReportContextField("window", "PM2");
     await button.fire("click", { shiftKey: true });
     assert.equal(await writes[2]["text/plain"].text(), createReportSummaryClipboard("receipt").text);
-    assert.match(text.textContent, /Cole em A44/);
-    assert.match(button.title, /A44/);
+    assert.match(text.textContent, /Cole em K3/);
+    assert.match(button.title, /K3/);
 });
 
 test("fallback de texto lê o estado atual e os botões acompanham importação e limpeza", async t => {
