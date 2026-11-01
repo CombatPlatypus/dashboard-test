@@ -116,7 +116,7 @@ test("expedição inclui resumo, erros e lista de conferentes em E3:H58", () => 
     assert.doesNotMatch(payload.text, /Processamento|Volume Recebido/);
 });
 
-test("colagem inclui fontes, tamanhos e centralização explícitos em títulos, dados e células vazias", () => {
+test("colagem inclui bordas, fontes, tamanhos e centralização em títulos, dados e células vazias", () => {
     populate();
     for (const kind of ["receipt", "expedition"]) {
         const { html } = createReportSummaryClipboard(kind);
@@ -137,6 +137,7 @@ test("colagem inclui fontes, tamanhos e centralização explícitos em títulos,
             const span = Number(attributes.match(/colspan="(\d+)"/)[1]);
             assert.match(attributes, new RegExp(`width="${150 * span}"`));
             assert.match(attributes, /text-align:center;vertical-align:middle/);
+            assert.match(attributes, /border:1px solid #000000;/);
             assert.equal(format["2"] & (4096 | 8192), 4096 | 8192);
             assert.ok(["Roboto", "Arial"].includes(format["15"]));
             assert.match(attributes, new RegExp(`font-family:${format["15"]};font-size:${format["16"]}pt`));

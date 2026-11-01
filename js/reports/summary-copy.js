@@ -41,7 +41,7 @@ function createClipboardTable(rows) {
         '<tr style="height:25px">' + row.map(({ value, span, fontSize, fontFamily }) => {
             const format = JSON.stringify({ "2": sheetsFormatFields, "9": 1, "10": 1, "15": fontFamily, "16": fontSize });
             return `<td rowspan="1" colspan="${span}" width="${150 * span}" data-sheets-userformat='${format}' align="center" valign="middle" ` +
-                `style="width:${150 * span}px;text-align:center;vertical-align:middle;font-family:${fontFamily};font-size:${fontSize}pt;font-weight:normal;white-space:nowrap">${escapeHtml(value)}</td>`;
+                `style="border:1px solid #000000;width:${150 * span}px;text-align:center;vertical-align:middle;font-family:${fontFamily};font-size:${fontSize}pt;font-weight:normal;white-space:nowrap">${escapeHtml(value)}</td>`;
         }).join("") + "</tr>",
     ).join("") + '</tbody></table></google-sheets-html-origin><!--EndFragment--></body></html>';
     return { text, html };
