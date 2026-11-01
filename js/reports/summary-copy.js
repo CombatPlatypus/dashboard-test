@@ -1,4 +1,5 @@
 import { getReportContext, subscribeReportContext } from "./core/report-context.js";
+import { formatReportPersonWithOps } from "./core/person-name.js";
 import { getReceiptState, getReceiptSummary, subscribeReceiptState } from "./receipt/state.js";
 import { getReceiptLinehaulState, getReceiptLinehaulSummary, subscribeReceiptLinehaulState } from "./receipt/linehaul-state.js";
 import { getExpeditionState, getExpeditionSummary, getExpeditionErrorAnalysis, getExpeditionOperatorRanking, subscribeExpeditionState } from "./expedition/state.js";
@@ -32,12 +33,17 @@ function createClipboardTable(rows) {
         [String(value ?? ""), ...Array(span - 1).fill("")],
     ).join("\t")).join("\n");
     // Sheets only applies data-sheets-* formatting when its clipboard origin marker is present.
-    const html = '<meta charset="utf-8"><google-sheets-html-origin><table data-sheets-root="1">' + rows.map(row =>
-        "<tr>" + row.map(({ value, span, fontSize, fontFamily }) => {
+    const columns = '<colgroup>' + '<col width="150" style="width:150px">'.repeat(4) + '</colgroup>';
+    const html = '<html><head><meta charset="utf-8"></head><body><!--StartFragment-->' +
+        '<google-sheets-html-origin><table xmlns="http://www.w3.org/1999/xhtml" data-sheets-root="1" data-sheets-baot="1" ' +
+        'cellspacing="0" cellpadding="0" dir="ltr" style="table-layout:fixed;border-collapse:collapse;font-family:Roboto;font-size:10pt">' +
+        columns + '<tbody>' + rows.map(row =>
+        '<tr style="height:25px">' + row.map(({ value, span, fontSize, fontFamily }) => {
             const format = JSON.stringify({ "2": sheetsFormatFields, "9": 1, "10": 1, "15": fontFamily, "16": fontSize });
-            return `<td colspan="${span}" data-sheets-userformat='${format}' align="center" valign="middle" style="text-align:center;vertical-align:middle;font-family:${fontFamily};font-size:${fontSize}pt">${escapeHtml(value)}</td>`;
+            return `<td rowspan="1" colspan="${span}" width="${150 * span}" data-sheets-userformat='${format}' align="center" valign="middle" ` +
+                `style="width:${150 * span}px;text-align:center;vertical-align:middle;font-family:${fontFamily};font-size:${fontSize}pt;font-weight:normal;white-space:nowrap">${escapeHtml(value)}</td>`;
         }).join("") + "</tr>",
-    ).join("") + "</table></google-sheets-html-origin>";
+    ).join("") + '</tbody></table></google-sheets-html-origin><!--EndFragment--></body></html>';
     return { text, html };
 }
 
@@ -76,7 +82,7 @@ function createReportSummaryClipboard(kind, {
             ["Recebor SPX", "Etiquetador", "Recebido", "Erros"].map(value => cell(value, 1, 11)),
         ];
         operators = (receipt.operators ?? []).filter(operator => operator.selected !== false);
-        createOperatorRow = operator => [operator?.receiver, operator?.labeler, operator?.packagesReceived, operator?.errorQuantity]
+        createOperatorRow = operator => [formatReportPersonWithOps(operator?.receiver), formatReportPersonWithOps(operator?.labeler), operator?.packagesReceived, operator?.errorQuantity]
             .map(value => cell(value, 1, 10, "Arial"));
         listLabel = "recebedores";
         target = `A${firstRow}`;
@@ -106,7 +112,7 @@ function createReportSummaryClipboard(kind, {
             [cell("Conferente SPX", 2, 11), cell("Rotas Feitas", 1, 11), cell("Tempo Médio", 1, 11)],
         ];
         operators = getExpeditionOperatorRanking(expedition).filter(operator => operator.selected !== false);
-        createOperatorRow = operator => [cell(operator?.operator), cell(operator?.routesChecked, 1),
+        createOperatorRow = operator => [cell(formatReportPersonWithOps(operator?.operator)), cell(operator?.routesChecked, 1),
             cell(formatDuration(operator?.averageDurationSeconds), 1)];
         listLabel = "conferentes";
         target = `E${firstRow}`;
@@ -125,17 +131,38 @@ function createReportSummaryClipboard(kind, {
     return { ...createClipboardTable(rows), target, label, shift, hasData, copyError };
 }
 
+function writeSummaryCopyEvent(payload) {
+    if (typeof document?.execCommand !== "function" || typeof document?.addEventListener !== "function") return false;
+    let handled = false;
+    const onCopy = event => {
+        if (!event.clipboardData) return;
+        event.clipboardData.setData("text/html", payload.html);
+        event.clipboardData.setData("text/plain", payload.text);
+        event.preventDefault();
+        handled = true;
+    };
+    document.addEventListener("copy", onCopy);
+    try {
+        return document.execCommand("copy") && handled;
+    } catch {
+        return false;
+    } finally {
+        document.removeEventListener("copy", onCopy);
+    }
+}
+
 async function writeSummaryClipboard(payload) {
+    // DataTransfer retains table metadata that the async clipboard path can sanitize.
+    // https://chromium.googlesource.com/chromium/src/+/main/third_party/blink/renderer/core/clipboard/README.md#sanitization
+    if (writeSummaryCopyEvent(payload)) return;
     const clipboard = navigator.clipboard;
     if (typeof clipboard?.write === "function" && typeof ClipboardItem === "function") {
         await clipboard.write([new ClipboardItem({
             "text/html": new Blob([payload.html], { type: "text/html" }),
             "text/plain": new Blob([payload.text], { type: "text/plain" }),
         })]);
-    } else if (typeof clipboard?.writeText === "function") {
-        await clipboard.writeText(payload.text);
     } else {
-        throw new Error("Área de transferência indisponível.");
+        throw new Error("Cópia formatada indisponível.");
     }
 }
 
@@ -170,11 +197,11 @@ function bindReportSummaryCopyButton(button, { reportId, kind, subscribe }) {
         try {
             await writeSummaryClipboard(payload);
             setReportNotification({ reportId, type: "success",
-                message: `${payload.label} copiado. Cole em ${payload.target} da aba Base do Resumo (${payload.shift}).`,
+                message: `${payload.label} copiado. Cole em ${payload.target} da aba Base do Resumo (${payload.shift}). Use Ctrl+V para manter mesclagens e alinhamento.`,
             });
         } catch {
             setReportNotification({ reportId, type: "error",
-                message: "Não foi possível copiar os dados. Verifique a permissão da área de transferência e acesse o dashboard por localhost ou HTTPS.",
+                message: "Não foi possível copiar a tabela com formatação. Verifique a permissão da área de transferência e acesse o dashboard por localhost ou HTTPS.",
             });
         } finally {
             busy = false;

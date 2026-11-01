@@ -900,3 +900,5 @@ LM Hub_SP_Santos_PraiaGrande_02
 'Gráfico de Ocorrências'!A1:C3
 
 =IMPORTRANGE("https://docs.google.com/spreadsheets/d/11jdHDwRBiDKTpP2G7s02v0wR2K27nJ5mG9G6aExwESQ/";"'Tabela do Gráfico'!A1:C3")
+
+=IMPORTRANGE("https://docs.google.com/spreadsheets/d/11jdHDwRBiDKTpP2G7s02v0wR2K27nJ5mG9G6aExwESQ/";"'Tabela do Gráfico'!A1:C3")

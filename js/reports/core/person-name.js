@@ -50,6 +50,14 @@ function formatReportPersonFirstName(
     );
 }
 
+function formatReportPersonWithOps(value) {
+    const text = String(value ?? "").trim();
+    const code = text.match(/\[\s*(ops\d+)\s*\]/i)?.[1].toLocaleLowerCase("pt-BR");
+    const firstName = formatReportPersonFirstName(text, "");
+    return [code ? `[${code}]` : "", firstName].filter(Boolean).join(" ");
+}
+
 export {
     formatReportPersonFirstName,
+    formatReportPersonWithOps,
 };

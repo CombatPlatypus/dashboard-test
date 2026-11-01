@@ -6,6 +6,7 @@ import {
     bindReportSummaryCopyButton, createReportSummaryClipboard, initializeReportSummaryCopy,
 } from "../js/reports/summary-copy.js";
 import { restoreReportContext, subscribeReportContext, updateReportContextField } from "../js/reports/core/report-context.js";
+import { formatReportPersonWithOps } from "../js/reports/core/person-name.js";
 import { resetReceiptReport, restoreReceiptState, subscribeReceiptState } from "../js/reports/receipt/state.js";
 import { resetReceiptLinehaulState, restoreReceiptLinehaulState, subscribeReceiptLinehaulState } from "../js/reports/receipt/linehaul-state.js";
 import { resetExpeditionReport, restoreExpeditionState } from "../js/reports/expedition/state.js";
@@ -120,7 +121,11 @@ test("colagem inclui fontes, tamanhos e centralização explícitos em títulos,
     for (const kind of ["receipt", "expedition"]) {
         const { html } = createReportSummaryClipboard(kind);
         assert.match(html, /<google-sheets-html-origin><table\b[^>]*data-sheets-root="1"/);
-        assert.ok(html.endsWith("</table></google-sheets-html-origin>"));
+        assert.ok(html.startsWith('<html><head><meta charset="utf-8"></head><body><!--StartFragment-->'));
+        assert.ok(html.endsWith('</tbody></table></google-sheets-html-origin><!--EndFragment--></body></html>'));
+        assert.match(html, /data-sheets-baot="1"/);
+        assert.equal([...html.matchAll(/<col width="150"/g)].length, 4);
+        assert.equal([...html.matchAll(/<tr\b/g)].length, 56);
         const cells = [...html.matchAll(/<td\b([^>]*)>([^<]*)<\/td>/g)];
         assert.equal(cells.length, kind === "receipt" ? 210 : 150);
         for (const [, attributes] of cells) {
@@ -128,6 +133,10 @@ test("colagem inclui fontes, tamanhos e centralização explícitos em títulos,
             assert.equal(format["2"] & (64 | 128), 64 | 128);
             assert.equal(format["9"], 1);
             assert.equal(format["10"], 1);
+            assert.match(attributes, /rowspan="1"/);
+            const span = Number(attributes.match(/colspan="(\d+)"/)[1]);
+            assert.match(attributes, new RegExp(`width="${150 * span}"`));
+            assert.match(attributes, /text-align:center;vertical-align:middle/);
             assert.equal(format["2"] & (4096 | 8192), 4096 | 8192);
             assert.ok(["Roboto", "Arial"].includes(format["15"]));
             assert.match(attributes, new RegExp(`font-family:${format["15"]};font-size:${format["16"]}pt`));
@@ -210,18 +219,35 @@ test("campos ausentes ficam vazios, zeros continuam numéricos e dados parciais 
 
 test("listas preservam campos ausentes, zeros e texto escapado sem copiar recebedores desmarcados", () => {
     restoreReceiptState({ operators: [
-        { receiver: "Ana & Bia <SPX>", labeler: "Lia \"A\"", packagesReceived: 0, errorQuantity: 0 },
+        { receiver: "[ops1]ANA&<SPX> SILVA", labeler: '[ops2]LIA" SOUZA', packagesReceived: 0, errorQuantity: 0 },
         { receiver: "Bruno", labeler: "", packagesReceived: null, errorQuantity: null },
         { receiver: "Caio", packagesReceived: 20, selected: false },
     ] });
     const payload = createReportSummaryClipboard("receipt");
     assert.equal(payload.hasData, true);
     assert.deepEqual(matrix(payload).slice(7, 9), [
-        ["Ana & Bia <SPX>", 'Lia "A"', "0", "0"], ["Bruno", "", "", ""],
+        ["[ops1] Ana&<spx>", '[ops2] Lia"', "0", "0"], ["Bruno", "", "", ""],
     ]);
-    assert.match(payload.html, /Ana &amp; Bia &lt;SPX&gt;/);
-    assert.match(payload.html, /Lia &quot;A&quot;/);
+    assert.match(payload.html, /Ana&amp;&lt;spx&gt;/);
+    assert.match(payload.html, /Lia&quot;/);
     assert.doesNotMatch(payload.text, /Caio/);
+});
+
+test("nomes copiados mantêm o código OPS e apenas o primeiro nome com inicial maiúscula", () => {
+    for (const [input, expected] of [
+        ["[ops112064]MARIANE RAMOS DE OLIVEIRA", "[ops112064] Mariane"],
+        [" [OPS209211] ANTONIO HENRIQUE ALVES ", "[ops209211] Antonio"],
+        ["[ops434601]WILLIAN SILVA SOUZA", "[ops434601] Willian"],
+        ["[ops209316]JOÃO PAULO", "[ops209316] João"],
+        ["[ops434593]TAMIRES CRISTINA", "[ops434593] Tamires"],
+        ["MARIANE RAMOS", "Mariane"], ["[ops112064]", "[ops112064]"], [null, ""], ["", ""],
+    ]) assert.equal(formatReportPersonWithOps(input), expected);
+    restoreReceiptState({ operators: [{ receiver: "[ops112064]MARIANE RAMOS DE OLIVEIRA",
+        labeler: "[ops209316]JOÃO PAULO", packagesReceived: 10 }] });
+    assert.deepEqual(matrix(createReportSummaryClipboard("receipt"))[7],
+        ["[ops112064] Mariane", "[ops209316] João", "10", ""]);
+    restoreExpeditionState({ routes: [{ ...routes[0], validationOperator: "[ops434601]WILLIAN SILVA SOUZA" }] });
+    assert.equal(matrix(createReportSummaryClipboard("expedition"))[16][0], "[ops434601] Willian");
 });
 
 test("conferentes seguem o ranking selecionado, agrupam rotas validadas e mantêm tempo ausente vazio", () => {
@@ -255,8 +281,7 @@ test("nova cópia com menos recebedores apaga as linhas restantes da lista anter
 
 test("listas cheias cabem na última linha e excesso impede a cópia sem descartar pessoas", async t => {
     const writes = [];
-    const { text, expeditionText } = setup(t, { writeText: async value => writes.push(value) });
-    replaceGlobal(t, "ClipboardItem", undefined);
+    const { text, expeditionText } = setup(t, { write: async items => writes.push(await items[0].data["text/plain"].text()) });
     for (const [kind, limit, notificationText] of [["receipt", 49, text], ["expedition", 40, expeditionText]]) {
         const setCount = count => {
             if (kind === "receipt") {
@@ -281,7 +306,7 @@ test("listas cheias cabem na última linha e excesso impede a cópia sem descart
         setCount(limit);
         const valid = createReportSummaryClipboard(kind);
         assert.equal(valid.copyError, "");
-        assert.ok(matrix(valid)[55][0].startsWith("Pessoa "));
+        assert.equal(matrix(valid)[55][0], "Pessoa");
         await button.fire();
         assert.equal(writes.length, before + 1);
     }
@@ -313,7 +338,7 @@ class Button extends Element {
     }
 }
 
-function setup(t, clipboard) {
+function setup(t, clipboard, { nativeCopy = false, clipboardItem = true } = {}) {
     const notification = new Element();
     const text = new Element();
     const expeditionNotification = new Element();
@@ -325,9 +350,25 @@ function setup(t, clipboard) {
     replaceGlobal(t, "HTMLElement", Element);
     replaceGlobal(t, "HTMLButtonElement", Button);
     replaceGlobal(t, "HTMLImageElement", Image);
-    replaceGlobal(t, "document", { getElementById: id => elements[id] });
+    const copyListeners = new Set();
+    const nativeCopies = [];
+    replaceGlobal(t, "document", {
+        getElementById: id => elements[id],
+        addEventListener: (type, handler) => { if (type === "copy") copyListeners.add(handler); },
+        removeEventListener: (type, handler) => { if (type === "copy") copyListeners.delete(handler); },
+        execCommand: command => {
+            if (!nativeCopy || command !== "copy") return false;
+            const data = {};
+            const event = { clipboardData: { setData: (type, value) => { data[type] = value; } },
+                preventDefault() { this.defaultPrevented = true; } };
+            copyListeners.forEach(handler => handler(event));
+            if (event.defaultPrevented) nativeCopies.push(data);
+            return Boolean(event.defaultPrevented);
+        },
+    });
     replaceGlobal(t, "navigator", { clipboard });
-    return { notification, text, expeditionNotification, expeditionText };
+    replaceGlobal(t, "ClipboardItem", clipboardItem ? class { constructor(data) { this.data = data; } } : undefined);
+    return { notification, text, expeditionNotification, expeditionText, nativeCopies, copyListeners };
 }
 
 const receiptBinding = {
@@ -338,8 +379,7 @@ const receiptBinding = {
 test("clique grava apenas os dados e cabeçalhos do relatório em HTML e TSV", async t => {
     populate();
     const writes = [];
-    const { notification, text } = setup(t, { write: async items => writes.push(items[0].data) });
-    replaceGlobal(t, "ClipboardItem", class { constructor(data) { this.data = data; } });
+    const { notification, text, copyListeners } = setup(t, { write: async items => writes.push(items[0].data) });
     const button = new Button();
     assert.equal(bindReportSummaryCopyButton(button, receiptBinding), true);
     assert.equal(bindReportSummaryCopyButton(button, receiptBinding), true);
@@ -361,37 +401,54 @@ test("clique grava apenas os dados e cabeçalhos do relatório em HTML e TSV", a
     assert.equal(await writes[2]["text/plain"].text(), createReportSummaryClipboard("receipt").text);
     assert.match(text.textContent, /Cole em A121/);
     assert.match(button.title, /A121/);
+    assert.equal(copyListeners.size, 0);
 });
 
-test("fallback de texto lê o estado atual e os botões acompanham importação e limpeza", async t => {
-    const writes = [];
-    setup(t, { writeText: async value => writes.push(value) });
-    replaceGlobal(t, "ClipboardItem", undefined);
+test("evento nativo copia HTML e TSV juntos e lê os dados atuais após importação e edição", async t => {
+    const { nativeCopies, copyListeners } = setup(t, { write: async () => assert.fail("evento nativo deve ter prioridade") },
+        { nativeCopy: true, clipboardItem: false });
     const button = new Button();
     bindReportSummaryCopyButton(button, receiptBinding);
     assert.equal(button.disabled, true);
     await button.fire();
-    assert.deepEqual(writes, []);
+    assert.deepEqual(nativeCopies, []);
     populate();
     assert.equal(button.disabled, false);
     updateReportContextField("plannedVolume", 4321);
     await button.fire();
-    assert.equal(matrix({ text: writes[0] })[4][0], "4321");
+    const payload = createReportSummaryClipboard("receipt");
+    assert.equal(nativeCopies[0]["text/plain"], payload.text);
+    assert.equal(nativeCopies[0]["text/html"], payload.html);
+    assert.equal(matrix({ text: nativeCopies[0]["text/plain"] })[4][0], "4321");
+    assert.equal(copyListeners.size, 0);
     resetReceiptReport();
     assert.equal(button.disabled, false);
     resetReceiptLinehaulState();
     assert.equal(button.disabled, true);
 });
 
+test("somente texto simples não informa sucesso nem substitui a cópia formatada", async t => {
+    populate();
+    const writes = [];
+    const { notification, text, copyListeners } = setup(t, { writeText: async value => writes.push(value) }, { clipboardItem: false });
+    const button = new Button();
+    bindReportSummaryCopyButton(button, receiptBinding);
+    await button.fire();
+    assert.deepEqual(writes, []);
+    assert.equal(notification.dataset.notificationType, "error");
+    assert.match(text.textContent, /tabela com formatação/);
+    assert.equal(copyListeners.size, 0);
+});
+
 test("falha de permissão e cliques duplicados restauram o botão e permitem nova tentativa", async t => {
     populate();
     let finish;
     const writes = [];
-    const { notification } = setup(t, { writeText: value => {
+    const { notification, copyListeners } = setup(t, { write: value => {
         writes.push(value);
         return new Promise(resolve => { finish = resolve; });
     } });
-    replaceGlobal(t, "ClipboardItem", undefined);
+    document.execCommand = () => { throw new Error("Native copy unavailable"); };
     const button = new Button();
     bindReportSummaryCopyButton(button, receiptBinding);
     const pending = button.fire();
@@ -401,7 +458,7 @@ test("falha de permissão e cliques duplicados restauram o botão e permitem nov
     assert.equal(writes.length, 1);
     finish();
     await pending;
-    navigator.clipboard.writeText = async () => { throw new Error("NotAllowedError"); };
+    navigator.clipboard.write = async () => { throw new Error("NotAllowedError"); };
     await button.fire();
     assert.equal(notification.dataset.notificationType, "error");
     assert.equal(button.disabled, false);
@@ -409,16 +466,16 @@ test("falha de permissão e cliques duplicados restauram o botão e permitem nov
     navigator.clipboard = undefined;
     await button.fire();
     assert.equal(notification.dataset.notificationType, "error");
-    navigator.clipboard = { writeText: async value => writes.push(value) };
+    navigator.clipboard = { write: async value => writes.push(value) };
     await button.fire();
     assert.equal(notification.dataset.notificationType, "success");
+    assert.equal(copyListeners.size, 0);
 });
 
 test("ambos os botões atualizam as notificações e dicas de colagem conforme a janela selecionada", async t => {
     populate();
     const writes = [];
-    const { text, expeditionText } = setup(t, { writeText: async value => writes.push(value) });
-    replaceGlobal(t, "ClipboardItem", undefined);
+    const { text, expeditionText } = setup(t, { write: async items => writes.push(await items[0].data["text/plain"].text()) });
     const receipt = new Button();
     const expedition = new Button();
     const root = { querySelector: selector => ({
@@ -436,9 +493,9 @@ test("ambos os botões atualizam as notificações e dicas de colagem conforme a
             await button.fire();
         }
         assert.equal(text.textContent,
-            `Resumo de processamento copiado. Cole em ${receiptTarget} da aba Base do Resumo (${window}).`);
+            `Resumo de processamento copiado. Cole em ${receiptTarget} da aba Base do Resumo (${window}). Use Ctrl+V para manter mesclagens e alinhamento.`);
         assert.equal(expeditionText.textContent,
-            `Resumo de expedição e erros copiado. Cole em ${expeditionTarget} da aba Base do Resumo (${window}).`);
+            `Resumo de expedição e erros copiado. Cole em ${expeditionTarget} da aba Base do Resumo (${window}). Use Ctrl+V para manter mesclagens e alinhamento.`);
     }
     assert.equal(writes.length, 6);
     assert.ok(writes.every(value => value.split("\n").length === 56));
