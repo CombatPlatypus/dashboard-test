@@ -16,7 +16,7 @@ const matrix = payload => payload.text.split("\n").map(row => row.split("\t"));
 const routes = [{
     code: "AT1", status: "Validated", finalOrders: 1000, missortedOrders: 50,
     validationOperator: "Ana", validationStartTime: "2026-10-23 08:00:00",
-    validationEndTime: "2026-10-23 09:05:30",
+    validationEndTime: "2026-10-23 09:05:30", validationDurationSeconds: 3930,
 }];
 
 beforeEach(() => {
@@ -28,8 +28,8 @@ beforeEach(() => {
 
 function populate() {
     restoreReceiptState({ operators: [
-        { receiver: "Ana", packagesReceived: 900, selected: true },
-        { receiver: "Bia", packagesReceived: 200, selected: true },
+        { receiver: "Ana", labeler: "Lia", packagesReceived: 900, errorQuantity: 12, selected: true },
+        { receiver: "Bia", labeler: "Duda", packagesReceived: 200, errorQuantity: 0, selected: true },
         { receiver: "Caio", packagesReceived: 500, selected: false },
     ] });
     restoreReceiptLinehaulState({ linehauls: [
@@ -43,33 +43,47 @@ function populate() {
     });
 }
 
-test("processamento reproduz A3:D7 com títulos, cabeçalhos e somente os dados selecionados", () => {
+test("processamento inclui o resumo e a lista dos recebedores selecionados em A3:D58", () => {
     populate();
     const payload = createReportSummaryClipboard("receipt");
     assert.equal(payload.target, "A3");
     assert.equal(payload.hasData, true);
-    assert.deepEqual(matrix(payload), [
+    const rows = matrix(payload);
+    assert.equal(rows.length, 56);
+    assert.deepEqual(rows.slice(0, 9), [
         ["Último Processamento", "", "", ""],
         ["LHs Descarregados", "", "Volume Descarregado", ""],
         ["2", "", "1200", ""],
         ["Volume Esperado", "", "Volume Recebido", ""],
         ["1500", "", "1100", ""],
+        ["Lista de Recebedores", "", "", ""],
+        ["Recebor SPX", "Etiquetador", "Recebido", "Erros"],
+        ["Ana", "Lia", "900", "12"],
+        ["Bia", "Duda", "200", "0"],
     ]);
+    assert.ok(rows.slice(9).every(row => row.every(value => value === "")));
+    assert.doesNotMatch(payload.text, /Caio/);
     const workbook = XLSX.read(payload.html, { type: "string" });
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     assert.deepEqual(sheet["!merges"].map(XLSX.utils.encode_range), [
-        "A1:D1", "A2:B2", "C2:D2", "A3:B3", "C3:D3", "A4:B4", "C4:D4", "A5:B5", "C5:D5",
+        "A1:D1", "A2:B2", "C2:D2", "A3:B3", "C3:D3", "A4:B4", "C4:D4", "A5:B5", "C5:D5", "A6:D6",
     ]);
     assert.equal(sheet.A3.v, 2);
     assert.equal(sheet.C3.v, 1200);
+    assert.equal(sheet.A8.v, "Ana");
+    assert.equal(sheet.B8.v, "Lia");
+    assert.equal(sheet.C8.v, 900);
+    assert.equal(sheet.D9.v, 0);
 });
 
-test("expedição reproduz E3:H16 com os erros e taxas calculados pelo relatório", () => {
+test("expedição inclui resumo, erros e lista de conferentes em E3:H58", () => {
     populate();
     const payload = createReportSummaryClipboard("expedition");
     assert.equal(payload.target, "E3");
     assert.equal(payload.hasData, true);
-    assert.deepEqual(matrix(payload), [
+    const rows = matrix(payload);
+    assert.equal(rows.length, 56);
+    assert.deepEqual(rows.slice(0, 17), [
         ["Última Expedição", "", "", ""],
         ["Rotas Conferidas", "", "Volume Expedido", ""],
         ["1", "", "1000", ""],
@@ -84,33 +98,59 @@ test("expedição reproduz E3:H16 com os erros e taxas calculados pelo relatóri
         ["50", "", "5,00%", ""],
         ["Saldo Final", "", "Taxa Final", ""],
         ["40", "", "4,00%", ""],
+        ["Lista de Conferentes", "", "", ""],
+        ["Conferente SPX", "", "Rotas Feitas", "Tempo Médio"],
+        ["Ana", "", "1", "01:05:30"],
     ]);
+    assert.ok(rows.slice(17).every(row => row.every(value => value === "")));
     const workbook = XLSX.read(payload.html, { type: "string" });
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    assert.equal(sheet["!merges"].length, 26);
+    assert.equal(sheet["!merges"].length, 68);
     assert.ok(sheet["!merges"].some(range => XLSX.utils.encode_range(range) === "A6:D6"));
     assert.ok(sheet["!merges"].some(range => XLSX.utils.encode_range(range) === "C14:D14"));
+    assert.ok(sheet["!merges"].some(range => XLSX.utils.encode_range(range) === "A15:D15"));
+    assert.ok(sheet["!merges"].some(range => XLSX.utils.encode_range(range) === "A17:B17"));
+    assert.equal(sheet.A17.v, "Ana");
+    assert.equal(sheet.C17.v, 1);
     assert.doesNotMatch(payload.text, /Processamento|Volume Recebido/);
 });
 
-test("formato de colagem do Planilhas centraliza as duas direções em títulos, dados e células vazias", () => {
+test("colagem inclui fontes, tamanhos e centralização explícitos em títulos, dados e células vazias", () => {
     populate();
     for (const kind of ["receipt", "expedition"]) {
         const { html } = createReportSummaryClipboard(kind);
         assert.match(html, /<google-sheets-html-origin><table\b[^>]*data-sheets-root="1"/);
         assert.ok(html.endsWith("</table></google-sheets-html-origin>"));
         const cells = [...html.matchAll(/<td\b([^>]*)>([^<]*)<\/td>/g)];
-        assert.equal(cells.length, kind === "receipt" ? 9 : 26);
+        assert.equal(cells.length, kind === "receipt" ? 210 : 150);
         for (const [, attributes] of cells) {
             const format = JSON.parse(attributes.match(/data-sheets-userformat='([^']+)'/)[1]);
             assert.equal(format["2"] & (64 | 128), 64 | 128);
             assert.equal(format["9"], 1);
             assert.equal(format["10"], 1);
+            assert.equal(format["2"] & (4096 | 8192), 4096 | 8192);
+            assert.ok(["Roboto", "Arial"].includes(format["15"]));
+            assert.match(attributes, new RegExp(`font-family:${format["15"]};font-size:${format["16"]}pt`));
+        }
+        const fontSizes = new Map(cells.map(([, attributes, value]) => [value,
+            JSON.parse(attributes.match(/data-sheets-userformat='([^']+)'/)[1])["16"],
+        ]));
+        if (kind === "receipt") {
+            assert.equal(fontSizes.get("Último Processamento"), 11);
+            assert.equal(fontSizes.get("Lista de Recebedores"), 12);
+            assert.equal(fontSizes.get("Recebor SPX"), 11);
+            assert.equal(fontSizes.get("LHs Descarregados"), 11);
+        } else {
+            for (const title of ["Última Expedição", "Análise de Erros", "Lista de Conferentes"]) {
+                assert.equal(fontSizes.get(title), 12);
+            }
+            assert.equal(fontSizes.get("Conferente SPX"), 11);
+            assert.equal(fontSizes.get("Rotas Conferidas"), 11);
         }
     }
 });
 
-test("os resumos começam nos títulos de cada janela sem atingir cabeçalhos, listas ou outro relatório", () => {
+test("resumos e listas ocupam apenas o bloco reservado de cada janela", () => {
     populate();
     const occupied = new Set();
     for (const [window, firstRow] of [["AM", 3], ["PM1", 62], ["PM2", 121]]) {
@@ -119,8 +159,8 @@ test("os resumos começam nos títulos de cada janela sem atingir cabeçalhos, l
         const expedition = createReportSummaryClipboard("expedition", options);
         assert.equal(receipt.target, `A${firstRow}`);
         assert.equal(expedition.target, `E${firstRow}`);
-        assert.equal(matrix(receipt).length, 5);
-        assert.equal(matrix(expedition).length, 14);
+        assert.equal(matrix(receipt).length, 56);
+        assert.equal(matrix(expedition).length, 56);
         for (const payload of [receipt, expedition]) {
             assert.ok(matrix(payload).every(row => row.length === 4));
             const [, column, rowNumber] = payload.target.match(/^([A-Z]+)(\d+)$/);
@@ -131,9 +171,9 @@ test("os resumos começam nos títulos de cada janela sem atingir cabeçalhos, l
                 return [cell, value];
             })));
             const valuesByRow = payload === receipt
-                ? [[2, "2", "1200"], [4, "1500", "1100"]]
+                ? [[2, "2", "1200"], [4, "1500", "1100"], [7, "Ana", "900"], [8, "Bia", "200"]]
                 : [[2, "1", "1000"], [4, "100", "01:05:30"], [7, "30", "20"],
-                    [9, "10", "20,00%"], [11, "50", "5,00%"], [13, "40", "4,00%"]];
+                    [9, "10", "20,00%"], [11, "50", "5,00%"], [13, "40", "4,00%"], [16, "Ana", "1"]];
             const secondColumn = String.fromCharCode(column.charCodeAt(0) + 2);
             for (const [rowOffset, left, right] of valuesByRow) {
                 assert.equal(pasted.get(`${column}${firstRow + rowOffset}`), left);
@@ -143,8 +183,7 @@ test("os resumos começam nos títulos de cada janela sem atingir cabeçalhos, l
         for (const column of "ABCDEFGH") {
             assert.equal(occupied.has(`${column}${firstRow - 2}`), false);
             assert.equal(occupied.has(`${column}${firstRow - 1}`), false);
-            const listRow = firstRow + (column < "E" ? 5 : 14);
-            assert.equal(occupied.has(`${column}${listRow}`), false);
+            assert.equal(occupied.has(`${column}${firstRow + 56}`), false);
         }
     }
 });
@@ -167,6 +206,85 @@ test("campos ausentes ficam vazios, zeros continuam numéricos e dados parciais 
     assert.deepEqual(rows[7], ["0", "", "0", ""]);
     assert.deepEqual(rows[11], ["0", "", "", ""]);
     assert.throws(() => createReportSummaryClipboard("other"), /inválido/);
+});
+
+test("listas preservam campos ausentes, zeros e texto escapado sem copiar recebedores desmarcados", () => {
+    restoreReceiptState({ operators: [
+        { receiver: "Ana & Bia <SPX>", labeler: "Lia \"A\"", packagesReceived: 0, errorQuantity: 0 },
+        { receiver: "Bruno", labeler: "", packagesReceived: null, errorQuantity: null },
+        { receiver: "Caio", packagesReceived: 20, selected: false },
+    ] });
+    const payload = createReportSummaryClipboard("receipt");
+    assert.equal(payload.hasData, true);
+    assert.deepEqual(matrix(payload).slice(7, 9), [
+        ["Ana & Bia <SPX>", 'Lia "A"', "0", "0"], ["Bruno", "", "", ""],
+    ]);
+    assert.match(payload.html, /Ana &amp; Bia &lt;SPX&gt;/);
+    assert.match(payload.html, /Lia &quot;A&quot;/);
+    assert.doesNotMatch(payload.text, /Caio/);
+});
+
+test("conferentes seguem o ranking selecionado, agrupam rotas validadas e mantêm tempo ausente vazio", () => {
+    restoreExpeditionState({
+        excludedOperatorKeys: ["caio"],
+        routes: [
+            { code: "AT1", status: "Validated", validationOperator: "Ana", validationDurationSeconds: 60 },
+            { code: "AT2", status: "Validated", validationOperator: "Ana", validationDurationSeconds: 120 },
+            { code: "AT3", status: "Validated", validationOperator: "Bruno", validationDurationSeconds: 0 },
+            { code: "AT4", status: "Validated", validationOperator: "Bia" },
+            { code: "AT5", status: "Validated", validationOperator: "Caio", validationDurationSeconds: 30 },
+            { code: "AT6", status: "Created", validationOperator: "Duda", validationDurationSeconds: 30 },
+        ],
+    });
+    const rows = matrix(createReportSummaryClipboard("expedition"));
+    assert.deepEqual(rows.slice(16, 19), [
+        ["Ana", "", "2", "00:01:30"], ["Bruno", "", "1", "00:00:00"], ["Bia", "", "1", ""],
+    ]);
+    assert.ok(rows.slice(19).every(row => row.every(value => value === "")));
+});
+
+test("nova cópia com menos recebedores apaga as linhas restantes da lista anterior", () => {
+    populate();
+    assert.equal(matrix(createReportSummaryClipboard("receipt"))[8][0], "Bia");
+    restoreReceiptState({ operators: [{ receiver: "Ana", packagesReceived: 10 }] });
+    const rows = matrix(createReportSummaryClipboard("receipt"));
+    assert.equal(rows.length, 56);
+    assert.equal(rows[7][0], "Ana");
+    assert.ok(rows.slice(8).every(row => row.every(value => value === "")));
+});
+
+test("listas cheias cabem na última linha e excesso impede a cópia sem descartar pessoas", async t => {
+    const writes = [];
+    const { text, expeditionText } = setup(t, { writeText: async value => writes.push(value) });
+    replaceGlobal(t, "ClipboardItem", undefined);
+    for (const [kind, limit, notificationText] of [["receipt", 49, text], ["expedition", 40, expeditionText]]) {
+        const setCount = count => {
+            if (kind === "receipt") {
+                restoreReceiptState({ operators: Array.from({ length: count }, (_, index) => ({
+                    receiver: `Pessoa ${index + 1}`, packagesReceived: 1,
+                })) });
+            } else {
+                restoreExpeditionState({ routes: Array.from({ length: count }, (_, index) => ({
+                    code: `AT${index + 1}`, status: "Validated", validationOperator: `Pessoa ${index + 1}`,
+                })) });
+            }
+        };
+        setCount(limit + 1);
+        const button = new Button();
+        bindReportSummaryCopyButton(button, { reportId: kind, kind, subscribe: [] });
+        const before = writes.length;
+        const invalid = createReportSummaryClipboard(kind);
+        assert.ok(invalid.copyError.includes(`comporta ${limit}`));
+        await button.fire();
+        assert.equal(writes.length, before);
+        assert.equal(notificationText.textContent, invalid.copyError);
+        setCount(limit);
+        const valid = createReportSummaryClipboard(kind);
+        assert.equal(valid.copyError, "");
+        assert.ok(matrix(valid)[55][0].startsWith("Pessoa "));
+        await button.fire();
+        assert.equal(writes.length, before + 1);
+    }
 });
 
 function replaceGlobal(t, name, value) {
@@ -323,7 +441,7 @@ test("ambos os botões atualizam as notificações e dicas de colagem conforme a
             `Resumo de expedição e erros copiado. Cole em ${expeditionTarget} da aba Base do Resumo (${window}).`);
     }
     assert.equal(writes.length, 6);
-    assert.ok(writes.every((value, index) => value.split("\n").length === (index % 2 === 0 ? 5 : 14)));
+    assert.ok(writes.every(value => value.split("\n").length === 56));
     assert.equal(expedition.listeners.click.length, 1);
     resetExpeditionReport();
     assert.equal(expedition.disabled, true);
