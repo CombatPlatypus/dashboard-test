@@ -457,6 +457,7 @@
         }
         #receipt-controls .input-group .flex-box-start input[data-receipt-operator-field="labeler"] {
             flex: 1 1 0 !important;
+            text-align: left !important;
         }
         #receipt-controls .input-group:last-of-type {
             overflow-y: auto;
