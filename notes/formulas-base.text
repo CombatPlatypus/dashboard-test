@@ -844,3 +844,59 @@ LM Hub_SP_Santos_PraiaGrande_02
         )
     )
 }
+
+
+
+=SWITCH(
+    'Base do Resumo'!$P$3;
+
+    "AM";'Base do Resumo'!A7;
+    "PM1";'Base do Resumo'!F7;
+    "PM2";'Base do Resumo'!K7;
+
+    "-"
+)
+=SWITCH(
+    'Base do Resumo'!$P$3;
+
+    "AM";'Base do Resumo'!C7;
+    "PM1";'Base do Resumo'!H7;
+    "PM2";'Base do Resumo'!M7;
+
+    "-"
+)
+
+
+=SWITCH('Base do Resumo'!$P$3;"AM"; 'Base do Resumo'!C5;"PM1"; 'Base do Resumo'!F5;"PM2"; 'Base do Resumo'!M5;"")
+
+=IMPORTRANGE("https://docs.google.com/spreadsheets/d/11jdHDwRBiDKTpP2G7s02v0wR2K27nJ5mG9G6aExwESQ/";"'Histórico de Retornados'!B3:D")
+
+
+=CONT.SES(
+    'Base de Retornados'!A1:A;">="&HOJE();
+    'Base de Retornados'!A1:A;"<"&HOJE()+1;
+    'Base de Retornados'!C1:C;"<>"
+)
+
+=CONT.SES(
+    'Base de Retornados'!A1:A;">="&HOJE()-1;
+    'Base de Retornados'!A1:A;"<"&HOJE();
+    'Base de Retornados'!C1:C;"<>"
+)
+
+=CONT.SES(
+    'Base de Retornados'!A1:A;">="&HOJE()-2;
+    'Base de Retornados'!A1:A;"<"&HOJE()-1;
+    'Base de Retornados'!C1:C;"<>"
+)
+
+=CONT.SES(
+    'Base de Retornados'!C1:C;"<>"
+)
+
+=CONT.SES('Base de Retornados'!A1:A;">="&DATA(ANO(HOJE());MÊS(HOJE());1); 'Base de Retornados'!A1:A;"<"&DATA(ANO(HOJE());MÊS(HOJE())+1;1); 'Base de Retornados'!C1:C;"<>")
+
+
+'Gráfico de Ocorrências'!A1:C3
+
+=IMPORTRANGE("https://docs.google.com/spreadsheets/d/11jdHDwRBiDKTpP2G7s02v0wR2K27nJ5mG9G6aExwESQ/";"'Tabela do Gráfico'!A1:C3")

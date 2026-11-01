@@ -64,10 +64,10 @@ test("processamento reproduz A3:D7 com títulos, cabeçalhos e somente os dados 
     assert.equal(sheet.C3.v, 1200);
 });
 
-test("expedição reproduz A8:D21 com os erros e taxas calculados pelo relatório", () => {
+test("expedição reproduz E3:H16 com os erros e taxas calculados pelo relatório", () => {
     populate();
     const payload = createReportSummaryClipboard("expedition");
-    assert.equal(payload.target, "A8");
+    assert.equal(payload.target, "E3");
     assert.equal(payload.hasData, true);
     assert.deepEqual(matrix(payload), [
         ["Última Expedição", "", "", ""],
@@ -76,13 +76,13 @@ test("expedição reproduz A8:D21 com os erros e taxas calculados pelo relatóri
         ["Volume no Piso", "", "Duração", ""],
         ["100", "", "01:05:30", ""],
         ["Análise de Erros", "", "", ""],
-        ["Erros de Sorting", "", "Erros de Etiquetagem", ""],
+        ["Sorting", "", "Etiquetagem", ""],
         ["30", "", "20", ""],
-        ["Erros Revertidos", "", "Taxa de Revertidos", ""],
+        ["Revertidos", "", "Taxa de Revertidos", ""],
         ["10", "", "20,00%", ""],
         ["Total de Erros", "", "Taxa de Erros", ""],
         ["50", "", "5,00%", ""],
-        ["Total Final de Erros", "", "Taxa Final", ""],
+        ["Saldo Final", "", "Taxa Final", ""],
         ["40", "", "4,00%", ""],
     ]);
     const workbook = XLSX.read(payload.html, { type: "string" });
@@ -110,41 +110,42 @@ test("formato de colagem do Planilhas centraliza as duas direções em títulos,
     }
 });
 
-test("os turnos ocupam blocos lado a lado sem atingir os cabeçalhos, as divisórias ou outro relatório", () => {
+test("os resumos começam nos títulos de cada janela sem atingir cabeçalhos, listas ou outro relatório", () => {
     populate();
     const occupied = new Set();
-    for (const [window, firstColumn] of [["AM", "A"], ["PM1", "F"], ["PM2", "K"]]) {
+    for (const [window, firstRow] of [["AM", 3], ["PM1", 62], ["PM2", 121]]) {
         const options = { context: { window } };
         const receipt = createReportSummaryClipboard("receipt", options);
         const expedition = createReportSummaryClipboard("expedition", options);
-        assert.equal(receipt.target, `${firstColumn}3`);
-        assert.equal(expedition.target, `${firstColumn}8`);
+        assert.equal(receipt.target, `A${firstRow}`);
+        assert.equal(expedition.target, `E${firstRow}`);
         assert.equal(matrix(receipt).length, 5);
         assert.equal(matrix(expedition).length, 14);
         for (const payload of [receipt, expedition]) {
             assert.ok(matrix(payload).every(row => row.length === 4));
-            const [, column, firstRow] = payload.target.match(/^([A-Z]+)(\d+)$/);
+            const [, column, rowNumber] = payload.target.match(/^([A-Z]+)(\d+)$/);
             const pasted = new Map(matrix(payload).flatMap((row, rowOffset) => row.map((value, columnOffset) => {
-                const cell = `${String.fromCharCode(column.charCodeAt(0) + columnOffset)}${Number(firstRow) + rowOffset}`;
+                const cell = `${String.fromCharCode(column.charCodeAt(0) + columnOffset)}${Number(rowNumber) + rowOffset}`;
                 assert.equal(occupied.has(cell), false, `${window}: sobreposição em ${cell}`);
                 occupied.add(cell);
                 return [cell, value];
             })));
-            // The "Último" sheets read these rows in the new Base do Resumo layout.
             const valuesByRow = payload === receipt
-                ? [[5, "2", "1200"], [7, "1500", "1100"]]
-                : [[10, "1", "1000"], [12, "100", "01:05:30"], [15, "30", "20"],
-                    [17, "10", "20,00%"], [19, "50", "5,00%"], [21, "40", "4,00%"]];
-            const secondColumn = String.fromCharCode(firstColumn.charCodeAt(0) + 2);
-            for (const [row, left, right] of valuesByRow) {
-                assert.equal(pasted.get(`${firstColumn}${row}`), left);
-                assert.equal(pasted.get(`${secondColumn}${row}`), right);
+                ? [[2, "2", "1200"], [4, "1500", "1100"]]
+                : [[2, "1", "1000"], [4, "100", "01:05:30"], [7, "30", "20"],
+                    [9, "10", "20,00%"], [11, "50", "5,00%"], [13, "40", "4,00%"]];
+            const secondColumn = String.fromCharCode(column.charCodeAt(0) + 2);
+            for (const [rowOffset, left, right] of valuesByRow) {
+                assert.equal(pasted.get(`${column}${firstRow + rowOffset}`), left);
+                assert.equal(pasted.get(`${secondColumn}${firstRow + rowOffset}`), right);
             }
         }
-    }
-    for (const cell of occupied) {
-        assert.doesNotMatch(cell, /^[EJ]/);
-        assert.ok(Number(cell.match(/\d+$/)[0]) >= 3);
+        for (const column of "ABCDEFGH") {
+            assert.equal(occupied.has(`${column}${firstRow - 2}`), false);
+            assert.equal(occupied.has(`${column}${firstRow - 1}`), false);
+            const listRow = firstRow + (column < "E" ? 5 : 14);
+            assert.equal(occupied.has(`${column}${listRow}`), false);
+        }
     }
 });
 
@@ -197,13 +198,18 @@ class Button extends Element {
 function setup(t, clipboard) {
     const notification = new Element();
     const text = new Element();
-    const elements = { receiptNotification: notification, receiptNotificationIcon: new Image(), receiptNotificationText: text };
+    const expeditionNotification = new Element();
+    const expeditionText = new Element();
+    const elements = {
+        receiptNotification: notification, receiptNotificationIcon: new Image(), receiptNotificationText: text,
+        expeditionNotification, expeditionNotificationIcon: new Image(), expeditionNotificationText: expeditionText,
+    };
     replaceGlobal(t, "HTMLElement", Element);
     replaceGlobal(t, "HTMLButtonElement", Button);
     replaceGlobal(t, "HTMLImageElement", Image);
     replaceGlobal(t, "document", { getElementById: id => elements[id] });
     replaceGlobal(t, "navigator", { clipboard });
-    return { notification, text };
+    return { notification, text, expeditionNotification, expeditionText };
 }
 
 const receiptBinding = {
@@ -231,12 +237,12 @@ test("clique grava apenas os dados e cabeçalhos do relatório em HTML e TSV", a
     assert.equal(writes.length, 1);
     await button.fire();
     assert.equal(await writes[1]["text/plain"].text(), createReportSummaryClipboard("receipt").text);
-    assert.match(text.textContent, /Cole em F3/);
+    assert.match(text.textContent, /Cole em A62/);
     updateReportContextField("window", "PM2");
     await button.fire("click", { shiftKey: true });
     assert.equal(await writes[2]["text/plain"].text(), createReportSummaryClipboard("receipt").text);
-    assert.match(text.textContent, /Cole em K3/);
-    assert.match(button.title, /K3/);
+    assert.match(text.textContent, /Cole em A121/);
+    assert.match(button.title, /A121/);
 });
 
 test("fallback de texto lê o estado atual e os botões acompanham importação e limpeza", async t => {
@@ -290,10 +296,10 @@ test("falha de permissão e cliques duplicados restauram o botão e permitem nov
     assert.equal(notification.dataset.notificationType, "success");
 });
 
-test("inicialização conecta ambos os botões sem depender da subaba selecionada", async t => {
+test("ambos os botões atualizam as notificações e dicas de colagem conforme a janela selecionada", async t => {
     populate();
     const writes = [];
-    setup(t, { writeText: async value => writes.push(value) });
+    const { text, expeditionText } = setup(t, { writeText: async value => writes.push(value) });
     replaceGlobal(t, "ClipboardItem", undefined);
     const receipt = new Button();
     const expedition = new Button();
@@ -302,10 +308,22 @@ test("inicialização conecta ambos os botões sem depender da subaba selecionad
     })[selector] };
     assert.equal(initializeReportSummaryCopy(root), true);
     assert.equal(initializeReportSummaryCopy(root), true);
-    await receipt.fire();
-    await expedition.fire();
-    assert.equal(writes[0].split("\n").length, 5);
-    assert.equal(writes[1].split("\n").length, 14);
+    for (const [window, receiptTarget, expeditionTarget] of [
+        ["AM", "A3", "E3"], ["PM1", "A62", "E62"], ["PM2", "A121", "E121"],
+    ]) {
+        updateReportContextField("window", window);
+        for (const [button, target] of [[receipt, receiptTarget], [expedition, expeditionTarget]]) {
+            assert.ok(button.title.includes(`copiar para ${target} da aba Base do Resumo.`));
+            assert.equal(button.attributes["aria-label"], button.title);
+            await button.fire();
+        }
+        assert.equal(text.textContent,
+            `Resumo de processamento copiado. Cole em ${receiptTarget} da aba Base do Resumo (${window}).`);
+        assert.equal(expeditionText.textContent,
+            `Resumo de expedição e erros copiado. Cole em ${expeditionTarget} da aba Base do Resumo (${window}).`);
+    }
+    assert.equal(writes.length, 6);
+    assert.ok(writes.every((value, index) => value.split("\n").length === (index % 2 === 0 ? 5 : 14)));
     assert.equal(expedition.listeners.click.length, 1);
     resetExpeditionReport();
     assert.equal(expedition.disabled, true);

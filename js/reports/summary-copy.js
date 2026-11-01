@@ -4,7 +4,7 @@ import { getReceiptLinehaulState, getReceiptLinehaulSummary, subscribeReceiptLin
 import { getExpeditionState, getExpeditionSummary, getExpeditionErrorAnalysis, subscribeExpeditionState } from "./expedition/state.js";
 import { setReportNotification } from "./report-notifications.js";
 
-const shiftColumns = { AM: "A", PM1: "F", PM2: "K" };
+const shiftRows = { AM: 3, PM1: 62, PM2: 121 };
 const rateFormatter = new Intl.NumberFormat("pt-BR", {
     style: "percent", minimumFractionDigits: 2, maximumFractionDigits: 2,
 });
@@ -45,7 +45,7 @@ function createReportSummaryClipboard(kind, {
     expedition = getExpeditionState(),
 } = {}) {
     const shift = context.window;
-    const firstColumn = shiftColumns[shift];
+    const firstRow = shiftRows[shift];
     const cell = (value, span = 2) => ({ value, span });
     const pair = (...values) => values.map(value => cell(value));
     const rate = value => value === null || value === undefined ? "" : rateFormatter.format(value);
@@ -65,7 +65,7 @@ function createReportSummaryClipboard(kind, {
             pair("Volume Esperado", "Volume Recebido"),
             pair(receipt.expectedVolume, received.receivedVolume),
         ];
-        target = `${firstColumn}3`;
+        target = `A${firstRow}`;
         label = "Resumo de processamento";
         hasData = unloaded.hasData || received.receivedVolume !== null;
     } else if (kind === "expedition") {
@@ -80,16 +80,16 @@ function createReportSummaryClipboard(kind, {
             pair(summary.hasData ? summary.floorVolume : null,
                 summary.hasData ? formatDuration(summary.expeditionDurationSeconds) : null),
             [cell("Análise de Erros", 4)],
-            pair("Erros de Sorting", "Erros de Etiquetagem"),
+            pair("Sorting", "Etiquetagem"),
             pair(analysis.sortingErrors, analysis.labelingErrors),
-            pair("Erros Revertidos", "Taxa de Revertidos"),
+            pair("Revertidos", "Taxa de Revertidos"),
             pair(analysis.totalRevertedErrors, rate(analysis.revertedRate)),
             pair("Total de Erros", "Taxa de Erros"),
             pair(analysis.totalErrors, rate(analysis.errorRate)),
-            pair("Total Final de Erros", "Taxa Final"),
+            pair("Saldo Final", "Taxa Final"),
             pair(analysis.finalErrors, rate(analysis.finalRate)),
         ];
-        target = `${firstColumn}8`;
+        target = `E${firstRow}`;
         label = "Resumo de expedição e erros";
         hasData = analysis.hasSpXData || analysis.hasErrorData;
     } else {
