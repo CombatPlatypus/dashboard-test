@@ -10,6 +10,7 @@ import { formatReportPersonWithOps } from "../js/reports/core/person-name.js";
 import { resetReceiptReport, restoreReceiptState, subscribeReceiptState } from "../js/reports/receipt/state.js";
 import { resetReceiptLinehaulState, restoreReceiptLinehaulState, subscribeReceiptLinehaulState } from "../js/reports/receipt/linehaul-state.js";
 import { resetExpeditionReport, restoreExpeditionState } from "../js/reports/expedition/state.js";
+import { replaceParcelRows, resetParcelReport, restoreParcelState, updateParcelFilter } from "../js/reports/parcel-sweeper/state.js";
 
 const require = createRequire(import.meta.url);
 const XLSX = require("../js/libraries/xlsx.full.min.js");
@@ -19,11 +20,20 @@ const routes = [{
     validationOperator: "Ana", validationStartTime: "2026-10-23 08:00:00",
     validationEndTime: "2026-10-23 09:05:30", validationDurationSeconds: 3930,
 }];
+const parcelRows = [
+    { trackingNumber: "BR1", countType: "Backlog", expected: "Y" },
+    { trackingNumber: "BR2", countType: "Exception", expected: "Y" },
+    { trackingNumber: "BR3", countType: "Missing", expected: "Y" },
+    { trackingNumber: "BR4", countType: "Missing", expected: "Y" },
+    { trackingNumber: "BR5", countType: "Mis-sorted", expected: "N" },
+    { trackingNumber: "BR6", countType: "Exception", expected: "N" },
+];
 
 beforeEach(() => {
     resetReceiptReport();
     resetReceiptLinehaulState();
     resetExpeditionReport();
+    resetParcelReport();
     restoreReportContext({ window: "AM", plannedVolume: 1500 });
 });
 
@@ -114,6 +124,107 @@ test("expedição inclui resumo, erros e lista de conferentes em E3:H58", () => 
     assert.equal(sheet.A17.v, "Ana");
     assert.equal(sheet.C17.v, 1);
     assert.doesNotMatch(payload.text, /Processamento|Volume Recebido/);
+});
+
+test("parcel copia A1:H3 com o título, cobertura e os três totais nas colunas da imagem", () => {
+    replaceParcelRows(parcelRows);
+    const payload = createReportSummaryClipboard("parcel");
+    assert.equal(payload.target, "A1");
+    assert.equal(payload.sheet, "Base do Parcel");
+    assert.equal(payload.hasData, true);
+    assert.equal(payload.copyError, "");
+    assert.deepEqual(matrix(payload), [
+        ["Relatório Parcel Sweeper", "", "", "", "", "", "", ""],
+        ["Porcentagem Total", "", "Total de Bipado", "", "Pacotes Exception", "", "Pacotes Missorted", ""],
+        ["50,00%", "", "4", "", "2", "", "1", ""],
+    ]);
+    const workbook = XLSX.read(payload.html, { type: "string" });
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    assert.deepEqual(sheet["!merges"].map(XLSX.utils.encode_range), [
+        "A1:H1", "A2:B2", "C2:D2", "E2:F2", "G2:H2", "A3:B3", "C3:D3", "E3:F3", "G3:H3",
+    ]);
+    assert.equal(sheet.C3.v, 4);
+    assert.equal(sheet.E3.v, 2);
+    assert.equal(sheet.G3.v, 1);
+    assert.equal([...payload.html.matchAll(/<col width="100"/g)].length, 8);
+    const cells = [...payload.html.matchAll(/<td\b([^>]*)>([^<]*)<\/td>/g)];
+    assert.equal(cells.length, 9);
+    for (const [, attributes] of cells) {
+        assert.match(attributes, /border:1px solid #000000;/);
+        assert.match(attributes, /text-align:center;vertical-align:middle/);
+        const format = JSON.parse(attributes.match(/data-sheets-userformat='([^']+)'/)[1]);
+        assert.equal(format["9"], 1);
+        assert.equal(format["10"], 1);
+        assert.equal(format["15"], "Roboto");
+    }
+    assert.match(cells[0][1], /colspan="8"/);
+    assert.match(cells[0][1], /font-size:12pt/);
+});
+
+test("parcel mantém zeros reais e deixa a porcentagem vazia quando não há base de cobertura", () => {
+    let payload = createReportSummaryClipboard("parcel");
+    assert.equal(payload.hasData, false);
+    assert.deepEqual(matrix(payload)[2], Array(8).fill(""));
+    replaceParcelRows([{ trackingNumber: "BR1", countType: "Missing", expected: "Y" }]);
+    payload = createReportSummaryClipboard("parcel");
+    assert.equal(payload.hasData, true);
+    assert.deepEqual(matrix(payload)[2], ["0,00%", "", "0", "", "0", "", "0", ""]);
+    replaceParcelRows(parcelRows.map(row => ({ ...row, expected: "N" })));
+    assert.deepEqual(matrix(createReportSummaryClipboard("parcel"))[2], ["", "", "4", "", "2", "", "1", ""]);
+    replaceParcelRows(parcelRows.map(({ expected, ...row }) => row));
+    assert.equal(matrix(createReportSummaryClipboard("parcel"))[2][0], "66,67%");
+});
+
+test("parcel copia o resumo completo em A1 independentemente da janela e do filtro de pacotes", () => {
+    replaceParcelRows(parcelRows);
+    const original = createReportSummaryClipboard("parcel");
+    for (const window of ["AM", "PM1", "PM2"]) {
+        updateReportContextField("window", window);
+        for (const filter of ["backlog", "exception", "all"]) {
+            updateParcelFilter(filter);
+            const payload = createReportSummaryClipboard("parcel");
+            assert.equal(payload.text, original.text);
+            assert.equal(payload.target, "A1");
+            assert.equal(payload.shift, null);
+        }
+    }
+});
+
+test("botão do parcel acompanha importação, limpeza e restauração e orienta colar na Base do Parcel", async t => {
+    const { nativeCopies, parcelNotification, parcelText } = setup(t, {}, { nativeCopy: true, clipboardItem: false });
+    const parcel = new Button();
+    const receipt = new Button();
+    const expedition = new Button();
+    const root = { querySelector: selector => ({
+        "#receiptCopySummaryButton": receipt, "#expeditionCopySummaryButton": expedition,
+        "#parcelCopySummaryButton": parcel,
+    })[selector] };
+    assert.equal(initializeReportSummaryCopy(root), true);
+    assert.equal(initializeReportSummaryCopy(root), true);
+    assert.equal(parcel.listeners.click.length, 1);
+    assert.equal(parcel.disabled, true);
+    await parcel.fire();
+    assert.equal(nativeCopies.length, 0);
+    replaceParcelRows(parcelRows);
+    assert.equal(parcel.disabled, false);
+    assert.equal(parcel.title, "Relatório Parcel Sweeper: copiar para A1 da aba Base do Parcel.");
+    assert.equal(parcel.attributes["aria-label"], parcel.title);
+    await parcel.fire();
+    const payload = createReportSummaryClipboard("parcel");
+    assert.equal(nativeCopies[0]["text/plain"], payload.text);
+    assert.equal(nativeCopies[0]["text/html"], payload.html);
+    assert.equal(parcelNotification.dataset.notificationType, "success");
+    assert.equal(parcelText.textContent,
+        "Relatório Parcel Sweeper copiado. Cole em A1 da aba Base do Parcel. Use Ctrl+V para manter mesclagens e alinhamento.");
+    assert.equal(parcel.attributes["aria-busy"], undefined);
+    resetParcelReport();
+    assert.equal(parcel.disabled, true);
+    await parcel.fire();
+    assert.equal(nativeCopies.length, 1);
+    restoreParcelState({ rows: [{ trackingNumber: "BR1", countType: "Mis-sorted", expected: "Y" }] });
+    assert.equal(parcel.disabled, false);
+    await parcel.fire();
+    assert.deepEqual(matrix({ text: nativeCopies[1]["text/plain"] })[2], ["100,00%", "", "1", "", "0", "", "1", ""]);
 });
 
 test("colagem inclui bordas, fontes, tamanhos e centralização em títulos, dados e células vazias", () => {
@@ -344,9 +455,12 @@ function setup(t, clipboard, { nativeCopy = false, clipboardItem = true } = {}) 
     const text = new Element();
     const expeditionNotification = new Element();
     const expeditionText = new Element();
+    const parcelNotification = new Element();
+    const parcelText = new Element();
     const elements = {
         receiptNotification: notification, receiptNotificationIcon: new Image(), receiptNotificationText: text,
         expeditionNotification, expeditionNotificationIcon: new Image(), expeditionNotificationText: expeditionText,
+        parcelNotification, parcelNotificationIcon: new Image(), parcelNotificationText: parcelText,
     };
     replaceGlobal(t, "HTMLElement", Element);
     replaceGlobal(t, "HTMLButtonElement", Button);
@@ -369,7 +483,7 @@ function setup(t, clipboard, { nativeCopy = false, clipboardItem = true } = {}) 
     });
     replaceGlobal(t, "navigator", { clipboard });
     replaceGlobal(t, "ClipboardItem", clipboardItem ? class { constructor(data) { this.data = data; } } : undefined);
-    return { notification, text, expeditionNotification, expeditionText, nativeCopies, copyListeners };
+    return { notification, text, expeditionNotification, expeditionText, parcelNotification, parcelText, nativeCopies, copyListeners };
 }
 
 const receiptBinding = {
@@ -479,8 +593,10 @@ test("ambos os botões atualizam as notificações e dicas de colagem conforme a
     const { text, expeditionText } = setup(t, { write: async items => writes.push(await items[0].data["text/plain"].text()) });
     const receipt = new Button();
     const expedition = new Button();
+    const parcel = new Button();
     const root = { querySelector: selector => ({
         "#receiptCopySummaryButton": receipt, "#expeditionCopySummaryButton": expedition,
+        "#parcelCopySummaryButton": parcel,
     })[selector] };
     assert.equal(initializeReportSummaryCopy(root), true);
     assert.equal(initializeReportSummaryCopy(root), true);
@@ -505,7 +621,7 @@ test("ambos os botões atualizam as notificações e dicas de colagem conforme a
     assert.equal(expedition.disabled, true);
     assert.equal(bindReportSummaryCopyButton(null, receiptBinding), false);
     const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
-    for (const id of ["receiptCopySummaryButton", "expeditionCopySummaryButton"]) {
+    for (const id of ["receiptCopySummaryButton", "expeditionCopySummaryButton", "parcelCopySummaryButton"]) {
         assert.equal(html.split(`id="${id}"`).length - 1, 1);
     }
 });

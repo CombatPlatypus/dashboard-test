@@ -3,6 +3,8 @@ import { formatReportPersonWithOps } from "./core/person-name.js";
 import { getReceiptState, getReceiptSummary, subscribeReceiptState } from "./receipt/state.js";
 import { getReceiptLinehaulState, getReceiptLinehaulSummary, subscribeReceiptLinehaulState } from "./receipt/linehaul-state.js";
 import { getExpeditionState, getExpeditionSummary, getExpeditionErrorAnalysis, getExpeditionOperatorRanking, subscribeExpeditionState } from "./expedition/state.js";
+import { createParcelSummary } from "./parcel-sweeper/model.js";
+import { getParcelState, subscribeParcelState } from "./parcel-sweeper/state.js";
 import { setReportNotification } from "./report-notifications.js";
 
 const shiftRows = { AM: 3, PM1: 62, PM2: 121 };
@@ -28,20 +30,21 @@ function escapeHtml(value) {
 }
 
 // HTML carries the template's merges; TSV keeps a placeholder for every physical column.
-function createClipboardTable(rows) {
+function createClipboardTable(rows, { columnWidth = 150 } = {}) {
     const text = rows.map(row => row.flatMap(({ value, span }) =>
         [String(value ?? ""), ...Array(span - 1).fill("")],
     ).join("\t")).join("\n");
     // Sheets only applies data-sheets-* formatting when its clipboard origin marker is present.
-    const columns = '<colgroup>' + '<col width="150" style="width:150px">'.repeat(4) + '</colgroup>';
+    const columnCount = rows[0].reduce((total, cell) => total + cell.span, 0);
+    const columns = '<colgroup>' + `<col width="${columnWidth}" style="width:${columnWidth}px">`.repeat(columnCount) + '</colgroup>';
     const html = '<html><head><meta charset="utf-8"></head><body><!--StartFragment-->' +
         '<google-sheets-html-origin><table xmlns="http://www.w3.org/1999/xhtml" data-sheets-root="1" data-sheets-baot="1" ' +
         'cellspacing="0" cellpadding="0" dir="ltr" style="table-layout:fixed;border-collapse:collapse;font-family:Roboto;font-size:10pt">' +
         columns + '<tbody>' + rows.map(row =>
         '<tr style="height:25px">' + row.map(({ value, span, fontSize, fontFamily }) => {
             const format = JSON.stringify({ "2": sheetsFormatFields, "9": 1, "10": 1, "15": fontFamily, "16": fontSize });
-            return `<td rowspan="1" colspan="${span}" width="${150 * span}" data-sheets-userformat='${format}' align="center" valign="middle" ` +
-                `style="border:1px solid #000000;width:${150 * span}px;text-align:center;vertical-align:middle;font-family:${fontFamily};font-size:${fontSize}pt;font-weight:normal;white-space:nowrap">${escapeHtml(value)}</td>`;
+            return `<td rowspan="1" colspan="${span}" width="${columnWidth * span}" data-sheets-userformat='${format}' align="center" valign="middle" ` +
+                `style="border:1px solid #000000;width:${columnWidth * span}px;text-align:center;vertical-align:middle;font-family:${fontFamily};font-size:${fontSize}pt;font-weight:normal;white-space:nowrap">${escapeHtml(value)}</td>`;
         }).join("") + "</tr>",
     ).join("") + '</tbody></table></google-sheets-html-origin><!--EndFragment--></body></html>';
     return { text, html };
@@ -52,6 +55,7 @@ function createReportSummaryClipboard(kind, {
     receipt = getReceiptState(),
     linehaul = getReceiptLinehaulState(),
     expedition = getExpeditionState(),
+    parcel,
 } = {}) {
     const shift = context.window;
     const firstRow = shiftRows[shift];
@@ -60,6 +64,23 @@ function createReportSummaryClipboard(kind, {
     const heading = (...values) => values.map(value => cell(value, 2, 11));
     const title = (value, fontSize = 12) => [cell(value, 4, fontSize)];
     const rate = value => value === null || value === undefined ? "" : rateFormatter.format(value);
+
+    if (kind === "parcel") {
+        const state = parcel ?? getParcelState();
+        const summary = createParcelSummary(state.rows, state.operatorKindOverrides);
+        const rows = [
+            [cell("Relatório Parcel Sweeper", 8, 12)],
+            heading("Porcentagem Total", "Total de Bipado", "Pacotes Exception", "Pacotes Missorted"),
+            pair(summary.expectedTotalCount > 0 ? rate(summary.expectedScannedCount / summary.expectedTotalCount) : null,
+                summary.hasData ? summary.scannedCount : null,
+                summary.hasData ? summary.exceptionCount : null,
+                summary.hasData ? summary.missortedCount : null),
+        ];
+        return { ...createClipboardTable(rows, { columnWidth: 100 }),
+            target: "A1", sheet: "Base do Parcel", label: "Relatório Parcel Sweeper",
+            shift: null, hasData: summary.hasData, copyError: "",
+        };
+    }
     let rows;
     let target;
     let label;
@@ -128,7 +149,7 @@ function createReportSummaryClipboard(kind, {
         : "";
     // Empty rows remove names left by a previous, longer list without touching the next window.
     rows.push(...Array.from({ length: listCapacity }, (_, index) => createOperatorRow(operators[index])));
-    return { ...createClipboardTable(rows), target, label, shift, hasData, copyError };
+    return { ...createClipboardTable(rows), target, sheet: "Base do Resumo", label, shift, hasData, copyError };
 }
 
 function writeSummaryCopyEvent(payload) {
@@ -176,7 +197,7 @@ function bindReportSummaryCopyButton(button, { reportId, kind, subscribe }) {
         const payload = createReportSummaryClipboard(kind);
         button.disabled = busy || !payload.hasData;
         if (!busy) {
-            button.title = payload.copyError || `${payload.label}: copiar para ${payload.target} da aba Base do Resumo.`;
+            button.title = payload.copyError || `${payload.label}: copiar para ${payload.target} da aba ${payload.sheet}.`;
             button.setAttribute("aria-label", button.title);
         }
     }
@@ -197,7 +218,7 @@ function bindReportSummaryCopyButton(button, { reportId, kind, subscribe }) {
         try {
             await writeSummaryClipboard(payload);
             setReportNotification({ reportId, type: "success",
-                message: `${payload.label} copiado. Cole em ${payload.target} da aba Base do Resumo (${payload.shift}). Use Ctrl+V para manter mesclagens e alinhamento.`,
+                message: `${payload.label} copiado. Cole em ${payload.target} da aba ${payload.sheet}${payload.shift ? ` (${payload.shift})` : ""}. Use Ctrl+V para manter mesclagens e alinhamento.`,
             });
         } catch {
             setReportNotification({ reportId, type: "error",
@@ -219,6 +240,7 @@ function bindReportSummaryCopyButton(button, { reportId, kind, subscribe }) {
 function initializeReportSummaryCopy(root = document) {
     const receiptButton = root.querySelector("#receiptCopySummaryButton");
     const expeditionButton = root.querySelector("#expeditionCopySummaryButton");
+    const parcelButton = root.querySelector("#parcelCopySummaryButton");
     const receiptBound = bindReportSummaryCopyButton(receiptButton, {
         reportId: "receipt", kind: "receipt",
         subscribe: [subscribeReceiptState, subscribeReceiptLinehaulState, subscribeReportContext],
@@ -227,7 +249,10 @@ function initializeReportSummaryCopy(root = document) {
         reportId: "expedition", kind: "expedition",
         subscribe: [subscribeExpeditionState, subscribeReportContext],
     });
-    return receiptBound && expeditionBound;
+    const parcelBound = bindReportSummaryCopyButton(parcelButton, {
+        reportId: "parcel", kind: "parcel", subscribe: [subscribeParcelState],
+    });
+    return receiptBound && expeditionBound && parcelBound;
 }
 
 export { bindReportSummaryCopyButton, createReportSummaryClipboard, initializeReportSummaryCopy };

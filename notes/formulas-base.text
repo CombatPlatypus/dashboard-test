@@ -913,3 +913,35 @@ LM Hub_SP_Santos_PraiaGrande_02
 =SEERRO(SE('Base do Resumo'!E19<>"";'Base do Resumo'!E19:H58;"");"")
 
 =SEERRO(SE('Base do Resumo'!H19<>"";'Base do Resumo'!H19:H58;"");"")
+
+
+={"Taxa";
+
+    MAP(
+        J3:J;
+        M3:M;
+
+        LAMBDA(
+            operador;
+            erros;
+
+            SE(
+                operador="";
+                "";
+                SEERRO(
+                    erros/SOMA($M$3:$M);
+                    0
+                )
+            )
+        )
+    )
+}
+
+
+=IMPORTRANGE("https://docs.google.com/spreadsheets/d/1CIdBvPaCkLo9elCjyHuKzQ7rfLepiMv6xBXAeYxUL1Y/";"'Histórico de Reversa'!B3:E")
+
+=CONT.SES(
+    'Base da Reversa'!D1:D;"Missorted";
+    'Base da Reversa'!A1:A;">="&HOJE();
+    'Base da Reversa'!A1:A;"<"&(HOJE()+1)
+)
