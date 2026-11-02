@@ -11,6 +11,7 @@ import { resetReceiptReport, restoreReceiptState, subscribeReceiptState } from "
 import { resetReceiptLinehaulState, restoreReceiptLinehaulState, subscribeReceiptLinehaulState } from "../js/reports/receipt/linehaul-state.js";
 import { resetExpeditionReport, restoreExpeditionState } from "../js/reports/expedition/state.js";
 import { replaceParcelRows, resetParcelReport, restoreParcelState, updateParcelFilter } from "../js/reports/parcel-sweeper/state.js";
+import { resetReverseReport, restoreReverseState, upsertReverseTransfer } from "../js/reports/reverse/state.js";
 
 const require = createRequire(import.meta.url);
 const XLSX = require("../js/libraries/xlsx.full.min.js");
@@ -28,12 +29,18 @@ const parcelRows = [
     { trackingNumber: "BR5", countType: "Mis-sorted", expected: "N" },
     { trackingNumber: "BR6", countType: "Exception", expected: "N" },
 ];
+const reverseTransfers = [
+    { to: "TO1", quantities: { return: 5, missorted: 2, liquidate: 0, confiscated: 1 } },
+    { to: "TO2", quantities: { return: 3, missorted: 0, liquidate: 7, confiscated: 2 } },
+];
+const copyDate = new Date("2026-11-02T12:00:00-03:00");
 
 beforeEach(() => {
     resetReceiptReport();
     resetReceiptLinehaulState();
     resetExpeditionReport();
     resetParcelReport();
+    resetReverseReport();
     restoreReportContext({ window: "AM", plannedVolume: 1500 });
 });
 
@@ -126,29 +133,29 @@ test("expedição inclui resumo, erros e lista de conferentes em E3:H58", () => 
     assert.doesNotMatch(payload.text, /Processamento|Volume Recebido/);
 });
 
-test("parcel copia A1:H3 com o título, cobertura e os três totais nas colunas da imagem", () => {
+test("parcel copia A1:H3 com título em A1:F1, data em G1:H1 e os quatro indicadores", () => {
     replaceParcelRows(parcelRows);
-    const payload = createReportSummaryClipboard("parcel");
+    const payload = createReportSummaryClipboard("parcel", { now: copyDate });
     assert.equal(payload.target, "A1");
     assert.equal(payload.sheet, "Base do Parcel");
     assert.equal(payload.hasData, true);
     assert.equal(payload.copyError, "");
     assert.deepEqual(matrix(payload), [
-        ["Relatório Parcel Sweeper", "", "", "", "", "", "", ""],
+        ["Relatório Parcel Sweeper", "", "", "", "", "", "02/11/2026", ""],
         ["Porcentagem Total", "", "Total de Bipado", "", "Pacotes Exception", "", "Pacotes Missorted", ""],
         ["50,00%", "", "4", "", "2", "", "1", ""],
     ]);
     const workbook = XLSX.read(payload.html, { type: "string" });
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     assert.deepEqual(sheet["!merges"].map(XLSX.utils.encode_range), [
-        "A1:H1", "A2:B2", "C2:D2", "E2:F2", "G2:H2", "A3:B3", "C3:D3", "E3:F3", "G3:H3",
+        "A1:F1", "G1:H1", "A2:B2", "C2:D2", "E2:F2", "G2:H2", "A3:B3", "C3:D3", "E3:F3", "G3:H3",
     ]);
     assert.equal(sheet.C3.v, 4);
     assert.equal(sheet.E3.v, 2);
     assert.equal(sheet.G3.v, 1);
     assert.equal([...payload.html.matchAll(/<col width="100"/g)].length, 8);
     const cells = [...payload.html.matchAll(/<td\b([^>]*)>([^<]*)<\/td>/g)];
-    assert.equal(cells.length, 9);
+    assert.equal(cells.length, 10);
     for (const [, attributes] of cells) {
         assert.match(attributes, /border:1px solid #000000;/);
         assert.match(attributes, /text-align:center;vertical-align:middle/);
@@ -157,8 +164,10 @@ test("parcel copia A1:H3 com o título, cobertura e os três totais nas colunas 
         assert.equal(format["10"], 1);
         assert.equal(format["15"], "Roboto");
     }
-    assert.match(cells[0][1], /colspan="8"/);
+    assert.match(cells[0][1], /colspan="6"/);
     assert.match(cells[0][1], /font-size:12pt/);
+    assert.match(cells[1][1], /colspan="2"/);
+    assert.equal(cells[1][2], "02/11/2026");
 });
 
 test("parcel mantém zeros reais e deixa a porcentagem vazia quando não há base de cobertura", () => {
@@ -192,13 +201,7 @@ test("parcel copia o resumo completo em A1 independentemente da janela e do filt
 
 test("botão do parcel acompanha importação, limpeza e restauração e orienta colar na Base do Parcel", async t => {
     const { nativeCopies, parcelNotification, parcelText } = setup(t, {}, { nativeCopy: true, clipboardItem: false });
-    const parcel = new Button();
-    const receipt = new Button();
-    const expedition = new Button();
-    const root = { querySelector: selector => ({
-        "#receiptCopySummaryButton": receipt, "#expeditionCopySummaryButton": expedition,
-        "#parcelCopySummaryButton": parcel,
-    })[selector] };
+    const { parcel, root } = createCopyButtons();
     assert.equal(initializeReportSummaryCopy(root), true);
     assert.equal(initializeReportSummaryCopy(root), true);
     assert.equal(parcel.listeners.click.length, 1);
@@ -225,6 +228,104 @@ test("botão do parcel acompanha importação, limpeza e restauração e orienta
     assert.equal(parcel.disabled, false);
     await parcel.fire();
     assert.deepEqual(matrix({ text: nativeCopies[1]["text/plain"] })[2], ["100,00%", "", "1", "", "0", "", "1", ""]);
+});
+
+test("reversa copia A1:D3 com título, data e os totais das TOs na ordem da imagem", () => {
+    restoreReverseState({ transfers: reverseTransfers });
+    const payload = createReportSummaryClipboard("reverse", { now: copyDate });
+    assert.equal(payload.target, "A1");
+    assert.equal(payload.hasData, true);
+    assert.equal(payload.copyError, "");
+    assert.deepEqual(matrix(payload), [
+        ["Reversa", "", "", "02/11/2026"],
+        ["Return", "Missorted", "Liquidate", "Confiscado"],
+        ["8", "2", "7", "3"],
+    ]);
+    const workbook = XLSX.read(payload.html, { type: "string" });
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    assert.deepEqual(sheet["!merges"].map(XLSX.utils.encode_range), ["A1:C1"]);
+    assert.deepEqual([sheet.A3.v, sheet.B3.v, sheet.C3.v, sheet.D3.v], [8, 2, 7, 3]);
+    assert.equal([...payload.html.matchAll(/<col width="125"/g)].length, 4);
+    const cells = [...payload.html.matchAll(/<td\b([^>]*)>([^<]*)<\/td>/g)];
+    assert.equal(cells.length, 10);
+    for (const [, attributes] of cells) {
+        assert.match(attributes, /border:1px solid #000000;/);
+        assert.match(attributes, /text-align:center;vertical-align:middle/);
+    }
+    assert.match(cells[0][1], /colspan="3"/);
+    assert.match(cells[0][1], /font-size:12pt/);
+    assert.match(cells[1][1], /colspan="1"/);
+});
+
+test("reversa deixa totais vazios sem dados e preserva zeros com uma categoria importada", () => {
+    let payload = createReportSummaryClipboard("reverse");
+    assert.equal(payload.hasData, false);
+    assert.deepEqual(matrix(payload)[2], ["", "", "", ""]);
+    upsertReverseTransfer({ to: "TO1", quantities: { return: 10 } });
+    payload = createReportSummaryClipboard("reverse");
+    assert.equal(payload.hasData, true);
+    assert.deepEqual(matrix(payload)[2], ["10", "0", "0", "0"]);
+    for (const window of ["AM", "PM1", "PM2"]) {
+        updateReportContextField("window", window);
+        assert.equal(createReportSummaryClipboard("reverse").target, "A1");
+        assert.equal(createReportSummaryClipboard("reverse").shift, null);
+    }
+});
+
+test("botão da reversa acompanha TOs atualizadas, limpeza e restauração e copia HTML e TSV", async t => {
+    const { nativeCopies, reverseNotification, reverseText } = setup(t, {}, { nativeCopy: true, clipboardItem: false });
+    const { reverse, root } = createCopyButtons();
+    assert.equal(initializeReportSummaryCopy(root), true);
+    assert.equal(initializeReportSummaryCopy(root), true);
+    assert.equal(reverse.listeners.click.length, 1);
+    assert.equal(reverse.disabled, true);
+    await reverse.fire();
+    assert.equal(nativeCopies.length, 0);
+    restoreReverseState({ transfers: reverseTransfers });
+    assert.equal(reverse.disabled, false);
+    assert.equal(reverse.title, "Resumo de reversa: copiar para A1 da planilha.");
+    assert.equal(reverse.attributes["aria-label"], reverse.title);
+    await reverse.fire();
+    const payload = createReportSummaryClipboard("reverse");
+    assert.equal(nativeCopies[0]["text/plain"], payload.text);
+    assert.equal(nativeCopies[0]["text/html"], payload.html);
+    assert.equal(reverseNotification.dataset.notificationType, "success");
+    assert.equal(reverseText.textContent,
+        "Resumo de reversa copiado. Cole em A1 da planilha. Use Ctrl+V para manter mesclagens e alinhamento.");
+    upsertReverseTransfer({ to: "TO1", quantities: { return: 2 } });
+    await reverse.fire();
+    assert.deepEqual(matrix({ text: nativeCopies[1]["text/plain"] })[2], ["5", "0", "7", "2"]);
+    resetReverseReport();
+    assert.equal(reverse.disabled, true);
+    await reverse.fire();
+    assert.equal(nativeCopies.length, 2);
+    restoreReverseState({ transfers: reverseTransfers });
+    assert.equal(reverse.disabled, false);
+    await reverse.fire();
+    assert.deepEqual(matrix({ text: nativeCopies[2]["text/plain"] })[2], ["8", "2", "7", "3"]);
+});
+
+test("data do Parcel e da Reversa usa o dia de São Paulo e muda na próxima cópia após a meia-noite", async t => {
+    const RealDate = Date;
+    let instant = RealDate.parse("2026-11-03T02:59:59Z");
+    replaceGlobal(t, "Date", class extends RealDate {
+        constructor(...args) { super(...(args.length ? args : [instant])); }
+        static now() { return instant; }
+    });
+    replaceParcelRows(parcelRows);
+    restoreReverseState({ transfers: reverseTransfers });
+    const { nativeCopies } = setup(t, {}, { nativeCopy: true, clipboardItem: false });
+    const { parcel, reverse, root } = createCopyButtons();
+    initializeReportSummaryCopy(root);
+    await parcel.fire();
+    await reverse.fire();
+    assert.equal(matrix({ text: nativeCopies[0]["text/plain"] })[0][6], "02/11/2026");
+    assert.equal(matrix({ text: nativeCopies[1]["text/plain"] })[0][3], "02/11/2026");
+    instant = RealDate.parse("2026-11-03T03:00:00Z");
+    await parcel.fire();
+    await reverse.fire();
+    assert.equal(matrix({ text: nativeCopies[2]["text/plain"] })[0][6], "03/11/2026");
+    assert.equal(matrix({ text: nativeCopies[3]["text/plain"] })[0][3], "03/11/2026");
 });
 
 test("colagem inclui bordas, fontes, tamanhos e centralização em títulos, dados e células vazias", () => {
@@ -450,6 +551,15 @@ class Button extends Element {
     }
 }
 
+function createCopyButtons() {
+    const receipt = new Button(), expedition = new Button(), parcel = new Button(), reverse = new Button();
+    const root = { querySelector: selector => ({
+        "#receiptCopySummaryButton": receipt, "#expeditionCopySummaryButton": expedition,
+        "#parcelCopySummaryButton": parcel, "#reverseCopySummaryButton": reverse,
+    })[selector] };
+    return { receipt, expedition, parcel, reverse, root };
+}
+
 function setup(t, clipboard, { nativeCopy = false, clipboardItem = true } = {}) {
     const notification = new Element();
     const text = new Element();
@@ -457,10 +567,13 @@ function setup(t, clipboard, { nativeCopy = false, clipboardItem = true } = {}) 
     const expeditionText = new Element();
     const parcelNotification = new Element();
     const parcelText = new Element();
+    const reverseNotification = new Element();
+    const reverseText = new Element();
     const elements = {
         receiptNotification: notification, receiptNotificationIcon: new Image(), receiptNotificationText: text,
         expeditionNotification, expeditionNotificationIcon: new Image(), expeditionNotificationText: expeditionText,
         parcelNotification, parcelNotificationIcon: new Image(), parcelNotificationText: parcelText,
+        reverseNotification, reverseNotificationIcon: new Image(), reverseNotificationText: reverseText,
     };
     replaceGlobal(t, "HTMLElement", Element);
     replaceGlobal(t, "HTMLButtonElement", Button);
@@ -483,7 +596,8 @@ function setup(t, clipboard, { nativeCopy = false, clipboardItem = true } = {}) 
     });
     replaceGlobal(t, "navigator", { clipboard });
     replaceGlobal(t, "ClipboardItem", clipboardItem ? class { constructor(data) { this.data = data; } } : undefined);
-    return { notification, text, expeditionNotification, expeditionText, parcelNotification, parcelText, nativeCopies, copyListeners };
+    return { notification, text, expeditionNotification, expeditionText, parcelNotification, parcelText,
+        reverseNotification, reverseText, nativeCopies, copyListeners };
 }
 
 const receiptBinding = {
@@ -591,13 +705,7 @@ test("ambos os botões atualizam as notificações e dicas de colagem conforme a
     populate();
     const writes = [];
     const { text, expeditionText } = setup(t, { write: async items => writes.push(await items[0].data["text/plain"].text()) });
-    const receipt = new Button();
-    const expedition = new Button();
-    const parcel = new Button();
-    const root = { querySelector: selector => ({
-        "#receiptCopySummaryButton": receipt, "#expeditionCopySummaryButton": expedition,
-        "#parcelCopySummaryButton": parcel,
-    })[selector] };
+    const { receipt, expedition, root } = createCopyButtons();
     assert.equal(initializeReportSummaryCopy(root), true);
     assert.equal(initializeReportSummaryCopy(root), true);
     for (const [window, receiptTarget, expeditionTarget] of [
@@ -621,7 +729,7 @@ test("ambos os botões atualizam as notificações e dicas de colagem conforme a
     assert.equal(expedition.disabled, true);
     assert.equal(bindReportSummaryCopyButton(null, receiptBinding), false);
     const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
-    for (const id of ["receiptCopySummaryButton", "expeditionCopySummaryButton", "parcelCopySummaryButton"]) {
+    for (const id of ["receiptCopySummaryButton", "expeditionCopySummaryButton", "parcelCopySummaryButton", "reverseCopySummaryButton"]) {
         assert.equal(html.split(`id="${id}"`).length - 1, 1);
     }
 });

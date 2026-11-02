@@ -5,6 +5,8 @@ import { getReceiptLinehaulState, getReceiptLinehaulSummary, subscribeReceiptLin
 import { getExpeditionState, getExpeditionSummary, getExpeditionErrorAnalysis, getExpeditionOperatorRanking, subscribeExpeditionState } from "./expedition/state.js";
 import { createParcelSummary } from "./parcel-sweeper/model.js";
 import { getParcelState, subscribeParcelState } from "./parcel-sweeper/state.js";
+import { createReverseSummary } from "./reverse/model.js";
+import { getReverseState, subscribeReverseState } from "./reverse/state.js";
 import { setReportNotification } from "./report-notifications.js";
 
 const shiftRows = { AM: 3, PM1: 62, PM2: 121 };
@@ -12,6 +14,9 @@ const shiftRows = { AM: 3, PM1: 62, PM2: 121 };
 const summaryRowCount = 56;
 const rateFormatter = new Intl.NumberFormat("pt-BR", {
     style: "percent", minimumFractionDigits: 2, maximumFractionDigits: 2,
+});
+const dateFormatter = new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit", month: "2-digit", year: "numeric", timeZone: "America/Sao_Paulo",
 });
 // Sheets' clipboard fields: centered alignment (64 | 128), font family (4096) and size (8192).
 const sheetsFormatFields = 64 | 128 | 4096 | 8192;
@@ -56,6 +61,8 @@ function createReportSummaryClipboard(kind, {
     linehaul = getReceiptLinehaulState(),
     expedition = getExpeditionState(),
     parcel,
+    reverse,
+    now = new Date(),
 } = {}) {
     const shift = context.window;
     const firstRow = shiftRows[shift];
@@ -69,7 +76,7 @@ function createReportSummaryClipboard(kind, {
         const state = parcel ?? getParcelState();
         const summary = createParcelSummary(state.rows, state.operatorKindOverrides);
         const rows = [
-            [cell("Relatório Parcel Sweeper", 8, 12)],
+            [cell("Relatório Parcel Sweeper", 6, 12), cell(dateFormatter.format(now), 2, 12)],
             heading("Porcentagem Total", "Total de Bipado", "Pacotes Exception", "Pacotes Missorted"),
             pair(summary.expectedTotalCount > 0 ? rate(summary.expectedScannedCount / summary.expectedTotalCount) : null,
                 summary.hasData ? summary.scannedCount : null,
@@ -78,6 +85,20 @@ function createReportSummaryClipboard(kind, {
         ];
         return { ...createClipboardTable(rows, { columnWidth: 100 }),
             target: "A1", sheet: "Base do Parcel", label: "Relatório Parcel Sweeper",
+            shift: null, hasData: summary.hasData, copyError: "",
+        };
+    }
+    if (kind === "reverse") {
+        const state = reverse ?? getReverseState();
+        const summary = createReverseSummary(state.transfers);
+        const types = ["return", "missorted", "liquidate", "confiscated"];
+        const rows = [
+            [cell("Reversa", 3, 12), cell(dateFormatter.format(now), 1, 12)],
+            ["Return", "Missorted", "Liquidate", "Confiscado"].map(value => cell(value, 1, 11)),
+            types.map(type => cell(summary.hasData ? summary.quantities[type] : null, 1)),
+        ];
+        return { ...createClipboardTable(rows, { columnWidth: 125 }),
+            target: "A1", sheet: null, label: "Resumo de reversa",
             shift: null, hasData: summary.hasData, copyError: "",
         };
     }
@@ -193,11 +214,13 @@ function bindReportSummaryCopyButton(button, { reportId, kind, subscribe }) {
     button.dataset.summaryCopyInitialized = "true";
     let busy = false;
 
+    const destination = payload => `${payload.target} da ${payload.sheet ? `aba ${payload.sheet}` : "planilha"}`;
+
     function render() {
         const payload = createReportSummaryClipboard(kind);
         button.disabled = busy || !payload.hasData;
         if (!busy) {
-            button.title = payload.copyError || `${payload.label}: copiar para ${payload.target} da aba ${payload.sheet}.`;
+            button.title = payload.copyError || `${payload.label}: copiar para ${destination(payload)}.`;
             button.setAttribute("aria-label", button.title);
         }
     }
@@ -218,7 +241,7 @@ function bindReportSummaryCopyButton(button, { reportId, kind, subscribe }) {
         try {
             await writeSummaryClipboard(payload);
             setReportNotification({ reportId, type: "success",
-                message: `${payload.label} copiado. Cole em ${payload.target} da aba ${payload.sheet}${payload.shift ? ` (${payload.shift})` : ""}. Use Ctrl+V para manter mesclagens e alinhamento.`,
+                message: `${payload.label} copiado. Cole em ${destination(payload)}${payload.shift ? ` (${payload.shift})` : ""}. Use Ctrl+V para manter mesclagens e alinhamento.`,
             });
         } catch {
             setReportNotification({ reportId, type: "error",
@@ -241,6 +264,7 @@ function initializeReportSummaryCopy(root = document) {
     const receiptButton = root.querySelector("#receiptCopySummaryButton");
     const expeditionButton = root.querySelector("#expeditionCopySummaryButton");
     const parcelButton = root.querySelector("#parcelCopySummaryButton");
+    const reverseButton = root.querySelector("#reverseCopySummaryButton");
     const receiptBound = bindReportSummaryCopyButton(receiptButton, {
         reportId: "receipt", kind: "receipt",
         subscribe: [subscribeReceiptState, subscribeReceiptLinehaulState, subscribeReportContext],
@@ -252,7 +276,10 @@ function initializeReportSummaryCopy(root = document) {
     const parcelBound = bindReportSummaryCopyButton(parcelButton, {
         reportId: "parcel", kind: "parcel", subscribe: [subscribeParcelState],
     });
-    return receiptBound && expeditionBound && parcelBound;
+    const reverseBound = bindReportSummaryCopyButton(reverseButton, {
+        reportId: "reverse", kind: "reverse", subscribe: [subscribeReverseState],
+    });
+    return receiptBound && expeditionBound && parcelBound && reverseBound;
 }
 
 export { bindReportSummaryCopyButton, createReportSummaryClipboard, initializeReportSummaryCopy };

@@ -945,3 +945,119 @@ LM Hub_SP_Santos_PraiaGrande_02
     'Base da Reversa'!A1:A;">="&HOJE();
     'Base da Reversa'!A1:A;"<"&(HOJE()+1)
 )
+
+=IMPORTRANGE("https://docs.google.com/spreadsheets/d/1PUheTCH7QeLo-4c3t3-GS8eQrtAHiZ8B4ICZFsUJ8hA/";"'Motivos do Backlog'!J8:K10")
+=IMPORTRANGE("https://docs.google.com/spreadsheets/d/1CIdBvPaCkLo9elCjyHuKzQ7rfLepiMv6xBXAeYxUL1Y/";"'Insumos no Piso'!A3")
+=IMPORTRANGE("https://docs.google.com/spreadsheets/d/1PUheTCH7QeLo-4c3t3-GS8eQrtAHiZ8B4ICZFsUJ8hA/";"'Motivos do Backlog'!J3")
+
+='Base do Parcel'!A3:H3
+
+
+
+=SEERRO(
+    LET(
+        url;"https://docs.google.com/spreadsheets/d/11jdHDwRBiDKTpP2G7s02v0wR2K27nJ5mG9G6aExwESQ/";
+
+        avarias;IMPORTRANGE(
+            url;
+            "'Histórico de Avarias e Perdas'!B3:D"
+        );
+
+        perdas;IMPORTRANGE(
+            url;
+            "'Histórico de Avarias e Perdas'!L3:N"
+        );
+
+        linhasA;SEQUENCE(LINHAS(avarias);1;3);
+        linhasP;SEQUENCE(LINHAS(perdas);1;3);
+
+        QUERY(
+            {
+                avarias\linhasA\ARRAYFORMULA(linhasA*0+1);
+                perdas\linhasP\ARRAYFORMULA(linhasP*0+2)
+            };
+
+            "SELECT Col1, Col2, Col3
+             WHERE Col1 IS NOT NULL
+             AND Col2 IS NOT NULL
+             ORDER BY Col1 DESC, Col4 DESC, Col5 ASC
+             LIMIT 25";
+
+            0
+        )
+    );
+    ""
+)
+
+
+=LET(
+        url;"https://docs.google.com/spreadsheets/d/11jdHDwRBiDKTpP2G7s02v0wR2K27nJ5mG9G6aExwESQ/";
+
+        avarias;IMPORTRANGE(
+            url;
+            "'Histórico de Avarias e Perdas'!B3:D"
+        );
+
+        perdas;IMPORTRANGE(
+            url;
+            "'Histórico de Avarias e Perdas'!L3:N"
+        );
+
+        linhasA;SEQUENCE(LINHAS(avarias);1;3);
+        linhasP;SEQUENCE(LINHAS(perdas);1;3);
+
+        QUERY(
+            {
+                avarias\linhasA\ARRAYFORMULA(linhasA*0+1);
+                perdas\linhasP\ARRAYFORMULA(linhasP*0+2)
+            };
+
+            "SELECT Col1, Col2, Col3
+             WHERE Col1 IS NOT NULL
+             AND Col2 IS NOT NULL
+             ORDER BY Col1 DESC, Col4 DESC, Col5 ASC
+             LIMIT 25";
+
+            0
+        )
+    )
+
+
+=LET(url;"https://docs.google.com/spreadsheets/d/11jdHDwRBiDKTpP2G7s02v0wR2K27nJ5mG9G6aExwESQ/";
+
+    avarias;IMPORTRANGE(
+        url;
+        "'Histórico de Avarias e Perdas'!B3:D"
+    );
+
+    perdas;IMPORTRANGE(
+        url;
+        "'Histórico de Avarias e Perdas'!L3:N"
+    );
+
+    linhasA;SEQUENCE(LINHAS(avarias);1;3);
+    linhasP;SEQUENCE(LINHAS(perdas);1;3);
+
+    dados;VSTACK(
+        HSTACK(
+            avarias;
+            linhasA;
+            ARRAYFORMULA(linhasA*0+1)
+        );
+        HSTACK(
+            perdas;
+            linhasP;
+            ARRAYFORMULA(linhasP*0+2)
+        )
+    );
+
+    QUERY(
+        dados;
+        "SELECT Col1, Col2, Col3
+         WHERE Col1 IS NOT NULL
+         AND Col2 IS NOT NULL
+         ORDER BY Col1 DESC, Col4 ASC, Col5 ASC
+         LIMIT 25";
+        0
+    )
+)
