@@ -519,8 +519,8 @@ try {
     assert.deepEqual(await spreadsheetMenu(), OPERATION_SPREADSHEET_SETTINGS);
     await page.goto(`${base}/settings.html`);
     await readySettings();
-    assert.equal(await page.locator("#settingsSpreadsheetName15").inputValue(), "Relatório de Processamento");
-    assert.equal(await page.locator("#settingsSpreadsheetLink15").inputValue(), OPERATION_SPREADSHEET_SETTINGS[14].link);
+    assert.equal(await page.locator("#settingsSpreadsheetName14").inputValue(), "Relatório de Processamento");
+    assert.equal(await page.locator("#settingsSpreadsheetLink14").inputValue(), OPERATION_SPREADSHEET_SETTINGS[13].link);
     assert.equal(await page.locator("#settingsSpreadsheetName13").getAttribute("maxlength"), "60");
     await page.evaluate(() => sessionStorage.clear());
     await page.goto(`${base}/index.html`);
