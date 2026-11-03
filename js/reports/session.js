@@ -41,13 +41,21 @@ const REPORT_SESSION_VARIABLE =
 const REPORT_SESSION_MAX_FILE_SIZE =
     50 * 1024 * 1024;
 
-const REPORT_SESSION_IDS =
+// Os arquivos v1 antigos possuem apenas estes quatro relatórios.
+const REQUIRED_REPORT_SESSION_IDS =
     Object.freeze([
         "planning",
         "receipt",
         "expedition",
         "losses-rate",
     ]);
+
+const REPORT_SESSION_IDS = Object.freeze([
+    ...REQUIRED_REPORT_SESSION_IDS,
+    "damage-and-losses",
+    "parcel",
+    "reverse",
+]);
 
 const REPORT_SESSION_FEEDBACK_ICONS =
     Object.freeze({
@@ -98,7 +106,7 @@ function isSessionObjectList(
     );
 }
 
-/* OBTÉM SOMENTE OS QUATRO RELATÓRIOS DA SESSÃO */
+/* OBTÉM OS RELATÓRIOS INCLUÍDOS NO ARQUIVO DE SESSÃO */
 
 function getSessionReport(
     reportId,
@@ -257,12 +265,10 @@ function validateReportSessionPayload(
 
     REPORT_SESSION_IDS.forEach(
         function (reportId) {
+            const present = Object.prototype.hasOwnProperty.call(payload.reports, reportId);
+            if (!present && !REQUIRED_REPORT_SESSION_IDS.includes(reportId)) return;
             if (
-                !Object.prototype
-                    .hasOwnProperty.call(
-                        payload.reports,
-                        reportId,
-                    ) ||
+                !present ||
                 !isSessionObject(
                     payload.reports[
                         reportId
@@ -363,6 +369,40 @@ function validateReportSessionPayload(
         );
     }
 
+    const damageAndLosses = payload.reports["damage-and-losses"];
+    if (damageAndLosses !== undefined) {
+        const damage = damageAndLosses.damage || damageAndLosses;
+        const losses = damageAndLosses.losses;
+        const validDays = value => isSessionObject(value) && isSessionObjectList(value.days) &&
+            (value.history === undefined || isSessionObjectList(value.history));
+        if (!validDays(damage) ||
+            (damage.socStations !== undefined && !isSessionObjectList(damage.socStations)) ||
+            (losses !== undefined && !validDays(losses))) {
+            throw new TypeError("Os dados de Avarias e Perdas são inválidos.");
+        }
+    }
+
+    const parcel = payload.reports.parcel;
+    if (parcel !== undefined) {
+        const overrides = parcel.operatorKindOverrides;
+        const validOverrides = overrides === undefined || (isSessionObject(overrides) &&
+            Object.values(overrides).every(value => typeof value === "boolean"));
+        if (!isSessionObjectList(parcel.rows) || !validOverrides) {
+            throw new TypeError("Os dados do Parcel Sweeper são inválidos.");
+        }
+    }
+
+    const reverse = payload.reports.reverse;
+    if (reverse !== undefined) {
+        const validTransfers = isSessionObjectList(reverse.transfers) && reverse.transfers.every(transfer => {
+            if (!isSessionObject(transfer.quantities)) return false;
+            if (transfer.packages === undefined) return true;
+            return isSessionObject(transfer.packages) && Object.values(transfer.packages).every(codes =>
+                Array.isArray(codes) && codes.every(code => typeof code === "string"));
+        });
+        if (!validTransfers) throw new TypeError("Os dados da Reversa são inválidos.");
+    }
+
     return true;
 }
 
@@ -453,7 +493,7 @@ function selectSessionReports(
     reports,
 ) {
     return Object.fromEntries(
-        REPORT_SESSION_IDS.map(
+        REPORT_SESSION_IDS.filter(reportId => Object.prototype.hasOwnProperty.call(reports, reportId)).map(
             function (reportId) {
                 return [
                     reportId,
@@ -495,6 +535,8 @@ function restoreReportSession(
     const previousSettings =
         exportDashboardSettings();
 
+    const sessionReports = includeAllReports ? payload.reports : selectSessionReports(payload.reports);
+
     const sessionContext =
         payload.context ?? {
             window:
@@ -510,17 +552,14 @@ function restoreReportSession(
             sessionContext,
         );
 
-        reportManager.importSession(
-            includeAllReports ? payload.reports : selectSessionReports(
-                payload.reports,
-            ),
-        );
+        reportManager.importSession(sessionReports);
 
         if (
             payload.settings !== undefined
         ) {
             importDashboardSettings(
                 payload.settings,
+                { applyProfileToReports: false },
             );
         }
 
@@ -537,6 +576,7 @@ function restoreReportSession(
 
             importDashboardSettings(
                 previousSettings,
+                { applyProfileToReports: false },
             );
 
             renderRestoredOverallAnalysis();
@@ -558,9 +598,7 @@ function restoreReportSession(
                     createdAt:
                         payload.createdAt,
 
-                    reportIds: [
-                        ...REPORT_SESSION_IDS,
-                    ],
+                    reportIds: Object.keys(sessionReports).filter(reportId => reportManager.get(reportId)),
                 },
             },
         ),
