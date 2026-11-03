@@ -490,7 +490,7 @@ try {
         menuName: item.querySelector("a").textContent,
         link: item.querySelector("button").dataset.url,
     })));
-    assert.equal(defaultSpreadsheets.length, 15);
+    assert.equal(defaultSpreadsheets.length, 14);
     assert.deepEqual(await spreadsheetMenu(), defaultSpreadsheets.map(({ menuName, link }) => ({ menuName, link })));
     const contextBeforePreset = await reportContext();
     const reportsBeforePreset = await page.evaluate(async () =>

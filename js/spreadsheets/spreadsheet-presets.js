@@ -19,7 +19,6 @@ const FALLBACK_SPREADSHEET_SETTINGS = createSpreadsheetPreset([
     ["Stuck Orders", "1FisKLnYYdqg94k6ZFENFIj8nJaCv4-rr4TeCHm4mCSw"],
     ["Pacotes Full", "1PnKEGQtfETj0ptk7xAIPG3dcrZgbBunWFUJp18O_XDE"],
     ["Insucesso", "1CvONso--DM9_Rdf4ieesREV5lpD0e-hb"],
-    ["SPM1", "1PnKEGQtfETj0ptk7xAIPG3dcrZgbBunWFUJp18O_XDE"],
     ["Controle de Equipamentos", "1EDSg6R1qmHWpif4b-0J-qxUo78XUK-a8"],
     ["Mapa de Calor", "1wtCWPTkgkAULZ7lPCL9R2UWLGUSzypNV"],
     ["Avarias AppSheet", "1SpChx2r8HHeqWQAYDELewvKzQM8eRLIgknT2EiMjPnU"],
