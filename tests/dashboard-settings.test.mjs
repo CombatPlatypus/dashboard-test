@@ -6,7 +6,7 @@ import {
 } from "../js/settings/settings-file.js";
 import {
     DASHBOARD_SETTINGS_SESSION_KEY, readDashboardSettingsFromSession, saveDashboardSettingsToSession,
-    exportDashboardSettings, importDashboardSettings, validateDashboardSettings,
+    applyOperationSpreadsheetSettings, exportDashboardSettings, importDashboardSettings, validateDashboardSettings,
 } from "../js/spreadsheets/load-spreadsheets.js";
 import {
     getReportContext, restoreReportContext, updateReportContextField,
@@ -58,6 +58,40 @@ test("cópia na sessão preserva os mesmos dados do arquivo e fica independente 
     assert.deepEqual(JSON.parse(values.get(DASHBOARD_SETTINGS_SESSION_KEY)), fileSettings);
     snapshot.profile.name = "Rascunho não salvo";
     assert.deepEqual(readDashboardSettingsFromSession(storage), fileSettings);
+});
+
+test("lista da operação substitui as vinte posições e preserva preferências e contexto dos relatórios", () => {
+    const custom = { ...settings, theme: "purple", spreadsheets: Array.from({ length: 20 }, (_, index) => ({
+        link: `https://docs.google.com/spreadsheets/d/custom-${index}/`, menuName: `Planilha ${index}`, visible: false,
+    })) };
+    importDashboardSettings(custom);
+    const previous = exportDashboardSettings();
+    restoreReportContext({ window: "PM1", analyst: "Analista dos relatórios", plannedVolume: 1234 });
+    const context = getReportContext();
+    try {
+        applyOperationSpreadsheetSettings();
+        const applied = exportDashboardSettings();
+        assert.deepEqual({ ...applied, spreadsheets: previous.spreadsheets }, previous);
+        assert.deepEqual(getReportContext(), context);
+        assert.equal(applied.spreadsheets.length, 20);
+        assert.equal(applied.spreadsheets[0].menuName, "Resumo da Operação");
+        assert.equal(applied.spreadsheets[14].menuName, "Relatório de Processamento");
+        assert.ok(applied.spreadsheets.slice(0, 16).every(item => item.visible && item.link));
+        assert.deepEqual(applied.spreadsheets.slice(16), Array.from({ length: 4 }, () => ({
+            link: "", menuName: "", visible: true,
+        })));
+        applyOperationSpreadsheetSettings();
+        assert.deepEqual(exportDashboardSettings(), applied);
+        const values = new Map();
+        const storage = { getItem: key => values.get(key) ?? null, setItem: (key, value) => values.set(key, value) };
+        saveDashboardSettingsToSession(applied, storage);
+        assert.deepEqual(readDashboardSettingsFromSession(storage), applied);
+        importDashboardSettings(parseDashboardSettingsFile(serializeDashboardSettingsFile(applied)));
+        assert.deepEqual(exportDashboardSettings(), applied);
+    } finally {
+        importDashboardSettings(settings);
+        restoreReportContext({});
+    }
 });
 
 test("sessão inválida usa os padrões e falha de gravação não altera a cópia anterior", t => {

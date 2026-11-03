@@ -1,6 +1,11 @@
 import {
     loadDefaultSpreadsheetSettings,
 } from "./default-spreadsheets.js";
+import {
+    FALLBACK_SPREADSHEET_SETTINGS,
+    OPERATION_SPREADSHEET_SETTINGS,
+    SPREADSHEET_MENU_NAME_MAX_LENGTH,
+} from "./spreadsheet-presets.js";
 import { updateReportContextField } from "../reports/core/report-context.js";
 
 const DASHBOARD_SETTINGS_SESSION_KEY = "dashboard-settings-session-v1";
@@ -56,78 +61,6 @@ const DEFAULT_COLLECTION_APP_URL =
     "#appName=ColetasLMHub-510641030" +
     "&page=gallery&sort=%5B%5D" +
     "&table=MenuInicial&view=Menu";
-
-const FALLBACK_SPREADSHEET_SETTINGS =
-    Object.freeze([
-        {
-            spreadsheetId: "15goeiy-QDNIVC6N1kFSG55rqECRwv58FMXwgoDyt25o",
-            menuName: "Checklist Operacional",
-        },
-        {
-            spreadsheetId: "1WaHywDEm3ipdvEtq-pB01v4kyaREhn2i",
-            menuName: "Avarias",
-        },
-        {
-            spreadsheetId: "1xJZpuck84CM9-FTYd5UnWbZ4AezWUdGx",
-            menuName: "Pacotes em Análise",
-        },
-        {
-            spreadsheetId: "1cbHXjnfHGIDSob9Sh977p5J827qPlM5f9juRq_sIgcM",
-            menuName: "Backlog e Logs",
-        },
-        {
-            spreadsheetId: "1b9VlTXNfWhOqJtx9UoPrQchh77AiPqcs",
-            menuName: "Pacotes Retornados",
-        },
-        {
-            spreadsheetId: "1MJFZlrUrcZXve4WOYYLjCrKeUkD0QgSshCfZdWxNMZA",
-            menuName: "Erros de Etiquetagem",
-        },
-        {
-            spreadsheetId: "1UWlOQfVw-eD1ZkD5gxCo2MHZ4CEyJUd4osungKFTfwA",
-            menuName: "Gerenciamento de Rotas",
-        },
-        {
-            spreadsheetId: "1sh3TgSwLOt8EhoDhji2CHivbrEQiuhIpoBw0VHe2JoE",
-            menuName: "Controle Operacional",
-        },
-        {
-            spreadsheetId: "1FisKLnYYdqg94k6ZFENFIj8nJaCv4-rr4TeCHm4mCSw",
-            menuName: "Stuck Orders",
-        },
-        {
-            spreadsheetId: "18jFdAElZYUlGEQaAMrUdqLu6Ux_LyQupyq9N-m-jLg0",
-            menuName: "Controle de Endereços",
-        },
-        {
-            spreadsheetId: "1sOzs3lgS6dO0WluGRQR2B8kmFTDUR5VC",
-            menuName: "Justificativas",
-        },
-        {
-            spreadsheetId: "1FpcZuJboPyMKUGZwYHGHRYg4Pr_Phs4-ycqg-u7qGSU",
-            menuName: "Erros de Processo",
-        },
-        {
-            spreadsheetId: "1J41DYbdogIyzxJxKOBJa_9uforRo5faS",
-            menuName: "Insucesso",
-        },
-        {
-            spreadsheetId: "1wtALHYfXyFm9nfkV9TP1idnVV12oBwa-",
-            menuName: "Reversa",
-        },
-        {
-            spreadsheetId: "15ycLVugBymQR63SivMIvwRMce4dTe5XV",
-            menuName: "Equipamentos",
-        },
-        {
-            spreadsheetId: "1PnKEGQtfETj0ptk7xAIPG3dcrZgbBunWFUJp18O_XDE",
-            menuName: "Pacotes Full",
-        },
-        {
-            spreadsheetId: "1SpChx2r8HHeqWQAYDELewvKzQM8eRLIgknT2EiMjPnU",
-            menuName: "Avarias AppSheet",
-        },
-    ]);
 
 let defaultSpreadsheetSettings =
     FALLBACK_SPREADSHEET_SETTINGS;
@@ -219,12 +152,7 @@ function createDefaultSpreadsheetSetting(
 
     return {
         link:
-            defaultSetting.link ||
-            (
-                `${GOOGLE_SPREADSHEETS_URL_PREFIX}` +
-                `d/${defaultSetting.spreadsheetId}/` +
-                "edit?gid=0#gid=0"
-            ),
+            defaultSetting.link,
         menuName:
             defaultSetting.menuName,
         visible: true,
@@ -334,7 +262,7 @@ function normalizeSpreadsheetSetting(
         menuName:
             normalizeSettingsText(
                 value.menuName,
-                22,
+                SPREADSHEET_MENU_NAME_MAX_LENGTH,
             ),
 
         visible:
@@ -1204,7 +1132,7 @@ function createSpreadsheetSettingsRow(
         `settingsSpreadsheetName${position}`;
     nameInput.placeholder =
         "Nome no Menu";
-    nameInput.maxLength = 22;
+    nameInput.maxLength = SPREADSHEET_MENU_NAME_MAX_LENGTH;
     nameInput.dataset.dashboardSpreadsheetField =
         "menuName";
     nameInput.setAttribute(
@@ -1599,6 +1527,15 @@ function readDashboardSettingsFromSession(storage) {
     }
 }
 
+function applyOperationSpreadsheetSettings() {
+    dashboardSettingsState.spreadsheets = Array.from(
+        { length: DASHBOARD_SPREADSHEET_LIMIT },
+        (_, index) => normalizeSpreadsheetSetting(OPERATION_SPREADSHEET_SETTINGS[index]),
+    );
+    renderSettingsInputs();
+    renderSpreadsheetInterface();
+}
+
 /* AGENDA A ATUALIZAÇÃO DO PAINEL */
 
 function scheduleSpreadsheetRender() {
@@ -1625,6 +1562,26 @@ function bindDashboardSettingsEvents() {
         spreadsheetRows,
         anotherLinks,
     } = dashboardSettingsElements;
+
+    const presetLogo = document.getElementById("dashboardSpreadsheetPresetLogo");
+    if (presetLogo && presetLogo.dataset.presetInitialized !== "true") {
+        const applyPreset = () => {
+            applyOperationSpreadsheetSettings();
+            try {
+                saveDashboardSettingsToSession();
+            } catch (error) {
+                console.warn("Não foi possível guardar a lista de planilhas na sessão da aba.", error);
+            }
+        };
+        presetLogo.addEventListener("dblclick", applyPreset);
+        presetLogo.addEventListener("keydown", event => {
+            if (["Enter", " "].includes(event.key)) {
+                event.preventDefault();
+                if (!event.repeat) applyPreset();
+            }
+        });
+        presetLogo.dataset.presetInitialized = "true";
+    }
 
     const settingsLink = document.getElementById("dashboardSettingsLink");
     if (settingsLink && settingsLink.dataset.settingsNavigationInitialized !== "true") {
@@ -1827,7 +1784,7 @@ function bindDashboardSettingsEvents() {
                     field === "menuName"
                         ? normalizeSettingsText(
                             input.value,
-                            22,
+                            SPREADSHEET_MENU_NAME_MAX_LENGTH,
                         )
                         : input.value;
 
@@ -2085,6 +2042,7 @@ async function initializeDashboardSettings() {
 if (globalThis.document) await initializeDashboardSettings();
 
 export {
+    applyOperationSpreadsheetSettings,
     DASHBOARD_SETTINGS_SESSION_KEY,
     exportDashboardSettings,
     importDashboardSettings,

@@ -10,6 +10,10 @@ import {
     loadDefaultSpreadsheetSettings,
     normalizeDefaultSpreadsheetSettings,
 } from "../js/spreadsheets/default-spreadsheets.js";
+import {
+    FALLBACK_SPREADSHEET_SETTINGS,
+    OPERATION_SPREADSHEET_SETTINGS,
+} from "../js/spreadsheets/spreadsheet-presets.js";
 
 const configPath =
     new URL(
@@ -18,40 +22,58 @@ const configPath =
     );
 
 const expectedSpreadsheets = [
-    ["Checklist Operacional", "15goeiy-QDNIVC6N1kFSG55rqECRwv58FMXwgoDyt25o"],
-    ["Avarias", "1WaHywDEm3ipdvEtq-pB01v4kyaREhn2i"],
-    ["Pacotes em Análise", "1xJZpuck84CM9-FTYd5UnWbZ4AezWUdGx"],
-    ["Backlog e Logs", "1cbHXjnfHGIDSob9Sh977p5J827qPlM5f9juRq_sIgcM"],
-    ["Pacotes Retornados", "1b9VlTXNfWhOqJtx9UoPrQchh77AiPqcs"],
-    ["Erros de Etiquetagem", "1MJFZlrUrcZXve4WOYYLjCrKeUkD0QgSshCfZdWxNMZA"],
-    ["Gerenciamento de Rotas", "1UWlOQfVw-eD1ZkD5gxCo2MHZ4CEyJUd4osungKFTfwA"],
-    ["Controle Operacional", "1sh3TgSwLOt8EhoDhji2CHivbrEQiuhIpoBw0VHe2JoE"],
-    ["Stuck Orders", "1FisKLnYYdqg94k6ZFENFIj8nJaCv4-rr4TeCHm4mCSw"],
-    ["Controle de Endereços", "18jFdAElZYUlGEQaAMrUdqLu6Ux_LyQupyq9N-m-jLg0"],
-    ["Justificativas", "1sOzs3lgS6dO0WluGRQR2B8kmFTDUR5VC"],
-    ["Erros de Processo", "1FpcZuJboPyMKUGZwYHGHRYg4Pr_Phs4-ycqg-u7qGSU"],
-    ["Insucesso", "1J41DYbdogIyzxJxKOBJa_9uforRo5faS"],
+    ["Checklist Operacional", "1zjg2F1iPf9cd8lvuoCGgYIBm4qwtnpL56hWyJclJlnI"],
+    ["Avarias", "1-T7ok_Pzfh2-002wgH8qx5oH7I8UDPv2"],
+    ["Pacotes em Análise", "111dayXmqz5HZiXFYYBp-EzIgOhrXsaKC"],
+    ["Controle de Endereços", "166K25CQqHYERaZ3xotO6-p-BTCO9OrBQNsNHJa3YWKI"],
+    ["Backlog", "1jbnACxvCZV2zpJorNPf7pB5bIpygd1ELOIhlcm7AFbM"],
+    ["Pacotes Retornados", "1Nqfqc2CWhIPgpDSzXKbtgVRY4MNz9y60"],
     ["Reversa", "1wtALHYfXyFm9nfkV9TP1idnVV12oBwa-"],
-    ["Equipamentos", "15ycLVugBymQR63SivMIvwRMce4dTe5XV"],
+    ["Controle Operacional", "1UWlOQfVw-eD1ZkD5gxCo2MHZ4CEyJUd4osungKFTfwA"],
+    ["Stuck Orders", "1FisKLnYYdqg94k6ZFENFIj8nJaCv4-rr4TeCHm4mCSw"],
     ["Pacotes Full", "1PnKEGQtfETj0ptk7xAIPG3dcrZgbBunWFUJp18O_XDE"],
+    ["Insucesso", "1CvONso--DM9_Rdf4ieesREV5lpD0e-hb"],
+    ["SPM1", "1PnKEGQtfETj0ptk7xAIPG3dcrZgbBunWFUJp18O_XDE"],
+    ["Controle de Equipamentos", "1EDSg6R1qmHWpif4b-0J-qxUo78XUK-a8"],
+    ["Mapa de Calor", "1wtCWPTkgkAULZ7lPCL9R2UWLGUSzypNV"],
     ["Avarias AppSheet", "1SpChx2r8HHeqWQAYDELewvKzQM8eRLIgknT2EiMjPnU"],
 ];
 
-test("ordem padrão segue as imagens e mantém cada nome ligado à planilha correta", async () => {
+test("ordem padrão mantém os quinze nomes e links solicitados", async () => {
     const configuration = JSON.parse(await readFile(configPath, "utf8"));
     const spreadsheets = normalizeDefaultSpreadsheetSettings(configuration);
     assert.deepEqual(spreadsheets.map(({ menuName, link }) => [menuName, new URL(link).pathname.split("/")[3]]),
         expectedSpreadsheets);
-    assert.equal(new Set(spreadsheets.map(({ link }) => link)).size, expectedSpreadsheets.length);
+    assert.equal(spreadsheets.find(item => item.menuName === "Controle de Equipamentos").menuName,
+        "Controle de Equipamentos");
 });
 
 test("configuração incorporada mantém a mesma ordem e os mesmos links da configuração padrão", async () => {
-    const source = await readFile(new URL("../js/spreadsheets/load-spreadsheets.js", import.meta.url), "utf8");
-    const fallback = source.match(/const FALLBACK_SPREADSHEET_SETTINGS =\s*Object\.freeze\(\[([\s\S]*?)\]\);/)?.[1];
-    assert.ok(fallback, "A lista de reserva das planilhas deve existir.");
-    const spreadsheets = Array.from(fallback.matchAll(/spreadsheetId:\s*"([^"]+)",\s*menuName:\s*"([^"]+)"/g),
-        ([, id, name]) => [name, id]);
-    assert.deepEqual(spreadsheets, expectedSpreadsheets);
+    const configuration = JSON.parse(await readFile(configPath, "utf8"));
+    assert.deepEqual(FALLBACK_SPREADSHEET_SETTINGS, normalizeDefaultSpreadsheetSettings(configuration));
+});
+
+test("atalho da operação mantém dezesseis nomes completos e seus respectivos destinos", () => {
+    const expected = [
+        ["Resumo da Operação", "1ikhuvRYNdqlEmkBPuclqLqqeSO88ITvAtxZN0nhhzFs"],
+        ["Checklist Operacional", "15goeiy-QDNIVC6N1kFSG55rqECRwv58FMXwgoDyt25o"],
+        ["Avarias e Perdas", "11jdHDwRBiDKTpP2G7s02v0wR2K27nJ5mG9G6aExwESQ"],
+        ["Controle de Endereços", "166K25CQqHYERaZ3xotO6-p-BTCO9OrBQNsNHJa3YWKI"],
+        ["Backlog", "11jdHDwRBiDKTpP2G7s02v0wR2K27nJ5mG9G6aExwESQ"],
+        ["Reversa", "11jdHDwRBiDKTpP2G7s02v0wR2K27nJ5mG9G6aExwESQ"],
+        ["Controle Operacional", "1UWlOQfVw-eD1ZkD5gxCo2MHZ4CEyJUd4osungKFTfwA"],
+        ["Stuck Orders", "1FisKLnYYdqg94k6ZFENFIj8nJaCv4-rr4TeCHm4mCSw"],
+        ["Pacotes Full", "1PnKEGQtfETj0ptk7xAIPG3dcrZgbBunWFUJp18O_XDE"],
+        ["Insucesso", "1CvONso--DM9_Rdf4ieesREV5lpD0e-hb"],
+        ["SPM1", "1PnKEGQtfETj0ptk7xAIPG3dcrZgbBunWFUJp18O_XDE"],
+        ["Controle de Equipamentos", "1EDSg6R1qmHWpif4b-0J-qxUo78XUK-a8"],
+        ["Avarias AppSheet", "1SpChx2r8HHeqWQAYDELewvKzQM8eRLIgknT2EiMjPnU"],
+        ["Relatório de Planejamento", "1vdJ7cgfN56hlKR1UnGDpctzfxZK2EkLSXfgxCIEMUNE"],
+        ["Relatório de Processamento", "1ySTMhlf8AROkIkly83cUPQ9pzqP2FjhU7hE0aIO9YYA"],
+        ["Relatório de Expedição", "15U1VuVYA1paDWwQuKZ7_7waGM_J2HtuCl1y_6EiNzcU"],
+    ];
+    assert.deepEqual(OPERATION_SPREADSHEET_SETTINGS,
+        expected.map(([menuName, id]) => ({ menuName, link: `https://docs.google.com/spreadsheets/d/${id}/` })));
 });
 
 test(
@@ -80,7 +102,7 @@ test(
 
         assert.equal(
             returnedPackages?.link,
-            "https://docs.google.com/spreadsheets/d/1b9VlTXNfWhOqJtx9UoPrQchh77AiPqcs/",
+            "https://docs.google.com/spreadsheets/d/1Nqfqc2CWhIPgpDSzXKbtgVRY4MNz9y60/",
         );
     },
 );

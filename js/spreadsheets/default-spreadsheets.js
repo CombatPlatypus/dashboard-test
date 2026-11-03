@@ -1,3 +1,5 @@
+import { SPREADSHEET_MENU_NAME_MAX_LENGTH } from "./spreadsheet-presets.js";
+
 const DEFAULT_SPREADSHEET_CONFIG_PATH =
     "config/spreadsheets.json";
 
@@ -44,7 +46,7 @@ function normalizeDefaultSpreadsheetSettings(
                         "",
                     )
                         .trim()
-                        .slice(0, 22);
+                        .slice(0, SPREADSHEET_MENU_NAME_MAX_LENGTH);
 
                 if (
                     !link.startsWith(

@@ -7,6 +7,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseDashboardSettingsFile, serializeDashboardSettingsFile } from "../js/settings/settings-file.js";
+import { OPERATION_SPREADSHEET_SETTINGS } from "../js/spreadsheets/spreadsheet-presets.js";
 
 const { chromium } = createRequire(import.meta.url)("playwright");
 const root = fileURLToPath(new URL("../", import.meta.url));
@@ -482,6 +483,49 @@ try {
     assert.equal(await page.locator("#reportAnalystInput").inputValue(), "");
     assert.equal((await themeColors()).theme, "default");
     assert.equal(await page.locator("#footerReverseFormLink").isVisible(), true);
+
+    // O clique simples mantém os padrões; o duplo clique aplica a lista da operação na aba.
+    const defaultSpreadsheets = JSON.parse(await readFile(path.join(root, "config/spreadsheets.json"), "utf8")).spreadsheets;
+    const spreadsheetMenu = () => page.locator("#switch-spreadsheet .tabs-title").evaluateAll(items => items.map(item => ({
+        menuName: item.querySelector("a").textContent,
+        link: item.querySelector("button").dataset.url,
+    })));
+    assert.equal(defaultSpreadsheets.length, 15);
+    assert.deepEqual(await spreadsheetMenu(), defaultSpreadsheets.map(({ menuName, link }) => ({ menuName, link })));
+    const contextBeforePreset = await reportContext();
+    const reportsBeforePreset = await page.evaluate(async () =>
+        (await import("/js/reports/core/report-manager.js")).reportManager.exportSession());
+    const logo = page.locator("#dashboardSpreadsheetPresetLogo");
+    await logo.click();
+    assert.deepEqual(await spreadsheetMenu(), defaultSpreadsheets.map(({ menuName, link }) => ({ menuName, link })));
+    await logo.dblclick();
+    assert.deepEqual(await spreadsheetMenu(), OPERATION_SPREADSHEET_SETTINGS);
+    assert.deepEqual(await page.locator("#spreadsheetPanels iframe").evaluateAll(frames => frames.map(frame => ({
+        menuName: frame.title, link: frame.dataset.src,
+    }))), OPERATION_SPREADSHEET_SETTINGS);
+    assert.deepEqual(await reportContext(), contextBeforePreset);
+    assert.deepEqual(await page.evaluate(async () =>
+        (await import("/js/reports/core/report-manager.js")).reportManager.exportSession()), reportsBeforePreset);
+    const operationSettings = await page.evaluate(async () =>
+        (await import("/js/spreadsheets/load-spreadsheets.js")).exportDashboardSettings());
+    assert.deepEqual(await sessionSettings(page), operationSettings);
+    await logo.dblclick();
+    assert.deepEqual(await sessionSettings(page), operationSettings);
+    await page.screenshot({ path: path.join(output, "planilhas-operacao.png"), fullPage: true });
+    await page.reload();
+    await readyIndex();
+    assert.deepEqual(await spreadsheetMenu(), OPERATION_SPREADSHEET_SETTINGS);
+    await page.locator("#dashboardSpreadsheetPresetLogo").press("Enter");
+    assert.deepEqual(await spreadsheetMenu(), OPERATION_SPREADSHEET_SETTINGS);
+    await page.goto(`${base}/settings.html`);
+    await readySettings();
+    assert.equal(await page.locator("#settingsSpreadsheetName15").inputValue(), "Relatório de Processamento");
+    assert.equal(await page.locator("#settingsSpreadsheetLink15").inputValue(), OPERATION_SPREADSHEET_SETTINGS[14].link);
+    assert.equal(await page.locator("#settingsSpreadsheetName13").getAttribute("maxlength"), "60");
+    await page.evaluate(() => sessionStorage.clear());
+    await page.goto(`${base}/index.html`);
+    await readyIndex();
+    assert.deepEqual(await spreadsheetMenu(), defaultSpreadsheets.map(({ menuName, link }) => ({ menuName, link })));
 
     // Falhas do armazenamento não impedem baixar o arquivo nem indicam sucesso da cópia na aba.
     await page.goto(`${base}/settings.html`);

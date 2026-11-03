@@ -1,0 +1,96 @@
+Adicionar uma funcionalidade que quando clicado duas vezes na imagem do logo do menu principal, o dahsboard muda o links e nomes das planilhas de acordo com a lista abaixo:
+
+1 . Resumo da Operação
+https://docs.google.com/spreadsheets/d/1ikhuvRYNdqlEmkBPuclqLqqeSO88ITvAtxZN0nhhzFs/
+
+2 . Checklist Operacional
+https://docs.google.com/spreadsheets/d/15goeiy-QDNIVC6N1kFSG55rqECRwv58FMXwgoDyt25o/
+
+3 . Avarias e Perdas
+https://docs.google.com/spreadsheets/d/11jdHDwRBiDKTpP2G7s02v0wR2K27nJ5mG9G6aExwESQ/
+
+4 . Controle de Endereços
+https://docs.google.com/spreadsheets/d/166K25CQqHYERaZ3xotO6-p-BTCO9OrBQNsNHJa3YWKI/
+
+5 . Backlog
+https://docs.google.com/spreadsheets/d/11jdHDwRBiDKTpP2G7s02v0wR2K27nJ5mG9G6aExwESQ/
+
+6 . Reversa
+https://docs.google.com/spreadsheets/d/11jdHDwRBiDKTpP2G7s02v0wR2K27nJ5mG9G6aExwESQ/
+
+7 . Controle Operacional
+https://docs.google.com/spreadsheets/d/1UWlOQfVw-eD1ZkD5gxCo2MHZ4CEyJUd4osungKFTfwA/
+
+8 . Stuck Orders
+https://docs.google.com/spreadsheets/d/1FisKLnYYdqg94k6ZFENFIj8nJaCv4-rr4TeCHm4mCSw/
+
+9 . Pacotes Full
+https://docs.google.com/spreadsheets/d/1PnKEGQtfETj0ptk7xAIPG3dcrZgbBunWFUJp18O_XDE/
+
+10 . Insucesso
+https://docs.google.com/spreadsheets/d/1CvONso--DM9_Rdf4ieesREV5lpD0e-hb/
+
+11 . SPM1
+https://docs.google.com/spreadsheets/d/1PnKEGQtfETj0ptk7xAIPG3dcrZgbBunWFUJp18O_XDE/
+
+12 . Controle de Equipamentos
+https://docs.google.com/spreadsheets/d/1EDSg6R1qmHWpif4b-0J-qxUo78XUK-a8/
+
+13 . Avarias AppSheet
+https://docs.google.com/spreadsheets/d/1SpChx2r8HHeqWQAYDELewvKzQM8eRLIgknT2EiMjPnU/
+
+14 . Relatório de Planejamento
+https://docs.google.com/spreadsheets/d/1vdJ7cgfN56hlKR1UnGDpctzfxZK2EkLSXfgxCIEMUNE/
+
+15 . Relatório de Processamento
+https://docs.google.com/spreadsheets/d/1ySTMhlf8AROkIkly83cUPQ9pzqP2FjhU7hE0aIO9YYA/
+
+16 . Relatório de Expedição
+https://docs.google.com/spreadsheets/d/15U1VuVYA1paDWwQuKZ7_7waGM_J2HtuCl1y_6EiNzcU/
+
+Mude os links e nomes padrões das planilhas de acordo com a lista abaixo
+
+1 . Checklist Operacional
+https://docs.google.com/spreadsheets/d/1zjg2F1iPf9cd8lvuoCGgYIBm4qwtnpL56hWyJclJlnI/
+
+3 . Avarias
+https://docs.google.com/spreadsheets/d/1-T7ok_Pzfh2-002wgH8qx5oH7I8UDPv2/
+
+4 . Pacotes em Análise
+https://docs.google.com/spreadsheets/d/111dayXmqz5HZiXFYYBp-EzIgOhrXsaKC/
+
+5 . Controle de Endereços
+https://docs.google.com/spreadsheets/d/166K25CQqHYERaZ3xotO6-p-BTCO9OrBQNsNHJa3YWKI/
+
+6 . Backlog
+https://docs.google.com/spreadsheets/d/1jbnACxvCZV2zpJorNPf7pB5bIpygd1ELOIhlcm7AFbM/
+
+6 . Pacotes Retornados
+https://docs.google.com/spreadsheets/d/1Nqfqc2CWhIPgpDSzXKbtgVRY4MNz9y60/
+
+6 . Reversa
+https://docs.google.com/spreadsheets/d/1wtALHYfXyFm9nfkV9TP1idnVV12oBwa-/
+
+7 . Controle Operacional
+https://docs.google.com/spreadsheets/d/1UWlOQfVw-eD1ZkD5gxCo2MHZ4CEyJUd4osungKFTfwA/
+
+8 . Stuck Orders
+https://docs.google.com/spreadsheets/d/1FisKLnYYdqg94k6ZFENFIj8nJaCv4-rr4TeCHm4mCSw/
+
+9 . Pacotes Full
+https://docs.google.com/spreadsheets/d/1PnKEGQtfETj0ptk7xAIPG3dcrZgbBunWFUJp18O_XDE/
+
+10 . Insucesso
+https://docs.google.com/spreadsheets/d/1CvONso--DM9_Rdf4ieesREV5lpD0e-hb/
+
+11 . SPM1
+https://docs.google.com/spreadsheets/d/1PnKEGQtfETj0ptk7xAIPG3dcrZgbBunWFUJp18O_XDE/
+
+12 . Controle de Equipamentos
+https://docs.google.com/spreadsheets/d/1EDSg6R1qmHWpif4b-0J-qxUo78XUK-a8/
+
+13 . Mapa de Calor
+https://docs.google.com/spreadsheets/d/1wtCWPTkgkAULZ7lPCL9R2UWLGUSzypNV/
+
+14 . Avarias AppSheet
+https://docs.google.com/spreadsheets/d/1SpChx2r8HHeqWQAYDELewvKzQM8eRLIgknT2EiMjPnU/
