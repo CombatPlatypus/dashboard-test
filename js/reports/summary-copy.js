@@ -76,13 +76,14 @@ function createReportSummaryClipboard(kind, {
         const state = parcel ?? getParcelState();
         const summary = createParcelSummary(state.rows, state.operatorKindOverrides);
         const rows = [
-            [cell("Relatório Parcel Sweeper", 6, 12), cell(dateFormatter.format(now), 2, 12)],
-            heading("Porcentagem Total", "Total de Bipado", "Pacotes Exception", "Pacotes Missorted"),
+            [cell("Relatório Parcel Sweeper", 3, 12), cell(dateFormatter.format(now), 1, 12)],
+            heading("Porcentagem Total", "Total de Bipado"),
             [cell(summary.expectedTotalCount > 0 ? rate(summary.expectedScannedCount / summary.expectedTotalCount) : null, 1),
                 cell(summary.hasData ? "-" : null, 1),
-                ...pair(summary.hasData ? summary.scannedCount : null,
-                    summary.hasData ? summary.exceptionCount : null,
-                    summary.hasData ? summary.missortedCount : null)],
+                cell(summary.hasData ? summary.scannedCount : null)],
+            heading("Pacotes Exception", "Pacotes Missorted"),
+            pair(summary.hasData ? summary.exceptionCount : null,
+                summary.hasData ? summary.missortedCount : null),
         ];
         return { ...createClipboardTable(rows, { columnWidth: 100 }),
             target: "A1", sheet: "Base da Visão Geral", label: "Relatório Parcel Sweeper",
@@ -99,7 +100,7 @@ function createReportSummaryClipboard(kind, {
             types.map(type => cell(summary.hasData ? summary.quantities[type] : null, 1)),
         ];
         return { ...createClipboardTable(rows, { columnWidth: 125 }),
-            target: "A5", sheet: "Base da Visão Geral", label: "Resumo de reversa",
+            target: "A7", sheet: "Base da Visão Geral", label: "Resumo de reversa",
             shift: null, hasData: summary.hasData, copyError: "",
         };
     }

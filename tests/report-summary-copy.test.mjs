@@ -133,7 +133,7 @@ test("expedição inclui resumo, erros e lista de conferentes em E3:H58", () => 
     assert.doesNotMatch(payload.text, /Processamento|Volume Recebido/);
 });
 
-test("parcel copia A1:H3 com título, data, quatro indicadores e traço em B3 ao lado da porcentagem", () => {
+test("parcel copia A1:D5 com data em D1 e traço em B3, deixando espaço para a reversa em A7", () => {
     replaceParcelRows(parcelRows);
     const payload = createReportSummaryClipboard("parcel", { now: copyDate });
     assert.equal(payload.target, "A1");
@@ -141,24 +141,26 @@ test("parcel copia A1:H3 com título, data, quatro indicadores e traço em B3 ao
     assert.equal(payload.hasData, true);
     assert.equal(payload.copyError, "");
     assert.deepEqual(matrix(payload), [
-        ["Relatório Parcel Sweeper", "", "", "", "", "", "02/11/2026", ""],
-        ["Porcentagem Total", "", "Total de Bipado", "", "Pacotes Exception", "", "Pacotes Missorted", ""],
-        ["50,00%", "-", "4", "", "2", "", "1", ""],
+        ["Relatório Parcel Sweeper", "", "", "02/11/2026"],
+        ["Porcentagem Total", "", "Total de Bipado", ""],
+        ["50,00%", "-", "4", ""],
+        ["Pacotes Exception", "", "Pacotes Missorted", ""],
+        ["2", "", "1", ""],
     ]);
     const workbook = XLSX.read(payload.html, { type: "string" });
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     assert.deepEqual(sheet["!merges"].map(XLSX.utils.encode_range), [
-        "A1:F1", "G1:H1", "A2:B2", "C2:D2", "E2:F2", "G2:H2", "C3:D3", "E3:F3", "G3:H3",
+        "A1:C1", "A2:B2", "C2:D2", "C3:D3", "A4:B4", "C4:D4", "A5:B5", "C5:D5",
     ]);
     assert.equal(sheet.B3.v, "-");
     assert.equal(sheet.C3.v, 4);
-    assert.equal(sheet.E3.v, 2);
-    assert.equal(sheet.G3.v, 1);
-    assert.equal([...payload.html.matchAll(/<col width="100"/g)].length, 8);
+    assert.equal(sheet.A5.v, 2);
+    assert.equal(sheet.C5.v, 1);
+    assert.equal([...payload.html.matchAll(/<col width="100"/g)].length, 4);
     const cells = [...payload.html.matchAll(/<td\b([^>]*)>([^<]*)<\/td>/g)];
     assert.equal(cells.length, 11);
-    assert.deepEqual(cells.slice(6, 8).map(([, , text]) => text), ["50,00%", "-"]);
-    assert.ok(cells.slice(6, 8).every(([, attributes]) => attributes.includes('colspan="1"')));
+    assert.deepEqual(cells.slice(4, 6).map(([, , text]) => text), ["50,00%", "-"]);
+    assert.ok(cells.slice(4, 6).every(([, attributes]) => attributes.includes('colspan="1"')));
     for (const [, attributes] of cells) {
         assert.match(attributes, /border:1px solid #000000;/);
         assert.match(attributes, /text-align:center;vertical-align:middle/);
@@ -167,22 +169,26 @@ test("parcel copia A1:H3 com título, data, quatro indicadores e traço em B3 ao
         assert.equal(format["10"], 1);
         assert.equal(format["15"], "Roboto");
     }
-    assert.match(cells[0][1], /colspan="6"/);
+    assert.match(cells[0][1], /colspan="3"/);
     assert.match(cells[0][1], /font-size:12pt/);
-    assert.match(cells[1][1], /colspan="2"/);
+    assert.match(cells[1][1], /colspan="1"/);
     assert.equal(cells[1][2], "02/11/2026");
 });
 
 test("parcel mantém zeros reais e deixa a porcentagem vazia quando não há base de cobertura", () => {
     let payload = createReportSummaryClipboard("parcel");
     assert.equal(payload.hasData, false);
-    assert.deepEqual(matrix(payload)[2], Array(8).fill(""));
+    assert.deepEqual(matrix(payload)[2], Array(4).fill(""));
+    assert.deepEqual(matrix(payload)[4], Array(4).fill(""));
     replaceParcelRows([{ trackingNumber: "BR1", countType: "Missing", expected: "Y" }]);
     payload = createReportSummaryClipboard("parcel");
     assert.equal(payload.hasData, true);
-    assert.deepEqual(matrix(payload)[2], ["0,00%", "-", "0", "", "0", "", "0", ""]);
+    assert.deepEqual(matrix(payload)[2], ["0,00%", "-", "0", ""]);
+    assert.deepEqual(matrix(payload)[4], ["0", "", "0", ""]);
     replaceParcelRows(parcelRows.map(row => ({ ...row, expected: "N" })));
-    assert.deepEqual(matrix(createReportSummaryClipboard("parcel"))[2], ["", "-", "4", "", "2", "", "1", ""]);
+    payload = createReportSummaryClipboard("parcel");
+    assert.deepEqual(matrix(payload)[2], ["", "-", "4", ""]);
+    assert.deepEqual(matrix(payload)[4], ["2", "", "1", ""]);
     replaceParcelRows(parcelRows.map(({ expected, ...row }) => row));
     assert.equal(matrix(createReportSummaryClipboard("parcel"))[2][0], "66,67%");
 });
@@ -230,13 +236,15 @@ test("botão do parcel acompanha importação, limpeza e restauração e orienta
     restoreParcelState({ rows: [{ trackingNumber: "BR1", countType: "Mis-sorted", expected: "Y" }] });
     assert.equal(parcel.disabled, false);
     await parcel.fire();
-    assert.deepEqual(matrix({ text: nativeCopies[1]["text/plain"] })[2], ["100,00%", "-", "1", "", "0", "", "1", ""]);
+    const restored = matrix({ text: nativeCopies[1]["text/plain"] });
+    assert.deepEqual(restored[2], ["100,00%", "-", "1", ""]);
+    assert.deepEqual(restored[4], ["0", "", "1", ""]);
 });
 
-test("reversa copia A5:D7 com título, data e os totais das TOs na ordem da planilha", () => {
+test("reversa copia A7:D9 com título, data e os totais das TOs na ordem da planilha", () => {
     restoreReverseState({ transfers: reverseTransfers });
     const payload = createReportSummaryClipboard("reverse", { now: copyDate });
-    assert.equal(payload.target, "A5");
+    assert.equal(payload.target, "A7");
     assert.equal(payload.sheet, "Base da Visão Geral");
     assert.equal(payload.hasData, true);
     assert.equal(payload.copyError, "");
@@ -271,7 +279,7 @@ test("reversa deixa totais vazios sem dados e preserva zeros com uma categoria i
     assert.deepEqual(matrix(payload)[2], ["10", "0", "0", "0"]);
     for (const window of ["AM", "PM1", "PM2"]) {
         updateReportContextField("window", window);
-        assert.equal(createReportSummaryClipboard("reverse").target, "A5");
+        assert.equal(createReportSummaryClipboard("reverse").target, "A7");
         assert.equal(createReportSummaryClipboard("reverse").shift, null);
     }
 });
@@ -287,7 +295,7 @@ test("botão da reversa acompanha TOs atualizadas, limpeza e restauração e cop
     assert.equal(nativeCopies.length, 0);
     restoreReverseState({ transfers: reverseTransfers });
     assert.equal(reverse.disabled, false);
-    assert.equal(reverse.title, "Resumo de reversa: copiar para A5 da aba Base da Visão Geral.");
+    assert.equal(reverse.title, "Resumo de reversa: copiar para A7 da aba Base da Visão Geral.");
     assert.equal(reverse.attributes["aria-label"], reverse.title);
     await reverse.fire();
     const payload = createReportSummaryClipboard("reverse");
@@ -295,7 +303,7 @@ test("botão da reversa acompanha TOs atualizadas, limpeza e restauração e cop
     assert.equal(nativeCopies[0]["text/html"], payload.html);
     assert.equal(reverseNotification.dataset.notificationType, "success");
     assert.equal(reverseText.textContent,
-        "Resumo de reversa copiado. Cole em A5 da aba Base da Visão Geral. Use Ctrl+V para manter mesclagens e alinhamento.");
+        "Resumo de reversa copiado. Cole em A7 da aba Base da Visão Geral. Use Ctrl+V para manter mesclagens e alinhamento.");
     upsertReverseTransfer({ to: "TO1", quantities: { return: 2 } });
     await reverse.fire();
     assert.deepEqual(matrix({ text: nativeCopies[1]["text/plain"] })[2], ["5", "0", "7", "2"]);
@@ -323,12 +331,12 @@ test("data do Parcel e da Reversa usa o dia de São Paulo e muda na próxima có
     initializeReportSummaryCopy(root);
     await parcel.fire();
     await reverse.fire();
-    assert.equal(matrix({ text: nativeCopies[0]["text/plain"] })[0][6], "02/11/2026");
+    assert.equal(matrix({ text: nativeCopies[0]["text/plain"] })[0][3], "02/11/2026");
     assert.equal(matrix({ text: nativeCopies[1]["text/plain"] })[0][3], "02/11/2026");
     instant = RealDate.parse("2026-11-03T03:00:00Z");
     await parcel.fire();
     await reverse.fire();
-    assert.equal(matrix({ text: nativeCopies[2]["text/plain"] })[0][6], "03/11/2026");
+    assert.equal(matrix({ text: nativeCopies[2]["text/plain"] })[0][3], "03/11/2026");
     assert.equal(matrix({ text: nativeCopies[3]["text/plain"] })[0][3], "03/11/2026");
 });
 
