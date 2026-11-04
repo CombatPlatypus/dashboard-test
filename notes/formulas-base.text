@@ -1061,3 +1061,5 @@ LM Hub_SP_Santos_PraiaGrande_02
         0
     )
 )
+
+    =SOMA('Último AM'!E11; 'Último PM1'!E11; 'Último PM2'!E11)

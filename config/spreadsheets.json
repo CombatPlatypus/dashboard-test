@@ -13,6 +13,14 @@
             "menuName": "Pacotes em Análise"
         },
         {
+            "link": "https://docs.google.com/spreadsheets/d/1sOzs3lgS6dO0WluGRQR2B8kmFTDUR5VC/",
+            "menuName": "Justificativas"
+        },
+        {
+            "link": "https://docs.google.com/spreadsheets/d/1MJFZlrUrcZXve4WOYYLjCrKeUkD0QgSshCfZdWxNMZA/",
+            "menuName": "Erros de Etiquetagem"
+        },
+        {
             "link": "https://docs.google.com/spreadsheets/d/166K25CQqHYERaZ3xotO6-p-BTCO9OrBQNsNHJa3YWKI/",
             "menuName": "Controle de Endereços"
         },

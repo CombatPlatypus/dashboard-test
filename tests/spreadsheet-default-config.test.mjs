@@ -25,6 +25,8 @@ const expectedSpreadsheets = [
     ["Checklist Operacional", "1zjg2F1iPf9cd8lvuoCGgYIBm4qwtnpL56hWyJclJlnI"],
     ["Avarias", "1-T7ok_Pzfh2-002wgH8qx5oH7I8UDPv2"],
     ["Pacotes em Análise", "111dayXmqz5HZiXFYYBp-EzIgOhrXsaKC"],
+    ["Justificativas", "1sOzs3lgS6dO0WluGRQR2B8kmFTDUR5VC"],
+    ["Erros de Etiquetagem", "1MJFZlrUrcZXve4WOYYLjCrKeUkD0QgSshCfZdWxNMZA"],
     ["Controle de Endereços", "166K25CQqHYERaZ3xotO6-p-BTCO9OrBQNsNHJa3YWKI"],
     ["Backlog", "1jbnACxvCZV2zpJorNPf7pB5bIpygd1ELOIhlcm7AFbM"],
     ["Pacotes Retornados", "1Nqfqc2CWhIPgpDSzXKbtgVRY4MNz9y60"],
@@ -38,7 +40,7 @@ const expectedSpreadsheets = [
     ["Avarias AppSheet", "1SpChx2r8HHeqWQAYDELewvKzQM8eRLIgknT2EiMjPnU"],
 ];
 
-test("ordem padrão mantém os quatorze nomes e links solicitados", async () => {
+test("ordem padrão mantém os dezesseis nomes e links solicitados", async () => {
     const configuration = JSON.parse(await readFile(configPath, "utf8"));
     const spreadsheets = normalizeDefaultSpreadsheetSettings(configuration);
     assert.deepEqual(spreadsheets.map(({ menuName, link }) => [menuName, new URL(link).pathname.split("/")[3]]),
@@ -52,12 +54,13 @@ test("configuração incorporada mantém a mesma ordem e os mesmos links da conf
     assert.deepEqual(FALLBACK_SPREADSHEET_SETTINGS, normalizeDefaultSpreadsheetSettings(configuration));
 });
 
-test("atalho da operação mantém quinze nomes completos e seus respectivos destinos", () => {
+test("atalho da operação mantém dezesseis nomes completos e seus respectivos destinos", () => {
     const expected = [
         ["Resumo da Operação", "1ikhuvRYNdqlEmkBPuclqLqqeSO88ITvAtxZN0nhhzFs"],
         ["Checklist Operacional", "15goeiy-QDNIVC6N1kFSG55rqECRwv58FMXwgoDyt25o"],
         ["Avarias e Perdas", "11jdHDwRBiDKTpP2G7s02v0wR2K27nJ5mG9G6aExwESQ"],
         ["Controle de Endereços", "166K25CQqHYERaZ3xotO6-p-BTCO9OrBQNsNHJa3YWKI"],
+        ["Justificativas", "1sOzs3lgS6dO0WluGRQR2B8kmFTDUR5VC"],
         ["Backlog", "1PUheTCH7QeLo-4c3t3-GS8eQrtAHiZ8B4ICZFsUJ8hA"],
         ["Reversa", "1CIdBvPaCkLo9elCjyHuKzQ7rfLepiMv6xBXAeYxUL1Y"],
         ["Controle Operacional", "1UWlOQfVw-eD1ZkD5gxCo2MHZ4CEyJUd4osungKFTfwA"],

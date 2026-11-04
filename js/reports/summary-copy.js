@@ -78,13 +78,14 @@ function createReportSummaryClipboard(kind, {
         const rows = [
             [cell("Relatório Parcel Sweeper", 6, 12), cell(dateFormatter.format(now), 2, 12)],
             heading("Porcentagem Total", "Total de Bipado", "Pacotes Exception", "Pacotes Missorted"),
-            pair(summary.expectedTotalCount > 0 ? rate(summary.expectedScannedCount / summary.expectedTotalCount) : null,
-                summary.hasData ? summary.scannedCount : null,
-                summary.hasData ? summary.exceptionCount : null,
-                summary.hasData ? summary.missortedCount : null),
+            [cell(summary.expectedTotalCount > 0 ? rate(summary.expectedScannedCount / summary.expectedTotalCount) : null, 1),
+                cell(summary.hasData ? "-" : null, 1),
+                ...pair(summary.hasData ? summary.scannedCount : null,
+                    summary.hasData ? summary.exceptionCount : null,
+                    summary.hasData ? summary.missortedCount : null)],
         ];
         return { ...createClipboardTable(rows, { columnWidth: 100 }),
-            target: "A1", sheet: "Base do Parcel", label: "Relatório Parcel Sweeper",
+            target: "A1", sheet: "Base da Visão Geral", label: "Relatório Parcel Sweeper",
             shift: null, hasData: summary.hasData, copyError: "",
         };
     }
@@ -98,7 +99,7 @@ function createReportSummaryClipboard(kind, {
             types.map(type => cell(summary.hasData ? summary.quantities[type] : null, 1)),
         ];
         return { ...createClipboardTable(rows, { columnWidth: 125 }),
-            target: "A1", sheet: null, label: "Resumo de reversa",
+            target: "A5", sheet: "Base da Visão Geral", label: "Resumo de reversa",
             shift: null, hasData: summary.hasData, copyError: "",
         };
     }
@@ -170,7 +171,7 @@ function createReportSummaryClipboard(kind, {
         : "";
     // Empty rows remove names left by a previous, longer list without touching the next window.
     rows.push(...Array.from({ length: listCapacity }, (_, index) => createOperatorRow(operators[index])));
-    return { ...createClipboardTable(rows), target, sheet: "Base do Resumo", label, shift, hasData, copyError };
+    return { ...createClipboardTable(rows), target, sheet: "Base dos Turnos", label, shift, hasData, copyError };
 }
 
 function writeSummaryCopyEvent(payload) {
