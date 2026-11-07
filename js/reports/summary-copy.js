@@ -9,8 +9,8 @@ import { createReverseSummary } from "./reverse/model.js";
 import { getReverseState, subscribeReverseState } from "./reverse/state.js";
 import { setReportNotification } from "./report-notifications.js";
 
-const shiftRows = { AM: 3, PM1: 62, PM2: 121 };
-// Each window reserves rows 3:58, 62:117 or 121:176 for the two report blocks.
+const shiftRows = { AM: 11, PM1: 70, PM2: 129 };
+// Each window reserves rows 11:66, 70:125 or 129:184 for the two report blocks.
 const summaryRowCount = 56;
 const rateFormatter = new Intl.NumberFormat("pt-BR", {
     style: "percent", minimumFractionDigits: 2, maximumFractionDigits: 2,
@@ -86,7 +86,7 @@ function createReportSummaryClipboard(kind, {
                 summary.hasData ? summary.missortedCount : null),
         ];
         return { ...createClipboardTable(rows, { columnWidth: 100 }),
-            target: "A1", sheet: "Base da Visão Geral", label: "Relatório Parcel Sweeper",
+            target: "G10", sheet: "Base da Visão Geral", label: "Relatório Parcel Sweeper",
             shift: null, hasData: summary.hasData, copyError: "",
         };
     }
@@ -100,7 +100,7 @@ function createReportSummaryClipboard(kind, {
             types.map(type => cell(summary.hasData ? summary.quantities[type] : null, 1)),
         ];
         return { ...createClipboardTable(rows, { columnWidth: 125 }),
-            target: "A7", sheet: "Base da Visão Geral", label: "Resumo de reversa",
+            target: "G16", sheet: "Base da Visão Geral", label: "Resumo de reversa",
             shift: null, hasData: summary.hasData, copyError: "",
         };
     }
@@ -129,7 +129,7 @@ function createReportSummaryClipboard(kind, {
         createOperatorRow = operator => [formatReportPersonWithOps(operator?.receiver), formatReportPersonWithOps(operator?.labeler), operator?.packagesReceived, operator?.errorQuantity]
             .map(value => cell(value, 1, 10, "Arial"));
         listLabel = "recebedores";
-        target = `A${firstRow}`;
+        target = `C${firstRow}`;
         label = "Resumo de processamento";
         hasData = unloaded.hasData || received.receivedVolume !== null || operators.length > 0;
     } else if (kind === "expedition") {
@@ -159,7 +159,7 @@ function createReportSummaryClipboard(kind, {
         createOperatorRow = operator => [cell(formatReportPersonWithOps(operator?.operator)), cell(operator?.routesChecked, 1),
             cell(formatDuration(operator?.averageDurationSeconds), 1)];
         listLabel = "conferentes";
-        target = `E${firstRow}`;
+        target = `G${firstRow}`;
         label = "Resumo de expedição e erros";
         hasData = analysis.hasSpXData || analysis.hasErrorData;
     } else {
