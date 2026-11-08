@@ -27,6 +27,10 @@ CONTAGEM DE REGISTROS (FUNÇÕES DE CONTAGEM E PARA QUE SERVEM)
 
     =CONT.VALORES(A2:A100) Conta células não vazias, sejam elas textos ou números, mas não é muito recomendável usar para contar dados de uma coluna que seja gerada por uma fórmula, uma célula contendo fórmula que retorna "" também pode ser considerada preenchida por CONT.VALORES.
 
+    =CONT.SES(E3:E;"Missorted";B3:B;">="&DATA(2026;11;1);B3:B;"<"&DATA(2026;12;1))
+    =CONT.SES(E12:E;"<>"; C12:C;">="&DATA(2026;11;1);C12:C;"<"&DATA(2026;12;1))
+
+
     Usar somente para colunas que sejam preenchidas manualmente
 
     =CONT.SE(A2:A100;"<>") O critério "<>" significa diferente de vazio, faz basicamente o que a de cima faz, só que melhor, mais seguro eu diria, prefira usar =CONT.SE(A2:A100;"<>") invés de =CONT.VALORES(A2:A100) para contar o valores de uma coluna, é certeza que só vai contar os valores e não as celulas vazias.
@@ -1063,3 +1067,6 @@ LM Hub_SP_Santos_PraiaGrande_02
 )
 
     =SOMA('Último AM'!E11; 'Último PM1'!E11; 'Último PM2'!E11)
+
+
+=CONT.SES(E12:E;"<>";C12:C;">="&DATA(ANO(HOJE());MÊS(HOJE());1);C12:C;"<"&DATA(ANO(HOJE());MÊS(HOJE())+1;1))
