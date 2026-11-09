@@ -90,7 +90,7 @@ test("planejamento preenche o Modelo a partir de B2, com mesclagens, cores e val
     assert.equal(payload.sheet, "Modelo");
     assert.equal(payload.hasData, true);
     const rows = matrix(payload);
-    assert.equal(rows.length, 5999);
+    assert.equal(rows.length, 63);
     assert.ok(rows.every(row => row.length === 6));
     for (const [row, values] of [
         [2, ["PLANEJAMENTO", "", "", "", "", ""]],
@@ -107,13 +107,12 @@ test("planejamento preenche o Modelo a partir de B2, com mesclagens, cores e val
         [62, ["TOs para Segregar", "LH", "QTD", "", "", ""]],
         [63, ["To-A", "LtA", "20", "", "", ""]],
         [64, ["To-B", "LtA", "0", "", "", ""]],
-        [6000, ["", "", "", "", "", ""]],
     ]) assert.deepEqual(rows[row - 2], values, `Linha ${row}`);
 
     const sheet = XLSX.read(payload.html, { type: "string" }).Sheets.Sheet1;
     assert.deepEqual(sheet["!merges"].map(XLSX.utils.encode_range), [
         "A1:F2", "A4:C4", "E4:F4", "A7:C7", "A8:C8", "A11:C11", "A12:C12",
-        "A15:C15", "A16:C16", "D16:D5999", "A38:C38", "A60:C60",
+        "A15:C15", "A16:C16", "A38:C38", "A60:C60",
     ]);
     assert.equal(sheet.B18.v, "São Bernardo & Hub");
     assert.equal(sheet.C63.v, 0);
@@ -122,6 +121,31 @@ test("planejamento preenche o Modelo a partir de B2, com mesclagens, cores e val
     assert.match(payload.html, /<td[^>]+background-color:#1b1b1b;color:#e4e6eb;[^>]+vertical-align:bottom[^>]+>To-B<\/td>/);
     assert.match(payload.html, /data-sheets-value="\{&quot;1&quot;:3,&quot;3&quot;:20000\}">20000<\/td>/);
     assert.match(payload.html, /data-sheets-value="\{&quot;1&quot;:2,&quot;2&quot;:&quot;br001&quot;\}">br001<\/td>/);
+});
+
+test("a cópia de planejamento termina na última linha usada por LHs, segregação ou backlog", () => {
+    const state = createPlanningState();
+    for (const lh of state.lhs) {
+        lh.segregate = false;
+        lh.segregateTos = false;
+    }
+    state.lhs.push({ code: "", origin: "", quantity: null, tos: [] });
+    const copy = () => createReportSummaryClipboard("planning", { planning: state });
+
+    const scheduled = copy();
+    assert.equal(matrix(scheduled).length, 19);
+    assert.deepEqual(matrix(scheduled).at(-1), ["LtB", "Guarulhos", "500", "", "", ""]);
+    assert.equal((scheduled.html.match(/<tr\b/g) ?? []).length, 19);
+
+    state.lhs[1].segregate = true;
+    const segregated = matrix(copy());
+    assert.equal(segregated.length, 40);
+    assert.deepEqual(segregated.at(-1), ["LtB", "Guarulhos", "500", "", "", ""]);
+
+    state.backlog.bulky = Array.from({ length: 61 }, (_, index) => `BRV${index + 1}`).join("\n");
+    const backlog = matrix(copy());
+    assert.equal(backlog.length, 66);
+    assert.deepEqual(backlog.at(-1), ["", "", "", "", "", "BRV61"]);
 });
 
 test("planejamento preenche as últimas células permitidas e informa quando as listas excedem o modelo", () => {

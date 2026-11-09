@@ -9,7 +9,7 @@ import {
     hasPlanningToInformation,
 } from "./calculations.js";
 
-const lastRow = 6000;
+const modelLastRow = 6000;
 const backlogStart = 7;
 const scheduledStart = 19;
 const segregatedStart = 41;
@@ -46,9 +46,9 @@ function getPlanningClipboardData(state) {
     const overflow = [
         [lhs, 20, "LHs programados"],
         [segregated, 20, "LHs a segregar"],
-        [tos, lastRow - tosStart + 1, "TOs para segregar"],
-        [packages, lastRow - backlogStart + 1, "pacotes normais no backlog"],
-        [bulky, lastRow - backlogStart + 1, "pacotes volumosos no backlog"],
+        [tos, modelLastRow - tosStart + 1, "TOs para segregar"],
+        [packages, modelLastRow - backlogStart + 1, "pacotes normais no backlog"],
+        [bulky, modelLastRow - backlogStart + 1, "pacotes volumosos no backlog"],
     ].find(([records, limit]) => records.length > limit);
     if (overflow) {
         const [records, limit, label] = overflow;
@@ -77,6 +77,13 @@ function recordCells(record, row) {
 }
 
 function createPlanningClipboardRows(state, { lhs, segregated, tos, packages, bulky }) {
+    const lastUsedRow = Math.max(
+        15,
+        scheduledStart + lhs.length - 1,
+        segregated.length > 0 ? segregatedStart + segregated.length - 1 : 0,
+        tos.length > 0 ? tosStart + tos.length - 1 : 0,
+        backlogStart + Math.max(packages.length, bulky.length) - 1,
+    );
     const left = new Map([
         [4, cells(["", "", ""], blank)],
         [5, [cell("Resumo do Planejamento", section, 3)]],
@@ -109,10 +116,11 @@ function createPlanningClipboardRows(state, { lhs, segregated, tos, packages, bu
     const recordSections = [
         [scheduledStart, 38, lhs.map(lh => [lh.code, lh.origin, lh.quantity])],
         [segregatedStart, 60, segregated.map(lh => [lh.code, lh.origin, getPlanningLhSegregatedQuantity(lh)])],
-        [tosStart, lastRow, tos],
+        [tosStart, modelLastRow, tos],
     ];
     for (const [start, end, records] of recordSections) {
-        for (let row = start; row <= end; row += 1) {
+        const lastSectionRow = Math.min(end, lastUsedRow);
+        for (let row = start; row <= lastSectionRow; row += 1) {
             left.set(row, recordCells(records[row - start], row));
         }
     }
@@ -124,9 +132,9 @@ function createPlanningClipboardRows(state, { lhs, segregated, tos, packages, bu
         [...left.get(5), cell("", blank), cell("Backlog Adicionado", section, 2)],
         [...left.get(6), cell("", blank), ...cells(["Pacotes Normais", "Pacotes Volumosos"], heading)],
     ];
-    // The separator is merged through E6000. Keep the full range so a paste also clears old list entries.
-    for (let row = backlogStart; row <= lastRow; row += 1) {
-        const separator = row < 17 ? cell("", blank) : row === 17 ? cell("", blank, 1, lastRow - 16) : null;
+    // Use individual cells in column E so the separator cannot extend the paste range.
+    const separator = cell("", blank);
+    for (let row = backlogStart; row <= lastUsedRow; row += 1) {
         const index = row - backlogStart;
         rows.push([...left.get(row), separator, ...cells([packages[index], bulky[index]], dataStyle(row))]);
     }
