@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 
 import {
+    getExpeditionErrorAnalysis,
     getExpeditionState,
     getExpeditionSummary,
     getExpeditionOperatorRanking,
@@ -162,13 +163,14 @@ test("o CSV usa o total final sem descontar incorretos, ausentes ou retirados", 
     }
 });
 
-test("resumo e ranking somam o total final somente das rotas validadas", () => {
+test("volume expedido e taxa de erros usam os totais final e inicial das rotas validadas", () => {
     replaceExpeditionRoutes([
-        { code: "AT1", status: "Validated", finalOrders: 70, scannedOrders: 100, missortedOrders: 20, validationOperator: "Ana" },
-        { code: "AT2", status: "Validado", finalOrders: 160, scannedOrders: 200, missortedOrders: 30, validationOperator: "Bruno" },
-        { code: "AT3", status: "Not Validated", finalOrders: 900, scannedOrders: 1000, missortedOrders: 40, validationOperator: "Ana" },
+        { code: "AT1", status: "Validated", initialOrders: 100, finalOrders: 70, scannedOrders: 120, missortedOrders: 20, validationOperator: "Ana" },
+        { code: "AT2", status: "Validado", initialOrders: 200, finalOrders: 160, scannedOrders: 220, missortedOrders: 30, validationOperator: "Bruno" },
+        { code: "AT3", status: "Not Validated", initialOrders: 1000, finalOrders: 900, scannedOrders: 1100, missortedOrders: 40, validationOperator: "Ana" },
     ]);
     assert.equal(getExpeditionSummary().volumeChecked, 230);
+    assert.equal(getExpeditionErrorAnalysis().errorRate, 50 / 300);
     assert.equal(getAnalysis().flow.expedited, 230);
     const ranking = getExpeditionOperatorRanking();
     assert.equal(ranking.find(operator => operator.operator === "Ana").volumeChecked, 70);
@@ -176,6 +178,7 @@ test("resumo e ranking somam o total final somente das rotas validadas", () => {
 
     updateExpeditionOperatorSelection("Ana", false);
     assert.equal(getExpeditionSummary().volumeChecked, 230);
+    assert.equal(getExpeditionErrorAnalysis().errorRate, 30 / 300);
     assert.equal(getAnalysis().flow.expedited, 230);
 });
 

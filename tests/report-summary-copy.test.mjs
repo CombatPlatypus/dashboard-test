@@ -18,7 +18,7 @@ const require = createRequire(import.meta.url);
 const XLSX = require("../js/libraries/xlsx.full.min.js");
 const matrix = payload => payload.text.split("\n").map(row => row.split("\t"));
 const routes = [{
-    code: "AT1", status: "Validated", finalOrders: 1000, missortedOrders: 50,
+    code: "AT1", status: "Validated", initialOrders: 1250, finalOrders: 1000, missortedOrders: 50,
     validationOperator: "Ana", validationStartTime: "2026-10-23 08:00:00",
     validationEndTime: "2026-10-23 09:05:30", validationDurationSeconds: 3930,
 }];
@@ -227,7 +227,7 @@ test("expedição inclui resumo, erros e lista de conferentes em G7:J62", () => 
         ["Revertidos", "", "Taxa de Revertidos", ""],
         ["10", "", "20,00%", ""],
         ["Total de Erros", "", "Taxa de Erros", ""],
-        ["50", "", "5,00%", ""],
+        ["50", "", "4,00%", ""],
         ["Saldo Final", "", "Taxa Final", ""],
         ["40", "", "4,00%", ""],
         ["Lista de Conferentes", "", "", ""],
@@ -521,7 +521,7 @@ test("resumos e listas ocupam apenas o bloco reservado de cada janela", () => {
             const valuesByRow = payload === receipt
                 ? [[2, "2", "1200"], [4, "1500", "1100"], [7, "Ana", "900"], [8, "Bia", "200"]]
                 : [[2, "1", "1000"], [4, "100", "01:05:30"], [7, "30", "20"],
-                    [9, "10", "20,00%"], [11, "50", "5,00%"], [13, "40", "4,00%"], [16, "Ana", "1"]];
+                    [9, "10", "20,00%"], [11, "50", "4,00%"], [13, "40", "4,00%"], [16, "Ana", "1"]];
             const secondColumn = String.fromCharCode(column.charCodeAt(0) + 2);
             for (const [rowOffset, left, right] of valuesByRow) {
                 assert.equal(pasted.get(`${column}${firstRow + rowOffset}`), left);
