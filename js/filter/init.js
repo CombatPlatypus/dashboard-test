@@ -156,7 +156,7 @@ const FILTER_PURPOSES =
                         "Current Station",
                     ]),
 
-                exportIgnoredColumns:
+                csvIgnoredColumns:
                     Object.freeze([
                         "Order ID",
                     ]),
@@ -207,7 +207,7 @@ const FILTER_PURPOSES =
                         "Data",
                     ]),
 
-                exportIgnoredColumns:
+                csvIgnoredColumns:
                     Object.freeze([
                         "Order ID",
                     ]),
@@ -2065,19 +2065,17 @@ function downloadBlob(
 
 function createFilteredWorksheet(
     purpose,
-    includeHeaders = true,
+    includeHeaders,
+    ignoredColumns = purpose.exportIgnoredColumns ?? [],
 ) {
     const activeColumns =
         getActivePurposeColumns(
             purpose,
         );
 
-    const ignoredExportColumns =
+    const ignoredColumnNames =
         new Set(
-            (
-                purpose.exportIgnoredColumns ??
-                []
-            ).map(
+            ignoredColumns.map(
                 normalizeText,
             ),
         );
@@ -2090,7 +2088,7 @@ function createFilteredWorksheet(
                 columnIndex,
             ) {
                 if (
-                    !ignoredExportColumns.has(
+                    !ignoredColumnNames.has(
                         normalizeText(
                             column,
                         ),
@@ -2240,6 +2238,7 @@ function saveFilteredFile() {
             purpose,
             purpose.includeCsvHeaders !==
                 false,
+            purpose.csvIgnoredColumns,
         );
 
     const csvContent =

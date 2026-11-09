@@ -40,11 +40,6 @@ import {
     setReportNotification,
 } from "../report-notifications.js";
 
-import {
-    createPlanningSpreadsheetBlob,
-    createPlanningSpreadsheetFileName,
-} from "./spreadsheet.js";
-
 /* ELEMENTOS DO PLANEJAMENTO */
 
 let planningLhList = null;
@@ -70,7 +65,6 @@ let planningClearReportButton = null;
 let planningPreviewCpErrors = null;
 let planningPreviewCpAdded = null;
 let planningPreviewCpRemoved = null;
-let planningSpreadsheetDownloadButton = null;
 let planningCopyReportButton = null;
 let planningDownloadReportButton = null;
 let planningReportExportArea = null;
@@ -788,9 +782,6 @@ function renderPlanningReportStatus(
     planningDownloadReportButton.disabled =
         !canExport;
 
-    planningSpreadsheetDownloadButton.disabled =
-        !canExport;
-
     if (
         !planningPanel.classList.contains(
             "is-active",
@@ -1396,112 +1387,6 @@ async function handleDownloadPlanningReport() {
     }
 }
 
-/* BAIXA A PLANILHA PREENCHIDA DO PLANEJAMENTO */
-
-async function handleDownloadPlanningSpreadsheet() {
-    const state =
-        getPlanningState();
-
-    if (
-        !canExportPlanningReport(
-            state,
-        )
-    ) {
-        return;
-    }
-
-    const originalTitle =
-        planningSpreadsheetDownloadButton.title;
-
-    const originalAriaLabel =
-        planningSpreadsheetDownloadButton.getAttribute(
-            "aria-label",
-        );
-
-    planningSpreadsheetDownloadButton.disabled =
-        true;
-
-    planningSpreadsheetDownloadButton.title =
-        "Gerando planilha...";
-
-    planningSpreadsheetDownloadButton.setAttribute(
-        "aria-label",
-        "Gerando planilha de planejamento",
-    );
-
-    planningSpreadsheetDownloadButton.setAttribute(
-        "aria-busy",
-        "true",
-    );
-
-    try {
-        const exportDate =
-            new Date();
-
-        const spreadsheetBlob =
-            await createPlanningSpreadsheetBlob(
-                state,
-                exportDate,
-            );
-
-        const fileName =
-            createPlanningSpreadsheetFileName(
-                exportDate,
-            );
-
-        downloadReportBlob(
-            spreadsheetBlob,
-            fileName,
-        );
-
-        setReportNotification({
-            reportId: "planning",
-            type: "success",
-            message:
-                `Planilha de planejamento salva em ${fileName}.`,
-        });
-    } catch (error) {
-        console.error(
-            "Não foi possível gerar a planilha de planejamento:",
-            error,
-        );
-
-        const message =
-            error instanceof Error
-                ? error.message
-                : "Não foi possível gerar a planilha de planejamento.";
-
-        window.alert(
-            message,
-        );
-
-        setReportNotification({
-            reportId: "planning",
-            type: "error",
-            message,
-        });
-    } finally {
-        planningSpreadsheetDownloadButton.title =
-            originalTitle;
-
-        if (originalAriaLabel) {
-            planningSpreadsheetDownloadButton.setAttribute(
-                "aria-label",
-                originalAriaLabel,
-            );
-        }
-
-        planningSpreadsheetDownloadButton.removeAttribute(
-            "aria-busy",
-        );
-
-        planningSpreadsheetDownloadButton.disabled =
-            !canExportPlanningReport(
-                getPlanningState(),
-            );
-    }
-}
-
 /* ATUALIZA UM CAMPO DE LH */
 
 function handlePlanningLhInput(event) {
@@ -1754,11 +1639,6 @@ function initializePlanningView(
             "planningCopyReportButton",
         );
 
-    planningSpreadsheetDownloadButton =
-        getPlanningElementById(
-            "planningSpreadsheetDownloadButton",
-        );
-
     planningDownloadReportButton =
         planningCopyReportButton;
 
@@ -1898,7 +1778,6 @@ function initializePlanningView(
         !planningPreviewDailyCapacity ||
         !planningReportExportArea ||
         !planningPanel ||
-        !planningSpreadsheetDownloadButton ||
         !planningCopyReportButton ||
         !planningDownloadReportButton
         
@@ -2049,11 +1928,6 @@ function initializePlanningView(
     planningClearReportButton.addEventListener(
         "click",
         handleResetPlanningReport,
-    );
-
-    planningSpreadsheetDownloadButton.addEventListener(
-        "click",
-        handleDownloadPlanningSpreadsheet,
     );
 
     bindReportImageExportButton(

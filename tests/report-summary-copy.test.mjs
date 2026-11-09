@@ -10,6 +10,7 @@ import { formatReportPersonWithOps } from "../js/reports/core/person-name.js";
 import { resetReceiptReport, restoreReceiptState, subscribeReceiptState } from "../js/reports/receipt/state.js";
 import { resetReceiptLinehaulState, restoreReceiptLinehaulState, subscribeReceiptLinehaulState } from "../js/reports/receipt/linehaul-state.js";
 import { resetExpeditionReport, restoreExpeditionState } from "../js/reports/expedition/state.js";
+import { resetPlanningReport, restorePlanningState } from "../js/reports/planning/state.js";
 import { replaceParcelRows, resetParcelReport, restoreParcelState, updateParcelFilter } from "../js/reports/parcel-sweeper/state.js";
 import { resetReverseReport, restoreReverseState, upsertReverseTransfer } from "../js/reports/reverse/state.js";
 
@@ -39,6 +40,7 @@ beforeEach(() => {
     resetReceiptReport();
     resetReceiptLinehaulState();
     resetExpeditionReport();
+    resetPlanningReport();
     resetParcelReport();
     resetReverseReport();
     restoreReportContext({ window: "AM", plannedVolume: 1500 });
@@ -60,6 +62,94 @@ function populate() {
         errorTotals: { sortingErrors: 12, labelingErrors: 8 }, revertedErrors: 10,
     });
 }
+
+function createPlanningState() {
+    return {
+        averageSpr: 95,
+        dailyCapacity: 20000,
+        vehicleCounts: {},
+        collectionPool: { removed: 2, errors: 0 },
+        backlog: { packages: "br001 BR002 BR001", bulky: "BR002 BR003" },
+        lhs: [
+            {
+                code: "LtA", origin: "São Bernardo & Hub", quantity: 2786,
+                segregate: true, segregateTos: true,
+                tos: [{ code: "To-A", quantity: 20 }, { code: "To-B", quantity: 0 }],
+            },
+            {
+                code: "LtB", origin: "Guarulhos", quantity: 500,
+                segregate: true, segregateTos: false, tos: [],
+            },
+        ],
+    };
+}
+
+test("planejamento preenche o Modelo a partir de B2, com mesclagens, cores e valores tipados", () => {
+    const payload = createReportSummaryClipboard("planning", { planning: createPlanningState() });
+    assert.equal(payload.target, "B2");
+    assert.equal(payload.sheet, "Modelo");
+    assert.equal(payload.hasData, true);
+    const rows = matrix(payload);
+    assert.equal(rows.length, 5999);
+    assert.ok(rows.every(row => row.length === 6));
+    for (const [row, values] of [
+        [2, ["PLANEJAMENTO", "", "", "", "", ""]],
+        [5, ["Resumo do Planejamento", "", "", "", "Backlog Adicionado", ""]],
+        [7, ["3289", "95", "20000", "", "br001", "BR003"]],
+        [8, ["", "", "", "", "BR002", ""]],
+        [11, ["2", "1", "3286", "", "", ""]],
+        [15, ["3", "2", "0", "", "", ""]],
+        [18, ["LHs Programados", "Origem", "QTD", "", "", ""]],
+        [19, ["LtA", "São Bernardo & Hub", "2786", "", "", ""]],
+        [40, ["LHs a Segregar", "Origem", "QTD", "", "", ""]],
+        [41, ["LtA", "São Bernardo & Hub", "20", "", "", ""]],
+        [42, ["LtB", "Guarulhos", "500", "", "", ""]],
+        [62, ["TOs para Segregar", "LH", "QTD", "", "", ""]],
+        [63, ["To-A", "LtA", "20", "", "", ""]],
+        [64, ["To-B", "LtA", "0", "", "", ""]],
+        [6000, ["", "", "", "", "", ""]],
+    ]) assert.deepEqual(rows[row - 2], values, `Linha ${row}`);
+
+    const sheet = XLSX.read(payload.html, { type: "string" }).Sheets.Sheet1;
+    assert.deepEqual(sheet["!merges"].map(XLSX.utils.encode_range), [
+        "A1:F2", "A4:C4", "E4:F4", "A7:C7", "A8:C8", "A11:C11", "A12:C12",
+        "A15:C15", "A16:C16", "D16:D5999", "A38:C38", "A60:C60",
+    ]);
+    assert.equal(sheet.B18.v, "São Bernardo & Hub");
+    assert.equal(sheet.C63.v, 0);
+    assert.match(payload.html, /<td rowspan="2" colspan="6" [^>]+font-size:22pt;font-weight:bold;[^>]+>PLANEJAMENTO<\/td>/);
+    assert.match(payload.html, /<td[^>]+background-color:#262626;[^>]+vertical-align:middle[^>]+>Cap do Dia<\/td>/);
+    assert.match(payload.html, /<td[^>]+background-color:#1b1b1b;color:#e4e6eb;[^>]+vertical-align:bottom[^>]+>To-B<\/td>/);
+    assert.match(payload.html, /data-sheets-value="\{&quot;1&quot;:3,&quot;3&quot;:20000\}">20000<\/td>/);
+    assert.match(payload.html, /data-sheets-value="\{&quot;1&quot;:2,&quot;2&quot;:&quot;br001&quot;\}">br001<\/td>/);
+});
+
+test("planejamento preenche as últimas células permitidas e informa quando as listas excedem o modelo", () => {
+    const state = createPlanningState();
+    state.lhs = Array.from({ length: 20 }, (_, index) => ({
+        ...state.lhs[0], code: `LH${index + 1}`, quantity: 6000, tos: [],
+    }));
+    state.lhs[0].tos = Array.from({ length: 5938 }, (_, index) => ({ code: `TO${index + 1}`, quantity: 1 }));
+    state.backlog.packages = Array.from({ length: 5994 }, (_, index) => `BRN${index + 1}`).join("\n");
+    state.backlog.bulky = Array.from({ length: 5994 }, (_, index) => `BRV${index + 1}`).join("\n");
+    const payload = createReportSummaryClipboard("planning", { planning: state });
+    const rows = matrix(payload);
+    assert.equal(payload.copyError, "");
+    assert.equal(rows[38 - 2][0], "LH20");
+    assert.equal(rows[60 - 2][0], "LH20");
+    assert.deepEqual(rows.at(-1), ["TO5938", "LH1", "1", "", "BRN5994", "BRV5994"]);
+
+    for (const [overflow, error] of [
+        [{ ...state, lhs: [...state.lhs, state.lhs.at(-1)] }, /20 LHs programados/],
+        [{ ...state, lhs: [{ ...state.lhs[0], tos: [...state.lhs[0].tos, { code: "TO5939", quantity: 1 }] }] }, /5938 TOs/],
+        [{ ...state, backlog: { ...state.backlog, packages: `${state.backlog.packages}\nBRN5995` } }, /5994 pacotes normais/],
+        [{ ...state, backlog: { ...state.backlog, bulky: `${state.backlog.bulky}\nBRV5995` } }, /5994 pacotes volumosos/],
+    ]) {
+        const blocked = createReportSummaryClipboard("planning", { planning: overflow });
+        assert.match(blocked.copyError, error);
+        assert.equal(blocked.html, "");
+    }
+});
 
 test("processamento inclui o resumo e a lista dos recebedores selecionados em C7:F62", () => {
     populate();
@@ -565,11 +655,13 @@ class Button extends Element {
 
 function createCopyButtons() {
     const receipt = new Button(), expedition = new Button(), parcel = new Button(), reverse = new Button();
+    const planning = new Button();
     const root = { querySelector: selector => ({
         "#receiptCopySummaryButton": receipt, "#expeditionCopySummaryButton": expedition,
+        "#planningCopySummaryButton": planning,
         "#parcelCopySummaryButton": parcel, "#reverseCopySummaryButton": reverse,
     })[selector] };
-    return { receipt, expedition, parcel, reverse, root };
+    return { receipt, expedition, planning, parcel, reverse, root };
 }
 
 function setup(t, clipboard, { nativeCopy = false, clipboardItem = true } = {}) {
@@ -577,6 +669,8 @@ function setup(t, clipboard, { nativeCopy = false, clipboardItem = true } = {}) 
     const text = new Element();
     const expeditionNotification = new Element();
     const expeditionText = new Element();
+    const planningNotification = new Element();
+    const planningText = new Element();
     const parcelNotification = new Element();
     const parcelText = new Element();
     const reverseNotification = new Element();
@@ -584,6 +678,7 @@ function setup(t, clipboard, { nativeCopy = false, clipboardItem = true } = {}) 
     const elements = {
         receiptNotification: notification, receiptNotificationIcon: new Image(), receiptNotificationText: text,
         expeditionNotification, expeditionNotificationIcon: new Image(), expeditionNotificationText: expeditionText,
+        planningNotification, planningNotificationIcon: new Image(), planningNotificationText: planningText,
         parcelNotification, parcelNotificationIcon: new Image(), parcelNotificationText: parcelText,
         reverseNotification, reverseNotificationIcon: new Image(), reverseNotificationText: reverseText,
     };
@@ -608,7 +703,7 @@ function setup(t, clipboard, { nativeCopy = false, clipboardItem = true } = {}) 
     });
     replaceGlobal(t, "navigator", { clipboard });
     replaceGlobal(t, "ClipboardItem", clipboardItem ? class { constructor(data) { this.data = data; } } : undefined);
-    return { notification, text, expeditionNotification, expeditionText, parcelNotification, parcelText,
+    return { notification, text, expeditionNotification, expeditionText, planningNotification, planningText, parcelNotification, parcelText,
         reverseNotification, reverseText, nativeCopies, copyListeners };
 }
 
@@ -616,6 +711,24 @@ const receiptBinding = {
     reportId: "receipt", kind: "receipt",
     subscribe: [subscribeReceiptState, subscribeReceiptLinehaulState, subscribeReportContext],
 };
+
+test("botão de planejamento copia o relatório atual e indica B2 da aba Modelo", async t => {
+    const { planningNotification, planningText, nativeCopies } = setup(t, {}, { nativeCopy: true });
+    const { planning, root } = createCopyButtons();
+    assert.equal(initializeReportSummaryCopy(root), true);
+    assert.equal(planning.disabled, true);
+    restorePlanningState(createPlanningState());
+    assert.equal(planning.disabled, false);
+    assert.match(planning.title, /B2 da aba Modelo/);
+    await planning.fire();
+    assert.equal(nativeCopies.length, 1);
+    assert.match(nativeCopies[0]["text/plain"], /^PLANEJAMENTO\t/);
+    assert.match(nativeCopies[0]["text/html"], /google-sheets-html-origin/);
+    assert.equal(planningNotification.dataset.notificationType, "success");
+    assert.match(planningText.textContent, /Cole em B2 da aba Modelo/);
+    resetPlanningReport();
+    assert.equal(planning.disabled, true);
+});
 
 test("clique grava apenas os dados e cabeçalhos do relatório em HTML e TSV", async t => {
     populate();
@@ -741,7 +854,7 @@ test("ambos os botões atualizam as notificações e dicas de colagem conforme a
     assert.equal(expedition.disabled, true);
     assert.equal(bindReportSummaryCopyButton(null, receiptBinding), false);
     const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
-    for (const id of ["receiptCopySummaryButton", "expeditionCopySummaryButton", "parcelCopySummaryButton", "reverseCopySummaryButton"]) {
+    for (const id of ["receiptCopySummaryButton", "expeditionCopySummaryButton", "planningCopySummaryButton", "parcelCopySummaryButton", "reverseCopySummaryButton"]) {
         assert.equal(html.split(`id="${id}"`).length - 1, 1);
     }
 });

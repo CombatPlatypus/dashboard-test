@@ -68,19 +68,20 @@ test("eixos e indicadores manuais usam a cor compartilhada, preservando os dois 
             update() {} resize() {}
         },
     });
-    for (const [id, initialize] of [
-        ["damage-and-losses", initializeDamageAndLossesCharts],
-        ["damage-and-losses", initializeLossesCharts],
-        ["losses-rate", initializeLossesRateCharts],
-        ["parcel", initializeParcelCharts],
-        ["expedition", initializeExpeditionErrorsCharts],
-        ["overall-analysis", initializeOverallAnalysisCharts],
+    for (const [id, initialize, expectedCharts] of [
+        ["damage-and-losses", initializeDamageAndLossesCharts, 3],
+        ["damage-and-losses", initializeLossesCharts, 3],
+        ["losses-rate", initializeLossesRateCharts, 2],
+        ["parcel", initializeParcelCharts, 5],
+        ["expedition", initializeExpeditionErrorsCharts, 2],
+        ["overall-analysis", initializeOverallAnalysisCharts, 4],
     ]) {
         const root = new Element(id);
         elements.set(id, root);
+        const previousCount = charts.length;
         assert.equal(initialize(root), true, `Inicialização de ${id}`);
+        assert.equal(charts.length - previousCount, expectedCharts, `Gráficos de ${initialize.name}`);
     }
-    assert.equal(charts.length, 22);
     const testedPlugins = new Set();
     for (const chart of charts) {
         for (const [axis, scale] of Object.entries(chart.options.scales ?? {})) {

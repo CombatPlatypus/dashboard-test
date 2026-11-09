@@ -250,6 +250,42 @@ test("Export Erros recusa XLSX/XLS e mantém esses formatos disponíveis nas dem
     }
 });
 
+test("Export Avaria por arquivo copia o Código BR na primeira coluna e mantém o formato do CSV", async () => {
+    const panel = setup();
+    await panel.select("export-damage");
+    await panel.import(csvFile([
+        "Order ID,Status,Current Station,Current Station Received Time",
+        "BR001,Recebido,LM Hub,2026-10-01 10:00:00",
+        "BR002,Pendente,SoC,2026-10-02 10:00:00",
+    ].join("\n"), "avarias.csv"));
+    await panel.filter("BR002\nBR001");
+
+    await panel.get("filterCopyButton").click();
+    assert.deepEqual(panel.copies, ["BR002\tPendente\tSoC\nBR001\tRecebido\tLM Hub"]);
+
+    await panel.get("filterSaveButton").click();
+    assert.equal(new TextDecoder().decode(await panel.downloads[0].blob.arrayBuffer()),
+        "Status,Current Station\nPendente,SoC\nRecebido,LM Hub");
+});
+
+test("Export Avaria pela área de transferência copia o Código BR na primeira coluna", async () => {
+    const panel = setup({ clipboardText: [
+        "Ordem ID\tStatus do pedido\tStation Atual",
+        "BR001\tRecebido\tLM Hub",
+        "BR002\tPendente\tSoC",
+    ].join("\n") });
+    await panel.select("export-damage-clipboard");
+    await panel.get("filterImportButton").click();
+    await panel.filter("BR002\nBR001");
+
+    await panel.get("filterCopyButton").click();
+    assert.deepEqual(panel.copies, ["BR002\tPendente\tSoC\nBR001\tRecebido\tLM Hub"]);
+
+    await panel.get("filterSaveButton").click();
+    assert.equal(new TextDecoder().decode(await panel.downloads[0].blob.arrayBuffer()),
+        "Status,Current Station\nPendente,SoC\nRecebido,LM Hub");
+});
+
 test("trocar de finalidade ou editar os BRs invalida a prévia e o descarte restaura os formatos", async () => {
     const panel = setup();
     await panel.select("export-errors");
