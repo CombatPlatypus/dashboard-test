@@ -14,6 +14,7 @@ import { setReportNotification } from "./report-notifications.js";
 const shiftRows = { AM: 7, PM1: 67, PM2: 127 };
 // Each window reserves rows 7:62, 67:122 or 127:182 for the two report blocks.
 const summaryRowCount = 56;
+const shiftClipboardPalette = { background: "#101010", color: "#f8faf8", borderColor: "#626262" };
 const rateFormatter = new Intl.NumberFormat("pt-BR", {
     style: "percent", minimumFractionDigits: 2, maximumFractionDigits: 2,
 });
@@ -22,6 +23,7 @@ const dateFormatter = new Intl.DateTimeFormat("pt-BR", {
 });
 // Sheets' clipboard fields: centered alignment (64 | 128), font family (4096) and size (8192).
 const sheetsFormatFields = 64 | 128 | 4096 | 8192;
+const sheetsColorFields = 2 | 2048;
 
 function formatDuration(seconds) {
     if (seconds === null || seconds === undefined) return "";
@@ -45,7 +47,7 @@ function createStyledCellAttributes({ background, fontSize, bold, border, bottom
     const borderColor = "#626262";
     // Sheets stores fill, text color and bold in fields 4, 14 and 17, with bit flags for each.
     const format = {
-        "2": sheetsFormatFields | 2 | 2048 | (bold ? 16384 : 0),
+        "2": sheetsFormatFields | sheetsColorFields | (bold ? 16384 : 0),
         "4": sheetsColor(background), "9": 1, "10": bottom ? 2 : 1,
         "14": sheetsColor(color), "15": "Open Sans", "16": fontSize,
     };
@@ -71,7 +73,7 @@ function createStyledClipboardCell({ value, span, rowSpan, style }, attributes) 
 }
 
 // HTML carries the template's merges; TSV keeps a placeholder for every physical column.
-function createClipboardTable(rows, { columnWidth = 150, columnWidths } = {}) {
+function createClipboardTable(rows, { columnWidth = 150, columnWidths, palette } = {}) {
     const text = rows.map(row => row.flatMap(cell => {
         if (!cell) return [""];
         const { value, span, style } = cell;
@@ -83,6 +85,16 @@ function createClipboardTable(rows, { columnWidth = 150, columnWidths } = {}) {
     const columnCount = rows[0].reduce((total, cell) => total + cell.span, 0);
     const widths = columnWidths ?? Array(columnCount).fill(columnWidth);
     const columns = '<colgroup>' + widths.map(width => `<col width="${width}" style="width:${width}px">`).join("") + '</colgroup>';
+    const baseFormat = { "2": sheetsFormatFields, "9": 1, "10": 1 };
+    const borderColor = palette?.borderColor ?? "#000000";
+    let colorStyles = "";
+    if (palette) {
+        const { background, color } = palette;
+        baseFormat["2"] |= sheetsColorFields;
+        baseFormat["4"] = sheetsColor(background);
+        baseFormat["14"] = sheetsColor(color);
+        colorStyles = `background-color:${background};color:${color};`;
+    }
     const styledAttributes = new WeakMap();
     const html = '<html><head><meta charset="utf-8"></head><body><!--StartFragment-->' +
         '<google-sheets-html-origin><table xmlns="http://www.w3.org/1999/xhtml" data-sheets-root="1" data-sheets-baot="1" ' +
@@ -92,9 +104,9 @@ function createClipboardTable(rows, { columnWidth = 150, columnWidths } = {}) {
             if (!cell) return "";
             if (cell.style) return createStyledClipboardCell(cell, styledAttributes);
             const { value, span, fontSize, fontFamily } = cell;
-            const format = JSON.stringify({ "2": sheetsFormatFields, "9": 1, "10": 1, "15": fontFamily, "16": fontSize });
+            const format = JSON.stringify({ ...baseFormat, "15": fontFamily, "16": fontSize });
             return `<td rowspan="1" colspan="${span}" width="${columnWidth * span}" data-sheets-userformat='${format}' align="center" valign="middle" ` +
-                `style="border:1px solid #000000;width:${columnWidth * span}px;text-align:center;vertical-align:middle;font-family:${fontFamily};font-size:${fontSize}pt;font-weight:normal;white-space:nowrap">${escapeHtml(value)}</td>`;
+                `style="${colorStyles}border:1px solid ${borderColor};width:${columnWidth * span}px;text-align:center;vertical-align:middle;font-family:${fontFamily};font-size:${fontSize}pt;font-weight:normal;white-space:nowrap">${escapeHtml(value)}</td>`;
         }).join("") + "</tr>",
     ).join("") + '</tbody></table></google-sheets-html-origin><!--EndFragment--></body></html>';
     return { text, html };
@@ -227,7 +239,7 @@ function createReportSummaryClipboard(kind, {
         : "";
     // Empty rows remove names left by a previous, longer list without touching the next window.
     rows.push(...Array.from({ length: listCapacity }, (_, index) => createOperatorRow(operators[index])));
-    return { ...createClipboardTable(rows), target, sheet: "Base dos Turnos", label, shift, hasData, copyError };
+    return { ...createClipboardTable(rows, { palette: shiftClipboardPalette }), target, sheet: "Base dos Turnos", label, shift, hasData, copyError };
 }
 
 function writeSummaryCopyEvent(payload) {

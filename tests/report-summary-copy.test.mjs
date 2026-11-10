@@ -457,7 +457,7 @@ test("data do Parcel e da Reversa usa o dia de São Paulo e muda na próxima có
     assert.equal(matrix({ text: nativeCopies[3]["text/plain"] })[0][3], "03/11/2026");
 });
 
-test("colagem inclui bordas, fontes, tamanhos e centralização em títulos, dados e células vazias", () => {
+test("colagem na Base dos Turnos inclui cores, bordas e fontes em títulos, dados e células vazias", () => {
     populate();
     for (const kind of ["receipt", "expedition"]) {
         const { html } = createReportSummaryClipboard(kind);
@@ -478,7 +478,10 @@ test("colagem inclui bordas, fontes, tamanhos e centralização em títulos, dad
             const span = Number(attributes.match(/colspan="(\d+)"/)[1]);
             assert.match(attributes, new RegExp(`width="${150 * span}"`));
             assert.match(attributes, /text-align:center;vertical-align:middle/);
-            assert.match(attributes, /border:1px solid #000000;/);
+            assert.match(attributes, /background-color:#101010;color:#f8faf8;border:1px solid #626262;/);
+            assert.equal(format["2"] & (2 | 2048), 2 | 2048);
+            assert.deepEqual(format["4"], { "1": 2, "2": 0x101010 });
+            assert.deepEqual(format["14"], { "1": 2, "2": 0xf8faf8 });
             assert.equal(format["2"] & (4096 | 8192), 4096 | 8192);
             assert.ok(["Roboto", "Arial"].includes(format["15"]));
             assert.match(attributes, new RegExp(`font-family:${format["15"]};font-size:${format["16"]}pt`));
