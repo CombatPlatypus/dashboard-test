@@ -290,11 +290,6 @@ function getExpeditionElements(
                 "expeditionPreviewVolumeChecked",
             ),
 
-        previewInitialVolume:
-            getElementById(
-                "expeditionPreviewInitialVolume",
-            ),
-
         previewValidatedRoutes:
             getElementById(
                 "expeditionPreviewValidatedRoutes",
@@ -1284,12 +1279,6 @@ function renderExpeditionReport(
         .textContent =
             quantityOrDash(
                 summary.volumeChecked,
-            );
-
-    elements.previewInitialVolume
-        .textContent =
-            quantityOrDash(
-                summary.totalInitialOrders,
             );
 
     elements.previewValidatedRoutes

@@ -200,13 +200,13 @@ test("total final vazio ou zero não usa scanned orders como alternativa", () =>
     assert.equal(getAnalysis().flow.expedited, 0);
 });
 
-test("a prévia mostra Volume Inicial ao lado de Volume Expedido e os gráficos mantêm o rótulo expedido", () => {
+test("a prévia e os gráficos exibem Volume Expedido", () => {
     const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
     const expeditionCharts = readFileSync(new URL("../js/reports/expedition/charts.js", import.meta.url), "utf8");
     const overallCharts = readFileSync(new URL("../js/reports/overall-analysis/charts.js", import.meta.url), "utf8");
     assert.equal(Array.from(html.matchAll(/<th>Volume Expedido<\/th>/g)).length, 2);
-    assert.match(html, /<th>Volume Expedido<\/th>\s*<th>Volume Inicial<\/th>/);
-    assert.match(html, /<td id="expeditionPreviewVolumeChecked">—<\/td>\s*<td id="expeditionPreviewInitialVolume">—<\/td>/);
+    assert.match(html, /<th>Volume Expedido<\/th>\s*<th>Volume no Piso<\/th>/);
+    assert.doesNotMatch(html, /<th>Volume Inicial<\/th>/);
     assert.match(expeditionCharts, /"Volume expedido: "/);
     assert.match(overallCharts, /"Volume Expedido"/);
     assert.doesNotMatch(html + expeditionCharts + overallCharts, /volume conferido/i);
