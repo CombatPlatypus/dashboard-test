@@ -82,7 +82,7 @@ function createOperatorRows({
     );
 }
 
-test("exibe código Ops e somente o primeiro nome com inicial maiúscula", () => {
+test("exibe o primeiro nome de operadores com código Ops ou e-mail", () => {
     const examples = [
         ["[Ops68017]LUCAS CAMPOS JUNQUEIRA", "[Ops68017] Lucas"],
         ["  [ops0012]  mARIA   EDUARDA SANTOS  ", "[Ops0012] Maria"],
@@ -91,7 +91,11 @@ test("exibe código Ops e somente o primeiro nome com inicial maiúscula", () =>
         ["[Ops85572]LETICIA OLIVEIRA", "[Ops85572] Leticia"],
         ["[Ops4]ANA", "[Ops4] Ana"],
         ["[Ops5]", "[Ops5]"],
-        ["operador@empresa.com", "operador@empresa.com"],
+        ["fernando.ferrarie@shopee.com", "Analista - Fernando"],
+        ["ÁLVARO.SILVA@empresa.com", "Analista - Álvaro"],
+        ["operador@empresa.com", "Analista - Operador"],
+        ["MARIA EDUARDA@empresa.com", "Analista - Maria"],
+        ["Maria Eduarda", "Maria Eduarda"],
         [null, ""],
     ];
 
@@ -311,7 +315,7 @@ test("aceita somente operadores iniciados por [Ops] sem diferenciar maiúsculas"
     );
 });
 
-test("calcula cobertura e omite operadores fora do padrão apenas das análises por operador", () => {
+test("inclui BRs de operadores sem Ops sem alterar a cobertura nem as análises por operador", () => {
     const rows = [
         createParcelRow({
             trackingNumber: "BR1",
@@ -324,11 +328,18 @@ test("calcula cobertura e omite operadores fora do padrão apenas das análises 
             trackingNumber: "BR2",
             scannedStatus: "LMHub_Received",
             countType: "Exception",
+            finalStatus: "LMHub_Received",
             operator: "ana@empresa.com",
             scannedTime: "2026-10-02 14:00:01",
         }),
         createParcelRow({
             trackingNumber: "BR3",
+            scannedStatus: "LMHub_Received",
+            countType: "Backlog",
+            operator: "Maria Eduarda",
+        }),
+        createParcelRow({
+            trackingNumber: "BR4",
             scannedStatus: "-",
             countType: "Missing",
             operator: "",
@@ -343,11 +354,11 @@ test("calcula cobertura e omite operadores fora do padrão apenas das análises 
 
     assert.equal(
         summary.totalRows,
-        3,
+        4,
     );
     assert.equal(
         summary.scannedCount,
-        2,
+        3,
     );
     assert.equal(
         summary.unscannedCount,
@@ -355,12 +366,14 @@ test("calcula cobertura e omite operadores fora do padrão apenas das análises 
     );
     assert.equal(
         summary.ignoredScannedCount,
-        1,
+        2,
     );
     assert.equal(
         summary.operatorStats.length,
         1,
     );
+    assert.deepEqual(filterParcelPackageRows(summary.commonRows, "all"), rows.slice(0, 3));
+    assert.deepEqual(filterParcelPackageRows(summary.commonRows, "exception"), [rows[1]]);
 });
 
 test("cobertura segue Count Type do SPX mesmo quando Scanned Status diverge", () => {

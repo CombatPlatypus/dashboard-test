@@ -1,3 +1,5 @@
+import { formatReportPersonFirstName } from "../core/person-name.js";
+
 const PARCEL_PACKAGE_FILTERS =
     Object.freeze([
         "all",
@@ -144,21 +146,20 @@ function getParcelOperatorKey(
 function formatParcelOperatorName(value) {
     const text = normalizeParcelText(value);
     const match = text.match(/^\[ops(\d+)\]\s*(.*)$/i);
+    const name = match?.[2] ?? text;
+    const emailSeparator = name.indexOf("@");
+
+    if (emailSeparator !== -1) {
+        const localPart = name.slice(0, emailSeparator);
+        const firstName = formatReportPersonFirstName(localPart.split(".")[0], "");
+        return firstName ? `Analista - ${firstName}` : text;
+    }
 
     if (!match) {
         return text;
     }
 
-    const shortName = match[2]
-        .split(" ")
-        .filter(Boolean)
-        .slice(0, 1)
-        .map(function (name) {
-            const lowercaseName = name.toLocaleLowerCase("pt-BR");
-            return lowercaseName.charAt(0).toLocaleUpperCase("pt-BR") +
-                lowercaseName.slice(1);
-        })
-        .join(" ");
+    const shortName = formatReportPersonFirstName(name, "");
 
     return `[Ops${match[1]}]${shortName ? ` ${shortName}` : ""}`;
 }
@@ -954,20 +955,15 @@ function createParcelSummary(
     const commonRows = [];
     const bulkyRows = [];
 
-    validOperatorRows.forEach(
+    scannedRows.forEach(
         function (row) {
-            const destination =
-                bulkyOperatorKeys.has(
-                    getParcelOperatorKey(
-                        row.operator,
-                    ),
-                )
-                    ? bulkyRows
-                    : commonRows;
+            const operatorKey = getParcelOperatorKey(row.operator);
+            if (!operatorKey || operatorKey === "-" || operatorKey === "—") {
+                return;
+            }
 
-            destination.push(
-                row,
-            );
+            const destination = bulkyOperatorKeys.has(operatorKey) ? bulkyRows : commonRows;
+            destination.push(row);
         },
     );
 

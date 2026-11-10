@@ -84,6 +84,8 @@ test("cada botão acompanha filtros, ordenação e correções de Volumoso sem m
         { operator: "operador@teste.com", trackingNumber: "BR98", countType: "Backlog", scannedStatus: "Scanned" },
         { operator: "[Ops100]ANA TESTE", trackingNumber: "BR97", countType: "Exception", finalStatus: "SOC_Received", scannedStatus: "LMHub_Received" },
         { operator: "[Ops200]CAIO TESTE", trackingNumber: "BR96", countType: "Exception", finalStatus: "Return_LMHub_Packed", scannedStatus: "LMHub_Received" },
+        { operator: "-", trackingNumber: "BR95", countType: "Backlog", scannedStatus: "Scanned" },
+        { operator: "", trackingNumber: "BR94", countType: "Backlog", scannedStatus: "Scanned" },
     ];
     const common = new Body(); const bulky = new Body();
     const commonButton = new Button(); const bulkyButton = new Button();
@@ -99,16 +101,16 @@ test("cada botão acompanha filtros, ordenação e correções de Volumoso sem m
     const overrides = { "[ops200]caio teste": true };
     renderTables("all", overrides);
     await commonButton.click(); await bulkyButton.click();
-    assert.deepEqual(writes.slice(-2), ["BR2\nBR10", "BR1\nBR3"]);
+    assert.deepEqual(writes.slice(-2), ["BR2\nBR10\nBR98", "BR1\nBR3"]);
     renderTables("backlog", overrides);
     await commonButton.click(); await bulkyButton.click();
-    assert.deepEqual(writes.slice(-2), ["BR2", "BR1"]);
+    assert.deepEqual(writes.slice(-2), ["BR2\nBR98", "BR1"]);
     renderTables("exception", overrides);
     await commonButton.click(); await bulkyButton.click();
     assert.deepEqual(writes.slice(-2), ["BR10", "BR3"]);
     renderTables("all", { "[ops100]ana teste": true, "[ops200]caio teste": false }, "desc");
     await commonButton.click(); await bulkyButton.click();
-    assert.deepEqual(writes.slice(-2), ["BR3\nBR1", "BR10\nBR2"]);
+    assert.deepEqual(writes.slice(-2), ["BR98\nBR3\nBR1", "BR10\nBR2"]);
 });
 
 test("tabela vazia não apaga a área de transferência e falhas permitem tentar novamente", async t => {
