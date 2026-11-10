@@ -29,6 +29,9 @@ const DAMAGE_HISTORY_SHEET_NAME =
     "historico de avarias e perdas";
 
 const DAMAGE_PRODUCT_SHEET_NAME =
+    "historico de avarias recebidas";
+
+const LEGACY_DAMAGE_PRODUCT_SHEET_NAME =
     "avarias recebidas";
 
 const DAMAGE_BASE_SHEET_NAME =
@@ -366,11 +369,13 @@ function findDamageProductSource(
     const sheetName =
         workbook.SheetNames.find(
             isDamageProductSheetName,
+        ) ?? workbook.SheetNames.find(
+            name => normalizeDamageSearchText(name) === LEGACY_DAMAGE_PRODUCT_SHEET_NAME,
         );
 
     if (!sheetName) {
         throw new Error(
-            "O arquivo não possui a aba Avarias Recebidas.",
+            "O arquivo não possui a aba Histórico de Avarias Recebidas.",
         );
     }
 

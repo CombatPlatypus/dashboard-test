@@ -58,7 +58,7 @@ export function createDamageAndLossesWorkbook(
         ["Histórico de Avarias e Perdas", history],
         ["Taxa de Perdas", rate],
         [returnedSheetName, returned],
-        ["Avarias Recebidas", products],
+        ["Histórico de Avarias Recebidas", products],
         ["Base de Avarias", damageBase],
         ["Base de Análises", lossesBase],
     ]) {

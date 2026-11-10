@@ -69,6 +69,18 @@ test("importa o novo XLSX completo sem misturar os históricos lado a lado", asy
     });
 });
 
+test("prioriza Histórico de Avarias Recebidas e aceita o nome anterior em arquivos antigos", () => {
+    const workbook = createDamageAndLossesWorkbook();
+    const current = "Histórico de Avarias Recebidas";
+    const legacy = "Avarias Recebidas";
+    workbook.Sheets[legacy] = workbook.Sheets[current];
+    workbook.SheetNames.unshift(legacy);
+    assert.equal(findDamageMonthSource(workbook).productSource.sheetName, current);
+
+    workbook.SheetNames = workbook.SheetNames.filter(name => name !== current);
+    assert.equal(findDamageMonthSource(workbook).productSource.sheetName, legacy);
+});
+
 test("cada histórico seleciona seu próprio mês quando um bloco só tem dados anteriores", () => {
     const workbook = createDamageAndLossesWorkbook();
     const sheet = workbook.Sheets[historyName];
