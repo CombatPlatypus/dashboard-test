@@ -217,8 +217,8 @@ test("expedição inclui resumo, erros e lista de conferentes em G7:J62", () => 
     assert.equal(rows.length, 56);
     assert.deepEqual(rows.slice(0, 17), [
         ["Última Expedição", "", "", ""],
-        ["Rotas Conferidas", "", "Volume Expedido", ""],
-        ["1", "", "1000", ""],
+        ["Rotas Conferidas", "", "Volume Expedido e Inicial", ""],
+        ["1", "", "1000", "1250"],
         ["Volume no Piso", "", "Duração", ""],
         ["100", "", "01:05:30", ""],
         ["Análise de Erros", "", "", ""],
@@ -237,7 +237,10 @@ test("expedição inclui resumo, erros e lista de conferentes em G7:J62", () => 
     assert.ok(rows.slice(17).every(row => row.every(value => value === "")));
     const workbook = XLSX.read(payload.html, { type: "string" });
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    assert.equal(sheet["!merges"].length, 68);
+    assert.equal(sheet["!merges"].length, 67);
+    assert.ok(sheet["!merges"].some(range => XLSX.utils.encode_range(range) === "C2:D2"));
+    assert.ok(!sheet["!merges"].some(range => XLSX.utils.encode_range(range) === "C3:D3"));
+    assert.deepEqual([sheet.C3.v, sheet.D3.v], [1000, 1250]);
     assert.ok(sheet["!merges"].some(range => XLSX.utils.encode_range(range) === "A6:D6"));
     assert.ok(sheet["!merges"].some(range => XLSX.utils.encode_range(range) === "C14:D14"));
     assert.ok(sheet["!merges"].some(range => XLSX.utils.encode_range(range) === "A15:D15"));
@@ -465,7 +468,7 @@ test("colagem inclui bordas, fontes, tamanhos e centralização em títulos, dad
         assert.equal([...html.matchAll(/<col width="150"/g)].length, 4);
         assert.equal([...html.matchAll(/<tr\b/g)].length, 56);
         const cells = [...html.matchAll(/<td\b([^>]*)>([^<]*)<\/td>/g)];
-        assert.equal(cells.length, kind === "receipt" ? 210 : 150);
+        assert.equal(cells.length, kind === "receipt" ? 210 : 151);
         for (const [, attributes] of cells) {
             const format = JSON.parse(attributes.match(/data-sheets-userformat='([^']+)'/)[1]);
             assert.equal(format["2"] & (64 | 128), 64 | 128);
@@ -494,6 +497,7 @@ test("colagem inclui bordas, fontes, tamanhos e centralização em títulos, dad
             }
             assert.equal(fontSizes.get("Conferente SPX"), 11);
             assert.equal(fontSizes.get("Rotas Conferidas"), 11);
+            assert.equal(fontSizes.get("Volume Expedido e Inicial"), 11);
         }
     }
 });
@@ -527,6 +531,7 @@ test("resumos e listas ocupam apenas o bloco reservado de cada janela", () => {
                 assert.equal(pasted.get(`${column}${firstRow + rowOffset}`), left);
                 assert.equal(pasted.get(`${secondColumn}${firstRow + rowOffset}`), right);
             }
+            if (payload === expedition) assert.equal(pasted.get(`J${firstRow + 2}`), "1250");
         }
         for (const column of "CDEFGHIJ") {
             assert.equal(occupied.has(`${column}${firstRow - 2}`), false);
@@ -546,6 +551,8 @@ test("campos ausentes ficam vazios, zeros continuam numéricos e dados parciais 
     let rows = matrix(createReportSummaryClipboard("expedition"));
     assert.equal(rows[4][0], "0");
     assert.deepEqual(rows[9], ["", "", "", ""]);
+    restoreExpeditionState({ routes: [{ ...routes[0], initialOrders: undefined }] });
+    assert.deepEqual(matrix(createReportSummaryClipboard("expedition"))[2], ["1", "", "1000", ""]);
     restoreExpeditionState({ routes: [], hasErrorData: true, errorTotals: { sortingErrors: 0, labelingErrors: 0 } });
     const payload = createReportSummaryClipboard("expedition");
     rows = matrix(payload);

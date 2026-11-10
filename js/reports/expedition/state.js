@@ -575,10 +575,12 @@ function getExpeditionSummary(
         validatedRoutes.reduce(
             function (volumes, route) {
                 volumes.volumeChecked += route.finalOrders ?? 0;
-                volumes.totalInitialOrders += route.initialOrders ?? 0;
+                if (route.initialOrders != null) {
+                    volumes.totalInitialOrders = (volumes.totalInitialOrders ?? 0) + route.initialOrders;
+                }
                 return volumes;
             },
-            { volumeChecked: 0, totalInitialOrders: 0 },
+            { volumeChecked: 0, totalInitialOrders: validatedRoutes.length ? null : 0 },
         );
 
     const totals =

@@ -96,11 +96,15 @@ test("a sessão salva e restaura retirados e aceita sessões antigas sem o campo
     resetExpeditionReport();
     assert.equal(restoreExpeditionState(savedState), true);
     assert.equal(getExpeditionState().withdrawnOrders, 100);
+    assert.equal(getExpeditionSummary().totalInitialOrders, 6689);
     assert.equal(getAnalysis().flow.expedited, 6500);
 
     delete savedState.withdrawnOrders;
+    delete savedState.routes[0].initialOrders;
     assert.equal(restoreExpeditionState(savedState), true);
     assert.equal(getExpeditionState().withdrawnOrders, 0);
+    assert.equal(getExpeditionSummary().totalInitialOrders, null);
+    assert.equal(getExpeditionErrorAnalysis().errorRate, null);
     assert.equal(getAnalysis().flow.expedited, 6500);
 });
 
@@ -137,7 +141,7 @@ test("o HTML apresenta os quatro controles e Retirados à direita de Exceção",
     assert.match(css, /#expedition \.report-controls \.input-group:first-of-type\s*\{[^}]*grid-template-columns:\s*repeat\(auto-fit, minmax\(117px, 1fr\)\)/);
 });
 
-test("o CSV usa o total final sem descontar incorretos, ausentes ou retirados", async () => {
+test("o CSV usa os totais inicial e final sem descontar incorretos, ausentes ou retirados", async () => {
     const require = createRequire(import.meta.url);
     const previousWindow = globalThis.window;
     globalThis.window = { XLSX: require("../js/libraries/xlsx.full.min.js") };
@@ -153,7 +157,9 @@ test("o CSV usa o total final sem descontar incorretos, ausentes ou retirados", 
         updateExpeditionManualQuantity("withdrawnOrders", 100);
         assert.equal(imported.routes[0].scannedOrders, 6689);
         assert.equal(imported.routes[0].missortedOrders, 20);
+        assert.equal(imported.routes[0].initialOrders, 6689);
         assert.equal(imported.routes[0].finalOrders, 6500);
+        assert.equal(getExpeditionSummary().totalInitialOrders, 6689);
         assert.equal(getExpeditionSummary().volumeChecked, 6500);
         assert.equal(getExpeditionOperatorRanking()[0].volumeChecked, 6500);
         assert.equal(getAnalysis().flow.expedited, 6500);
@@ -170,6 +176,7 @@ test("volume expedido e taxa de erros usam os totais final e inicial das rotas v
         { code: "AT3", status: "Not Validated", initialOrders: 1000, finalOrders: 900, scannedOrders: 1100, missortedOrders: 40, validationOperator: "Ana" },
     ]);
     assert.equal(getExpeditionSummary().volumeChecked, 230);
+    assert.equal(getExpeditionSummary().totalInitialOrders, 300);
     assert.equal(getExpeditionErrorAnalysis().errorRate, 50 / 300);
     assert.equal(getAnalysis().flow.expedited, 230);
     const ranking = getExpeditionOperatorRanking();
@@ -178,6 +185,7 @@ test("volume expedido e taxa de erros usam os totais final e inicial das rotas v
 
     updateExpeditionOperatorSelection("Ana", false);
     assert.equal(getExpeditionSummary().volumeChecked, 230);
+    assert.equal(getExpeditionSummary().totalInitialOrders, 300);
     assert.equal(getExpeditionErrorAnalysis().errorRate, 30 / 300);
     assert.equal(getAnalysis().flow.expedited, 230);
 });
@@ -185,17 +193,20 @@ test("volume expedido e taxa de erros usam os totais final e inicial das rotas v
 test("total final vazio ou zero não usa scanned orders como alternativa", () => {
     replaceExpeditionRoutes([{ ...routes[0], finalOrders: null }]);
     assert.equal(getExpeditionSummary().volumeChecked, 0);
-    replaceExpeditionRoutes([{ ...routes[0], finalOrders: 0 }]);
+    replaceExpeditionRoutes([{ ...routes[0], finalOrders: 0, initialOrders: 0 }]);
     assert.equal(getExpeditionSummary().volumeChecked, 0);
+    assert.equal(getExpeditionSummary().totalInitialOrders, 0);
     assert.equal(getExpeditionOperatorRanking()[0].volumeChecked, 0);
     assert.equal(getAnalysis().flow.expedited, 0);
 });
 
-test("tabelas, legenda e tooltip exibem Volume Expedido", () => {
+test("a prévia mostra Volume Inicial ao lado de Volume Expedido e os gráficos mantêm o rótulo expedido", () => {
     const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
     const expeditionCharts = readFileSync(new URL("../js/reports/expedition/charts.js", import.meta.url), "utf8");
     const overallCharts = readFileSync(new URL("../js/reports/overall-analysis/charts.js", import.meta.url), "utf8");
     assert.equal(Array.from(html.matchAll(/<th>Volume Expedido<\/th>/g)).length, 2);
+    assert.match(html, /<th>Volume Expedido<\/th>\s*<th>Volume Inicial<\/th>/);
+    assert.match(html, /<td id="expeditionPreviewVolumeChecked">—<\/td>\s*<td id="expeditionPreviewInitialVolume">—<\/td>/);
     assert.match(expeditionCharts, /"Volume expedido: "/);
     assert.match(overallCharts, /"Volume Expedido"/);
     assert.doesNotMatch(html + expeditionCharts + overallCharts, /volume conferido/i);

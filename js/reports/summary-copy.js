@@ -191,9 +191,10 @@ function createReportSummaryClipboard(kind, {
         const analysis = getExpeditionErrorAnalysis(expedition);
         rows = [
             title("Última Expedição"),
-            heading("Rotas Conferidas", "Volume Expedido"),
-            pair(summary.hasData ? summary.validatedRoutes : null,
-                summary.hasData ? summary.volumeChecked : null),
+            heading("Rotas Conferidas", "Volume Expedido e Inicial"),
+            [cell(summary.hasData ? summary.validatedRoutes : null),
+                cell(summary.hasData ? summary.volumeChecked : null, 1),
+                cell(summary.hasData ? summary.totalInitialOrders : null, 1)],
             heading("Volume no Piso", "Duração"),
             pair(summary.hasData ? summary.floorVolume : null,
                 summary.hasData ? formatDuration(summary.expeditionDurationSeconds) : null),

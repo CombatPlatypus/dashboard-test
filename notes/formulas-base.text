@@ -1070,3 +1070,17 @@ LM Hub_SP_Santos_PraiaGrande_02
 
 
 =CONT.SES(E12:E;"<>";C12:C;">="&DATA(ANO(HOJE());MÊS(HOJE());1);C12:C;"<"&DATA(ANO(HOJE());MÊS(HOJE())+1;1))
+
+
+
+
+
+=SEERRO
+
+    =SE(
+        E(I12<>""; F12<>"");
+
+        (I12/F12;"0");
+        
+        ""
+    )
