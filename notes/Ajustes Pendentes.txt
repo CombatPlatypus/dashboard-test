@@ -9,17 +9,23 @@ https://docs.google.com/spreadsheets/d/15goeiy-QDNIVC6N1kFSG55rqECRwv58FMXwgoDyt
  . Avarias e Perdas
 https://docs.google.com/spreadsheets/d/11jdHDwRBiDKTpP2G7s02v0wR2K27nJ5mG9G6aExwESQ/
 
+. Registros de Backlog
+https://docs.google.com/spreadsheets/d/1PUheTCH7QeLo-4c3t3-GS8eQrtAHiZ8B4ICZFsUJ8hA/
+
+. Registros de Erros
+https://docs.google.com/spreadsheets/d/10qRP4k-3VYNqvzQMrRjJ4rmsLK4ihh9I95GLPz8KCls/
+
+ . Reversa
+https://docs.google.com/spreadsheets/d/1CIdBvPaCkLo9elCjyHuKzQ7rfLepiMv6xBXAeYxUL1Y/
+
+ . Planejamento
+https://docs.google.com/spreadsheets/d/1vdJ7cgfN56hlKR1UnGDpctzfxZK2EkLSXfgxCIEMUNE/
+
  . Controle de Endereços
 https://docs.google.com/spreadsheets/d/166K25CQqHYERaZ3xotO6-p-BTCO9OrBQNsNHJa3YWKI/
 
 . Justificativas
 https://docs.google.com/spreadsheets/d/1sOzs3lgS6dO0WluGRQR2B8kmFTDUR5VC/
-
-. Backlog
-https://docs.google.com/spreadsheets/d/1PUheTCH7QeLo-4c3t3-GS8eQrtAHiZ8B4ICZFsUJ8hA/
-
- . Reversa
-https://docs.google.com/spreadsheets/d/1CIdBvPaCkLo9elCjyHuKzQ7rfLepiMv6xBXAeYxUL1Y/
 
  . Controle Operacional
 https://docs.google.com/spreadsheets/d/1UWlOQfVw-eD1ZkD5gxCo2MHZ4CEyJUd4osungKFTfwA/
@@ -33,20 +39,11 @@ https://docs.google.com/spreadsheets/d/1PnKEGQtfETj0ptk7xAIPG3dcrZgbBunWFUJp18O_
  . Insucesso
 https://docs.google.com/spreadsheets/d/1CvONso--DM9_Rdf4ieesREV5lpD0e-hb/
 
- . Controle de Equipamentos
+ . Controle de Estoque
 https://docs.google.com/spreadsheets/d/1EDSg6R1qmHWpif4b-0J-qxUo78XUK-a8/
 
  . Avarias AppSheet
 https://docs.google.com/spreadsheets/d/1SpChx2r8HHeqWQAYDELewvKzQM8eRLIgknT2EiMjPnU/
-
- . Relatório de Planejamento
-https://docs.google.com/spreadsheets/d/1vdJ7cgfN56hlKR1UnGDpctzfxZK2EkLSXfgxCIEMUNE/
-
- . Relatório de Processamento
-https://docs.google.com/spreadsheets/d/1ySTMhlf8AROkIkly83cUPQ9pzqP2FjhU7hE0aIO9YYA/
-
- . Relatório de Expedição
-https://docs.google.com/spreadsheets/d/15U1VuVYA1paDWwQuKZ7_7waGM_J2HtuCl1y_6EiNzcU/
 
 
 Lista Padrão

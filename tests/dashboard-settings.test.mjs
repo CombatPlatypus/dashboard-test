@@ -75,9 +75,9 @@ test("lista da operação substitui as vinte posições e preserva preferências
         assert.deepEqual(getReportContext(), context);
         assert.equal(applied.spreadsheets.length, 20);
         assert.equal(applied.spreadsheets[0].menuName, "Resumo da Operação");
-        assert.equal(applied.spreadsheets[14].menuName, "Relatório de Processamento");
-        assert.ok(applied.spreadsheets.slice(0, 16).every(item => item.visible && item.link));
-        assert.deepEqual(applied.spreadsheets.slice(16), Array.from({ length: 4 }, () => ({
+        assert.equal(applied.spreadsheets[14].menuName, "Avarias AppSheet");
+        assert.ok(applied.spreadsheets.slice(0, 15).every(item => item.visible && item.link));
+        assert.deepEqual(applied.spreadsheets.slice(15), Array.from({ length: 5 }, () => ({
             link: "", menuName: "", visible: true,
         })));
         applyOperationSpreadsheetSettings();
