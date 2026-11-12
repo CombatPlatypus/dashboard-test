@@ -1,3 +1,5 @@
+const ANALYSIS_SESSION_STORAGE_KEY = "dashboard-analysis-session-v1";
+
 function validateDataset(dataset) {
     return Boolean(
         dataset &&
@@ -93,7 +95,37 @@ function createAnalysisStore() {
 const analysisStore =
     createAnalysisStore();
 
+function initializeAnalysisSession(store, notification, storage) {
+    try {
+        const saved = (storage ?? window.sessionStorage).getItem(ANALYSIS_SESSION_STORAGE_KEY);
+        if (saved) {
+            store.setDataset(JSON.parse(saved));
+            notification.set("Base de análise recuperada da sessão desta aba.", "success");
+        }
+    } catch (error) {
+        console.warn("Não foi possível recuperar a base de análise da sessão da aba.", error);
+        notification.set("Não foi possível recuperar a base de análise desta aba.", "warning");
+    }
+
+    return store.subscribe(({ dataset }, { type }) => {
+        if (type === "initial-state") return;
+
+        try {
+            const session = storage ?? window.sessionStorage;
+            if (dataset) {
+                session.setItem(ANALYSIS_SESSION_STORAGE_KEY, JSON.stringify(dataset));
+            } else {
+                session.removeItem(ANALYSIS_SESSION_STORAGE_KEY);
+            }
+        } catch (error) {
+            console.warn("Não foi possível guardar a análise na sessão da aba.", error);
+            queueMicrotask(() => notification.set("A base de análise atual não pôde ser guardada nesta aba.", "warning"));
+        }
+    });
+}
+
 export {
     analysisStore,
     createAnalysisStore,
+    initializeAnalysisSession,
 };

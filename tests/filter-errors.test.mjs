@@ -47,7 +47,7 @@ class Element {
     }
 }
 
-function setup({ clipboardText = "" } = {}) {
+function setup({ clipboardText = "", sessionData = new Map() } = {}) {
     const ids = new Set(Array.from(html.matchAll(/id="([^"]+)"/g), match => match[1]));
     const elements = new Map();
     const copies = [];
@@ -86,7 +86,16 @@ function setup({ clipboardText = "" } = {}) {
     vm.runInNewContext(source, {
         ...clipboardSource,
         document,
-        window: { XLSX, jQuery, setTimeout: callback => callback() },
+        window: {
+            XLSX,
+            jQuery,
+            setTimeout: callback => callback(),
+            sessionStorage: {
+                getItem: key => sessionData.get(key) ?? null,
+                setItem: (key, value) => sessionData.set(key, value),
+                removeItem: key => sessionData.delete(key),
+            },
+        },
         navigator: {
             clipboard: {
                 readText: async () => clipboardText,
@@ -143,6 +152,48 @@ function workbookFile(rows, name) {
     const bookType = name.endsWith(".xls") ? "xls" : "xlsx";
     return new File([XLSX.write(workbook, { type: "array", bookType })], name);
 }
+
+test("recarrega a base e a filtragem da mesma aba e descarta ambas ao limpar", async () => {
+    const sessionData = new Map();
+    const panel = setup({ sessionData });
+    await panel.select("export-errors");
+    await panel.import(csvFile("SPX Tracking Number,Operator\nBR1,Ana\nBR2,Bia\n"));
+    await panel.filter("BR2\nBR1");
+
+    const reloaded = setup({ sessionData });
+    assert.equal(reloaded.get("filterPurpose").value, "export-errors");
+    assert.equal(reloaded.get("filterValues").value, "BR2\nBR1");
+    assert.deepEqual(reloaded.rows(), [["BR2", "Bia"], ["BR1", "Ana"]]);
+    await reloaded.get("filterCopyButton").click();
+    assert.equal(reloaded.copies[0], "BR2\tBia\nBR1\tAna");
+
+    assert.equal(setup().get("filterPurpose").value, "");
+    await reloaded.get("filterClearButton").click();
+    const cleared = setup({ sessionData });
+    assert.equal(cleared.get("filterPurpose").value, "");
+    assert.equal(cleared.get("filterValues").disabled, true);
+    assert.deepEqual(cleared.rows(), []);
+});
+
+test("trocar de finalidade impede uma importação pendente de gravar na sessão", async () => {
+    const sessionData = new Map();
+    const panel = setup({ sessionData });
+    await panel.select("export-errors");
+    const file = csvFile("SPX Tracking Number,Operator\nBR1,Ana\n");
+    let finishReading;
+    const importPending = panel.import({
+        name: file.name,
+        arrayBuffer: () => new Promise(resolve => { finishReading = resolve; }),
+    });
+    await new Promise(resolve => setImmediate(resolve));
+    await panel.select("free-filter-file");
+    finishReading(await file.arrayBuffer());
+    await importPending;
+
+    const reloaded = setup({ sessionData });
+    assert.equal(reloaded.get("filterPurpose").value, "free-filter-file");
+    assert.equal(reloaded.get("filterValues").disabled, true);
+});
 
 test("Export Erros filtra por BR, mostra as duas colunas e copia/salva o CSV na ordem informada", async () => {
     const panel = setup();

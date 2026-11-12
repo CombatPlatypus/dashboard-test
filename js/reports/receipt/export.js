@@ -542,9 +542,7 @@ async function runReceiptExport(
 
     if (
         receiptExportBusy ||
-        !canExportReceiptReport(
-            state,
-        )
+        getActiveReceiptExportPendingMessage(state) !== ""
     ) {
         return;
     }

@@ -81,6 +81,13 @@ fileInput.addEventListener("change", async () => {
     try {
         const source = await readDashboardSettingsFile(file);
         importDashboardSettings(parseDashboardSettingsFile(source));
+        try {
+            saveDashboardSettingsToSession();
+        } catch (error) {
+            console.warn("As configurações foram importadas, mas não foi possível guardá-las na sessão.", error);
+            notify(`Configurações importadas de ${file.name}. Não foi possível guardá-las nesta aba.`, "warning");
+            return;
+        }
         notify(`Configurações importadas de ${file.name}.`);
     } catch (error) {
         notify(error.message || "Não foi possível importar as configurações.", "error");

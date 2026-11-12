@@ -435,10 +435,11 @@ const elements = {
         ),
 };
 
+const FILTER_SESSION_STORAGE_KEY = "dashboard-filter-session-v1";
+let filterImportSequence = 0;
+
 const filterState = {
     sourceFileName: "",
-
-    workbook: null,
 
     sourceSheetName: "",
 
@@ -947,7 +948,6 @@ function syncImportButton() {
 
 function clearImportedSource() {
     filterState.sourceFileName = "";
-    filterState.workbook = null;
 
     elements.fileInput.value = "";
     elements.clearButton.disabled = true;
@@ -958,6 +958,7 @@ function clearImportedSource() {
 function resetPanel({
     notification = true,
 } = {}) {
+    filterImportSequence += 1;
     clearImportedSource();
 
     elements.purpose.value = "";
@@ -971,6 +972,81 @@ function resetPanel({
             FILTER_INITIAL_MESSAGE,
             "idle",
         );
+    }
+}
+
+function saveFilterSession() {
+    try {
+        const storage = window.sessionStorage;
+        if (!getSelectedPurpose()) {
+            storage.removeItem(FILTER_SESSION_STORAGE_KEY);
+            return;
+        }
+        storage.setItem(FILTER_SESSION_STORAGE_KEY, JSON.stringify({
+            purpose: elements.purpose.value,
+            sourceFileName: filterState.sourceFileName,
+            sourceSheetName: filterState.sourceSheetName,
+            sourceRows: filterState.sourceRows,
+            headerIndexes: [...filterState.headerIndexes],
+            activeColumns: filterState.activeColumns,
+            values: elements.values.value,
+            applied: !elements.previewResult.hidden,
+        }));
+    } catch (error) {
+        console.warn("Não foi possível guardar a filtragem na sessão da aba.", error);
+        setNotification("A filtragem atual não pôde ser guardada nesta aba.", "warning");
+    }
+}
+
+function restoreFilterSession() {
+    try {
+        const saved = window.sessionStorage.getItem(FILTER_SESSION_STORAGE_KEY);
+        if (!saved) return;
+
+        const session = JSON.parse(saved);
+        if (
+            typeof session?.purpose !== "string" ||
+            !Object.hasOwn(FILTER_PURPOSES, session.purpose) ||
+            typeof session.sourceFileName !== "string" ||
+            typeof session.sourceSheetName !== "string" ||
+            typeof session.values !== "string" ||
+            !Array.isArray(session.sourceRows) ||
+            !session.sourceRows.every(Array.isArray) ||
+            !Array.isArray(session.activeColumns) ||
+            !session.activeColumns.every(column => typeof column === "string") ||
+            !Array.isArray(session.headerIndexes)
+        ) {
+            throw new TypeError("A sessão de filtragem é inválida.");
+        }
+
+        const headerIndexes = new Map(session.headerIndexes);
+        elements.purpose.value = session.purpose;
+        syncPurposeSelect();
+        if (!session.sourceFileName) {
+            handlePurposeChange();
+            return;
+        }
+
+        filterState.sourceFileName = session.sourceFileName;
+        filterState.sourceSheetName = session.sourceSheetName;
+        filterState.sourceRows = session.sourceRows;
+        filterState.headerIndexes = headerIndexes;
+        filterState.activeColumns = session.activeColumns;
+        elements.values.value = session.values;
+        elements.values.disabled = false;
+        elements.clearButton.disabled = false;
+        syncImportButton();
+        updateLineCount();
+
+        if (session.applied) {
+            filterRows();
+        } else {
+            setNotification("Base recuperada da sessão desta aba.", "success");
+        }
+    } catch (error) {
+        console.warn("Não foi possível recuperar a filtragem da sessão da aba.", error);
+        resetPanel({ notification: false });
+        setNotification("Não foi possível recuperar a filtragem desta aba.", "warning");
     }
 }
 
@@ -1152,6 +1228,7 @@ async function importFile(file) {
         return;
     }
 
+    const currentImport = ++filterImportSequence;
     setNotification(
         "Lendo arquivo...",
         "info",
@@ -1174,6 +1251,7 @@ async function importFile(file) {
 
         const workbook =
             await readWorkbook(file);
+        if (currentImport !== filterImportSequence) return;
 
         const compatibleSheet =
             findCompatibleSheet(
@@ -1202,8 +1280,6 @@ async function importFile(file) {
         filterState.sourceFileName =
             file.name;
 
-        filterState.workbook =
-            workbook;
 
         filterState.sourceSheetName =
             compatibleSheet.sheetName;
@@ -1234,6 +1310,7 @@ async function importFile(file) {
             "success",
         );
     } catch (error) {
+        if (currentImport !== filterImportSequence) return;
         clearImportedSource();
 
         setNotification(
@@ -1243,12 +1320,16 @@ async function importFile(file) {
             "error",
         );
     } finally {
-        elements.fileInput.value = "";
-        syncImportButton();
+        if (currentImport === filterImportSequence) {
+            elements.fileInput.value = "";
+            syncImportButton();
+            saveFilterSession();
+        }
     }
 }
 
 async function importClipboard(purpose) {
+    const currentImport = ++filterImportSequence;
     setNotification(
         "Lendo dados da área de transferência...",
         "info",
@@ -1260,6 +1341,7 @@ async function importClipboard(purpose) {
     try {
         const clipboardContent =
             await readClipboardContent();
+        if (currentImport !== filterImportSequence) return;
 
         const htmlRows =
             parseClipboardHtmlRows(
@@ -1378,6 +1460,7 @@ async function importClipboard(purpose) {
             "success",
         );
     } catch (error) {
+        if (currentImport !== filterImportSequence) return;
         clearImportedSource();
 
         setNotification(
@@ -1387,11 +1470,15 @@ async function importClipboard(purpose) {
             "error",
         );
     } finally {
-        syncImportButton();
+        if (currentImport === filterImportSequence) {
+            syncImportButton();
+            saveFilterSession();
+        }
     }
 }
 
 function handlePurposeChange() {
+    filterImportSequence += 1;
     clearImportedSource();
     syncImportButton();
 
@@ -2287,6 +2374,7 @@ function handleValuesInput() {
             "info",
         );
     }
+    saveFilterSession();
 }
 
 elements.importButton.addEventListener(
@@ -2340,8 +2428,14 @@ elements.clearButton.addEventListener(
             "Os dados importados e a filtragem foram descartados.",
             "success",
         );
+        saveFilterSession();
     },
 );
+
+function changeFilterPurpose() {
+    handlePurposeChange();
+    saveFilterSession();
+}
 
 if (window.jQuery) {
     window
@@ -2350,12 +2444,12 @@ if (window.jQuery) {
         )
         .on(
             "change.filterPanel",
-            handlePurposeChange,
+            changeFilterPurpose,
         );
 } else {
     elements.purpose.addEventListener(
         "change",
-        handlePurposeChange,
+        changeFilterPurpose,
     );
 }
 
@@ -2366,7 +2460,10 @@ elements.values.addEventListener(
 
 elements.applyButton.addEventListener(
     "click",
-    filterRows,
+    function () {
+        filterRows();
+        saveFilterSession();
+    },
 );
 
 elements.copyButton.addEventListener(
@@ -2380,3 +2477,4 @@ elements.saveButton.addEventListener(
 );
 
 resetPanel();
+restoreFilterSession();

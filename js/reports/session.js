@@ -13,7 +13,17 @@ import {
 import {
     getReportContext,
     restoreReportContext,
+    subscribeReportContext,
 } from "./core/report-context.js";
+import { subscribePlanningState } from "./planning/state.js";
+import { subscribeReceiptState } from "./receipt/state.js";
+import { subscribeReceiptLinehaulState } from "./receipt/linehaul-state.js";
+import { subscribeExpeditionState } from "./expedition/state.js";
+import { subscribeLossesRateState } from "./losses-rate/state.js";
+import { subscribeDamageAndLossesState } from "./damage-and-losses/state.js";
+import { subscribeLossesState } from "./damage-and-losses/losses-state.js";
+import { subscribeParcelState } from "./parcel-sweeper/state.js";
+import { subscribeReverseState } from "./reverse/state.js";
 
 import {
     exportDashboardSettings,
@@ -76,6 +86,8 @@ const REPORT_SESSION_FEEDBACK_DURATION =
     6000;
 
 let reportSessionInitialized = false;
+let reportSessionSaveScheduled = false;
+let reportSessionStorageWarningShown = false;
 
 let reportSessionFeedbackTimeout =
     null;
@@ -145,7 +157,7 @@ function exportSessionReports() {
 
 /* CRIA E VALIDA O CONTEÚDO DA SESSÃO */
 
-function createReportSessionPayload() {
+function createReportSessionPayload({ includeAllReports = false } = {}) {
     return {
         schema:
             REPORT_SESSION_SCHEMA,
@@ -163,7 +175,7 @@ function createReportSessionPayload() {
             exportDashboardSettings(),
 
         reports:
-            exportSessionReports(),
+            includeAllReports ? reportManager.exportSession() : exportSessionReports(),
     };
 }
 
@@ -673,14 +685,34 @@ function downloadReportSession(payload = createReportSessionPayload()) {
     return fileName;
 }
 
-function saveReportSessionToStorage(payload = createReportSessionPayload()) {
-    const snapshot = {
-        ...payload,
-        reports: { ...payload.reports, ...reportManager.exportSession() },
-    };
+function saveReportSessionToStorage() {
+    const snapshot = createReportSessionPayload({ includeAllReports: true });
     validateReportSessionPayload(snapshot);
-    saveDashboardSettingsToSession(snapshot.settings ?? exportDashboardSettings());
     window.sessionStorage.setItem(REPORT_SESSION_STORAGE_KEY, JSON.stringify(snapshot));
+    reportSessionStorageWarningShown = false;
+}
+
+function scheduleReportSessionSave() {
+    if (reportSessionSaveScheduled) return;
+    reportSessionSaveScheduled = true;
+
+    // Uma operação pode notificar mais de um estado antes de terminar.
+    queueMicrotask(() => {
+        if (!reportSessionSaveScheduled) return;
+        reportSessionSaveScheduled = false;
+
+        try {
+            saveReportSessionToStorage();
+        } catch (error) {
+            if (reportSessionStorageWarningShown) return;
+            reportSessionStorageWarningShown = true;
+            console.warn("Não foi possível guardar os relatórios na sessão da aba.", error);
+            setReportSessionNotification({
+                type: "warning",
+                message: "As alterações dos relatórios não puderam ser guardadas nesta aba. Use Salvar sessão para baixar uma cópia.",
+            });
+        }
+    });
 }
 
 function restoreSavedReportSession() {
@@ -956,23 +988,13 @@ function initializeReportSession() {
         "click",
         function () {
             try {
-                const payload = createReportSessionPayload();
                 const fileName =
-                    downloadReportSession(payload);
-
-                try {
-                    saveReportSessionToStorage(payload);
-                } catch (error) {
-                    console.warn("O arquivo foi salvo, mas não foi possível guardar os relatórios na sessão.", error);
-                    setReportSessionNotification({ type: "warning", message:
-                        `Arquivo ${fileName} salvo. Não foi possível guardar os relatórios na sessão desta aba.` });
-                    return;
-                }
+                    downloadReportSession();
 
                 setReportSessionNotification({
                     type: "success",
                     message:
-                        `Sessão salva em ${fileName} e nesta aba.`,
+                        `Sessão salva em ${fileName}.`,
                 });
             } catch (error) {
                 console.error(
@@ -1036,8 +1058,8 @@ function initializeReportSession() {
 
                 let sessionSaved = true;
                 try {
-                    if (settingsOnly) saveDashboardSettingsToSession();
-                    else saveReportSessionToStorage();
+                    saveDashboardSettingsToSession();
+                    saveReportSessionToStorage();
                 } catch (error) {
                     sessionSaved = false;
                     console.warn("Os dados foram importados, mas não foi possível guardá-los na sessão.", error);
@@ -1065,6 +1087,8 @@ function initializeReportSession() {
                             : "Não foi possível importar a sessão.",
                 });
             } finally {
+                // A importação grava uma única vez após aplicar os dados com sucesso.
+                reportSessionSaveScheduled = false;
                 setReportSessionBusy(
                     importButton,
                     false,
@@ -1080,6 +1104,19 @@ function initializeReportSession() {
         setReportSessionNotification({ type: "warning", message:
             "Não foi possível recuperar os relatórios da sessão desta aba. Você pode importar o arquivo salvo." });
     }
+
+    [
+        subscribeReportContext,
+        subscribePlanningState,
+        subscribeReceiptState,
+        subscribeReceiptLinehaulState,
+        subscribeExpeditionState,
+        subscribeLossesRateState,
+        subscribeDamageAndLossesState,
+        subscribeLossesState,
+        subscribeParcelState,
+        subscribeReverseState,
+    ].forEach(subscribe => subscribe(scheduleReportSessionSave));
 
     reportSessionInitialized = true;
 

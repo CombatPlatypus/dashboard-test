@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "Dashboard do Inventário — Teste",
+  "version": "0.1.0",
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "externally_connectable": {
+    "matches": [
+      "https://combatplatypus.github.io/dashboard-test/*"
+    ]
+  }
+}

@@ -57,6 +57,14 @@ try {
     });
     const reportContext = () => page.evaluate(async () =>
         (await import("/js/reports/core/report-context.js")).getReportContext());
+    async function openSettingsInNewTab() {
+        const link = page.locator("#dashboardSettingsLink");
+        // Este cenário verifica a cópia inicial da sessão com duas guias.
+        await link.evaluate(element => { element.target = "_blank"; });
+        const opened = context.waitForEvent("page");
+        await link.click();
+        return opened;
+    }
     const sessionSettings = tab => tab.evaluate(key => JSON.parse(sessionStorage.getItem(key)), settingsSessionKey);
     const sessionReports = tab => tab.evaluate(key => JSON.parse(sessionStorage.getItem(key)), reportsSessionKey);
     const themeColors = () => page.evaluate(() => ({
@@ -90,32 +98,36 @@ try {
     });
     const reportsBefore = await page.evaluate(async () =>
         (await import("/js/reports/core/report-manager.js")).reportManager.exportSession());
+    await page.waitForFunction(key => JSON.parse(sessionStorage.getItem(key))?.context.plannedVolume === 3141,
+        reportsSessionKey);
+    const savedReports = await sessionReports(page);
+    assert.deepEqual(savedReports.reports, reportsBefore);
     const reportFileEvent = page.waitForEvent("download");
     await page.locator("#reportDownloadButton").click();
     const reportFile = await reportFileEvent;
     assert.match(reportFile.suggestedFilename(), /^sessao-dashboard-.*\.js$/);
     const reportFileSource = await readFile(await reportFile.path(), "utf8");
     const fileSnapshot = JSON.parse(reportFileSource.match(/^const DASHBOARD_REPORT_SESSION = ([\s\S]*);\s*$/)[1]);
-    const savedReports = await sessionReports(page);
-    assert.deepEqual(savedReports.reports, reportsBefore);
+    assert.deepEqual(await sessionReports(page), savedReports);
     for (const id of Object.keys(fileSnapshot.reports)) {
         assert.deepEqual(savedReports.reports[id], fileSnapshot.reports[id]);
     }
     assert.deepEqual(savedReports.context, fileSnapshot.context);
     await page.locator("#reportPlanningInput").fill("9999");
+    await page.waitForFunction(key => JSON.parse(sessionStorage.getItem(key))?.context.plannedVolume === 9999,
+        reportsSessionKey);
     await page.reload();
     await readyIndex();
-    await page.waitForFunction(() => document.getElementById("reportPlanningInput").value === "3141");
+    await page.waitForFunction(() => document.getElementById("reportPlanningInput").value === "9999");
     assert.equal(await page.locator("#reportAnalystInput").inputValue(), "");
+    await page.locator('a[href="#reports"]').click();
+    await page.locator("#reportPlanningInput").fill("3141");
     assert.deepEqual(await page.evaluate(async () =>
         (await import("/js/reports/core/report-manager.js")).reportManager.exportSession()), reportsBefore);
-    await page.locator('a[href="#reports"]').click();
     const dashboard = page;
     const initialSettings = await dashboard.evaluate(async () =>
         (await import("/js/spreadsheets/load-spreadsheets.js")).exportDashboardSettings());
-    const newTab = context.waitForEvent("page");
-    await page.locator("#dashboardSettingsLink").click();
-    page = await newTab;
+    page = await openSettingsInNewTab();
     await page.waitForURL("**/settings.html");
     await readySettings();
     assert.equal(await page.locator("#settingsFeedback, .settings-feedback").count(), 0);
@@ -437,9 +449,7 @@ try {
         sessionStorage.setItem(key, JSON.stringify({ ...settings, theme: "red",
             profile: { ...settings.profile, name: "Fernando Ferrari", email: "fernando.ferrari@shopee.com", shift: "PM1" } }));
     }, [settingsSessionKey, currentSettings]);
-    const reopenedTabEvent = context.waitForEvent("page");
-    await page.locator("#dashboardSettingsLink").click();
-    page = await reopenedTabEvent;
+    page = await openSettingsInNewTab();
     await page.waitForURL("**/settings.html");
     await readySettings();
     assert.equal(configuredDashboard.isClosed(), false);

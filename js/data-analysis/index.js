@@ -1,5 +1,6 @@
 import {
     analysisStore,
+    initializeAnalysisSession,
 } from "./core/analysis-store.js";
 
 import {
@@ -72,6 +73,8 @@ function initializeAnalysisPanel() {
             store: analysisStore,
             notification,
         });
+
+        initializeAnalysisSession(analysisStore, notification);
 
         return true;
     } catch (error) {
