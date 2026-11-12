@@ -100,7 +100,7 @@ function populateMissingReports() {
     Object.assign(damage.losses, {
         monthIndex: 9, year: 2026, sourceFileName: "avarias.xlsx", sourceSheetName: "Histórico de Avarias e Perdas",
         days: [{ date: "2026-10-15", underReview: 4, confirmedLosses: 2, returnedPackages: 1,
-            recoveryDone: 2, recoveryNotDone: 1, recoveryInvalidId: 1, recoveryUninformed: 2 }],
+            recoveryDone: 2, recoveryPending: 1, recoveryInvalidId: 1, recoveryUninformed: 2 }],
         history: [{ date: "2026-10-15", packageCode: "BRL1", situation: "Lost" }],
     });
     payload.reports.parcel = {
@@ -206,6 +206,7 @@ test("arquivo salvo restaura os sete relatórios, incluindo avarias, perdas, Par
     assert.deepEqual(Object.keys(original.reports), expectedIds);
     assert.equal(original.reports.parcel.operatorKindOverrides["[ops1]ana"], true);
     assert.equal(original.reports["damage-and-losses"].losses.days[0].confirmedLosses, 2);
+    assert.equal(original.reports["damage-and-losses"].losses.days[0].recoveryPending, 1);
     const saved = parseReportSession(serializeReportSession(original));
     for (const report of reportModules) if (report.id !== "overall-analysis") report.reset();
     restoreReportContext({ window: "AM", plannedVolume: 1 });

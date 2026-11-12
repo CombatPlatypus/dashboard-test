@@ -950,28 +950,18 @@ function findLossesMonthSource(
 }
 
 function classifyLossesRecovery(value) {
-    const normalizedValue =
-        normalizeDamageSearchText(value);
-
-    if (
-        normalizedValue === "feito"
-    ) {
-        return "recoveryDone";
+    switch (normalizeDamageSearchText(value)) {
+        case "feito":
+            return "recoveryDone";
+        case "id invalido":
+            return "recoveryInvalidId";
+        case "sem dados":
+            return "recoveryUninformed";
+        case "aguardando":
+            return "recoveryPending";
+        default:
+            return normalizeDamageText(value) === "" ? "recoveryUninformed" : null;
     }
-
-    if (
-        normalizedValue === "nao feito"
-    ) {
-        return "recoveryNotDone";
-    }
-
-    if (
-        normalizedValue === "id invalido"
-    ) {
-        return "recoveryInvalidId";
-    }
-
-    return "recoveryUninformed";
 }
 
 function classifyLossesSituation(value) {
@@ -1086,7 +1076,7 @@ function createLossesDataForMonth(
                 confirmedLosses: 0,
                 returnedPackages: 0,
                 recoveryDone: 0,
-                recoveryNotDone: 0,
+                recoveryPending: 0,
                 recoveryInvalidId: 0,
                 recoveryUninformed: 0,
             };
@@ -1142,10 +1132,11 @@ function createLossesDataForMonth(
         const recovery =
             source.recoverySource
                 .valuesByPackageCode
-                .get(packageCode) ??
-            "recoveryUninformed";
+                .get(packageCode);
 
-        day[recovery] += 1;
+        if (recovery !== null) {
+            day[recovery ?? "recoveryUninformed"] += 1;
+        }
     }
 
     let returnedImportedRows = 0;

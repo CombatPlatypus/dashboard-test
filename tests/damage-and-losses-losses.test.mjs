@@ -43,7 +43,7 @@ test("importa as quatro opções atuais do Pack Recovery e os pacotes retornados
     assert.equal(summary.underReview, 1);
     assert.equal(summary.returnedPackages, 2);
     assert.equal(summary.recoveryDone, 1);
-    assert.equal(summary.recoveryNotDone, 1);
+    assert.equal(summary.recoveryPending, 1);
     assert.equal(summary.recoveryInvalidId, 1);
     assert.equal(summary.recoveryUninformed, 1);
     assert.equal(summary.packRecoveryTotal, 4);
@@ -52,6 +52,22 @@ test("importa as quatro opções atuais do Pack Recovery e os pacotes retornados
             .returnedPackages,
         2,
     );
+});
+
+test("conta células vazias como Sem Dados e ignora rótulos fora das opções atuais", () => {
+    const workbook = createLossesWorkbook();
+    const sheet = workbook.Sheets["Base de Análises"];
+    XLSX.utils.sheet_add_aoa(sheet, [["Não Feito"]], { origin: "I4" });
+    delete sheet.I6;
+    const source = findLossesMonthSource(workbook);
+    const result = createLossesMonthData(source, new Date(2026, 9, 3, 12));
+    replaceLossesData(result);
+
+    const summary = getLossesSummary();
+    assert.equal(summary.recoveryPending, 0);
+    assert.equal(summary.recoveryUninformed, 1);
+    assert.equal(summary.packRecoveryTotal, 3);
+    assert.equal(summary.total, 4);
 });
 
 test("aceita o nome singular informado para a aba de retornados", () => {
@@ -99,7 +115,7 @@ test("o HTML liga o novo gráfico e a linha de retornados ao estado", () => {
     );
 });
 
-test("comparação mostra Em Análise, Perdidos e Retornados nessa ordem, com cores e valores corretos", t => {
+test("os gráficos de Pack Recovery e de comparação mostram categorias, cores e valores na ordem correta", t => {
     class Element {
         constructor(id) {
             this.id = id;
@@ -159,12 +175,21 @@ test("comparação mostra Em Análise, Perdidos e Retornados nessa ordem, com co
     assert.deepEqual(comparison.data.datasets[0].backgroundColor, ["#f99400", "#8B0000", "#007A48"]);
     assert.deepEqual(comparison.data.datasets[0].data, [0, 0, 0]);
 
-    const source = findLossesMonthSource(createLossesWorkbook());
+    const recovery = charts.get("lossesPackRecoveryChart");
+    assert.deepEqual(recovery.data.labels, ["Feito", "ID Inválido", "Sem Dados", "Aguardando"]);
+    assert.deepEqual(recovery.data.datasets[0].backgroundColor, ["#007A48", "#8B0000", "#8B0000", "#f99400"]);
+    assert.deepEqual(recovery.data.datasets[0].data, [0, 0, 0, 0]);
+
+    const workbook = createLossesWorkbook();
+    XLSX.utils.sheet_add_aoa(workbook.Sheets["Base de Análises"],
+        [["Aguardando"], ["Aguardando"], ["Aguardando"]], { origin: "I3" });
+    const source = findLossesMonthSource(workbook);
     replaceLossesData(createLossesMonthData(source, new Date(2026, 9, 3, 12)));
     assert.deepEqual(comparison.data.datasets[0].data, [1, 3, 2]);
-    assert.deepEqual(charts.get("lossesPackRecoveryChart").data.datasets[0].data, [1, 1, 1, 1]);
+    assert.deepEqual(recovery.data.datasets[0].data, [0, 0, 1, 3]);
 
     resetLossesState();
     assert.deepEqual(comparison.data.datasets[0].data, [0, 0, 0]);
+    assert.deepEqual(recovery.data.datasets[0].data, [0, 0, 0, 0]);
     assert.deepEqual(comparison.data.labels, ["Em Análise", "Perdidos", "Retornados"]);
 });

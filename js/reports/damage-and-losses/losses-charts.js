@@ -29,10 +29,6 @@ import {
 const LOSSES_REVIEW_COLOR = DAMAGE_AND_LOSSES_YELLOW;
 const LOSSES_CONFIRMED_COLOR = DAMAGE_AND_LOSSES_RED;
 const LOSSES_RETURNED_COLOR = DAMAGE_AND_LOSSES_GREEN;
-const LOSSES_RECOVERY_DONE_COLOR = DAMAGE_AND_LOSSES_GREEN;
-const LOSSES_RECOVERY_NOT_DONE_COLOR = DAMAGE_AND_LOSSES_RED;
-const LOSSES_RECOVERY_INVALID_ID_COLOR = DAMAGE_AND_LOSSES_YELLOW;
-const LOSSES_RECOVERY_UNINFORMED_COLOR = "#a0a4aa";
 
 const lossesQuantityFormatter =
     new Intl.NumberFormat("pt-BR", {
@@ -399,18 +395,18 @@ function createLossesPackRecoveryChart(canvas) {
         data: {
             labels: [
                 "Feito",
-                "Não Feito",
                 "ID Inválido",
-                "-",
+                "Sem Dados",
+                "Aguardando",
             ],
             datasets: [
                 {
-                    data: [0, 0, 0],
+                    data: [0, 0, 0, 0],
                     backgroundColor: [
-                        LOSSES_RECOVERY_DONE_COLOR,
-                        LOSSES_RECOVERY_NOT_DONE_COLOR,
-                        LOSSES_RECOVERY_INVALID_ID_COLOR,
-                        LOSSES_RECOVERY_UNINFORMED_COLOR,
+                        DAMAGE_AND_LOSSES_GREEN,
+                        DAMAGE_AND_LOSSES_RED,
+                        DAMAGE_AND_LOSSES_RED,
+                        DAMAGE_AND_LOSSES_YELLOW,
                     ],
                     borderWidth: 0,
                     borderRadius: 0,
@@ -589,7 +585,7 @@ function getActiveLossesChartPeriod(summary) {
             confirmedLosses: 0,
             returnedPackages: 0,
             recoveryDone: 0,
-            recoveryNotDone: 0,
+            recoveryPending: 0,
             recoveryInvalidId: 0,
             recoveryUninformed: 0,
             dailyAverage: 0,
@@ -711,9 +707,9 @@ function renderLossesCharts(
 
     const recoveryValues = [
         selectedPeriod.recoveryDone,
-        selectedPeriod.recoveryNotDone,
         selectedPeriod.recoveryInvalidId,
         selectedPeriod.recoveryUninformed,
+        selectedPeriod.recoveryPending,
     ];
     const maximumRecovery =
         Math.max(...recoveryValues, 0);

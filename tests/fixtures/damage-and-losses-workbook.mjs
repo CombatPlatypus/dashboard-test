@@ -32,9 +32,9 @@ export function createDamageAndLossesWorkbook(
         ["Acompanhamento dos Pacotes em Análise"],
         ["Data", "Código BR", "Situação", "Rota", "AT", "ID do Motorista", "Motorista", "Produto", "Pack Recovery"],
         [new Date(2026, 9, 1, 12), "BR1", "Lost", "", "", "", "", "", "Feito"],
-        [new Date(2026, 9, 2, 12), "BR2", "Em Análise", "", "", "", "", "", "Não Feito"],
+        [new Date(2026, 9, 2, 12), "BR2", "Em Análise", "", "", "", "", "", "Aguardando"],
         [new Date(2026, 9, 3, 12), "BR3", "Lost", "", "", "", "", "", "ID Inválido"],
-        [new Date(2026, 9, 3, 12), "BR4", "Lost", "", "", "", "", "", "-"],
+        [new Date(2026, 9, 3, 12), "BR4", "Lost", "", "", "", "", "", "Sem Dados"],
     ];
     const returned = [
         ["Informações dos Pacotes Retornados", "", "", "", "", "", "", "", "", "", "Base de Análise"],

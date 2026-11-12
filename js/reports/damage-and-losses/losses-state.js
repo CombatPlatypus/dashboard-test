@@ -56,8 +56,8 @@ function createLossesDayRecord(values = {}) {
             normalizeLossesCount(values.returnedPackages),
         recoveryDone:
             normalizeLossesCount(values.recoveryDone),
-        recoveryNotDone:
-            normalizeLossesCount(values.recoveryNotDone),
+        recoveryPending:
+            normalizeLossesCount(values.recoveryPending),
         recoveryInvalidId:
             normalizeLossesCount(values.recoveryInvalidId),
         recoveryUninformed:
@@ -270,7 +270,7 @@ function createLossesMetrics(days) {
         confirmedLosses: 0,
         returnedPackages: 0,
         recoveryDone: 0,
-        recoveryNotDone: 0,
+        recoveryPending: 0,
         recoveryInvalidId: 0,
         recoveryUninformed: 0,
     };
@@ -286,8 +286,8 @@ function createLossesMetrics(days) {
                     normalizeLossesCount(day.returnedPackages);
                 metrics.recoveryDone +=
                     normalizeLossesCount(day.recoveryDone);
-                metrics.recoveryNotDone +=
-                    normalizeLossesCount(day.recoveryNotDone);
+                metrics.recoveryPending +=
+                    normalizeLossesCount(day.recoveryPending);
                 metrics.recoveryInvalidId +=
                     normalizeLossesCount(day.recoveryInvalidId);
                 metrics.recoveryUninformed +=
@@ -300,7 +300,7 @@ function createLossesMetrics(days) {
         metrics.confirmedLosses;
     metrics.packRecoveryTotal =
         metrics.recoveryDone +
-        metrics.recoveryNotDone +
+        metrics.recoveryPending +
         metrics.recoveryInvalidId +
         metrics.recoveryUninformed;
 

@@ -56,9 +56,9 @@ test("importa o novo XLSX completo sem misturar os históricos lado a lado", asy
     assert.equal(result.losses.importedRows, 4);
     assert.equal(result.losses.returnedImportedRows, 2);
     assert.deepEqual(result.losses.days, [
-        { date: "2026-10-01", underReview: 0, confirmedLosses: 1, returnedPackages: 0, recoveryDone: 1, recoveryNotDone: 0, recoveryInvalidId: 0, recoveryUninformed: 0 },
-        { date: "2026-10-02", underReview: 1, confirmedLosses: 0, returnedPackages: 1, recoveryDone: 0, recoveryNotDone: 1, recoveryInvalidId: 0, recoveryUninformed: 0 },
-        { date: "2026-10-03", underReview: 0, confirmedLosses: 2, returnedPackages: 1, recoveryDone: 0, recoveryNotDone: 0, recoveryInvalidId: 1, recoveryUninformed: 1 },
+        { date: "2026-10-01", underReview: 0, confirmedLosses: 1, returnedPackages: 0, recoveryDone: 1, recoveryPending: 0, recoveryInvalidId: 0, recoveryUninformed: 0 },
+        { date: "2026-10-02", underReview: 1, confirmedLosses: 0, returnedPackages: 1, recoveryDone: 0, recoveryPending: 1, recoveryInvalidId: 0, recoveryUninformed: 0 },
+        { date: "2026-10-03", underReview: 0, confirmedLosses: 2, returnedPackages: 1, recoveryDone: 0, recoveryPending: 0, recoveryInvalidId: 1, recoveryUninformed: 1 },
     ]);
     assert.equal(result.lossesRate.importedRows, 12);
     assert.deepEqual(result.lossesRate.history[9], {

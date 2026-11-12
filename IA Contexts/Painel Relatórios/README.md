@@ -38,6 +38,8 @@ Verifique a origem do backlog e sua presença nos resumos em [planning-backlog.t
 
 Mostra Avarias do Mês, Perdas do Mês e Histórico Consolidado. O [importador](../../js/reports/damage-and-losses/import.js) identifica as abas e os blocos do XLSX. O [controlador](../../js/reports/damage-and-losses/controller.js) exporta os estados de avarias e perdas na mesma entrada da sessão. O [modelo consolidado](../../js/reports/damage-and-losses/consolidated-model.js) combina os históricos com o estado da Taxa de Perdas para o mês selecionado.
 
+Em **Perdas do Mês**, o gráfico **Pack Recovery** cruza os códigos BR do histórico com a coluna Pack Recovery da **Base de Análises**. A contagem do período selecionado usa **Feito**, **ID Inválido**, **Sem Dados** e **Aguardando**. Células vazias e pacotes sem correspondência na base entram em **Sem Dados**. Rótulos preenchidos fora da lista ficam fora da contagem do gráfico. [Importação](../../js/reports/damage-and-losses/import.js) · [Gráfico](../../js/reports/damage-and-losses/losses-charts.js) · [Testes](../../tests/damage-and-losses-losses.test.mjs)
+
 Verifique o reconhecimento dos blocos lado a lado e a seleção mensal em [damage-and-losses-workbook.test.mjs](../../tests/damage-and-losses-workbook.test.mjs) e [consolidated-history.test.mjs](../../tests/consolidated-history.test.mjs).
 
 ## Taxa de Perdas
