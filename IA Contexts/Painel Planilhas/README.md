@@ -14,6 +14,12 @@ O HTML define o contêiner `#spreadsheets` em [index.html](../../index.html). Em
 
 O endereço fica em `data-src`. O módulo só atribui `src` ao iframe da planilha selecionada enquanto **Planilhas** está aberto. Ao trocar de planilha ou sair do painel, o iframe anterior é descarregado.
 
+## Teste de leitura pela extensão
+
+A [página de teste](../../extension-test.html) mantém **Testar conexão** e oferece **Ler título da planilha**. [extension-connection.js](../../extensions/extension-connection.js) envia o pedido e exibe a resposta no parágrafo `#status-conexao-extensao`. [background.js](../../extensions/background.js) aceita a leitura somente da página de teste publicada e procura uma única planilha aberta na janela do Dashboard.
+
+No Opera GX, recarregue a extensão da pasta `extensions` e permita o acesso a `docs.google.com`. Na aba **Visão Geral** de **Resumo Operação**, selecione o título mesclado `B2:R3`, deixe a barra de fórmulas visível e clique em **Ler título da planilha** no Dashboard. O teste confere a seleção e lê o texto da barra de fórmulas. Não usa a API do Google Planilhas, não alterna o foco e não modifica o arquivo. Como depende dos elementos da interface do editor, valide essa leitura no navegador após mudar a extensão.
+
 ## Verificação
 
 Rode `node --test tests/spreadsheet-default-config.test.mjs` para conferir a ordem da lista padrão, a correspondência da lista incorporada e o carregamento da configuração. Em mudanças de navegação, confira a seleção da planilha, a seta de abertura e a troca para outro painel.

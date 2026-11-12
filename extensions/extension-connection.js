@@ -1,9 +1,10 @@
 const idExtensao = "aoagcglalglmemlllchbpbadppnloejb";
 
-const botao = document.querySelector("#testar-conexao-extensao");
+const botaoConexao = document.querySelector("#testar-conexao-extensao");
+const botaoTitulo = document.querySelector("#ler-titulo-planilha");
 const status = document.querySelector("#status-conexao-extensao");
 
-botao.addEventListener("click", () => {
+function executarTeste(tipo, emAndamento, lerResposta) {
   if (!/^[a-p]{32}$/.test(idExtensao)) {
     status.textContent = "Configure o ID da extensão antes de testar.";
     return;
@@ -16,19 +17,39 @@ botao.addEventListener("click", () => {
     return;
   }
 
-  botao.disabled = true;
-  status.textContent = "Testando conexão…";
+  botaoConexao.disabled = true;
+  botaoTitulo.disabled = true;
+  status.textContent = emAndamento;
 
-  runtime.sendMessage(idExtensao, { tipo: "PING" }, (resposta) => {
-    const erro = runtime.lastError;
-    botao.disabled = false;
+  function concluir(texto) {
+    botaoConexao.disabled = false;
+    botaoTitulo.disabled = false;
+    status.textContent = texto;
+  }
 
-    if (erro || resposta?.tipo !== "PONG") {
-      status.textContent = "Não foi possível conectar à extensão.";
+  try {
+    runtime.sendMessage(idExtensao, { tipo }, (resposta) => {
+      const erro = runtime.lastError;
       if (erro) console.warn("Teste da extensão:", erro.message);
-      return;
-    }
 
-    status.textContent = "Extensão conectada.";
-  });
+      concluir(lerResposta(erro ? undefined : resposta));
+    });
+  } catch (erro) {
+    console.warn("Teste da extensão:", erro.message);
+    concluir(lerResposta(undefined));
+  }
+}
+
+botaoConexao.addEventListener("click", () => {
+  executarTeste("PING", "Testando conexão…", (resposta) => (
+    resposta?.tipo === "PONG" ? "Extensão conectada." : "Não foi possível conectar à extensão."
+  ));
+});
+
+botaoTitulo.addEventListener("click", () => {
+  executarTeste("LER_TITULO_PLANILHA", "Lendo o título da planilha…", (resposta) => (
+    resposta?.tipo === "TITULO_PLANILHA"
+      ? resposta.erro ?? resposta.titulo ?? "O título não foi retornado."
+      : "Não consegui ler o título. Recarregue a extensão no Opera GX e tente novamente."
+  ));
 });
