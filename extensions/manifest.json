@@ -1,14 +1,14 @@
 {
   "manifest_version": 3,
   "name": "Dashboard do Inventário — Teste",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "action": {
     "default_popup": "popup.html"
   },
   "background": {
     "service_worker": "background.js"
   },
-  "permissions": ["scripting"],
+  "permissions": ["scripting", "clipboardRead", "clipboardWrite"],
   "host_permissions": ["https://docs.google.com/*"],
   "externally_connectable": {
     "matches": [

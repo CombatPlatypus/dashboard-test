@@ -2,6 +2,8 @@ const idExtensao = "aoagcglalglmemlllchbpbadppnloejb";
 
 const botaoConexao = document.querySelector("#testar-conexao-extensao");
 const botaoTitulo = document.querySelector("#ler-titulo-planilha");
+const botaoI7 = document.querySelector("#ler-i7-planilha");
+const botoes = [botaoConexao, botaoTitulo, botaoI7];
 const status = document.querySelector("#status-conexao-extensao");
 
 function executarTeste(tipo, emAndamento, lerResposta) {
@@ -17,13 +19,11 @@ function executarTeste(tipo, emAndamento, lerResposta) {
     return;
   }
 
-  botaoConexao.disabled = true;
-  botaoTitulo.disabled = true;
+  botoes.forEach((botao) => { botao.disabled = true; });
   status.textContent = emAndamento;
 
   function concluir(texto) {
-    botaoConexao.disabled = false;
-    botaoTitulo.disabled = false;
+    botoes.forEach((botao) => { botao.disabled = false; });
     status.textContent = texto;
   }
 
@@ -51,5 +51,13 @@ botaoTitulo.addEventListener("click", () => {
     resposta?.tipo === "TITULO_PLANILHA"
       ? resposta.erro ?? resposta.titulo ?? "O título não foi retornado."
       : "Não consegui ler o título. Recarregue a extensão no Opera GX e tente novamente."
+  ));
+});
+
+botaoI7.addEventListener("click", () => {
+  executarTeste("LER_I7_PLANILHA", "Lendo a célula I7…", (resposta) => (
+    resposta?.tipo === "VALOR_I7_PLANILHA"
+      ? resposta.erro ?? (resposta.valor || "I7 está vazia.")
+      : "Não consegui ler I7. Recarregue a extensão no Opera GX e tente novamente."
   ));
 });

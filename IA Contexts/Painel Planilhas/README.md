@@ -20,6 +20,8 @@ A [página de teste](../../extension-test.html) mantém **Testar conexão** e of
 
 No Opera GX, recarregue a extensão da pasta `extensions` e permita o acesso a `docs.google.com`. Na aba **Visão Geral** de **Resumo Operação**, selecione o título mesclado `B2:R3`, deixe a barra de fórmulas visível e clique em **Ler título da planilha** no Dashboard. O teste confere a seleção e lê o texto da barra de fórmulas. Não usa a API do Google Planilhas, não alterna o foco e não modifica o arquivo. Como depende dos elementos da interface do editor, valide essa leitura no navegador após mudar a extensão.
 
+**Ler célula I7** testa o valor exibido sem usar a barra de fórmulas. Com a **Visão Geral** aberta, a extensão ativa a planilha, tenta ir a `I7` pela caixa de nome e copia a seleção. O texto copiado aparece em `#status-conexao-extensao` e a extensão volta ao Dashboard. Esse teste usa as permissões de área de transferência; uma cópia bem-sucedida substitui o conteúdo dela. Se a seleção automática não for confirmada, selecione `I7` e repita o teste. Se a área de transferência já contiver o mesmo texto, copie outro texto antes de testar novamente para permitir a confirmação da nova cópia.
+
 ## Verificação
 
 Rode `node --test tests/spreadsheet-default-config.test.mjs` para conferir a ordem da lista padrão, a correspondência da lista incorporada e o carregamento da configuração. Em mudanças de navegação, confira a seleção da planilha, a seta de abertura e a troca para outro painel.
