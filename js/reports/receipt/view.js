@@ -14,6 +14,7 @@ import {
 
 import {
     formatReportPersonFirstName,
+    formatReportPersonWithOps,
 } from "../core/person-name.js";
 
 import {
@@ -199,12 +200,6 @@ function getReceiptElements(rootElement) {
             getReceiptElementById(
                 rootElement,
                 "receipt-controls",
-            ),
-
-        previewWindow:
-            getReceiptElementById(
-                rootElement,
-                "receiptPreviewWindow",
             ),
 
         previewExpected:
@@ -692,16 +687,14 @@ function createReceiptPreviewRow(
         );
 
     const receiver =
-        getReceiptReceiverFirstName(
+        formatReportPersonWithOps(
             operator?.receiver,
-        ) ||
-        "—";
+        ) || "—";
 
     const labeler =
-        formatReportPersonFirstName(
+        formatReportPersonWithOps(
             operator?.labeler,
-            "—",
-        );
+        ) || "—";
 
     const packagesReceived =
         formatReceiptQuantity(
@@ -847,10 +840,6 @@ function renderReceiptSummary(
             totalErrors,
             receivedVolume,
         );
-
-    elements.previewWindow.textContent =
-        state.window.trim() ||
-        "—";
 
     elements.previewExpected.textContent =
         formatReceiptQuantity(

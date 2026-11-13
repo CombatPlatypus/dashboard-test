@@ -19,6 +19,7 @@ import {
 
 import {
     formatReportPersonFirstName,
+    formatReportPersonWithOps,
 } from "../core/person-name.js";
 
 /* CONFIGURAÇÕES */
@@ -275,11 +276,6 @@ function getExpeditionElements(
                 "expeditionOperatorControls",
             ),
 
-        previewWindow:
-            getElementById(
-                "expeditionPreviewWindow",
-            ),
-
         previewOperatorCount:
             getElementById(
                 "expeditionPreviewOperatorCount",
@@ -517,11 +513,9 @@ function createExpeditionOperatorRow(
         );
 
     nameCell.textContent =
-        operator
-            ? getExpeditionOperatorName(
-                operator.operator,
-            )
-            : "—";
+        formatReportPersonWithOps(
+            operator?.operator,
+        ) || "—";
 
     routesCell.textContent =
         operator
@@ -1260,12 +1254,6 @@ function renderExpeditionReport(
                 )
                 : "—";
         };
-
-    elements.previewWindow
-        .textContent =
-            String(
-                state.window ?? "",
-            ).trim() || "—";
 
     elements.previewOperatorCount
         .textContent =

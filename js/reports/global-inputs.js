@@ -7,13 +7,6 @@ import {
 let reportGlobalInputsInitialized =
     false;
 
-const reportWindowOutputIds = [
-    "receiptPreviewWindow",
-    "receiptLinehaulPreviewWindow",
-    "expeditionPreviewWindow",
-    "overallAnalysisWindow",
-];
-
 const reportGlobalInputDefinitions = [
     {
         id: "reportWindowInput",
@@ -157,22 +150,15 @@ function initializeReportGlobalInputs() {
             },
         );
 
-        const displayWindow =
-            context.window || "—";
+        const windowOutput =
+            document.getElementById(
+                "overallAnalysisWindow",
+            );
 
-        reportWindowOutputIds.forEach(
-            function (outputId) {
-                const output =
-                    document.getElementById(
-                        outputId,
-                    );
-
-                if (output) {
-                    output.textContent =
-                        displayWindow;
-                }
-            },
-        );
+        if (windowOutput) {
+            windowOutput.textContent =
+                context.window || "—";
+        }
 
         const analystOutput =
             document.getElementById(

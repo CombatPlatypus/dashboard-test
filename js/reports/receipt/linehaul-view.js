@@ -73,12 +73,6 @@ function getReceiptLinehaulElements(
                 "receiptLinehaulRemoveButton",
             ),
 
-        previewWindow:
-            getReceiptLinehaulElement(
-                rootElement,
-                "receiptLinehaulPreviewWindow",
-            ),
-
         previewExpected:
             getReceiptLinehaulElement(
                 rootElement,
@@ -678,11 +672,6 @@ function renderReceiptLinehaulSummary(
                     100,
                 ),
             );
-
-    elements.previewWindow.textContent =
-        String(
-            state.window ?? "",
-        ).trim() || "—";
 
     elements.previewExpected.textContent =
         hasData

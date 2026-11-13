@@ -425,6 +425,17 @@
         table thead {
             color: var(--color-text);
         }
+        table thead th {
+            font-weight: 600;
+            background-color: var(--color-table-th);
+            padding: 10px 0;
+            height: auto;
+            font-size: 14px;
+            color: var(--color-text);
+            font-family: 'Open Sans', sans-serif;
+            overflow-wrap: anywhere;
+            text-align: center;
+        }
         table tfoot {
             background: var(--color-container);
             color: var(--color-text);

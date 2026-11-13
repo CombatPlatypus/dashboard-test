@@ -386,6 +386,13 @@
 
         /* AJUSTES POR RELATÓRIO */
 
+            /* PROCESSAMENTO */
+
+            #receiptAlignedComparisonChartContainer {
+                min-height: 476px !important;
+            }
+
+
             /* EXPEDIÇÃO */
 
             #expeditionAlignedComparisonChartContainer {
@@ -450,10 +457,10 @@
         #receipt-controls #receipt-controls-1 .input-group {
             /* Contém os selects ocultos do Select2 na área de rolagem. */
             position: relative;
-            max-height: 542px;
+            max-height: 550px;
         }
         #receipt-controls #receipt-controls-2 .input-group {
-            max-height: 559px;
+            max-height: 567px;
         }
         #receipt-controls .input-group .flex-box-start input[data-receipt-operator-field="labeler"] {
             flex: 1 1 0 !important;

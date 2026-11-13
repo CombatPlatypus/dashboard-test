@@ -24,9 +24,17 @@ Verifique alinhamento, confirmação da importação e recálculo de volume em [
 
 O [exportador de Processamento](../../js/reports/receipt/export.js) usa os dados da subaba ativa tanto para habilitar o botão de imagem quanto para executar a captura. Descarregamento de LHs pode ser copiado assim que houver LHs cadastrados. Mesa de Recebimento e Ranking de Recebedores usam a validação dos dados de recebimento.
 
+As prévias de **Descarregamento de LHs** e **Mesa de Recebimento** começam pelo Volume Esperado. A seleção da janela fica no controle **Janela do Turno**, no topo do painel. [Estrutura das prévias](../../index.html)
+
+Na lista da **Mesa de Recebimento**, as colunas Recebedor e Etiquetador exibem o código OPS seguido de um espaço e do primeiro nome com inicial maiúscula, como `[ops12345] Lucas`. A prévia usa o mesmo formatador da cópia para planilha. Se o registro trouxer apenas o código ou o nome, a lista mostra o dado disponível. A célula sem identificação exibe `—`. [Renderização da mesa](../../js/reports/receipt/view.js) · [Formatador de nomes](../../js/reports/core/person-name.js)
+
 ## Expedição
 
 Acompanha rotas expedidas, ranking de conferentes, erros e ocorrências por rua. O [importador de expedição](../../js/reports/expedition/import.js) identifica as colunas e monta os registros por rota. A [importação de erros](../../js/reports/expedition/errors-import.js) alimenta as visões de erros e ruas. O [estado](../../js/reports/expedition/state.js) reúne rotas, volumes, erros e ajustes usados no resumo e no Relatório Final.
+
+A prévia do **Resumo de Expedição** começa pela coluna Conferentes. A janela vem do controle **Janela do Turno**, no topo do painel. [Estrutura da prévia](../../index.html)
+
+Na lista do **Resumo de Expedição**, a coluna Conferente usa o mesmo formato da Mesa de Recebimento e da cópia para planilha. [Renderização da lista](../../js/reports/expedition/view.js)
 
 Verifique o botão de importação nas quatro abas em [expedition-import-tabs.test.mjs](../../tests/expedition-import-tabs.test.mjs) e o volume de retirados em [expedition-withdrawn.test.mjs](../../tests/expedition-withdrawn.test.mjs).
 
