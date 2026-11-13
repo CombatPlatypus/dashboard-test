@@ -188,7 +188,7 @@
     #reports td {
         height: 38px;
         padding: 8px 10px;
-        font-size: 13px;
+        font-size: 14px;
         color: var(--color-text);
         border: 1px solid var(--color-border);
         overflow-wrap: anywhere;
