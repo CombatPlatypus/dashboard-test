@@ -672,7 +672,7 @@
             row-gap: 20px;
             overflow: auto;
             padding-right: 15px;
-            max-height: 420px !important;
+            max-height: 375px !important;
         }
         .lhs-list label {
             display: flex;
@@ -804,7 +804,7 @@
         /* BACKLOG */
 
         #planning-backlog textarea {
-            min-height: 403px;
+            min-height: 358px;
         }
 
         /* SELEÇÃO DE JANELA PARA IMPORTAR */
