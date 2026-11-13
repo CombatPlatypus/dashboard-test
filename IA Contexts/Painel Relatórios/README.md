@@ -14,6 +14,8 @@ Para criar ou alterar gráficos no painel ou no HTML do Relatório Final, siga o
 
 O botão de imagem captura a visualização de dados da subaba aberta. Quando as subabas alternam apenas os controles, a captura usa a prévia compartilhada. Consulte o [contexto da cópia de imagem](copia-de-imagem.md) para os destinos de cada relatório.
 
+O botão de cópia de dados gera os blocos de colagem para o Resumo da Operação e a planilha de Planejamento. Consulte os intervalos e o formato no [contexto da cópia de dados para planilha](copia-de-dados-para-planilha.md).
+
 ## Processamento
 
 Acompanha **Descarregamento de LHs**, **Mesa de Recebimento** e **Ranking de Recebedores**. O [importador de LHs](../../js/reports/receipt/linehaul-import.js) trata a leitura e a seleção da janela. O [estado de LHs](../../js/reports/receipt/linehaul-state.js) deriva o volume restante a partir do volume esperado e dos LHs marcados como descarregados. O [importador de recebimento](../../js/reports/receipt/import.js) agrupa os registros por operador para a mesa e o ranking. A sessão reúne os dois estados no [controlador](../../js/reports/receipt/controller.js).

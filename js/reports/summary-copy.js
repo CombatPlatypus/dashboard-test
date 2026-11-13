@@ -12,6 +12,7 @@ import { getReverseState, subscribeReverseState } from "./reverse/state.js";
 import { setReportNotification } from "./report-notifications.js";
 
 const shiftRows = { AM: 7, PM1: 67, PM2: 127 };
+const operationDataSheet = "Base de Dados";
 // Each window reserves rows 7:62, 67:122 or 127:182 for the two report blocks.
 const summaryRowCount = 56;
 const shiftClipboardPalette = { background: "#101010", color: "#f8faf8", borderColor: "#626262" };
@@ -142,17 +143,16 @@ function createReportSummaryClipboard(kind, {
         const state = parcel ?? getParcelState();
         const summary = createParcelSummary(state.rows, state.operatorKindOverrides);
         const rows = [
-            [cell("Relatório Parcel Sweeper", 3, 12), cell(dateFormatter.format(now), 1, 12)],
-            heading("Porcentagem Total", "Total de Bipado"),
+            [cell("Relatório Parcel Sweeper", 4, 12), cell(dateFormatter.format(now), 4, 12)],
+            heading("Porcentagem Total", "Total de Bipado", "Pacotes Exception", "Pacotes Missorted"),
             [cell(summary.expectedTotalCount > 0 ? rate(summary.expectedScannedCount / summary.expectedTotalCount) : null, 1),
                 cell(summary.hasData ? "-" : null, 1),
-                cell(summary.hasData ? summary.scannedCount : null)],
-            heading("Pacotes Exception", "Pacotes Missorted"),
-            pair(summary.hasData ? summary.exceptionCount : null,
-                summary.hasData ? summary.missortedCount : null),
+                ...pair(summary.hasData ? summary.scannedCount : null,
+                    summary.hasData ? summary.exceptionCount : null,
+                    summary.hasData ? summary.missortedCount : null)],
         ];
-        return { ...createClipboardTable(rows, { columnWidth: 100 }),
-            target: "G5", sheet: "Base da Visão Geral", label: "Relatório Parcel Sweeper",
+        return { ...createClipboardTable(rows),
+            target: "C185", sheet: operationDataSheet, label: "Relatório Parcel Sweeper",
             shift: null, hasData: summary.hasData, copyError: "",
         };
     }
@@ -161,12 +161,12 @@ function createReportSummaryClipboard(kind, {
         const summary = createReverseSummary(state.transfers);
         const types = ["return", "missorted", "liquidate", "confiscated"];
         const rows = [
-            [cell("Reversa", 3, 12), cell(dateFormatter.format(now), 1, 12)],
-            ["Return", "Missorted", "Liquidate", "Confiscado"].map(value => cell(value, 1, 11)),
-            types.map(type => cell(summary.hasData ? summary.quantities[type] : null, 1)),
+            [cell("Reversa", 4, 12), cell(dateFormatter.format(now), 4, 12)],
+            heading("Return", "Missorted", "Liquidate", "Confiscado"),
+            types.map(type => cell(summary.hasData ? summary.quantities[type] : null)),
         ];
-        return { ...createClipboardTable(rows, { columnWidth: 125 }),
-            target: "G11", sheet: "Base da Visão Geral", label: "Resumo de reversa",
+        return { ...createClipboardTable(rows),
+            target: "C189", sheet: operationDataSheet, label: "Resumo de reversa",
             shift: null, hasData: summary.hasData, copyError: "",
         };
     }
@@ -239,7 +239,7 @@ function createReportSummaryClipboard(kind, {
         : "";
     // Empty rows remove names left by a previous, longer list without touching the next window.
     rows.push(...Array.from({ length: listCapacity }, (_, index) => createOperatorRow(operators[index])));
-    return { ...createClipboardTable(rows, { palette: shiftClipboardPalette }), target, sheet: "Base dos Turnos", label, shift, hasData, copyError };
+    return { ...createClipboardTable(rows, { palette: shiftClipboardPalette }), target, sheet: operationDataSheet, label, shift, hasData, copyError };
 }
 
 function writeSummaryCopyEvent(payload) {
