@@ -404,7 +404,7 @@
                 margin: 0 20px 20px 20px;
             }
             #expedition-streets .vertical-bars-chart .chart-canvas-container {
-                height: 252px;
+                height: 248px;
                 margin: 0 20px 20px 20px;
             }
             #expedition-streets .vertical-bars-chart .chart-label{
@@ -545,8 +545,6 @@
         }
         #expedition .expedition-operator-table th:first-child,
         #expedition .expedition-operator-table td:first-child {
-            padding-left: 15px;
-            text-align: left;
             white-space: normal;
             overflow-wrap: anywhere;
         }
@@ -589,7 +587,7 @@
             padding-right: 15px;
         }
         #expedition #expeditionStreetGuardianControls.is-errors-tab-active {
-            max-height: 465px;
+            max-height: 473px;
         }
         #expedition #expeditionWindowInput {
             width: 100%;
