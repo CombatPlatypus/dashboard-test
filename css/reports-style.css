@@ -389,9 +389,8 @@
             /* PROCESSAMENTO */
 
             #receiptAlignedComparisonChartContainer {
-                min-height: 476px !important;
+                min-height: 470px !important;
             }
-
 
             /* EXPEDIÇÃO */
 
@@ -404,7 +403,7 @@
                 margin: 0 20px 20px 20px;
             }
             #expedition-streets .vertical-bars-chart .chart-canvas-container {
-                height: 248px;
+                height: 251px;
                 margin: 0 20px 20px 20px;
             }
             #expedition-streets .vertical-bars-chart .chart-label{
@@ -457,10 +456,10 @@
         #receipt-controls #receipt-controls-1 .input-group {
             /* Contém os selects ocultos do Select2 na área de rolagem. */
             position: relative;
-            max-height: 550px;
+            max-height: 542px;
         }
         #receipt-controls #receipt-controls-2 .input-group {
-            max-height: 567px;
+            max-height: 559px;
         }
         #receipt-controls .input-group .flex-box-start input[data-receipt-operator-field="labeler"] {
             flex: 1 1 0 !important;
@@ -587,7 +586,7 @@
             padding-right: 15px;
         }
         #expedition #expeditionStreetGuardianControls.is-errors-tab-active {
-            max-height: 473px;
+            max-height: 465;
         }
         #expedition #expeditionWindowInput {
             width: 100%;
@@ -1099,7 +1098,8 @@
             gap: 10px;
             width: max-content;
         }
-        #reports #parcel caption .flex-box-start button img {
+        #reports #parcel caption .flex-box-start button img,
+        #analysis .analysis-copy-column-button img {
             width: 20px;
             cursor: pointer;
         }

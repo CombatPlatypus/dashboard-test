@@ -270,6 +270,14 @@
     color: var(--color-gray-p);
     font-size: 15px;
 }
+#analysis .analysis-preview-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+#analysis .analysis-copy-column-button {
+    flex: 0 0 auto;
+}
 #analysis #analysisPreviewTable .analysis-empty-row {
     padding: 45px 20px;
     color: var(--color-gray-p);

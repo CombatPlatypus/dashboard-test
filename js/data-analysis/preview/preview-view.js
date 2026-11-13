@@ -563,9 +563,27 @@ function createPreviewView(
                         indicator,
                     );
 
-                    headerCell.appendChild(
-                        sortButton,
-                    );
+                    if (snapshot.visibleColumnIndexes.length === 1) {
+                        const actions = document.createElement("div");
+                        actions.className = "analysis-preview-header-actions";
+
+                        const copyButton = document.createElement("button");
+                        copyButton.type = "button";
+                        copyButton.className = "analysis-copy-column-button";
+                        copyButton.title = `Copiar coluna ${snapshot.dataset.headers[columnIndex]}`;
+                        copyButton.setAttribute("aria-label", copyButton.title);
+                        copyButton.disabled = !snapshot.canExport;
+
+                        const icon = document.createElement("img");
+                        icon.src = "images/geral-icons/copy-mini-icon.svg";
+                        icon.alt = "";
+                        copyButton.appendChild(icon);
+
+                        actions.append(sortButton, copyButton);
+                        headerCell.appendChild(actions);
+                    } else {
+                        headerCell.appendChild(sortButton);
+                    }
 
                     headerRow.appendChild(
                         headerCell,

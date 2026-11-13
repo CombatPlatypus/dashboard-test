@@ -12,6 +12,8 @@ A base importada é gravada em `dashboard-analysis-session-v1` no `sessionStorag
 
 O [modelo da prévia](../../js/data-analysis/preview/preview-model.js) controla as colunas visíveis e as operações de filtro e ordenação. O [controlador](../../js/data-analysis/preview/preview-controller.js) atualiza a tabela, fornece o estado da prévia às outras abas e aciona a cópia ou o download dos dados filtrados. O [exportador](../../js/data-analysis/services/preview-export.js) gera o CSV.
 
+Com uma única coluna visível, o cabeçalho exibe o botão de cópia ao lado da ordenação. A cópia usa todas as linhas que passam pelos filtros, na ordem atual, independentemente do limite da prévia. O texto tabulado contém os valores da coluna sem o cabeçalho e preserva repetições e células vazias. Sem resultados, o botão fica desabilitado. [Cabeçalho da prévia](../../js/data-analysis/preview/preview-view.js) · [Exportação para a área de transferência](../../js/data-analysis/services/preview-export.js)
+
 ## Análise de Dados
 
 O [controlador de análise](../../js/data-analysis/analysis/analysis-controller.js) recebe mudanças da prévia. O [modelo de análise](../../js/data-analysis/analysis/analysis-model.js) calcula os indicadores das colunas visíveis sobre as linhas filtradas, com métricas que dependem do tipo de dado. Uma mudança de filtro pode alterar os resultados dessa aba mesmo quando o arquivo importado é o mesmo.
@@ -23,5 +25,7 @@ O [modelo de comparação](../../js/data-analysis/comparison/comparison-model.js
 ## Verificação
 
 Importe uma base com um identificador repetido e uma coluna numérica. Oculte uma coluna, filtre a prévia e confira os indicadores, a comparação de um valor presente e outro ausente, e as colunas do CSV. Descarte a base e confira se as abas dependentes voltam ao estado inicial.
+
+Para conferir a cópia da coluna, aplique um filtro com mais resultados que o limite da prévia, ordene a coluna e cole em um editor de texto. Confira todos os resultados na ordem selecionada, inclusive repetidos, e verifique que o ícone desaparece ao exibir outra coluna.
 
 Rode `node --test tests/analysis-session.test.mjs` para verificar a restauração e o descarte da base.

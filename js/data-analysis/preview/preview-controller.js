@@ -3,6 +3,7 @@ import {
 } from "../core/select-control.js";
 
 import {
+    copyPreviewColumn,
     copyPreviewData,
     savePreviewAsCsv,
 } from "../services/preview-export.js";
@@ -40,6 +41,7 @@ function initializePreviewModule({
 
     const listeners =
         new Set();
+    let columnCopyPending = false;
 
     function getSnapshot() {
         return model.getSnapshot();
@@ -287,6 +289,25 @@ function initializePreviewModule({
             },
         );
 
+    async function copyVisibleColumn(button) {
+        const snapshot = getSnapshot();
+        if (columnCopyPending || !snapshot.canExport || snapshot.visibleColumnIndexes.length !== 1) {
+            return;
+        }
+
+        columnCopyPending = true;
+        button.disabled = true;
+        try {
+            await copyPreviewColumn(snapshot.orderedRows, snapshot.visibleColumnIndexes[0]);
+            notification.set(`${snapshot.orderedRows.length} linha(s) da coluna copiadas para a área de transferência.`, "success");
+        } catch (error) {
+            notification.set(error instanceof Error ? error.message : "Não foi possível copiar a coluna.", "error");
+        } finally {
+            columnCopyPending = false;
+            button.disabled = false;
+        }
+    }
+
     elements.previewTable
         .addEventListener(
             "click",
@@ -296,6 +317,11 @@ function initializePreviewModule({
                         Element
                         ? event.target
                         : null;
+
+                const copyButton = eventTarget?.closest(".analysis-copy-column-button");
+                if (copyButton && elements.previewTable.contains(copyButton)) {
+                    return copyVisibleColumn(copyButton);
+                }
 
                 const sortButton =
                     eventTarget?.closest(

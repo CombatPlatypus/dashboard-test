@@ -185,7 +185,12 @@ async function copyPreviewData(
     );
 }
 
+function copyPreviewColumn(rows, columnIndex) {
+    return copyPreviewData({ matrix: rows.map(row => [row[columnIndex] ?? ""]) });
+}
+
 export {
+    copyPreviewColumn,
     copyPreviewData,
     savePreviewAsCsv,
 };
