@@ -74,4 +74,6 @@ Verifique o tipo obrigatório, a reimportação sem duplicar totais e a compatib
 
 A aba **Relatório Final** corresponde ao módulo `overall-analysis`. O [controlador](../../js/reports/overall-analysis/controller.js) coleta os dados dos demais módulos e o [modelo](../../js/reports/overall-analysis/model.js) calcula o resumo da janela. A [verificação de completude](../../js/reports/overall-analysis/completeness.js) determina quando o HTML autônomo pode ser gerado. Parcel Sweeper e Reversa são opcionais nessa verificação. O [exportador](../../js/reports/overall-analysis/standalone-export.js) gera o HTML a partir de uma cópia dos dados da janela.
 
+A cópia em imagem captura a própria prévia. O HTML baixado incorpora o CSS do seu modelo e abre offline. Ao mudar as tabelas do painel, confira no modelo os cabeçalhos, títulos, tipografia, bordas e espaçamento das cinco tabelas. [Modelo HTML](../../final-report.html) · [Teste de paridade das tabelas](../../tests/overall-analysis-standalone-template.test.mjs)
+
 Verifique indicadores e critérios de exportação em [overall-analysis-cards.test.mjs](../../tests/overall-analysis-cards.test.mjs) e [overall-analysis-html.test.mjs](../../tests/overall-analysis-html.test.mjs).

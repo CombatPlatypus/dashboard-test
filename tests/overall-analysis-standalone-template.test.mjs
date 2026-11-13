@@ -106,3 +106,20 @@ test(
         );
     },
 );
+
+test("as tabelas do HTML mantêm a estrutura e os estilos de célula do Relatório Final", () => {
+    const preview = dashboard.split('id="overallAnalysisReportExportArea"')[1]
+        .split('id="analysis"')[0];
+    const tables = markup => Array.from(markup.matchAll(/<table\b[^>]*>[\s\S]*?<\/table>/g), ([table]) =>
+        table.replace(/\s+id="[^"]+"/g, "").replace(/>\s+</g, "><"));
+    const previewTables = tables(preview);
+    assert.equal(previewTables.length, 5);
+    assert.deepEqual(tables(template), previewTables);
+
+    const dashboardCss = readFileSync(new URL("../css/dashboard-style.css", import.meta.url), "utf8");
+    const reportsCss = readFileSync(new URL("../css/reports-style.css", import.meta.url), "utf8");
+    const declarations = (css, selector) => css.replace(/\s+/g, " ").split(`${selector} {`)[1].split("}")[0].trim();
+    assert.equal(declarations(template, "table thead th"), declarations(dashboardCss, "table thead th"));
+    assert.equal(declarations(template, ".main-structure table th, .main-structure table td"),
+        declarations(reportsCss, "#reports th, #reports td"));
+});

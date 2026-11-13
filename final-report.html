@@ -488,9 +488,20 @@
             table thead {
                 color: var(--color-text);
             }
+            table thead th {
+                font-weight: 600;
+                background-color: var(--color-table-th);
+                padding: 10px 0;
+                height: auto;
+                font-size: 14px;
+                color: var(--color-text);
+                font-family: 'Open Sans', sans-serif;
+                overflow-wrap: anywhere;
+                text-align: center;
+            }
             table tfoot {
                 background: var(--color-container);
-                color: var(--color-body);
+                color: var(--color-text);
             }
             table thead tr, table tfoot tr {
                 background: transparent;
@@ -499,21 +510,15 @@
             tr {
                 border-top: 1px solid var(--color-border);
             }
-            table thead th, table thead td, table tfoot th, table tfoot td {
-                padding: 15px 20px;
-                font-size: 14px;
-                text-align: center;
-                font-family: 'Open Sans', sans-serif;
-                font-weight: 400;
-                background: transparent;
-                letter-spacing: 1px;
-            }
             table tbody th, table tbody td {
                 padding: 10px 0;
+                height: auto;
                 font-size: 14px;
+                color: var(--color-text);
                 font-family: 'Open Sans', sans-serif;
                 font-weight: 400;
                 background: transparent;
+                overflow-wrap: anywhere;
                 text-align: center;
             }
             table tbody tr:nth-child(even) {
@@ -533,7 +538,7 @@
             .main-structure table th, .main-structure table td {
                 height: 38px;
                 padding: 8px 10px;
-                font-size: 13px;
+                font-size: 14px;
                 color: var(--color-text);
                 border: 1px solid var(--color-border);
                 overflow-wrap: anywhere;
@@ -542,6 +547,9 @@
                 font-weight: 600;
                 text-align: center;
                 background-color: var(--color-table-th);
+            }
+            .main-structure tbody tr:nth-child(even) {
+                background-color: var(--color-table-tr);
             }
 
             /* CONTAINERS FLEXÍVEIS */
@@ -893,8 +901,6 @@
                 <!-- AVARIAS E PERDAS -->
 
                 <table id="finalReport-LossesTable">
-                    <caption>Situação das Avarias e Perdas</caption>
-
                     <thead>
                         <tr>
                             <th scope="col" style="width: 230px;">Ocorrência</th>
