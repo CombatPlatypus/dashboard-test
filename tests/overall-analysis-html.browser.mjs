@@ -210,7 +210,14 @@ try {
 
     await page.locator('a[href="#overall-analysis"]').click();
     assert.deepEqual(await page.evaluate(readDamageAndLossesComposition, "overallAnalysisDamageAndLossesComposition"), sourceComposition);
-    assert.deepEqual(await page.evaluate(readLossesRateHistory, "overallAnalysisLossesRate"), sourceHistory);
+    const finalHistory = await page.evaluate(readLossesRateHistory, "overallAnalysisLossesRate");
+    assert.deepEqual(finalHistory.rates, sourceHistory.rates);
+    assert.deepEqual(finalHistory.months, sourceHistory.months);
+    assert.deepEqual(finalHistory.historyPlugins, sourceHistory.historyPlugins);
+    assert.equal(finalHistory.pointColors[0], "#e4e6eb");
+    assert.equal(finalHistory.pointRadii[0], 4);
+    assert.equal(finalHistory.pointColors[9], "#f99400");
+    assert.equal(finalHistory.pointRadii[9], 6);
     assert.equal(await page.locator("#overall-analysis .losses-rate-charts .chart-title").count(), 0);
     assert.deepEqual(await errorTable(), sourceErrors);
     assert.deepEqual(await page.evaluate(readErrorChart, "overallAnalysisErrorBalanceChart"), sourceChart);
@@ -305,9 +312,9 @@ try {
     assert.equal(rendered.tooltipsDisabled, true);
     assert.deepEqual(rendered.bars, [12000, 11500, 500]);
     assert.deepEqual(await report.evaluate(readDamageAndLossesComposition, "finalReportDamageAndLossesComposition"), sourceComposition);
-    assert.deepEqual(await report.evaluate(readLossesRateHistory, "finalReportLossesRate"), sourceHistory);
+    assert.deepEqual(await report.evaluate(readLossesRateHistory, "finalReportLossesRate"), finalHistory);
     assert.equal(await report.locator(".losses-rate-charts .chart-title").count(), 0);
-    assert.deepEqual(await report.evaluate(readHistoryPointColor, { prefix: "finalReportLossesRate", month: 0 }),
+    assert.deepEqual(await report.evaluate(readHistoryPointColor, { prefix: "finalReportLossesRate", month: 9 }),
         [249, 148, 0, 255]);
     assert.deepEqual(await Promise.all(errorFields.map(field =>
         report.locator(`#finalReportExpedition${field}`).textContent())), sourceErrors);

@@ -56,14 +56,16 @@ test("o histórico da Taxa de Perdas permite copiar o Relatório Final com dados
     assert.equal(canExportOverallAnalysisController(analysis), true);
 });
 
-test("composição do Relatório Final acompanha o período do Histórico Consolidado", () => {
-    const rate = { activeMonth: 0, year: 2026, months: [{ lost: 100, possibleLosses: 200 }] };
-    const analysis = createOverallAnalysisData({ operators: [] }, { routes: [] }, rate, {},
+test("composição e destaque do histórico seguem o período do Histórico Consolidado", () => {
+    const createAnalysis = year => createOverallAnalysisData({ operators: [] }, { routes: [] },
+        { activeMonth: 0, year, months: [{ lost: 100, possibleLosses: 200 }] }, {},
         { days: [{ date: "2026-10-30", hub: 60, soc: 153 }] },
         { days: [{ date: "2026-10-30", underReview: 81, confirmedLosses: 24 }] },
         null, null, new Date(2026, 10, 2, 12));
+    const analysis = createAnalysis(2026);
     assert.deepEqual(analysis.damageAndLossesComposition.composition, [81, 24, 60, 153]);
     assert.equal(analysis.damageAndLossesComposition.total, 318);
     assert.equal(analysis.damageAndLossesComposition.monthName, "Outubro");
-    assert.equal(analysis.lossesRateHistory.activeMonth, 0);
+    assert.equal(analysis.lossesRateHistory.activeMonth, 9);
+    assert.equal(createAnalysis(2025).lossesRateHistory.activeMonth, null);
 });

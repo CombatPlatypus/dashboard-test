@@ -296,7 +296,10 @@ function createOverallAnalysisData(
         );
 
     const consolidated = getConsolidatedSummary(damageState, lossesState, lossesRateState ?? null, referenceDate);
-    const { activeMonth, monthlyRates } = getLossesRateChartData(lossesRateState);
+    const { monthlyRates } = getLossesRateChartData(lossesRateState);
+    const activeHistoryMonth = consolidated.hasData && lossesRateState?.year === consolidated.year
+        ? consolidated.monthIndex
+        : null;
 
     const packagesAnalysisRate =
         damageAndLossesAnalysis
@@ -476,7 +479,7 @@ function createOverallAnalysisData(
             year: consolidated.year,
         },
 
-        lossesRateHistory: { activeMonth, monthlyRates },
+        lossesRateHistory: { activeMonth: activeHistoryMonth, monthlyRates },
 
         parcel: {
             hasData: parcelSummary.hasData,
