@@ -34,9 +34,11 @@ Acompanha rotas expedidas, ranking de conferentes, erros e ocorrências por rua.
 
 A prévia do **Resumo de Expedição** começa pela coluna Conferentes. A janela vem do controle **Janela do Turno**, no topo do painel. [Estrutura da prévia](../../index.html)
 
+A barra **Progresso da Conferência** usa o mesmo componente visual de Processamento e mostra rotas feitas, rotas pendentes e o percentual concluído. O estado conta como feitas as rotas com status `Validated` ou `Validado` na coluna **AT/TO Validation Status** do Gestão Audit. As demais rotas importadas contam como pendentes. O percentual divide as rotas feitas pelo total importado. A seleção de conferentes filtra a tabela, enquanto a barra acompanha todas as rotas. A prévia atualiza a barra ao importar, restaurar uma sessão ou limpar o relatório. Sem rotas, os valores aparecem como travessões. A cópia em imagem do Resumo inclui a barra. [Cálculo](../../js/reports/expedition/state.js) · [Renderização](../../js/reports/expedition/view.js)
+
 Na lista do **Resumo de Expedição**, a coluna Conferente usa o mesmo formato da Mesa de Recebimento e da cópia para planilha. [Renderização da lista](../../js/reports/expedition/view.js)
 
-Verifique o botão de importação nas quatro abas em [expedition-import-tabs.test.mjs](../../tests/expedition-import-tabs.test.mjs) e o volume de retirados em [expedition-withdrawn.test.mjs](../../tests/expedition-withdrawn.test.mjs).
+Verifique o botão de importação nas quatro abas em [expedition-import-tabs.test.mjs](../../tests/expedition-import-tabs.test.mjs), o progresso por status em [expedition-progress.test.mjs](../../tests/expedition-progress.test.mjs) e o volume de retirados em [expedition-withdrawn.test.mjs](../../tests/expedition-withdrawn.test.mjs).
 
 ## Planejamento
 

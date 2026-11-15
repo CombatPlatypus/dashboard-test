@@ -683,6 +683,12 @@ function getExpeditionSummary(
         totalRoutes:
             routes.length,
 
+        completedRoutes:
+            validatedRoutes.length,
+
+        pendingRoutes:
+            routes.length - validatedRoutes.length,
+
     validatedRoutes:
         selectedValidatedRoutes.length,
 

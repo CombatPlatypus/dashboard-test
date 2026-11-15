@@ -60,6 +60,12 @@ const expeditionRateFormatter =
         },
     );
 
+const expeditionProgressFormatter = new Intl.NumberFormat("pt-BR", {
+    style: "percent",
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+});
+
 /* FORMATAÇÕES */
 
 function formatExpeditionQuantity(
@@ -290,6 +296,12 @@ function getExpeditionElements(
             getElementById(
                 "expeditionPreviewValidatedRoutes",
             ),
+
+        progressCompleted: getElementById("expeditionProgressCompleted"),
+        progressPending: getElementById("expeditionProgressPending"),
+        progressPercentage: getElementById("expeditionProgressPercentage"),
+        progressBar: getElementById("expeditionProgressBar"),
+        progressFill: getElementById("expeditionProgressFill"),
 
         previewFloorVolume:
             getElementById(
@@ -1209,6 +1221,30 @@ function renderExpeditionErrorTables(
     );
 }
 
+/* RENDERIZA O PROGRESSO DA CONFERÊNCIA */
+
+function renderExpeditionProgress(elements, summary) {
+    const { hasData, completedRoutes, pendingRoutes, totalRoutes } = summary;
+    elements.progressCompleted.textContent = formatExpeditionQuantity(hasData ? completedRoutes : null);
+    elements.progressPending.textContent = formatExpeditionQuantity(hasData ? pendingRoutes : null);
+
+    if (!hasData) {
+        elements.progressPercentage.textContent = "—";
+        elements.progressFill.style.width = "0%";
+        elements.progressBar.removeAttribute("aria-valuenow");
+        elements.progressBar.setAttribute("aria-valuetext", "Aguardando a importação do relatório Gestão Audit.");
+        return;
+    }
+
+    const ratio = completedRoutes / totalRoutes;
+    const percentage = expeditionProgressFormatter.format(ratio);
+    const progressValue = String(ratio * 100);
+    elements.progressPercentage.textContent = percentage;
+    elements.progressFill.style.width = `${progressValue}%`;
+    elements.progressBar.setAttribute("aria-valuenow", progressValue);
+    elements.progressBar.setAttribute("aria-valuetext", percentage);
+}
+
 /* RENDERIZA O RELATÓRIO */
 
 function renderExpeditionReport(
@@ -1274,6 +1310,8 @@ function renderExpeditionReport(
             quantityOrDash(
                 summary.validatedRoutes,
             );
+
+    renderExpeditionProgress(elements, summary);
 
     elements.previewFloorVolume
         .textContent =

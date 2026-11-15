@@ -808,21 +808,19 @@
                                                 <div class="chart-progress">
                                                     <div class="chart-progress-header">
                                                         <div>
-                                                            <h4>Progresso do Conferência</h4>
+                                                            <h4 id="expeditionProgressTitle">Progresso da Conferência</h4>
 
-                                                            <p>
-                                                                <span id="">—</span>
-                                                                de
-                                                                <span id="">—</span>
-                                                                Rotas
+                                                            <p id="expeditionProgressCounts">
+                                                                Rotas feitas <strong id="expeditionProgressCompleted">—</strong>
+                                                                · Rotas pendentes <strong id="expeditionProgressPending">—</strong>
                                                             </p>
                                                         </div>
 
-                                                        <p class="chart-progress-percentage" id="">—</p>
+                                                        <p class="chart-progress-percentage" id="expeditionProgressPercentage">—</p>
                                                     </div>
 
-                                                    <div class="chart-progress-track" id="" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-                                                        <div class="chart-progress-fill" id=""></div>
+                                                    <div class="chart-progress-track" id="expeditionProgressBar" role="progressbar" aria-labelledby="expeditionProgressTitle" aria-describedby="expeditionProgressCounts" aria-valuemin="0" aria-valuemax="100" aria-valuetext="Aguardando a importação do relatório Gestão Audit.">
+                                                        <div class="chart-progress-fill" id="expeditionProgressFill"></div>
                                                     </div>
                                                 </div>
 
