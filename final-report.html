@@ -646,7 +646,7 @@
                 margin: 0 20px 20px 20px;
             }
             .line-chart .chart-canvas-container {
-                height: 304px;
+                height: 339px;
                 margin: 0 20px 20px 20px;
             }
 
@@ -803,6 +803,10 @@
             .losses-rate-charts .chart-label {
                 flex-wrap: wrap;
             }
+            .losses-rate-charts .doughnut-chart .chart-label {
+                max-width: 500px;
+                margin: 0 auto 20px;
+            }
 
             @media (max-width: 900px) {
                 .tables-and-charts > div,
@@ -936,7 +940,7 @@
                 <div class="losses-rate-charts flex-box-start">
                     <div class="chart doughnut-chart">
                         <div class="chart-canvas-container">
-                            <canvas id="finalReportLossesRateCompositionChart" role="img" aria-label="Composição das ocorrências">
+                            <canvas id="finalReportDamageAndLossesCompositionChart" role="img" aria-label="Composição das ocorrências">
                                 Seu navegador não suporta gráficos em canvas.
                             </canvas>
                         </div>
@@ -944,17 +948,22 @@
                         <div class="chart-label">
                             <div class="type">
                                 <div style="background-color: #2538a5;"></div>
-                                <p>Possíveis Perdas <span id="finalReportLossesRateCompositionPossibleLosses">—</span></p>
+                                <p>Em Análise <span id="finalReportDamageAndLossesCompositionUnderReview">—</span></p>
                             </div>
 
                             <div class="type">
                                 <div style="background-color: #8B0000;"></div>
-                                <p>Lost <span id="finalReportLossesRateCompositionLost">—</span></p>
+                                <p>Lost <span id="finalReportDamageAndLossesCompositionLost">—</span></p>
+                            </div>
+
+                            <div class="type">
+                                <div style="background-color: #007A48;"></div>
+                                <p>Avarias (Hub) <span id="finalReportDamageAndLossesCompositionDamage">—</span></p>
                             </div>
 
                             <div class="type">
                                 <div style="background-color: #f99400;"></div>
-                                <p>Avarias <span id="finalReportLossesRateCompositionDamage">—</span></p>
+                                <p>Avarias (SOC) <span id="finalReportDamageAndLossesCompositionSoc">—</span></p>
                             </div>
                         </div>
                     </div>

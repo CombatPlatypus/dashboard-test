@@ -1008,8 +1008,15 @@
     #overall-analysis .losses-rate-charts .chart-canvas-container {
         margin-top: 20px;
     }
+    #overall-analysis .line-chart .chart-canvas-container {
+        height: 339px !important;
+    }
     #overall-analysis .losses-rate-charts .chart-label {
         flex-wrap: wrap;
+    }
+    #overall-analysis .losses-rate-charts .doughnut-chart .chart-label {
+        max-width: 500px;
+        margin: 0px auto 20px;
     }
 
     /* PARCEL SWEEPER */

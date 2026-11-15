@@ -41,7 +41,7 @@ function getConsolidatedSummary(
     const hasDamageData = Boolean(damageState.sourceFileName || damageState.days.length || damageState.history?.length);
     const hasLossesData = Boolean(lossesState.sourceFileName || lossesState.days.length || lossesState.history?.length);
     const hasData = hasDamageData || hasLossesData;
-    const rate = rateState.year === year
+    const rate = rateState?.year === year
         ? getLossesRateMonthSummary(monthIndex, rateState)?.lossRate
         : null;
 

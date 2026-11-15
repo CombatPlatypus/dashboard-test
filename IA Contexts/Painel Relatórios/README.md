@@ -54,6 +54,8 @@ Mostra Avarias do Mês, Perdas do Mês e Histórico Consolidado. O [importador](
 
 Em **Perdas do Mês**, o gráfico **Pack Recovery** cruza os códigos BR do histórico com a coluna Pack Recovery da **Base de Análises**. A contagem do período selecionado usa **Feito**, **ID Inválido**, **Sem Dados** e **Aguardando**. Células vazias e pacotes sem correspondência na base entram em **Sem Dados**. Rótulos preenchidos fora da lista ficam fora da contagem do gráfico. [Importação](../../js/reports/damage-and-losses/import.js) · [Gráfico](../../js/reports/damage-and-losses/losses-charts.js) · [Testes](../../tests/damage-and-losses-losses.test.mjs)
 
+A rosca do **Histórico Consolidado** também alimenta o Relatório Final. Ela usa **Em Análise** em azul, **Lost** em vermelho, **Avarias (Hub)** em verde e **Avarias (SOC)** em amarelo. A composição usa o mês atual quando há ocorrências e recorre ao mês anterior nos demais casos. [Período e dados](../../js/reports/damage-and-losses/consolidated-model.js) · [Rosca e legenda](../../js/reports/damage-and-losses/consolidated-charts.js)
+
 Verifique o reconhecimento dos blocos lado a lado e a seleção mensal em [damage-and-losses-workbook.test.mjs](../../tests/damage-and-losses-workbook.test.mjs) e [consolidated-history.test.mjs](../../tests/consolidated-history.test.mjs).
 
 ## Taxa de Perdas
@@ -64,7 +66,7 @@ No **Histórico da Taxa de Perdas**, a linha pontilhada marca o limite de 0,030%
 
 Na **Composição das Ocorrências**, a fatia e a legenda de **Possíveis Perdas** usam o azul padrão `#2538a5`. [Gráfico](../../js/reports/losses-rate/charts.js) · [Legenda](../../index.html)
 
-A composição e o histórico fornecem ao Relatório Final o mês selecionado e a série anual. As duas prévias usam a mesma configuração, incluindo a legenda da composição, o destaque do mês no histórico e a linha de referência. [Dados dos gráficos](../../js/reports/losses-rate/state.js) · [Configuração compartilhada](../../js/reports/losses-rate/charts.js)
+O histórico fornece ao Relatório Final a série anual e o destaque do mês selecionado. As duas prévias usam a mesma configuração, incluindo a linha de referência. [Dados do gráfico](../../js/reports/losses-rate/state.js) · [Configuração compartilhada](../../js/reports/losses-rate/charts.js)
 
 Verifique a leitura do formato em [losses-rate-workbook.test.mjs](../../tests/losses-rate-workbook.test.mjs) e a presença dos 12 meses em [report-session.test.mjs](../../tests/report-session.test.mjs).
 
@@ -84,7 +86,7 @@ Verifique o tipo obrigatório, a reimportação sem duplicar totais e a compatib
 
 A aba **Relatório Final** corresponde ao módulo `overall-analysis`. O [controlador](../../js/reports/overall-analysis/controller.js) coleta os dados dos demais módulos e o [modelo](../../js/reports/overall-analysis/model.js) calcula o resumo da janela. A [verificação de completude](../../js/reports/overall-analysis/completeness.js) determina quando o HTML autônomo pode ser gerado. Parcel Sweeper e Reversa são opcionais nessa verificação. O [exportador](../../js/reports/overall-analysis/standalone-export.js) gera o HTML a partir de uma cópia dos dados da janela.
 
-Abaixo dos indicadores de **Avarias e Perdas**, o Relatório Final exibe a **Composição das Ocorrências** e o **Histórico da Taxa de Perdas** sem títulos visuais. A composição e o ponto destacado acompanham o mês selecionado em **Taxa de Perdas**. O histórico mantém os 12 meses, com intervalos onde faltam dados. O HTML incorpora os gráficos e o mês selecionado no momento do download. [Modelo](../../js/reports/overall-analysis/model.js) · [Gráficos](../../js/reports/overall-analysis/charts.js) · [Teste de integração](../../tests/overall-analysis-html.browser.mjs)
+Abaixo dos indicadores de **Avarias e Perdas**, o Relatório Final exibe dois gráficos sem títulos visuais. A rosca usa as quatro categorias, as cores, os percentuais e o período do **Histórico Consolidado**. O gráfico de linha usa os 12 meses da **Taxa de Perdas**, com intervalos onde faltam dados e destaque para o mês selecionado nessa aba. O HTML incorpora os dados dos dois gráficos no momento do download. [Modelo](../../js/reports/overall-analysis/model.js) · [Gráficos](../../js/reports/overall-analysis/charts.js) · [Teste de integração](../../tests/overall-analysis-html.browser.mjs)
 
 A seção **Análise de Erros** fica entre os resumos de Processamento e Expedição e os de Parcel Sweeper e Reversa. O modelo reutiliza `getExpeditionErrorAnalysis` e copia os oito indicadores da tabela para a exportação. Alterações na Expedição atualizam a prévia pelo controlador do Relatório Final. Os indicadores indisponíveis aparecem como travessões conforme a origem e as barras usam zero para valores ausentes. [Modelo](../../js/reports/overall-analysis/model.js) · [Prévia](../../js/reports/overall-analysis/view.js) · [Teste de integração](../../tests/overall-analysis-html.browser.mjs)
 

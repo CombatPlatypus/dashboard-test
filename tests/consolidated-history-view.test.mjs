@@ -57,7 +57,7 @@ test("tabelas e cópia seguem o mês dos cards e limpam registros antigos ao atu
         HTMLElement: Element,
         MutationObserver: class { observe() {} },
         window: { Chart: class {
-            constructor(canvas, config) { Object.assign(this, config); }
+            constructor(canvas, config) { Object.assign(this, config, { canvas }); }
             update() {} resize() {}
         } },
         document: {

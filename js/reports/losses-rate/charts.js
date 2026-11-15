@@ -796,8 +796,6 @@ function initializeLossesRateCharts(
 export {
     createLossesRateCompositionChart,
     createLossesRateHistoryChart,
-    getLossesRateCompositionIndicators,
     initializeLossesRateCharts,
-    updateLossesRateCompositionChart,
     updateLossesRateHistoryChart,
 };

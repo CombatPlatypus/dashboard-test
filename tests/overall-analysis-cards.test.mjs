@@ -48,14 +48,22 @@ test("volume ausente ou zero mantém a taxa vazia e preserva o total de perdas",
     assert.equal(rate.rate, 0);
 });
 
-test("os gráficos de Taxa de Perdas permitem copiar o Relatório Final com dados de outros meses", () => {
-    for (const state of [
-        { activeMonth: 0, year: 2025, months: [{ possibleLosses: 5 }] },
-        { activeMonth: 1, year: 2025, months: [{ moved: 100000, lost: 24, damage: 6 }] },
-    ]) {
-        const analysis = createOverallAnalysisData({ operators: [] }, { routes: [] }, state, {},
-            { days: [] }, { days: [] }, null, null, new Date(2026, 9, 28, 12));
-        assert.equal(analysis.cards.lossesRate.rate, null);
-        assert.equal(canExportOverallAnalysisController(analysis), true);
-    }
+test("o histórico da Taxa de Perdas permite copiar o Relatório Final com dados de outros meses", () => {
+    const state = { activeMonth: 1, year: 2025, months: [{ moved: 100000, lost: 24, damage: 6 }] };
+    const analysis = createOverallAnalysisData({ operators: [] }, { routes: [] }, state, {},
+        { days: [] }, { days: [] }, null, null, new Date(2026, 9, 28, 12));
+    assert.equal(analysis.cards.lossesRate.rate, null);
+    assert.equal(canExportOverallAnalysisController(analysis), true);
+});
+
+test("composição do Relatório Final acompanha o período do Histórico Consolidado", () => {
+    const rate = { activeMonth: 0, year: 2026, months: [{ lost: 100, possibleLosses: 200 }] };
+    const analysis = createOverallAnalysisData({ operators: [] }, { routes: [] }, rate, {},
+        { days: [{ date: "2026-10-30", hub: 60, soc: 153 }] },
+        { days: [{ date: "2026-10-30", underReview: 81, confirmedLosses: 24 }] },
+        null, null, new Date(2026, 10, 2, 12));
+    assert.deepEqual(analysis.damageAndLossesComposition.composition, [81, 24, 60, 153]);
+    assert.equal(analysis.damageAndLossesComposition.total, 318);
+    assert.equal(analysis.damageAndLossesComposition.monthName, "Outubro");
+    assert.equal(analysis.lossesRateHistory.activeMonth, 0);
 });

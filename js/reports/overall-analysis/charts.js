@@ -9,12 +9,15 @@ import {
 } from "../expedition/error-balance-chart.js";
 
 import {
-    createLossesRateCompositionChart,
     createLossesRateHistoryChart,
-    getLossesRateCompositionIndicators,
-    updateLossesRateCompositionChart,
     updateLossesRateHistoryChart,
 } from "../losses-rate/charts.js";
+
+import {
+    createConsolidatedCompositionChart,
+    getConsolidatedCompositionIndicators,
+    updateConsolidatedCompositionChart,
+} from "../damage-and-losses/consolidated-charts.js";
 
 import {
     createParcelCoverageChart,
@@ -38,7 +41,9 @@ let overallAnalysisExpeditionChart =
 
 let overallAnalysisErrorBalanceChart = null;
 
-let overallAnalysisLossesRateCharts = null;
+let overallAnalysisDamageAndLossesChart = null;
+let overallAnalysisDamageAndLossesIndicators = null;
+let overallAnalysisLossesRateHistoryChart = null;
 
 let overallAnalysisParcelCoverageChart =
     null;
@@ -381,8 +386,8 @@ function resizeOverallAnalysisCharts() {
                     overallAnalysisReceiptChart,
                     overallAnalysisExpeditionChart,
                     overallAnalysisErrorBalanceChart,
-                    overallAnalysisLossesRateCharts?.composition,
-                    overallAnalysisLossesRateCharts?.history,
+                    overallAnalysisDamageAndLossesChart,
+                    overallAnalysisLossesRateHistoryChart,
                     overallAnalysisParcelCoverageChart,
                     overallAnalysisReverseCompositionChart,
                 ].forEach(
@@ -440,7 +445,8 @@ function renderOverallAnalysisCharts(
         !overallAnalysisReceiptChart ||
         !overallAnalysisExpeditionChart ||
         !overallAnalysisErrorBalanceChart ||
-        !overallAnalysisLossesRateCharts ||
+        !overallAnalysisDamageAndLossesChart ||
+        !overallAnalysisLossesRateHistoryChart ||
         !overallAnalysisParcelCoverageChart ||
         !overallAnalysisReverseCompositionChart
     ) {
@@ -483,13 +489,12 @@ function renderOverallAnalysisCharts(
 
     updateErrorBalanceChart(overallAnalysisErrorBalanceChart, data.expeditionErrors, updateMode);
 
-    updateLossesRateCompositionChart(
-        overallAnalysisLossesRateCharts.composition,
-        data.lossesRateCharts.composition,
-        overallAnalysisLossesRateCharts.indicators,
-        updateMode,
+    updateConsolidatedCompositionChart(
+        overallAnalysisDamageAndLossesChart,
+        data.damageAndLossesComposition,
+        overallAnalysisDamageAndLossesIndicators,
     );
-    updateLossesRateHistoryChart(overallAnalysisLossesRateCharts.history, data.lossesRateCharts, updateMode);
+    updateLossesRateHistoryChart(overallAnalysisLossesRateHistoryChart, data.lossesRateHistory, updateMode);
 
     updateParcelCoverageChart(
         overallAnalysisParcelCoverageChart,
@@ -520,7 +525,7 @@ function initializeOverallAnalysisCharts(
         );
 
     const errorBalanceCanvas = rootElement.querySelector("#overallAnalysisErrorBalanceChart");
-    const lossesRateCompositionCanvas = rootElement.querySelector("#overallAnalysisLossesRateCompositionChart");
+    const damageAndLossesCanvas = rootElement.querySelector("#overallAnalysisDamageAndLossesCompositionChart");
     const lossesRateHistoryCanvas = rootElement.querySelector("#overallAnalysisLossesRateHistoryChart");
 
     const parcelCoverageCanvas =
@@ -539,7 +544,7 @@ function initializeOverallAnalysisCharts(
         !(expeditionCanvas instanceof
             HTMLCanvasElement) ||
         !(errorBalanceCanvas instanceof HTMLCanvasElement) ||
-        !(lossesRateCompositionCanvas instanceof HTMLCanvasElement) ||
+        !(damageAndLossesCanvas instanceof HTMLCanvasElement) ||
         !(lossesRateHistoryCanvas instanceof HTMLCanvasElement) ||
         !(parcelCoverageCanvas instanceof
             HTMLCanvasElement) ||
@@ -588,11 +593,10 @@ function initializeOverallAnalysisCharts(
 
     overallAnalysisErrorBalanceChart = createErrorBalanceChart(errorBalanceCanvas);
 
-    overallAnalysisLossesRateCharts = {
-        composition: createLossesRateCompositionChart(lossesRateCompositionCanvas),
-        history: createLossesRateHistoryChart(lossesRateHistoryCanvas),
-        indicators: getLossesRateCompositionIndicators(rootElement, "overallAnalysisLossesRateComposition"),
-    };
+    overallAnalysisDamageAndLossesChart = createConsolidatedCompositionChart(damageAndLossesCanvas);
+    overallAnalysisDamageAndLossesIndicators =
+        getConsolidatedCompositionIndicators(rootElement, "overallAnalysisDamageAndLossesComposition");
+    overallAnalysisLossesRateHistoryChart = createLossesRateHistoryChart(lossesRateHistoryCanvas);
 
     overallAnalysisParcelCoverageChart =
         createParcelCoverageChart(

@@ -20,6 +20,8 @@ import {
     getLossesSummary,
 } from "../damage-and-losses/losses-state.js";
 
+import { getConsolidatedSummary } from "../damage-and-losses/consolidated-model.js";
+
 import {
     createParcelSummary,
 } from "../parcel-sweeper/model.js";
@@ -293,6 +295,9 @@ function createOverallAnalysisData(
             lossesState,
         );
 
+    const consolidated = getConsolidatedSummary(damageState, lossesState, lossesRateState ?? null, referenceDate);
+    const { activeMonth, monthlyRates } = getLossesRateChartData(lossesRateState);
+
     const packagesAnalysisRate =
         damageAndLossesAnalysis
             .packagesUnderReview !== null &&
@@ -461,7 +466,17 @@ function createOverallAnalysisData(
         damageAndLosses:
             damageAndLossesAnalysis,
 
-        lossesRateCharts: getLossesRateChartData(lossesRateState),
+        damageAndLossesComposition: {
+            composition: consolidated.composition,
+            total: consolidated.total,
+            hasData: consolidated.hasData,
+            hasDamageData: consolidated.hasDamageData,
+            hasLossesData: consolidated.hasLossesData,
+            monthName: consolidated.monthName,
+            year: consolidated.year,
+        },
+
+        lossesRateHistory: { activeMonth, monthlyRates },
 
         parcel: {
             hasData: parcelSummary.hasData,

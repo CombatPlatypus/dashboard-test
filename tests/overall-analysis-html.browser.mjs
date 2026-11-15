@@ -55,16 +55,24 @@ function errorBarsDrawn(id) {
         Math.abs(bar.x - chart.scales.x.getPixelForValue(values[index])) < 1);
 }
 
-function readLossesRateCharts(prefix) {
-    const composition = Chart.getChart(`${prefix}CompositionChart`);
+function readDamageAndLossesComposition(prefix) {
+    const chart = Chart.getChart(`${prefix}Chart`);
+    const categories = ["UnderReview", "Lost", "Damage", "Soc"]
+        .map(field => document.getElementById(`${prefix}${field}`));
+    return {
+        quantities: chart.data.datasets[0].data,
+        colors: chart.data.datasets[0].backgroundColor,
+        center: chart.options.plugins.consolidatedCenterText.text,
+        indicators: categories.map(element => element.textContent),
+        legendColors: categories.map(element => getComputedStyle(element.closest(".type").firstElementChild).backgroundColor),
+        accessibleName: chart.canvas.getAttribute("aria-label"),
+    };
+}
+
+function readLossesRateHistory(prefix) {
     const history = Chart.getChart(`${prefix}HistoryChart`);
     const historySeries = history.data.datasets[0];
     return {
-        quantities: composition.data.datasets[0].data,
-        colors: composition.data.datasets[0].backgroundColor,
-        center: composition.options.plugins.lossesRateCenterText.text,
-        indicators: ["PossibleLosses", "Lost", "Damage"].map(field =>
-            document.getElementById(`${prefix}Composition${field}`).textContent),
         months: history.data.labels,
         rates: historySeries.data,
         pointColors: historySeries.pointBackgroundColor,
@@ -169,19 +177,23 @@ try {
     }, createCompleteAnalysis());
     assert.equal(completeness.disabled, false, completeness.title);
     assert.deepEqual(await errorTable(), ["—", "—", "56", "0,51%", "—", "—", "—", "—"]);
-    const initialLossesCharts = await page.evaluate(readLossesRateCharts, "overallAnalysisLossesRate");
-    assert.deepEqual(initialLossesCharts.quantities, [120, 30, 8]);
-    assert.equal(initialLossesCharts.pointRadii[9], 6);
+    const initialHistory = await page.evaluate(readLossesRateHistory, "overallAnalysisLossesRate");
+    assert.equal(initialHistory.pointRadii[9], 6);
+
+    await page.locator('#report-choice a[href="#damage-and-losses"]').click();
+    await page.locator('a[href="#consolidated-history"]').click();
+    const sourceComposition = await page.evaluate(readDamageAndLossesComposition, "consolidatedComposition");
+    assert.deepEqual(sourceComposition.quantities, [8, 2, 3, 2]);
+    assert.deepEqual(sourceComposition.indicators, ["8 (53,3%)", "2 (13,3%)", "3 (20%)", "2 (13,3%)"]);
+    assert.deepEqual(sourceComposition.colors, ["#2538a5", "#8B0000", "#007A48", "#f99400"]);
+    assert.equal(sourceComposition.center, "15");
 
     await page.locator('#report-choice a[href="#losses-rate"]').click();
     await page.locator("#lossesRateMonthTabs").getByText("Janeiro", { exact: true }).click();
-    const sourceLossesCharts = await page.evaluate(readLossesRateCharts, "lossesRate");
-    assert.deepEqual(sourceLossesCharts.quantities, [24, 6, 81]);
-    assert.deepEqual(sourceLossesCharts.indicators, ["81 (73%)", "24 (22%)", "6 (5%)"]);
-    assert.equal(sourceLossesCharts.center, "111");
-    assert.deepEqual(sourceLossesCharts.rates, [0.0003 * 100, ...Array(8).fill(null), 0.00015 * 100, null, null]);
-    assert.equal(sourceLossesCharts.pointColors[0], "#f99400");
-    assert.equal(sourceLossesCharts.pointRadii[0], 6);
+    const sourceHistory = await page.evaluate(readLossesRateHistory, "lossesRate");
+    assert.deepEqual(sourceHistory.rates, [0.0003 * 100, ...Array(8).fill(null), 0.00015 * 100, null, null]);
+    assert.equal(sourceHistory.pointColors[0], "#f99400");
+    assert.equal(sourceHistory.pointRadii[0], 6);
 
     await page.locator('a[href="#expedition"]').click();
     await page.locator('a[href="#expedition-mistakes"]').click();
@@ -197,7 +209,8 @@ try {
     assert.deepEqual(await page.evaluate(readErrorBarColors, "expeditionErrorBalanceChart"), errorBarColors);
 
     await page.locator('a[href="#overall-analysis"]').click();
-    assert.deepEqual(await page.evaluate(readLossesRateCharts, "overallAnalysisLossesRate"), sourceLossesCharts);
+    assert.deepEqual(await page.evaluate(readDamageAndLossesComposition, "overallAnalysisDamageAndLossesComposition"), sourceComposition);
+    assert.deepEqual(await page.evaluate(readLossesRateHistory, "overallAnalysisLossesRate"), sourceHistory);
     assert.equal(await page.locator("#overall-analysis .losses-rate-charts .chart-title").count(), 0);
     assert.deepEqual(await errorTable(), sourceErrors);
     assert.deepEqual(await page.evaluate(readErrorChart, "overallAnalysisErrorBalanceChart"), sourceChart);
@@ -241,10 +254,15 @@ try {
     assert.deepEqual(await errorTable(), errorFields.map(() => "—"));
     assert.deepEqual((await page.evaluate(readErrorChart, "overallAnalysisErrorBalanceChart")).values, [0, 0, 0, 0]);
     await page.evaluate(async () => (await import("/js/reports/losses-rate/state.js")).resetLossesRateReport());
-    const emptyLossesCharts = await page.evaluate(readLossesRateCharts, "overallAnalysisLossesRate");
-    assert.deepEqual(emptyLossesCharts.quantities, [0, 0, 0]);
-    assert.deepEqual(emptyLossesCharts.indicators, ["—", "—", "—"]);
-    assert.deepEqual(emptyLossesCharts.rates, Array(12).fill(null));
+    assert.deepEqual((await page.evaluate(readLossesRateHistory, "overallAnalysisLossesRate")).rates, Array(12).fill(null));
+    assert.deepEqual(await page.evaluate(readDamageAndLossesComposition, "overallAnalysisDamageAndLossesComposition"), sourceComposition);
+    await page.evaluate(async () => {
+        (await import("/js/reports/damage-and-losses/state.js")).resetDamageAndLossesState();
+        (await import("/js/reports/damage-and-losses/losses-state.js")).resetLossesState();
+    });
+    const emptyComposition = await page.evaluate(readDamageAndLossesComposition, "overallAnalysisDamageAndLossesComposition");
+    assert.deepEqual(emptyComposition.quantities, [0, 0, 0, 0]);
+    assert.deepEqual(emptyComposition.indicators, ["—", "—", "—", "—"]);
     await context.close();
 
     const offline = await browser.newContext({ offline: true, timezoneId: "Pacific/Auckland",
@@ -286,7 +304,8 @@ try {
     assert.equal(rendered.reverse, "4 (40%)");
     assert.equal(rendered.tooltipsDisabled, true);
     assert.deepEqual(rendered.bars, [12000, 11500, 500]);
-    assert.deepEqual(await report.evaluate(readLossesRateCharts, "finalReportLossesRate"), sourceLossesCharts);
+    assert.deepEqual(await report.evaluate(readDamageAndLossesComposition, "finalReportDamageAndLossesComposition"), sourceComposition);
+    assert.deepEqual(await report.evaluate(readLossesRateHistory, "finalReportLossesRate"), sourceHistory);
     assert.equal(await report.locator(".losses-rate-charts .chart-title").count(), 0);
     assert.deepEqual(await report.evaluate(readHistoryPointColor, { prefix: "finalReportLossesRate", month: 0 }),
         [249, 148, 0, 255]);
