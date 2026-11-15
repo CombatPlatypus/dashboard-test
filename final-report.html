@@ -782,6 +782,9 @@
             .expedition-errors-summary > .chart {
                 margin-top: 20px;
             }
+            .expedition-errors-summary > .chart > .chart-canvas-container {
+                margin-top: 20px;
+            }
 
             @media (max-width: 900px) {
                 .tables-and-charts > div {
@@ -1151,12 +1154,8 @@
                     </table>
 
                     <div class="chart horizontal-bars-chart expedition-error-balance-chart">
-                        <div class="chart-title">
-                            <h4 id="finalReportErrorBalanceTitle">Acompanhamento dos Erros</h4>
-                        </div>
-
                         <div class="chart-canvas-container">
-                            <canvas id="finalReportErrorBalanceChart" role="img" aria-labelledby="finalReportErrorBalanceTitle"></canvas>
+                            <canvas id="finalReportErrorBalanceChart" role="img" aria-label="Acompanhamento dos Erros"></canvas>
                         </div>
                     </div>
                 </div>

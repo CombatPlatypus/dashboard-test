@@ -80,6 +80,8 @@ A aba **Relatório Final** corresponde ao módulo `overall-analysis`. O [control
 
 A seção **Análise de Erros** fica entre os resumos de Processamento e Expedição e os de Parcel Sweeper e Reversa. O modelo reutiliza `getExpeditionErrorAnalysis` e copia os oito indicadores da tabela para a exportação. Alterações na Expedição atualizam a prévia pelo controlador do Relatório Final. Os indicadores indisponíveis aparecem como travessões conforme a origem e as barras usam zero para valores ausentes. [Modelo](../../js/reports/overall-analysis/model.js) · [Prévia](../../js/reports/overall-analysis/view.js) · [Teste de integração](../../tests/overall-analysis-html.browser.mjs)
 
+Na prévia e no HTML baixado, o gráfico aparece abaixo da tabela sem cabeçalho visual. O canvas tem o nome acessível **Acompanhamento dos Erros**. [Prévia do Relatório Final](../../index.html) · [Modelo HTML](../../final-report.html)
+
 A cópia em imagem captura a própria prévia. O HTML baixado incorpora o CSS do seu modelo e abre offline. Ao mudar as tabelas do painel, confira no modelo os cabeçalhos, títulos, tipografia, bordas e espaçamento. [Modelo HTML](../../final-report.html) · [Teste de paridade das tabelas](../../tests/overall-analysis-standalone-template.test.mjs)
 
 Verifique indicadores e critérios de exportação em [overall-analysis-cards.test.mjs](../../tests/overall-analysis-cards.test.mjs) e [overall-analysis-html.test.mjs](../../tests/overall-analysis-html.test.mjs).

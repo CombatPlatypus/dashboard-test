@@ -1316,3 +1316,6 @@
         .expedition-errors-summary > .chart {
             margin-top: 20px;
         }
+        .expedition-errors-summary > .chart > .chart-canvas-container {
+            margin-top: 20px;
+        }
