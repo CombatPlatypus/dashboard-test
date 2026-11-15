@@ -995,11 +995,11 @@
 
     /* TAXA DE PERDAS */
 
-    #losses-rate .losses-rate-charts {
+    #losses-rate .losses-rate-charts, #overall-analysis .losses-rate-charts {
         gap: 15px;
         align-items: flex-start;
     }
-    #losses-rate .losses-rate-charts > div {
+    #losses-rate .losses-rate-charts > div, #overall-analysis .losses-rate-charts > div {
         flex: 1 1 0;
     }
 
