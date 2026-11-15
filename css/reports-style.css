@@ -586,7 +586,7 @@
             padding-right: 15px;
         }
         #expedition #expeditionStreetGuardianControls.is-errors-tab-active {
-            max-height: 465;
+            max-height: 465px;
         }
         #expedition #expeditionWindowInput {
             width: 100%;
