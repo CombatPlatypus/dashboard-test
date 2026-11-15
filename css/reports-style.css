@@ -1262,6 +1262,9 @@
             padding: 25px;
             border: 1px solid var(--color-border);
         }
+        #overall-analysis #reports .cards > div > .flex-box-start > img {
+            width: 35px;
+        }
 
         /* FLUXO DA JANELA */
         
