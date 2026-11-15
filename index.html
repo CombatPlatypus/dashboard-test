@@ -937,13 +937,13 @@
                                                     </tbody>
                                                 </table>
 
-                                                <div class="chart horizontal-bars-chart">
+                                                <div class="chart horizontal-bars-chart expedition-error-balance-chart">
                                                     <div class="chart-title">
-                                                        <h4>Acompanhamento dos Erros</h4>
+                                                        <h4 id="expeditionErrorBalanceTitle">Acompanhamento dos Erros</h4>
                                                     </div>
 
                                                     <div class="chart-canvas-container">
-                                                        <canvas id="expeditionErrorBalanceChart" role="img"></canvas>
+                                                        <canvas id="expeditionErrorBalanceChart" role="img" aria-labelledby="expeditionErrorBalanceTitle"></canvas>
                                                     </div>
                                                 </div>
                                             </div>
@@ -3141,8 +3141,7 @@
 
                                     <!-- ANÁLISE DE ERROS -->
 
-                                    <div class="">
-
+                                    <div class="expedition-errors-summary">
                                         <table>
                                             <caption>Análise de Erros</caption>
 
@@ -3157,35 +3156,35 @@
 
                                             <tbody>
                                                 <tr>
-                                                    <td id="">—</td>
-                                                    <td id="">—</td>
-                                                    <td id="">—</td>
-                                                    <td id="">—</td>
+                                                    <td id="overallAnalysisExpeditionSortingErrors">—</td>
+                                                    <td id="overallAnalysisExpeditionLabelingErrors">—</td>
+                                                    <td id="overallAnalysisExpeditionTotalErrors">—</td>
+                                                    <td id="overallAnalysisExpeditionErrorRate">—</td>
                                                 </tr>
-                                            </tbody>
 
-                                            <thead>
                                                 <tr>
-                                                    <th>Erros Revertidos</th>
-                                                    <th>Taxa de Revertidos</th>
-                                                    <th>Total Final de Erros</th>
-                                                    <th>Taxa Final</th>
+                                                    <th id="expeditionRevertedErrorsHeading" scope="col">Erros Revertidos</th>
+                                                    <th id="expeditionRevertedRateHeading" scope="col">Taxa de Revertidos</th>
+                                                    <th id="expeditionFinalErrorsHeading" scope="col">Total Final de Erros</th>
+                                                    <th id="expeditionFinalRateHeading" scope="col">Taxa Final</th>
                                                 </tr>
-                                            </thead>
 
-                                            <tbody>
                                                 <tr>
-                                                    <td id="">—</td>
-                                                    <td id="">—</td>
-                                                    <td id="">—</td>
-                                                    <td id="">—</td>
+                                                    <td id="overallAnalysisExpeditionRevertedErrors" headers="expeditionRevertedErrorsHeading">—</td>
+                                                    <td id="overallAnalysisExpeditionRevertedRate" headers="expeditionRevertedRateHeading">—</td>
+                                                    <td id="overallAnalysisExpeditionFinalErrors" headers="expeditionFinalErrorsHeading">—</td>
+                                                    <td id="overallAnalysisExpeditionFinalRate" headers="expeditionFinalRateHeading">—</td>
                                                 </tr>
                                             </tbody>
                                         </table>
 
-                                        <div class="chart horizontal-bars-chart">
+                                        <div class="chart horizontal-bars-chart expedition-error-balance-chart">
+                                            <div class="chart-title">
+                                                <h4 id="overallAnalysisErrorBalanceTitle">Acompanhamento dos Erros</h4>
+                                            </div>
+
                                             <div class="chart-canvas-container">
-                                                <canvas id="" role="img"></canvas>
+                                                <canvas id="overallAnalysisErrorBalanceChart" role="img" aria-labelledby="overallAnalysisErrorBalanceTitle"></canvas>
                                             </div>
                                         </div>
                                     </div>

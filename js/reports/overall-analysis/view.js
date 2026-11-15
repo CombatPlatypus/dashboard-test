@@ -332,6 +332,15 @@ function getOverallAnalysisViewElements(
                 "overallAnalysisExpeditionTime",
             ),
 
+        expeditionSortingErrors: getElement("overallAnalysisExpeditionSortingErrors"),
+        expeditionLabelingErrors: getElement("overallAnalysisExpeditionLabelingErrors"),
+        expeditionTotalErrors: getElement("overallAnalysisExpeditionTotalErrors"),
+        expeditionErrorRate: getElement("overallAnalysisExpeditionErrorRate"),
+        expeditionRevertedErrors: getElement("overallAnalysisExpeditionRevertedErrors"),
+        expeditionRevertedRate: getElement("overallAnalysisExpeditionRevertedRate"),
+        expeditionFinalErrors: getElement("overallAnalysisExpeditionFinalErrors"),
+        expeditionFinalRate: getElement("overallAnalysisExpeditionFinalRate"),
+
         damageAndLossesTable:
             getElement(
                 "overallAnalysisDamageAndLossesTable",
@@ -589,6 +598,16 @@ function renderOverallAnalysisView(
         formatOverallAnalysisDuration(
             data.expedition.durationSeconds,
         );
+
+    const errors = data.expeditionErrors;
+    elements.expeditionSortingErrors.textContent = formatOverallAnalysisQuantity(errors.sortingErrors);
+    elements.expeditionLabelingErrors.textContent = formatOverallAnalysisQuantity(errors.labelingErrors);
+    elements.expeditionTotalErrors.textContent = formatOverallAnalysisQuantity(errors.totalErrors);
+    elements.expeditionErrorRate.textContent = formatOverallAnalysisRate(errors.errorRate);
+    elements.expeditionRevertedErrors.textContent = formatOverallAnalysisQuantity(errors.totalRevertedErrors);
+    elements.expeditionRevertedRate.textContent = formatOverallAnalysisRate(errors.revertedRate);
+    elements.expeditionFinalErrors.textContent = formatOverallAnalysisQuantity(errors.finalErrors);
+    elements.expeditionFinalRate.textContent = formatOverallAnalysisRate(errors.finalRate);
 
     renderOverallDamageAndLossesTable(
         elements.damageAndLossesTable,

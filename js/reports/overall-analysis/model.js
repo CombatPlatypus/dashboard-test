@@ -3,6 +3,7 @@ import {
 } from "../receipt/state.js";
 
 import {
+    getExpeditionErrorAnalysis,
     getExpeditionSummary,
 } from "../expedition/state.js";
 
@@ -181,6 +182,8 @@ function createOverallAnalysisData(
         getExpeditionSummary(
             expeditionState,
         );
+
+    const expeditionErrors = getExpeditionErrorAnalysis(expeditionState);
 
     const expectedVolume =
         receiptState?.expectedVolume ??
@@ -441,6 +444,17 @@ function createOverallAnalysisData(
             durationSeconds:
                 expeditionSummary
                     .expeditionDurationSeconds,
+        },
+
+        expeditionErrors: {
+            sortingErrors: expeditionErrors.sortingErrors,
+            labelingErrors: expeditionErrors.labelingErrors,
+            totalErrors: expeditionErrors.totalErrors,
+            errorRate: expeditionErrors.errorRate,
+            totalRevertedErrors: expeditionErrors.totalRevertedErrors,
+            revertedRate: expeditionErrors.revertedRate,
+            finalErrors: expeditionErrors.finalErrors,
+            finalRate: expeditionErrors.finalRate,
         },
 
         damageAndLosses:

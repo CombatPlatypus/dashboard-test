@@ -38,6 +38,8 @@ A barra **Progresso da Conferência** usa o mesmo componente visual de Processam
 
 Na lista do **Resumo de Expedição**, a coluna Conferente usa o mesmo formato da Mesa de Recebimento e da cópia para planilha. [Renderização da lista](../../js/reports/expedition/view.js)
 
+A subaba **Análise de Erros** fornece ao Relatório Final os mesmos totais por tipo, revertidos, saldo final e taxas que aparecem na Expedição. A configuração do gráfico **Acompanhamento dos Erros** é compartilhada entre a Expedição, a prévia do Relatório Final e o HTML offline. [Cálculo dos erros](../../js/reports/expedition/state.js) · [Gráfico compartilhado](../../js/reports/expedition/error-balance-chart.js)
+
 Verifique o botão de importação nas quatro abas em [expedition-import-tabs.test.mjs](../../tests/expedition-import-tabs.test.mjs), o progresso por status em [expedition-progress.test.mjs](../../tests/expedition-progress.test.mjs) e o volume de retirados em [expedition-withdrawn.test.mjs](../../tests/expedition-withdrawn.test.mjs).
 
 ## Planejamento
@@ -76,6 +78,8 @@ Verifique o tipo obrigatório, a reimportação sem duplicar totais e a compatib
 
 A aba **Relatório Final** corresponde ao módulo `overall-analysis`. O [controlador](../../js/reports/overall-analysis/controller.js) coleta os dados dos demais módulos e o [modelo](../../js/reports/overall-analysis/model.js) calcula o resumo da janela. A [verificação de completude](../../js/reports/overall-analysis/completeness.js) determina quando o HTML autônomo pode ser gerado. Parcel Sweeper e Reversa são opcionais nessa verificação. O [exportador](../../js/reports/overall-analysis/standalone-export.js) gera o HTML a partir de uma cópia dos dados da janela.
 
-A cópia em imagem captura a própria prévia. O HTML baixado incorpora o CSS do seu modelo e abre offline. Ao mudar as tabelas do painel, confira no modelo os cabeçalhos, títulos, tipografia, bordas e espaçamento das cinco tabelas. [Modelo HTML](../../final-report.html) · [Teste de paridade das tabelas](../../tests/overall-analysis-standalone-template.test.mjs)
+A seção **Análise de Erros** fica entre os resumos de Processamento e Expedição e os de Parcel Sweeper e Reversa. O modelo reutiliza `getExpeditionErrorAnalysis` e copia os oito indicadores da tabela para a exportação. Alterações na Expedição atualizam a prévia pelo controlador do Relatório Final. Os indicadores indisponíveis aparecem como travessões conforme a origem e as barras usam zero para valores ausentes. [Modelo](../../js/reports/overall-analysis/model.js) · [Prévia](../../js/reports/overall-analysis/view.js) · [Teste de integração](../../tests/overall-analysis-html.browser.mjs)
+
+A cópia em imagem captura a própria prévia. O HTML baixado incorpora o CSS do seu modelo e abre offline. Ao mudar as tabelas do painel, confira no modelo os cabeçalhos, títulos, tipografia, bordas e espaçamento. [Modelo HTML](../../final-report.html) · [Teste de paridade das tabelas](../../tests/overall-analysis-standalone-template.test.mjs)
 
 Verifique indicadores e critérios de exportação em [overall-analysis-cards.test.mjs](../../tests/overall-analysis-cards.test.mjs) e [overall-analysis-html.test.mjs](../../tests/overall-analysis-html.test.mjs).

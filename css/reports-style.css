@@ -398,8 +398,8 @@
                 min-height: 1224px !important;
                 padding: 20px;
             }
-            #expedition-mistakes .horizontal-bars-chart .chart-canvas-container {
-                height: 313px !important;
+            .expedition-error-balance-chart > .chart-canvas-container {
+                height: 313px;
                 margin: 0 20px 20px 20px;
             }
             #expedition-streets .vertical-bars-chart .chart-canvas-container {
@@ -429,7 +429,7 @@
 
             /* RELATÓRIO FINAL  */
 
-            #overall-analysis .horizontal-bars-chart > .chart-canvas-container {
+            #overall-analysis .horizontal-bars-chart:not(.expedition-error-balance-chart) > .chart-canvas-container {
                 height: 320px !important;
                 margin: 20px;
             }
@@ -1312,4 +1312,7 @@
         }
         #overall-analysis .tables-and-charts > div > .chart {
             margin-top: 15px;
+        }
+        .expedition-errors-summary > .chart {
+            margin-top: 20px;
         }

@@ -4,6 +4,11 @@ import { createDashboardChart } from "../../charts/standard.js";
 import { CHART_TEXT_COLOR, CHART_VALUE_FONT } from "../../charts/theme.js";
 
 import {
+    createErrorBalanceChart,
+    updateErrorBalanceChart,
+} from "../expedition/error-balance-chart.js";
+
+import {
     createParcelCoverageChart,
     updateParcelCoverageChart,
 } from "../parcel-sweeper/charts.js";
@@ -22,6 +27,8 @@ let overallAnalysisReceiptChart =
 
 let overallAnalysisExpeditionChart =
     null;
+
+let overallAnalysisErrorBalanceChart = null;
 
 let overallAnalysisParcelCoverageChart =
     null;
@@ -363,6 +370,7 @@ function resizeOverallAnalysisCharts() {
                 [
                     overallAnalysisReceiptChart,
                     overallAnalysisExpeditionChart,
+                    overallAnalysisErrorBalanceChart,
                     overallAnalysisParcelCoverageChart,
                     overallAnalysisReverseCompositionChart,
                 ].forEach(
@@ -419,6 +427,7 @@ function renderOverallAnalysisCharts(
     if (
         !overallAnalysisReceiptChart ||
         !overallAnalysisExpeditionChart ||
+        !overallAnalysisErrorBalanceChart ||
         !overallAnalysisParcelCoverageChart ||
         !overallAnalysisReverseCompositionChart
     ) {
@@ -459,6 +468,8 @@ function renderOverallAnalysisCharts(
         updateMode,
     );
 
+    updateErrorBalanceChart(overallAnalysisErrorBalanceChart, data.expeditionErrors, updateMode);
+
     updateParcelCoverageChart(
         overallAnalysisParcelCoverageChart,
         data.parcel,
@@ -487,6 +498,8 @@ function initializeOverallAnalysisCharts(
             "#overallAnalysisExpeditionChart",
         );
 
+    const errorBalanceCanvas = rootElement.querySelector("#overallAnalysisErrorBalanceChart");
+
     const parcelCoverageCanvas =
         rootElement.querySelector(
             "#overallAnalysisParcelCoverageChart",
@@ -502,6 +515,7 @@ function initializeOverallAnalysisCharts(
             HTMLCanvasElement) ||
         !(expeditionCanvas instanceof
             HTMLCanvasElement) ||
+        !(errorBalanceCanvas instanceof HTMLCanvasElement) ||
         !(parcelCoverageCanvas instanceof
             HTMLCanvasElement) ||
         !(reverseCompositionCanvas instanceof
@@ -546,6 +560,8 @@ function initializeOverallAnalysisCharts(
                 CHART_COLORS.yellow,
             ],
         );
+
+    overallAnalysisErrorBalanceChart = createErrorBalanceChart(errorBalanceCanvas);
 
     overallAnalysisParcelCoverageChart =
         createParcelCoverageChart(

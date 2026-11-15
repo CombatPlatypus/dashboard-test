@@ -102,7 +102,7 @@ test("gráfico usa o novo título e mantém Etiquetagem, Sorting, Revertidos e S
     assert.equal(chart.options.scales.x.grid.color({ tick: { value: 0 } }), "rgba(0, 0, 0, 0)");
     assert.equal(chart.options.scales.x.grid.color({ tick: { value: 20 } }), "#626262");
     const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
-    assert.match(html, /<h4>Acompanhamento dos Erros<\/h4>/);
+    assert.match(html, /<h4 id="expeditionErrorBalanceTitle">Acompanhamento dos Erros<\/h4>/);
     assert.doesNotMatch(html, /(?:Identificados|Erros de Etiqueta x Erros de Sorting) x? Revertidos x Saldo Final/);
     const view = readFileSync(new URL("../js/reports/expedition/view.js", import.meta.url), "utf8");
     for (const [element, field] of [["labelingErrorsInput", "labelingErrors"],

@@ -196,6 +196,7 @@ function canExportOverallAnalysisController(
         data.flow.processed,
         data.flow.expedited,
         data.flow.floor,
+        data.expeditionErrors.totalErrors,
         data.cards.lossesRate.rate,
         data.damageAndLosses
             .hasData

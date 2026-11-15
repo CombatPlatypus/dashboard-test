@@ -127,7 +127,7 @@ test("os cinco cards tradicionais exibem os dados atuais sem depender dos mini g
     for (const id of ["DamageChart", "PackagesAnalysisChart", "LossRateChart", "DamageTotal", "PackagesAnalysisValue", "LossRateStatus"]) {
         assert.equal(elements.has("overallAnalysis" + id), false);
     }
-    assert.equal(charts.length, 4);
+    assert.equal(charts.length, 5);
 });
 
 test("limpar os dados retorna os cinco indicadores ao estado vazio sem recriar os gráficos restantes", t => {
@@ -140,7 +140,7 @@ test("limpar os dados retorna os cinco indicadores ao estado vazio sem recriar o
     for (const id of ["DamageSoc", "DamageHub", "PackagesUnderReview", "ConfirmedLosses", "LossRate"]) {
         assert.equal(elements.get("overallAnalysis" + id).textContent, "—");
     }
-    assert.equal(charts.length, 4);
+    assert.equal(charts.length, 5);
 });
 
 test("Parcel e Reversa exibem totais, cobertura de esperados e composição e voltam ao estado vazio", t => {
@@ -185,5 +185,5 @@ test("Parcel e Reversa exibem totais, cobertura de esperados e composição e vo
     assert.deepEqual(parcelChart.data.datasets[0].data, [0, 0]);
     assert.deepEqual(reverseChart.data.datasets[0].data, [0, 0, 0, 0]);
     assert.equal(reverseChart.options.plugins.reverseCenterText.text, "—");
-    assert.equal(charts.length, 4);
+    assert.equal(charts.length, 5);
 });

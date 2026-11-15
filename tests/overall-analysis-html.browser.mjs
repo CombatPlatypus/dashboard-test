@@ -14,6 +14,47 @@ import { createStandaloneOverallAnalysisHtml } from "../js/reports/overall-analy
 const require = createRequire(import.meta.url);
 const { chromium } = require("playwright");
 const XLSX = require("../js/libraries/xlsx.full.min.js");
+const errorFields = ["SortingErrors", "LabelingErrors", "TotalErrors", "ErrorRate",
+    "RevertedErrors", "RevertedRate", "FinalErrors", "FinalRate"];
+const errorBarColors = [
+    [37, 56, 165, 255],
+    [249, 148, 0, 255],
+    [0, 122, 72, 255],
+    [139, 0, 0, 255],
+];
+
+function readErrorChart(id) {
+    const chart = Chart.getChart(id);
+    return {
+        labels: chart.data.labels,
+        values: chart.data.datasets[0].data,
+        colors: chart.data.datasets[0].backgroundColor,
+        plugins: chart.config.plugins.map(plugin => plugin.id),
+        height: chart.canvas.parentElement.clientHeight,
+        axis: chart.options.indexAxis,
+        grace: chart.options.scales.x.grace,
+        tooltips: chart.options.plugins.tooltip.enabled,
+    };
+}
+
+function readErrorBarColors(id) {
+    const chart = Chart.getChart(id);
+    const ratio = chart.currentDevicePixelRatio;
+    return chart.getDatasetMeta(0).data.map(bar => {
+        const x = Math.floor((bar.base + bar.x) / 2 * ratio);
+        const y = Math.floor(bar.y * ratio);
+        return Array.from(chart.ctx.getImageData(x, y, 1, 1).data);
+    });
+}
+
+function errorBarsDrawn(id) {
+    const chart = Chart.getChart(id);
+    const values = chart.data.datasets[0].data;
+    const bars = chart.getDatasetMeta(0).data;
+    return chart.width > 0 && bars.length === values.length && bars.every((bar, index) =>
+        Math.abs(bar.x - chart.scales.x.getPixelForValue(values[index])) < 1);
+}
+
 const repo = fileURLToPath(new URL("../", import.meta.url));
 const output = process.env.REPORT_QA_OUTPUT || await mkdtemp(path.join(tmpdir(), "overall-html-"));
 await mkdir(output, { recursive: true });
@@ -36,7 +77,7 @@ try {
     browser = await chromium.launch({ channel: "msedge", headless: true });
     const context = await browser.newContext({ acceptDownloads: true, viewport: { width: 1600, height: 1050 } });
     const page = await context.newPage();
-    await page.clock.setFixedTime(new Date("2026-10-28T15:00:00-03:00"));
+    await page.clock.install({ time: new Date("2026-10-28T15:00:00-03:00") });
     const errors = [];
     page.on("pageerror", error => errors.push(error.message));
     await page.goto(`http://127.0.0.1:${server.address().port}/`);
@@ -61,7 +102,9 @@ try {
         ["2", "1", "0,024%", "1", "3"]);
     await page.evaluate(async () => (await import("/js/reports/losses-rate/state.js")).setActiveLossesRateMonth(0));
     assert.equal(await cardText("LossRate"), "0,024%", "O seletor mensal não altera o mês atual do card.");
-    assert.equal(await page.evaluate(() => Object.values(Chart.instances).filter(chart => chart.canvas.closest("#overall-analysis")).length), 4);
+    assert.equal(await page.evaluate(() => Object.values(Chart.instances).filter(chart => chart.canvas.closest("#overall-analysis")).length), 5);
+    const errorTable = () => Promise.all(errorFields.map(field => cardText(`Expedition${field}`)));
+    assert.deepEqual(await errorTable(), errorFields.map(() => "—"));
     await page.locator("#overallAnalysisIndicators").screenshot({ path: path.join(output, "cards-importacao-dashboard.png") });
     const completeness = await page.evaluate(async data => {
         const [context, receipt, expedition, damage, losses, rate, parcel, reverse] = await Promise.all([
@@ -75,6 +118,7 @@ try {
             packagesReceived: data.processing.receivedVolume, errorQuantity: data.processing.totalErrors }] });
         expedition.restoreExpeditionState({ floorVolume: data.expedition.floorVolume, routes: [{
             code: "ATTEST", status: "Validated", finalOrders: data.expedition.volumeChecked,
+            initialOrders: 11000, missortedOrders: 56,
             validationOperator: "Conferente teste", validationStartTime: "2026-10-19 01:00:00",
             validationEndTime: "2026-10-19 03:10:05",
         }] });
@@ -96,6 +140,26 @@ try {
             title: document.getElementById("overallAnalysisExportHtmlButton").title };
     }, createCompleteAnalysis());
     assert.equal(completeness.disabled, false, completeness.title);
+    assert.deepEqual(await errorTable(), ["—", "—", "56", "0,51%", "—", "—", "—", "—"]);
+
+    await page.locator('a[href="#expedition"]').click();
+    await page.locator('a[href="#expedition-mistakes"]').click();
+    await page.locator("#expeditionSortingErrorsInput").fill("19");
+    await page.locator("#expeditionLabelingErrorsInput").fill("37");
+    await page.locator("#expeditionRevertedInput").fill("2");
+    const sourceErrors = await Promise.all(errorFields.map(field =>
+        page.locator(`#expeditionPreview${field}`).textContent()));
+    assert.deepEqual(sourceErrors, ["19", "37", "56", "0,51%", "2", "3,57%", "54", "0,49%"]);
+    const sourceChart = await page.evaluate(readErrorChart, "expeditionErrorBalanceChart");
+    assert.deepEqual(sourceChart.values, [37, 19, 2, 54]);
+    await page.waitForFunction(errorBarsDrawn, "expeditionErrorBalanceChart", { timeout: 5000 });
+    assert.deepEqual(await page.evaluate(readErrorBarColors, "expeditionErrorBalanceChart"), errorBarColors);
+
+    await page.locator('a[href="#overall-analysis"]').click();
+    assert.deepEqual(await errorTable(), sourceErrors);
+    assert.deepEqual(await page.evaluate(readErrorChart, "overallAnalysisErrorBalanceChart"), sourceChart);
+    await page.waitForFunction(errorBarsDrawn, "overallAnalysisErrorBalanceChart", { timeout: 5000 });
+    assert.deepEqual(await page.evaluate(readErrorBarColors, "overallAnalysisErrorBalanceChart"), errorBarColors);
     assert.equal(await page.evaluate(() => Object.values(Chart.instances)
         .every(chart => chart.options.plugins.tooltip.enabled === false)), true);
 
@@ -130,6 +194,9 @@ try {
     const optionalDownload = await optionalDownloadEvent;
     const optionalPath = path.join(output, "relatorio-final-sem-parcel-reversa.html");
     await optionalDownload.saveAs(optionalPath);
+    await page.evaluate(async () => (await import("/js/reports/expedition/state.js")).resetExpeditionReport());
+    assert.deepEqual(await errorTable(), errorFields.map(() => "—"));
+    assert.deepEqual((await page.evaluate(readErrorChart, "overallAnalysisErrorBalanceChart")).values, [0, 0, 0, 0]);
     await context.close();
 
     const offline = await browser.newContext({ offline: true, timezoneId: "Pacific/Auckland",
@@ -156,7 +223,7 @@ try {
             sizes: [...document.querySelectorAll("canvas")].map(canvas => [canvas.clientWidth, canvas.clientHeight]),
         };
     });
-    assert.equal(rendered.count, 4);
+    assert.equal(rendered.count, 5);
     assert.equal(rendered.indicatorCount, 5);
     assert.equal(rendered.fonts, true);
     assert.equal(rendered.damageSoc, "2");
@@ -171,6 +238,10 @@ try {
     assert.equal(rendered.reverse, "4 (40%)");
     assert.equal(rendered.tooltipsDisabled, true);
     assert.deepEqual(rendered.bars, [12000, 11500, 500]);
+    assert.deepEqual(await Promise.all(errorFields.map(field =>
+        report.locator(`#finalReportExpedition${field}`).textContent())), sourceErrors);
+    assert.deepEqual(await report.evaluate(readErrorChart, "finalReportErrorBalanceChart"), sourceChart);
+    assert.deepEqual(await report.evaluate(readErrorBarColors, "finalReportErrorBalanceChart"), errorBarColors);
     assert.ok(rendered.sizes.every(([width, height]) => width > 0 && height > 0));
     const legend = report.locator("#finalReport-ReverseChartContainer + .chart-label .type").first();
     await legend.click();
@@ -206,7 +277,7 @@ try {
     await report.waitForFunction(() => document.documentElement.dataset.finalReportState === "ready");
     assert.equal(await report.locator("#finalReportParcelScanned").textContent(), "—");
     assert.equal(await report.locator("#finalReportReverseReturn").textContent(), "—");
-    assert.equal(await report.evaluate(() => Object.values(Chart.instances).length), 4);
+    assert.equal(await report.evaluate(() => Object.values(Chart.instances).length), 5);
     assert.equal(await report.evaluate(() => Object.values(Chart.instances)
         .every(chart => chart.options.plugins.tooltip.enabled === false)), true);
     assert.deepEqual(await report.evaluate(() => Chart.getChart("finalReport-ReverseChart").data.datasets[0].data), [0, 0, 0, 0]);

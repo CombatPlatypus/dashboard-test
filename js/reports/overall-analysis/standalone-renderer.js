@@ -2,6 +2,7 @@ import { CHART_COLORS, CHART_TEXT_COLOR, CHART_VALUE_FONT } from "../../charts/t
 import { createDashboardChart } from "../../charts/standard.js";
 import { getHorizontalBarLabelPosition } from "../core/horizontal-bars-3d.js";
 import { DOUGHNUT_3D_PADDING, drawDoughnut3D, drawDoughnut3DCenterText } from "../core/doughnut-3d.js";
+import { createErrorBalanceChart } from "../expedition/error-balance-chart.js";
 import { REVERSE_TYPE_KEYS, REVERSE_TYPE_DEFINITIONS } from "../reverse/model.js";
 import { getOverallAnalysisViewElements, renderOverallAnalysisView, formatOverallAnalysisQuantity } from "./view.js";
 
@@ -144,6 +145,10 @@ async function renderStandaloneReport(snapshot, root = document) {
             ["#bdbdbd", CHART_COLORS.green, CHART_COLORS.yellow]),
         createBarChart(canvas("finalReportExpeditionChart"), ["Volume Expedido", "Volume no Piso"],
             [data.expedition.volumeChecked, data.expedition.floorVolume], [CHART_COLORS.green, CHART_COLORS.yellow]),
+        createErrorBalanceChart(canvas("finalReportErrorBalanceChart"), {
+            analysis: data.expeditionErrors,
+            animate: false,
+        }),
         createCompositionChart(canvas("finalReport-ParcelChart"), ["Escaneados", "Não escaneados"],
             [data.parcel.expectedScannedCount, data.parcel.expectedUnscannedCount], [CHART_COLORS.blue, "#e4e6eb"],
             data.parcel.expectedTotalCount > 0 ? new Intl.NumberFormat("pt-BR", {
