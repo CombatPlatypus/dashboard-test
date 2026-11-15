@@ -2,6 +2,8 @@
 
 Use este índice para localizar o código de uma função e entender quais dados, telas e testes ela envolve. A ordem dos painéis segue o menu de [index.html](../index.html).
 
+Para entender como os painéis se conectam ao código e onde os dados são processados, comece pela [arquitetura do dashboard](arquitetura.md).
+
 Para manutenção no código, siga o [fluxo do repositório](../AGENTS.md) e consulte o [Registro de Alterações](Registro%20de%20Altera%C3%A7%C3%B5es/README.md) para ver o histórico.
 
 ## Painéis
