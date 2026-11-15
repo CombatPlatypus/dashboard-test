@@ -144,7 +144,7 @@ const lossesRateMaximumReferencePlugin = {
             chart.ctx;
 
         const label =
-            "Máximo " +
+            "Max " +
             lossesRateChartPercentageFormatter.format(
                 LOSSES_RATE_MAXIMUM_REFERENCE,
             ) +
@@ -349,7 +349,7 @@ function createLossesRateCompositionChart(
                         backgroundColor: [
                             CHART_COLORS.red,
                             CHART_COLORS.yellow,
-                            "#8b8d91",
+                            CHART_COLORS.blue,
                         ],
 
                         borderColor:

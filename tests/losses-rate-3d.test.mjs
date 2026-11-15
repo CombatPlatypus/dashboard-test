@@ -15,7 +15,7 @@ import { createDoughnut3DSegments } from "../js/reports/core/doughnut-3d.js";
 import { drawParcelCoverage3D } from "../js/reports/parcel-sweeper/coverage-3d.js";
 import { drawDoughnut3D } from "../js/reports/core/doughnut-3d.js";
 
-const colors = ["#8B0000", "#f99400", "#8b8d91"];
+const colors = ["#8B0000", "#f99400", "#2538a5"];
 
 function replaceGlobal(t, name, value) {
     const original = Object.getOwnPropertyDescriptor(globalThis, name);
@@ -177,13 +177,13 @@ test("troca de mês, restauração e limpeza atualizam a composição sem recria
     assert.equal(charts.length, 2);
 });
 
-test("indicadores do HTML estão ligados aos três campos com as cores originais", () => {
+test("indicadores do HTML usam as mesmas cores das três categorias do gráfico", () => {
     const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
     const composition = html.match(/<div class="tabs-panel" id="losses-rate">([\s\S]*?)<!-- RELATÓRIO DO PARCEL -->/)[1];
     for (const [color, label, id] of [
-        ["#8b8d91", "Possíveis Perdas", "lossesRateCompositionPossibleLosses"],
-        ["#8B0000", "Lost", "lossesRateCompositionLost"],
-        ["#f99400", "Avarias", "lossesRateCompositionDamage"],
+        [colors[2], "Possíveis Perdas", "lossesRateCompositionPossibleLosses"],
+        [colors[0], "Lost", "lossesRateCompositionLost"],
+        [colors[1], "Avarias", "lossesRateCompositionDamage"],
     ]) {
         assert.match(composition, new RegExp(`background-color: ${color};[\\s\\S]*?<p>${label}\\s+<span id="${id}">—</span>`));
         assert.equal(html.split(`id="${id}"`).length - 1, 1);

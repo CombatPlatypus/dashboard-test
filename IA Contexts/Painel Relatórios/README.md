@@ -60,6 +60,10 @@ Verifique o reconhecimento dos blocos lado a lado e a seleção mensal em [damag
 
 Acompanha a composição das ocorrências e a evolução da taxa ao longo do ano. O [leitor de histórico](../../js/reports/losses-rate/workbook.js) reconhece as colunas da planilha, converte os valores e monta a série de 12 meses. O [estado](../../js/reports/losses-rate/state.js) fornece os dados ao relatório, ao Histórico Consolidado e ao Relatório Final.
 
+No **Histórico da Taxa de Perdas**, a linha pontilhada marca o limite de 0,030% com o rótulo **Max 0,030%**. [Gráfico](../../js/reports/losses-rate/charts.js)
+
+Na **Composição das Ocorrências**, a fatia e a legenda de **Possíveis Perdas** usam o azul padrão `#2538a5`. [Gráfico](../../js/reports/losses-rate/charts.js) · [Legenda](../../index.html)
+
 Verifique a leitura do formato em [losses-rate-workbook.test.mjs](../../tests/losses-rate-workbook.test.mjs) e a presença dos 12 meses em [report-session.test.mjs](../../tests/report-session.test.mjs).
 
 ## Parcel Sweeper
