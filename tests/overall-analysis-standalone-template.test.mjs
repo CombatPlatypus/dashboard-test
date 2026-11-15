@@ -85,6 +85,8 @@ test(
     "modelo e dashboard expõem os elementos da exportação",
     function () {
         const canvasIds = [
+            "finalReportLossesRateCompositionChart",
+            "finalReportLossesRateHistoryChart",
             "finalReportReceiptChart",
             "finalReportExpeditionChart",
             "finalReportErrorBalanceChart",

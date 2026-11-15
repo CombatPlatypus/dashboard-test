@@ -266,6 +266,19 @@ function getLossesRateMonthSummary(
     };
 }
 
+function getLossesRateChartData(state = null) {
+    const activeMonth = state?.activeMonth ?? null;
+
+    return {
+        activeMonth,
+        composition: getLossesRateMonthSummary(activeMonth, state),
+        monthlyRates: LOSSES_RATE_MONTHS.map((month, index) => {
+            const rate = getLossesRateMonthSummary(index, state)?.lossRate ?? null;
+            return rate === null ? null : rate * 100;
+        }),
+    };
+}
+
 /* SUBSTITUI TODO O HISTÓRICO */
 
 function replaceLossesRateHistory(
@@ -397,6 +410,7 @@ function resetLossesRateReport() {
 
 export {
     LOSSES_RATE_MONTHS,
+    getLossesRateChartData,
     getLossesRateMonthSummary,
     getLossesRateState,
     replaceLossesRateHistory,

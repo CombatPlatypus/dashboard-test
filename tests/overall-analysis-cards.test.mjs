@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { createOverallAnalysisData } from "../js/reports/overall-analysis/model.js";
+import { canExportOverallAnalysisController } from "../js/reports/overall-analysis/controller.js";
 
 function createData({ activeMonth = 0, year = 2026, currentMonth = { moved: 356741, lost: 26, damage: 60, possibleLosses: 111 },
     date = new Date(2026, 9, 28, 12) } = {}) {
@@ -45,4 +46,16 @@ test("volume ausente ou zero mantém a taxa vazia e preserva o total de perdas",
     const rate = createData({ currentMonth: { moved: 1000, lost: 0, damage: 0, possibleLosses: 50 } }).cards.lossesRate;
     assert.equal(rate.totalLosses, 0);
     assert.equal(rate.rate, 0);
+});
+
+test("os gráficos de Taxa de Perdas permitem copiar o Relatório Final com dados de outros meses", () => {
+    for (const state of [
+        { activeMonth: 0, year: 2025, months: [{ possibleLosses: 5 }] },
+        { activeMonth: 1, year: 2025, months: [{ moved: 100000, lost: 24, damage: 6 }] },
+    ]) {
+        const analysis = createOverallAnalysisData({ operators: [] }, { routes: [] }, state, {},
+            { days: [] }, { days: [] }, null, null, new Date(2026, 9, 28, 12));
+        assert.equal(analysis.cards.lossesRate.rate, null);
+        assert.equal(canExportOverallAnalysisController(analysis), true);
+    }
 });

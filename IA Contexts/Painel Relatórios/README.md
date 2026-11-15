@@ -64,6 +64,8 @@ No **Histórico da Taxa de Perdas**, a linha pontilhada marca o limite de 0,030%
 
 Na **Composição das Ocorrências**, a fatia e a legenda de **Possíveis Perdas** usam o azul padrão `#2538a5`. [Gráfico](../../js/reports/losses-rate/charts.js) · [Legenda](../../index.html)
 
+A composição e o histórico fornecem ao Relatório Final o mês selecionado e a série anual. As duas prévias usam a mesma configuração, incluindo a legenda da composição, o destaque do mês no histórico e a linha de referência. [Dados dos gráficos](../../js/reports/losses-rate/state.js) · [Configuração compartilhada](../../js/reports/losses-rate/charts.js)
+
 Verifique a leitura do formato em [losses-rate-workbook.test.mjs](../../tests/losses-rate-workbook.test.mjs) e a presença dos 12 meses em [report-session.test.mjs](../../tests/report-session.test.mjs).
 
 ## Parcel Sweeper
@@ -82,10 +84,12 @@ Verifique o tipo obrigatório, a reimportação sem duplicar totais e a compatib
 
 A aba **Relatório Final** corresponde ao módulo `overall-analysis`. O [controlador](../../js/reports/overall-analysis/controller.js) coleta os dados dos demais módulos e o [modelo](../../js/reports/overall-analysis/model.js) calcula o resumo da janela. A [verificação de completude](../../js/reports/overall-analysis/completeness.js) determina quando o HTML autônomo pode ser gerado. Parcel Sweeper e Reversa são opcionais nessa verificação. O [exportador](../../js/reports/overall-analysis/standalone-export.js) gera o HTML a partir de uma cópia dos dados da janela.
 
+Abaixo dos indicadores de **Avarias e Perdas**, o Relatório Final exibe a **Composição das Ocorrências** e o **Histórico da Taxa de Perdas** sem títulos visuais. A composição e o ponto destacado acompanham o mês selecionado em **Taxa de Perdas**. O histórico mantém os 12 meses, com intervalos onde faltam dados. O HTML incorpora os gráficos e o mês selecionado no momento do download. [Modelo](../../js/reports/overall-analysis/model.js) · [Gráficos](../../js/reports/overall-analysis/charts.js) · [Teste de integração](../../tests/overall-analysis-html.browser.mjs)
+
 A seção **Análise de Erros** fica entre os resumos de Processamento e Expedição e os de Parcel Sweeper e Reversa. O modelo reutiliza `getExpeditionErrorAnalysis` e copia os oito indicadores da tabela para a exportação. Alterações na Expedição atualizam a prévia pelo controlador do Relatório Final. Os indicadores indisponíveis aparecem como travessões conforme a origem e as barras usam zero para valores ausentes. [Modelo](../../js/reports/overall-analysis/model.js) · [Prévia](../../js/reports/overall-analysis/view.js) · [Teste de integração](../../tests/overall-analysis-html.browser.mjs)
 
 Na prévia e no HTML baixado, o gráfico aparece abaixo da tabela sem cabeçalho visual. O canvas tem o nome acessível **Acompanhamento dos Erros**. [Prévia do Relatório Final](../../index.html) · [Modelo HTML](../../final-report.html)
 
-A cópia em imagem captura a própria prévia. O HTML baixado incorpora o CSS do seu modelo e abre offline. Ao mudar as tabelas do painel, confira no modelo os cabeçalhos, títulos, tipografia, bordas e espaçamento. [Modelo HTML](../../final-report.html) · [Teste de paridade das tabelas](../../tests/overall-analysis-standalone-template.test.mjs)
+A cópia em imagem captura a própria prévia e pode ser usada quando há dados disponíveis nos gráficos da Taxa de Perdas. O HTML baixado incorpora o CSS do seu modelo e abre offline. Ao mudar as tabelas do painel, confira no modelo os cabeçalhos, títulos, tipografia, bordas e espaçamento. [Modelo HTML](../../final-report.html) · [Teste de paridade das tabelas](../../tests/overall-analysis-standalone-template.test.mjs)
 
 Verifique indicadores e critérios de exportação em [overall-analysis-cards.test.mjs](../../tests/overall-analysis-cards.test.mjs) e [overall-analysis-html.test.mjs](../../tests/overall-analysis-html.test.mjs).

@@ -74,7 +74,7 @@ test("eixos e indicadores manuais usam a cor compartilhada, preservando os dois 
         ["losses-rate", initializeLossesRateCharts, 2],
         ["parcel", initializeParcelCharts, 5],
         ["expedition", initializeExpeditionErrorsCharts, 2],
-        ["overall-analysis", initializeOverallAnalysisCharts, 5],
+        ["overall-analysis", initializeOverallAnalysisCharts, 7],
     ]) {
         const root = new Element(id);
         elements.set(id, root);

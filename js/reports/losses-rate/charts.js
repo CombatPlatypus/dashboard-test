@@ -4,7 +4,7 @@ import { CHART_TEXT_COLOR, CHART_VALUE_FONT } from "../../charts/theme.js";
 
 import {
     LOSSES_RATE_MONTHS,
-    getLossesRateMonthSummary,
+    getLossesRateChartData,
     getLossesRateState,
     subscribeLossesRateState,
 } from "./state.js";
@@ -405,6 +405,7 @@ function createLossesRateCompositionChart(
 
 function createLossesRateHistoryChart(
     canvas,
+    { animate = true } = {},
 ) {
     return createDashboardChart(
         canvas,
@@ -476,7 +477,7 @@ function createLossesRateHistoryChart(
                     },
                 },
 
-                animation: {
+                animation: animate && {
                     duration: 250,
                 },
 
@@ -558,180 +559,69 @@ function createLossesRateHistoryChart(
     );
 }
 
-/* ATUALIZA O GRÁFICO DE COMPOSIÇÃO */
-
-function updateLossesRateCompositionChart(
-    state,
-) {
-    const summary =
-        getLossesRateMonthSummary(
-            state.activeMonth,
-            state,
-        );
-
-    const possibleLosses =
-        summary.possibleLosses || 0;
-
-    const lost =
-        summary.lost || 0;
-
-    const damage =
-        summary.damage || 0;
-
-    const hasCompositionData =
-        summary.possibleLosses !== null ||
-        summary.lost !== null ||
-        summary.damage !== null;
-
-    const compositionTotal =
-        hasCompositionData
-            ? possibleLosses +
-            lost +
-            damage
-            : null;
-
-    lossesRateCompositionChart
-        .data
-        .datasets[0]
-        .data = [
-            lost,
-            damage,
-            possibleLosses,
-        ];
-
-    lossesRateCompositionChart
-        .options
-        .plugins
-        .lossesRateCenterText
-        .text =
-            compositionTotal === null
-                ? "—"
-                : lossesRateChartIntegerFormatter.format(
-                    compositionTotal,
-                );
-    lossesRateCompositionChart.update();
-
-    Object.entries(lossesRateCompositionIndicators).forEach(
-        function ([field, element]) {
-            if (!(element instanceof HTMLElement)) {
-                return;
-            }
-
-            const quantity = summary[field];
-            if (quantity === null || quantity === undefined) {
-                element.textContent = "—";
-                return;
-            }
-
-            const percentage = compositionTotal > 0
-                ? quantity / compositionTotal
-                : 0;
-            element.textContent = `${lossesRateChartIntegerFormatter.format(quantity)} ` +
-                `(${lossesRateCompositionPercentageFormatter.format(percentage)})`;
-        },
-    );
-
-    lossesRateCompositionMonthElement
-        .textContent =
-        LOSSES_RATE_MONTHS[
-            state.activeMonth
-        ];
+function getLossesRateCompositionIndicators(rootElement, idPrefix) {
+    return {
+        possibleLosses: rootElement.querySelector(`#${idPrefix}PossibleLosses`),
+        lost: rootElement.querySelector(`#${idPrefix}Lost`),
+        damage: rootElement.querySelector(`#${idPrefix}Damage`),
+    };
 }
 
-/* ATUALIZA O GRÁFICO DO HISTÓRICO */
+function updateLossesRateCompositionChart(chart, summary, indicators, updateMode) {
+    const { lost = null, damage = null, possibleLosses = null } = summary ?? {};
+    const quantities = [lost, damage, possibleLosses];
+    const values = quantities.map(quantity => quantity ?? 0);
+    const total = quantities.some(quantity => quantity !== null)
+        ? values.reduce((sum, quantity) => sum + quantity, 0)
+        : null;
 
-function updateLossesRateHistoryChart(
-    state,
-) {
-    const monthlyRates =
-        state.months.map(
-            function (
-                month,
-                monthIndex,
-            ) {
-                const summary =
-                    getLossesRateMonthSummary(
-                        monthIndex,
-                        state,
-                    );
+    chart.data.datasets[0].data = values;
+    chart.options.plugins.lossesRateCenterText.text =
+        total === null ? "—" : lossesRateChartIntegerFormatter.format(total);
+    chart.update(updateMode);
 
-                return summary.lossRate ===
-                    null
-                    ? null
-                    : summary.lossRate *
-                      100;
-            },
-        );
+    for (const [field, element] of Object.entries(indicators)) {
+        if (!(element instanceof HTMLElement)) {
+            continue;
+        }
 
-    const dataset =
-        lossesRateHistoryChart
-            .data
-            .datasets[0];
+        const quantity = summary?.[field];
+        if (quantity == null) {
+            element.textContent = "—";
+            continue;
+        }
 
-    dataset.data =
-        monthlyRates;
-
-    dataset.pointRadius =
-        monthlyRates.map(
-            function (
-                value,
-                monthIndex,
-            ) {
-                if (
-                    value === null
-                ) {
-                    return 0;
-                }
-
-                return monthIndex ===
-                    state.activeMonth
-                    ? 6
-                    : 4;
-            },
-        );
-
-    dataset.pointBackgroundColor =
-        monthlyRates.map(
-            function (
-                value,
-                monthIndex,
-            ) {
-                return monthIndex ===
-                    state.activeMonth
-                    ? CHART_COLORS.yellow
-                    : "#e4e6eb";
-            },
-        );
-
-    dataset.pointBorderColor =
-        dataset.pointBackgroundColor;
-
-    lossesRateHistoryChart.update();
-
-    lossesRateHistoryYearElement
-        .textContent =
-        String(state.year);
+        const rate = total > 0 ? quantity / total : 0;
+        element.textContent = `${lossesRateChartIntegerFormatter.format(quantity)} ` +
+            `(${lossesRateCompositionPercentageFormatter.format(rate)})`;
+    }
 }
 
-/* ATUALIZA OS DOIS GRÁFICOS */
+function updateLossesRateHistoryChart(chart, { monthlyRates, activeMonth }, updateMode) {
+    const dataset = chart.data.datasets[0];
+    dataset.data = monthlyRates.slice();
+    dataset.pointRadius = monthlyRates.map((rate, index) => {
+        if (rate === null) {
+            return 0;
+        }
+        return index === activeMonth ? 6 : 4;
+    });
+    dataset.pointBackgroundColor = monthlyRates.map((rate, index) =>
+        index === activeMonth ? CHART_COLORS.yellow : "#e4e6eb");
+    dataset.pointBorderColor = dataset.pointBackgroundColor;
+    chart.update(updateMode);
+}
 
-function updateLossesRateCharts(
-    state,
-) {
-    if (
-        !lossesRateCompositionChart ||
-        !lossesRateHistoryChart
-    ) {
+function updateLossesRateCharts(state) {
+    if (!lossesRateCompositionChart || !lossesRateHistoryChart) {
         return;
     }
 
-    updateLossesRateCompositionChart(
-        state,
-    );
-
-    updateLossesRateHistoryChart(
-        state,
-    );
+    const data = getLossesRateChartData(state);
+    updateLossesRateCompositionChart(lossesRateCompositionChart, data.composition, lossesRateCompositionIndicators);
+    updateLossesRateHistoryChart(lossesRateHistoryChart, data);
+    lossesRateCompositionMonthElement.textContent = LOSSES_RATE_MONTHS[state.activeMonth];
+    lossesRateHistoryYearElement.textContent = String(state.year);
 }
 
 /* REAJUSTA OS GRÁFICOS AO EXIBIR O PAINEL */
@@ -827,17 +717,8 @@ function initializeLossesRateCharts(
             "#lossesRateHistoryYear",
         );
 
-    lossesRateCompositionIndicators = {
-        possibleLosses: rootElement.querySelector(
-            "#lossesRateCompositionPossibleLosses",
-        ),
-        lost: rootElement.querySelector(
-            "#lossesRateCompositionLost",
-        ),
-        damage: rootElement.querySelector(
-            "#lossesRateCompositionDamage",
-        ),
-    };
+    lossesRateCompositionIndicators =
+        getLossesRateCompositionIndicators(rootElement, "lossesRateComposition");
 
     if (
         !(compositionCanvas instanceof HTMLCanvasElement) ||
@@ -915,5 +796,8 @@ function initializeLossesRateCharts(
 export {
     createLossesRateCompositionChart,
     createLossesRateHistoryChart,
+    getLossesRateCompositionIndicators,
     initializeLossesRateCharts,
+    updateLossesRateCompositionChart,
+    updateLossesRateHistoryChart,
 };

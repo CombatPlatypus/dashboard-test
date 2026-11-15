@@ -3,6 +3,13 @@ import { createDashboardChart } from "../../charts/standard.js";
 import { getHorizontalBarLabelPosition } from "../core/horizontal-bars-3d.js";
 import { DOUGHNUT_3D_PADDING, drawDoughnut3D, drawDoughnut3DCenterText } from "../core/doughnut-3d.js";
 import { createErrorBalanceChart } from "../expedition/error-balance-chart.js";
+import {
+    createLossesRateCompositionChart,
+    createLossesRateHistoryChart,
+    getLossesRateCompositionIndicators,
+    updateLossesRateCompositionChart,
+    updateLossesRateHistoryChart,
+} from "../losses-rate/charts.js";
 import { REVERSE_TYPE_KEYS, REVERSE_TYPE_DEFINITIONS } from "../reverse/model.js";
 import { getOverallAnalysisViewElements, renderOverallAnalysisView, formatOverallAnalysisQuantity } from "./view.js";
 
@@ -139,7 +146,18 @@ async function renderStandaloneReport(snapshot, root = document) {
         if (!element) throw new Error(`Gráfico ${id} não encontrado no modelo.`);
         return element;
     };
+    const lossesRateComposition = createLossesRateCompositionChart(canvas("finalReportLossesRateCompositionChart"));
+    const lossesRateHistory = createLossesRateHistoryChart(canvas("finalReportLossesRateHistoryChart"), { animate: false });
+    updateLossesRateCompositionChart(
+        lossesRateComposition,
+        data.lossesRateCharts.composition,
+        getLossesRateCompositionIndicators(root, "finalReportLossesRateComposition"),
+        "none",
+    );
+    updateLossesRateHistoryChart(lossesRateHistory, data.lossesRateCharts, "none");
     const charts = [
+        lossesRateComposition,
+        lossesRateHistory,
         createBarChart(canvas("finalReportReceiptChart"), ["Volume Esperado", "Volume Recebido", "Gap"],
             [data.processing.expectedVolume, data.processing.receivedVolume, data.processing.gap],
             ["#bdbdbd", CHART_COLORS.green, CHART_COLORS.yellow]),

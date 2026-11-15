@@ -7,6 +7,7 @@ import {
 } from "../js/reports/core/report-context.js";
 
 import {
+    getLossesRateChartData,
     getLossesRateMonthSummary,
 } from "../js/reports/losses-rate/state.js";
 
@@ -69,22 +70,14 @@ test("taxa de perdas usa o estado renderizado na tabela e no gráfico", () => {
         ),
         "utf8",
     );
-    const charts = readFileSync(
-        new URL(
-            "../js/reports/losses-rate/charts.js",
-            import.meta.url,
-        ),
-        "utf8",
-    );
-
     assert.match(
         view,
         /getLossesRateMonthSummary\(\s*state\.activeMonth,\s*state,\s*\)/,
     );
-    assert.match(
-        charts,
-        /getLossesRateMonthSummary\(\s*monthIndex,\s*state,\s*\)/,
-    );
+    const charts = getLossesRateChartData(state);
+    assert.equal(charts.activeMonth, 0);
+    assert.deepEqual(charts.composition, getLossesRateMonthSummary(0, state));
+    assert.deepEqual(charts.monthlyRates, [0.0003 * 100, ...Array(11).fill(null)]);
 });
 
 test("ranking posiciona nomes 8 px acima das barras e aplica padding interno às colunas", () => {

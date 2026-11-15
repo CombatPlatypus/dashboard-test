@@ -645,6 +645,10 @@
                 height: 313px;
                 margin: 0 20px 20px 20px;
             }
+            .line-chart .chart-canvas-container {
+                height: 304px;
+                margin: 0 20px 20px 20px;
+            }
 
             /* TITULOS */
 
@@ -785,9 +789,24 @@
             .expedition-errors-summary > .chart > .chart-canvas-container {
                 margin-top: 20px;
             }
+            .losses-rate-charts {
+                gap: 15px;
+                align-items: flex-start;
+            }
+            .losses-rate-charts > .chart {
+                flex: 1 1 0;
+                min-width: 0;
+            }
+            .losses-rate-charts .chart-canvas-container {
+                margin-top: 20px;
+            }
+            .losses-rate-charts .chart-label {
+                flex-wrap: wrap;
+            }
 
             @media (max-width: 900px) {
-                .tables-and-charts > div {
+                .tables-and-charts > div,
+                .losses-rate-charts > .chart {
                     flex-basis: 100%;
                     min-width: 0;
                 }
@@ -913,6 +932,41 @@
                 </div>
 
                 <!-- AVARIAS E PERDAS -->
+
+                <div class="losses-rate-charts flex-box-start">
+                    <div class="chart doughnut-chart">
+                        <div class="chart-canvas-container">
+                            <canvas id="finalReportLossesRateCompositionChart" role="img" aria-label="Composição das ocorrências">
+                                Seu navegador não suporta gráficos em canvas.
+                            </canvas>
+                        </div>
+
+                        <div class="chart-label">
+                            <div class="type">
+                                <div style="background-color: #2538a5;"></div>
+                                <p>Possíveis Perdas <span id="finalReportLossesRateCompositionPossibleLosses">—</span></p>
+                            </div>
+
+                            <div class="type">
+                                <div style="background-color: #8B0000;"></div>
+                                <p>Lost <span id="finalReportLossesRateCompositionLost">—</span></p>
+                            </div>
+
+                            <div class="type">
+                                <div style="background-color: #f99400;"></div>
+                                <p>Avarias <span id="finalReportLossesRateCompositionDamage">—</span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chart line-chart">
+                        <div class="chart-canvas-container">
+                            <canvas id="finalReportLossesRateHistoryChart" role="img" aria-label="Histórico da taxa de perdas">
+                                Seu navegador não suporta gráficos em canvas.
+                            </canvas>
+                        </div>
+                    </div>
+                </div>
 
                 <table id="finalReport-LossesTable">
                     <thead>

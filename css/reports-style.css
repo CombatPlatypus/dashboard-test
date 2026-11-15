@@ -1002,6 +1002,15 @@
     #losses-rate .losses-rate-charts > div, #overall-analysis .losses-rate-charts > div {
         flex: 1 1 0;
     }
+    #overall-analysis .losses-rate-charts > .chart {
+        min-width: 0;
+    }
+    #overall-analysis .losses-rate-charts .chart-canvas-container {
+        margin-top: 20px;
+    }
+    #overall-analysis .losses-rate-charts .chart-label {
+        flex-wrap: wrap;
+    }
 
     /* PARCEL SWEEPER */
 

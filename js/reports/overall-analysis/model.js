@@ -8,6 +8,7 @@ import {
 } from "../expedition/state.js";
 
 import {
+    getLossesRateChartData,
     getLossesRateMonthSummary,
 } from "../losses-rate/state.js";
 
@@ -459,6 +460,8 @@ function createOverallAnalysisData(
 
         damageAndLosses:
             damageAndLossesAnalysis,
+
+        lossesRateCharts: getLossesRateChartData(lossesRateState),
 
         parcel: {
             hasData: parcelSummary.hasData,

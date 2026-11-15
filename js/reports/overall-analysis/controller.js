@@ -191,6 +191,8 @@ function importOverallAnalysisSession() {
 function canExportOverallAnalysisController(
     data = getCurrentOverallAnalysisData(),
 ) {
+    const { composition, monthlyRates } = data.lossesRateCharts;
+
     return [
         data.flow.planned,
         data.flow.processed,
@@ -198,6 +200,8 @@ function canExportOverallAnalysisController(
         data.flow.floor,
         data.expeditionErrors.totalErrors,
         data.cards.lossesRate.rate,
+        composition?.possibleLosses ?? composition?.lost ?? composition?.damage ?? null,
+        ...monthlyRates,
         data.damageAndLosses
             .hasData
             ? 1
