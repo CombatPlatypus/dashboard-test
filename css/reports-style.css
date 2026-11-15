@@ -1015,7 +1015,7 @@
         flex-wrap: wrap;
     }
     #overall-analysis .losses-rate-charts .doughnut-chart .chart-label {
-        max-width: 500px;
+        max-width: 385px;
         margin: 0px auto 20px;
     }
 
