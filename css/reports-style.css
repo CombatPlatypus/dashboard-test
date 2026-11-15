@@ -1002,22 +1002,6 @@
     #losses-rate .losses-rate-charts > div, #overall-analysis .losses-rate-charts > div {
         flex: 1 1 0;
     }
-    #overall-analysis .losses-rate-charts > .chart {
-        min-width: 0;
-    }
-    #overall-analysis .losses-rate-charts .chart-canvas-container {
-        margin-top: 20px;
-    }
-    #overall-analysis .line-chart .chart-canvas-container {
-        height: 339px !important;
-    }
-    #overall-analysis .losses-rate-charts .chart-label {
-        flex-wrap: wrap;
-    }
-    #overall-analysis .losses-rate-charts .doughnut-chart .chart-label {
-        max-width: 385px;
-        margin: 0px auto 20px;
-    }
 
     /* PARCEL SWEEPER */
 
@@ -1334,4 +1318,34 @@
         }
         .expedition-errors-summary > .chart > .chart-canvas-container {
             margin-top: 20px;
+        }
+        #overall-analysis .losses-rate-charts > .chart {
+            min-width: 0;
+        }
+        #overall-analysis .losses-rate-charts .chart-canvas-container {
+            margin-top: 20px;
+        }
+        #overall-analysis .line-chart .chart-canvas-container {
+            height: 339px !important;
+        }
+        #overall-analysis .losses-rate-charts .chart-label {
+            flex-wrap: wrap;
+        }
+        #overall-analysis .losses-rate-charts .doughnut-chart .chart-label {
+            max-width: 385px;
+            margin: 0px auto 20px;
+        }
+        #overall-analysis .expedition-errors-summary .flex-box-start {
+            gap: 15px;
+            margin-top: 15px;
+        }
+        #overall-analysis .expedition-errors-summary .flex-box-start > div {
+            flex: 1 1 0;
+        }
+        #overall-analysis .expedition-errors-summary .flex-box-start > .chart {
+            justify-content: center;
+        }
+        .expedition-error-balance-chart > .chart-canvas-container {
+            margin: 20px !important;
+            height: 452px !important;
         }
