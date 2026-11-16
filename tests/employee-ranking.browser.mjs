@@ -74,15 +74,27 @@ try {
     page.on("pageerror", error => errors.push(error.message));
     page.on("dialog", dialog => dialog.accept());
     await page.addInitScript(() => {
-        window.rankingClipboard = { text: "", image: null };
+        window.rankingClipboard = { text: "", html: "", image: null };
+        const execCommand = document.execCommand.bind(document);
+        document.execCommand = (command, ...args) => {
+            if (command !== "copy") return execCommand(command, ...args);
+            const clipboardData = new DataTransfer();
+            const event = new ClipboardEvent("copy", { clipboardData, cancelable: true });
+            document.dispatchEvent(event);
+            window.rankingClipboard.text = clipboardData.getData("text/plain");
+            window.rankingClipboard.html = clipboardData.getData("text/html");
+            return event.defaultPrevented;
+        };
         Object.defineProperty(navigator, "clipboard", {
             value: {
                 readText: async () => window.rankingClipboard.text,
-                writeText: async text => { window.rankingClipboard.text = text; },
                 write: async items => {
                     for (const item of items) {
                         if (item.types.includes("text/plain")) {
                             window.rankingClipboard.text = await (await item.getType("text/plain")).text();
+                        }
+                        if (item.types.includes("text/html")) {
+                            window.rankingClipboard.html = await (await item.getType("text/html")).text();
                         }
                         if (item.types.includes("image/png")) {
                             const blob = await item.getType("image/png");
@@ -183,11 +195,29 @@ try {
     }
 
     await copyButton.click();
-    await page.waitForFunction(() => window.rankingClipboard.text.startsWith("Maria da Silva Santos\t"));
-    const copied = await page.evaluate(() => window.rankingClipboard.text.split(/\r?\n/));
-    assert.equal(copied.length, 153);
-    assert.equal(copied[0], "Maria da Silva Santos\t14\t00:05:30");
-    assert.equal(copied[1], "Maria da Silva Rodrigues\t9\t00:03:00");
+    await page.waitForFunction(() => window.rankingClipboard.text.startsWith("RANKING MENSAL DE DESEMPENHO\t"));
+    const copied = await page.evaluate(() => window.rankingClipboard.text.split("\n").map(row => row.split("\t")));
+    assert.equal(copied.length, 158);
+    assert.deepEqual(copied[5].slice(9, 12), ["Maria Silva", "14", "00:05:30"]);
+    assert.deepEqual(copied[6].slice(9, 12), ["Maria Silva", "9", "00:03:00"]);
+    assert.equal(copied[5][16], "Maria da Silva Santos");
+    assert.equal(copied[6][16], "Maria da Silva Rodrigues");
+    assert.match(await page.locator("#employeeRankingNotificationText").textContent(), /B2/);
+
+    const copiedFormat = await page.evaluate(() => {
+        const doc = new DOMParser().parseFromString(window.rankingClipboard.html, "text/html");
+        const table = doc.querySelector("google-sheets-html-origin table");
+        const title = table.rows[0].cells[0];
+        const expeditionCells = Array.from(table.rows[5].cells).slice(6, 9);
+        return {
+            titleSpan: [title.colSpan, title.rowSpan],
+            centerAligned: expeditionCells.every(cell => cell.style.textAlign === "center" && cell.style.verticalAlign === "middle"),
+            values: expeditionCells.map(cell => cell.textContent),
+        };
+    });
+    assert.deepEqual(copiedFormat, {
+        titleSpan: [15, 2], centerAligned: true, values: ["Maria Silva", "14", "00:05:30"],
+    });
 
     await page.reload();
     await page.waitForFunction(() => document.querySelectorAll("#switch-spreadsheet .tabs-title").length > 0);
@@ -202,11 +232,11 @@ try {
     assert.equal(await page.locator("#expeditionPreviewOperatorBody tr").first().locator("td").nth(1).textContent(), "12");
 
     await copyButton.click();
-    await page.waitForFunction(() => window.rankingClipboard.text.startsWith("Maria da Silva Santos\t"));
-    const copiedAfterClear = await page.evaluate(() => window.rankingClipboard.text.split(/\r?\n/));
-    assert.equal(copiedAfterClear[0], "Maria da Silva Santos\t12\t00:05:29");
-    assert.equal(copiedAfterClear.length, 153);
-    assert.ok(copiedAfterClear.slice(1).every(row => row === "\t\t"));
+    await page.waitForFunction(() => window.rankingClipboard.text.startsWith("RANKING MENSAL DE DESEMPENHO\t"));
+    const copiedAfterClear = await page.evaluate(() => window.rankingClipboard.text.split("\n").map(row => row.split("\t")));
+    assert.deepEqual(copiedAfterClear[5].slice(9, 12), ["Maria Silva", "12", "00:05:29"]);
+    assert.equal(copiedAfterClear.length, 158);
+    assert.ok(copiedAfterClear.slice(6).every(row => row.every(value => value === "")));
 
     const imageButton = page.locator("#employeeRankingImageButton");
     await imageButton.click();

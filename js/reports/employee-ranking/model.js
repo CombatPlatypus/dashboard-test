@@ -73,5 +73,6 @@ function buildEmployeeExpeditionRanking(currentRanking, importedRanking = []) {
 export {
     buildEmployeeExpeditionRanking,
     formatEmployeeRankingDuration,
+    formatEmployeeRankingName,
     normalizeEmployeeRankingName,
 };

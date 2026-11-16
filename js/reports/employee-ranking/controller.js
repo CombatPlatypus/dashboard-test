@@ -11,9 +11,10 @@ import {
     downloadReportBlob,
 } from "../export.js";
 import { setReportNotification } from "../report-notifications.js";
+import { writeSummaryClipboard } from "../summary-copy.js";
 import {
     MIN_EMPLOYEE_RANKING_ROWS,
-    createEmployeeRankingClipboardText,
+    createEmployeeRankingClipboard,
     parseEmployeeRankingClipboardText,
 } from "./clipboard.js";
 import { buildEmployeeExpeditionRanking, formatEmployeeRankingDuration } from "./model.js";
@@ -130,11 +131,11 @@ function initializeEmployeeRankingController(root) {
 
     copyButton.addEventListener("click", () => runAction(copyButton, async () => {
         try {
-            await navigator.clipboard.writeText(createEmployeeRankingClipboardText(ranking, clipboardRowCount));
+            await writeSummaryClipboard(createEmployeeRankingClipboard(ranking, clipboardRowCount));
         } catch {
-            throw new Error("Não foi possível copiar os dados. Verifique a permissão da área de transferência.");
+            throw new Error("Não foi possível copiar o ranking com formatação. Verifique a permissão da área de transferência.");
         }
-        notify("success", "Dados de Expedição copiados. Cole na célula K7 da aba Ranking de Colaboradores.");
+        notify("success", "Ranking copiado. Use Ctrl+V na célula B2 da aba Ranking de Colaboradores.");
     }));
 
     bindReportImageExportButton(imageButton, {

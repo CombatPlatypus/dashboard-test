@@ -73,10 +73,10 @@ function createStyledCellAttributes({ background, fontSize, bold, border, bottom
     return `data-sheets-userformat='${JSON.stringify(format)}' align="center" valign="${alignment}" style="${css}"`;
 }
 
-function createStyledClipboardCell({ value, span, rowSpan, style }, attributes) {
+function createStyledClipboardCell({ value, span, rowSpan, style, inferValueType }, attributes) {
     if (!attributes.has(style)) attributes.set(style, createStyledCellAttributes(style));
     let typedValue = "";
-    if (value != null && value !== "") {
+    if (!inferValueType && value != null && value !== "") {
         const data = typeof value === "number" ? { "1": 3, "3": value } : { "1": 2, "2": String(value) };
         typedValue = ` data-sheets-value="${escapeHtml(JSON.stringify(data))}"`;
     }
@@ -88,7 +88,7 @@ function createClipboardTable(rows, { columnWidth = 150, columnWidths, palette }
     const text = rows.map(row => row.flatMap(cell => {
         if (!cell) return [""];
         const { value, span, style } = cell;
-        const content = String(value ?? "");
+        const content = String(cell.textValue ?? value ?? "");
         const field = style && /[\t\r\n"]/.test(content) ? `"${content.replaceAll('"', '""')}"` : content;
         return [field, ...Array(span - 1).fill("")];
     }).join("\t")).join("\n");
@@ -407,4 +407,10 @@ function initializeReportSummaryCopy(root = document) {
     return receiptBound && expeditionBound && planningBound && parcelBound && reverseBound;
 }
 
-export { bindReportSummaryCopyButton, createReportSummaryClipboard, initializeReportSummaryCopy };
+export {
+    bindReportSummaryCopyButton,
+    createClipboardTable,
+    createReportSummaryClipboard,
+    initializeReportSummaryCopy,
+    writeSummaryClipboard,
+};

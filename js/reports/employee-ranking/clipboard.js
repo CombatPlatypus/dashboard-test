@@ -1,26 +1,49 @@
 import { normalizeText, parseClipboardRows } from "../../filter/clipboard-source.js";
-import { normalizeEmployeeRankingName } from "./model.js";
+import { createClipboardTable } from "../summary-copy.js";
+import { formatEmployeeRankingName, normalizeEmployeeRankingName } from "./model.js";
 
 const MIN_EMPLOYEE_RANKING_ROWS = 150;
-const expeditionTitle = "rotas conferidas e tempo medio";
-const expeditionHeaders = ["colaborador", "quantidade", "tempo"];
+const rankingTitle = "RANKING MENSAL DE DESEMPENHO";
+const commonHeaders = ["Colaborador", "Quantidade"];
+const expedition = { title: "Rotas Conferidas e Tempo Médio", headers: [...commonHeaders, "Tempo"] };
+const rankingSections = [
+    { title: "Recebimento", headers: commonHeaders },
+    { title: "Erros de Etiquetagem", headers: commonHeaders },
+    { title: "Avarias Recebidas", headers: commonHeaders },
+    expedition,
+    { title: "Pacotes OFF", headers: commonHeaders },
+];
+const operatorHeader = "Nome completo do conferente";
+// B:P contains the report, Q is the existing border, R keeps the full name for reimport.
+const columnWidths = [181, 121, 20, 181, 121, 20, 181, 121, 20, 181, 121, 81, 20, 201, 121, 50, 260];
+const blankStyle = { background: "#121212", fontSize: 10 };
+const titleStyle = { background: "#323232", fontSize: 18, bold: true, border: true };
+const sectionStyle = { background: "#323232", fontSize: 11, border: true };
+const headerStyle = { background: "#242424", fontSize: 10, border: true };
+const rowStyles = [
+    { ...blankStyle, border: true },
+    { background: "#1b1b1b", fontSize: 10, border: true },
+];
 
 function isExpeditionHeader(row, column) {
-    return expeditionHeaders.every((header, index) => normalizeText(row?.[column + index]) === header);
+    return expedition.headers.every((header, index) => normalizeText(row?.[column + index]) === normalizeText(header));
 }
 
 function findExpeditionClipboardBlock(rows) {
     for (const [rowIndex, row] of rows.entries()) {
-        const column = row.findIndex(value => normalizeText(value) === expeditionTitle);
-        if (column !== -1 && isExpeditionHeader(rows[rowIndex + 1], column)) {
-            return { column, startRow: rowIndex + 2 };
+        const column = row.findIndex(value => normalizeText(value) === normalizeText(expedition.title));
+        const headers = rows[rowIndex + 1];
+        if (column !== -1 && isExpeditionHeader(headers, column)) {
+            const operatorColumn = headers.findIndex(value => normalizeText(value) === normalizeText(operatorHeader));
+            return { column, operatorColumn, startRow: rowIndex + 2 };
         }
     }
 
-    if (rows.every(row => row.length <= expeditionHeaders.length)) {
+    if (rows.every(row => row.length <= expedition.headers.length)) {
         const firstRow = rows.findIndex(row => row.some(value => normalizeText(value)));
         return {
             column: 0,
+            operatorColumn: -1,
             startRow: isExpeditionHeader(rows[firstRow], 0) ? firstRow + 1 : 0,
         };
     }
@@ -46,18 +69,33 @@ function isEmptyCell(value) {
     return value === "" || value === "—" || value === "–" || value === "-";
 }
 
+function readClipboardName(value) {
+    return String(value ?? "").trim()
+        .replace(/^"((?:[^"]|"")*)"$/, (_, text) => text.replaceAll('""', '"'))
+        .replace(/^'(?=[=+@-])/, "");
+}
+
 function parseEmployeeRankingClipboardText(text) {
     const rows = parseClipboardRows(text);
     if (rows.length === 0) throw new Error("A área de transferência está vazia.");
 
-    const { column, startRow } = findExpeditionClipboardBlock(rows);
+    const { column, operatorColumn, startRow } = findExpeditionClipboardBlock(rows);
     const ranking = [];
     for (let rowIndex = startRow; rowIndex < rows.length; rowIndex += 1) {
-        const cells = expeditionHeaders.map((_, index) => String(rows[rowIndex][column + index] ?? "").trim());
+        const row = rows[rowIndex];
+        const cells = expedition.headers.map((_, index) => String(row[column + index] ?? "").trim());
         const [name, quantity, time] = cells;
-        if (cells.every(isEmptyCell)) continue;
+        const fullName = readClipboardName(row[operatorColumn]);
+        if (cells.every(isEmptyCell) && isEmptyCell(fullName)) continue;
 
-        const operator = normalizeEmployeeRankingName(name.replace(/^'(?=[=+@-])/, ""));
+        const operator = normalizeEmployeeRankingName(operatorColumn === -1 ? readClipboardName(name) : fullName);
+        if (operatorColumn !== -1) {
+            const displayedName = normalizeText(readClipboardName(name));
+            if (isEmptyCell(operator) || (displayedName !== normalizeText(formatEmployeeRankingName(operator)) &&
+                displayedName !== normalizeText(operator))) {
+                throw new Error(`Confira o nome completo do conferente na coluna R, na linha ${rowIndex + 1} da seleção copiada.`);
+            }
+        }
         const routesChecked = parseRouteCount(quantity.replace(/[\u00a0\u202f]/g, " "));
         const hasTime = !isEmptyCell(time);
         const averageDuration = hasTime ? parseAverageDuration(time) : 0;
@@ -86,16 +124,49 @@ function formatSpreadsheetDuration(seconds) {
     return [hours, minutes, total % 60].map(value => String(value).padStart(2, "0")).join(":");
 }
 
-function createEmployeeRankingClipboardText(ranking, previousRowCount = 0) {
-    const rowCount = Math.max(ranking.length, MIN_EMPLOYEE_RANKING_ROWS, previousRowCount);
-    return Array.from({ length: rowCount }, (_, index) => {
-        const row = ranking[index];
-        if (!row) return "\t\t";
-
-        const operator = normalizeEmployeeRankingName(row.operator);
-        const clipboardName = /^[=+@-]/.test(operator) ? `'${operator}` : operator;
-        return [clipboardName, row.routesChecked, formatSpreadsheetDuration(row.averageDurationSeconds)].join("\t");
-    }).join("\n");
+function cell(value, style, span = 1, rowSpan = 1) {
+    return { value, style, span, rowSpan };
 }
 
-export { MIN_EMPLOYEE_RANKING_ROWS, createEmployeeRankingClipboardText, parseEmployeeRankingClipboardText };
+function nameCell(value, style) {
+    return {
+        ...cell(value, style),
+        textValue: /^[=+@-]/.test(value ?? "") ? `'${value}` : value,
+    };
+}
+
+function createEmployeeRankingClipboard(ranking, previousRowCount = 0) {
+    const rowCount = Math.max(ranking.length, MIN_EMPLOYEE_RANKING_ROWS, previousRowCount);
+    const emptyCell = cell(null, blankStyle);
+    const sectionGap = cell(null, blankStyle, 1, rowCount + 2);
+    const rows = [
+        [cell(rankingTitle, titleStyle, 15, 2), cell(null, blankStyle, 1, 2), emptyCell],
+        [...Array(16).fill(null), emptyCell],
+        Array(columnWidths.length).fill(emptyCell),
+        [...rankingSections.flatMap(section => [cell(section.title, sectionStyle, section.headers.length), sectionGap]), emptyCell],
+        [...rankingSections.flatMap(section => [...section.headers.map(header => cell(header, headerStyle)), null]),
+            cell(operatorHeader, headerStyle)],
+    ];
+
+    for (let index = 0; index < rowCount; index += 1) {
+        const entry = ranking[index];
+        const style = rowStyles[index % rowStyles.length];
+        const expeditionCells = [
+            nameCell(entry?.displayName, style),
+            cell(entry?.routesChecked, style),
+            // Let the spreadsheet recognize hh:mm:ss as a time value, as in text paste.
+            { ...cell(formatSpreadsheetDuration(entry?.averageDurationSeconds), style), inferValueType: true },
+        ];
+        rows.push([
+            ...rankingSections.flatMap(section => [
+                ...(section === expedition ? expeditionCells : section.headers.map(() => cell(null, style))),
+                null,
+            ]),
+            nameCell(entry?.operator, style),
+        ]);
+    }
+
+    return createClipboardTable(rows, { columnWidths });
+}
+
+export { MIN_EMPLOYEE_RANKING_ROWS, createEmployeeRankingClipboard, parseEmployeeRankingClipboardText };

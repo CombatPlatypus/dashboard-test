@@ -22,7 +22,9 @@ Parcel Sweeper e Reversa usam o dia da cópia no horário de São Paulo e os tot
 
 ### Expedição do Ranking Mensal
 
-No [Ranking Mensal de Colaboradores](ranking-de-colaboradores.md), copie o bloco tabulado e cole em `K7` da aba **Ranking de Colaboradores**. As colunas K, L e M recebem nome completo, total de rotas e tempo médio como `hh:mm:ss`. O bloco tem pelo menos 150 linhas. Se o ranking já exibiu mais linhas na aba do navegador, a cópia inclui vazios até esse tamanho para sobrescrever a colagem anterior. [Cópia do ranking](../../js/reports/employee-ranking/clipboard.js)
+No [Ranking Mensal de Colaboradores](ranking-de-colaboradores.md), cole o bloco em `B2` da aba **Ranking de Colaboradores** com `Ctrl+V`. A cópia contém o título mesclado, os cabeçalhos dos cinco blocos e as células centralizadas. As colunas K, L e M recebem o nome abreviado da prévia, o total de rotas e o tempo médio como `hh:mm:ss`. As células de dados dos outros blocos vão vazias.
+
+O bloco tem pelo menos 150 linhas de dados. Se o ranking já exibiu mais linhas na aba do navegador, a cópia inclui vazios até esse tamanho para sobrescrever a colagem anterior. A coluna R guarda o nome completo do conferente, fora dos cinco blocos. Para reimportar o acumulado, copie a aba inteira incluindo R. [Cópia do ranking](../../js/reports/employee-ranking/clipboard.js)
 
 ## Listas de pacotes da Reversa
 
