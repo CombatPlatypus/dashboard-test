@@ -20,6 +20,10 @@ Cada bloco por janela tem 56 linhas. Processamento copia o resumo de LHs, os vol
 
 Parcel Sweeper e Reversa usam o dia da cópia no horário de São Paulo e os totais do relatório. A janela selecionada não altera esses dois destinos.
 
+## Listas de pacotes da Reversa
+
+O botão ao lado do título de Return, Missorted, Liquidate ou Confiscado copia os pares da tabela correspondente em texto tabulado. A colagem começa pelo primeiro pacote e preenche **Código BR** na primeira coluna e **Respectiva TO** na segunda. [Implementação](../../js/reports/reverse/package-copy.js) · [Teste](../../tests/reverse-packages.test.mjs)
+
 ## Planejamento
 
 A cópia de Planejamento começa em `B2` da aba **Modelo**, na planilha própria do relatório. Ela usa os dados da prévia e termina na última linha ocupada pelas listas de LHs, segregação ou backlog. [Montagem do bloco](../../js/reports/planning/clipboard.js)

@@ -102,6 +102,8 @@ Agrupa os pacotes por TO e mostra a composição de Return, Missorted, Liquidate
 
 A composição, o Final e a cópia compartilham os totais normalizados. Quando só os códigos BR mudam, a prévia atualiza as tabelas correspondentes. O gráfico e o bloco do Final acompanham mudanças nos totais. [Modelo](../../js/reports/reverse/model.js) · [Prévia](../../js/reports/reverse/view.js)
 
+Os botões de cópia nas tabelas de pacotes enviam o **Código BR** e a **Respectiva TO** em duas colunas, na ordem exibida em cada tabela. [Cópia das listas de pacotes](copia-de-dados-para-planilha.md#listas-de-pacotes-da-reversa)
+
 Verifique o tipo obrigatório, a reimportação sem duplicar totais e a compatibilidade das sessões antigas em [reverse-import.test.mjs](../../tests/reverse-import.test.mjs).
 
 ## Relatório Final

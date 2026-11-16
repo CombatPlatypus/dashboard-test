@@ -8,7 +8,6 @@ import {
 
 import {
     bindReversePackageCopyButton,
-    getReversePackageCodes,
 } from "../js/reports/reverse/package-copy.js";
 
 import {
@@ -119,7 +118,7 @@ class Button extends Element {
         super("button");
         this.disabled = false;
         this.listeners = [];
-        this.title = "Copiar BRs";
+        this.title = "Copiar BRs e TOs";
     }
 
     addEventListener(
@@ -292,7 +291,7 @@ test(
 );
 
 test(
-    "copia somente os códigos BR da tabela de reversa",
+    "copia o BR e a respectiva TO em duas colunas, na ordem da tabela",
     async function (t) {
         const writes = [];
         const {
@@ -312,21 +311,17 @@ test(
             body,
             [
                 {
-                    trackingNumber: "BR1",
+                    trackingNumber: "BR3",
                     to: "TOXXX1",
                 },
                 {
-                    trackingNumber: "BR2",
-                    to: "TOXXX1",
+                    trackingNumber: "BR1",
+                    to: "TOXXX2",
                 },
             ],
             button,
         );
 
-        assert.deepEqual(
-            getReversePackageCodes(body),
-            ["BR1", "BR2"],
-        );
         assert.equal(
             bindReversePackageCopyButton(
                 button,
@@ -340,7 +335,7 @@ test(
 
         assert.deepEqual(
             writes,
-            ["BR1\nBR2"],
+            ["BR3\tTOXXX1\nBR1\tTOXXX2"],
         );
         assert.equal(
             notification.dataset
@@ -349,7 +344,7 @@ test(
         );
         assert.equal(
             text.textContent,
-            "2 BRs de Return copiados.",
+            "2 BRs de Return copiados com as respectivas TOs.",
         );
         assert.equal(button.disabled, false);
     },

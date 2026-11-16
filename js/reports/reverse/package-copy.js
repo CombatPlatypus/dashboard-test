@@ -5,23 +5,13 @@ import {
 const reversePackageQuantityFormatter =
     new Intl.NumberFormat("pt-BR");
 
-function getReversePackageCodes(
+function getReversePackagePairs(
     body,
 ) {
     return Array.from(
         body.querySelectorAll("tr"),
-        function (row) {
-            return row.cells[0]
-                ?.textContent
-                .trim() ?? "";
-        },
-    ).filter(
-        function (code) {
-            return code &&
-                code !== "—" &&
-                code !== "-";
-        },
-    );
+        row => [row.cells[0]?.textContent.trim(), row.cells[1]?.textContent.trim()],
+    ).filter(pair => pair.every(value => value && value !== "—" && value !== "-"));
 }
 
 function bindReversePackageCopyButton(
@@ -50,7 +40,7 @@ function bindReversePackageCopyButton(
         "true";
 
     button.disabled =
-        getReversePackageCodes(
+        getReversePackagePairs(
             body,
         ).length === 0;
 
@@ -65,17 +55,17 @@ function bindReversePackageCopyButton(
                 return;
             }
 
-            const codes =
-                getReversePackageCodes(
+            const pairs =
+                getReversePackagePairs(
                     body,
                 );
 
-            if (codes.length === 0) {
+            if (pairs.length === 0) {
                 setReportNotification({
                     reportId: "reverse",
                     type: "warning",
                     message:
-                        `Nenhum BR para copiar na tabela de ${label}.`,
+                        `Nenhum par de BR e TO para copiar na tabela de ${label}.`,
                 });
 
                 return;
@@ -88,7 +78,7 @@ function bindReversePackageCopyButton(
                 .reversePackageCopyBusy =
                 "true";
             button.disabled = true;
-            button.title = "Copiando BRs...";
+            button.title = "Copiando BRs e TOs...";
             button.setAttribute(
                 "aria-busy",
                 "true",
@@ -108,7 +98,7 @@ function bindReversePackageCopyButton(
 
                 await navigator.clipboard
                     .writeText(
-                        codes.join("\n"),
+                        pairs.map(pair => pair.join("\t")).join("\n"),
                     );
 
                 setReportNotification({
@@ -116,26 +106,24 @@ function bindReversePackageCopyButton(
                     type: "success",
                     message:
                         `${reversePackageQuantityFormatter.format(
-                            codes.length,
-                        )} ${codes.length === 1
-                            ? "BR"
-                            : "BRs"} de ${label} ${codes.length === 1
-                            ? "copiado"
-                            : "copiados"}.`,
+                            pairs.length,
+                        )} ${pairs.length === 1
+                            ? `BR de ${label} copiado com a respectiva TO`
+                            : `BRs de ${label} copiados com as respectivas TOs`}.`,
                 });
             } catch {
                 setReportNotification({
                     reportId: "reverse",
                     type: "error",
                     message:
-                        "Não foi possível copiar os BRs. Verifique a permissão da área de transferência e acesse o dashboard por localhost ou HTTPS.",
+                        "Não foi possível copiar os BRs e as TOs. Verifique a permissão da área de transferência e acesse o dashboard por localhost ou HTTPS.",
                 });
             } finally {
                 delete button.dataset
                     .reversePackageCopyBusy;
 
                 button.disabled =
-                    getReversePackageCodes(
+                    getReversePackagePairs(
                         body,
                     ).length === 0;
 
@@ -154,5 +142,4 @@ function bindReversePackageCopyButton(
 
 export {
     bindReversePackageCopyButton,
-    getReversePackageCodes,
 };
