@@ -32,6 +32,7 @@ function createCanvasBlob(
 
 async function createReportImageBlob(
     element,
+    { onclone } = {},
 ) {
     if (!(element instanceof HTMLElement)) {
         throw new Error(
@@ -56,6 +57,7 @@ async function createReportImageBlob(
                 scale: 2,
                 useCORS: true,
                 logging: false,
+                onclone,
             },
         );
 

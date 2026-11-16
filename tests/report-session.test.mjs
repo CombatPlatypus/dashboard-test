@@ -55,6 +55,7 @@ console.error =
 
 const { reportManager } = await import("../js/reports/core/report-manager.js");
 const { getReportContext, restoreReportContext } = await import("../js/reports/core/report-context.js");
+const { replaceEmployeeRankingHistory } = await import("../js/reports/employee-ranking/state.js");
 const { exportDashboardSettings, importDashboardSettings } = await import("../js/spreadsheets/load-spreadsheets.js");
 const reportModules = await Promise.all([
     "planning", "receipt", "expedition", "losses-rate", "damage-and-losses", "parcel-sweeper", "reverse", "overall-analysis",
@@ -67,6 +68,7 @@ function registerReports(t) {
     reportManager.reports.clear();
     reportManager.initializedReports.clear();
     restoredEvents.length = 0;
+    replaceEmployeeRankingHistory([]);
     for (const report of reportModules) {
         if (report.id !== "overall-analysis") report.reset();
         // Exercise the real state import/export without initializing charts or DOM controls.
@@ -77,6 +79,7 @@ function registerReports(t) {
     }
     t.after(() => {
         for (const report of reportModules) if (report.id !== "overall-analysis") report.reset();
+        replaceEmployeeRankingHistory([]);
         reportManager.reports.clear();
         reportManager.initializedReports.clear();
         restoreReportContext(context);
@@ -116,6 +119,9 @@ function populateMissingReports() {
         totalOrders: 3, scannedOrders: 3,
         quantities: { return: 2, missorted: 1, liquidate: 0, confiscated: 0 },
         packages: { return: ["BRR1", "BRR2"], missorted: ["BRR3"], liquidate: [], confiscated: [] },
+    }] };
+    payload.reports["overall-analysis"] = { employeeRanking: [{
+        operator: "Ana Rosa Silva", routesChecked: 10, routesWithDuration: 8, totalDurationSeconds: 2400,
     }] };
     reportManager.importSession(payload.reports);
     restoreReportContext(payload.context);
@@ -198,10 +204,10 @@ test(
     },
 );
 
-test("arquivo salvo restaura os sete relatórios, incluindo avarias, perdas, Parcel e Reversa", t => {
+test("arquivo salvo restaura os sete relatórios e o histórico do Ranking de Colaboradores", t => {
     const rendered = registerReports(t);
     const original = populateMissingReports();
-    const expectedIds = ["planning", "receipt", "expedition", "losses-rate", "damage-and-losses", "parcel", "reverse"];
+    const expectedIds = ["planning", "receipt", "expedition", "losses-rate", "damage-and-losses", "parcel", "reverse", "overall-analysis"];
     assert.deepEqual(REPORT_SESSION_IDS, expectedIds);
     assert.deepEqual(Object.keys(original.reports), expectedIds);
     assert.equal(original.reports.parcel.operatorKindOverrides["[ops1]ana"], true);
@@ -209,6 +215,7 @@ test("arquivo salvo restaura os sete relatórios, incluindo avarias, perdas, Par
     assert.equal(original.reports["damage-and-losses"].losses.days[0].recoveryPending, 1);
     const saved = parseReportSession(serializeReportSession(original));
     for (const report of reportModules) if (report.id !== "overall-analysis") report.reset();
+    replaceEmployeeRankingHistory([]);
     restoreReportContext({ window: "AM", plannedVolume: 1 });
     importDashboardSettings({ ...original.settings, theme: "blue" }, { applyProfileToReports: false });
     assert.equal(restoreReportSession(saved), true);
@@ -226,7 +233,7 @@ test("arquivo v1 antigo com quatro relatórios continua legível sem limpar os r
     const legacy = parseReportSession(serializeReportSession(createSessionPayload()));
     assert.equal(restoreReportSession(legacy), true);
     const restored = createReportSessionPayload();
-    for (const id of ["damage-and-losses", "parcel", "reverse"]) {
+    for (const id of ["damage-and-losses", "parcel", "reverse", "overall-analysis"]) {
         assert.deepEqual(restored.reports[id], current.reports[id]);
     }
     assert.deepEqual(restoredEvents.at(-1).detail.reportIds, ["planning", "receipt", "expedition", "losses-rate"]);
@@ -255,13 +262,15 @@ test("valida dados adicionais antes de alterar os relatórios da sessão", t => 
         ["parcel", { rows: [], operatorKindOverrides: { ana: "sim" } }, /Parcel Sweeper/],
         ["reverse", { transfers: [{ quantities: null }] }, /Reversa/],
         ["reverse", { transfers: [{ quantities: {}, packages: { return: "BRR1" } }] }, /Reversa/],
+        ["overall-analysis", { employeeRanking: [{ operator: "Ana Rosa Silva", routesChecked: 2,
+            routesWithDuration: 3, totalDurationSeconds: 900 }] }, /Ranking de Colaboradores/],
     ]) {
         const invalid = structuredClone(original);
         invalid.reports[id] = report;
         assert.throws(() => restoreReportSession(invalid), message);
         assert.deepEqual(createReportSessionPayload().reports, original.reports);
     }
-    for (const id of ["damage-and-losses", "parcel", "reverse"]) {
+    for (const id of ["damage-and-losses", "parcel", "reverse", "overall-analysis"]) {
         const invalid = structuredClone(original);
         invalid.reports[id] = null;
         assert.throws(() => validateReportSessionPayload(invalid), /dados válidos/);
@@ -301,6 +310,7 @@ test("falha na renderização final reverte os dados e as preferências já apli
     incoming.reports["damage-and-losses"].days = [];
     incoming.reports["damage-and-losses"].losses.days = [];
     incoming.reports.reverse.transfers = [];
+    incoming.reports["overall-analysis"] = {};
     const overall = reportManager.get("overall-analysis");
     const render = overall.render;
     let first = true;

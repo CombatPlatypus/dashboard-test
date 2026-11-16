@@ -20,6 +20,7 @@ import { subscribePlanningState } from "./planning/state.js";
 import { subscribeReceiptState } from "./receipt/state.js";
 import { subscribeReceiptLinehaulState } from "./receipt/linehaul-state.js";
 import { subscribeExpeditionState } from "./expedition/state.js";
+import { subscribeEmployeeRankingHistory } from "./employee-ranking/state.js";
 import { subscribeLossesRateState } from "./losses-rate/state.js";
 import { subscribeDamageAndLossesState } from "./damage-and-losses/state.js";
 import { subscribeLossesState } from "./damage-and-losses/losses-state.js";
@@ -69,6 +70,7 @@ const REPORT_SESSION_IDS = Object.freeze([
     "damage-and-losses",
     "parcel",
     "reverse",
+    "overall-analysis",
 ]);
 
 const REPORT_SESSION_FEEDBACK_ICONS =
@@ -226,6 +228,13 @@ const sessionReportValidators = {
         return transfer.packages === undefined || (isSessionObject(transfer.packages) && Object.values(transfer.packages)
             .every(codes => Array.isArray(codes) && codes.every(code => typeof code === "string")));
     })],
+    "overall-analysis": ["do Ranking de Colaboradores", state => state.employeeRanking === undefined ||
+        (isSessionObjectList(state.employeeRanking) && state.employeeRanking.every(row =>
+            typeof row.operator === "string" && row.operator.trim() !== "" &&
+            Number.isSafeInteger(row.routesChecked) && row.routesChecked >= 0 &&
+            Number.isSafeInteger(row.routesWithDuration) && row.routesWithDuration >= 0 &&
+            row.routesWithDuration <= row.routesChecked &&
+            Number.isFinite(row.totalDurationSeconds) && row.totalDurationSeconds >= 0))],
 };
 
 function validateSessionReport(reportId, state) {
@@ -1170,6 +1179,7 @@ function initializeReportSession() {
         ["damage-and-losses", subscribeDamageAndLossesState],
         ["damage-and-losses", subscribeLossesState],
         ["reverse", subscribeReverseState],
+        ["overall-analysis", subscribeEmployeeRankingHistory],
     ]) {
         subscribe(() => scheduleReportSessionSave({ reportId }));
     }

@@ -144,6 +144,43 @@
     letter-spacing: 1.5px;
 }
 
+/* RANKING DE COLABORADORES */
+
+#employee-ranking .employee-ranking {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(11rem, 1fr)) minmax(15rem, 320px) minmax(11rem, 1fr);
+    align-items: start;
+    gap: 15px;
+    max-height: 412px;
+    overflow: auto;
+}
+#employee-ranking .employee-ranking thead {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background-color: var(--color-table-th);
+}
+#employee-ranking .employee-ranking-block-title th {
+    font-size: 15px;
+    letter-spacing: 1.5px;
+}
+#employee-ranking .employee-ranking td {
+    overflow-wrap: anywhere;
+}
+#employee-ranking .employee-ranking td:last-child {
+    white-space: nowrap;
+}
+#employee-ranking .employee-ranking-image .employee-ranking {
+    max-height: none;
+    overflow: visible;
+}
+#employee-ranking .employee-ranking-image thead {
+    position: static;
+}
+#employee-ranking .employee-ranking-image tr[data-placeholder]:not(:first-child) {
+    display: none;
+}
+
 /* CONTROLES */
 
 #reports .report-controls {

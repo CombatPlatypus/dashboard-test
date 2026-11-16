@@ -105,6 +105,10 @@ const DEFAULT_REPORT_NOTIFICATIONS =
 
         "overall-analysis":
             OVERALL_ANALYSIS_NOTIFICATION,
+        "employee-ranking": {
+            type: "idle",
+            message: "Importe o relatório de Expedição para preencher o ranking.",
+        },
     });
 
 const reportNotifications =
@@ -122,6 +126,7 @@ const REPORT_NOTIFICATION_PREFIXES =
         "losses-rate": "lossesRate",
         "overall-analysis":
             "overallAnalysis",
+        "employee-ranking": "employeeRanking",
     });
 
 /* IDENTIFICA O RELATÓRIO ATIVO */

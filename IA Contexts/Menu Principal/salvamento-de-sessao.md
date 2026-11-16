@@ -12,9 +12,11 @@ Ao recarregar a aba, o dashboard restaura os dados gravados e o Relatório Final
 
 As bases importadas em [Análises](../Painel%20An%C3%A1lises/README.md) e [Filtragem](../Painel%20Filtragem/README.md) também são guardadas na aba em chaves próprias.
 
+O [Ranking Mensal de Colaboradores](../Painel%20Relat%C3%B3rios/ranking-de-colaboradores.md) grava o acumulado importado na parte `overall-analysis` quando ele muda ou é descartado. A prévia recupera as rotas atuais da parte de Expedição.
+
 ## Arquivo de sessão
 
-`createReportSessionPayload()` coleta o contexto da janela, as preferências e o estado que cada um dos sete relatórios operacionais exporta. `downloadReportSession()` valida o objeto e inicia o download de `sessao-dashboard-AAAA-MM-DD_HH-MM-SS.js`. O arquivo contém JSON dentro de uma atribuição a `DASHBOARD_REPORT_SESSION`, com esquema `dashboard-report-session` e versão 1. O clique só inicia o download.
+`createReportSessionPayload()` coleta o contexto da janela, as preferências, os sete relatórios operacionais e o acumulado importado do Ranking de Colaboradores. `downloadReportSession()` valida o objeto e inicia o download de `sessao-dashboard-AAAA-MM-DD_HH-MM-SS.js`. O arquivo contém JSON dentro de uma atribuição a `DASHBOARD_REPORT_SESSION`, com esquema `dashboard-report-session` e versão 1. O clique só inicia o download.
 
 ## Importação e restauração
 
@@ -29,4 +31,4 @@ As bases importadas em [Análises](../Painel%20An%C3%A1lises/README.md) e [Filtr
 
 ## Verificação
 
-Rode `node --test tests/report-session.test.mjs tests/report-session-autosave.test.mjs tests/dashboard-settings.test.mjs`. As suítes cobrem quais partes são gravadas, a migração, a separação entre gravação e download, a restauração dos sete relatórios e a reversão ou nova tentativa após falhas. O [roteiro de navegador](../../tests/dashboard-settings.browser.mjs) também verifica a recuperação na aba e a prioridade das preferências.
+Rode `node --test tests/report-session.test.mjs tests/report-session-autosave.test.mjs tests/dashboard-settings.test.mjs`. As suítes cobrem quais partes são gravadas, a migração, a separação entre gravação e download, a restauração dos relatórios e do ranking e a reversão ou nova tentativa após falhas. O [roteiro de navegador](../../tests/dashboard-settings.browser.mjs) também verifica a recuperação na aba e a prioridade das preferências.

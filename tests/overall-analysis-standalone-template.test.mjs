@@ -112,7 +112,7 @@ test(
 
 test("as tabelas do HTML mantêm a estrutura e os estilos de célula do Relatório Final", () => {
     const preview = dashboard.split('id="overallAnalysisReportExportArea"')[1]
-        .split('id="analysis"')[0];
+        .split('id="employee-ranking"')[0];
     const tables = markup => Array.from(markup.matchAll(/<table\b[^>]*>[\s\S]*?<\/table>/g), ([table]) =>
         table.replace(/\s+id="[^"]+"/g, "").replace(/>\s+</g, "><"));
     const previewTables = tables(preview);

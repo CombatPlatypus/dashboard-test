@@ -31,20 +31,6 @@
         <link rel="stylesheet" href="css/docs.css">
         <link rel="stylesheet" href="css/filter.css">
 
-        <style>
-
-            .employee-ranking {
-                gap: 15px;
-                align-items: flex-start;
-            }
-            .employee-ranking > div {
-                flex: 1 1 0;
-                max-height: 412px;
-            }
-
-
-
-        </style>
     </head>
 
     <!-- CONTEÚDO DA PÁGINA -->
@@ -2856,7 +2842,7 @@
 
                                 <li class="tabs-title">
                                     <a href="#employee-ranking">
-                                        <h4>Ranking de Colaboradores</h4>
+                                        <h4>Ranking Mensal de Colaboradores</h4>
                                     </a>
                                 </li>
                             </ul> 
@@ -3463,251 +3449,141 @@
                                     <!-- BARRA DE NOTIFICAÇÕES E BOTÕES DE AÇÃO -->
 
                                     <div class="flex-box-start" style="gap: 15px;">
-                                        <div class="warning" id="" role="status" aria-live="polite" aria-atomic="true" data-notification-type="idle">
+                                        <div class="warning" id="employeeRankingNotification" role="status" aria-live="polite" aria-atomic="true" data-notification-type="idle">
                                             <div class="flex-box-start">
-                                                <img id="" src="images/geral-icons/bell-icon.svg">
+                                                <img id="employeeRankingNotificationIcon" src="images/geral-icons/bell-icon.svg" alt="">
 
-                                                <h4 id="">
-                                                    Preencha os relatórios para completar o ranking de colaboradores. Todas as informações serão atualizadas automaticamente.
+                                                <h4 id="employeeRankingNotificationText">
+                                                    Importe o relatório de Expedição para preencher o ranking.
                                                 </h4>
                                             </div>
                                         </div>
 
                                         <div class="report-actions">
-                                            <button id="" type="button">
+                                            <button id="employeeRankingCopyButton" type="button" title="Copiar Expedição para K7 da aba Ranking de Colaboradores" aria-label="Copiar dados de Expedição para a planilha" disabled>
                                                 <img src="images/geral-icons/copy-icon.svg" alt="">
                                             </button>
 
-                                            <button id="" type="button">
-                                                <img src="images/geral-icons/image-icon.svg">
+                                            <button id="employeeRankingImageButton" type="button" title="Copiar a imagem do ranking. Segure para baixar." aria-label="Copiar a imagem do ranking" disabled>
+                                                <img src="images/geral-icons/image-icon.svg" alt="">
                                             </button>
 
-                                            <button id="" type="button">
-                                                <img src="images/geral-icons/import-icon.svg">
+                                            <button id="employeeRankingImportButton" type="button" title="Importar o acumulado anterior da aba Ranking de Colaboradores" aria-label="Importar o acumulado anterior da planilha">
+                                                <img src="images/geral-icons/import-icon.svg" alt="">
                                             </button>
 
-                                            <button id="" type="button">
-                                                <img src="images/geral-icons/trash-basket-icon.svg">
+                                            <button id="employeeRankingClearButton" type="button" title="Descartar o acumulado importado e mostrar os dados atuais" aria-label="Descartar o acumulado importado" disabled>
+                                                <img src="images/geral-icons/trash-basket-icon.svg" alt="">
                                             </button>
                                         </div>
                                     </div>
 
-                                    <!-- PPÉVIA DO RELATÓRIO -->
+                                    <!-- PRÉVIA DO RANKING -->
 
                                     <div class="preview">
-                                        <div class="preview-style" id="">
+                                        <div class="preview-style" id="employeeRankingExportArea">
                                             <div class="title">
                                                 <h2>Ranking de Colaboradores</h2>
                                             </div>
 
-                                            <div class="employee-ranking flex-box-start">
+                                            <div class="employee-ranking" role="region" aria-label="Tabelas do ranking de colaboradores" tabindex="0">
                                                 <div>
                                                     <table>
-                                                        <caption>Recebimento</caption>
-
+                                                        <colgroup>
+                                                            <col>
+                                                            <col style="width: 65px;">
+                                                        </colgroup>
                                                         <thead>
+                                                            <tr class="employee-ranking-block-title">
+                                                                <th colspan="2" scope="colgroup">Recebimento</th>
+                                                            </tr>
                                                             <tr>
-                                                                <th>Colaborador</th>
-                                                                <th style="width: 65px;">Qtd</th>
+                                                                <th scope="col">Colaborador</th>
+                                                                <th scope="col">Qtd</th>
                                                             </tr>
                                                         </thead>
 
-                                                        <tbody id="">
-
-                                                            <tr>
-                                                                <td>—</td>
-                                                                <td>—</td>
-                                                            </tr>
-
-                                                            <tr>
-                                                                <td>—</td>
-                                                                <td>—</td>
-                                                            </tr>
-
-                                                            <tr>
-                                                                <td>—</td>
-                                                                <td>—</td>
-                                                            </tr>
-
-                                                            <tr>
-                                                                <td>—</td>
-                                                                <td>—</td>
-                                                            </tr>
-
-                                                            <tr>
-                                                                <td>—</td>
-                                                                <td>—</td>
-                                                            </tr>
-
-                                                        </tbody>
+                                                        <tbody></tbody>
                                                     </table>
                                                 </div>
 
                                                 <div>
                                                     <table>
-                                                        <caption>Erros de Etiquetagem</caption>
-
+                                                        <colgroup>
+                                                            <col>
+                                                            <col style="width: 65px;">
+                                                        </colgroup>
                                                         <thead>
+                                                            <tr class="employee-ranking-block-title">
+                                                                <th colspan="2" scope="colgroup">Erros de Etiquetagem</th>
+                                                            </tr>
                                                             <tr>
-                                                                <th>Colaborador</th>
-                                                                <th style="width: 65px;">Qtd</th>
+                                                                <th scope="col">Colaborador</th>
+                                                                <th scope="col">Qtd</th>
                                                             </tr>
                                                         </thead>
 
-                                                        <tbody id="">
-
-                                                            <tr>
-                                                                <td>—</td>
-                                                                <td>—</td>
-                                                            </tr>
-
-                                                            <tr>
-                                                                <td>—</td>
-                                                                <td>—</td>
-                                                            </tr>
-
-                                                            <tr>
-                                                                <td>—</td>
-                                                                <td>—</td>
-                                                            </tr>
-
-                                                            <tr>
-                                                                <td>—</td>
-                                                                <td>—</td>
-                                                            </tr>
-
-                                                            <tr>
-                                                                <td>—</td>
-                                                                <td>—</td>
-                                                            </tr>
-
-                                                        </tbody>
+                                                        <tbody></tbody>
                                                     </table>
                                                 </div>
 
                                                 <div>
                                                     <table>
-                                                        <caption>Avarias Recebidas</caption>
-
+                                                        <colgroup>
+                                                            <col>
+                                                            <col style="width: 65px;">
+                                                        </colgroup>
                                                         <thead>
+                                                            <tr class="employee-ranking-block-title">
+                                                                <th colspan="2" scope="colgroup">Avarias Recebidas</th>
+                                                            </tr>
                                                             <tr>
-                                                                <th>Colaborador</th>
-                                                                <th style="width: 65px;">Qtd</th>
+                                                                <th scope="col">Colaborador</th>
+                                                                <th scope="col">Qtd</th>
                                                             </tr>
                                                         </thead>
 
-                                                        <tbody id="">
-
-                                                            <tr>
-                                                                <td>—</td>
-                                                                <td>—</td>
-                                                            </tr>
-
-                                                            <tr>
-                                                                <td>—</td>
-                                                                <td>—</td>
-                                                            </tr>
-
-                                                            <tr>
-                                                                <td>—</td>
-                                                                <td>—</td>
-                                                            </tr>
-
-                                                            <tr>
-                                                                <td>—</td>
-                                                                <td>—</td>
-                                                            </tr>
-
-                                                            <tr>
-                                                                <td>—</td>
-                                                                <td>—</td>
-                                                            </tr>
-
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-
-                                                <div style="flex: 0 0 320px;">
-                                                    <table>
-                                                        <caption>Expedição</caption>
-
-                                                        <thead>
-                                                            <tr>
-                                                                <th>Colaborador</th>
-                                                                <th style="width: 127px;">Qtd e Tempo</th>
-                                                            </tr>
-                                                        </thead>
-
-                                                        <tbody id="">
-
-                                                            <tr>
-                                                                <td>—</td>
-                                                                <td>—</td>
-                                                            </tr>
-
-                                                            <tr>
-                                                                <td>—</td>
-                                                                <td>—</td>
-                                                            </tr>
-
-                                                            <tr>
-                                                                <td>—</td>
-                                                                <td>—</td>
-                                                            </tr>
-
-                                                            <tr>
-                                                                <td>—</td>
-                                                                <td>—</td>
-                                                            </tr>
-
-                                                            <tr>
-                                                                <td>—</td>
-                                                                <td>—</td>
-                                                            </tr>
-
-                                                        </tbody>
+                                                        <tbody></tbody>
                                                     </table>
                                                 </div>
 
                                                 <div>
                                                     <table>
-                                                        <caption>Pacotes OFF</caption>
-
+                                                        <colgroup>
+                                                            <col>
+                                                            <col style="width: 127px;">
+                                                        </colgroup>
                                                         <thead>
+                                                            <tr class="employee-ranking-block-title">
+                                                                <th colspan="2" scope="colgroup">Expedição</th>
+                                                            </tr>
                                                             <tr>
-                                                                <th>Colaborador</th>
-                                                                <th style="width: 65px;">Qtd</th>
+                                                                <th scope="col">Colaborador</th>
+                                                                <th scope="col">Qtd e Tempo</th>
                                                             </tr>
                                                         </thead>
 
-                                                        <tbody id="">
+                                                        <tbody id="employeeRankingExpeditionBody"></tbody>
+                                                    </table>
+                                                </div>
 
-                                                            <tr>
-                                                                <td>—</td>
-                                                                <td>—</td>
+                                                <div>
+                                                    <table>
+                                                        <colgroup>
+                                                            <col>
+                                                            <col style="width: 65px;">
+                                                        </colgroup>
+                                                        <thead>
+                                                            <tr class="employee-ranking-block-title">
+                                                                <th colspan="2" scope="colgroup">Pacotes OFF</th>
                                                             </tr>
-
                                                             <tr>
-                                                                <td>—</td>
-                                                                <td>—</td>
+                                                                <th scope="col">Colaborador</th>
+                                                                <th scope="col">Qtd</th>
                                                             </tr>
+                                                        </thead>
 
-                                                            <tr>
-                                                                <td>—</td>
-                                                                <td>—</td>
-                                                            </tr>
-
-                                                            <tr>
-                                                                <td>—</td>
-                                                                <td>—</td>
-                                                            </tr>
-
-                                                            <tr>
-                                                                <td>—</td>
-                                                                <td>—</td>
-                                                            </tr>
-
-                                                        </tbody>
+                                                        <tbody></tbody>
                                                     </table>
                                                 </div>
                                             </div>

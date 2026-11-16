@@ -20,6 +20,10 @@ Cada bloco por janela tem 56 linhas. Processamento copia o resumo de LHs, os vol
 
 Parcel Sweeper e Reversa usam o dia da cópia no horário de São Paulo e os totais do relatório. A janela selecionada não altera esses dois destinos.
 
+### Expedição do Ranking Mensal
+
+No [Ranking Mensal de Colaboradores](ranking-de-colaboradores.md), copie o bloco tabulado e cole em `K7` da aba **Ranking de Colaboradores**. As colunas K, L e M recebem nome completo, total de rotas e tempo médio como `hh:mm:ss`. O bloco tem pelo menos 150 linhas. Se o ranking já exibiu mais linhas na aba do navegador, a cópia inclui vazios até esse tamanho para sobrescrever a colagem anterior. [Cópia do ranking](../../js/reports/employee-ranking/clipboard.js)
+
 ## Listas de pacotes da Reversa
 
 O botão ao lado do título de Return, Missorted, Liquidate ou Confiscado copia os pares da tabela correspondente em texto tabulado. A colagem começa pelo primeiro pacote e preenche **Código BR** na primeira coluna e **Respectiva TO** na segunda. [Implementação](../../js/reports/reverse/package-copy.js) · [Teste](../../tests/reverse-packages.test.mjs)

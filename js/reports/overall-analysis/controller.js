@@ -47,6 +47,11 @@ import {
 } from "../core/report-context.js";
 
 import { requestReportUpdate } from "../core/report-updates.js";
+import { initializeEmployeeRankingController } from "../employee-ranking/controller.js";
+import {
+    getEmployeeRankingHistory,
+    replaceEmployeeRankingHistory,
+} from "../employee-ranking/state.js";
 
 import {
     initializeOverallAnalysisView,
@@ -210,6 +215,8 @@ function initializeOverallAnalysisController() {
         return false;
     }
 
+    initializeEmployeeRankingController(rootElement);
+
     subscribeReceiptState((receipt, change) => {
         if (change.field === "labeler" || change.field === "useTotalErrorParticipation") return;
         if (change.type === "operator-field-updated" &&
@@ -251,10 +258,12 @@ function importOverallAnalysisData() {
 }
 
 function exportOverallAnalysisSession() {
-    return {};
+    const history = getEmployeeRankingHistory();
+    return history.length ? { employeeRanking: history } : {};
 }
 
-function importOverallAnalysisSession() {
+function importOverallAnalysisSession(session = {}) {
+    replaceEmployeeRankingHistory(session.employeeRanking ?? []);
     return renderOverallAnalysisController();
 }
 

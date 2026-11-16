@@ -5,6 +5,8 @@ import { reportManager } from "../js/reports/core/report-manager.js";
 import { getReportContext, updateReportContextField } from "../js/reports/core/report-context.js";
 import { addPlanningLh, getPlanningState, resetPlanningReport } from "../js/reports/planning/state.js";
 import { getReceiptLinehaulState, replaceReceiptLinehauls } from "../js/reports/receipt/linehaul-state.js";
+import { replaceExpeditionRoutes } from "../js/reports/expedition/state.js";
+import { replaceEmployeeRankingHistory } from "../js/reports/employee-ranking/state.js";
 import { replaceParcelRows, updateParcelFilter } from "../js/reports/parcel-sweeper/state.js";
 import {
     createReportSessionPayload,
@@ -37,11 +39,12 @@ test("restaura, salva alterações automaticamente e usa o botão apenas para ba
     const contextKey = "dashboard-report-context-v1";
     addPlanningLh({ code: "LH-ANTIGO", origin: "SOC", quantity: 20 });
     updateReportContextField("plannedVolume", 2500);
-    const legacySnapshot = JSON.stringify(createReportSessionPayload());
+    const legacySnapshot = createReportSessionPayload();
+    delete legacySnapshot.reports["overall-analysis"];
     resetPlanningReport();
 
     const items = new Map([
-        [legacyReportsKey, legacySnapshot],
+        [legacyReportsKey, JSON.stringify(legacySnapshot)],
         [contextKey, JSON.stringify({
             storageRevision: 0,
             context: { ...getReportContext(), plannedVolume: null },
@@ -183,4 +186,25 @@ test("restaura, salva alterações automaticamente e usa o botão apenas para ba
     assert.equal(readPart("planning").lhs.some(lh => lh.code === "LH-RETRY"), true);
     assert.equal(readPart("receipt").linehaul.linehauls.some(lh => lh.code === "LH-RETRY"), true);
     assert.equal(readIndex().parcelControls.activeFilter, "backlog");
+
+    reportExports.length = 0;
+    writes.length = 0;
+    const ranking = [{ operator: "Ana Rosa Silva", routesChecked: 10, routesWithDuration: 8, totalDurationSeconds: 2400 }];
+    replaceEmployeeRankingHistory(ranking);
+    await Promise.resolve();
+    assert.deepEqual(reportExports, ["overall-analysis"]);
+    assert.deepEqual(writes, [partKey("overall-analysis", readIndex().parts["overall-analysis"])]);
+    assert.deepEqual(readPart("overall-analysis"), { employeeRanking: ranking });
+
+    reportExports.length = 0;
+    writes.length = 0;
+    replaceExpeditionRoutes([{ code: "AT1", status: "Validated", validationOperator: "Ana Rosa Silva" }]);
+    await Promise.resolve();
+    assert.deepEqual(reportExports, ["expedition"]);
+    assert.deepEqual(writes, [partKey("expedition", readIndex().parts.expedition)]);
+    assert.deepEqual(readPart("overall-analysis"), { employeeRanking: ranking });
+
+    replaceEmployeeRankingHistory([]);
+    await Promise.resolve();
+    assert.deepEqual(readPart("overall-analysis"), {});
 });

@@ -56,6 +56,8 @@ Os ouvintes usam o tipo da alteração para decidir se atualizam progresso, rank
 
 Verifique o botão de importação nas quatro abas em [expedition-import-tabs.test.mjs](../../tests/expedition-import-tabs.test.mjs), o progresso por status em [expedition-progress.test.mjs](../../tests/expedition-progress.test.mjs) e o volume de retirados em [expedition-withdrawn.test.mjs](../../tests/expedition-withdrawn.test.mjs).
 
+O ranking de conferentes fornece as rotas e durações ao [Ranking Mensal de Colaboradores](ranking-de-colaboradores.md). Os filtros da tabela de Expedição são locais.
+
 ## Planejamento
 
 Organiza a lista de LHs, as TOs a segregar, o backlog e os indicadores de Collection Pool e veículos. A [importação de Planejamento](../../js/reports/planning/import.js) interpreta dados copiados do SPX e pede uma escolha quando detecta mais de uma janela válida. Os [cálculos](../../js/reports/planning/calculations.js) usam os dados da [janela e do planejamento](../../js/reports/planning/state.js) para montar os totais.
@@ -121,3 +123,7 @@ Na prévia e no HTML baixado, o gráfico de erros aparece abaixo da tabela de to
 A cópia em imagem captura a própria prévia e pode ser usada quando há dados disponíveis nos gráficos da Taxa de Perdas. O HTML baixado abre offline com as fontes e os ícones incorporados, as cores do tema ativo e o mesmo formato de data da prévia. Processamento e Expedição compartilham a configuração dos gráficos de volume entre a prévia e o HTML. Em telas de até 900 px, o HTML empilha os blocos que aparecem lado a lado no desktop. Ao mudar a prévia, confira no modelo a estrutura, a tipografia, as cores, as bordas e o espaçamento. [Modelo HTML](../../final-report.html) · [Gráficos de volume](../../js/reports/overall-analysis/volume-chart.js) · [Teste de paridade](../../tests/overall-analysis-html.browser.mjs)
 
 Verifique indicadores e critérios de exportação em [overall-analysis-cards.test.mjs](../../tests/overall-analysis-cards.test.mjs) e [overall-analysis-html.test.mjs](../../tests/overall-analysis-html.test.mjs).
+
+### Ranking Mensal de Colaboradores
+
+A subaba [Ranking Mensal de Colaboradores](ranking-de-colaboradores.md) apresenta cinco blocos com cabeçalhos fixos. A tabela de Expedição combina os dados atuais do relatório com o acumulado importado do Resumo da Operação. Os outros quatro blocos exibem linhas de preenchimento.

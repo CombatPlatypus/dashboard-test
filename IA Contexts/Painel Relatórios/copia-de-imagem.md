@@ -13,7 +13,7 @@ O clique no botão com ícone de imagem gera um PNG da visualização do relató
 | Taxa de Perdas | Prévia atualizada com o mês selecionado e o gráfico de histórico anual. |
 | Parcel Sweeper | Prévia com as tabelas atualizadas pelo filtro de pacotes ativo. |
 | Reversa | Prévia completa da Reversa. |
-| Relatório Final | Área completa do Relatório Final. |
+| Relatório Final | Prévia da Análise Geral ou do Ranking Mensal de Colaboradores, conforme a subaba. O ranking inclui todas as linhas preenchidas. |
 
 ## Implementação
 
@@ -22,5 +22,6 @@ O clique no botão com ícone de imagem gera um PNG da visualização do relató
 - [Processamento](../../js/reports/receipt/export.js) identifica a subaba ativa e usa a mesma validação para habilitar o botão e executar a exportação. Descarregamento de LHs usa os LHs cadastrados. Mesa de Recebimento e Ranking exigem recebedor selecionado, volume esperado e erros preenchidos.
 - [Expedição](../../js/reports/expedition/export.js) seleciona a área associada à subaba ativa. [Avarias e Perdas](../../js/reports/damage-and-losses/actions.js) seleciona a área de avarias, histórico ou perdas conforme a subaba aberta.
 - [Planejamento](../../js/reports/planning/view.js) captura `#planningReportExportArea`. O [Relatório Final](../../js/reports/overall-analysis/actions.js) captura `#overallAnalysisReportExportArea`.
+- O [Ranking Mensal de Colaboradores](../../js/reports/employee-ranking/controller.js) captura `#employeeRankingExportArea` expandindo a área de rolagem para a imagem.
 
 Para verificar a seleção e a validação das subabas de Processamento, rode `node --test tests/receipt-image-export.test.mjs`.
