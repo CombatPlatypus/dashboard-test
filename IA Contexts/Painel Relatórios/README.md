@@ -6,15 +6,17 @@ O painel acompanha a operação da janela e consolida os dados no **Relatório F
 
 [init.js](../../js/reports/init.js) registra os módulos no [ReportManager](../../js/reports/core/report-manager.js). Cada módulo expõe ações de inicialização, renderização, limpeza, importação de dados e leitura e gravação da sessão. Os [campos globais](../../js/reports/global-inputs.js) atualizam o [contexto da janela](../../js/reports/core/report-context.js), com turno, analista, volume planejado, colaboradores e capacidade.
 
+O analista atualiza o cabeçalho do Relatório Final e sua identificação na exportação. A janela atualiza o cabeçalho do Relatório Final e as indicações de destino da cópia de Processamento e Expedição. O volume planejado atualiza o volume esperado, o progresso e a disponibilidade da cópia em imagem no Processamento, quando aplicável. No Relatório Final, ele atualiza o fluxo, a capacidade, o volume esperado e o gráfico de Processamento. As ações de importação, cópia e download que usam a janela ou o volume leem o contexto atual ao executar. [Campos globais](../../js/reports/global-inputs.js) · [Controlador do Relatório Final](../../js/reports/overall-analysis/controller.js) · [Cópia para planilha](../../js/reports/summary-copy.js)
+
 Dentro de cada relatório, siga o controlador para localizar os eventos da tela e a função que altera o estado. Consulte o importador para as regras do arquivo ou da área de transferência e o estado ou modelo para os cálculos. Uma mudança na estrutura exportada pode afetar a [restauração de sessões](../Menu%20Principal/salvamento-de-sessao.md) e o Relatório Final.
 
-Importações, edições e limpezas passam pelas notificações do estado e são [guardadas automaticamente na aba](../Menu%20Principal/salvamento-de-sessao.md). Ao registrar novos dados de um relatório, inclua os dados no estado que o módulo exporta e restaura e emita a notificação de mudança. Para um novo módulo, conecte a inscrição do estado em [session.js](../../js/reports/session.js).
+Importações, edições e limpezas passam pelas notificações do estado e seguem a [regra de atualização seletiva](../arquitetura.md#atualização-seletiva). Ao registrar dados, inclua-os no estado exportado e restaurado e emita uma notificação que identifique o tipo de alteração. Para um novo módulo, conecte em [session.js](../../js/reports/session.js) a inscrição que agenda a gravação daquela parte e o validador do estado. [Salvamento automático](../Menu%20Principal/salvamento-de-sessao.md)
 
 Para criar ou alterar gráficos no painel ou no HTML do Relatório Final, siga o [padrão de gráficos do dashboard](../graficos.md).
 
 O botão de imagem captura a visualização de dados da subaba aberta. Quando as subabas alternam apenas os controles, a captura usa a prévia compartilhada. Consulte o [contexto da cópia de imagem](copia-de-imagem.md) para os destinos de cada relatório.
 
-O botão de cópia de dados gera os blocos de colagem para o Resumo da Operação e a planilha de Planejamento. Consulte os intervalos e o formato no [contexto da cópia de dados para planilha](copia-de-dados-para-planilha.md).
+O botão de cópia de dados usa os estados relevantes para indicar disponibilidade e destino. Os blocos em HTML e TSV para o Resumo da Operação e para Planejamento são montados no clique. Consulte os intervalos e o formato no [contexto da cópia de dados para planilha](copia-de-dados-para-planilha.md).
 
 ## Processamento
 
@@ -23,6 +25,8 @@ Acompanha **Descarregamento de LHs**, **Mesa de Recebimento** e **Ranking de Rec
 Verifique alinhamento, confirmação da importação e recálculo de volume em [linehaul-import-alignment.test.mjs](../../tests/linehaul-import-alignment.test.mjs), [linehaul-import-confirmation.test.mjs](../../tests/linehaul-import-confirmation.test.mjs) e [receipt-linehaul-remaining.test.mjs](../../tests/receipt-linehaul-remaining.test.mjs).
 
 O [exportador de Processamento](../../js/reports/receipt/export.js) usa os dados da subaba ativa tanto para habilitar o botão de imagem quanto para executar a captura. Descarregamento de LHs pode ser copiado assim que houver LHs cadastrados. Mesa de Recebimento e Ranking de Recebedores usam a validação dos dados de recebimento.
+
+Na Mesa, ajustes no etiquetador ou nos erros atualizam a linha e as métricas que dependem do valor. Somente os volumes alimentam a barra de progresso. O Final recebe os totais de Recebimento e Erros. Edições de motorista e origem ficam na prévia de LHs, enquanto código, quantidade e seleção também podem alterar o resumo de descarregamento. [Mesa](../../js/reports/receipt/view.js) · [LHs](../../js/reports/receipt/linehaul-view.js)
 
 As prévias de **Descarregamento de LHs** e **Mesa de Recebimento** começam pelo Volume Esperado. A seleção da janela fica no controle **Janela do Turno**, no topo do painel. [Estrutura das prévias](../../index.html)
 
@@ -40,17 +44,23 @@ Na lista do **Resumo de Expedição**, a coluna Conferente usa o mesmo formato d
 
 A subaba **Análise de Erros** fornece ao Relatório Final os mesmos totais por tipo, revertidos, saldo final e taxas que aparecem na Expedição. A configuração do gráfico **Acompanhamento dos Erros** é compartilhada entre a Expedição, a prévia do Relatório Final e o HTML offline. [Cálculo dos erros](../../js/reports/expedition/state.js) · [Gráfico compartilhado](../../js/reports/expedition/error-balance-chart.js)
 
+Os ouvintes usam o tipo da alteração para decidir se atualizam progresso, ranking, erros ou ruas. Guardião altera a identificação da rua e os dados do gráfico de ocorrências. Duplicados, exceções e retirados ficam nos indicadores locais. O piso atualiza o volume no piso da Expedição e do Final. [Dependências](../../js/reports/expedition/state.js) · [Prévia](../../js/reports/expedition/view.js)
+
 Verifique o botão de importação nas quatro abas em [expedition-import-tabs.test.mjs](../../tests/expedition-import-tabs.test.mjs), o progresso por status em [expedition-progress.test.mjs](../../tests/expedition-progress.test.mjs) e o volume de retirados em [expedition-withdrawn.test.mjs](../../tests/expedition-withdrawn.test.mjs).
 
 ## Planejamento
 
 Organiza a lista de LHs, as TOs a segregar, o backlog e os indicadores de Collection Pool e veículos. A [importação de Planejamento](../../js/reports/planning/import.js) interpreta dados copiados do SPX e pede uma escolha quando detecta mais de uma janela válida. Os [cálculos](../../js/reports/planning/calculations.js) usam os dados da [janela e do planejamento](../../js/reports/planning/state.js) para montar os totais.
 
+A prévia atualiza cada tabela de acordo com as mudanças em LHs e TOs. Quantidades do backlog, capacidade e veículos só atualizam os indicadores que as usam. A lista de códigos do backlog é reaproveitada enquanto o texto de origem permanece igual. [Prévia](../../js/reports/planning/view.js) · [Cálculos](../../js/reports/planning/calculations.js)
+
 Verifique a origem do backlog e sua presença nos resumos em [planning-backlog.test.mjs](../../tests/planning-backlog.test.mjs) e [report-summary-copy.test.mjs](../../tests/report-summary-copy.test.mjs).
 
 ## Avarias e Perdas
 
 Mostra Avarias do Mês, Perdas do Mês e Histórico Consolidado. O [importador](../../js/reports/damage-and-losses/import.js) identifica as abas e os blocos do XLSX. O [controlador](../../js/reports/damage-and-losses/controller.js) exporta os estados de avarias e perdas na mesma entrada da sessão. O [modelo consolidado](../../js/reports/damage-and-losses/consolidated-model.js) combina os históricos com o estado da Taxa de Perdas para o mês selecionado.
+
+O importador converte a aba de histórico uma vez e lê os dois blocos a partir das mesmas linhas. Aplica Avarias, Perdas e Taxa em lote e atualiza o Consolidado e o Final uma vez por arquivo. Se a série anual mudar isoladamente, o Consolidado atualiza somente a célula da taxa. [Importação](../../js/reports/damage-and-losses/import.js) · [Consolidado](../../js/reports/damage-and-losses/consolidated-view.js)
 
 Em **Perdas do Mês**, o gráfico **Pack Recovery** cruza os códigos BR do histórico com a coluna Pack Recovery da **Base de Análises**. A contagem do período selecionado usa **Feito**, **ID Inválido**, **Sem Dados** e **Aguardando**. Células vazias e pacotes sem correspondência na base entram em **Sem Dados**. Rótulos preenchidos fora da lista ficam fora da contagem do gráfico. [Importação](../../js/reports/damage-and-losses/import.js) · [Gráfico](../../js/reports/damage-and-losses/losses-charts.js) · [Testes](../../tests/damage-and-losses-losses.test.mjs)
 
@@ -66,7 +76,7 @@ No **Histórico da Taxa de Perdas**, a linha pontilhada marca o limite de 0,030%
 
 Na **Composição das Ocorrências**, a fatia e a legenda de **Possíveis Perdas** usam o azul padrão `#2538a5`. [Gráfico](../../js/reports/losses-rate/charts.js) · [Legenda](../../index.html)
 
-O histórico fornece ao Relatório Final a série anual. As duas prévias usam a mesma configuração, incluindo a linha de referência. Na Taxa de Perdas, o destaque acompanha o seletor desta aba. [Dados do gráfico](../../js/reports/losses-rate/state.js) · [Configuração compartilhada](../../js/reports/losses-rate/charts.js)
+O histórico fornece ao Relatório Final a série anual. As duas prévias usam a mesma configuração, incluindo a linha de referência. O seletor da Taxa atualiza a sua tabela, a rosca e o destaque da linha com a série existente. O Consolidado e o Final usam seus próprios períodos. [Dados do gráfico](../../js/reports/losses-rate/state.js) · [Configuração compartilhada](../../js/reports/losses-rate/charts.js)
 
 Verifique a leitura do formato em [losses-rate-workbook.test.mjs](../../tests/losses-rate-workbook.test.mjs) e a presença dos 12 meses em [report-session.test.mjs](../../tests/report-session.test.mjs).
 
@@ -74,17 +84,23 @@ Verifique a leitura do formato em [losses-rate-workbook.test.mjs](../../tests/lo
 
 Acompanha a cobertura da varredura e apresenta recortes de pacotes por operador, aging, status e próxima ação. O [importador](../../js/reports/parcel-sweeper/import.js) normaliza os registros do arquivo. O [modelo](../../js/reports/parcel-sweeper/model.js) usa `Count Type` para a cobertura dos pacotes esperados e aplica as regras de classificação por operador. O [estado](../../js/reports/parcel-sweeper/state.js) guarda os registros e os ajustes manuais de classificação.
 
+Prévia e gráficos reaproveitam o resumo até a troca das linhas. O filtro atualiza as duas tabelas de pacotes, a ordem muda só a tabela acionada, e a classificação manual atualiza o operador e a divisão entre comuns e volumosos. O Final usa apenas os totais de pacotes e cobertura. [Resumo compartilhado](../../js/reports/parcel-sweeper/state.js) · [Prévia](../../js/reports/parcel-sweeper/view.js)
+
 Verifique cobertura, casos de exceção e classificação em [parcel-sweeper.test.mjs](../../tests/parcel-sweeper.test.mjs) e [parcel-sweeper-overrides.test.mjs](../../tests/parcel-sweeper-overrides.test.mjs).
 
 ## Reversa
 
 Agrupa os pacotes por TO e mostra a composição de Return, Missorted, Liquidate e Confiscado. O usuário escolhe o tipo antes de o [importador](../../js/reports/reverse/import.js) processar o arquivo SPX. O importador lê o identificador da TO na célula B2 e usa o tipo escolhido para classificar os códigos únicos. Uma nova importação da mesma TO atualiza a entrada existente no [estado](../../js/reports/reverse/state.js).
 
+A composição, o Final e a cópia compartilham os totais normalizados. Quando só os códigos BR mudam, a prévia atualiza as tabelas correspondentes. O gráfico e o bloco do Final acompanham mudanças nos totais. [Modelo](../../js/reports/reverse/model.js) · [Prévia](../../js/reports/reverse/view.js)
+
 Verifique o tipo obrigatório, a reimportação sem duplicar totais e a compatibilidade das sessões antigas em [reverse-import.test.mjs](../../tests/reverse-import.test.mjs).
 
 ## Relatório Final
 
-A aba **Relatório Final** corresponde ao módulo `overall-analysis`. O [controlador](../../js/reports/overall-analysis/controller.js) coleta os dados dos demais módulos e o [modelo](../../js/reports/overall-analysis/model.js) calcula o resumo da janela. A [verificação de completude](../../js/reports/overall-analysis/completeness.js) determina quando o HTML autônomo pode ser gerado. Parcel Sweeper e Reversa são opcionais nessa verificação. O [exportador](../../js/reports/overall-analysis/standalone-export.js) gera o HTML a partir de uma cópia dos dados da janela.
+A aba **Relatório Final** corresponde ao módulo `overall-analysis`. O [controlador](../../js/reports/overall-analysis/controller.js) recebe as alterações das fontes usadas pelo [modelo](../../js/reports/overall-analysis/model.js) e atualiza as seções dependentes. Os gráficos acompanham os valores que exibem. A [verificação de completude](../../js/reports/overall-analysis/completeness.js) determina quando o HTML autônomo pode ser gerado. Parcel Sweeper e Reversa são opcionais nessa verificação. O [exportador](../../js/reports/overall-analysis/standalone-export.js) gera o HTML a partir de uma cópia dos dados da janela.
+
+As alterações nos campos globais reaproveitam os dados derivados dos relatórios de origem. A prévia escreve os valores que mudaram e as ações usam o contexto atualizado para verificar a disponibilidade e gerar a exportação. [Modelo](../../js/reports/overall-analysis/model.js) · [Teste de integração](../../tests/overall-analysis-html.browser.mjs)
 
 Abaixo dos indicadores de **Avarias e Perdas**, o Relatório Final exibe dois gráficos sem títulos visuais. A rosca usa as quatro categorias, as cores, os percentuais e o período do **Histórico Consolidado**. Na prévia e no HTML, sua legenda tem largura máxima de 443 px quando há dados de Avarias e Perdas e 385 px quando o relatório está vazio. O gráfico de linha usa os 12 meses da **Taxa de Perdas**, com intervalos onde faltam dados. Ele destaca o mês do **Histórico Consolidado** de Avarias e Perdas quando há um ponto desse mês e ano na série. O HTML incorpora os dados dos dois gráficos no momento do download. [Modelo](../../js/reports/overall-analysis/model.js) · [Gráficos](../../js/reports/overall-analysis/charts.js) · [Teste de integração](../../tests/overall-analysis-html.browser.mjs)
 

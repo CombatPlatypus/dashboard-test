@@ -1,11 +1,13 @@
 import {
     REVERSE_TYPE_DEFINITIONS,
     REVERSE_TYPE_KEYS,
-    createReverseSummary,
+    getReverseDistribution,
+    getReversePackageRows,
 } from "./model.js";
 
 import {
-    getReverseState,
+    getReverseSnapshot,
+    getReverseStateTotals,
     subscribeReverseState,
 } from "./state.js";
 
@@ -307,18 +309,7 @@ function renderReversePackageTable(
     body.replaceChildren(fragment);
 }
 
-function renderReverseView(
-    state = getReverseState(),
-) {
-    if (!reverseViewElements) {
-        return false;
-    }
-
-    const summary =
-        createReverseSummary(
-            state.transfers,
-        );
-
+function renderReverseMetrics(summary) {
     reverseViewElements.total
         .textContent =
         formatReverseQuantity(
@@ -364,47 +355,33 @@ function renderReverseView(
                     : "—";
         },
     );
+}
 
-    renderReverseDistribution(
-        reverseViewElements
-            .distributionBody,
-        summary.transfers,
-    );
+function renderReverseView(state = getReverseSnapshot(), change) {
+    if (!reverseViewElements) return false;
 
-    const hasPackageRows =
-        REVERSE_TYPE_KEYS.some(
-            function (typeKey) {
-                return summary.packages[
-                    typeKey
-                ].length > 0;
-            },
-        );
+    const { transfers } = state;
+    if (change?.totalsChanged !== false) {
+        const totals = getReverseStateTotals(state);
+        renderReverseMetrics(totals);
+        renderReverseDistribution(reverseViewElements.distributionBody, getReverseDistribution(transfers, totals.total));
+    }
 
-    reverseViewElements
-        .packageTables.hidden = false;
-
-    REVERSE_TYPE_KEYS.forEach(
-        function (typeKey) {
-            renderReversePackageTable(
-                reverseViewElements
-                    .packageBodies[
-                        typeKey
-                    ],
-                summary.packages[
-                    typeKey
-                ],
-                reverseViewElements
-                    .packageCopyButtons[
-                        typeKey
-                    ],
-                reverseViewElements
-                    .packageSections[
-                        typeKey
-                    ],
-                !hasPackageRows,
-            );
-        },
-    );
+    const packageTypes = change?.packageTypes ?? REVERSE_TYPE_KEYS;
+    if (packageTypes.length > 0) {
+        const hasPackages = type => transfers.some(transfer => transfer.packages[type].length > 0);
+        const showWhenEmpty = !REVERSE_TYPE_KEYS.some(hasPackages);
+        for (const type of REVERSE_TYPE_KEYS) {
+            const section = reverseViewElements.packageSections[type];
+            if (packageTypes.includes(type)) {
+                renderReversePackageTable(reverseViewElements.packageBodies[type], getReversePackageRows(transfers, type),
+                    reverseViewElements.packageCopyButtons[type], section, showWhenEmpty);
+            } else if (section instanceof HTMLElement) {
+                const hidden = !showWhenEmpty && !hasPackages(type);
+                if (section.hidden !== hidden) section.hidden = hidden;
+            }
+        }
+    }
 
     return true;
 }
@@ -422,6 +399,7 @@ function initializeReverseView(
     }
 
     reverseViewElements = elements;
+    elements.packageTables.hidden = false;
 
     REVERSE_TYPE_KEYS.forEach(
         function (typeKey) {
@@ -444,9 +422,7 @@ function initializeReverseView(
         renderReverseView,
     );
 
-    renderReverseView(
-        getReverseState(),
-    );
+    renderReverseView();
 
     return true;
 }

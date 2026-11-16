@@ -116,6 +116,7 @@ function createReceiptReceiverKey(
 
 function createReceiptOperatorRecord(
     values = {},
+    id = nextReceiptOperatorId++,
 ) {
     const packagesReceived =
         normalizeReceiptQuantity(
@@ -128,8 +129,7 @@ function createReceiptOperatorRecord(
         );
 
     return {
-        id:
-            nextReceiptOperatorId++,
+        id,
 
         receiver:
             normalizeReceiptText(
@@ -537,6 +537,7 @@ function replaceReceiptOperators(
         },
     );
 
+    const reusedIds = new Set();
     receiptState.operators =
         receivedOperators
             .map(
@@ -568,6 +569,9 @@ function replaceReceiptOperators(
                         previousOperators.get(
                             receiverKey,
                         );
+                    const id = previousOperator?.id;
+                    const reuseId = id !== undefined && !reusedIds.has(id);
+                    if (reuseId) reusedIds.add(id);
 
                     return createReceiptOperatorRecord({
                         receiver,
@@ -593,7 +597,7 @@ function replaceReceiptOperators(
                                 .selected ??
                             previousOperator
                                 ?.selected,
-                    });
+                    }, reuseId ? id : undefined);
                 },
             )
             .filter(

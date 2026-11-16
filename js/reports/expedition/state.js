@@ -1395,10 +1395,8 @@ function getExpeditionStreetAnalysis(
 
 function getExpeditionErrorAnalysis(
     state = getExpeditionState(),
+    { summary = getExpeditionSummary(state), includeStreets = true } = {},
 ) {
-    const summary =
-        getExpeditionSummary(state);
-
     const hasSpXData =
         summary.hasData;
 
@@ -1429,7 +1427,7 @@ function getExpeditionErrorAnalysis(
         rawSortingErrors +
         rawLabelingErrors;
 
-    const streets = hasSpXData
+    const streets = hasSpXData && includeStreets
         ? getExpeditionStreetAnalysis(
             state,
             spxTotal,
@@ -1543,17 +1541,50 @@ function getExpeditionErrorAnalysis(
 
 /* NOTIFICA OS OUVINTES */
 
+function getExpeditionChangeScope(change) {
+    const type = change?.type;
+    const routes = !change || ["routes-replaced", "expedition-session-imported", "expedition-reset"].includes(type);
+    const ranking = routes || type === "operator-selection-updated";
+    return {
+        routes,
+        ranking,
+        errors: ranking || ["error-data-replaced", "error-quantity-updated", "error-quantities-reconciled"].includes(type) ||
+            (type === "manual-quantity-updated" && change.field === "revertedErrors"),
+        guardian: type === "street-guardian-updated" ? change.street : null,
+        manualField: type === "manual-quantity-updated" ? change.field : null,
+        availability: routes || type === "error-data-replaced" || change?.hasErrorDataChanged === true,
+    };
+}
+
+function createExpeditionDerivations(state) {
+    let summary;
+    let ranking;
+    let errors;
+    let streets;
+    const getSummary = () => summary ??= getExpeditionSummary(state);
+    return {
+        getSummary,
+        getRanking: () => ranking ??= getExpeditionOperatorRanking(state),
+        getErrors: () => errors ??= getExpeditionErrorAnalysis(state, { summary: getSummary(), includeStreets: false }),
+        getStreets: () => streets ??= getSummary().hasData
+            ? getExpeditionStreetAnalysis(state, getSummary().missortedOrders)
+            : [],
+    };
+}
+
 function notifyExpeditionState(
     change,
 ) {
     const stateSnapshot =
         getExpeditionState();
+    const derived = createExpeditionDerivations(stateSnapshot);
 
     expeditionStateListeners.forEach(
         function (listener) {
             listener(
                 stateSnapshot,
                 change,
+                derived,
             );
         },
     );
@@ -1705,6 +1736,7 @@ function updateExpeditionErrorQuantity(
                 nextValue;
     }
 
+    const hasErrorDataChanged = !expeditionState.hasErrorData;
     expeditionState.hasErrorData =
         true;
 
@@ -1716,6 +1748,7 @@ function updateExpeditionErrorQuantity(
             "error-quantity-updated",
 
         field,
+        hasErrorDataChanged,
     });
 
     return true;
@@ -1803,6 +1836,13 @@ function reconcileExpeditionErrorQuantities() {
     }
 
     return hasChanged;
+}
+
+function getExpeditionErrorInputValue(field) {
+    if (field === "revertedErrors") {
+        return getExpeditionErrorAnalysis(expeditionState, { includeStreets: false }).totalRevertedErrors;
+    }
+    return expeditionState.hasErrorData ? expeditionState.errorTotals[field] : null;
 }
 
 /* ALTERA MANUALMENTE O GUARDIÃO DE UMA RUA */
@@ -1937,7 +1977,7 @@ function updateExpeditionOperatorSelection(
 
 /* SUBSTITUI AS ROTAS IMPORTADAS */
 
-function replaceExpeditionRoutes(
+function setExpeditionRoutes(
     routes,
     sourceFileName = "",
 ) {
@@ -2000,17 +2040,17 @@ function replaceExpeditionRoutes(
     expeditionState
         .excludedOperatorKeys
         .clear();
+}
 
-    notifyExpeditionState({
-        type: "routes-replaced",
-    });
-
+function replaceExpeditionRoutes(routes, sourceFileName) {
+    setExpeditionRoutes(routes, sourceFileName);
+    notifyExpeditionState({ type: "routes-replaced" });
     return true;
 }
 
 /* SUBSTITUI OS DADOS DA PLANILHA DE ERROS */
 
-function replaceExpeditionErrorData(
+function setExpeditionErrorData(
     errorData,
     sourceFileName = "",
 ) {
@@ -2053,12 +2093,22 @@ function replaceExpeditionErrorData(
 
     expeditionState.revertedLabelingErrors =
         0;
+}
 
-    notifyExpeditionState({
-        type:
-            "error-data-replaced",
-    });
+function replaceExpeditionErrorData(errorData, sourceFileName) {
+    setExpeditionErrorData(errorData, sourceFileName);
+    notifyExpeditionState({ type: "error-data-replaced" });
+    return true;
+}
 
+function replaceExpeditionData({ routes, errorData }, { sourceFileName, errorSourceFileName }) {
+    if (!Array.isArray(routes)) {
+        return errorData ? replaceExpeditionErrorData(errorData, errorSourceFileName) : false;
+    }
+
+    setExpeditionRoutes(routes, sourceFileName);
+    if (errorData) setExpeditionErrorData(errorData, errorSourceFileName);
+    notifyExpeditionState({ type: "routes-replaced" });
     return true;
 }
 
@@ -2289,11 +2339,15 @@ function resetExpeditionReport() {
 }
 
 export {
+    createExpeditionDerivations,
+    getExpeditionChangeScope,
     getExpeditionErrorAnalysis,
+    getExpeditionErrorInputValue,
     getExpeditionOperatorRanking,
     getExpeditionState,
     getExpeditionSummary,
     isExpeditionValidatedRoute,
+    replaceExpeditionData,
     reconcileExpeditionErrorQuantities,
     replaceExpeditionErrorData,
     replaceExpeditionRoutes,

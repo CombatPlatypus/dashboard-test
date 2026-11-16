@@ -163,20 +163,20 @@ function renderReceiptClearStatus(
 function renderReceiptExportStatus(
     state,
 ) {
-    if (state.operators.length === 0 && getReceiptLinehaulState().linehauls.length === 0) {
+    const linehaulState = getReceiptLinehaulState();
+    if (state.operators.length === 0 && linehaulState.linehauls.length === 0) {
         receiptReportHasActivity = false;
     }
 
     const pendingMessage =
-        getActiveReceiptExportPendingMessage(
-            state,
-        );
+        getActiveReceiptExportPendingMessage(state, linehaulState);
 
     const canExport =
         pendingMessage === "";
 
     renderReceiptClearStatus(
         state,
+        linehaulState,
     );
             
     receiptExportElements
@@ -216,6 +216,12 @@ function renderReceiptExportStatus(
                 ? "O relatório de recebimento está pronto para exportação."
                 : pendingMessage,
     });
+}
+
+function renderReceiptExpectedVolumeExportStatus(state) {
+    if (getActiveReceiptViewId() !== "linehaul") {
+        renderReceiptExportStatus(state);
+    }
 }
 
 /* RETORNA A GUIA ATIVA */
@@ -791,7 +797,11 @@ function initializeReceiptExport(
     );
 
     subscribeReceiptState(
-        function (state) {
+        function (state, change) {
+            if (change.field === "labeler" || change.field === "useTotalErrorParticipation") return;
+            if (change.type === "operator-field-updated" &&
+                state.operators.find(operator => operator.id === change.operatorId)?.selected === false) return;
+
             receiptReportHasActivity =
                 true;
 
@@ -802,10 +812,10 @@ function initializeReceiptExport(
     );
 
     subscribeReceiptLinehaulState(
-        function () {
-            renderReceiptExportStatus(
-                getReceiptState(),
-            );
+        function (state, change) {
+            if (change.type !== "linehaul-record-updated" && change.type !== "linehaul-selection-updated") {
+                renderReceiptExportStatus(getReceiptState());
+            }
         },
     );
 
@@ -855,5 +865,6 @@ function initializeReceiptExport(
 export {
     canExportReceiptReport,
     initializeReceiptExport,
+    renderReceiptExpectedVolumeExportStatus,
     renderReceiptExportStatus,
 };

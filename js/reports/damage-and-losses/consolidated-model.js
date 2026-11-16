@@ -14,6 +14,12 @@ function alignAnalysisDays(days, latestDate) {
         : days;
 }
 
+function getConsolidatedLossRate({ hasData, monthIndex, year }, rateState = getLossesRateState()) {
+    return hasData && rateState?.year === year
+        ? getLossesRateMonthSummary(monthIndex, rateState)?.lossRate ?? null
+        : null;
+}
+
 function getConsolidatedSummary(
     damageState = getDamageAndLossesState(),
     lossesState = getLossesState(),
@@ -41,10 +47,6 @@ function getConsolidatedSummary(
     const hasDamageData = Boolean(damageState.sourceFileName || damageState.days.length || damageState.history?.length);
     const hasLossesData = Boolean(lossesState.sourceFileName || lossesState.days.length || lossesState.history?.length);
     const hasData = hasDamageData || hasLossesData;
-    const rate = rateState?.year === year
-        ? getLossesRateMonthSummary(monthIndex, rateState)?.lossRate
-        : null;
-
     const composition = [losses.underReview, losses.confirmedLosses, damage.hub, damage.soc];
     const traditionalAnalysis = Object.fromEntries(CONSOLIDATED_ANALYSIS_PERIODS.map(key => [key, {
         hub: damage.traditionalAnalysis?.[key]?.hub ?? 0,
@@ -64,11 +66,11 @@ function getConsolidatedSummary(
         soc: damage.soc,
         underReview: losses.underReview,
         confirmedLosses: losses.confirmedLosses,
-        lossRate: hasData ? rate ?? null : null,
+        lossRate: getConsolidatedLossRate({ hasData, monthIndex, year }, rateState),
         composition,
         traditionalAnalysis,
         total: composition.reduce((sum, value) => sum + value, 0),
     };
 }
 
-export { CONSOLIDATED_ANALYSIS_PERIODS, getConsolidatedSummary };
+export { CONSOLIDATED_ANALYSIS_PERIODS, getConsolidatedLossRate, getConsolidatedSummary };

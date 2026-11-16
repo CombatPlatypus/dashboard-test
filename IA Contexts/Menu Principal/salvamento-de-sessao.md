@@ -4,9 +4,11 @@ O dashboard guarda o trabalho automaticamente no `sessionStorage` da aba. **Salv
 
 ## Salvamento automático na aba
 
-Após restaurar a sessão, o módulo observa os estados dos relatórios e os campos globais. Importações, edições e limpezas agendam uma gravação em `dashboard-report-session-v1`. As notificações de uma mesma operação são agrupadas em uma única gravação. O Relatório Final é recalculado a partir dos dados restaurados.
+Após restaurar a sessão, o módulo observa os estados dos relatórios e os campos globais. O índice `dashboard-report-session-v2` aponta para as partes gravadas em `dashboard-report-state-v2:<id>:<revisão>`. Uma edição exporta, valida e grava apenas o relatório afetado. O filtro e a classificação manual do Parcel Sweeper ficam no índice e reutilizam a parte que guarda os pacotes.
 
-Ao recarregar a mesma aba, o dashboard restaura a última gravação. Ao fechar a aba, o navegador encerra a sessão. Se a gravação falhar por cota ou acesso ao armazenamento, o dashboard avisa e a opção de baixar o arquivo usa os dados atuais dos relatórios.
+Notificações da mesma operação são agrupadas. Se a operação altera vários relatórios, as novas partes são gravadas antes de publicar o índice e as referências anteriores são liberadas após o sucesso. Edições restritas aos campos globais gravam `dashboard-report-context-v1`. A revisão do índice permite recuperar o contexto mais recente, inclusive quando o volume planejado foi apagado. A cópia antiga em `dashboard-report-session-v1` continua legível e é migrada na primeira gravação de dados dos relatórios.
+
+Ao recarregar a aba, o dashboard restaura os dados gravados e o Relatório Final é recalculado a partir das fontes recuperadas. Ao fechar a aba, o navegador encerra a sessão. Na falta de espaço para uma gravação, a última cópia válida é preservada, o dashboard mostra um aviso e tenta guardar as alterações pendentes na próxima edição. **Salvar sessão** baixa os dados atuais.
 
 As bases importadas em [Análises](../Painel%20An%C3%A1lises/README.md) e [Filtragem](../Painel%20Filtragem/README.md) também são guardadas na aba em chaves próprias.
 
@@ -17,7 +19,7 @@ As bases importadas em [Análises](../Painel%20An%C3%A1lises/README.md) e [Filtr
 ## Importação e restauração
 
 - O seletor aceita arquivos `.js` de até 50 MB. O módulo lê o conteúdo como texto, extrai o JSON e valida o esquema, a versão e a estrutura dos relatórios. A leitura usa `JSON.parse()` sem executar o JavaScript do arquivo.
-- Um arquivo de relatórios aplica o contexto, chama `importSession()` em cada módulo presente, aplica as preferências do arquivo quando disponíveis e renderiza o Relatório Final. A sessão da aba é gravada após a aplicação bem-sucedida. Se a aplicação falhar, o código tenta reaplicar os estados, o contexto e as preferências anteriores.
+- Um arquivo de relatórios aplica o contexto, chama `importSession()` nos módulos presentes e aplica as preferências disponíveis. As visualizações dependentes são atualizadas no mesmo lote após aplicar os dados. A sessão da aba é gravada após o sucesso. Se a aplicação falhar, o código tenta reaplicar os estados afetados, o contexto e as preferências anteriores.
 - Sessões v1 antigas podem conter apenas Planejamento, Processamento, Expedição e Taxa de Perdas. A importação aplica os relatórios presentes no arquivo e conserva o estado atual dos demais.
 - O botão do menu também aceita arquivos só de configurações. Nesse fluxo ele aplica e grava as preferências diretamente na aba. Veja [Página de Configurações](../P%C3%A1gina%20de%20Configura%C3%A7%C3%B5es/README.md) para o fluxo do editor.
 
@@ -27,4 +29,4 @@ As bases importadas em [Análises](../Painel%20An%C3%A1lises/README.md) e [Filtr
 
 ## Verificação
 
-Rode `node --test tests/report-session.test.mjs tests/report-session-autosave.test.mjs tests/dashboard-settings.test.mjs`. As suítes cobrem a gravação automática, a separação entre gravação e download, a restauração dos sete relatórios, a leitura de arquivos antigos e a tentativa de reversão em caso de falha. O [roteiro de navegador](../../tests/dashboard-settings.browser.mjs) também verifica a recuperação na aba e a prioridade das preferências.
+Rode `node --test tests/report-session.test.mjs tests/report-session-autosave.test.mjs tests/dashboard-settings.test.mjs`. As suítes cobrem quais partes são gravadas, a migração, a separação entre gravação e download, a restauração dos sete relatórios e a reversão ou nova tentativa após falhas. O [roteiro de navegador](../../tests/dashboard-settings.browser.mjs) também verifica a recuperação na aba e a prioridade das preferências.

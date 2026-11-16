@@ -1,12 +1,13 @@
 import {
-    createParcelSummary,
     filterParcelPackageRows,
     formatParcelOperatorName,
     getParcelOperatorKey,
 } from "./model.js";
 
 import {
-    getParcelState,
+    getParcelSnapshot,
+    getParcelStateSummary,
+    hasParcelRowsChanged,
     subscribeParcelState,
     toggleParcelOperatorBulky,
     updateParcelFilter,
@@ -332,25 +333,7 @@ function renderParcelFilter(
         );
 }
 
-function renderParcelView(
-    state = getParcelState(),
-    event,
-) {
-    if (!parcelViewElements) {
-        return false;
-    }
-
-    if (["parcel-rows-replaced", "parcel-reset", "parcel-state-restored"].includes(event?.type)) {
-        parcelPackageSorts.common = null;
-        parcelPackageSorts.bulky = null;
-    }
-
-    const summary =
-        createParcelSummary(
-            state.rows,
-            state.operatorKindOverrides,
-        );
-
+function renderParcelMetrics(summary) {
     const formatMetric =
         function (value) {
             return summary.hasData
@@ -420,38 +403,41 @@ function renderParcelView(
             formatCoveragePercentage(
                 summary.expectedUnscannedCount,
             );
+}
 
-    renderParcelOperatorTable(
-        parcelViewElements
-            .operatorBody,
-        summary.operatorStats,
-    );
+function renderParcelPackages(kind, state = getParcelSnapshot(), summary = getParcelStateSummary(state)) {
+    const body = kind === "common" ? parcelViewElements.commonPackagesBody : parcelViewElements.bulkyPackagesBody;
+    const rows = kind === "common" ? summary.commonRows : summary.bulkyRows;
+    renderParcelPackageTable(body, filterParcelPackageRows(rows, state.activeFilter), parcelPackageSorts[kind]);
+}
 
-    renderParcelFilter(
-        parcelViewElements,
-        state,
-    );
+function renderParcelView(state = getParcelSnapshot(), event) {
+    if (!parcelViewElements) return false;
 
-    renderParcelPackageTable(
-        parcelViewElements
-            .commonPackagesBody,
-        filterParcelPackageRows(
-            summary.commonRows,
-            state.activeFilter,
-        ),
-        parcelPackageSorts.common,
-    );
+    const summary = getParcelStateSummary(state);
+    if (hasParcelRowsChanged(event)) {
+        if (event) {
+            parcelPackageSorts.common = null;
+            parcelPackageSorts.bulky = null;
+        }
+        renderParcelMetrics(summary);
+        renderParcelOperatorTable(parcelViewElements.operatorBody, summary.operatorStats);
+    } else if (event.type === "parcel-operator-kind-updated") {
+        const { operatorKey } = event;
+        const button = [...parcelViewElements.operatorBody.querySelectorAll("[data-parcel-operator-key]")]
+            .find(item => item.dataset.parcelOperatorKey === operatorKey);
+        if (button) {
+            const isBulky = state.operatorKindOverrides[operatorKey];
+            button.textContent = isBulky ? "Sim" : "Não";
+            button.setAttribute("aria-pressed", String(isBulky));
+        }
+    }
 
-    renderParcelPackageTable(
-        parcelViewElements
-            .bulkyPackagesBody,
-        filterParcelPackageRows(
-            summary.bulkyRows,
-            state.activeFilter,
-        ),
-        parcelPackageSorts.bulky,
-    );
-
+    if (event?.type !== "parcel-operator-kind-updated") {
+        renderParcelFilter(parcelViewElements, state);
+    }
+    renderParcelPackages("common", state, summary);
+    renderParcelPackages("bulky", state, summary);
     return true;
 }
 
@@ -530,11 +516,7 @@ function initializeParcelView(
         }
 
         const operatorKey = button.dataset.parcelOperatorKey;
-        if (toggleParcelOperatorBulky(operatorKey)) {
-            const replacement = [...parcelViewElements.operatorBody.querySelectorAll("[data-parcel-operator-key]")]
-                .find(item => item.dataset.parcelOperatorKey === operatorKey);
-            replacement?.focus({ preventScroll: true });
-        }
+        toggleParcelOperatorBulky(operatorKey);
     });
 
     parcelPackageSorts.common = null;
@@ -554,7 +536,7 @@ function initializeParcelView(
 
             parcelPackageSorts[kind] = toggleParcelPackageSort(
                 parcelPackageSorts[kind], button.dataset.parcelSort);
-            renderParcelView();
+            renderParcelPackages(kind);
         });
 
         bindParcelPackageCopyButton(
@@ -563,9 +545,7 @@ function initializeParcelView(
         );
     });
 
-    return renderParcelView(
-        getParcelState(),
-    );
+    return renderParcelView();
 }
 
 export {

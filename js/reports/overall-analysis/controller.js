@@ -4,6 +4,7 @@ import {
 } from "../receipt/state.js";
 
 import {
+    getExpeditionChangeScope,
     getExpeditionState,
     subscribeExpeditionState,
 } from "../expedition/state.js";
@@ -24,17 +25,20 @@ import {
 } from "../damage-and-losses/losses-state.js";
 
 import {
-    getParcelState,
+    getParcelSnapshot,
+    hasParcelRowsChanged,
     subscribeParcelState,
 } from "../parcel-sweeper/state.js";
 
 import {
-    getReverseState,
+    getReverseSnapshot,
     subscribeReverseState,
 } from "../reverse/state.js";
 
 import {
     createOverallAnalysisData,
+    updateOverallAnalysisContext,
+    updateOverallAnalysisSources,
 } from "./model.js";
 
 import {
@@ -42,8 +46,11 @@ import {
     subscribeReportContext,
 } from "../core/report-context.js";
 
+import { requestReportUpdate } from "../core/report-updates.js";
+
 import {
     initializeOverallAnalysisView,
+    renderOverallAnalysisChanges,
     renderOverallAnalysisView,
 } from "./view.js";
 
@@ -59,10 +66,12 @@ import {
 
 let overallAnalysisControllerInitialized =
     false;
+let overallAnalysisData = null;
+let overallAnalysisReferenceMonth = null;
 
 /* DADOS SEMPRE DERIVADOS DOS RELATÓRIOS DE ORIGEM */
 
-function getCurrentOverallAnalysisData() {
+function getCurrentOverallAnalysisData(date = new Date()) {
     return createOverallAnalysisData(
         getReceiptState(),
         getExpeditionState(),
@@ -70,14 +79,18 @@ function getCurrentOverallAnalysisData() {
         getReportContext(),
         getDamageAndLossesState(),
         getLossesState(),
-        getParcelState(),
-        getReverseState(),
+        getParcelSnapshot(),
+        getReverseSnapshot(),
+        date,
     );
 }
 
-function renderOverallAnalysisController() {
+function rebuildOverallAnalysis() {
+    const date = new Date();
     const data =
-        getCurrentOverallAnalysisData();
+        getCurrentOverallAnalysisData(date);
+    overallAnalysisData = data;
+    overallAnalysisReferenceMonth = getReferenceMonth(date);
 
     const viewRendered =
         renderOverallAnalysisView(
@@ -98,6 +111,69 @@ function renderOverallAnalysisController() {
     return viewRendered &&
         chartsRendered &&
         actionsRendered;
+}
+
+function renderOverallAnalysisUpdate(data) {
+    const previous = overallAnalysisData;
+    if (data === previous) {
+        return true;
+    }
+
+    overallAnalysisData = data;
+    const viewRendered = renderOverallAnalysisChanges(data, previous);
+    const chartsRendered = renderOverallAnalysisCharts(data, previous);
+    const actionsRendered = renderOverallAnalysisActions(canExportOverallAnalysisController(data), data);
+    return viewRendered && chartsRendered && actionsRendered;
+}
+
+function getReferenceMonth(date) {
+    return date.getFullYear() * 12 + date.getMonth();
+}
+
+function applyOverallAnalysisChanges(changes) {
+    if (!overallAnalysisData || Object.keys(changes).length === 0) {
+        return rebuildOverallAnalysis();
+    }
+
+    const { context, damage, losses, ...sources } = changes;
+    let data = context ? updateOverallAnalysisContext(overallAnalysisData, context) : overallAnalysisData;
+    const date = new Date();
+    const month = getReferenceMonth(date);
+    const monthChanged = month !== overallAnalysisReferenceMonth;
+    if (damage || losses || monthChanged) {
+        sources.occurrences = { damage: damage ?? getDamageAndLossesState(), losses: losses ?? getLossesState() };
+    }
+    if (monthChanged) {
+        sources.lossesRate ??= getLossesRateState();
+    }
+    if (context && sources.receipt) {
+        sources.receipt = { ...sources.receipt, expectedVolume: data.context.plannedVolume };
+    }
+    if (Object.keys(sources).length > 0) {
+        data = updateOverallAnalysisSources(data, sources, date);
+    }
+    const rendered = renderOverallAnalysisUpdate(data);
+    overallAnalysisReferenceMonth = month;
+    return rendered;
+}
+
+function requestOverallAnalysisUpdate(changes) {
+    return requestReportUpdate(applyOverallAnalysisChanges, changes);
+}
+
+function renderOverallAnalysisController() {
+    return requestOverallAnalysisUpdate();
+}
+
+function onExpeditionChange(expedition, change, expeditionDerived) {
+    const scope = getExpeditionChangeScope(change);
+    if (scope.ranking) {
+        requestOverallAnalysisUpdate({ expedition, expeditionDerived, expeditionSummary: true });
+    } else if (scope.errors) {
+        requestOverallAnalysisUpdate({ expedition, expeditionDerived, expeditionErrors: true });
+    } else if (scope.manualField === "floorVolume") {
+        requestOverallAnalysisUpdate({ expedition, expeditionDerived, expeditionFloor: true });
+    }
 }
 
 function initializeOverallAnalysisController() {
@@ -134,37 +210,31 @@ function initializeOverallAnalysisController() {
         return false;
     }
 
-    subscribeReceiptState(
-        renderOverallAnalysisController,
-    );
-
-    subscribeExpeditionState(
-        renderOverallAnalysisController,
-    );
-
-    subscribeLossesRateState(
-        renderOverallAnalysisController,
-    );
-
-    subscribeDamageAndLossesState(
-        renderOverallAnalysisController,
-    );
-
-    subscribeLossesState(
-        renderOverallAnalysisController,
-    );
-
-    subscribeParcelState(
-        renderOverallAnalysisController,
-    );
-
-    subscribeReverseState(
-        renderOverallAnalysisController,
-    );
-
-    subscribeReportContext(
-        renderOverallAnalysisController,
-    );
+    subscribeReceiptState((receipt, change) => {
+        if (change.field === "labeler" || change.field === "useTotalErrorParticipation") return;
+        if (change.type === "operator-field-updated" &&
+            receipt.operators.find(operator => operator.id === change.operatorId)?.selected === false) return;
+        requestOverallAnalysisUpdate({ receipt });
+    });
+    subscribeExpeditionState(onExpeditionChange);
+    subscribeLossesRateState((lossesRate, change) => {
+        if (change.type !== "active-month-changed") {
+            requestOverallAnalysisUpdate({ lossesRate });
+        }
+    });
+    subscribeDamageAndLossesState(damage => requestOverallAnalysisUpdate({ damage }));
+    subscribeLossesState(losses => requestOverallAnalysisUpdate({ losses }));
+    subscribeParcelState((parcel, change) => {
+        if (hasParcelRowsChanged(change)) {
+            requestOverallAnalysisUpdate({ parcel });
+        }
+    });
+    subscribeReverseState((reverse, change) => {
+        if (change.totalsChanged !== false) {
+            requestOverallAnalysisUpdate({ reverse });
+        }
+    });
+    subscribeReportContext(context => requestOverallAnalysisUpdate({ context }));
 
     overallAnalysisControllerInitialized =
         true;
@@ -189,7 +259,7 @@ function importOverallAnalysisSession() {
 }
 
 function canExportOverallAnalysisController(
-    data = getCurrentOverallAnalysisData(),
+    data = overallAnalysisData ?? getCurrentOverallAnalysisData(),
 ) {
     return [
         data.flow.planned,

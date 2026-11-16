@@ -5,6 +5,7 @@ import { CHART_TEXT_COLOR, CHART_VALUE_FONT } from "../../charts/theme.js";
 import {
     LOSSES_RATE_MONTHS,
     getLossesRateChartData,
+    getLossesRateMonthSummary,
     getLossesRateState,
     subscribeLossesRateState,
 } from "./state.js";
@@ -598,8 +599,13 @@ function updateLossesRateCompositionChart(chart, summary, indicators, updateMode
 }
 
 function updateLossesRateHistoryChart(chart, { monthlyRates, activeMonth }, updateMode) {
+    chart.data.datasets[0].data = monthlyRates.slice();
+    updateLossesRateHistoryHighlight(chart, activeMonth, updateMode);
+}
+
+function updateLossesRateHistoryHighlight(chart, activeMonth, updateMode) {
     const dataset = chart.data.datasets[0];
-    dataset.data = monthlyRates.slice();
+    const monthlyRates = dataset.data;
     dataset.pointRadius = monthlyRates.map((rate, index) => {
         if (rate === null) {
             return 0;
@@ -612,16 +618,21 @@ function updateLossesRateHistoryChart(chart, { monthlyRates, activeMonth }, upda
     chart.update(updateMode);
 }
 
-function updateLossesRateCharts(state) {
+function updateLossesRateCharts(state, change) {
     if (!lossesRateCompositionChart || !lossesRateHistoryChart) {
         return;
     }
 
-    const data = getLossesRateChartData(state);
-    updateLossesRateCompositionChart(lossesRateCompositionChart, data.composition, lossesRateCompositionIndicators);
-    updateLossesRateHistoryChart(lossesRateHistoryChart, data);
-    lossesRateCompositionMonthElement.textContent = LOSSES_RATE_MONTHS[state.activeMonth];
-    lossesRateHistoryYearElement.textContent = String(state.year);
+    const { activeMonth } = state;
+    if (change?.type === "active-month-changed") {
+        updateLossesRateHistoryHighlight(lossesRateHistoryChart, activeMonth);
+    } else {
+        updateLossesRateHistoryChart(lossesRateHistoryChart, getLossesRateChartData(state));
+        lossesRateHistoryYearElement.textContent = String(state.year);
+    }
+    updateLossesRateCompositionChart(lossesRateCompositionChart,
+        getLossesRateMonthSummary(activeMonth, state), lossesRateCompositionIndicators);
+    lossesRateCompositionMonthElement.textContent = LOSSES_RATE_MONTHS[activeMonth];
 }
 
 /* REAJUSTA OS GRÁFICOS AO EXIBIR O PAINEL */
@@ -774,13 +785,7 @@ function initializeLossesRateCharts(
         .lossesRateChartsInitialized =
             "true";
 
-    subscribeLossesRateState(
-        function (state) {
-            updateLossesRateCharts(
-                state,
-            );
-        },
-    );
+    subscribeLossesRateState(updateLossesRateCharts);
 
     updateLossesRateCharts(
         getLossesRateState(),
@@ -798,4 +803,5 @@ export {
     createLossesRateHistoryChart,
     initializeLossesRateCharts,
     updateLossesRateHistoryChart,
+    updateLossesRateHistoryHighlight,
 };

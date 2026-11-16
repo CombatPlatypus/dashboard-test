@@ -1,20 +1,30 @@
 import { getReportContext, subscribeReportContext } from "./core/report-context.js";
+import { requestReportUpdate } from "./core/report-updates.js";
 import { formatReportPersonWithOps } from "./core/person-name.js";
 import { getReceiptState, getReceiptSummary, subscribeReceiptState } from "./receipt/state.js";
 import { getReceiptLinehaulState, getReceiptLinehaulSummary, subscribeReceiptLinehaulState } from "./receipt/linehaul-state.js";
-import { getExpeditionState, getExpeditionSummary, getExpeditionErrorAnalysis, getExpeditionOperatorRanking, subscribeExpeditionState } from "./expedition/state.js";
+import { getExpeditionChangeScope, getExpeditionState, getExpeditionSummary, getExpeditionErrorAnalysis, getExpeditionOperatorRanking, subscribeExpeditionState } from "./expedition/state.js";
 import { getPlanningState, subscribePlanningState } from "./planning/state.js";
+import { hasPlanningExportInputChanged } from "./planning/calculations.js";
 import { columnWidths as planningColumnWidths, createPlanningClipboardRows, getPlanningClipboardData } from "./planning/clipboard.js";
-import { createParcelSummary } from "./parcel-sweeper/model.js";
-import { getParcelState, subscribeParcelState } from "./parcel-sweeper/state.js";
-import { createReverseSummary } from "./reverse/model.js";
-import { getReverseState, subscribeReverseState } from "./reverse/state.js";
+import { getParcelSnapshot, getParcelStateSummary, hasParcelRowsChanged, subscribeParcelState } from "./parcel-sweeper/state.js";
+import { getReverseSnapshot, getReverseStateTotals, subscribeReverseState } from "./reverse/state.js";
 import { setReportNotification } from "./report-notifications.js";
 
 const shiftRows = { AM: 7, PM1: 67, PM2: 127 };
 const operationDataSheet = "Base de Dados";
 // Each window reserves rows 7:62, 67:122 or 127:182 for the two report blocks.
 const summaryRowCount = 56;
+const shiftClipboardReports = {
+    receipt: { column: "C", label: "Resumo de processamento", list: "recebedores", headerRows: 7 },
+    expedition: { column: "G", label: "Resumo de expedição e erros", list: "conferentes", headerRows: 16 },
+};
+const parcelClipboardDestination = {
+    target: "C185", sheet: operationDataSheet, label: "Relatório Parcel Sweeper", shift: null, copyError: "",
+};
+const reverseClipboardDestination = {
+    target: "C189", sheet: operationDataSheet, label: "Resumo de reversa", shift: null, copyError: "",
+};
 const shiftClipboardPalette = { background: "#101010", color: "#f8faf8", borderColor: "#626262" };
 const rateFormatter = new Intl.NumberFormat("pt-BR", {
     style: "percent", minimumFractionDigits: 2, maximumFractionDigits: 2,
@@ -113,18 +123,43 @@ function createClipboardTable(rows, { columnWidth = 150, columnWidths, palette }
     return { text, html };
 }
 
+function getShiftClipboardStatus(kind, shift, hasData, operatorCount) {
+    const { column, label, list, headerRows } = shiftClipboardReports[kind];
+    const listCapacity = summaryRowCount - headerRows;
+    const copyError = operatorCount > listCapacity
+        ? `A lista de ${list} tem ${operatorCount} registros, mas a janela ${shift} comporta ${listCapacity}. Reduza a seleção antes de copiar.`
+        : "";
+    return { target: `${column}${shiftRows[shift]}`, sheet: operationDataSheet, label, shift, hasData, copyError };
+}
+
+function getReportSummaryCopyStatus(kind) {
+    if (kind === "planning") return getPlanningClipboardData(getPlanningState()).status;
+    if (kind === "parcel") return { ...parcelClipboardDestination, hasData: getParcelSnapshot().rows.length > 0 };
+    if (kind === "reverse") return { ...reverseClipboardDestination, hasData: getReverseSnapshot().transfers.length > 0 };
+
+    const { window: shift } = getReportContext();
+    if (kind === "receipt") {
+        const count = getReceiptState().operators.filter(operator => operator.selected !== false).length;
+        return getShiftClipboardStatus(kind, shift, count > 0 || getReceiptLinehaulSummary().hasData, count);
+    }
+    if (kind === "expedition") {
+        const state = getExpeditionState();
+        const summary = getExpeditionSummary(state);
+        return getShiftClipboardStatus(kind, shift, summary.hasData || state.hasErrorData === true, summary.operatorCount);
+    }
+    throw new Error("Tipo de resumo inválido.");
+}
+
 function createReportSummaryClipboard(kind, {
-    context = getReportContext(),
-    receipt = getReceiptState(),
-    linehaul = getReceiptLinehaulState(),
-    expedition = getExpeditionState(),
+    context,
+    receipt,
+    linehaul,
+    expedition,
     planning,
     parcel,
     reverse,
     now = new Date(),
 } = {}) {
-    const shift = context.window;
-    const firstRow = shiftRows[shift];
     const cell = (value, span = 2, fontSize = 10, fontFamily = "Roboto") => ({ value, span, fontSize, fontFamily });
     const pair = (...values) => values.map(value => cell(value));
     const heading = (...values) => values.map(value => cell(value, 2, 11));
@@ -140,8 +175,7 @@ function createReportSummaryClipboard(kind, {
         return { ...status, ...createClipboardTable(rows, { columnWidths: planningColumnWidths }) };
     }
     if (kind === "parcel") {
-        const state = parcel ?? getParcelState();
-        const summary = createParcelSummary(state.rows, state.operatorKindOverrides);
+        const summary = getParcelStateSummary(parcel ?? getParcelSnapshot());
         const rows = [
             [cell("Relatório Parcel Sweeper", 4, 12), cell(dateFormatter.format(now), 4, 12)],
             heading("Porcentagem Total", "Total de Bipado", "Pacotes Exception", "Pacotes Missorted"),
@@ -151,34 +185,26 @@ function createReportSummaryClipboard(kind, {
                     summary.hasData ? summary.exceptionCount : null,
                     summary.hasData ? summary.missortedCount : null)],
         ];
-        return { ...createClipboardTable(rows),
-            target: "C185", sheet: operationDataSheet, label: "Relatório Parcel Sweeper",
-            shift: null, hasData: summary.hasData, copyError: "",
-        };
+        return { ...createClipboardTable(rows), ...parcelClipboardDestination, hasData: summary.hasData };
     }
     if (kind === "reverse") {
-        const state = reverse ?? getReverseState();
-        const summary = createReverseSummary(state.transfers);
+        const summary = getReverseStateTotals(reverse ?? getReverseSnapshot());
         const types = ["return", "missorted", "liquidate", "confiscated"];
         const rows = [
             [cell("Reversa", 4, 12), cell(dateFormatter.format(now), 4, 12)],
             heading("Return", "Missorted", "Liquidate", "Confiscado"),
             types.map(type => cell(summary.hasData ? summary.quantities[type] : null)),
         ];
-        return { ...createClipboardTable(rows),
-            target: "C189", sheet: operationDataSheet, label: "Resumo de reversa",
-            shift: null, hasData: summary.hasData, copyError: "",
-        };
+        return { ...createClipboardTable(rows), ...reverseClipboardDestination, hasData: summary.hasData };
     }
     let rows;
-    let target;
-    let label;
     let hasData;
     let operators;
     let createOperatorRow;
-    let listLabel;
 
     if (kind === "receipt") {
+        receipt ??= getReceiptState();
+        linehaul ??= getReceiptLinehaulState();
         const received = getReceiptSummary(receipt);
         const unloaded = getReceiptLinehaulSummary(linehaul);
         rows = [
@@ -194,13 +220,11 @@ function createReportSummaryClipboard(kind, {
         operators = (receipt.operators ?? []).filter(operator => operator.selected !== false);
         createOperatorRow = operator => [formatReportPersonWithOps(operator?.receiver), formatReportPersonWithOps(operator?.labeler), operator?.packagesReceived, operator?.errorQuantity]
             .map(value => cell(value, 1, 10, "Arial"));
-        listLabel = "recebedores";
-        target = `C${firstRow}`;
-        label = "Resumo de processamento";
         hasData = unloaded.hasData || received.receivedVolume !== null || operators.length > 0;
     } else if (kind === "expedition") {
+        expedition ??= getExpeditionState();
         const summary = getExpeditionSummary(expedition);
-        const analysis = getExpeditionErrorAnalysis(expedition);
+        const analysis = getExpeditionErrorAnalysis(expedition, { summary, includeStreets: false });
         rows = [
             title("Última Expedição"),
             heading("Rotas Conferidas", "Volume Expedido e Inicial"),
@@ -225,21 +249,16 @@ function createReportSummaryClipboard(kind, {
         operators = getExpeditionOperatorRanking(expedition).filter(operator => operator.selected !== false);
         createOperatorRow = operator => [cell(formatReportPersonWithOps(operator?.operator)), cell(operator?.routesChecked, 1),
             cell(formatDuration(operator?.averageDurationSeconds), 1)];
-        listLabel = "conferentes";
-        target = `G${firstRow}`;
-        label = "Resumo de expedição e erros";
         hasData = analysis.hasSpXData || analysis.hasErrorData;
     } else {
         throw new Error("Tipo de resumo inválido.");
     }
 
-    const listCapacity = summaryRowCount - rows.length;
-    const copyError = operators.length > listCapacity
-        ? `A lista de ${listLabel} tem ${operators.length} registros, mas a janela ${shift} comporta ${listCapacity}. Reduza a seleção antes de copiar.`
-        : "";
+    const status = getShiftClipboardStatus(kind, (context ?? getReportContext()).window, hasData, operators.length);
+    const listCapacity = summaryRowCount - shiftClipboardReports[kind].headerRows;
     // Empty rows remove names left by a previous, longer list without touching the next window.
     rows.push(...Array.from({ length: listCapacity }, (_, index) => createOperatorRow(operators[index])));
-    return { ...createClipboardTable(rows, { palette: shiftClipboardPalette }), target, sheet: operationDataSheet, label, shift, hasData, copyError };
+    return { ...createClipboardTable(rows, { palette: shiftClipboardPalette }), ...status };
 }
 
 function writeSummaryCopyEvent(payload) {
@@ -278,7 +297,7 @@ async function writeSummaryClipboard(payload) {
 }
 
 function bindReportSummaryCopyButton(button, {
-    reportId, kind, subscribe, getStatus = () => createReportSummaryClipboard(kind),
+    reportId, kind, subscribe, getStatus = () => getReportSummaryCopyStatus(kind),
 }) {
     if (!(button instanceof HTMLButtonElement)) return false;
     if (button.dataset.summaryCopyInitialized === "true") return true;
@@ -326,9 +345,18 @@ function bindReportSummaryCopyButton(button, {
     }
 
     button.addEventListener("click", copy);
-    subscribe.forEach(listen => listen(render));
+    subscribe.forEach(listen => listen(() => requestReportUpdate(render)));
     render();
     return true;
+}
+
+function subscribeSummaryWindow(listener) {
+    let previousWindow = getReportContext().window;
+    return subscribeReportContext(context => {
+        if (context.window === previousWindow) return;
+        previousWindow = context.window;
+        listener();
+    });
 }
 
 function initializeReportSummaryCopy(root = document) {
@@ -339,21 +367,42 @@ function initializeReportSummaryCopy(root = document) {
     const reverseButton = root.querySelector("#reverseCopySummaryButton");
     const receiptBound = bindReportSummaryCopyButton(receiptButton, {
         reportId: "receipt", kind: "receipt",
-        subscribe: [subscribeReceiptState, subscribeReceiptLinehaulState, subscribeReportContext],
+        subscribe: [
+            render => subscribeReceiptState((_, change) => {
+                if (change.type !== "operator-field-updated" && change.type !== "general-field-updated") render();
+            }),
+            render => subscribeReceiptLinehaulState((_, change) => {
+                if (change.type === "linehaul-selection-updated" ||
+                    (change.type === "linehaul-record-updated" && ["driver", "origin"].includes(change.field))) return;
+                render();
+            }),
+            subscribeSummaryWindow,
+        ],
     });
     const expeditionBound = bindReportSummaryCopyButton(expeditionButton, {
         reportId: "expedition", kind: "expedition",
-        subscribe: [subscribeExpeditionState, subscribeReportContext],
+        subscribe: [render => subscribeExpeditionState((_, change) => {
+            const scope = getExpeditionChangeScope(change);
+            if (scope.ranking || scope.availability) render();
+        }), subscribeSummaryWindow],
     });
     const planningBound = bindReportSummaryCopyButton(planningButton, {
-        reportId: "planning", kind: "planning", subscribe: [subscribePlanningState],
-        getStatus: () => getPlanningClipboardData(getPlanningState()).status,
+        reportId: "planning", kind: "planning",
+        subscribe: [render => subscribePlanningState((_, change) => {
+            if (hasPlanningExportInputChanged(change) || change.type === "lh-updated" || change.type.startsWith("to-")) render();
+        })],
     });
     const parcelBound = bindReportSummaryCopyButton(parcelButton, {
-        reportId: "parcel", kind: "parcel", subscribe: [subscribeParcelState],
+        reportId: "parcel", kind: "parcel",
+        subscribe: [render => subscribeParcelState((state, change) => {
+            if (hasParcelRowsChanged(change)) render();
+        })],
     });
     const reverseBound = bindReportSummaryCopyButton(reverseButton, {
-        reportId: "reverse", kind: "reverse", subscribe: [subscribeReverseState],
+        reportId: "reverse", kind: "reverse",
+        subscribe: [render => subscribeReverseState((state, change) => {
+            if (change.type !== "reverse-transfer-updated") render();
+        })],
     });
     return receiptBound && expeditionBound && planningBound && parcelBound && reverseBound;
 }

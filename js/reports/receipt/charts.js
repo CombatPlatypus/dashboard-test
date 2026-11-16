@@ -164,7 +164,7 @@ function renderReceiptProgress(
     state,
 ) {
     const summary =
-        getReceiptSummary();
+        getReceiptSummary(state);
 
     const expectedVolume =
         state.expectedVolume;
@@ -2077,7 +2077,12 @@ function initializeReceiptComparisonCharts(
     subscribeReceiptState(
         function (
             state,
+            change,
         ) {
+            if (change.type === "operator-field-updated" &&
+                state.operators.find(operator => operator.id === change.operatorId)?.selected === false) {
+                return;
+            }
             renderReceiptComparison(
                 elements,
                 state,
@@ -2158,7 +2163,11 @@ function initializeReceiptCharts(
         elements;
 
     subscribeReceiptState(
-        renderReceiptCharts,
+        (state, change) => {
+            if (change.type !== "operator-field-updated" && change.type !== "general-field-updated") {
+                renderReceiptCharts(state);
+            }
+        },
     );
 
     renderReceiptCharts();

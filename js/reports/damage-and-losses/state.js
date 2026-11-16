@@ -301,12 +301,16 @@ function notifyDamageAndLossesState(
     const snapshot =
         getDamageAndLossesState();
 
+    let summary;
+    const getSummary = () => summary ??= getDamageAndLossesSummary(snapshot);
+
     damageAndLossesStateListeners
         .forEach(
             function (listener) {
                 listener(
                     snapshot,
                     change,
+                    getSummary,
                 );
             },
         );

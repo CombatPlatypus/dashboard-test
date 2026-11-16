@@ -3,11 +3,11 @@ import { createDashboardChart } from "../../charts/standard.js";
 import {
     REVERSE_TYPE_DEFINITIONS,
     REVERSE_TYPE_KEYS,
-    createReverseSummary,
 } from "./model.js";
 
 import {
-    getReverseState,
+    getReverseSnapshot,
+    getReverseStateTotals,
     subscribeReverseState,
 } from "./state.js";
 
@@ -155,18 +155,16 @@ function updateReverseCompositionChart(
 }
 
 function renderReverseCharts(
-    state = getReverseState(),
+    state = getReverseSnapshot(),
+    change,
 ) {
     if (!reverseCompositionChart) {
         return false;
     }
 
-    updateReverseCompositionChart(
-        reverseCompositionChart,
-        createReverseSummary(
-            state.transfers,
-        ),
-    );
+    if (change?.totalsChanged !== false) {
+        updateReverseCompositionChart(reverseCompositionChart, getReverseStateTotals(state));
+    }
 
     return true;
 }
@@ -196,9 +194,7 @@ function initializeReverseCharts(
         renderReverseCharts,
     );
 
-    renderReverseCharts(
-        getReverseState(),
-    );
+    renderReverseCharts();
 
     return true;
 }

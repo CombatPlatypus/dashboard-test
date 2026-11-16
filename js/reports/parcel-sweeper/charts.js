@@ -3,11 +3,9 @@ import { createDashboardChart } from "../../charts/standard.js";
 import { CHART_TEXT_COLOR, CHART_VALUE_FONT } from "../../charts/theme.js";
 
 import {
-    createParcelSummary,
-} from "./model.js";
-
-import {
-    getParcelState,
+    getParcelSnapshot,
+    getParcelStateSummary,
+    hasParcelRowsChanged,
     subscribeParcelState,
 } from "./state.js";
 
@@ -354,8 +352,10 @@ function updateParcelCoverageChart(
 
 function updateParcelCharts(
     state,
+    change,
 ) {
     if (
+        !hasParcelRowsChanged(change) ||
         !parcelCoverageChart ||
         !parcelAgingChart ||
         !parcelScannedStatusChart ||
@@ -365,11 +365,7 @@ function updateParcelCharts(
         return;
     }
 
-    const summary =
-        createParcelSummary(
-            state.rows,
-            state.operatorKindOverrides,
-        );
+    const summary = getParcelStateSummary(state);
 
     updateParcelCoverageChart(
         parcelCoverageChart,
@@ -547,7 +543,7 @@ function initializeParcelCharts(
     );
 
     updateParcelCharts(
-        getParcelState(),
+        getParcelSnapshot(),
     );
 
     observeParcelChartVisibility(

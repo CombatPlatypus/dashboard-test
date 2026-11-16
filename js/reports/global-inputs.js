@@ -25,14 +25,6 @@ const reportGlobalInputDefinitions = [
     },
 ];
 
-const reportQuantityFormatter =
-    new Intl.NumberFormat(
-        "pt-BR",
-        {
-            maximumFractionDigits: 0,
-        },
-    );
-
 function isValidReportGlobalInput(
     entry,
 ) {
@@ -46,24 +38,26 @@ function isValidReportGlobalInput(
 function sanitizeReportGlobalInput(
     entry,
 ) {
-    if (
-        entry.characterType ===
-        "letters"
-    ) {
-        entry.input.value =
-            entry.input.value.replace(
-                /[^\p{L}\s]/gu,
-                "",
-            );
-    } else if (
-        entry.characterType ===
-        "numbers"
-    ) {
-        entry.input.value =
-            entry.input.value.replace(
-                /\D/g,
-                "",
-            );
+    const value = entry.input.value;
+    const sanitized = entry.characterType === "letters"
+        ? value.replace(/[^\p{L}\s]/gu, "")
+        : entry.characterType === "numbers"
+            ? value.replace(/\D/g, "")
+            : value;
+    if (value !== sanitized) {
+        entry.input.value = sanitized;
+    }
+}
+
+function synchronizeGlobalInput(entry, context) {
+    const value = String(context[entry.field] ?? "");
+    if (document.activeElement === entry.input || entry.input.value === value) {
+        return;
+    }
+
+    entry.input.value = value;
+    if (entry.elementType === "select") {
+        synchronizeSelect2Value(entry.input);
     }
 }
 
@@ -125,65 +119,11 @@ function initializeReportGlobalInputs() {
         return false;
     }
 
-    function synchronizeGlobalInputs(
-        context,
-    ) {
-        globalInputs.forEach(
-            function (entry) {
-                if (
-                    document.activeElement !==
-                    entry.input
-                ) {
-                    entry.input.value =
-                        context[entry.field] ??
-                        "";
-
-                    if (
-                        entry.elementType ===
-                        "select"
-                    ) {
-                        synchronizeSelect2Value(
-                            entry.input,
-                        );
-                    }
-                }
-            },
-        );
-
-        const windowOutput =
-            document.getElementById(
-                "overallAnalysisWindow",
-            );
-
-        if (windowOutput) {
-            windowOutput.textContent =
-                context.window || "—";
-        }
-
-        const analystOutput =
-            document.getElementById(
-                "overallAnalysisAnalyst",
-            );
-
-        if (analystOutput) {
-            analystOutput.textContent =
-                context.analyst || "—";
-        }
-
-        const plannedOutput =
-            document.getElementById(
-                "overallAnalysisPlanned",
-            );
-
-        if (plannedOutput) {
-            plannedOutput.textContent =
-                context.plannedVolume ===
-                    null
-                    ? "—"
-                    : reportQuantityFormatter
-                        .format(
-                            context.plannedVolume,
-                        );
+    function synchronizeGlobalInputs(context, { field } = {}) {
+        for (const entry of globalInputs) {
+            if (!field || entry.field === field) {
+                synchronizeGlobalInput(entry, context);
+            }
         }
     }
 
@@ -225,9 +165,7 @@ function initializeReportGlobalInputs() {
             entry.input.addEventListener(
                 "blur",
                 function () {
-                    synchronizeGlobalInputs(
-                        getReportContext(),
-                    );
+                    synchronizeGlobalInput(entry, getReportContext());
                 },
             );
         },

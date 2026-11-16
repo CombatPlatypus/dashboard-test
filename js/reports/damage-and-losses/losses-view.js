@@ -83,13 +83,12 @@ function renderLossesTraditionalAnalysis(summary) {
 
 function renderLossesView(
     state = getLossesState(),
+    summary = getLossesSummary(state),
 ) {
     if (!lossesViewElements) {
         return false;
     }
 
-    const summary =
-        getLossesSummary(state);
 
     lossesViewElements.total.textContent =
         formatLossesQuantity(
@@ -142,7 +141,7 @@ function initializeLossesView(
     }
 
     panel.dataset.lossesViewInitialized = "true";
-    subscribeLossesState(renderLossesView);
+    subscribeLossesState((state, _change, getSummary) => renderLossesView(state, getSummary()));
     renderLossesView();
 
     return true;

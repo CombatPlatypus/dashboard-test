@@ -922,6 +922,7 @@ function renderDamageCompositionValues(
 
 function renderDamageAndLossesCharts(
     state = getDamageAndLossesState(),
+    summary = getDamageAndLossesSummary(state),
 ) {
     if (
         !damageLastSevenDaysChart ||
@@ -931,10 +932,6 @@ function renderDamageAndLossesCharts(
         return false;
     }
 
-    const summary =
-        getDamageAndLossesSummary(
-            state,
-        );
 
     const selectedPeriod =
         getActiveDamageChartPeriod(
@@ -1277,9 +1274,7 @@ function initializeDamageAndLossesCharts(
             },
         );
 
-    subscribeDamageAndLossesState(
-        renderDamageAndLossesCharts,
-    );
+    subscribeDamageAndLossesState((state, _change, getSummary) => renderDamageAndLossesCharts(state, getSummary()));
 
     renderDamageAndLossesCharts();
     observeDamageChartVisibility(

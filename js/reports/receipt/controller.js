@@ -7,6 +7,7 @@ import {
 
 import {
     initializeReceiptView,
+    renderReceiptExpectedVolume,
     renderReceiptView,
 } from "./view.js";
 
@@ -37,10 +38,12 @@ import {
 import {
     canExportReceiptReport,
     initializeReceiptExport,
+    renderReceiptExpectedVolumeExportStatus,
     renderReceiptExportStatus,
 } from "./export.js";
 
 import {
+    getReportContext,
     subscribeReportContext,
 } from "../core/report-context.js";
 
@@ -93,9 +96,22 @@ function initializeReceiptController() {
     receiptControllerInitialized =
         true;
 
-    subscribeReportContext(
-        renderReceiptController,
-    );
+    let previousExpectedVolume = getReportContext().plannedVolume;
+    subscribeReportContext(({ plannedVolume }) => {
+        if (plannedVolume === previousExpectedVolume) {
+            return;
+        }
+
+        const availabilityChanged = (plannedVolume > 0) !== (previousExpectedVolume > 0);
+        previousExpectedVolume = plannedVolume;
+
+        const state = getReceiptState();
+        renderReceiptExpectedVolume(plannedVolume);
+        renderReceiptCharts(state);
+        if (availabilityChanged) {
+            renderReceiptExpectedVolumeExportStatus(state);
+        }
+    });
 
     return true;
 }

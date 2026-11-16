@@ -105,9 +105,12 @@ function notifyLossesState(change) {
     const snapshot =
         getLossesState();
 
+    let summary;
+    const getSummary = () => summary ??= getLossesSummary(snapshot);
+
     lossesStateListeners.forEach(
         function (listener) {
-            listener(snapshot, change);
+            listener(snapshot, change, getSummary);
         },
     );
 }

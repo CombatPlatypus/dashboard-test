@@ -1,4 +1,5 @@
 import {
+    createParcelClassification,
     createParcelRow,
     createParcelSummary,
     getParcelOperatorKey,
@@ -11,35 +12,57 @@ const parcelStateListeners =
     new Set();
 
 const parcelState = {
-    rows: [],
+    rows: Object.freeze([]),
     sourceFileName: "",
     activeFilter: "all",
-    operatorKindOverrides: {},
+    operatorKindOverrides: Object.freeze({}),
 };
+
+let parcelRowSummary = null;
+let parcelClassification = null;
+
+// A visão compartilhada conserva as linhas imutáveis durante filtros e classificações.
+function getParcelSnapshot() {
+    return { ...parcelState };
+}
 
 function getParcelState() {
     return {
-        rows:
-            parcelState.rows.map(
-                function (row) {
-                    return {
-                        ...row,
-                    };
-                },
-            ),
-        sourceFileName:
-            parcelState.sourceFileName,
-        activeFilter:
-            parcelState.activeFilter,
+        ...parcelState,
+        rows: parcelState.rows.map(row => ({ ...row })),
         operatorKindOverrides: { ...parcelState.operatorKindOverrides },
     };
+}
+
+function getParcelStateSummary(state = parcelState) {
+    if (state.rows !== parcelState.rows || state.operatorKindOverrides !== parcelState.operatorKindOverrides) {
+        return createParcelSummary(state.rows, state.operatorKindOverrides);
+    }
+
+    const base = parcelRowSummary ??= createParcelSummary(state.rows);
+    if (Object.keys(state.operatorKindOverrides).length === 0) return base;
+
+    return parcelClassification ??= {
+        ...base,
+        ...createParcelClassification(state.rows.filter(isParcelScannedRow), base.operatorStats, state.operatorKindOverrides),
+    };
+}
+
+function hasParcelRowsChanged(change) {
+    return change?.type !== "parcel-filter-updated" && change?.type !== "parcel-operator-kind-updated";
+}
+
+function setParcelRows(rows) {
+    parcelState.rows = Object.freeze(rows.map(row => Object.freeze(row)));
+    parcelRowSummary = null;
+    parcelClassification = null;
 }
 
 function notifyParcelState(
     event,
 ) {
     const snapshot =
-        getParcelState();
+        getParcelSnapshot();
 
     parcelStateListeners.forEach(
         function (listener) {
@@ -75,6 +98,7 @@ function subscribeParcelState(
 function replaceParcelRows(
     rows,
     sourceFileName = "",
+    { normalized = false } = {},
 ) {
     if (
         !Array.isArray(
@@ -84,18 +108,9 @@ function replaceParcelRows(
         return false;
     }
 
-    parcelState.rows =
-        rows
-            .map(
-                createParcelRow,
-            )
-            .filter(
-                function (row) {
-                    return Boolean(
-                        row.trackingNumber,
-                    );
-                },
-            );
+    setParcelRows(rows
+        .map(row => normalized ? { ...row } : createParcelRow(row))
+        .filter(row => Boolean(row.trackingNumber)));
 
     parcelState.sourceFileName =
         String(
@@ -104,7 +119,7 @@ function replaceParcelRows(
 
     parcelState.activeFilter =
         "all";
-    parcelState.operatorKindOverrides = {};
+    parcelState.operatorKindOverrides = Object.freeze({});
 
     notifyParcelState({
         type: "parcel-rows-replaced",
@@ -139,10 +154,10 @@ function updateParcelFilter(
 }
 
 function resetParcelReport() {
-    parcelState.rows = [];
+    setParcelRows([]);
     parcelState.sourceFileName = "";
     parcelState.activeFilter = "all";
-    parcelState.operatorKindOverrides = {};
+    parcelState.operatorKindOverrides = Object.freeze({});
 
     notifyParcelState({
         type: "parcel-reset",
@@ -153,13 +168,16 @@ function resetParcelReport() {
 
 function toggleParcelOperatorBulky(operatorKey) {
     const key = getParcelOperatorKey(operatorKey);
-    const summary = createParcelSummary(parcelState.rows, parcelState.operatorKindOverrides);
+    const summary = getParcelStateSummary();
     const operator = summary.operatorStats.find(item => item.operatorKey === key);
     if (!operator) {
         return false;
     }
 
-    parcelState.operatorKindOverrides[key] = operator.packageKind !== "bulky";
+    parcelState.operatorKindOverrides = Object.freeze({
+        ...parcelState.operatorKindOverrides, [key]: operator.packageKind !== "bulky",
+    });
+    parcelClassification = null;
     notifyParcelState({ type: "parcel-operator-kind-updated", operatorKey: key });
     return true;
 }
@@ -195,18 +213,7 @@ function restoreParcelState(
         return false;
     }
 
-    parcelState.rows =
-        receivedState.rows
-            .map(
-                createParcelRow,
-            )
-            .filter(
-                function (row) {
-                    return Boolean(
-                        row.trackingNumber,
-                    );
-                },
-            );
+    setParcelRows(receivedState.rows.map(createParcelRow).filter(row => Boolean(row.trackingNumber)));
 
     parcelState.sourceFileName =
         String(
@@ -220,8 +227,8 @@ function restoreParcelState(
                 .activeFilter,
         );
 
-    parcelState.operatorKindOverrides = normalizeParcelOperatorOverrides(
-        receivedState.operatorKindOverrides, parcelState.rows);
+    parcelState.operatorKindOverrides = Object.freeze(normalizeParcelOperatorOverrides(
+        receivedState.operatorKindOverrides, parcelState.rows));
 
     notifyParcelState({
         type: "parcel-state-restored",
@@ -231,7 +238,10 @@ function restoreParcelState(
 }
 
 export {
+    getParcelSnapshot,
     getParcelState,
+    getParcelStateSummary,
+    hasParcelRowsChanged,
     replaceParcelRows,
     resetParcelReport,
     restoreParcelState,

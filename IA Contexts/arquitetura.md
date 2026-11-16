@@ -17,7 +17,17 @@ A página de Configurações edita preferências usadas pelo painel Planilhas, p
 
 O painel registra sete módulos operacionais e o módulo do Relatório Final no `ReportManager`. Cada módulo oferece a mesma interface para inicializar, renderizar, limpar, importar dados, exportar ou restaurar seu estado de sessão e indicar se pode exportar. Os campos globais formam o contexto da janela, com turno, analista, volume planejado, número de colaboradores e capacidade. [Inicialização](../js/reports/init.js) · [Gerenciador](../js/reports/core/report-manager.js) · [Contrato dos módulos](../js/reports/core/report-contract.js) · [Contexto da janela](../js/reports/core/report-context.js)
 
-Dentro de um relatório, o controlador conecta os eventos da interface aos módulos. O importador interpreta a fonte, o estado guarda os registros em memória, e o estado ou o modelo calcula os indicadores. As visualizações usam esses resultados para atualizar tabelas e gráficos. O Relatório Final observa mudanças nos estados que utiliza e recalcula o resumo da janela. [Fluxo compartilhado de Relatórios](Painel%20Relat%C3%B3rios/README.md#fluxo-compartilhado) · [Controlador do Relatório Final](../js/reports/overall-analysis/controller.js)
+Dentro de um relatório, o controlador conecta os eventos da interface aos módulos. O importador interpreta a fonte, o estado guarda os registros em memória, e o estado ou o modelo calcula os indicadores. As visualizações usam esses resultados para atualizar tabelas e gráficos. O Relatório Final observa as fontes que utiliza e recalcula as seções afetadas. [Fluxo compartilhado de Relatórios](Painel%20Relat%C3%B3rios/README.md#fluxo-compartilhado) · [Controlador do Relatório Final](../js/reports/overall-analysis/controller.js)
+
+## Atualização seletiva
+
+Esta regra vale para funções atuais e futuras em todos os painéis. Ao conectar um input, uma importação ou outro evento, identifique os dados que ele altera e os componentes que os consomem. Uma mudança de Planejamento, por exemplo, atualiza os itens afetados em Planejamento e a própria parte da sessão.
+
+- Use o tipo da alteração e o campo afetado para limitar os ouvintes e a renderização. Um filtro local deve alcançar somente as tabelas ou os gráficos que usam esse filtro. Compare os valores do componente quando o mesmo evento puder deixar seu conteúdo igual.
+- Reaproveite cálculos derivados enquanto suas entradas forem as mesmas. Use o estado atual na hora de copiar ou exportar e calcule formatos como HTML e TSV quando a ação for executada.
+- Agrupe alterações que formam uma operação. Uma planilha de Avarias e Perdas publica Avarias, Perdas e Taxa juntas para o Consolidado e o Final lerem o conjunto completo uma vez. Para as prévias dos relatórios, use `requestReportUpdate` com uma função de renderização estável dentro de `batchReportUpdates`. O lote é síncrono e termina dentro do fluxo de restauração. [Atualização das prévias](../js/reports/core/report-updates.js)
+- Registre no salvamento automático somente o relatório que mudou. Preferências de visualização que não modificam a base podem ser persistidas separadamente. A exportação da sessão continua reunindo todos os estados. [Salvamento da sessão](Menu%20Principal/salvamento-de-sessao.md)
+- Verifique um componente dependente e um independente ao testar o fluxo. Em mudanças de importação ou armazenamento, confira também a restauração e as exportações correspondentes.
 
 ### Exemplo com o Gestão Audit
 

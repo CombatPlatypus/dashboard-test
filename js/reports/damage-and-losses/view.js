@@ -133,15 +133,12 @@ function renderDamageTraditionalAnalysis(
 
 function renderDamageAndLossesView(
     state = getDamageAndLossesState(),
+    summary = getDamageAndLossesSummary(state),
 ) {
     if (!damageViewElements) {
         return false;
     }
 
-    const summary =
-        getDamageAndLossesSummary(
-            state,
-        );
 
     damageViewElements.total
         .textContent =
@@ -240,9 +237,7 @@ function initializeDamageAndLossesView(
 
     damageViewElements = elements;
 
-    subscribeDamageAndLossesState(
-        renderDamageAndLossesView,
-    );
+    subscribeDamageAndLossesState((state, _change, getSummary) => renderDamageAndLossesView(state, getSummary()));
 
     renderDamageAndLossesView();
 

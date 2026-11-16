@@ -1,9 +1,6 @@
 import {
-    createParcelSummary,
-} from "./model.js";
-
-import {
-    getParcelState,
+    getParcelSnapshot,
+    hasParcelRowsChanged,
     resetParcelReport,
     subscribeParcelState,
 } from "./state.js";
@@ -23,18 +20,15 @@ import {
 let parcelExportBusy = false;
 
 function canExportParcelReport(
-    state = getParcelState(),
+    state = getParcelSnapshot(),
 ) {
-    return createParcelSummary(
-        state.rows,
-        state.operatorKindOverrides,
-    ).hasData;
+    return state.rows.length > 0;
 }
 
 function renderParcelExportStatus(
     copyButton,
     clearButton,
-    state = getParcelState(),
+    state = getParcelSnapshot(),
 ) {
     const hasData =
         canExportParcelReport(
@@ -73,7 +67,7 @@ async function runParcelExport({
     mode,
 }) {
     const state =
-        getParcelState();
+        getParcelSnapshot();
 
     if (
         parcelExportBusy ||
@@ -175,7 +169,7 @@ async function runParcelExport({
         renderParcelExportStatus(
             copyButton,
             clearButton,
-            getParcelState(),
+            getParcelSnapshot(),
         );
     }
 }
@@ -268,19 +262,17 @@ function initializeParcelExport(
     );
 
     subscribeParcelState(
-        function (state) {
-            renderParcelExportStatus(
-                copyButton,
-                clearButton,
-                state,
-            );
+        function (state, change) {
+            if (hasParcelRowsChanged(change)) {
+                renderParcelExportStatus(copyButton, clearButton, state);
+            }
         },
     );
 
     renderParcelExportStatus(
         copyButton,
         clearButton,
-        getParcelState(),
+        getParcelSnapshot(),
     );
 
     return true;

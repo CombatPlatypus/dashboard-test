@@ -1,13 +1,35 @@
 import {
+    REVERSE_TYPE_KEYS,
     createReverseTransfer,
+    getReverseTotals,
+    normalizeReverseTransfers,
 } from "./model.js";
 
 const reverseStateListeners =
     new Set();
 
 const reverseState = {
-    transfers: [],
+    transfers: Object.freeze([]),
 };
+let reverseTotals = null;
+
+function getReverseSnapshot() {
+    return { transfers: reverseState.transfers };
+}
+
+function getReverseStateTotals(state = reverseState) {
+    if (state.transfers !== reverseState.transfers) {
+        return getReverseTotals(normalizeReverseTransfers(state.transfers));
+    }
+    return reverseTotals ??= getReverseTotals(state.transfers);
+}
+
+function freezeReverseTransfer(transfer) {
+    for (const values of Object.values(transfer.packages)) Object.freeze(values);
+    Object.freeze(transfer.packages);
+    Object.freeze(transfer.quantities);
+    return Object.freeze(transfer);
+}
 
 function cloneReverseTransfer(
     transfer,
@@ -48,7 +70,7 @@ function notifyReverseState(
     change,
 ) {
     const snapshot =
-        getReverseState();
+        getReverseSnapshot();
 
     reverseStateListeners.forEach(
         function (listener) {
@@ -106,23 +128,27 @@ function upsertReverseTransfer(
             ? "updated"
             : "added";
 
-    if (transferIndex >= 0) {
-        reverseState.transfers[
-            transferIndex
-        ] = transfer;
-    } else {
-        reverseState.transfers.push(
-            transfer,
-        );
-    }
-
-    notifyReverseState({
-        type:
-            status === "updated"
-                ? "reverse-transfer-updated"
-                : "reverse-transfer-added",
-        to: transfer.to,
+    const previous = reverseState.transfers[transferIndex];
+    const packageTypes = REVERSE_TYPE_KEYS.filter(type => {
+        const prior = previous?.packages[type] ?? [];
+        const next = transfer.packages[type];
+        return prior.length !== next.length || next.some((tracking, index) => tracking !== prior[index]);
     });
+    const totalsChanged = !previous || REVERSE_TYPE_KEYS.some(type => previous.quantities[type] !== transfer.quantities[type]);
+    const changed = totalsChanged || packageTypes.length > 0 || Object.entries(transfer).some(([key, value]) =>
+        key !== "packages" && key !== "quantities" && previous[key] !== value);
+    if (changed) {
+        const transfers = reverseState.transfers.slice();
+        transfers[previous ? transferIndex : transfers.length] = freezeReverseTransfer(transfer);
+        reverseState.transfers = Object.freeze(transfers);
+        if (totalsChanged) reverseTotals = null;
+        notifyReverseState({
+            type: status === "updated" ? "reverse-transfer-updated" : "reverse-transfer-added",
+            to: transfer.to,
+            totalsChanged,
+            packageTypes,
+        });
+    }
 
     return {
         status,
@@ -183,7 +209,8 @@ function restoreReverseState(
     );
 
     reverseState.transfers =
-        transfers;
+        Object.freeze(transfers.map(freezeReverseTransfer));
+    reverseTotals = null;
 
     notifyReverseState({
         type: "reverse-session-imported",
@@ -193,7 +220,8 @@ function restoreReverseState(
 }
 
 function resetReverseReport() {
-    reverseState.transfers = [];
+    reverseState.transfers = Object.freeze([]);
+    reverseTotals = null;
 
     notifyReverseState({
         type: "reverse-reset",
@@ -203,7 +231,9 @@ function resetReverseReport() {
 }
 
 export {
+    getReverseSnapshot,
     getReverseState,
+    getReverseStateTotals,
     resetReverseReport,
     restoreReverseState,
     subscribeReverseState,

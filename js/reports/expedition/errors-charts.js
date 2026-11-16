@@ -10,7 +10,8 @@ import {
 } from "./error-balance-chart.js";
 
 import {
-    getExpeditionErrorAnalysis,
+    createExpeditionDerivations,
+    getExpeditionChangeScope,
     getExpeditionState,
     subscribeExpeditionState,
 } from "./state.js";
@@ -766,45 +767,26 @@ function updateStreetCards(
         );
 }
 
-function renderExpeditionErrorsCharts(
-    elements,
-    state,
-) {
-    const analysis =
-        getExpeditionErrorAnalysis(
-            state,
-        );
-
-    const animateErrors =
-        elements.errorsPanel
-            .classList
-            .contains(
-                "is-active",
-            );
-
-    const animateStreets =
-        elements.streetsPanel
-            .classList
-            .contains(
-                "is-active",
-            );
-
-    updateStreetCards(
-        elements,
-        analysis.streets,
-    );
-
-    updateErrorBalanceChart(
-        errorBalanceChart,
-        analysis,
-        animateErrors ? undefined : "none",
-    );
-
-    updateStreetOccurrencesChart(
-        elements,
-        analysis.streets,
-        animateStreets,
-    );
+function renderExpeditionErrorsCharts(elements, state, change, derived = createExpeditionDerivations(state)) {
+    const scope = getExpeditionChangeScope(change);
+    if (scope.errors) {
+        const animate = elements.errorsPanel.classList.contains("is-active");
+        updateErrorBalanceChart(errorBalanceChart, derived.getErrors(), animate ? undefined : "none");
+    }
+    if (scope.ranking) {
+        const streets = derived.getStreets();
+        updateStreetCards(elements, streets);
+        updateStreetOccurrencesChart(elements, streets, elements.streetsPanel.classList.contains("is-active"));
+    } else if (scope.guardian) {
+        // O nome do guardião aparece nos detalhes da rua e não altera as barras.
+        const datasets = streetOccurrencesChart.data.datasets;
+        const streets = datasets[0].expeditionStreets.map(street => street.name === scope.guardian
+            ? { ...street, guardian: state.streetGuardians[scope.guardian] ?? "" }
+            : street);
+        for (const dataset of datasets) {
+            dataset.expeditionStreets = streets;
+        }
+    }
 }
 
 function resizeExpeditionErrorsCharts() {
@@ -928,14 +910,7 @@ function initializeExpeditionErrorsCharts(
             elements.streetOccurrencesCanvas,
         );
 
-    subscribeExpeditionState(
-        function (state) {
-            renderExpeditionErrorsCharts(
-                elements,
-                state,
-            );
-        },
-    );
+    subscribeExpeditionState((state, change, derived) => renderExpeditionErrorsCharts(elements, state, change, derived));
 
     renderExpeditionErrorsCharts(
         elements,

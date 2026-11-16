@@ -290,87 +290,45 @@ function getReverseTransferTypeLabel(
     return labels.join(" / ") || "—";
 }
 
-function createReverseSummary(
-    transfers = [],
-) {
-    const normalizedTransfers =
-        Array.isArray(transfers)
-            ? transfers
-                .map(
-                    createReverseTransfer,
-                )
-                .filter(Boolean)
-            : [];
+function normalizeReverseTransfers(transfers) {
+    return Array.isArray(transfers) ? transfers.map(createReverseTransfer).filter(Boolean) : [];
+}
 
-    const quantities =
-        createEmptyReverseQuantities();
-
-    const packages =
-        createEmptyReversePackages();
-
-    normalizedTransfers.forEach(
-        function (transfer) {
-            REVERSE_TYPE_KEYS.forEach(
-                function (typeKey) {
-                    quantities[typeKey] +=
-                        transfer
-                            .quantities[
-                                typeKey
-                            ];
-
-                    transfer.packages[
-                        typeKey
-                    ].forEach(
-                        function (
-                            trackingNumber,
-                        ) {
-                            packages[typeKey]
-                                .push({
-                                    trackingNumber,
-                                    to: transfer.to,
-                                });
-                        },
-                    );
-                },
-            );
-        },
-    );
-
-    const total =
-        REVERSE_TYPE_KEYS.reduce(
-            function (sum, typeKey) {
-                return sum +
-                    quantities[typeKey];
-            },
-            0,
-        );
+function getReverseTotals(transfers) {
+    const quantities = createEmptyReverseQuantities();
+    for (const transfer of transfers) {
+        for (const type of REVERSE_TYPE_KEYS) {
+            quantities[type] += transfer.quantities[type];
+        }
+    }
 
     return {
-        hasData:
-            normalizedTransfers.length > 0,
-        total,
+        hasData: transfers.length > 0,
+        total: REVERSE_TYPE_KEYS.reduce((sum, type) => sum + quantities[type], 0),
         quantities,
-        packages,
-        transfers:
-            normalizedTransfers
-                .slice()
-                .reverse()
-                .map(
-                    function (transfer) {
-                        return {
-                            ...transfer,
-                            percentage:
-                                total > 0
-                                    ? transfer.quantity /
-                                        total
-                                    : 0,
-                            typeLabel:
-                                getReverseTransferTypeLabel(
-                                    transfer,
-                                ),
-                        };
-                    },
-                ),
+    };
+}
+
+function getReversePackageRows(transfers, type) {
+    return transfers.flatMap(transfer =>
+        transfer.packages[type].map(trackingNumber => ({ trackingNumber, to: transfer.to })));
+}
+
+function getReverseDistribution(transfers, total) {
+    return transfers.slice().reverse().map(transfer => ({
+        ...transfer,
+        percentage: total > 0 ? transfer.quantity / total : 0,
+        typeLabel: getReverseTransferTypeLabel(transfer),
+    }));
+}
+
+function createReverseSummary(transfers) {
+    const normalized = normalizeReverseTransfers(transfers);
+    const totals = getReverseTotals(normalized);
+    return {
+        ...totals,
+        packages: Object.fromEntries(REVERSE_TYPE_KEYS.map(type => [type, getReversePackageRows(normalized, type)])),
+        transfers: getReverseDistribution(normalized, totals.total),
     };
 }
 
@@ -380,6 +338,10 @@ export {
     createEmptyReversePackages,
     createEmptyReverseQuantities,
     createReverseSummary,
+    getReverseDistribution,
+    getReversePackageRows,
+    getReverseTotals,
+    normalizeReverseTransfers,
     createReverseTransfer,
     getReverseTransferTypeLabel,
     normalizeReverseSearchText,

@@ -3,8 +3,7 @@ import {
 } from "../receipt/state.js";
 
 import {
-    getExpeditionErrorAnalysis,
-    getExpeditionSummary,
+    createExpeditionDerivations,
 } from "../expedition/state.js";
 
 import {
@@ -23,12 +22,12 @@ import {
 import { getConsolidatedSummary } from "../damage-and-losses/consolidated-model.js";
 
 import {
-    createParcelSummary,
-} from "../parcel-sweeper/model.js";
+    getParcelStateSummary,
+} from "../parcel-sweeper/state.js";
 
 import {
-    createReverseSummary,
-} from "../reverse/model.js";
+    getReverseStateTotals,
+} from "../reverse/state.js";
 
 const OVERALL_ANALYSIS_CAPACITY =
     20000;
@@ -55,6 +54,55 @@ function getOverallAnalysisContextQuantity(
     ) && value >= 0
         ? value
         : null;
+}
+
+function createOverallAnalysisContext(reportContext) {
+    return {
+        window: String(reportContext.window ?? "").trim(),
+        analyst: String(reportContext.analyst ?? "").trim(),
+        plannedVolume: getOverallAnalysisContextQuantity(reportContext.plannedVolume),
+        collaboratorCount: getOverallAnalysisContextQuantity(reportContext.collaboratorCount),
+        shiftCapacity: getOverallAnalysisContextQuantity(reportContext.shiftCapacity),
+    };
+}
+
+function getOverallAnalysisGap(expected, actual) {
+    return expected !== null && actual !== null ? Math.max(expected - actual, 0) : null;
+}
+
+function getOverallAnalysisCapacity({ plannedVolume, shiftCapacity }) {
+    const limit = shiftCapacity > 0 ? shiftCapacity : OVERALL_ANALYSIS_CAPACITY;
+    return {
+        limit,
+        used: plannedVolume,
+        usageRate: plannedVolume === null ? null : plannedVolume / limit,
+        balance: plannedVolume === null ? null : limit - plannedVolume,
+    };
+}
+
+function updateOverallAnalysisContext(data, reportContext) {
+    const context = createOverallAnalysisContext(reportContext);
+    if (Object.keys(context).every(field => context[field] === data.context[field])) {
+        return data;
+    }
+
+    const updatedData = { ...data, context };
+    const plannedVolumeChanged = context.plannedVolume !== data.context.plannedVolume;
+    if (plannedVolumeChanged) {
+        const planned = context.plannedVolume;
+        const gap = getOverallAnalysisGap(planned, data.flow.expedited);
+        updatedData.flow = { ...data.flow, planned, gap, floor: gap };
+        updatedData.processing = {
+            ...data.processing,
+            expectedVolume: planned,
+            gap: getOverallAnalysisGap(planned, data.processing.receivedVolume),
+        };
+    }
+
+    if (plannedVolumeChanged || context.shiftCapacity !== data.context.shiftCapacity) {
+        updatedData.cards = { ...data.cards, capacity: getOverallAnalysisCapacity(context) };
+    }
+    return updatedData;
 }
 
 /* REÚNE AVARIAS E PERDAS NOS MESMOS PERÍODOS DA TABELA */
@@ -163,6 +211,156 @@ function getOverallDamageAndLossesAnalysis(
     };
 }
 
+function getOverallProcessing(state) {
+    const { receivedVolume, totalErrors } = getReceiptSummary(state);
+    const expectedVolume = state?.expectedVolume ?? null;
+
+    return {
+        expectedVolume,
+        receivedVolume,
+        totalErrors,
+        errorRate: totalErrors !== null && receivedVolume > 0
+            ? totalErrors / receivedVolume
+            : null,
+        gap: getOverallAnalysisGap(expectedVolume, receivedVolume),
+    };
+}
+
+function getOverallExpedition(summary) {
+    return {
+        routesChecked: summary.hasData ? summary.validatedRoutes : null,
+        volumeChecked: summary.hasData ? summary.volumeChecked : null,
+        floorVolume: summary.floorVolume,
+        durationSeconds: summary.expeditionDurationSeconds,
+    };
+}
+
+function getOverallExpeditionErrors(errors, streets) {
+    return {
+        sortingErrors: errors.sortingErrors,
+        labelingErrors: errors.labelingErrors,
+        totalErrors: errors.totalErrors,
+        errorRate: errors.errorRate,
+        totalRevertedErrors: errors.totalRevertedErrors,
+        revertedRate: errors.revertedRate,
+        finalErrors: errors.finalErrors,
+        finalRate: errors.finalRate,
+        streets,
+    };
+}
+
+function getOverallOccurrenceCards(analysis) {
+    const { packagesUnderReview, lossesTotal, traditionalAnalysis, damageHasData } = analysis;
+    const { confirmedLosses, hub, soc } = traditionalAnalysis.totalMonth;
+    return {
+        packagesAnalysis: {
+            value: packagesUnderReview,
+            total: lossesTotal,
+            rate: packagesUnderReview !== null && lossesTotal !== null
+                ? (lossesTotal === 0 ? 0 : packagesUnderReview / lossesTotal)
+                : null,
+            confirmedLosses,
+        },
+        damage: { hub, soc, total: damageHasData ? hub + soc : null },
+    };
+}
+
+function getOverallLossesRateCard(state, referenceDate) {
+    const summary = state?.year === referenceDate.getFullYear()
+        ? getLossesRateMonthSummary(referenceDate.getMonth(), state)
+        : null;
+    const rate = summary?.lossRate ?? null;
+
+    return {
+        moved: summary?.moved ?? null,
+        totalLosses: summary?.totalLosses ?? null,
+        rate,
+        limit: OVERALL_ANALYSIS_LOSS_RATE_LIMIT,
+        differencePercentagePoints: rate === null ? null : Math.abs(OVERALL_ANALYSIS_LOSS_RATE_LIMIT - rate) * 100,
+        withinLimit: rate === null ? null : rate <= OVERALL_ANALYSIS_LOSS_RATE_LIMIT,
+    };
+}
+
+function getOverallParcel(state) {
+    const summary = getParcelStateSummary(state ?? {});
+    return {
+        hasData: summary.hasData,
+        scannedCount: summary.scannedCount,
+        backlogCount: summary.backlogCount,
+        exceptionCount: summary.exceptionCount,
+        missortedCount: summary.missortedCount,
+        expectedTotalCount: summary.expectedTotalCount,
+        expectedScannedCount: summary.expectedScannedCount,
+        expectedUnscannedCount: summary.expectedUnscannedCount,
+    };
+}
+
+function getOverallReverse(state) {
+    return getReverseStateTotals(state ?? {});
+}
+
+/* ATUALIZA AS SEÇÕES QUE CONSOMEM AS FONTES ALTERADAS */
+
+function updateOverallAnalysisSources(data, sources, referenceDate = new Date()) {
+    const next = { ...data };
+    if ("receipt" in sources) {
+        next.processing = getOverallProcessing(sources.receipt);
+    }
+    if (sources.expeditionSummary || sources.expeditionErrors) {
+        const derived = sources.expeditionDerived ?? createExpeditionDerivations(sources.expedition);
+        const streets = sources.expeditionSummary
+            ? derived.getStreets().map(({ name, missingOrders, totalErrors, errorRate }) => ({ name, missingOrders, totalErrors, errorRate }))
+            : data.expeditionErrors.streets;
+        next.expeditionErrors = getOverallExpeditionErrors(derived.getErrors(), streets);
+        if (sources.expeditionSummary) {
+            next.expedition = getOverallExpedition(derived.getSummary());
+        }
+    }
+    if (sources.expeditionFloor && !sources.expeditionSummary) {
+        next.expedition = { ...data.expedition, floorVolume: sources.expedition.floorVolume };
+    }
+    if (next.processing?.receivedVolume !== data.flow.processed ||
+        next.expedition?.volumeChecked !== data.flow.expedited) {
+        const { planned } = data.flow;
+        const processed = next.processing.receivedVolume;
+        const expedited = next.expedition.volumeChecked;
+        const gap = getOverallAnalysisGap(planned, expedited);
+        next.flow = { planned, processed, expedited, floor: gap, gap };
+    }
+
+    if (sources.occurrences) {
+        const { damage, losses } = sources.occurrences;
+        const analysis = getOverallDamageAndLossesAnalysis(damage, losses);
+        const { composition, total, hasData, hasDamageData, hasLossesData, monthIndex, monthName, year } =
+            getConsolidatedSummary(damage, losses, null, referenceDate);
+        next.damageAndLosses = analysis;
+        next.damageAndLossesComposition = { composition, total, hasData, hasDamageData, hasLossesData, monthIndex, monthName, year };
+        next.cards = { ...data.cards, ...getOverallOccurrenceCards(analysis) };
+    }
+    if ("lossesRate" in sources) {
+        const rate = sources.lossesRate;
+        const { monthlyRates } = getLossesRateChartData(rate);
+        next.cards = { ...next.cards, lossesRate: getOverallLossesRateCard(rate, referenceDate) };
+        next.lossesRateHistory = { monthlyRates, year: rate?.year ?? null, activeMonth: null };
+    }
+    if (sources.occurrences || "lossesRate" in sources) {
+        const { hasData, monthIndex, year } = next.damageAndLossesComposition;
+        const history = next.lossesRateHistory;
+        const activeMonth = hasData && history.year === year ? monthIndex : null;
+        if (history.activeMonth !== activeMonth) {
+            next.lossesRateHistory = { ...history, activeMonth };
+        }
+    }
+
+    if ("parcel" in sources) {
+        next.parcel = getOverallParcel(sources.parcel);
+    }
+    if ("reverse" in sources) {
+        next.reverse = getOverallReverse(sources.reverse);
+    }
+    return next;
+}
+
 /* CRIA UMA VISÃO DERIVADA DOS RELATÓRIOS DE ORIGEM */
 
 function createOverallAnalysisData(
@@ -176,333 +374,24 @@ function createOverallAnalysisData(
     reverseState = null,
     referenceDate = new Date(),
 ) {
-    const receiptSummary =
-        getReceiptSummary(
-            receiptState,
-        );
-
-    const expeditionSummary =
-        getExpeditionSummary(
-            expeditionState,
-        );
-
-    const expeditionErrors = getExpeditionErrorAnalysis(expeditionState);
-
-    const expectedVolume =
-        receiptState?.expectedVolume ??
-        null;
-
-    const receivedVolume =
-        receiptSummary.receivedVolume;
-
-    const totalErrors =
-        receiptSummary.totalErrors;
-
-    const errorRate =
-        totalErrors !== null &&
-        receivedVolume !== null &&
-        receivedVolume > 0
-            ? totalErrors /
-                receivedVolume
-            : null;
-
-    const processingGap =
-        expectedVolume !== null &&
-        receivedVolume !== null
-            ? Math.max(
-                expectedVolume -
-                    receivedVolume,
-                0,
-            )
-            : null;
-
-    const hasExpeditionData =
-        expeditionSummary.hasData;
-
-    const floorVolume =
-        expeditionSummary.floorVolume;
-
-    const plannedVolume =
-        getOverallAnalysisContextQuantity(
-            reportContext.plannedVolume,
-        );
-
-    const expeditedVolume =
-        hasExpeditionData
-            ? expeditionSummary
-                .volumeChecked
-            : null;
-
-    const planningGap =
-        plannedVolume !== null &&
-        expeditedVolume !== null
-            ? Math.max(
-                plannedVolume -
-                    expeditedVolume,
-                0,
-            )
-            : null;
-
-    const configuredCapacity =
-        getOverallAnalysisContextQuantity(
-            reportContext.shiftCapacity,
-        );
-
-    const capacityLimit =
-        configuredCapacity !== null &&
-        configuredCapacity > 0
-            ? configuredCapacity
-            : OVERALL_ANALYSIS_CAPACITY;
-
-    const capacityUsed =
-        plannedVolume;
-
-    const capacityUsageRate =
-        capacityUsed !== null
-            ? capacityUsed /
-                capacityLimit
-            : null;
-
-    const capacityBalance =
-        capacityUsed !== null
-            ? capacityLimit -
-                capacityUsed
-            : null;
-
-    const lossesRateSummary =
-        lossesRateState?.year === referenceDate.getFullYear()
-            ? getLossesRateMonthSummary(
-                referenceDate.getMonth(),
-                lossesRateState,
-            )
-            : null;
-
-    const lossRate =
-        lossesRateSummary?.lossRate ??
-        null;
-
-    const lossRateDifference =
-        lossRate !== null
-            ? Math.abs(
-                OVERALL_ANALYSIS_LOSS_RATE_LIMIT -
-                    lossRate,
-            ) * 100
-            : null;
-
-    const damageAndLossesAnalysis =
-        getOverallDamageAndLossesAnalysis(
-            damageState,
-            lossesState,
-        );
-
-    const consolidated = getConsolidatedSummary(damageState, lossesState, lossesRateState ?? null, referenceDate);
-    const { monthlyRates } = getLossesRateChartData(lossesRateState);
-    const activeHistoryMonth = consolidated.hasData && lossesRateState?.year === consolidated.year
-        ? consolidated.monthIndex
-        : null;
-
-    const packagesAnalysisRate =
-        damageAndLossesAnalysis
-            .packagesUnderReview !== null &&
-        damageAndLossesAnalysis.lossesTotal !== null
-            ? damageAndLossesAnalysis.lossesTotal === 0
-                ? 0
-                : damageAndLossesAnalysis
-                .packagesUnderReview /
-                damageAndLossesAnalysis
-                    .lossesTotal
-            : null;
-
-    const parcelSummary =
-        createParcelSummary(
-            parcelState?.rows,
-            parcelState?.operatorKindOverrides,
-        );
-
-    const reverseSummary =
-        createReverseSummary(
-            reverseState?.transfers,
-        );
-
-    return {
-        context: {
-            window:
-                String(
-                    reportContext.window ??
-                    "",
-                ).trim(),
-
-            analyst:
-                String(
-                    reportContext.analyst ??
-                    "",
-                ).trim(),
-
-            plannedVolume,
-
-            collaboratorCount:
-                getOverallAnalysisContextQuantity(
-                    reportContext.collaboratorCount,
-                ),
-
-            shiftCapacity:
-                configuredCapacity,
-        },
-
-        cards: {
-            capacity: {
-                limit:
-                    capacityLimit,
-
-                used:
-                    capacityUsed,
-
-                usageRate:
-                    capacityUsageRate,
-
-                balance:
-                    capacityBalance,
-            },
-
-            packagesAnalysis: {
-                value:
-                    damageAndLossesAnalysis
-                        .packagesUnderReview,
-
-                total:
-                    damageAndLossesAnalysis
-                        .lossesTotal,
-
-                rate:
-                    packagesAnalysisRate,
-
-                confirmedLosses:
-                    damageAndLossesAnalysis.traditionalAnalysis.totalMonth.confirmedLosses,
-            },
-
-            damage: {
-                hub: damageAndLossesAnalysis.traditionalAnalysis.totalMonth.hub,
-                soc: damageAndLossesAnalysis.traditionalAnalysis.totalMonth.soc,
-                total: damageAndLossesAnalysis.damageHasData
-                    ? damageAndLossesAnalysis.traditionalAnalysis.totalMonth.hub +
-                        damageAndLossesAnalysis.traditionalAnalysis.totalMonth.soc
-                    : null,
-            },
-
-            lossesRate: {
-                moved: lossesRateSummary?.moved ?? null,
-                totalLosses: lossesRateSummary?.totalLosses ?? null,
-                rate:
-                    lossRate,
-
-                limit:
-                    OVERALL_ANALYSIS_LOSS_RATE_LIMIT,
-
-                differencePercentagePoints:
-                    lossRateDifference,
-
-                withinLimit:
-                    lossRate !== null
-                        ? lossRate <=
-                            OVERALL_ANALYSIS_LOSS_RATE_LIMIT
-                        : null,
-            },
-        },
-
-        flow: {
-            planned:
-                plannedVolume,
-
-            processed:
-                receivedVolume,
-
-            expedited:
-                expeditedVolume,
-
-            floor:
-                planningGap,
-
-            gap:
-                planningGap,
-        },
-
-        processing: {
-            expectedVolume,
-            receivedVolume,
-            totalErrors,
-            errorRate,
-            gap:
-                processingGap,
-        },
-
-        expedition: {
-            routesChecked:
-                hasExpeditionData
-                    ? expeditionSummary
-                        .validatedRoutes
-                    : null,
-
-            volumeChecked:
-                hasExpeditionData
-                    ? expeditionSummary
-                        .volumeChecked
-                    : null,
-
-            floorVolume,
-
-            durationSeconds:
-                expeditionSummary
-                    .expeditionDurationSeconds,
-        },
-
-        expeditionErrors: {
-            sortingErrors: expeditionErrors.sortingErrors,
-            labelingErrors: expeditionErrors.labelingErrors,
-            totalErrors: expeditionErrors.totalErrors,
-            errorRate: expeditionErrors.errorRate,
-            totalRevertedErrors: expeditionErrors.totalRevertedErrors,
-            revertedRate: expeditionErrors.revertedRate,
-            finalErrors: expeditionErrors.finalErrors,
-            finalRate: expeditionErrors.finalRate,
-            streets: expeditionErrors.streets.map(({ name, missingOrders, totalErrors, errorRate }) => ({
-                name, missingOrders, totalErrors, errorRate,
-            })),
-        },
-
-        damageAndLosses:
-            damageAndLossesAnalysis,
-
-        damageAndLossesComposition: {
-            composition: consolidated.composition,
-            total: consolidated.total,
-            hasData: consolidated.hasData,
-            hasDamageData: consolidated.hasDamageData,
-            hasLossesData: consolidated.hasLossesData,
-            monthName: consolidated.monthName,
-            year: consolidated.year,
-        },
-
-        lossesRateHistory: { activeMonth: activeHistoryMonth, monthlyRates },
-
-        parcel: {
-            hasData: parcelSummary.hasData,
-            scannedCount: parcelSummary.scannedCount,
-            backlogCount: parcelSummary.backlogCount,
-            exceptionCount: parcelSummary.exceptionCount,
-            missortedCount: parcelSummary.missortedCount,
-            expectedTotalCount: parcelSummary.expectedTotalCount,
-            expectedScannedCount: parcelSummary.expectedScannedCount,
-            expectedUnscannedCount: parcelSummary.expectedUnscannedCount,
-        },
-
-        reverse: {
-            hasData: reverseSummary.hasData,
-            total: reverseSummary.total,
-            quantities: reverseSummary.quantities,
-        },
-    };
+    const context = createOverallAnalysisContext(reportContext);
+    return updateOverallAnalysisSources({
+        context,
+        cards: { capacity: getOverallAnalysisCapacity(context) },
+        flow: { planned: context.plannedVolume },
+    }, {
+        receipt: receiptState,
+        expedition: expeditionState,
+        expeditionSummary: true,
+        occurrences: { damage: damageState, losses: lossesState },
+        lossesRate: lossesRateState,
+        parcel: parcelState,
+        reverse: reverseState,
+    }, referenceDate);
 }
 
 export {
     createOverallAnalysisData,
+    updateOverallAnalysisContext,
+    updateOverallAnalysisSources,
 };

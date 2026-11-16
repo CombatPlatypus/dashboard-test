@@ -1,5 +1,5 @@
 import {
-    getReverseState,
+    getReverseSnapshot,
     resetReverseReport,
     subscribeReverseState,
 } from "./state.js";
@@ -19,7 +19,7 @@ import {
 let reverseExportBusy = false;
 
 function canExportReverseReport(
-    state = getReverseState(),
+    state = getReverseSnapshot(),
 ) {
     return state.transfers.length > 0;
 }
@@ -27,7 +27,7 @@ function canExportReverseReport(
 function renderReverseExportStatus(
     copyButton,
     clearButton,
-    state = getReverseState(),
+    state = getReverseSnapshot(),
 ) {
     const hasData =
         canExportReverseReport(state);
@@ -195,12 +195,10 @@ function initializeReverseExport(
     );
 
     subscribeReverseState(
-        function (state) {
-            renderReverseExportStatus(
-                copyButton,
-                clearButton,
-                state,
-            );
+        function (state, change) {
+            if (change.type !== "reverse-transfer-updated") {
+                renderReverseExportStatus(copyButton, clearButton, state);
+            }
         },
     );
 

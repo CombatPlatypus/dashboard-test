@@ -7,6 +7,8 @@ import {
     restoreReportContext,
 } from "../core/report-context.js";
 
+import { batchReportUpdates } from "../core/report-updates.js";
+
 import {
     bindReportImageExportButton,
     copyReportBlob,
@@ -302,26 +304,14 @@ async function runOverallAnalysisExport(
 /* LIMPA TODOS OS RELATÓRIOS QUE ALIMENTAM A ANÁLISE */
 
 function resetOverallAnalysisSources() {
-    OVERALL_ANALYSIS_SOURCE_REPORT_IDS
-        .forEach(
-            function (reportId) {
-                reportManager.reset(
-                    reportId,
-                );
-
-                resetReportNotification(
-                    reportId,
-                );
-            },
-        );
-
-    restoreReportContext({
-        window: "AM",
+    batchReportUpdates(() => {
+        for (const reportId of OVERALL_ANALYSIS_SOURCE_REPORT_IDS) {
+            reportManager.reset(reportId);
+            resetReportNotification(reportId);
+        }
+        restoreReportContext({ window: "AM" });
+        reportManager.render("overall-analysis");
     });
-
-    reportManager.render(
-        "overall-analysis",
-    );
 
     setReportNotification({
         reportId:

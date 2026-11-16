@@ -1,4 +1,5 @@
 import {
+    getExpeditionChangeScope,
     getExpeditionState,
     subscribeExpeditionState,
 } from "./state.js";
@@ -69,11 +70,13 @@ function renderExpeditionExportButtons(
     panel,
     copyButton,
     downloadButton,
+    state,
 ) {
     const disabled =
         expeditionExportBusy ||
         !canExportActiveExpeditionArea(
             panel,
+            state,
         );
 
     copyButton.disabled = disabled;
@@ -325,12 +328,10 @@ function initializeExpeditionExport(
     );
 
     subscribeExpeditionState(
-        function () {
-            renderExpeditionExportButtons(
-                panel,
-                copyButton,
-                downloadButton,
-            );
+        function (state, change) {
+            if (getExpeditionChangeScope(change).availability) {
+                renderExpeditionExportButtons(panel, copyButton, downloadButton, state);
+            }
         },
     );
 

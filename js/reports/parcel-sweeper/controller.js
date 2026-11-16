@@ -1,9 +1,6 @@
 import {
-    createParcelSummary,
-} from "./model.js";
-
-import {
     getParcelState,
+    getParcelStateSummary,
     replaceParcelRows,
     resetParcelReport,
     restoreParcelState,
@@ -78,9 +75,7 @@ function initializeParcelController() {
 }
 
 function renderParcelController() {
-    return renderParcelView(
-        getParcelState(),
-    );
+    return renderParcelView();
 }
 
 function resetParcelController() {
@@ -138,11 +133,7 @@ function importParcelSession(
 }
 
 function getParcelSummary() {
-    const state = getParcelState();
-    return createParcelSummary(
-        state.rows,
-        state.operatorKindOverrides,
-    );
+    return getParcelStateSummary();
 }
 
 export {

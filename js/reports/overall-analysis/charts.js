@@ -8,6 +8,7 @@ import {
 import {
     createLossesRateHistoryChart,
     updateLossesRateHistoryChart,
+    updateLossesRateHistoryHighlight,
 } from "../losses-rate/charts.js";
 
 import {
@@ -127,9 +128,25 @@ function observeOverallAnalysisVisibility() {
 
 /* RENDERIZAÇÃO */
 
-function renderOverallAnalysisCharts(
-    data,
-) {
+function getOverallAnalysisChartUpdateMode() {
+    return overallAnalysisPanel?.classList.contains("is-active") ? undefined : "none";
+}
+
+function renderOverallAnalysisReceiptChart(processing, updateMode = getOverallAnalysisChartUpdateMode()) {
+    if (!overallAnalysisReceiptChart) {
+        return false;
+    }
+
+    overallAnalysisReceiptChart.data.datasets[0].data = [
+        processing.expectedVolume,
+        processing.receivedVolume,
+        processing.gap,
+    ];
+    overallAnalysisReceiptChart.update(updateMode);
+    return true;
+}
+
+function renderOverallAnalysisCharts(data, previous) {
     if (
         !overallAnalysisReceiptChart ||
         !overallAnalysisExpeditionChart ||
@@ -142,60 +159,47 @@ function renderOverallAnalysisCharts(
         return false;
     }
 
-    overallAnalysisReceiptChart
-        .data
-        .datasets[0]
-        .data = [
-            data.processing.expectedVolume,
-            data.processing.receivedVolume,
-            data.processing.gap,
-        ];
+    const updateMode = getOverallAnalysisChartUpdateMode();
 
-    overallAnalysisExpeditionChart
-        .data
-        .datasets[0]
-        .data = [
-            data.expedition.volumeChecked,
-            data.expedition.floorVolume,
-        ];
-
-    const updateMode =
-        overallAnalysisPanel
-            ?.classList
-            .contains(
-                "is-active",
-            )
-            ? undefined
-            : "none";
-
-    overallAnalysisReceiptChart.update(
-        updateMode,
-    );
-
-    overallAnalysisExpeditionChart.update(
-        updateMode,
-    );
-
-    updateErrorBalanceChart(overallAnalysisErrorBalanceChart, data.expeditionErrors, updateMode);
-
-    updateConsolidatedCompositionChart(
-        overallAnalysisDamageAndLossesChart,
-        data.damageAndLossesComposition,
-        overallAnalysisDamageAndLossesIndicators,
-    );
-    updateLossesRateHistoryChart(overallAnalysisLossesRateHistoryChart, data.lossesRateHistory, updateMode);
-
-    updateParcelCoverageChart(
-        overallAnalysisParcelCoverageChart,
-        data.parcel,
-        updateMode,
-    );
-
-    updateReverseCompositionChart(
-        overallAnalysisReverseCompositionChart,
-        data.reverse,
-        updateMode,
-    );
+    if (data.processing !== previous?.processing &&
+        ["expectedVolume", "receivedVolume", "gap"].some(key => data.processing[key] !== previous?.processing[key])) {
+        renderOverallAnalysisReceiptChart(data.processing, updateMode);
+    }
+    if (data.expedition.volumeChecked !== previous?.expedition.volumeChecked ||
+        data.expedition.floorVolume !== previous?.expedition.floorVolume) {
+        overallAnalysisExpeditionChart.data.datasets[0].data = [data.expedition.volumeChecked, data.expedition.floorVolume];
+        overallAnalysisExpeditionChart.update(updateMode);
+    }
+    if (data.expeditionErrors !== previous?.expeditionErrors &&
+        ["labelingErrors", "sortingErrors", "totalRevertedErrors", "finalErrors"]
+            .some(key => data.expeditionErrors[key] !== previous?.expeditionErrors[key])) {
+        updateErrorBalanceChart(overallAnalysisErrorBalanceChart, data.expeditionErrors, updateMode);
+    }
+    if (data.damageAndLossesComposition !== previous?.damageAndLossesComposition) {
+        updateConsolidatedCompositionChart(
+            overallAnalysisDamageAndLossesChart,
+            data.damageAndLossesComposition,
+            overallAnalysisDamageAndLossesIndicators,
+        );
+    }
+    const history = data.lossesRateHistory;
+    if (history !== previous?.lossesRateHistory) {
+        if (history.monthlyRates.some((rate, index) => rate !== previous?.lossesRateHistory.monthlyRates[index])) {
+            updateLossesRateHistoryChart(overallAnalysisLossesRateHistoryChart, history, updateMode);
+        } else if (history.activeMonth !== previous.lossesRateHistory.activeMonth) {
+            updateLossesRateHistoryHighlight(overallAnalysisLossesRateHistoryChart, history.activeMonth, updateMode);
+        }
+    }
+    if (data.parcel !== previous?.parcel &&
+        ["expectedTotalCount", "expectedScannedCount", "expectedUnscannedCount"]
+            .some(key => data.parcel[key] !== previous?.parcel[key])) {
+        updateParcelCoverageChart(overallAnalysisParcelCoverageChart, data.parcel, updateMode);
+    }
+    if (data.reverse !== previous?.reverse &&
+        (data.reverse.hasData !== previous?.reverse.hasData ||
+            Object.keys(data.reverse.quantities).some(key => data.reverse.quantities[key] !== previous?.reverse.quantities[key]))) {
+        updateReverseCompositionChart(overallAnalysisReverseCompositionChart, data.reverse, updateMode);
+    }
 
     return true;
 }
@@ -294,4 +298,5 @@ function initializeOverallAnalysisCharts(
 export {
     initializeOverallAnalysisCharts,
     renderOverallAnalysisCharts,
+    renderOverallAnalysisReceiptChart,
 };

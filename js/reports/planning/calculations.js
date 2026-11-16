@@ -3,6 +3,25 @@ import {
     MINIMUM_PLANNING_LHS,
 } from "./state.js";
 
+function hasPlanningLhListChanged(change) {
+    return !change || [
+        "lh-added", "lh-removed", "lhs-replaced", "lhs-minimum-restored",
+        "lhs-reset", "planning-reset", "planning-session-imported",
+    ].includes(change.type);
+}
+
+function hasPlanningVolumeChanged(change) {
+    return hasPlanningLhListChanged(change) || change.type === "backlog-updated" ||
+        (change.type === "lh-updated" && change.field === "quantity") ||
+        (change.type === "collection-pool-updated" && ["backlogPackages", "backlogBulky"].includes(change.field));
+}
+
+function hasPlanningExportInputChanged(change) {
+    return hasPlanningVolumeChanged(change) || change.type === "vehicle-count-updated" ||
+        change.type === "general-field-updated" ||
+        (change.type === "lh-updated" && ["code", "origin"].includes(change.field));
+}
+
 /* RETORNA OS LHS EXIBIDOS NA PRÉVIA */
 
 function getPlanningPreviewLhs(lhs) {
@@ -84,17 +103,7 @@ function getPlanningPoolQuantity(
     state,
     field,
 ) {
-    const backlogPackages =
-        getPlanningBacklogCodes(
-            state,
-            "packages",
-        );
-
-    const backlogBulky =
-        getPlanningBacklogCodes(
-            state,
-            "bulky",
-        );
+    const { packages: backlogPackages, bulky: backlogBulky } = getPlanningBacklogLists(state);
 
     const hasBacklogCodes =
         backlogPackages.length > 0 ||
@@ -184,52 +193,34 @@ function parsePlanningBacklogCodes(value) {
 
 /* RETORNA OS CÓDIGOS DE UM TIPO DE BACKLOG */
 
-function getPlanningBacklogCodes(
-    state,
-    field,
-) {
-    const codes =
-        parsePlanningBacklogCodes(
-            state?.backlog?.[field],
-        );
+let planningBacklogCache = null;
 
-    if (field !== "bulky") {
-        return codes;
+function getPlanningBacklogLists(state) {
+    const packagesText = state?.backlog?.packages;
+    const bulkyText = state?.backlog?.bulky;
+    if (planningBacklogCache && planningBacklogCache.packagesText === packagesText &&
+        planningBacklogCache.bulkyText === bulkyText) {
+        return planningBacklogCache;
     }
 
-    const packageCodes =
-        new Set(
-            parsePlanningBacklogCodes(
-                state?.backlog?.packages,
-            ).map(
-                function (code) {
-                    return code.toUpperCase();
-                },
-            ),
-        );
+    const packages = parsePlanningBacklogCodes(packagesText);
+    const packageCodes = new Set(packages.map(code => code.toUpperCase()));
+    const bulky = parsePlanningBacklogCodes(bulkyText).filter(code => !packageCodes.has(code.toUpperCase()));
+    planningBacklogCache = { packagesText, bulkyText, packages, bulky };
+    return planningBacklogCache;
+}
 
-    return codes.filter(
-        function (code) {
-            return !packageCodes.has(
-                code.toUpperCase(),
-            );
-        },
-    );
+function getPlanningBacklogCodes(state, field) {
+    return field === "packages" || field === "bulky"
+        ? getPlanningBacklogLists(state)[field].slice()
+        : parsePlanningBacklogCodes(state?.backlog?.[field]);
 }
 
 /* RETORNA A QUANTIDADE DE BRS INFORMADOS */
 
 function getPlanningBacklogTotal(state) {
-    return (
-        getPlanningBacklogCodes(
-            state,
-            "packages",
-        ).length +
-        getPlanningBacklogCodes(
-            state,
-            "bulky",
-        ).length
-    );
+    const { packages, bulky } = getPlanningBacklogLists(state);
+    return packages.length + bulky.length;
 }
 
 /* CALCULA A QUANTIDADE PRESENTE NOS LHS */
@@ -411,6 +402,9 @@ export {
     getPlanningBacklogTotal,
     getPlanningPoolQuantity,
     getPlanningPreviewLhs,
+    hasPlanningExportInputChanged,
+    hasPlanningLhListChanged,
     hasPlanningToInformation,
+    hasPlanningVolumeChanged,
     parsePlanningBacklogCodes,
 };

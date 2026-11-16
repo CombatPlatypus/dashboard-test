@@ -3,6 +3,7 @@ import { CHART_TEXT_COLOR, CHART_VALUE_FONT } from "../../charts/theme.js";
 import { drawHorizontalBar3D, drawHorizontalBar3DBase } from "../core/horizontal-bars-3d.js";
 import { createDashboardChart } from "../../charts/standard.js";
 import {
+    getExpeditionChangeScope,
     getExpeditionOperatorRanking,
     getExpeditionState,
     subscribeExpeditionState,
@@ -1057,11 +1058,10 @@ function renderCards(
 function renderCharts(
     elements,
     state,
+    ranking = getExpeditionOperatorRanking(state),
 ) {
     const operators =
-        getExpeditionOperatorRanking(
-            state,
-        ).filter(
+        ranking.filter(
             function (operator) {
                 return operator.selected !==
                     false;
@@ -1267,11 +1267,10 @@ function initializeExpeditionCharts(
         );
 
     subscribeExpeditionState(
-        function (state) {
-            renderCharts(
-                elements,
-                state,
-            );
+        function (state, change, derived) {
+            if (getExpeditionChangeScope(change).ranking) {
+                renderCharts(elements, state, derived.getRanking());
+            }
         },
     );
 

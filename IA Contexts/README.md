@@ -4,6 +4,8 @@ Use este índice para localizar o código de uma função e entender quais dados
 
 Para entender como os painéis se conectam ao código e onde os dados são processados, comece pela [arquitetura do dashboard](arquitetura.md).
 
+Use a [regra de atualização seletiva](arquitetura.md#atualização-seletiva) em funções novas e em alterações nos fluxos existentes.
+
 Para manutenção no código, siga o [fluxo do repositório](../AGENTS.md) e consulte o [Registro de Alterações](Registro%20de%20Altera%C3%A7%C3%B5es/README.md) para ver o histórico.
 
 ## Painéis

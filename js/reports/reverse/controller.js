@@ -3,6 +3,7 @@ import {
 } from "./model.js";
 
 import {
+    getReverseSnapshot,
     getReverseState,
     resetReverseReport,
     restoreReverseState,
@@ -74,8 +75,7 @@ function initializeReverseController() {
 }
 
 function renderReverseController() {
-    const state =
-        getReverseState();
+    const state = getReverseSnapshot();
 
     renderReverseView(state);
     renderReverseCharts(state);

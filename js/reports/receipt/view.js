@@ -305,11 +305,8 @@ function configureReceiptErrorSelect(
             0,
         );
 
-    if (
-        select.dataset
-            .receiptErrorMaximum !==
-        String(maximum)
-    ) {
+    const optionsChanged = select.dataset.receiptErrorMaximum !== String(maximum);
+    if (optionsChanged) {
         const fragment =
             document.createDocumentFragment();
 
@@ -348,12 +345,14 @@ function configureReceiptErrorSelect(
                 String(maximum);
     }
 
+    const previousValue = select.value;
     setReceiptInputValue(
         select,
         operator?.errorQuantity,
     );
 
     if (
+        (optionsChanged || previousValue !== select.value) &&
         select.classList.contains(
             "select2-hidden-accessible",
         ) &&
@@ -529,7 +528,6 @@ function getReceiptOperatorStructureSignature(
                 return [
                     operator.id,
                     operator.receiver,
-                    operator.packagesReceived,
                 ];
             },
         ),
@@ -812,6 +810,10 @@ function setReceiptGeneralControlsAvailability(
 
 /* RESUMO */
 
+function renderReceiptExpectedVolume(expectedVolume, elements = receiptViewElements) {
+    elements.previewExpected.textContent = formatReceiptQuantity(expectedVolume);
+}
+
 function renderReceiptSummary(
     elements,
     state,
@@ -841,10 +843,7 @@ function renderReceiptSummary(
             receivedVolume,
         );
 
-    elements.previewExpected.textContent =
-        formatReceiptQuantity(
-            state.expectedVolume,
-        );
+    renderReceiptExpectedVolume(state.expectedVolume, elements);
 
     elements.previewReceived.textContent =
         formatReceiptQuantity(
@@ -866,6 +865,7 @@ function renderReceiptReport(
     elements,
     template,
     state,
+    change,
 ) {
     const selectedOperators =
         state.operators.filter(
@@ -875,6 +875,10 @@ function renderReceiptReport(
             },
         );
 
+    if (change?.type === "operator-field-updated") {
+        updateReceiptOperatorField(elements, state, selectedOperators, change);
+        return;
+    }
     const summary =
         getReceiptSummary(
             state,
@@ -885,6 +889,11 @@ function renderReceiptReport(
         .checked =
             state
                 .useTotalErrorParticipation;
+
+    if (change?.type === "general-field-updated" && change.field === "useTotalErrorParticipation") {
+        renderReceiptOperatorRates(elements, selectedOperators, summary.totalErrors, state.useTotalErrorParticipation);
+        return;
+    }
 
     renderReceiptSummary(
         elements,
@@ -905,6 +914,45 @@ function renderReceiptReport(
         state
             .useTotalErrorParticipation,
     );
+}
+
+function renderReceiptOperatorRates(elements, selectedOperators, totalErrors, useParticipation, operatorId) {
+    const label = useParticipation ? "Participação nos Erros" : "Taxa de Erros";
+    if (elements.previewOperatorRateHeading.textContent !== label) {
+        elements.previewOperatorRateHeading.textContent = label;
+    }
+    selectedOperators.forEach((operator, index) => {
+        if (operatorId === undefined || operator.id === operatorId) {
+            const cell = elements.previewOperatorBody.rows[index].cells[4];
+            const value = formatReceiptErrorRate(calculateReceiptOperatorErrorMetric(operator, totalErrors, useParticipation));
+            if (cell.textContent !== value) cell.textContent = value;
+        }
+    });
+}
+
+function updateReceiptOperatorField(elements, state, selectedOperators, { operatorId, field }) {
+    const operator = state.operators.find(item => item.id === operatorId);
+    const control = elements.operatorControls.querySelector(`[data-receipt-operator-id="${operatorId}"]`);
+    if (!operator || !control) return;
+    const inputs = getReceiptOperatorInputs(control);
+    const index = selectedOperators.findIndex(item => item.id === operatorId);
+    const preview = elements.previewOperatorBody.rows[index];
+
+    if (field === "labeler") {
+        setReceiptInputValue(inputs.labeler, operator.labeler);
+        if (preview) preview.cells[1].textContent = formatReportPersonWithOps(operator.labeler) || "—";
+        return;
+    }
+
+    configureReceiptErrorSelect(inputs.errorQuantity, operator);
+    if (!preview) return;
+
+    const { totalErrors, receivedVolume } = getReceiptSummary(state);
+    preview.cells[3].textContent = formatReceiptQuantity(operator.errorQuantity);
+    elements.previewErrors.textContent = formatReceiptQuantity(totalErrors);
+    elements.previewErrorRate.textContent = formatReceiptErrorRate(calculateReceiptErrorRate(totalErrors, receivedVolume));
+    renderReceiptOperatorRates(elements, selectedOperators, totalErrors, state.useTotalErrorParticipation,
+        state.useTotalErrorParticipation ? undefined : operatorId);
 }
 
 /* LIMPA TODO O RELATÓRIO */
@@ -1252,6 +1300,7 @@ function initializeReceiptControlPanels(
 
 function renderReceiptView(
     state = getReceiptState(),
+    change,
 ) {
     if (
         !receiptViewElements ||
@@ -1264,6 +1313,7 @@ function renderReceiptView(
         receiptViewElements,
         receiptOperatorTemplate,
         state,
+        change,
     );
 
     return true;
@@ -1387,13 +1437,7 @@ function initializeReceiptView(
         handleResetReceiptReport,
     );
 
-    subscribeReceiptState(
-        function (state) {
-            renderReceiptView(
-                state,
-            );
-        },
-    );
+    subscribeReceiptState(renderReceiptView);
 
     renderReceiptView();
 
@@ -1402,5 +1446,6 @@ function initializeReceiptView(
 
 export {
     initializeReceiptView,
+    renderReceiptExpectedVolume,
     renderReceiptView,
 };

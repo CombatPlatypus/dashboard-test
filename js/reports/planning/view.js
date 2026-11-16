@@ -26,6 +26,9 @@ import {
     getPlanningBacklogTotal,
     getPlanningPoolQuantity,
     getPlanningPreviewLhs,
+    hasPlanningExportInputChanged,
+    hasPlanningLhListChanged,
+    hasPlanningVolumeChanged,
     hasPlanningToInformation,
 } from "./calculations.js";
 
@@ -672,98 +675,58 @@ function renderPlanningSegregatedTosPreview(lhs) {
 
 /* ATUALIZA A PRÉVIA DO PLANEJAMENTO */
 
-function renderPlanningPreview(state) {
-    const previewLhs =
-        getPlanningPreviewLhs(
-            state.lhs,
-        );
+function renderPlanningPreview(state, change) {
+    const { type, field } = change ?? {};
+    const listChanged = hasPlanningLhListChanged(change);
+    const volumeChanged = hasPlanningVolumeChanged(change);
+    const lhChanged = type === "lh-updated";
+    const toChanged = ["to-added", "to-updated", "to-removed"].includes(type);
+    const affectedLh = lhChanged || toChanged ? state.lhs.find(lh => lh.id === (change.id ?? change.lhId)) : null;
+    const reset = !change || ["planning-reset", "planning-session-imported"].includes(type);
+    const backlogChanged = reset || type === "backlog-updated";
+    const poolFieldChanged = key => backlogChanged || (type === "collection-pool-updated" && field === key);
+    const format = value => planningNumberFormatter.format(value);
 
-    const lhQuantity =
-        getPlanningLhQuantity(
-            previewLhs,
-        );
+    if (volumeChanged) {
+        planningEstimatedVolume.textContent = format(calculatePlanningEstimatedVolume(state));
+    }
+    if (volumeChanged || type === "vehicle-count-updated" || field === "averageSpr") {
+        planningPreviewAverageSpr.textContent = format(calculatePlanningAverageSpr(state));
+    }
+    if (reset || field === "dailyCapacity") {
+        planningPreviewDailyCapacity.textContent = format(state.dailyCapacity ?? 0);
+    }
 
-    const backlogPackages =
-        getPlanningPoolQuantity(
-            state,
-            "backlogPackages",
-        );
+    if (poolFieldChanged("backlogPackages")) {
+        planningPreviewCpBacklog.textContent = format(getPlanningPoolQuantity(state, "backlogPackages"));
+    }
+    if (poolFieldChanged("backlogBulky")) {
+        planningPreviewCpBulky.textContent = format(getPlanningPoolQuantity(state, "backlogBulky"));
+    }
+    if (poolFieldChanged("added")) {
+        planningPreviewCpAdded.textContent = format(getPlanningPoolQuantity(state, "added"));
+    }
+    if (reset || (type === "collection-pool-updated" && field === "removed")) {
+        planningPreviewCpRemoved.textContent = format(state.collectionPool.removed ?? 0);
+    }
+    if (reset || (type === "collection-pool-updated" && field === "errors")) {
+        planningPreviewCpErrors.textContent = format(state.collectionPool.errors ?? 0);
+    }
 
-    const backlogBulky =
-        getPlanningPoolQuantity(
-            state,
-            "backlogBulky",
-        );
-
-    const estimatedVolume =
-        calculatePlanningEstimatedVolume(
-            state,
-        );
-
-    const averageSpr =
-        calculatePlanningAverageSpr(
-            state,
-        );
-
-    planningEstimatedVolume.textContent =
-        planningNumberFormatter.format(
-            estimatedVolume,
-        );
-
-    planningPreviewAverageSpr.textContent =
-        planningNumberFormatter.format(
-            averageSpr,
-        );
-
-    planningPreviewDailyCapacity.textContent =
-        planningNumberFormatter.format(
-            state.dailyCapacity ?? 0,
-        );
-
-    planningPreviewCpBacklog.textContent =
-        planningNumberFormatter.format(
-            backlogPackages,
-        );
-
-    planningPreviewCpBulky.textContent =
-        planningNumberFormatter.format(
-            backlogBulky,
-        );
-
-    planningPreviewCpLhPool.textContent =
-        planningNumberFormatter.format(
-            lhQuantity,
-        );
-
-    planningPreviewCpAdded.textContent =
-        planningNumberFormatter.format(
-            getPlanningPoolQuantity(
-                state,
-                "added",
-            ),
-        );
-
-    planningPreviewCpRemoved.textContent =
-        planningNumberFormatter.format(
-            state.collectionPool.removed ?? 0,
-        );
-
-    planningPreviewCpErrors.textContent =
-        planningNumberFormatter.format(
-            state.collectionPool.errors ?? 0,
-        );
-
-    renderPlanningLhPreview(
-        previewLhs,
-    );
-
-    renderPlanningSegregatedPreview(
-        state.lhs,
-    );
-
-    renderPlanningSegregatedTosPreview(
-        state.lhs,
-    );
+    if (listChanged || (lhChanged && field === "quantity")) {
+        planningPreviewCpLhPool.textContent = format(getPlanningLhQuantity(state.lhs));
+    }
+    if (listChanged || (lhChanged && ["code", "origin", "quantity"].includes(field))) {
+        renderPlanningLhPreview(getPlanningPreviewLhs(state.lhs));
+    }
+    if (listChanged || (lhChanged && (field === "segregate" || affectedLh?.segregate)) ||
+        (toChanged && affectedLh?.segregateTos && field !== "code")) {
+        renderPlanningSegregatedPreview(state.lhs);
+    }
+    if (listChanged || (lhChanged && ["code", "segregate", "segregateTos"].includes(field)) ||
+        (toChanged && affectedLh?.segregateTos)) {
+        renderPlanningSegregatedTosPreview(state.lhs);
+    }
 }
 
 /* ATUALIZA O ESTADO DE EXPORTAÇÃO DO RELATÓRIO */
@@ -995,47 +958,25 @@ function handlePlanningBacklogInput(event) {
 
 /* SINCRONIZA OS CONTROLES DOS INDICADORES */
 
-function synchronizePlanningIndicatorControls(
-    state,
-) {
-    const averageSpr =
-        calculatePlanningAverageSpr(
-            state,
-        );
-
-    planningPanel
-        .querySelectorAll(
-            "[data-planning-field]",
-        )
-        .forEach(
-            function (input) {
-                const field =
-                    input.dataset
-                        .planningField;
-
-                input.value =
-                    field === "averageSpr"
-                        ? averageSpr
-                        : state[field] ?? "";
-            },
-        );
-
-    planningPanel
-        .querySelectorAll(
-            "[data-planning-vehicle-field]",
-        )
-        .forEach(
-            function (input) {
-                const field =
-                    input.dataset
-                        .planningVehicleField;
-
-                input.value =
-                    state
-                        .vehicleCounts[field] ??
-                    "";
-            },
-        );
+function synchronizePlanningIndicatorControls(state, change) {
+    const { type, field } = change ?? {};
+    const reset = !change || ["planning-reset", "planning-session-imported"].includes(type);
+    if (hasPlanningVolumeChanged(change) || type === "vehicle-count-updated" || field === "averageSpr") {
+        const input = planningPanel.querySelector('[data-planning-field="averageSpr"]');
+        input.value = calculatePlanningAverageSpr(state);
+    }
+    if (reset || field === "dailyCapacity") {
+        const input = planningPanel.querySelector('[data-planning-field="dailyCapacity"]');
+        input.value = state.dailyCapacity ?? "";
+    }
+    if (reset || type === "vehicle-count-updated" || change?.vehicleCountsCleared) {
+        for (const input of planningPanel.querySelectorAll("[data-planning-vehicle-field]")) {
+            const vehicle = input.dataset.planningVehicleField;
+            if (reset || change.vehicleCountsCleared || vehicle === field) {
+                input.value = state.vehicleCounts[vehicle] ?? "";
+            }
+        }
+    }
 }
 
 /* SINCRONIZA OS CONTROLES DA COLLECTION POOL */
@@ -1819,91 +1760,32 @@ function initializePlanningView(
         },
     );
 
-    subscribePlanningState(
-        function (
-            state,
-            change,
-        ) {
-            planningReportHasActivity =
-                true;
+    subscribePlanningState((state, change) => {
+        const { type, field } = change;
+        const renderStatus = !planningReportHasActivity || hasPlanningExportInputChanged(change);
+        planningReportHasActivity = true;
+        const listChanged = hasPlanningLhListChanged(change);
+        const reset = ["planning-reset", "planning-session-imported"].includes(type);
+        if (listChanged) {
+            renderPlanningLhList(state.lhs);
+        }
+        if (listChanged || ["to-added", "to-removed"].includes(type) ||
+            (type === "lh-updated" && ["code", "segregate", "segregateTos"].includes(field))) {
+            renderPlanningToList(state.lhs);
+        }
 
-            if (
-                change.type === "lh-added" ||
-                change.type === "lh-removed" ||
-                change.type === "lhs-replaced" ||
-                change.type === "lhs-minimum-restored" ||
-                change.type === "lhs-reset" ||
-                change.type === "planning-reset" ||
-                change.type === "planning-session-imported"
-            ) {
-                renderPlanningLhList(
-                    state.lhs,
-                );
-            }
-
-            if (
-                change.type === "lh-added" ||
-                change.type === "lh-removed" ||
-                change.type === "lhs-replaced" ||
-                change.type === "lhs-minimum-restored" ||
-                change.type === "lhs-reset" ||
-                change.type === "planning-reset" ||
-                change.type === "planning-session-imported" ||
-                change.type === "to-added" ||
-                change.type === "to-removed" ||
-                (
-                    change.type === "lh-updated" &&
-                    (
-                        change.field === "code" ||
-                        change.field === "segregate" ||
-                        change.field === "segregateTos"
-                    )
-                )
-            ) {
-                renderPlanningToList(
-                    state.lhs,
-                );
-            }
-
-            synchronizePlanningIndicatorControls(
-                state,
-            );
-
-            if (
-                change.type ===
-                    "planning-reset" ||
-                change.type ===
-                    "planning-session-imported" ||
-                change.type ===
-                    "collection-pool-updated" ||
-                change.type ===
-                    "backlog-updated"
-            ) {
-                synchronizePlanningPoolControls(
-                    state,
-                );
-            }
-
-            if (
-                change.type ===
-                    "planning-reset" ||
-                change.type ===
-                    "planning-session-imported"
-            ) {
-                synchronizePlanningBacklogControls(
-                    state,
-                );
-            }
-
-            renderPlanningPreview(
-                state,
-            );
-
-            renderPlanningReportStatus(
-                state,
-            );
-        },
-    );
+        synchronizePlanningIndicatorControls(state, change);
+        if (reset || ["collection-pool-updated", "backlog-updated"].includes(type)) {
+            synchronizePlanningPoolControls(state);
+        }
+        if (reset) {
+            synchronizePlanningBacklogControls(state);
+        }
+        renderPlanningPreview(state, change);
+        if (renderStatus) {
+            renderPlanningReportStatus(state);
+        }
+    });
 
     planningAddLhButton.addEventListener(
         "click",

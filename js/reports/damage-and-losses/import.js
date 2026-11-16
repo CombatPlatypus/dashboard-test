@@ -19,6 +19,8 @@ import {
     findLossesRateWorkbookHistory,
 } from "../losses-rate/workbook.js";
 
+import { batchReportUpdates } from "../core/report-updates.js";
+
 const MAX_DAMAGE_HEADER_SEARCH_ROWS =
     50;
 
@@ -443,14 +445,7 @@ function findDamageProductSource(
     );
 }
 
-function findHistorySectionSource(
-    workbook,
-    sectionName,
-    aliasesByField,
-    {
-        required = true,
-    } = {},
-) {
+function readHistorySheet(workbook, required = true) {
     const sheetName =
         workbook.SheetNames.find(
             function (receivedSheetName) {
@@ -487,6 +482,12 @@ function findHistorySectionSource(
                 },
             );
 
+    return { sheetName, rows };
+}
+
+function findHistorySectionSource(historySheet, sectionName, aliasesByField) {
+    if (!historySheet) return null;
+    const { sheetName, rows } = historySheet;
     const searchLimit =
         Math.min(
             rows.length,
@@ -580,13 +581,12 @@ function findHistorySectionSource(
 
 function findDamageMonthSource(
     workbook,
-    options,
+    { required = true, historySheet = readHistorySheet(workbook, required) } = {},
 ) {
     const source = findHistorySectionSource(
-        workbook,
+        historySheet,
         "Histórico de Avarias",
         damageColumnAliases,
-        options,
     );
 
     return source
@@ -931,13 +931,12 @@ function findLossesReturnedSource(workbook) {
 
 function findLossesMonthSource(
     workbook,
-    options,
+    { required = true, historySheet = readHistorySheet(workbook, required) } = {},
 ) {
     const source = findHistorySectionSource(
-        workbook,
+        historySheet,
         "Histórico de Perdas",
         lossesColumnAliases,
-        options,
     );
 
     return source
@@ -1584,15 +1583,9 @@ async function readDamageAndLossesFile(
         );
     }
 
-    const source =
-        findDamageMonthSource(
-            workbook,
-        );
-
-    const lossesSource =
-        findLossesMonthSource(
-            workbook,
-        );
+    const historySheet = readHistorySheet(workbook);
+    const source = findDamageMonthSource(workbook, { historySheet });
+    const lossesSource = findLossesMonthSource(workbook, { historySheet });
 
     const damage =
         {
@@ -1730,17 +1723,11 @@ async function importDamageAndLossesFile(
                 file,
             );
 
-        replaceDamageAndLossesData(
-            result.damage,
-        );
-
-        replaceLossesData(
-            result.losses,
-        );
-
-        synchronizeLossesRateReport(
-            result,
-        );
+        batchReportUpdates(() => {
+            replaceDamageAndLossesData(result.damage);
+            replaceLossesData(result.losses);
+            synchronizeLossesRateReport(result);
+        });
 
         setDamageAndLossesImportNotification(
             "success",

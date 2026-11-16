@@ -871,6 +871,54 @@ function createParcelColumnDistribution(rows, column) {
             first.label.localeCompare(second.label, "pt-BR", { numeric: true }));
 }
 
+function createParcelClassification(scannedRows, operators, operatorKindOverrides = {}) {
+    const operatorStats =
+        operators.map(function (operator) {
+            const hasOverride = Object.hasOwn(operatorKindOverrides ?? {}, operator.operatorKey) &&
+                typeof operatorKindOverrides[operator.operatorKey] === "boolean";
+
+            return hasOverride ? {
+                ...operator,
+                packageKind: operatorKindOverrides[operator.operatorKey] ? "bulky" : "common",
+            } : operator;
+        });
+
+    const bulkyOperatorKeys =
+        new Set(
+            operatorStats
+                .filter(
+                    function (operator) {
+                        return operator
+                            .packageKind ===
+                            "bulky";
+                    },
+                )
+                .map(
+                    function (operator) {
+                        return operator
+                            .operatorKey;
+                    },
+                ),
+        );
+
+    const commonRows = [];
+    const bulkyRows = [];
+
+    scannedRows.forEach(
+        function (row) {
+            const operatorKey = getParcelOperatorKey(row.operator);
+            if (!operatorKey || operatorKey === "-" || operatorKey === "—") {
+                return;
+            }
+
+            const destination = bulkyOperatorKeys.has(operatorKey) ? bulkyRows : commonRows;
+            destination.push(row);
+        },
+    );
+
+    return { operatorStats, commonRows, bulkyRows };
+}
+
 function createParcelSummary(
     rows,
     operatorKindOverrides = {},
@@ -921,51 +969,6 @@ function createParcelSummary(
             },
         );
 
-    const operatorStats =
-        classifyParcelOperators(
-            receivedRows,
-        ).map(function (operator) {
-            const hasOverride = Object.hasOwn(operatorKindOverrides ?? {}, operator.operatorKey) &&
-                typeof operatorKindOverrides[operator.operatorKey] === "boolean";
-
-            return hasOverride ? {
-                ...operator,
-                packageKind: operatorKindOverrides[operator.operatorKey] ? "bulky" : "common",
-            } : operator;
-        });
-
-    const bulkyOperatorKeys =
-        new Set(
-            operatorStats
-                .filter(
-                    function (operator) {
-                        return operator
-                            .packageKind ===
-                            "bulky";
-                    },
-                )
-                .map(
-                    function (operator) {
-                        return operator
-                            .operatorKey;
-                    },
-                ),
-        );
-
-    const commonRows = [];
-    const bulkyRows = [];
-
-    scannedRows.forEach(
-        function (row) {
-            const operatorKey = getParcelOperatorKey(row.operator);
-            if (!operatorKey || operatorKey === "-" || operatorKey === "—") {
-                return;
-            }
-
-            const destination = bulkyOperatorKeys.has(operatorKey) ? bulkyRows : commonRows;
-            destination.push(row);
-        },
-    );
 
     return {
         hasData:
@@ -1011,7 +1014,7 @@ function createParcelSummary(
         ignoredScannedCount:
             scannedRows.length -
                 validOperatorRows.length,
-        operatorStats,
+        ...createParcelClassification(scannedRows, classifyParcelOperators(receivedRows), operatorKindOverrides),
         scannedStatusDistribution: createParcelColumnDistribution(receivedRows, "scannedStatus"),
         finalStatusDistribution: createParcelColumnDistribution(receivedRows, "finalStatus"),
         nextStepActionDistribution: createParcelColumnDistribution(receivedRows, "nextStepAction"),
@@ -1019,8 +1022,6 @@ function createParcelSummary(
             createParcelAgingDistribution(
                 receivedRows,
             ),
-        commonRows,
-        bulkyRows,
     };
 }
 
@@ -1030,6 +1031,7 @@ export {
     PARCEL_PACKAGE_FILTERS,
     classifyParcelOperators,
     createParcelAgingDistribution,
+    createParcelClassification,
     createParcelColumnDistribution,
     createParcelOperatorStats,
     createParcelRow,

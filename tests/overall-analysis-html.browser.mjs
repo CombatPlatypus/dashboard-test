@@ -30,7 +30,6 @@ function readErrorChart(id) {
         values: chart.data.datasets[0].data,
         colors: chart.data.datasets[0].backgroundColor,
         plugins: chart.config.plugins.map(plugin => plugin.id),
-        height: chart.canvas.parentElement.clientHeight,
         axis: chart.options.indexAxis,
         grace: chart.options.scales.x.grace,
         tooltips: chart.options.plugins.tooltip.enabled,
@@ -116,6 +115,36 @@ function readReportAppearance(selector) {
     return records;
 }
 
+function editGlobalReportInput({ id, value }) {
+    const unchangedIds = [
+        "receiptLinehaulPreviewBody", "receiptPreviewOperatorBody",
+        "expeditionPreviewOperatorBody", "expeditionPreviewStreetBody",
+        "overallAnalysisDamageAndLossesTable", "overallAnalysisExpeditionStreetBody",
+        "overallAnalysisReceivedVolume", "overallAnalysisExpedited",
+    ];
+    const observers = unchangedIds.map(id => {
+        const observer = new MutationObserver(() => {});
+        observer.observe(document.getElementById(id), { childList: true, subtree: true, characterData: true });
+        return observer;
+    });
+    const chartUpdates = [];
+    const originalChartUpdate = Chart.prototype.update;
+    Chart.prototype.update = function (...args) {
+        chartUpdates.push(this.canvas.id);
+        return originalChartUpdate.apply(this, args);
+    };
+    try {
+        const input = document.getElementById(id);
+        input.value = value;
+        input.dispatchEvent(new Event(input.matches("select") ? "change" : "input", { bubbles: true }));
+        const changedElements = unchangedIds.filter((id, index) => observers[index].takeRecords().length > 0);
+        return { changedElements, chartUpdates };
+    } finally {
+        Chart.prototype.update = originalChartUpdate;
+        observers.forEach(observer => observer.disconnect());
+    }
+}
+
 const repo = fileURLToPath(new URL("../", import.meta.url));
 const output = process.env.REPORT_QA_OUTPUT || await mkdtemp(path.join(tmpdir(), "overall-html-"));
 await mkdir(output, { recursive: true });
@@ -146,6 +175,9 @@ try {
     await page.locator('a[href="#overall-analysis"]').click();
     const button = page.locator("#overallAnalysisExportHtmlButton");
     assert.equal(await button.isDisabled(), true);
+    for (const id of ["expeditionDuplicatedInput", "expeditionExceptionInput", "expeditionWithdrawnInput"]) {
+        assert.equal(await page.locator(`#${id}`).inputValue(), "");
+    }
     const legendWidth = () => page.locator("#overallAnalysisDamageAndLossesLegend")
         .evaluate(element => getComputedStyle(element).maxWidth);
     assert.equal(await legendWidth(), "385px");
@@ -156,12 +188,31 @@ try {
         mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         buffer: Buffer.from(XLSX.write(createDamageAndLossesWorkbook(), { type: "array", bookType: "xlsx" })),
     };
-    async function importDamageAndLosses() {
+    async function importDamageAndLosses({ trackChanges = false } = {}) {
         await page.locator('#report-choice a[href="#damage-and-losses"]').click();
+        if (trackChanges) {
+            await page.evaluate(async () => {
+                await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+                const originalUpdate = Chart.prototype.update;
+                const updates = [];
+                Chart.prototype.update = function (...args) {
+                    updates.push(this.canvas.id);
+                    return originalUpdate.apply(this, args);
+                };
+                window.finishImportTracking = () => {
+                    Chart.prototype.update = originalUpdate;
+                    return updates;
+                };
+            });
+        }
         await page.locator("#damageAndLossesFileInput").setInputFiles(workbook);
     }
-    await importDamageAndLosses();
+    await importDamageAndLosses({ trackChanges: true });
     await page.waitForFunction(() => document.getElementById("damageAndLossesNotification").dataset.notificationType === "success");
+    const importCharts = await page.evaluate(() => window.finishImportTracking());
+    assert.equal(importCharts.filter(id => id === "consolidatedCompositionChart").length, 1);
+    assert.deepEqual(importCharts.filter(id => id.startsWith("overallAnalysis")).sort(),
+        ["overallAnalysisDamageAndLossesCompositionChart", "overallAnalysisLossesRateHistoryChart"]);
     await page.locator('a[href="#overall-analysis"]').click();
     assert.equal(await legendWidth(), "443px");
     const cardText = suffix => page.locator(`#overallAnalysis${suffix}`).textContent();
@@ -266,14 +317,41 @@ try {
     assert.equal(await page.evaluate(() => Object.values(Chart.instances)
         .every(chart => chart.options.plugins.tooltip.enabled === false)), true);
 
-    // A regra acompanha alterações do estado, sem precisar reabrir o painel.
-    await page.evaluate(async () => {
-        (await import("/js/reports/core/report-context.js")).updateReportContextField("analyst", "");
-    });
+    // Os campos globais atualizam apenas os trechos que dependem deles.
+    async function editGlobal(id, value, chartUpdates = []) {
+        assert.deepEqual(await page.evaluate(editGlobalReportInput, { id, value }),
+            { changedElements: [], chartUpdates }, id);
+    }
+    await editGlobal("reportAnalystInput", "");
+    assert.equal(await cardText("Analyst"), "—");
     assert.equal(await button.isDisabled(), true);
-    await page.evaluate(async () => {
-        (await import("/js/reports/core/report-context.js")).updateReportContextField("analyst", "Analista de teste");
-    });
+    await editGlobal("reportAnalystInput", "Analista atualizado");
+    assert.equal(await cardText("Analyst"), "Analista atualizado");
+    assert.equal(await button.isDisabled(), false);
+    await editGlobal("reportWindowInput", "PM1");
+    assert.equal(await cardText("Window"), "PM1");
+    await editGlobal("reportPlanningInput", "13000", ["overallAnalysisReceiptChart"]);
+    assert.equal(await cardText("Planned"), "13.000");
+    assert.equal(await cardText("ExpectedVolume"), "13.000");
+    assert.equal(await cardText("Floor"), "2.000");
+    assert.equal(await page.locator("#receiptPreviewExpected").textContent(), "13.000");
+    assert.equal(await page.locator("#receiptProgressExpected").textContent(), "13.000");
+    assert.deepEqual((await page.evaluate(readErrorChart, "overallAnalysisReceiptChart")).values, [13000, 11500, 1500]);
+
+    const editedDownloadEvent = page.waitForEvent("download");
+    await button.click();
+    const editedDownload = await editedDownloadEvent;
+    assert.match(editedDownload.suggestedFilename(), /^Relatório Final - PM1 /);
+    const editedHtml = await readFile(await editedDownload.path(), "utf8");
+    const editedReport = JSON.parse(editedHtml.match(/<script id="finalReportData"[^>]*>([\s\S]*?)<\/script>/)[1]).report;
+    assert.equal(editedReport.context.analyst, "Analista atualizado");
+    assert.equal(editedReport.context.window, "PM1");
+    assert.equal(editedReport.flow.planned, 13000);
+    assert.equal(editedReport.processing.expectedVolume, 13000);
+
+    await editGlobal("reportAnalystInput", "Analista de teste");
+    await editGlobal("reportWindowInput", "AM");
+    await editGlobal("reportPlanningInput", "12000", ["overallAnalysisReceiptChart"]);
     assert.equal(await button.isDisabled(), false);
     await page.evaluate(async () => {
         document.documentElement.dataset.theme = "blue";

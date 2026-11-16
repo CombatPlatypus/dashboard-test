@@ -863,6 +863,18 @@ test("ambos os botões atualizam as notificações e dicas de colagem conforme a
     const { receipt, expedition, root } = createCopyButtons();
     assert.equal(initializeReportSummaryCopy(root), true);
     assert.equal(initializeReportSummaryCopy(root), true);
+    let updatedLabels = 0;
+    for (const button of [receipt, expedition]) {
+        const setAttribute = button.setAttribute.bind(button);
+        button.setAttribute = (name, value) => {
+            if (name === "aria-label") updatedLabels += 1;
+            setAttribute(name, value);
+        };
+    }
+    updateReportContextField("analyst", "Ana");
+    updateReportContextField("plannedVolume", 4321);
+    restoreReportContext({ window: "AM", analyst: "Bia", plannedVolume: 4321 });
+    assert.equal(updatedLabels, 0);
     for (const [window, receiptTarget, expeditionTarget] of [
         ["AM", "C7", "G7"], ["PM1", "C67", "G67"], ["PM2", "C127", "G127"],
     ]) {
@@ -879,6 +891,10 @@ test("ambos os botões atualizam as notificações e dicas de colagem conforme a
     }
     assert.equal(writes.length, 6);
     assert.ok(writes.every(value => value.split("\n").length === 56));
+    assert.equal(matrix({ text: writes[0] })[4][0], "4321");
+    restoreReportContext({ window: "AM", plannedVolume: 4321 });
+    assert.match(receipt.title, /copiar para C7 da aba Base de Dados/);
+    assert.match(expedition.title, /copiar para G7 da aba Base de Dados/);
     assert.equal(expedition.listeners.click.length, 1);
     resetExpeditionReport();
     assert.equal(expedition.disabled, true);

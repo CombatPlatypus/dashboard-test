@@ -15,6 +15,7 @@ import {
     restoreReportContext,
     subscribeReportContext,
 } from "./core/report-context.js";
+import { batchReportUpdates } from "./core/report-updates.js";
 import { subscribePlanningState } from "./planning/state.js";
 import { subscribeReceiptState } from "./receipt/state.js";
 import { subscribeReceiptLinehaulState } from "./receipt/linehaul-state.js";
@@ -22,7 +23,7 @@ import { subscribeExpeditionState } from "./expedition/state.js";
 import { subscribeLossesRateState } from "./losses-rate/state.js";
 import { subscribeDamageAndLossesState } from "./damage-and-losses/state.js";
 import { subscribeLossesState } from "./damage-and-losses/losses-state.js";
-import { subscribeParcelState } from "./parcel-sweeper/state.js";
+import { getParcelSnapshot, hasParcelRowsChanged, subscribeParcelState } from "./parcel-sweeper/state.js";
 import { subscribeReverseState } from "./reverse/state.js";
 
 import {
@@ -41,7 +42,10 @@ import {
 const REPORT_SESSION_SCHEMA =
     "dashboard-report-session";
 
-const REPORT_SESSION_STORAGE_KEY = "dashboard-report-session-v1";
+const LEGACY_REPORT_SESSION_STORAGE_KEY = "dashboard-report-session-v1";
+const REPORT_SESSION_INDEX_KEY = "dashboard-report-session-v2";
+const REPORT_SESSION_PART_PREFIX = "dashboard-report-state-v2";
+const REPORT_CONTEXT_STORAGE_KEY = "dashboard-report-context-v1";
 
 const REPORT_SESSION_VERSION = 1;
 
@@ -86,7 +90,11 @@ const REPORT_SESSION_FEEDBACK_DURATION =
     6000;
 
 let reportSessionInitialized = false;
+let pendingReportSessionSave = null;
 let reportSessionSaveScheduled = false;
+let savedReportSessionIndex = null;
+let restoreUsedLegacyStorage = false;
+let reportSessionStorageRevision = 0;
 let reportSessionStorageWarningShown = false;
 
 let reportSessionFeedbackTimeout =
@@ -116,6 +124,16 @@ function isSessionObjectList(
             isSessionObject,
         )
     );
+}
+
+function isValidSessionContext(context) {
+    return isSessionObject(context) &&
+        typeof context.window === "string" &&
+        (context.analyst === undefined || typeof context.analyst === "string") &&
+        ["plannedVolume", "collaboratorCount", "shiftCapacity"].every(field => {
+            const value = context[field];
+            return value == null || (Number.isSafeInteger(value) && value >= 0);
+        });
 }
 
 /* OBTÉM OS RELATÓRIOS INCLUÍDOS NO ARQUIVO DE SESSÃO */
@@ -179,6 +197,47 @@ function createReportSessionPayload({ includeAllReports = false } = {}) {
     };
 }
 
+const validOccurrenceDays = state => isSessionObject(state) && isSessionObjectList(state.days) &&
+    (state.history === undefined || isSessionObjectList(state.history));
+
+const sessionReportValidators = {
+    planning: ["do Planejamento", state =>
+        isSessionObjectList(state.lhs) && state.lhs.every(linehaul => isSessionObjectList(linehaul.tos)) &&
+        isSessionObject(state.vehicleCounts) && isSessionObject(state.collectionPool)],
+    receipt: ["do Processamento", state =>
+        isSessionObjectList(state.operators) && isSessionObject(state.linehaul) && isSessionObjectList(state.linehaul.linehauls)],
+    expedition: ["da Expedição", state =>
+        isSessionObjectList(state.routes) && isSessionObjectList(state.errorStreets) && Array.isArray(state.excludedOperatorKeys) &&
+        isSessionObject(state.errorTotals) && isSessionObject(state.streetGuardians)],
+    "losses-rate": ["da Taxa de Perdas", state => isSessionObjectList(state.months) && state.months.length === 12],
+    "damage-and-losses": ["de Avarias e Perdas", state => {
+        const damage = state.damage || state;
+        return validOccurrenceDays(damage) &&
+            (damage.socStations === undefined || isSessionObjectList(damage.socStations)) &&
+            (state.losses === undefined || validOccurrenceDays(state.losses));
+    }],
+    parcel: ["do Parcel Sweeper", state => {
+        const overrides = state.operatorKindOverrides;
+        return isSessionObjectList(state.rows) && (overrides === undefined ||
+            (isSessionObject(overrides) && Object.values(overrides).every(value => typeof value === "boolean")));
+    }],
+    reverse: ["da Reversa", state => isSessionObjectList(state.transfers) && state.transfers.every(transfer => {
+        if (!isSessionObject(transfer.quantities)) return false;
+        return transfer.packages === undefined || (isSessionObject(transfer.packages) && Object.values(transfer.packages)
+            .every(codes => Array.isArray(codes) && codes.every(code => typeof code === "string")));
+    })],
+};
+
+function validateSessionReport(reportId, state) {
+    if (!isSessionObject(state)) {
+        throw new TypeError(`A sessão não possui dados válidos para ${reportId}.`);
+    }
+    const [label, isValid] = sessionReportValidators[reportId];
+    if (!isValid(state)) {
+        throw new TypeError(`Os dados ${label} são inválidos.`);
+    }
+}
+
 function validateReportSessionPayload(
     payload,
 ) {
@@ -234,187 +293,18 @@ function validateReportSessionPayload(
         );
     }
 
-    if (
-        payload.context !== undefined &&
-        (
-            !isSessionObject(
-                payload.context,
-            ) ||
-            typeof payload.context.window !==
-                "string" ||
-            (
-                payload.context.analyst !==
-                    undefined &&
-                typeof payload.context.analyst !==
-                    "string"
-            ) ||
-            [
-                "plannedVolume",
-                "collaboratorCount",
-                "shiftCapacity",
-            ].some(
-                function (field) {
-                    const value =
-                        payload.context[field];
-
-                    return value !==
-                        undefined &&
-                        value !== null &&
-                        !(
-                            Number.isSafeInteger(
-                                value,
-                            ) &&
-                            value >= 0
-                        );
-                },
-            )
-        )
-    ) {
+    if (payload.context !== undefined && !isValidSessionContext(payload.context)) {
         throw new TypeError(
             "Os dados globais da sessão são inválidos.",
         );
     }
 
-    REPORT_SESSION_IDS.forEach(
-        function (reportId) {
-            const present = Object.prototype.hasOwnProperty.call(payload.reports, reportId);
-            if (!present && !REQUIRED_REPORT_SESSION_IDS.includes(reportId)) return;
-            if (
-                !present ||
-                !isSessionObject(
-                    payload.reports[
-                        reportId
-                    ],
-                )
-            ) {
-                throw new TypeError(
-                    `A sessão não possui dados válidos para ${reportId}.`,
-                );
-            }
-        },
-    );
-
-    const planning =
-        payload.reports.planning;
-
-    const receipt =
-        payload.reports.receipt;
-
-    const expedition =
-        payload.reports.expedition;
-
-    const lossesRate =
-        payload.reports[
-            "losses-rate"
-        ];
-
-    if (
-        !isSessionObjectList(
-            planning.lhs,
-        ) ||
-        !planning.lhs.every(
-            function (linehaul) {
-                return isSessionObjectList(
-                    linehaul.tos,
-                );
-            },
-        ) ||
-        !isSessionObject(
-            planning.vehicleCounts,
-        ) ||
-        !isSessionObject(
-            planning.collectionPool,
-        )
-    ) {
-        throw new TypeError(
-            "Os dados do Planejamento são inválidos.",
-        );
-    }
-
-    if (
-        !isSessionObjectList(
-            receipt.operators,
-        ) ||
-        !isSessionObject(
-            receipt.linehaul,
-        ) ||
-        !isSessionObjectList(
-            receipt.linehaul.linehauls,
-        )
-    ) {
-        throw new TypeError(
-            "Os dados do Processamento são inválidos.",
-        );
-    }
-
-    if (
-        !isSessionObjectList(
-            expedition.routes,
-        ) ||
-        !isSessionObjectList(
-            expedition.errorStreets,
-        ) ||
-        !Array.isArray(
-            expedition.excludedOperatorKeys,
-        ) ||
-        !isSessionObject(
-            expedition.errorTotals,
-        ) ||
-        !isSessionObject(
-            expedition.streetGuardians,
-        )
-    ) {
-        throw new TypeError(
-            "Os dados da Expedição são inválidos.",
-        );
-    }
-
-    if (
-        !isSessionObjectList(
-            lossesRate.months,
-        ) ||
-        lossesRate.months.length !==
-            12
-    ) {
-        throw new TypeError(
-            "Os dados da Taxa de Perdas são inválidos.",
-        );
-    }
-
-    const damageAndLosses = payload.reports["damage-and-losses"];
-    if (damageAndLosses !== undefined) {
-        const damage = damageAndLosses.damage || damageAndLosses;
-        const losses = damageAndLosses.losses;
-        const validDays = value => isSessionObject(value) && isSessionObjectList(value.days) &&
-            (value.history === undefined || isSessionObjectList(value.history));
-        if (!validDays(damage) ||
-            (damage.socStations !== undefined && !isSessionObjectList(damage.socStations)) ||
-            (losses !== undefined && !validDays(losses))) {
-            throw new TypeError("Os dados de Avarias e Perdas são inválidos.");
+    for (const reportId of REPORT_SESSION_IDS) {
+        const present = Object.hasOwn(payload.reports, reportId);
+        if (present || REQUIRED_REPORT_SESSION_IDS.includes(reportId)) {
+            validateSessionReport(reportId, present ? payload.reports[reportId] : undefined);
         }
     }
-
-    const parcel = payload.reports.parcel;
-    if (parcel !== undefined) {
-        const overrides = parcel.operatorKindOverrides;
-        const validOverrides = overrides === undefined || (isSessionObject(overrides) &&
-            Object.values(overrides).every(value => typeof value === "boolean"));
-        if (!isSessionObjectList(parcel.rows) || !validOverrides) {
-            throw new TypeError("Os dados do Parcel Sweeper são inválidos.");
-        }
-    }
-
-    const reverse = payload.reports.reverse;
-    if (reverse !== undefined) {
-        const validTransfers = isSessionObjectList(reverse.transfers) && reverse.transfers.every(transfer => {
-            if (!isSessionObject(transfer.quantities)) return false;
-            if (transfer.packages === undefined) return true;
-            return isSessionObject(transfer.packages) && Object.values(transfer.packages).every(codes =>
-                Array.isArray(codes) && codes.every(code => typeof code === "string"));
-        });
-        if (!validTransfers) throw new TypeError("Os dados da Reversa são inválidos.");
-    }
-
     return true;
 }
 
@@ -537,17 +427,18 @@ function restoreReportSession(
         payload,
     );
 
-    const previousReports = includeAllReports
-        ? reportManager.exportSession()
-        : exportSessionReports();
+    const sessionReports = includeAllReports ? payload.reports : selectSessionReports(payload.reports);
+    const previousReports = {};
+    for (const reportId of Object.keys(sessionReports)) {
+        const report = reportManager.get(reportId);
+        if (report) previousReports[reportId] = report.exportSession();
+    }
 
     const previousContext =
         getReportContext();
 
     const previousSettings =
         exportDashboardSettings();
-
-    const sessionReports = includeAllReports ? payload.reports : selectSessionReports(payload.reports);
 
     const sessionContext =
         payload.context ?? {
@@ -560,38 +451,22 @@ function restoreReportSession(
         };
 
     try {
-        restoreReportContext(
-            sessionContext,
-        );
-
-        reportManager.importSession(sessionReports);
-
-        if (
-            payload.settings !== undefined
-        ) {
-            importDashboardSettings(
-                payload.settings,
-                { applyProfileToReports: false },
-            );
-        }
-
-        renderRestoredOverallAnalysis();
+        batchReportUpdates(() => {
+            restoreReportContext(sessionContext);
+            reportManager.importSession(sessionReports);
+            if (payload.settings !== undefined) {
+                importDashboardSettings(payload.settings, { applyProfileToReports: false });
+            }
+            renderRestoredOverallAnalysis();
+        });
     } catch (error) {
         try {
-            restoreReportContext(
-                previousContext,
-            );
-
-            reportManager.importSession(
-                previousReports,
-            );
-
-            importDashboardSettings(
-                previousSettings,
-                { applyProfileToReports: false },
-            );
-
-            renderRestoredOverallAnalysis();
+            batchReportUpdates(() => {
+                restoreReportContext(previousContext);
+                reportManager.importSession(previousReports);
+                importDashboardSettings(previousSettings, { applyProfileToReports: false });
+                renderRestoredOverallAnalysis();
+            });
         } catch (rollbackError) {
             console.error(
                 "Não foi possível reverter a importação da sessão.",
@@ -685,24 +560,119 @@ function downloadReportSession(payload = createReportSessionPayload()) {
     return fileName;
 }
 
-function saveReportSessionToStorage() {
-    const snapshot = createReportSessionPayload({ includeAllReports: true });
-    validateReportSessionPayload(snapshot);
-    window.sessionStorage.setItem(REPORT_SESSION_STORAGE_KEY, JSON.stringify(snapshot));
+function reportSessionPartKey(reportId, revision) {
+    return `${REPORT_SESSION_PART_PREFIX}:${reportId}:${revision}`;
+}
+
+function discardStoredPart(storage, key) {
+    try {
+        storage.removeItem(key);
+    } catch (error) {
+        console.warn("Não foi possível remover uma cópia antiga da sessão.", error);
+    }
+}
+
+function saveReportSessionToStorage({ reportIds, contextChanged, parcelControlsChanged }) {
+    const storage = window.sessionStorage;
+    const ids = restoreUsedLegacyStorage ? REPORT_SESSION_IDS : [...reportIds];
+    const previous = savedReportSessionIndex;
+    const snapshots = ids.map(reportId => {
+        const report = getSessionReport(reportId).exportSession();
+        validateSessionReport(reportId, report);
+        return [reportId, JSON.stringify(report)];
+    });
+
+    const onlyReportId = ids[0];
+    const existingRevision = previous?.parts[onlyReportId];
+    if (ids.length === 1 && existingRevision && !contextChanged && !parcelControlsChanged &&
+        !(onlyReportId === "parcel" && previous.parcelControls)) {
+        // A gravação de uma única parte já é atômica no sessionStorage e reutiliza o espaço atual.
+        storage.setItem(reportSessionPartKey(onlyReportId, existingRevision), snapshots[0][1]);
+        return;
+    }
+
+    const revision = reportSessionStorageRevision + 1;
+    const parts = { ...previous?.parts };
+    let parcelControls = previous?.parcelControls ?? null;
+    if (ids.includes("parcel")) {
+        parcelControls = null;
+    } else if (parcelControlsChanged) {
+        const { activeFilter, operatorKindOverrides } = getParcelSnapshot();
+        parcelControls = { activeFilter, operatorKindOverrides };
+    }
+    const index = {
+        storageRevision: revision,
+        createdAt: new Date().toISOString(),
+        context: getReportContext(),
+        settings: exportDashboardSettings(),
+        parts,
+        parcelControls,
+    };
+    const staged = [];
+    try {
+        for (const [id, serialized] of snapshots) {
+            const key = reportSessionPartKey(id, revision);
+            storage.setItem(key, serialized);
+            staged.push(key);
+            parts[id] = revision;
+        }
+        // O índice passa a apontar para os novos dados somente após todas as partes estarem gravadas.
+        storage.setItem(REPORT_SESSION_INDEX_KEY, JSON.stringify(index));
+    } catch (error) {
+        staged.forEach(key => discardStoredPart(storage, key));
+        throw error;
+    }
+
+    savedReportSessionIndex = index;
+    reportSessionStorageRevision = revision;
+    for (const id of ids) {
+        if (previous?.parts[id]) {
+            discardStoredPart(storage, reportSessionPartKey(id, previous.parts[id]));
+        }
+    }
+    if (restoreUsedLegacyStorage) {
+        discardStoredPart(storage, LEGACY_REPORT_SESSION_STORAGE_KEY);
+        restoreUsedLegacyStorage = false;
+    }
+}
+
+function saveReportContextToStorage() {
+    const { name, shift } = exportDashboardSettings().profile;
+    const snapshot = {
+        storageRevision: reportSessionStorageRevision,
+        context: getReportContext(),
+        profile: { name, shift },
+    };
+    window.sessionStorage.setItem(REPORT_CONTEXT_STORAGE_KEY, JSON.stringify(snapshot));
+}
+
+function persistPendingReportSessionSave() {
+    reportSessionSaveScheduled = false;
+    const pending = pendingReportSessionSave;
+    if (!pending) return;
+
+    if (pending.reportIds.size > 0 || pending.parcelControlsChanged) {
+        saveReportSessionToStorage(pending);
+    } else {
+        saveReportContextToStorage();
+    }
+    pendingReportSessionSave = null;
     reportSessionStorageWarningShown = false;
 }
 
-function scheduleReportSessionSave() {
+function scheduleReportSessionSave({ reportId, contextChanged = false, parcelControlsChanged = false }) {
+    const pending = pendingReportSessionSave ??= { reportIds: new Set(), contextChanged: false, parcelControlsChanged: false };
+    if (reportId) pending.reportIds.add(reportId);
+    pending.contextChanged ||= contextChanged;
+    pending.parcelControlsChanged ||= parcelControlsChanged;
     if (reportSessionSaveScheduled) return;
     reportSessionSaveScheduled = true;
 
     // Uma operação pode notificar mais de um estado antes de terminar.
     queueMicrotask(() => {
         if (!reportSessionSaveScheduled) return;
-        reportSessionSaveScheduled = false;
-
         try {
-            saveReportSessionToStorage();
+            persistPendingReportSessionSave();
         } catch (error) {
             if (reportSessionStorageWarningShown) return;
             reportSessionStorageWarningShown = true;
@@ -715,18 +685,95 @@ function scheduleReportSessionSave() {
     });
 }
 
-function restoreSavedReportSession() {
-    const source = window.sessionStorage.getItem(REPORT_SESSION_STORAGE_KEY);
-    if (!source) return false;
-    const payload = JSON.parse(source);
+function readStoredReportSession() {
+    const storage = window.sessionStorage;
+    const source = storage.getItem(REPORT_SESSION_INDEX_KEY);
+    if (!source) {
+        const legacy = storage.getItem(LEGACY_REPORT_SESSION_STORAGE_KEY);
+        if (!legacy) return null;
+        const payload = JSON.parse(legacy);
+        validateReportSessionPayload(payload);
+        restoreUsedLegacyStorage = true;
+        return payload;
+    }
+
+    const index = JSON.parse(source);
+    if (!isSessionObject(index?.parts) || !isValidSessionContext(index.context) ||
+        !Number.isSafeInteger(index.storageRevision) || index.storageRevision < 1) {
+        throw new TypeError("O índice da sessão de relatórios é inválido.");
+    }
+
+    const reports = {};
+    for (const [id, revision] of Object.entries(index.parts)) {
+        if (!REPORT_SESSION_IDS.includes(id) || !Number.isSafeInteger(revision) || revision < 1 || revision > index.storageRevision) {
+            throw new TypeError("A versão de um relatório salvo na aba é inválida.");
+        }
+        const data = storage.getItem(reportSessionPartKey(id, revision));
+        if (data === null) throw new TypeError(`A cópia de ${id} está ausente na sessão da aba.`);
+        reports[id] = JSON.parse(data);
+    }
+    for (const id of REQUIRED_REPORT_SESSION_IDS) {
+        if (!Object.hasOwn(reports, id)) reports[id] = getSessionReport(id).exportSession();
+    }
+    if (index.parcelControls) {
+        const { activeFilter, operatorKindOverrides } = index.parcelControls;
+        reports.parcel = { ...(reports.parcel ?? getSessionReport("parcel").exportSession()), activeFilter, operatorKindOverrides };
+    }
+
+    const payload = {
+        schema: REPORT_SESSION_SCHEMA,
+        version: REPORT_SESSION_VERSION,
+        createdAt: index.createdAt,
+        context: index.context,
+        settings: index.settings,
+        reports,
+        storageRevision: index.storageRevision,
+    };
     validateReportSessionPayload(payload);
+    savedReportSessionIndex = index;
+    return payload;
+}
+
+function readSavedReportContext() {
+    const source = window.sessionStorage.getItem(REPORT_CONTEXT_STORAGE_KEY);
+    if (!source) return null;
+
+    try {
+        const snapshot = JSON.parse(source);
+        if (snapshot?.storageRevision === reportSessionStorageRevision &&
+            isValidSessionContext(snapshot.context)) {
+            return snapshot;
+        }
+    } catch {
+        // Um contexto inválido não impede recuperar os relatórios do snapshot completo.
+    }
+    return null;
+}
+
+function restoreSavedReportSession() {
+    const payload = readStoredReportSession();
+    const revision = payload?.storageRevision;
+    reportSessionStorageRevision = Number.isSafeInteger(revision) && revision >= 0 ? revision : 0;
+    const savedContext = readSavedReportContext();
+    if (!payload && !savedContext) return false;
+
     const savedSettings = readDashboardSettingsFromSession();
 
     // Restaura os campos operacionais sem substituí-los pelos padrões do perfil.
-    restoreReportSession({ ...payload, settings: undefined }, { includeAllReports: true });
-    const settings = savedSettings ?? payload.settings;
+    if (payload) {
+        const context = savedContext?.context ?? payload.context;
+        // O importador de Processamento aceita expectedVolume como fallback de sessões legadas.
+        const reports = savedContext || savedReportSessionIndex ? {
+            ...payload.reports,
+            receipt: { ...payload.reports.receipt, expectedVolume: context.plannedVolume },
+        } : payload.reports;
+        restoreReportSession({ ...payload, reports, context, settings: undefined }, { includeAllReports: true });
+    } else {
+        restoreReportContext(savedContext.context);
+    }
+    const settings = savedSettings ?? payload?.settings;
     if (settings) {
-        const previousProfile = payload.settings?.profile;
+        const previousProfile = savedContext?.profile ?? payload?.settings?.profile;
         // Alterar apenas a aparência ou os links não substitui os campos operacionais salvos.
         const profileChanged = savedSettings !== null && (
             savedSettings.profile.name !== (previousProfile?.name ?? "") ||
@@ -1049,17 +1096,27 @@ function initializeReportSession() {
 
                 const data = parseDashboardDataFile(source);
                 const settingsOnly = data?.schema === DASHBOARD_SETTINGS_SCHEMA;
-                if (settingsOnly) {
-                    importDashboardSettings(parseDashboardSettingsFile(source));
-                } else {
-                    const payload = parseReportSession(source);
-                    restoreReportSession(payload);
+                const pendingBeforeImport = pendingReportSessionSave ? {
+                    ...pendingReportSessionSave, reportIds: new Set(pendingReportSessionSave.reportIds),
+                } : null;
+                try {
+                    if (settingsOnly) {
+                        importDashboardSettings(parseDashboardSettingsFile(source));
+                    } else {
+                        const payload = parseReportSession(source);
+                        restoreReportSession(payload);
+                    }
+                } catch (error) {
+                    pendingReportSessionSave = pendingBeforeImport;
+                    reportSessionSaveScheduled = false;
+                    throw error;
                 }
 
+                scheduleReportSessionSave({ contextChanged: true });
                 let sessionSaved = true;
                 try {
+                    persistPendingReportSessionSave();
                     saveDashboardSettingsToSession();
-                    saveReportSessionToStorage();
                 } catch (error) {
                     sessionSaved = false;
                     console.warn("Os dados foram importados, mas não foi possível guardá-los na sessão.", error);
@@ -1087,8 +1144,6 @@ function initializeReportSession() {
                             : "Não foi possível importar a sessão.",
                 });
             } finally {
-                // A importação grava uma única vez após aplicar os dados com sucesso.
-                reportSessionSaveScheduled = false;
                 setReportSessionBusy(
                     importButton,
                     false,
@@ -1105,18 +1160,22 @@ function initializeReportSession() {
             "Não foi possível recuperar os relatórios da sessão desta aba. Você pode importar o arquivo salvo." });
     }
 
-    [
-        subscribeReportContext,
-        subscribePlanningState,
-        subscribeReceiptState,
-        subscribeReceiptLinehaulState,
-        subscribeExpeditionState,
-        subscribeLossesRateState,
-        subscribeDamageAndLossesState,
-        subscribeLossesState,
-        subscribeParcelState,
-        subscribeReverseState,
-    ].forEach(subscribe => subscribe(scheduleReportSessionSave));
+    subscribeReportContext(() => scheduleReportSessionSave({ contextChanged: true }));
+    for (const [reportId, subscribe] of [
+        ["planning", subscribePlanningState],
+        ["receipt", subscribeReceiptState],
+        ["receipt", subscribeReceiptLinehaulState],
+        ["expedition", subscribeExpeditionState],
+        ["losses-rate", subscribeLossesRateState],
+        ["damage-and-losses", subscribeDamageAndLossesState],
+        ["damage-and-losses", subscribeLossesState],
+        ["reverse", subscribeReverseState],
+    ]) {
+        subscribe(() => scheduleReportSessionSave({ reportId }));
+    }
+    subscribeParcelState((_, change) => {
+        scheduleReportSessionSave(hasParcelRowsChanged(change) ? { reportId: "parcel" } : { parcelControlsChanged: true });
+    });
 
     reportSessionInitialized = true;
 

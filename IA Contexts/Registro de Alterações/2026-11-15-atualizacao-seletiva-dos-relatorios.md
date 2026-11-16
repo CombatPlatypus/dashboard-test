@@ -1,0 +1,9 @@
+# 15/11/2026 · Atualização seletiva dos relatórios
+
+O Relatório Final passou a recalcular as seções que usam a fonte alterada. O Consolidado e o Final recebem em lote os três estados da planilha de Avarias e Perdas. O seletor da Taxa de Perdas atualiza sua própria prévia, rosca e destaque no histórico.
+
+Planejamento, Processamento, Expedição, Parcel Sweeper e Reversa passaram a atualizar os componentes afetados por cada evento. Parcel compartilha o resumo da base e separa filtro, ordenação e classificação manual dos gráficos. Reversa compartilha os totais e atualiza as listas de pacotes afetadas. Os botões de cópia geram HTML e TSV ao serem acionados. [Contexto dos relatórios](../Painel%20Relat%C3%B3rios/README.md)
+
+O salvamento na aba passou a gravar por relatório. Operações com vários estados publicam as novas partes juntas. Os controles do Parcel são guardados no índice e o download mantém o formato v1. Foi documentada a regra de atualizar apenas os consumidores dos dados alterados em todas as novas funções. [Salvamento da sessão](../Menu%20Principal/salvamento-de-sessao.md) · [Regra de atualização seletiva](../arquitetura.md#atualização-seletiva)
+
+Os 269 testes automatizados passaram. No Edge, os fluxos de Processamento, importação de Avarias e Perdas, exportação do Final e restauração foram verificados. Na sessão enviada, uma edição em Planejamento gravou só aquele relatório em 0,4 ms. A operação de Avarias e Perdas atualizou o Final e o Consolidado uma vez cada. A reaplicação das 3.484 linhas do Parcel calculou o resumo uma vez, e filtro e classificação reaproveitaram a base. O recarregamento recuperou os relatórios após essas alterações. [Teste do Relatório Final](../../tests/overall-analysis-html.browser.mjs) · [Teste de salvamento](../../tests/report-session-autosave.test.mjs)

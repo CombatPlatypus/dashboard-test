@@ -13,7 +13,8 @@ const { chromium } = createRequire(import.meta.url)("playwright");
 const root = fileURLToPath(new URL("../", import.meta.url));
 const output = process.env.SETTINGS_QA_OUTPUT || await mkdtemp(path.join(tmpdir(), "dashboard-settings-"));
 const settingsSessionKey = "dashboard-settings-session-v1";
-const reportsSessionKey = "dashboard-report-session-v1";
+const reportsSessionKey = "dashboard-report-session-v2";
+const reportContextSessionKey = "dashboard-report-context-v1";
 await mkdir(output, { recursive: true });
 const server = createServer(async (request, response) => {
     try {
@@ -66,7 +67,13 @@ try {
         return opened;
     }
     const sessionSettings = tab => tab.evaluate(key => JSON.parse(sessionStorage.getItem(key)), settingsSessionKey);
-    const sessionReports = tab => tab.evaluate(key => JSON.parse(sessionStorage.getItem(key)), reportsSessionKey);
+    const sessionReports = tab => tab.evaluate(key => {
+        const index = JSON.parse(sessionStorage.getItem(key));
+        if (!index) return null;
+        const reports = Object.fromEntries(Object.entries(index.parts).map(([id, revision]) =>
+            [id, JSON.parse(sessionStorage.getItem(`dashboard-report-state-v2:${id}:${revision}`))]));
+        return { ...index, reports };
+    }, reportsSessionKey);
     const themeColors = () => page.evaluate(() => ({
         theme: document.documentElement.dataset.theme,
         body: getComputedStyle(document.body).backgroundColor,
@@ -84,6 +91,13 @@ try {
     assert.equal((await reportContext()).shiftCapacity, 20000);
     await page.locator('a[href="#reports"]').click();
     await page.locator("#reportPlanningInput").fill("3141");
+    await page.waitForFunction(key => JSON.parse(sessionStorage.getItem(key))?.context.plannedVolume === 3141,
+        reportContextSessionKey);
+    assert.equal(await sessionReports(page), null);
+    await page.reload();
+    await readyIndex();
+    await page.waitForFunction(() => document.getElementById("reportPlanningInput").value === "3141");
+    await page.locator('a[href="#reports"]').click();
     await page.evaluate(async () => {
         const receipt = await import("/js/reports/receipt/state.js");
         receipt.restoreReceiptState({ operators: [{ receiver: "Operador teste", selected: true,
@@ -101,7 +115,10 @@ try {
     await page.waitForFunction(key => JSON.parse(sessionStorage.getItem(key))?.context.plannedVolume === 3141,
         reportsSessionKey);
     const savedReports = await sessionReports(page);
-    assert.deepEqual(savedReports.reports, reportsBefore);
+    assert.deepEqual(Object.keys(savedReports.reports).sort(), ["receipt", "reverse"]);
+    for (const [id, state] of Object.entries(savedReports.reports)) {
+        assert.deepEqual(state, reportsBefore[id]);
+    }
     const reportFileEvent = page.waitForEvent("download");
     await page.locator("#reportDownloadButton").click();
     const reportFile = await reportFileEvent;
@@ -110,16 +127,31 @@ try {
     const fileSnapshot = JSON.parse(reportFileSource.match(/^const DASHBOARD_REPORT_SESSION = ([\s\S]*);\s*$/)[1]);
     assert.deepEqual(await sessionReports(page), savedReports);
     for (const id of Object.keys(fileSnapshot.reports)) {
-        assert.deepEqual(savedReports.reports[id], fileSnapshot.reports[id]);
+        assert.deepEqual(reportsBefore[id], fileSnapshot.reports[id]);
     }
     assert.deepEqual(savedReports.context, fileSnapshot.context);
     await page.locator("#reportPlanningInput").fill("9999");
     await page.waitForFunction(key => JSON.parse(sessionStorage.getItem(key))?.context.plannedVolume === 9999,
-        reportsSessionKey);
+        reportContextSessionKey);
+    assert.deepEqual(await sessionReports(page), savedReports);
     await page.reload();
     await readyIndex();
     await page.waitForFunction(() => document.getElementById("reportPlanningInput").value === "9999");
     assert.equal(await page.locator("#reportAnalystInput").inputValue(), "");
+    await page.locator('a[href="#reports"]').click();
+    await page.locator("#reportPlanningInput").fill("");
+    await page.waitForFunction(key => JSON.parse(sessionStorage.getItem(key))?.context.plannedVolume === null,
+        reportContextSessionKey);
+    // Um novo índice pode conservar o Processamento de uma revisão mais antiga.
+    await page.evaluate(async () => {
+        const { getPlanningState, restorePlanningState } = await import("/js/reports/planning/state.js");
+        restorePlanningState(getPlanningState());
+    });
+    assert.equal((await sessionReports(page)).context.plannedVolume, null);
+    assert.equal((await sessionReports(page)).reports.receipt.expectedVolume, 3141);
+    await page.reload();
+    await readyIndex();
+    assert.equal(await page.locator("#reportPlanningInput").inputValue(), "");
     await page.locator('a[href="#reports"]').click();
     await page.locator("#reportPlanningInput").fill("3141");
     assert.deepEqual(await page.evaluate(async () =>
@@ -399,6 +431,10 @@ try {
     delete legacy.settings.theme;
     legacy.context.analyst = "Analista legado";
     legacy.context.shiftCapacity = 5000;
+    await page.evaluate(async () =>
+        (await import("/js/reports/core/report-context.js")).updateReportContextField("analyst", "Analista local"));
+    await page.waitForFunction(key => JSON.parse(sessionStorage.getItem(key))?.context.analyst === "Analista local",
+        reportContextSessionKey);
     await importSource("#reportSessionFileInput", `const DASHBOARD_REPORT_SESSION = ${JSON.stringify(legacy)};`);
     await page.waitForFunction(() => document.getElementById("reportAnalystInput").value === "Analista legado");
     assert.equal((await reportContext()).shiftCapacity, 20000);

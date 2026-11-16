@@ -1,9 +1,10 @@
 import { getDamageAndLossesState, subscribeDamageAndLossesState } from "./state.js";
 import { getLossesState, subscribeLossesState } from "./losses-state.js";
 import { subscribeLossesRateState } from "../losses-rate/state.js";
+import { requestReportUpdate } from "../core/report-updates.js";
 import { setReportNotification } from "../report-notifications.js";
 import { createHistoryClipboardText, formatOccurrenceDate, getOccurrenceHistoryForPeriod } from "./history.js";
-import { CONSOLIDATED_ANALYSIS_PERIODS, getConsolidatedSummary } from "./consolidated-model.js";
+import { CONSOLIDATED_ANALYSIS_PERIODS, getConsolidatedLossRate, getConsolidatedSummary } from "./consolidated-model.js";
 import {
     createConsolidatedCompositionChart,
     getConsolidatedCompositionIndicators,
@@ -16,6 +17,8 @@ const lossRate = new Intl.NumberFormat("pt-BR", {
 });
 let elements = null;
 let compositionChart = null;
+let consolidatedSummary = null;
+let consolidatedReferenceMonth = null;
 const renderedHistories = new WeakMap();
 const copyingButtons = new Set();
 
@@ -51,12 +54,27 @@ function renderHistory(body, records) {
     renderedHistories.set(body, records);
 }
 
-function renderConsolidatedView() {
+function updateConsolidatedLossRate(value) {
+    const text = value === null ? "—" : lossRate.format(value);
+    if (elements.lossRate.textContent !== text) {
+        elements.lossRate.textContent = text;
+    }
+}
+
+function renderConsolidatedView({ damage, losses, rate } = {}) {
     if (!elements || !compositionChart) return false;
-    const damage = getDamageAndLossesState();
-    const losses = getLossesState();
     const referenceDate = new Date();
-    const summary = getConsolidatedSummary(damage, losses, undefined, referenceDate);
+    const referenceMonth = referenceDate.getFullYear() * 12 + referenceDate.getMonth();
+    if (!damage && !losses && rate && referenceMonth === consolidatedReferenceMonth) {
+        updateConsolidatedLossRate(getConsolidatedLossRate(consolidatedSummary, rate));
+        return true;
+    }
+
+    damage ??= getDamageAndLossesState();
+    losses ??= getLossesState();
+    const summary = getConsolidatedSummary(damage, losses, rate, referenceDate);
+    consolidatedSummary = summary;
+    consolidatedReferenceMonth = referenceMonth;
     elements.compositionLegend.style.maxWidth = summary.hasData ? "max-content" : "385px";
     for (const [key, value, available] of [
         ["hub", summary.hub, summary.hasDamageData],
@@ -66,7 +84,7 @@ function renderConsolidatedView() {
     ]) {
         elements[key].textContent = available ? quantity.format(value) : "—";
     }
-    elements.lossRate.textContent = summary.lossRate === null ? "—" : lossRate.format(summary.lossRate);
+    updateConsolidatedLossRate(summary.lossRate);
 
     const damageHistory = getOccurrenceHistoryForPeriod(damage.history, summary);
     const lossesHistory = getOccurrenceHistoryForPeriod(losses.history, summary);
@@ -140,9 +158,13 @@ function initializeConsolidatedView(rootElement = document.getElementById("damag
         copyHistory(elements.copyDamage, () => renderedHistories.get(elements.damageBody) ?? [], "avarias"));
     elements.copyLosses.addEventListener("click", () =>
         copyHistory(elements.copyLosses, () => renderedHistories.get(elements.lossesBody) ?? [], "perdas"));
-    subscribeDamageAndLossesState(renderConsolidatedView);
-    subscribeLossesState(renderConsolidatedView);
-    subscribeLossesRateState(renderConsolidatedView);
+    subscribeDamageAndLossesState(damage => requestReportUpdate(renderConsolidatedView, { damage }));
+    subscribeLossesState(losses => requestReportUpdate(renderConsolidatedView, { losses }));
+    subscribeLossesRateState((rate, change) => {
+        if (change.type !== "active-month-changed") {
+            requestReportUpdate(renderConsolidatedView, { rate });
+        }
+    });
     new MutationObserver(() => {
         if (!rootElement.classList.contains("is-active") || !panel.classList.contains("is-active")) return;
         window.requestAnimationFrame(() => {

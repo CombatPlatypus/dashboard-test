@@ -642,6 +642,7 @@ function renderLossesPeriodSelector(
 
 function renderLossesCharts(
     state = getLossesState(),
+    summary = getLossesSummary(state),
 ) {
     if (
         !lossesPeriodChart ||
@@ -651,8 +652,6 @@ function renderLossesCharts(
         return false;
     }
 
-    const summary =
-        getLossesSummary(state);
     const selectedPeriod =
         getActiveLossesChartPeriod(summary);
     const chartDays = selectedPeriod.days;
@@ -881,7 +880,7 @@ function initializeLossesCharts(
         },
     );
 
-    subscribeLossesState(renderLossesCharts);
+    subscribeLossesState((state, _change, getSummary) => renderLossesCharts(state, getSummary()));
     renderLossesCharts();
     observeLossesChartVisibility(panel, lossesPanel);
 

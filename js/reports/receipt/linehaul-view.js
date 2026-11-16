@@ -748,12 +748,18 @@ function renderReceiptLinehaulSummary(
 
 function renderReceiptLinehaulView(
     state = getReceiptLinehaulState(),
+    change,
 ) {
     if (
         !receiptLinehaulElements ||
         !receiptLinehaulTemplate
     ) {
         return false;
+    }
+
+    if (change?.type === "linehaul-record-updated") {
+        updateReceiptLinehaulField(state, change);
+        return true;
     }
 
     const summary =
@@ -782,6 +788,27 @@ function renderReceiptLinehaulView(
     );
 
     return true;
+}
+
+function updateReceiptLinehaulField(state, { linehaulId, field }) {
+    const elements = receiptLinehaulElements;
+    const linehaul = state.linehauls.find(item => item.id === linehaulId);
+    const control = elements.controls.querySelector(`[data-receipt-linehaul-id="${linehaulId}"]`);
+    if (control) {
+        setReceiptLinehaulInputValue(getReceiptLinehaulControlInputs(control)[field], linehaul[field]);
+    }
+    const metricsChanged = field === "code" || field === "loadedOrders";
+    const summary = metricsChanged ? getReceiptLinehaulSummary(state) : null;
+    if (summary) {
+        renderReceiptLinehaulSummary(elements, state, summary);
+    }
+    if (linehaul.selected !== true) return;
+
+    const selectedLinehauls = summary?.selectedLinehauls ?? state.linehauls.filter(item => item.selected === true);
+    const row = elements.previewBody.rows[selectedLinehauls.findIndex(item => item.id === linehaulId)];
+    const column = ["code", "driver", "origin", "loadedOrders"].indexOf(field);
+    const text = field === "loadedOrders" ? formatReceiptLinehaulQuantity(linehaul[field]) : linehaul[field];
+    row.cells[column].textContent = text || "—";
 }
 
 function sanitizeReceiptLinehaulInput(
@@ -1051,13 +1078,7 @@ function initializeReceiptLinehaulView(
         handleRemoveReceiptLinehaul,
     );
 
-    subscribeReceiptLinehaulState(
-        function (state) {
-            renderReceiptLinehaulView(
-                state,
-            );
-        },
-    );
+    subscribeReceiptLinehaulState(renderReceiptLinehaulView);
 
     renderReceiptLinehaulView();
 

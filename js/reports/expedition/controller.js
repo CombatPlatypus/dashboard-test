@@ -1,8 +1,7 @@
 import {
     getExpeditionState,
     getExpeditionSummary,
-    replaceExpeditionErrorData,
-    replaceExpeditionRoutes,
+    replaceExpeditionData,
     resetExpeditionReport,
     restoreExpeditionState,
 } from "./state.js";
@@ -27,10 +26,6 @@ import {
 import {
     initializeExpeditionExport,
 } from "./export.js";
-
-import {
-    subscribeReportContext,
-} from "../core/report-context.js";
 
 let expeditionControllerInitialized =
     false;
@@ -77,10 +72,6 @@ function initializeExpeditionController() {
     expeditionControllerInitialized =
         true;
 
-    subscribeReportContext(
-        renderExpeditionController,
-    );
-
     return true;
 }
 
@@ -117,21 +108,6 @@ function importExpeditionData(
         );
     }
 
-    let imported = false;
-
-    if (
-        Array.isArray(
-            receivedData.routes,
-        )
-    ) {
-        replaceExpeditionRoutes(
-            receivedData.routes,
-            sourceFileName,
-        );
-
-        imported = true;
-    }
-
     const errorData =
         receivedData.errorData ??
         receivedData.errors ??
@@ -150,18 +126,10 @@ function importExpeditionData(
                 : null
         );
 
-    if (
-        errorData &&
-        typeof errorData === "object" &&
-        !Array.isArray(errorData)
-    ) {
-        replaceExpeditionErrorData(
-            errorData,
-            errorSourceFileName,
-        );
-
-        imported = true;
-    }
+    const imported = replaceExpeditionData({
+        routes: receivedData.routes,
+        errorData: errorData && typeof errorData === "object" && !Array.isArray(errorData) ? errorData : null,
+    }, { sourceFileName, errorSourceFileName });
 
     if (!imported) {
         throw new TypeError(

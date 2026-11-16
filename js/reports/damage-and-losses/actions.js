@@ -23,6 +23,8 @@ import {
     setReportNotification,
 } from "../report-notifications.js";
 
+import { batchReportUpdates, requestReportUpdate } from "../core/report-updates.js";
+
 let damageExportBusy = false;
 
 function isLossesReportActive(panel) {
@@ -290,8 +292,10 @@ function initializeDamageAndLossesActions(
     clearButton.addEventListener(
         "click",
         function () {
-            resetDamageAndLossesState();
-            resetLossesState();
+            batchReportUpdates(() => {
+                resetDamageAndLossesState();
+                resetLossesState();
+            });
 
             setReportNotification({
                 reportId:
@@ -303,25 +307,17 @@ function initializeDamageAndLossesActions(
         },
     );
 
-    subscribeDamageAndLossesState(
-        function () {
-            renderDamageActionButtons(
-                panel,
-                copyButton,
-                clearButton,
-            );
-        },
-    );
-
-    subscribeLossesState(
-        function () {
-            renderDamageActionButtons(
-                panel,
-                copyButton,
-                clearButton,
-            );
-        },
-    );
+    const updateButtons = () => renderDamageActionButtons(panel, copyButton, clearButton);
+    subscribeDamageAndLossesState(() => {
+        if (!isLossesReportActive(panel)) {
+            requestReportUpdate(updateButtons);
+        }
+    });
+    subscribeLossesState(() => {
+        if (isLossesReportActive(panel) || panel.querySelector("#consolidated-history")?.classList.contains("is-active")) {
+            requestReportUpdate(updateButtons);
+        }
+    });
 
     panel.querySelector(
         "#damage-and-losses-choice",

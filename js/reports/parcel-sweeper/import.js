@@ -1,6 +1,5 @@
 import {
     createParcelRow,
-    createParcelSummary,
     normalizeParcelColumnName,
     normalizeParcelText,
 } from "./model.js";
@@ -399,18 +398,14 @@ async function importParcelFile(
         replaceParcelRows(
             result.rows,
             file.name,
+            { normalized: true },
         );
-
-        const summary =
-            createParcelSummary(
-                result.rows,
-            );
 
         setReportNotification({
             reportId: "parcel",
             type: "success",
             message:
-                `${summary.totalRows.toLocaleString("pt-BR")} pacotes importados de ${file.name}.`,
+                `${result.rows.length.toLocaleString("pt-BR")} pacotes importados de ${file.name}.`,
         });
     } catch (error) {
         const message =

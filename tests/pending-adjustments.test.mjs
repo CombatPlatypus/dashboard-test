@@ -116,16 +116,9 @@ test("controles vazios da expedição não exibem zero inicial", () => {
         "utf8",
     );
 
-    for (const field of [
-        "duplicatedInput",
-        "exceptionInput",
-        "withdrawnInput",
-    ]) {
-        assert.match(
-            view,
-            new RegExp(
-                `elements\\.${field},\\s*summary\\.hasData\\s*\\?`,
-            ),
-        );
-    }
+    assert.match(view, /duplicatedOrders: \["duplicatedInput", "previewDuplicated", 0\]/);
+    assert.match(view, /exceptionOrders: \["exceptionInput", "previewException", 0\]/);
+    assert.match(view, /withdrawnOrders: \["withdrawnInput", "previewWithdrawn", 0\]/);
+    assert.match(view, /const value = state\.routes\.length > 0 \? state\[field\] \?\? fallback : null;/);
+    assert.match(view, /setExpeditionInputValue\(elements\[input\], value\)/);
 });

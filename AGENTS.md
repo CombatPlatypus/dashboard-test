@@ -8,3 +8,5 @@ Siga este fluxo em toda manutenção no código do dashboard, inclusive correç�
 4. **Registre a alteração.** Crie uma entrada em [Registro de Alterações](IA%20Contexts/Registro%20de%20Altera%C3%A7%C3%B5es/README.md) descrevendo o que mudou no código e indicando os contextos atualizados.
 
 Ao criar ou alterar gráficos em qualquer painel ou na exportação HTML, siga o [padrão de gráficos do dashboard](IA%20Contexts/graficos.md).
+
+Ao criar ou alterar funções, aplique a [regra de atualização seletiva](IA%20Contexts/arquitetura.md#atualização-seletiva). Um evento deve atualizar apenas os cálculos, componentes e registros de sessão que dependem dos dados alterados.
