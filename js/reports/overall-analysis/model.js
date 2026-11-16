@@ -464,6 +464,9 @@ function createOverallAnalysisData(
             revertedRate: expeditionErrors.revertedRate,
             finalErrors: expeditionErrors.finalErrors,
             finalRate: expeditionErrors.finalRate,
+            streets: expeditionErrors.streets.map(({ name, missingOrders, totalErrors, errorRate }) => ({
+                name, missingOrders, totalErrors, errorRate,
+            })),
         },
 
         damageAndLosses:

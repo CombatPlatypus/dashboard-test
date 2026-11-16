@@ -340,6 +340,7 @@ function getOverallAnalysisViewElements(
         expeditionRevertedRate: getElement("overallAnalysisExpeditionRevertedRate"),
         expeditionFinalErrors: getElement("overallAnalysisExpeditionFinalErrors"),
         expeditionFinalRate: getElement("overallAnalysisExpeditionFinalRate"),
+        expeditionStreetBody: getElement("overallAnalysisExpeditionStreetBody"),
 
         damageAndLossesTable:
             getElement(
@@ -451,6 +452,28 @@ function renderOverallDamageAndLossesTable(
 }
 
 /* RENDERIZAÇÃO */
+
+function renderOverallExpeditionStreets(body, streets) {
+    const rowCount = Math.max(12, streets.length);
+    while (body.rows.length > rowCount) {
+        body.deleteRow(-1);
+    }
+
+    for (let index = 0; index < rowCount; index += 1) {
+        const row = body.rows[index] ?? body.insertRow();
+        const street = streets[index];
+        const values = [
+            street?.name || "—",
+            formatOverallAnalysisQuantity(street?.missingOrders),
+            formatOverallAnalysisQuantity(street?.totalErrors),
+            formatOverallAnalysisRate(street?.errorRate),
+        ];
+        values.forEach((value, column) => {
+            const cell = row.cells[column] ?? row.insertCell();
+            cell.textContent = value;
+        });
+    }
+}
 
 function renderOverallParcelAndReverse(
     elements,
@@ -608,6 +631,7 @@ function renderOverallAnalysisView(
     elements.expeditionRevertedRate.textContent = formatOverallAnalysisRate(errors.revertedRate);
     elements.expeditionFinalErrors.textContent = formatOverallAnalysisQuantity(errors.finalErrors);
     elements.expeditionFinalRate.textContent = formatOverallAnalysisRate(errors.finalRate);
+    renderOverallExpeditionStreets(elements.expeditionStreetBody, errors.streets);
 
     renderOverallDamageAndLossesTable(
         elements.damageAndLossesTable,

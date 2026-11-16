@@ -642,8 +642,8 @@
                 margin: 20px;
             }
             .expedition-error-balance-chart > .chart-canvas-container {
-                height: 313px;
-                margin: 0 20px 20px 20px;
+                height: 452px;
+                margin: 20px;
             }
             .line-chart .chart-canvas-container {
                 height: 339px;
@@ -783,11 +783,16 @@
                 font-weight: 600;
                 background-color: var(--color-table-th);
             }
-            .expedition-errors-summary > .chart {
-                margin-top: 20px;
+            .expedition-errors-summary > .flex-box-start {
+                gap: 15px;
+                margin-top: 15px;
             }
-            .expedition-errors-summary > .chart > .chart-canvas-container {
-                margin-top: 20px;
+            .expedition-errors-summary > .flex-box-start > div {
+                flex: 1 1 0;
+                min-width: 0;
+            }
+            .expedition-errors-summary > .flex-box-start > .chart {
+                justify-content: center;
             }
             .losses-rate-charts {
                 gap: 15px;
@@ -804,12 +809,13 @@
                 flex-wrap: wrap;
             }
             .losses-rate-charts .doughnut-chart .chart-label {
-                max-width: 500px;
+                max-width: 443px;
                 margin: 0 auto 20px;
             }
 
             @media (max-width: 900px) {
                 .tables-and-charts > div,
+                .expedition-errors-summary > .flex-box-start > div,
                 .losses-rate-charts > .chart {
                     flex-basis: 100%;
                     min-width: 0;
@@ -1216,9 +1222,110 @@
                         </tbody>
                     </table>
 
-                    <div class="chart horizontal-bars-chart expedition-error-balance-chart">
-                        <div class="chart-canvas-container">
-                            <canvas id="finalReportErrorBalanceChart" role="img" aria-label="Acompanhamento dos Erros"></canvas>
+                    <div class="flex-box-start">
+                        <div class="chart horizontal-bars-chart expedition-error-balance-chart">
+                            <div class="chart-canvas-container">
+                                <canvas id="finalReportErrorBalanceChart" role="img" aria-label="Acompanhamento dos Erros"></canvas>
+                            </div>
+                        </div>
+
+                        <div>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Rua</th>
+                                        <th>Pacotes Ausentes</th>
+                                        <th>Erros da Rua</th>
+                                        <th>Taxa de Erros</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="finalReportExpeditionStreetBody">
+                                    <tr>
+                                        <td>—</td>
+                                        <td>—</td>
+                                        <td>—</td>
+                                        <td>—</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>—</td>
+                                        <td>—</td>
+                                        <td>—</td>
+                                        <td>—</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>—</td>
+                                        <td>—</td>
+                                        <td>—</td>
+                                        <td>—</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>—</td>
+                                        <td>—</td>
+                                        <td>—</td>
+                                        <td>—</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>—</td>
+                                        <td>—</td>
+                                        <td>—</td>
+                                        <td>—</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>—</td>
+                                        <td>—</td>
+                                        <td>—</td>
+                                        <td>—</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>—</td>
+                                        <td>—</td>
+                                        <td>—</td>
+                                        <td>—</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>—</td>
+                                        <td>—</td>
+                                        <td>—</td>
+                                        <td>—</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>—</td>
+                                        <td>—</td>
+                                        <td>—</td>
+                                        <td>—</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>—</td>
+                                        <td>—</td>
+                                        <td>—</td>
+                                        <td>—</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>—</td>
+                                        <td>—</td>
+                                        <td>—</td>
+                                        <td>—</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>—</td>
+                                        <td>—</td>
+                                        <td>—</td>
+                                        <td>—</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>

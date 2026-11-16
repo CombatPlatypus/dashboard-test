@@ -116,7 +116,7 @@ test("as tabelas do HTML mantêm a estrutura e os estilos de célula do Relatór
     const tables = markup => Array.from(markup.matchAll(/<table\b[^>]*>[\s\S]*?<\/table>/g), ([table]) =>
         table.replace(/\s+id="[^"]+"/g, "").replace(/>\s+</g, "><"));
     const previewTables = tables(preview);
-    assert.equal(previewTables.length, 6);
+    assert.equal(previewTables.length, 7);
     assert.deepEqual(tables(template), previewTables);
 
     const dashboardCss = readFileSync(new URL("../css/dashboard-style.css", import.meta.url), "utf8");

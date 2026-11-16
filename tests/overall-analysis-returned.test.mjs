@@ -63,6 +63,18 @@ function createElements(t) {
             return [field, { dataset: { overallDamageLossesField: field }, cells, querySelectorAll: () => cells }];
         }));
     elements.get("overallAnalysisDamageAndLossesTable").querySelectorAll = () => [...rows.values()];
+    const streetBody = elements.get("overallAnalysisExpeditionStreetBody");
+    streetBody.rows = [];
+    streetBody.insertRow = () => {
+        const row = { cells: [], insertCell() {
+            const cell = new Element();
+            this.cells.push(cell);
+            return cell;
+        } };
+        streetBody.rows.push(row);
+        return row;
+    };
+    streetBody.deleteRow = index => streetBody.rows.splice(index, 1);
     const root = new Element();
     root.querySelector = selector => elements.get(selector.slice(1));
     return { root, rows, charts, elements };

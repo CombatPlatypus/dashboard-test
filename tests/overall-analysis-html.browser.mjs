@@ -121,12 +121,16 @@ try {
     assert.equal(await button.isDisabled(), true);
 
     // Importa o XLSX completo pelo mesmo fluxo usado no dashboard.
-    await page.locator('a[href="#damage-and-losses"]').click();
-    await page.locator("#damageAndLossesFileInput").setInputFiles({
+    const workbook = {
         name: "avarias-e-perdas.xlsx",
         mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         buffer: Buffer.from(XLSX.write(createDamageAndLossesWorkbook(), { type: "array", bookType: "xlsx" })),
-    });
+    };
+    async function importDamageAndLosses() {
+        await page.locator('#report-choice a[href="#damage-and-losses"]').click();
+        await page.locator("#damageAndLossesFileInput").setInputFiles(workbook);
+    }
+    await importDamageAndLosses();
     await page.waitForFunction(() => document.getElementById("damageAndLossesNotification").dataset.notificationType === "success");
     await page.locator('a[href="#overall-analysis"]').click();
     const cardText = suffix => page.locator(`#overallAnalysis${suffix}`).textContent();
@@ -152,7 +156,7 @@ try {
             packagesReceived: data.processing.receivedVolume, errorQuantity: data.processing.totalErrors }] });
         expedition.restoreExpeditionState({ floorVolume: data.expedition.floorVolume, routes: [{
             code: "ATTEST", status: "Validated", finalOrders: data.expedition.volumeChecked,
-            initialOrders: 11000, missortedOrders: 56,
+            initialOrders: 11000, missortedOrders: 56, corridor: "A-01", missingOrders: 7,
             validationOperator: "Conferente teste", validationStartTime: "2026-10-19 01:00:00",
             validationEndTime: "2026-10-19 03:10:05",
         }] });
@@ -220,6 +224,12 @@ try {
     assert.equal(finalHistory.pointRadii[9], 6);
     assert.equal(await page.locator("#overall-analysis .losses-rate-charts .chart-title").count(), 0);
     assert.deepEqual(await errorTable(), sourceErrors);
+    const streetRows = page.locator("#overallAnalysisExpeditionStreetBody tr");
+    const streetValues = ["A", "7", "56", "100,00%"];
+    assert.equal(await streetRows.count(), 12);
+    assert.deepEqual(await streetRows.first().locator("td").allTextContents(), streetValues);
+    assert.equal(await page.locator("#overall-analysis .losses-rate-charts .doughnut-chart .chart-label")
+        .evaluate(element => getComputedStyle(element).maxWidth), "443px");
     assert.deepEqual(await page.evaluate(readErrorChart, "overallAnalysisErrorBalanceChart"), sourceChart);
     await page.waitForFunction(errorBarsDrawn, "overallAnalysisErrorBalanceChart", { timeout: 5000 });
     assert.deepEqual(await page.evaluate(readErrorBarColors, "overallAnalysisErrorBalanceChart"), errorBarColors);
@@ -257,12 +267,16 @@ try {
     const optionalDownload = await optionalDownloadEvent;
     const optionalPath = path.join(output, "relatorio-final-sem-parcel-reversa.html");
     await optionalDownload.saveAs(optionalPath);
-    await page.evaluate(async () => (await import("/js/reports/expedition/state.js")).resetExpeditionReport());
-    assert.deepEqual(await errorTable(), errorFields.map(() => "—"));
-    assert.deepEqual((await page.evaluate(readErrorChart, "overallAnalysisErrorBalanceChart")).values, [0, 0, 0, 0]);
     await page.evaluate(async () => (await import("/js/reports/losses-rate/state.js")).resetLossesRateReport());
     assert.deepEqual((await page.evaluate(readLossesRateHistory, "overallAnalysisLossesRate")).rates, Array(12).fill(null));
     assert.deepEqual(await page.evaluate(readDamageAndLossesComposition, "overallAnalysisDamageAndLossesComposition"), sourceComposition);
+    await importDamageAndLosses();
+    await page.waitForFunction(() => document.getElementById("overallAnalysisDamageHub").textContent === "2");
+    assert.deepEqual(await streetRows.first().locator("td").allTextContents(), streetValues);
+    await page.evaluate(async () => (await import("/js/reports/expedition/state.js")).resetExpeditionReport());
+    assert.deepEqual(await errorTable(), errorFields.map(() => "—"));
+    assert.deepEqual((await page.evaluate(readErrorChart, "overallAnalysisErrorBalanceChart")).values, [0, 0, 0, 0]);
+    assert.deepEqual(await streetRows.first().locator("td").allTextContents(), ["—", "—", "—", "—"]);
     await page.evaluate(async () => {
         (await import("/js/reports/damage-and-losses/state.js")).resetDamageAndLossesState();
         (await import("/js/reports/damage-and-losses/losses-state.js")).resetLossesState();
@@ -318,6 +332,9 @@ try {
         [249, 148, 0, 255]);
     assert.deepEqual(await Promise.all(errorFields.map(field =>
         report.locator(`#finalReportExpedition${field}`).textContent())), sourceErrors);
+    assert.deepEqual(await report.locator("#finalReportExpeditionStreetBody tr").first().locator("td").allTextContents(), streetValues);
+    assert.equal(await report.locator(".losses-rate-charts .doughnut-chart .chart-label")
+        .evaluate(element => getComputedStyle(element).maxWidth), "443px");
     assert.deepEqual(await report.evaluate(readErrorChart, "finalReportErrorBalanceChart"), sourceChart);
     assert.deepEqual(await report.evaluate(readErrorBarColors, "finalReportErrorBalanceChart"), errorBarColors);
     assert.ok(rendered.sizes.every(([width, height]) => width > 0 && height > 0));
