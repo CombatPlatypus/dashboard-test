@@ -1192,7 +1192,6 @@
         max-height: 412px;
         overflow: auto;
         border: 1px solid var(--color-border);
-        border-radius: 4px;
     }
     #reports #reverse #reversePreview > .distribution-tables > div::-webkit-scrollbar {
         width: 7px;
