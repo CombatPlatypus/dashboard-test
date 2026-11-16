@@ -77,6 +77,9 @@
 #reports > .tabs-content > #losses-rate .tabs {
     grid-template-columns: repeat(auto-fit, minmax(115px, 1fr));
 }
+#reports > .tabs-content > #overall-analysis .tabs {
+    grid-template-columns: repeat(auto-fit, minmax(299px, 1fr));
+}
 #reports > .tabs-content > .tabs-panel > .tabs .tabs-title {
     width: 100%;
 }
