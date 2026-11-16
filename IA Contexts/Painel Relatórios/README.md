@@ -18,6 +18,14 @@ O botão de imagem captura a visualização de dados da subaba aberta. Quando as
 
 O botão de cópia de dados usa os estados relevantes para indicar disponibilidade e destino. Os blocos em HTML e TSV para o Resumo da Operação e para Planejamento são montados no clique. Consulte os intervalos e o formato no [contexto da cópia de dados para planilha](copia-de-dados-para-planilha.md).
 
+## Importação de LHs do SPX
+
+Planejamento e Descarregamento de LHs usam a mesma regra para os dados copiados do SPX. O importador lê o CPT (`AM`, `PM1` ou `PM2`) e usa o nome da viagem quando a janela precisa ser recuperada. Outro CPT encerra o bloco. Em blocos mistos, a seleção considera os LHs com um vizinho consecutivo do mesmo CPT.
+
+O STA/STD habilita dois casos. Um bloco com um único LH vale para qualquer Indicador de Pontualidade quando a data desse LH estiver entre hoje e dois dias à frente. Um bloco composto só por `Waiting` exige que todos os LHs selecionados do CPT tenham data na mesma faixa. A contagem usa dias do calendário de São Paulo e inclui os dois limites. A data é lida da coluna STA/STD e usada na seleção da importação.
+
+Para cada CPT, vale o primeiro bloco elegível na ordem em que aparece nos dados copiados. Quando mais de um CPT tem um bloco válido, o modal permite escolher a janela. [Regra compartilhada](../../js/reports/core/spx-linehaul-rules.js) · [Teste dos importadores](../../tests/linehaul-import-alignment.test.mjs)
+
 ## Processamento
 
 Acompanha **Descarregamento de LHs**, **Mesa de Recebimento** e **Ranking de Recebedores**. O [importador de LHs](../../js/reports/receipt/linehaul-import.js) trata a leitura e a seleção da janela. O [estado de LHs](../../js/reports/receipt/linehaul-state.js) deriva o volume restante a partir do volume esperado e dos LHs marcados como descarregados. O [importador de recebimento](../../js/reports/receipt/import.js) agrupa os registros por operador para a mesa e o ranking. A sessão reúne os dois estados no [controlador](../../js/reports/receipt/controller.js).

@@ -4,11 +4,19 @@ import {
 } from "./state.js";
 
 import {
+    SPX_LINEHAUL_SCHEDULE_MESSAGE,
     createSpXLinehaulWindowCandidates,
     formatSpXLinehaulOrigin,
+    getSpXDetectedWindows as getPlanningSpXDetectedWindows,
     getSpXLinehaulPlainLoadedOrders,
+    getSpXLinehaulPlainScheduledDate,
+    getSpXLinehaulScheduleColumns,
+    getSpXLinehaulScheduledDate,
     getSpXLinehaulWindow,
+    hasSpXLinehaulPlainScheduleLayout,
     parseSpXLinehaulQuantity,
+    parseSpXLinehaulTextMatrix,
+    selectSpXLinehaulRecords,
 } from "../core/spx-linehaul-rules.js";
 
 import {
@@ -26,9 +34,6 @@ const PLANNING_IMPORT_SOURCE =
 
 const PLANNING_IMPORT_SUCCESS_DURATION =
     3000;
-
-const PLANNING_SPX_WINDOW_PATTERN =
-    /^(AM|PM1|PM2)$/i;
 
 const PLANNING_SPX_LH_PATTERN =
     /\bLT[A-Z0-9]{8,24}\b/i;
@@ -331,6 +336,8 @@ function getPlanningImportColumns(
                 "cpt",
             ),
 
+        schedule: getSpXLinehaulScheduleColumns(normalizedRow),
+
         tripName:
             findColumn(
                 "nome da viagem",
@@ -357,6 +364,7 @@ function getPlanningImportColumns(
                         "quantity",
                         "action",
                         "tripName",
+                        "schedule",
                     ].includes(
                         key,
                     );
@@ -438,6 +446,7 @@ function createPlanningImportHtmlRecord(
 
         quantity,
         hideQuantity,
+        scheduledDate: getSpXLinehaulScheduledDate(receivedRecord.schedule),
 
         window:
             getPlanningImportWindow(
@@ -539,6 +548,7 @@ function parsePlanningImportMatrix(
                         origin: [],
                         punctuality: [],
                         cpt: [],
+                        schedule: [],
                         tripName: [],
                         quantity: [],
                         action: [],
@@ -561,6 +571,7 @@ function parsePlanningImportMatrix(
                 currentRecord.cpt.push(
                     row[columns.cpt] ?? "",
                 );
+                for (const column of columns.schedule) currentRecord.schedule.push(row[column]);
 
                 currentRecord.tripName.push(
                     columns.tripName >= 0
@@ -649,35 +660,15 @@ function getPlanningImportPlainQuantity(
 function parsePlanningSpXPlainText(
     text,
 ) {
-    const receivedLines =
-        String(
-            text ?? "",
-        )
-            .replace(
-                /\r/g,
-                "",
-            )
-            .split(
-                "\n",
-            );
-
-    const tabularRecords =
-        parsePlanningImportMatrix(
-            receivedLines.map(
-                function (line) {
-                    return line.split(
-                        "\t",
-                    );
-                },
-            ),
-        );
+    const source = String(text ?? "").replace(/\r/g, "");
+    const tabularRecords = parsePlanningImportMatrix(parseSpXLinehaulTextMatrix(source));
 
     if (tabularRecords.length > 0) {
         return tabularRecords;
     }
 
     const lines =
-        receivedLines
+        source.split("\n")
             .map(
                 function (line) {
                     return line
@@ -745,6 +736,8 @@ function parsePlanningSpXPlainText(
         },
     );
 
+    const headings = normalizePlanningImportText(lines.slice(0, recordStarts[0]?.index ?? 0).join(" "));
+    const hasScheduleLayout = hasSpXLinehaulPlainScheduleLayout(headings);
     return recordStarts.map(
         function (
             recordStart,
@@ -756,15 +749,8 @@ function parsePlanningSpXPlainText(
                 ]?.index ??
                 lines.length;
 
-            const values =
-                lines
-                    .slice(
-                        recordStart.index + 1,
-                        endIndex,
-                    )
-                    .filter(
-                        Boolean,
-                    );
+            const rawValues = lines.slice(recordStart.index + 1, endIndex);
+            const values = rawValues.filter(Boolean);
 
             const origin =
                 formatSpXLinehaulOrigin(
@@ -793,6 +779,8 @@ function parsePlanningSpXPlainText(
                         values,
                     ),
 
+                scheduledDate: getSpXLinehaulPlainScheduledDate(rawValues, hasScheduleLayout),
+
                 window:
                     getPlanningImportWindow(
                         values,
@@ -814,592 +802,31 @@ function parsePlanningSpXPlainText(
     );
 }
 
-/* RETORNA AS JANELAS NA ORDEM ENCONTRADA */
+/* CONVERTE A SELEÇÃO COMPARTILHADA EM DADOS DE PLANEJAMENTO */
 
-function getPlanningSpXDetectedWindows(
-    receivedRecords,
-) {
-    const records =
-        Array.isArray(
-            receivedRecords,
-        )
-            ? receivedRecords
-            : [];
-
-    const receivedWindows =
-        new Set();
-
-    records.forEach(
-        function (record) {
-            const windowValue =
-                String(
-                    record.window ?? "",
-                )
-                    .trim()
-                    .toUpperCase();
-
-            if (
-                PLANNING_SPX_WINDOW_PATTERN.test(
-                    windowValue,
-                )
-            ) {
-                receivedWindows.add(
-                    windowValue,
-                );
-            }
-        },
-    );
-
-    return Array.from(
-        receivedWindows,
-    );
-}
-
-/* VERIFICA SE EXISTE UM VIZINHO COM O MESMO CPT */
-
-function hasPlanningSpXMatchingWindowNeighbor(
-    records,
-    index,
-    targetWindow,
-) {
-    return (
-        records[index - 1]
-            ?.window ===
-            targetWindow ||
-
-        records[index + 1]
-            ?.window ===
-            targetWindow
-    );
-}
-
-/* SELECIONA O PRIMEIRO BLOCO VÁLIDO DA JANELA */
-
-/* SELECIONA O PRIMEIRO BLOCO VÁLIDO DA JANELA */
-
-function selectPlanningSpXLhs(
-    receivedRecords,
-    receivedTargetWindow = "",
-) {
-    const records =
-        Array.isArray(
-            receivedRecords,
-        )
-            ? receivedRecords
-            : [];
-
-    const detectedWindows =
-        getPlanningSpXDetectedWindows(
-            records,
-        );
-
-    const targetWindow =
-        String(
-            receivedTargetWindow ||
-            detectedWindows[0] ||
-            "",
-        )
-            .trim()
-            .toUpperCase();
-
-    const allWaitingImport =
-        records.length > 0 &&
-        records.every(
-            function (record) {
-                return record.waiting ===
-                    true;
-            },
-        );
-
-    const validWindowIndexes = [];
-
-    records.forEach(
-        function (
-            record,
-            index,
-        ) {
-            if (
-                record.window ===
-                    targetWindow &&
-
-                hasPlanningSpXMatchingWindowNeighbor(
-                    records,
-                    index,
-                    targetWindow,
-                )
-            ) {
-                validWindowIndexes.push(
-                    index,
-                );
-            }
-        },
-    );
-
-    if (
-        !targetWindow ||
-        validWindowIndexes.length === 0 ||
-        (
-            allWaitingImport &&
-            targetWindow !==
-                detectedWindows[0]
-        )
-    ) {
-        return {
-            lhs: [],
-            targetWindow,
-            includedWaiting: 0,
-            includedWithoutQuantity: 0,
-            includedWithoutWindow: 0,
-            skippedWaitingWithoutWindow: 0,
-            skippedAllWaitingGroups: 0,
-            skippedUngrouped: records.filter(
-                function (record) {
-                    return record.window ===
-                        targetWindow;
-                },
-            ).length,
-            skippedDuplicates: 0,
-        };
-    }
-
-    let blockStart = -1;
-    let blockEnd = -1;
-    let blockWindowIndexes = [];
-    let skippedAllWaitingGroups = 0;
-
-    const checkedBlocks =
-        new Set();
-
-    /*
-     * Percorre os agrupamentos da janela
-     * até encontrar um que possua pelo
-     * menos um LH que não esteja Waiting.
-     */
-
-    for (
-        const validIndex of
-            validWindowIndexes
-    ) {
-        let candidateStart =
-            validIndex;
-
-        let candidateEnd =
-            validIndex;
-
-        /*
-         * Expande o início do bloco até
-         * encontrar uma janela diferente.
-         */
-
-        while (
-            candidateStart > 0
-        ) {
-            const previousWindow =
-                records[
-                    candidateStart - 1
-                ].window;
-
-            if (
-                previousWindow &&
-                previousWindow !==
-                    targetWindow
-            ) {
-                break;
-            }
-
-            candidateStart -= 1;
-        }
-
-        /*
-         * Expande o final do bloco até
-         * encontrar uma janela diferente.
-         */
-
-        while (
-            candidateEnd <
-                records.length - 1
-        ) {
-            const nextWindow =
-                records[
-                    candidateEnd + 1
-                ].window;
-
-            if (
-                nextWindow &&
-                nextWindow !==
-                    targetWindow
-            ) {
-                break;
-            }
-
-            candidateEnd += 1;
-        }
-
-        const blockKey =
-            `${candidateStart}:${candidateEnd}`;
-
-        /*
-         * Evita verificar o mesmo bloco
-         * mais de uma vez.
-         */
-
-        if (
-            checkedBlocks.has(
-                blockKey,
-            )
-        ) {
-            continue;
-        }
-
-        checkedBlocks.add(
-            blockKey,
-        );
-
-        const candidateWindowIndexes =
-            validWindowIndexes.filter(
-                function (index) {
-                    return (
-                        index >=
-                            candidateStart &&
-                        index <=
-                            candidateEnd
-                    );
-                },
-            );
-
-        /*
-         * Um agrupamento composto somente
-         * por LHs Waiting só é válido quando
-         * toda a importação estiver Waiting;
-         * nesse caso, apenas a primeira janela
-         * detectada poderá ser selecionada.
-         *
-         * Um grupo misto continua válido,
-         * incluindo também seus LHs Waiting.
-         */
-
-        const hasNonWaitingLh =
-            candidateWindowIndexes.some(
-                function (index) {
-                    return !records[index]
-                        .waiting;
-                },
-            );
-
-        if (
-            !hasNonWaitingLh &&
-            !allWaitingImport
-        ) {
-            skippedAllWaitingGroups += 1;
-            continue;
-        }
-
-        blockStart =
-            candidateStart;
-
-        blockEnd =
-            candidateEnd;
-
-        blockWindowIndexes =
-            candidateWindowIndexes;
-
-        break;
-    }
-
-    /*
-     * Nenhum agrupamento válido foi
-     * encontrado para a janela escolhida.
-     */
-
-    if (
-        blockStart === -1 ||
-        blockWindowIndexes.length === 0
-    ) {
-        return {
-            lhs: [],
-            targetWindow,
-            includedWaiting: 0,
-            includedWithoutQuantity: 0,
-            includedWithoutWindow: 0,
-            skippedWaitingWithoutWindow: 0,
-            skippedAllWaitingGroups,
-
-            skippedUngrouped:
-                records.filter(
-                    function (record) {
-                        return record.window ===
-                            targetWindow;
-                    },
-                ).length,
-
-            skippedDuplicates: 0,
-        };
-    }
-
-    const firstGroupedIndex =
-        blockWindowIndexes[0];
-
-    const lastGroupedIndex =
-        blockWindowIndexes[
-            blockWindowIndexes.length - 1
-        ];
-
-    const selectedIndexes =
-        new Set(
-            blockWindowIndexes,
-        );
-
-    /*
-     * Inclui os LHs sem CPT que estiverem
-     * dentro ou imediatamente ao lado do
-     * agrupamento escolhido.
-     *
-     * LHs sem CPT marcados como Waiting
-     * continuam sendo ignorados.
-     */
-
-    for (
-        let index = blockStart;
-        index <= blockEnd;
-        index += 1
-    ) {
-        const record =
-            records[index];
-
-        if (
-            record.window ||
-            record.waiting
-        ) {
-            continue;
-        }
-
-        const insideBlock =
-            index >= firstGroupedIndex &&
-            index <= lastGroupedIndex;
-
-        const immediatelyBefore =
-            index ===
-            firstGroupedIndex - 1;
-
-        const immediatelyAfter =
-            index ===
-            lastGroupedIndex + 1;
-
-        if (
-            insideBlock ||
-            immediatelyBefore ||
-            immediatelyAfter
-        ) {
-            selectedIndexes.add(
-                index,
-            );
-        }
-    }
-
-    const orderedIndexes =
-        Array.from(
-            selectedIndexes,
-        )
-            .sort(
-                function (
-                    firstIndex,
-                    secondIndex,
-                ) {
-                    return (
-                        firstIndex -
-                        secondIndex
-                    );
-                },
-            );
-
-    const lhs = [];
-
-    const receivedCodes =
-        new Set();
-
+function createPlanningSpXSelection({ records, ...selectionDetails }) {
     let includedWaiting = 0;
     let includedWithoutQuantity = 0;
     let includedWithoutWindow = 0;
-    let skippedDuplicates = 0;
-
-    orderedIndexes.forEach(
-        function (index) {
-            const record =
-                records[index];
-
-            const code =
-                getPlanningImportLhCode(
-                    record.code,
-                );
-
-            if (!code) {
-                return;
-            }
-
-            if (
-                receivedCodes.has(
-                    code,
-                )
-            ) {
-                skippedDuplicates += 1;
-                return;
-            }
-
-            const quantity =
-                parsePlanningImportQuantity(
-                    record.quantity,
-                );
-
-            if (record.waiting) {
-                includedWaiting += 1;
-            }
-
-            if (quantity === null) {
-                includedWithoutQuantity += 1;
-            }
-
-            if (!record.window) {
-                includedWithoutWindow += 1;
-            }
-
-            receivedCodes.add(
-                code,
-            );
-
-            lhs.push({
-                code,
-
-                origin:
-                    String(
-                        record.origin ?? "",
-                    ).trim(),
-
-                quantity,
-            });
-        },
-    );
-
-    const selectedCodes =
-        new Set(
-            lhs.map(
-                function (lh) {
-                    return lh.code;
-                },
-            ),
-        );
-
-    const skippedWaitingWithoutWindow =
-        records
-            .slice(
-                blockStart,
-                blockEnd + 1,
-            )
-            .filter(
-                function (record) {
-                    return (
-                        !record.window &&
-                        record.waiting
-                    );
-                },
-            )
-            .length;
-
-    const skippedUngrouped =
-        records.filter(
-            function (record) {
-                return (
-                    record.window ===
-                        targetWindow &&
-
-                    !selectedCodes.has(
-                        getPlanningImportLhCode(
-                            record.code,
-                        ),
-                    )
-                );
-            },
-        ).length;
-
-    return {
-        lhs,
-        targetWindow,
-        includedWaiting,
-        includedWithoutQuantity,
-        includedWithoutWindow,
-        skippedWaitingWithoutWindow,
-        skippedAllWaitingGroups,
-        skippedUngrouped,
-        skippedDuplicates,
-    };
+    const lhs = records.map(record => {
+        const quantity = parsePlanningImportQuantity(record.quantity);
+        if (record.waiting) includedWaiting += 1;
+        if (quantity === null) includedWithoutQuantity += 1;
+        if (!record.window) includedWithoutWindow += 1;
+        return { code: record.code, origin: formatSpXLinehaulOrigin(record.origin), quantity };
+    });
+    return { ...selectionDetails, lhs, includedWaiting, includedWithoutQuantity, includedWithoutWindow };
 }
 
-/* CRIA AS OPÇÕES DE JANELA */
+function selectPlanningSpXLhs(records, targetWindow, referenceDate) {
+    return createPlanningSpXSelection(selectSpXLinehaulRecords(records, targetWindow, referenceDate));
+}
 
-function createPlanningSpXWindowCandidates(
-    records,
-) {
-    return createSpXLinehaulWindowCandidates(
-        records,
-    ).map(
-        function (candidate) {
-            const {
-                records: selectedRecords,
-                ...selectionDetails
-            } = candidate.selection;
-
-            let includedWaiting = 0;
-            let includedWithoutQuantity = 0;
-            let includedWithoutWindow = 0;
-
-            const lhs =
-                selectedRecords.map(
-                    function (record) {
-                        const quantity =
-                            parsePlanningImportQuantity(
-                                record.quantity,
-                            );
-
-                        if (record.waiting) {
-                            includedWaiting += 1;
-                        }
-
-                        if (quantity === null) {
-                            includedWithoutQuantity += 1;
-                        }
-
-                        if (!record.window) {
-                            includedWithoutWindow += 1;
-                        }
-
-                        return {
-                            code:
-                                getPlanningImportLhCode(
-                                    record.code,
-                                ),
-
-                            origin:
-                                formatSpXLinehaulOrigin(
-                                    record.origin,
-                                ),
-
-                            quantity,
-                        };
-                    },
-                );
-
-            return {
-                window: candidate.window,
-
-                selection: {
-                    ...selectionDetails,
-                    lhs,
-                    includedWaiting,
-                    includedWithoutQuantity,
-                    includedWithoutWindow,
-                },
-            };
-        },
-    );
+function createPlanningSpXWindowCandidates(records, referenceDate) {
+    return createSpXLinehaulWindowCandidates(records, referenceDate).map(({ window, selection }) => ({
+        window,
+        selection: createPlanningSpXSelection(selection),
+    }));
 }
 
 /* LOCALIZA OS ELEMENTOS DO MODAL */
@@ -1946,6 +1373,7 @@ async function handlePlanningClipboardImport(
             },
         );
 
+        const referenceDate = new Date();
         const importCandidates = [
             {
                 format: "HTML",
@@ -1970,6 +1398,7 @@ async function handlePlanningClipboardImport(
                     const windowCandidates =
                         createPlanningSpXWindowCandidates(
                             candidate.records,
+                            referenceDate,
                         );
 
                     return {
@@ -2066,9 +1495,9 @@ async function handlePlanningClipboardImport(
             validWindowCandidates
                 .length === 0
         ) {
-            throw new Error(
-                "Nenhuma das janelas encontradas possui um agrupamento válido de LHs.",
-            );
+            const needsSchedule = selectedCandidate.windowCandidates.some(({ selection }) => selection.skippedScheduleGroups > 0);
+            throw new Error(needsSchedule ? SPX_LINEHAUL_SCHEDULE_MESSAGE
+                : "Nenhuma das janelas encontradas possui um agrupamento válido de LHs.");
         }
 
         let selectedWindow =
@@ -2115,18 +1544,7 @@ async function handlePlanningClipboardImport(
             !selection ||
             selection.lhs.length === 0
         ) {
-            if (
-                selection
-                    ?.skippedAllWaitingGroups > 0
-            ) {
-                throw new Error(
-                    `Todos os grupos da janela ${selectedWindow} estão integralmente como Waiting.`,
-                );
-            }
-
-            throw new Error(
-                `A janela ${selectedWindow} não possui pelo menos dois LHs consecutivos com o mesmo CPT.`,
-            );
+            throw new Error(`A janela ${selectedWindow} precisa de um agrupamento válido de LHs.`);
         }
 
         if (
@@ -2170,16 +1588,10 @@ async function handlePlanningClipboardImport(
             );
         }
 
-        if (
-            selection
-                .skippedAllWaitingGroups > 0
-        ) {
-            ignoredParts.push(
-                selection
-                    .skippedAllWaitingGroups === 1
-                    ? "1 grupo composto somente por Waiting"
-                    : `${selection.skippedAllWaitingGroups} grupos compostos somente por Waiting`,
-            );
+        if (selection.skippedScheduleGroups > 0) {
+            ignoredParts.push(selection.skippedScheduleGroups === 1
+                ? "1 bloco com STA/STD ausente ou fora do período"
+                : `${selection.skippedScheduleGroups} blocos com STA/STD ausente ou fora do período`);
         }
 
         if (

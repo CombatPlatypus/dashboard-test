@@ -5,11 +5,17 @@ import {
 } from "./linehaul-state.js";
 
 import {
+    SPX_LINEHAUL_SCHEDULE_MESSAGE,
     createSpXLinehaulWindowCandidates,
     formatSpXLinehaulOrigin,
     getSpXLinehaulPlainLoadedOrders,
+    getSpXLinehaulPlainScheduledDate,
+    getSpXLinehaulScheduleColumns,
+    getSpXLinehaulScheduledDate,
     getSpXLinehaulWindow,
+    hasSpXLinehaulPlainScheduleLayout,
     parseSpXLinehaulQuantity,
+    parseSpXLinehaulTextMatrix,
 } from "../core/spx-linehaul-rules.js";
 
 import {
@@ -437,6 +443,8 @@ function getReceiptLinehaulColumns(
                 ],
             ),
 
+        schedule: getSpXLinehaulScheduleColumns(normalizedRow),
+
         tripName:
             findReceiptLinehaulColumn(
                 normalizedRow,
@@ -488,6 +496,7 @@ function getReceiptLinehaulColumns(
                     "loadedOrders",
                     "tripName",
                     "vehiclePlate",
+                    "schedule",
                 ].includes(
                     key,
                 );
@@ -554,6 +563,7 @@ function createReceiptLinehaulRecord(
         cpt,
 
         window: cpt,
+        scheduledDate: getSpXLinehaulScheduledDate(receivedRecord.schedule),
 
         waiting:
             punctualityValues.some(
@@ -652,6 +662,7 @@ function parseReceiptLinehaulMatrix(
                         origin: [],
                         driver: [],
                         cpt: [],
+                        schedule: [],
                         tripName: [],
                         punctuality: [],
                         loadedOrders: [],
@@ -676,6 +687,7 @@ function parseReceiptLinehaulMatrix(
                 currentRecord.cpt.push(
                     row[columns.cpt] ?? "",
                 );
+                for (const column of columns.schedule) currentRecord.schedule.push(row[column]);
 
                 currentRecord.tripName.push(
                     columns.tripName >= 0
@@ -745,38 +757,15 @@ function parseReceiptLinehaulSpXHtml(
 function parseReceiptLinehaulSpXPlainText(
     text,
 ) {
-    const lines =
-        String(
-            text ?? "",
-        )
-            .replace(
-                /\r/g,
-                "",
-            )
-            .split(
-                "\n",
-            );
-
-    const tabularMatrix =
-        lines.map(
-            function (line) {
-                return line.split(
-                    "\t",
-                );
-            },
-        );
-
-    const tabularRecords =
-        parseReceiptLinehaulMatrix(
-            tabularMatrix,
-        );
+    const source = String(text ?? "").replace(/\r/g, "");
+    const tabularRecords = parseReceiptLinehaulMatrix(parseSpXLinehaulTextMatrix(source));
 
     if (tabularRecords.length > 0) {
         return tabularRecords;
     }
 
     const normalizedLines =
-        lines.map(
+        source.split("\n").map(
             function (line) {
                 return line
                     .replace(
@@ -866,6 +855,8 @@ function parseReceiptLinehaulSpXPlainText(
         },
     );
 
+    const headings = normalizeReceiptLinehaulImportText(normalizedLines.slice(0, recordStarts[0]?.index ?? 0).join(" "));
+    const hasScheduleLayout = hasSpXLinehaulPlainScheduleLayout(headings);
     const records =
         recordStarts.map(
             function (
@@ -878,13 +869,8 @@ function parseReceiptLinehaulSpXPlainText(
                     ]?.index ??
                     normalizedLines.length;
 
-                const values =
-                    normalizedLines
-                        .slice(
-                            recordStart.index + 1,
-                            endIndex,
-                        )
-                        .filter(Boolean);
+                const rawValues = normalizedLines.slice(recordStart.index + 1, endIndex);
+                const values = rawValues.filter(Boolean);
 
                 const cpt =
                     getReceiptLinehaulCpt(
@@ -916,6 +902,7 @@ function parseReceiptLinehaulSpXPlainText(
                     cpt,
 
                     window: cpt,
+                    scheduledDate: getSpXLinehaulPlainScheduledDate(rawValues, hasScheduleLayout),
 
                     waiting:
                         values.some(
@@ -1481,6 +1468,7 @@ async function handleReceiptLinehaulClipboardImport(
             ],
         );
 
+        const referenceDate = new Date();
         const importCandidates = [
             {
                 format: "HTML",
@@ -1503,6 +1491,7 @@ async function handleReceiptLinehaulClipboardImport(
                     const windowCandidates =
                         createSpXLinehaulWindowCandidates(
                             candidate.records,
+                            referenceDate,
                         );
 
                     return {
@@ -1573,9 +1562,9 @@ async function handleReceiptLinehaulClipboardImport(
                 );
 
         if (validWindowCandidates.length === 0) {
-            throw new Error(
-                "Nenhuma das janelas encontradas possui um agrupamento válido de LHs.",
-            );
+            const needsSchedule = selectedCandidate.windowCandidates.some(({ selection }) => selection.skippedScheduleGroups > 0);
+            throw new Error(needsSchedule ? SPX_LINEHAUL_SCHEDULE_MESSAGE
+                : "Nenhuma das janelas encontradas possui um agrupamento válido de LHs.");
         }
 
         let selectedWindow =
@@ -1612,9 +1601,7 @@ async function handleReceiptLinehaulClipboardImport(
             !selection ||
             selection.records.length === 0
         ) {
-            throw new Error(
-                `A janela ${selectedWindow} não possui pelo menos dois LHs consecutivos com o mesmo CPT.`,
-            );
+            throw new Error(`A janela ${selectedWindow} precisa de um agrupamento válido de LHs.`);
         }
 
         const currentState =

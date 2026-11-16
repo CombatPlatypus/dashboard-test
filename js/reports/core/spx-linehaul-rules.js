@@ -4,6 +4,86 @@ const SPX_LINEHAUL_WINDOW_PATTERN =
 const SPX_LINEHAUL_CODE_PATTERN =
     /\bLT[A-Z0-9]{8,24}\b/i;
 
+const SPX_LINEHAUL_SCHEDULE_MESSAGE =
+    "Blocos com um único LH ou somente Waiting exigem uma data de STA/STD entre hoje e dois dias à frente.";
+
+const spxLinehaulCalendar = new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit", month: "2-digit", year: "numeric", timeZone: "America/Sao_Paulo",
+});
+
+function getSpXLinehaulScheduleColumns(row) {
+    const combined = row.findIndex(value => /\bsta\s*(?:[\\/]\s*)?std\b/i.test(value));
+    if (combined >= 0) return [combined];
+    return ["sta", "std"].map(label => row.indexOf(label)).filter(index => index >= 0);
+}
+
+function getSpXLinehaulScheduledDate(values) {
+    for (const value of values) {
+        for (const line of String(value ?? "").split(/\r?\n/)) {
+            const text = line.trim();
+            const iso = text.match(/^(\d{4})-(\d{2})-(\d{2})(?=$|[ T])/);
+            if (iso) return iso[0];
+            // No SPX a data e a hora também podem ser copiadas juntas, como 16-1102:30.
+            const date = text.match(/^(\d{1,2})[-/](\d{2})(?:[-/](\d{4}))?(?=$|\s|\d{1,2}:\d{2})/);
+            if (date) {
+                const [, day, month, year] = date;
+                return [year, month, day.padStart(2, "0")].filter(Boolean).join("-");
+            }
+        }
+    }
+    return null;
+}
+
+function getSpXLinehaulScheduleDays(referenceDate) {
+    const [day, month, year] = spxLinehaulCalendar.format(referenceDate).split("/").map(Number);
+    const keys = new Set();
+    for (let offset = 0; offset <= 2; offset += 1) {
+        const fullDate = new Date(Date.UTC(year, month - 1, day + offset)).toISOString().slice(0, 10);
+        keys.add(fullDate);
+        keys.add(fullDate.slice(5));
+    }
+    return keys;
+}
+
+function parseSpXLinehaulTextMatrix(text) {
+    if (!text.includes("\t")) return [];
+
+    // Planilhas delimitam com aspas as células que têm quebras internas.
+    const rows = [];
+    for (const match of `\n${text}`.matchAll(/([\t\n])(?:"((?:[^"]|"")*)"(?=[\t\n]|$)|([^\t\n]*))/g)) {
+        const [, delimiter, quoted, plain] = match;
+        if (delimiter === "\n") rows.push([]);
+        rows.at(-1).push(quoted?.replaceAll('""', '"') ?? plain);
+    }
+    return rows;
+}
+
+const spxLinehaulPunctualityPattern =
+    /^(?:waiting|(?:on[- ]time|early|late|delay(?:ed)?)\s+(?:arrival|departure))$/i;
+
+function getSpXLinehaulPlainScheduledDate(values, hasScheduleLayout) {
+    const labeledDates = values.flatMap(value => {
+        const label = value.match(/^STA(?:\s*[\\/]\s*STD)?\s*:\s*(.+)$|^STD\s*:\s*(.+)$/i);
+        return label ? [label[1] ?? label[2]] : [];
+    });
+    const labeledDate = getSpXLinehaulScheduledDate(labeledDates);
+    if (labeledDate || !hasScheduleLayout) return labeledDate;
+
+    // Na lista linear do SPX, Veículo e STA/STD vêm logo após o Indicador de Pontualidade.
+    let vehicle = values.findIndex(value => spxLinehaulPunctualityPattern.test(value));
+    if (vehicle < 0) return null;
+    do {
+        vehicle += 1;
+    } while (vehicle < values.length &&
+        (!values[vehicle] || values[vehicle] === "-" || spxLinehaulPunctualityPattern.test(values[vehicle])));
+    if (!values[vehicle] || getSpXLinehaulScheduledDate([values[vehicle]])) return null;
+    return getSpXLinehaulScheduledDate([values[vehicle + 1]]);
+}
+
+function hasSpXLinehaulPlainScheduleLayout(headings) {
+    return /(?:indicador de pontualidade|on time indicator)\s+(?:veiculo|vehicle)\s+sta\s*(?:[\\/]\s*)?std\b/.test(headings);
+}
+
 function formatSpXLinehaulOrigin(
     value,
 ) {
@@ -325,43 +405,16 @@ function getSpXDetectedWindows(
     );
 }
 
-function isSpXAllWaitingImport(
-    records,
-) {
-    return records.length > 0 &&
-        records.every(
-            function (record) {
-                return record.waiting ===
-                    true;
-            },
-        );
-}
-
-function hasSpXMatchingWindowNeighbor(
-    records,
-    index,
-    targetWindow,
-) {
-    return (
-        records[index - 1]
-            ?.window ===
-            targetWindow ||
-        records[index + 1]
-            ?.window ===
-            targetWindow
-    );
-}
-
 function createEmptySpXSelection(
     records,
     targetWindow,
-    skippedAllWaitingGroups = 0,
+    skippedScheduleGroups = 0,
 ) {
     return {
         records: [],
         targetWindow,
         skippedWaitingWithoutWindow: 0,
-        skippedAllWaitingGroups,
+        skippedScheduleGroups,
         skippedUngrouped:
             records.filter(
                 function (record) {
@@ -373,180 +426,54 @@ function createEmptySpXSelection(
     };
 }
 
-function selectSpXLinehaulRecords(
-    receivedRecords,
-    receivedTargetWindow = "",
-) {
-    const records =
-        Array.isArray(
-            receivedRecords,
-        )
-            ? receivedRecords
-            : [];
-
-    const detectedWindows =
-        getSpXDetectedWindows(
-            records,
-        );
-
-    const targetWindow =
-        String(
-            receivedTargetWindow ||
-            detectedWindows[0] ||
-            "",
-        )
-            .trim()
-            .toUpperCase();
-
-    const allWaitingImport =
-        isSpXAllWaitingImport(
-            records,
-        );
-
-    if (
-        allWaitingImport &&
-        targetWindow !==
-            detectedWindows[0]
-    ) {
-        return createEmptySpXSelection(
-            records,
-            targetWindow,
-        );
-    }
-
-    const validWindowIndexes = [];
-
-    records.forEach(
-        function (
-            record,
-            index,
-        ) {
-            if (
-                record.window ===
-                    targetWindow &&
-                hasSpXMatchingWindowNeighbor(
-                    records,
-                    index,
-                    targetWindow,
-                )
-            ) {
-                validWindowIndexes.push(
-                    index,
-                );
-            }
-        },
-    );
-
-    if (
-        !targetWindow ||
-        validWindowIndexes.length === 0
-    ) {
-        return createEmptySpXSelection(
-            records,
-            targetWindow,
-        );
-    }
+function selectSpXLinehaulRecords(receivedRecords, receivedTargetWindow = "", referenceDate = new Date()) {
+    const records = Array.isArray(receivedRecords) ? receivedRecords : [];
+    const targetWindow = String(receivedTargetWindow || getSpXDetectedWindows(records)[0] || "").trim().toUpperCase();
+    if (!targetWindow) return createEmptySpXSelection(records, targetWindow);
 
     let blockStart = -1;
     let blockEnd = -1;
     let blockWindowIndexes = [];
-    let skippedAllWaitingGroups = 0;
+    let skippedScheduleGroups = 0;
+    let scheduleDays;
 
-    const checkedBlocks = new Set();
-
-    for (const validIndex of validWindowIndexes) {
-        let candidateStart = validIndex;
-        let candidateEnd = validIndex;
-
-        while (candidateStart > 0) {
-            const previousWindow =
-                records[
-                    candidateStart - 1
-                ].window;
-
-            if (
-                previousWindow &&
-                previousWindow !==
-                    targetWindow
-            ) {
-                break;
-            }
-
-            candidateStart -= 1;
-        }
-
-        while (
-            candidateEnd <
-            records.length - 1
-        ) {
-            const nextWindow =
-                records[
-                    candidateEnd + 1
-                ].window;
-
-            if (
-                nextWindow &&
-                nextWindow !==
-                    targetWindow
-            ) {
-                break;
-            }
-
-            candidateEnd += 1;
-        }
-
-        const blockKey =
-            `${candidateStart}:${candidateEnd}`;
-
-        if (checkedBlocks.has(blockKey)) {
+    for (let index = 0; index < records.length;) {
+        if (records[index].window !== targetWindow) {
+            index += 1;
             continue;
         }
 
-        checkedBlocks.add(blockKey);
+        let start = index;
+        while (start > 0 && !records[start - 1].window) start -= 1;
 
-        const candidateWindowIndexes =
-            validWindowIndexes.filter(
-                function (index) {
-                    return (
-                        index >= candidateStart &&
-                        index <= candidateEnd
-                    );
-                },
-            );
-
-        const hasNonWaitingLh =
-            candidateWindowIndexes.some(
-                function (index) {
-                    return !records[index]
-                        .waiting;
-                },
-            );
-
-        if (
-            !hasNonWaitingLh &&
-            !allWaitingImport
-        ) {
-            skippedAllWaitingGroups += 1;
-            continue;
+        const sameWindow = [];
+        while (index < records.length && (!records[index].window || records[index].window === targetWindow)) {
+            if (records[index].window === targetWindow) sameWindow.push(index);
+            index += 1;
         }
 
-        blockStart = candidateStart;
-        blockEnd = candidateEnd;
-        blockWindowIndexes =
-            candidateWindowIndexes;
+        const grouped = sameWindow.length === 1 ? sameWindow : sameWindow.filter(row =>
+            records[row - 1]?.window === targetWindow || records[row + 1]?.window === targetWindow);
+        if (!grouped.length) continue;
 
+        // A data habilita um bloco de um LH ou um bloco composto só por Waiting.
+        const requiresSchedule = grouped.length === 1 || grouped.every(row => records[row].waiting === true);
+        if (requiresSchedule) {
+            scheduleDays ??= getSpXLinehaulScheduleDays(referenceDate);
+            if (!grouped.every(row => scheduleDays.has(records[row].scheduledDate))) {
+                skippedScheduleGroups += 1;
+                continue;
+            }
+        }
+
+        blockStart = start;
+        blockEnd = index - 1;
+        blockWindowIndexes = grouped;
         break;
     }
 
-    if (
-        blockStart === -1 ||
-        blockWindowIndexes.length === 0
-    ) {
-        return createEmptySpXSelection(
-            records,
-            targetWindow,
-            skippedAllWaitingGroups,
-        );
+    if (blockStart === -1) {
+        return createEmptySpXSelection(records, targetWindow, skippedScheduleGroups);
     }
 
     const selectedIndexes =
@@ -658,51 +585,34 @@ function selectSpXLinehaulRecords(
         records: selectedRecords,
         targetWindow,
         skippedWaitingWithoutWindow,
-        skippedAllWaitingGroups,
+        skippedScheduleGroups,
         skippedUngrouped,
         skippedDuplicates,
     };
 }
 
-function createSpXLinehaulWindowCandidates(
-    records,
-) {
-    const detectedWindows =
-        getSpXDetectedWindows(
-            records,
-        );
-
-    const candidateWindows =
-        isSpXAllWaitingImport(
-            records,
-        )
-            ? detectedWindows.slice(0, 1)
-            : detectedWindows;
-
-    return candidateWindows.map(
-        function (windowValue) {
-            return {
-                window: windowValue,
-                selection:
-                    selectSpXLinehaulRecords(
-                        records,
-                        windowValue,
-                    ),
-            };
-        },
-    );
+function createSpXLinehaulWindowCandidates(records, referenceDate = new Date()) {
+    return getSpXDetectedWindows(records).map(window => ({
+        window,
+        selection: selectSpXLinehaulRecords(records, window, referenceDate),
+    }));
 }
 
 export {
     SPX_LINEHAUL_CODE_PATTERN,
+    SPX_LINEHAUL_SCHEDULE_MESSAGE,
     SPX_LINEHAUL_WINDOW_PATTERN,
     createSpXLinehaulWindowCandidates,
     formatSpXLinehaulOrigin,
     getSpXDetectedWindows,
     getSpXLinehaulCode,
     getSpXLinehaulPlainLoadedOrders,
+    getSpXLinehaulPlainScheduledDate,
+    getSpXLinehaulScheduleColumns,
+    getSpXLinehaulScheduledDate,
     getSpXLinehaulWindow,
-    isSpXAllWaitingImport,
+    hasSpXLinehaulPlainScheduleLayout,
     parseSpXLinehaulQuantity,
+    parseSpXLinehaulTextMatrix,
     selectSpXLinehaulRecords,
 };

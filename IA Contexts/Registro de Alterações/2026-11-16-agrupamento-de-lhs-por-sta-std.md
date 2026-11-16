@@ -1,0 +1,5 @@
+# 16/11/2026 · Agrupamento de LHs pela data do STA/STD
+
+Planejamento e Descarregamento de LHs passaram a aceitar blocos inteiramente em `Waiting` quando as datas de STA/STD de todos os LHs selecionados caem entre hoje e dois dias à frente. O mesmo intervalo habilita blocos de um único LH com qualquer Indicador de Pontualidade. A referência é o calendário de São Paulo. Cada CPT apresenta o primeiro bloco elegível na ordem da área de transferência. [Contexto da importação de LHs](../Painel%20Relat%C3%B3rios/README.md#importação-de-lhs-do-spx) · [Regra compartilhada](../../js/reports/core/spx-linehaul-rules.js)
+
+Os 274 testes passaram. As verificações cobrem os limites do intervalo, a virada de ano, o primeiro bloco elegível, o caso de um único LH e a leitura da coluna nos dois importadores. No Edge, com os dados da planilha de exemplo e referência em 16/11/2026, os dois modais ofereceram um LH de AM e seis LHs de PM2. [Testes de alinhamento](../../tests/linehaul-import-alignment.test.mjs)
