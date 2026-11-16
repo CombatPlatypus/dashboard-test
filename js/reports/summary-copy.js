@@ -53,16 +53,9 @@ function sheetsColor(hex) {
     return { "1": 2, "2": Number.parseInt(hex.slice(1), 16) };
 }
 
-function createStyledCellAttributes({ background, fontSize, bold, border, bottom }) {
+function createStyledCellAttributes({ background, fontSize, bold, border, bottom, inlineFormattingOnly }) {
     const color = "#e4e6eb";
     const borderColor = "#626262";
-    // Sheets stores fill, text color and bold in fields 4, 14 and 17, with bit flags for each.
-    const format = {
-        "2": sheetsFormatFields | sheetsColorFields | (bold ? 16384 : 0),
-        "4": sheetsColor(background), "9": 1, "10": bottom ? 2 : 1,
-        "14": sheetsColor(color), "15": "Open Sans", "16": fontSize,
-    };
-    if (bold) format["17"] = 1;
     const alignment = bottom ? "bottom" : "middle";
     const css = [
         `background-color:${background}`, `color:${color}`, "font-family:Open Sans",
@@ -70,6 +63,15 @@ function createStyledCellAttributes({ background, fontSize, bold, border, bottom
         "text-align:center", `vertical-align:${alignment}`, "white-space:nowrap",
         border ? `border:1px solid ${borderColor}` : "border:none",
     ].join(";");
+    if (inlineFormattingOnly) return `style="${css}"`;
+
+    // Sheets stores fill, text color and bold in fields 4, 14 and 17, with bit flags for each.
+    const format = {
+        "2": sheetsFormatFields | sheetsColorFields | (bold ? 16384 : 0),
+        "4": sheetsColor(background), "9": 1, "10": bottom ? 2 : 1,
+        "14": sheetsColor(color), "15": "Open Sans", "16": fontSize,
+    };
+    if (bold) format["17"] = 1;
     return `data-sheets-userformat='${JSON.stringify(format)}' align="center" valign="${alignment}" style="${css}"`;
 }
 

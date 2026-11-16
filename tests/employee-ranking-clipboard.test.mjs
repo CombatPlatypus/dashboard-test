@@ -45,10 +45,21 @@ test("copies the formatted ranking from B2 and keeps short names in the visible 
     assert.ok(rows.at(-1).every(cell => cell === ""));
 
     assert.match(html, /<google-sheets-html-origin>/);
-    assert.match(html, /<td rowspan="2" colspan="15"[^>]*align="center"[^>]*>RANKING MENSAL DE DESEMPENHO<\/td>/);
+    assert.match(html, /<td rowspan="2" colspan="15"[^>]*>RANKING MENSAL DE DESEMPENHO<\/td>/);
     assert.match(html, /<td rowspan="155" colspan="1"/);
-    assert.match(html, /<td[^>]*align="center"[^>]*>Maria Silva<\/td>/);
-    assert.match(html, /<td[^>]*align="center"[^>]*>00:05:29<\/td>/);
+    assert.doesNotMatch(html, /data-sheets-userformat/);
+    const cellStyles = new Map(Array.from(html.matchAll(/<td\b[^>]*style="([^"]+)"[^>]*>([^<]*)<\/td>/g),
+        ([, style, text]) => [text, style]));
+    for (const [text, fontSize] of [
+        ["RANKING MENSAL DE DESEMPENHO", 20],
+        ["Rotas Conferidas e Tempo Médio", 12],
+        ["Colaborador", 11],
+        ["Maria Silva", 10],
+        ["00:05:29", 10],
+    ]) {
+        assert.match(cellStyles.get(text), new RegExp(`font-size:${fontSize}pt;`));
+        assert.match(cellStyles.get(text), /text-align:center;vertical-align:middle;/);
+    }
     assert.deepEqual(parseEmployeeRankingClipboardText(text), operators);
 
     const fullWorksheet = rows.map(row => ["", ...row].join("\t")).join("\n");

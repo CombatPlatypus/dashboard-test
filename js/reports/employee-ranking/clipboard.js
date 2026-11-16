@@ -16,13 +16,14 @@ const rankingSections = [
 const operatorHeader = "Nome completo do conferente";
 // B:P contains the report, Q is the existing border, R keeps the full name for reimport.
 const columnWidths = [181, 121, 20, 181, 121, 20, 181, 121, 20, 181, 121, 81, 20, 201, 121, 50, 260];
-const blankStyle = { background: "#121212", fontSize: 10 };
-const titleStyle = { background: "#323232", fontSize: 18, bold: true, border: true };
-const sectionStyle = { background: "#323232", fontSize: 11, border: true };
-const headerStyle = { background: "#242424", fontSize: 10, border: true };
+// Match the inline cell formatting copied by Google Sheets from the ranking template.
+const blankStyle = { background: "#121212", fontSize: 10, inlineFormattingOnly: true };
+const titleStyle = { ...blankStyle, background: "#323232", fontSize: 20, bold: true, border: true };
+const sectionStyle = { ...titleStyle, fontSize: 12, bold: false };
+const headerStyle = { ...blankStyle, background: "#242424", fontSize: 11, border: true };
 const rowStyles = [
     { ...blankStyle, border: true },
-    { background: "#1b1b1b", fontSize: 10, border: true },
+    { ...blankStyle, background: "#1b1b1b", border: true },
 ];
 
 function isExpeditionHeader(row, column) {
