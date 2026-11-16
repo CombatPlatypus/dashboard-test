@@ -1335,8 +1335,11 @@
             flex-wrap: wrap;
         }
         #overall-analysis .losses-rate-charts .doughnut-chart .chart-label {
-            max-width: 443px;
+            max-width: 385px;
             margin: 0px auto 20px;
+        }
+        #overall-analysis .losses-rate-charts .doughnut-chart .chart-label[data-has-data="true"] {
+            max-width: 443px;
         }
         #overall-analysis .expedition-errors-summary .flex-box-start {
             gap: 15px;

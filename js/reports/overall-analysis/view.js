@@ -261,6 +261,7 @@ function getOverallAnalysisViewElements(
         damageHub: getElement("overallAnalysisDamageHub"),
         packagesUnderReview: getElement("overallAnalysisPackagesUnderReview"),
         confirmedLosses: getElement("overallAnalysisConfirmedLosses"),
+        damageAndLossesLegend: getElement("overallAnalysisDamageAndLossesLegend"),
 
         lossRate:
             getElement(
@@ -633,6 +634,7 @@ function renderOverallAnalysisView(
     elements.expeditionFinalRate.textContent = formatOverallAnalysisRate(errors.finalRate);
     renderOverallExpeditionStreets(elements.expeditionStreetBody, errors.streets);
 
+    elements.damageAndLossesLegend.dataset.hasData = String(data.damageAndLossesComposition.hasData);
     renderOverallDamageAndLossesTable(
         elements.damageAndLossesTable,
         data.damageAndLosses,

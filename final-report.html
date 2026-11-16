@@ -809,8 +809,11 @@
                 flex-wrap: wrap;
             }
             .losses-rate-charts .doughnut-chart .chart-label {
-                max-width: 443px;
+                max-width: 385px;
                 margin: 0 auto 20px;
+            }
+            .losses-rate-charts .doughnut-chart .chart-label[data-has-data="true"] {
+                max-width: 443px;
             }
 
             @media (max-width: 900px) {
@@ -951,7 +954,7 @@
                             </canvas>
                         </div>
 
-                        <div class="chart-label">
+                        <div class="chart-label" id="finalReportDamageAndLossesLegend">
                             <div class="type">
                                 <div style="background-color: #2538a5;"></div>
                                 <p>Em Análise <span id="finalReportDamageAndLossesCompositionUnderReview">—</span></p>

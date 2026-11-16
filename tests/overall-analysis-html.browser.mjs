@@ -119,6 +119,9 @@ try {
     await page.locator('a[href="#overall-analysis"]').click();
     const button = page.locator("#overallAnalysisExportHtmlButton");
     assert.equal(await button.isDisabled(), true);
+    const legendWidth = () => page.locator("#overallAnalysisDamageAndLossesLegend")
+        .evaluate(element => getComputedStyle(element).maxWidth);
+    assert.equal(await legendWidth(), "385px");
 
     // Importa o XLSX completo pelo mesmo fluxo usado no dashboard.
     const workbook = {
@@ -133,6 +136,7 @@ try {
     await importDamageAndLosses();
     await page.waitForFunction(() => document.getElementById("damageAndLossesNotification").dataset.notificationType === "success");
     await page.locator('a[href="#overall-analysis"]').click();
+    assert.equal(await legendWidth(), "443px");
     const cardText = suffix => page.locator(`#overallAnalysis${suffix}`).textContent();
     assert.equal(await page.locator("#overallAnalysisIndicators > div").count(), 5);
     assert.equal(await page.locator(".final-report-cards, #overallAnalysisDamageChart, #overallAnalysisLossRateChart, #overallAnalysisPackagesAnalysisChart").count(), 0);
@@ -228,8 +232,7 @@ try {
     const streetValues = ["A", "7", "56", "100,00%"];
     assert.equal(await streetRows.count(), 12);
     assert.deepEqual(await streetRows.first().locator("td").allTextContents(), streetValues);
-    assert.equal(await page.locator("#overall-analysis .losses-rate-charts .doughnut-chart .chart-label")
-        .evaluate(element => getComputedStyle(element).maxWidth), "443px");
+    assert.equal(await legendWidth(), "443px");
     assert.deepEqual(await page.evaluate(readErrorChart, "overallAnalysisErrorBalanceChart"), sourceChart);
     await page.waitForFunction(errorBarsDrawn, "overallAnalysisErrorBalanceChart", { timeout: 5000 });
     assert.deepEqual(await page.evaluate(readErrorBarColors, "overallAnalysisErrorBalanceChart"), errorBarColors);
@@ -284,6 +287,7 @@ try {
     const emptyComposition = await page.evaluate(readDamageAndLossesComposition, "overallAnalysisDamageAndLossesComposition");
     assert.deepEqual(emptyComposition.quantities, [0, 0, 0, 0]);
     assert.deepEqual(emptyComposition.indicators, ["—", "—", "—", "—"]);
+    assert.equal(await legendWidth(), "385px");
     await context.close();
 
     const offline = await browser.newContext({ offline: true, timezoneId: "Pacific/Auckland",
