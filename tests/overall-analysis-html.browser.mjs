@@ -89,6 +89,33 @@ function readHistoryPointColor({ prefix, month }) {
     return Array.from(history.ctx.getImageData(Math.floor(point.x * ratio), Math.floor((point.y + 2) * ratio), 1, 1).data);
 }
 
+function readReportAppearance(selector) {
+    const properties = [
+        "display", "flexWrap", "flexBasis", "justifyContent", "alignItems", "rowGap", "columnGap",
+        "marginTop", "marginBottom", "paddingTop", "paddingRight", "paddingBottom", "paddingLeft",
+        "maxWidth", "backgroundColor", "color", "borderTopWidth", "borderBottomWidth", "borderTopColor",
+        "borderRadius", "fontFamily", "fontSize", "lineHeight", "fontWeight", "letterSpacing", "textAlign",
+    ];
+    const records = [];
+    function visit(element) {
+        const icon = element.matches("img, svg");
+        const style = getComputedStyle(element);
+        const { width, height } = element.getBoundingClientRect();
+        const text = icon ? "" : Array.from(element.childNodes)
+            .filter(node => node.nodeType === Node.TEXT_NODE)
+            .map(node => node.textContent.trim()).filter(Boolean).join(" ");
+        records.push({
+            tag: icon ? "icon" : element.localName,
+            text,
+            size: [Math.round(width), Math.round(height)],
+            style: Object.fromEntries(properties.map(property => [property, style[property]])),
+        });
+        if (!icon) Array.from(element.children).forEach(visit);
+    }
+    visit(document.querySelector(selector));
+    return records;
+}
+
 const repo = fileURLToPath(new URL("../", import.meta.url));
 const output = process.env.REPORT_QA_OUTPUT || await mkdtemp(path.join(tmpdir(), "overall-html-"));
 await mkdir(output, { recursive: true });
@@ -248,6 +275,14 @@ try {
         (await import("/js/reports/core/report-context.js")).updateReportContextField("analyst", "Analista de teste");
     });
     assert.equal(await button.isDisabled(), false);
+    await page.evaluate(async () => {
+        document.documentElement.dataset.theme = "blue";
+        await document.fonts.ready;
+    });
+    const previewAppearance = await page.evaluate(readReportAppearance, "#overallAnalysisReportExportArea");
+    const volumeChartKeys = ["ReceiptChart", "ExpeditionChart"];
+    const previewVolumeCharts = await Promise.all(volumeChartKeys.map(key =>
+        page.evaluate(readErrorChart, `overallAnalysis${key}`)));
     const downloadEvent = page.waitForEvent("download");
     await button.click();
     const download = await downloadEvent;
@@ -298,6 +333,13 @@ try {
     report.on("request", request => { if (/^https?:/.test(request.url())) requests.push(request.url()); });
     await report.goto(pathToFileURL(downloadedPath).href);
     await report.waitForFunction(() => document.documentElement.dataset.finalReportState === "ready");
+    const downloadedAppearance = await report.evaluate(readReportAppearance, ".main-structure > .preview-style");
+    assert.equal(downloadedAppearance.length, previewAppearance.length);
+    previewAppearance.forEach((element, index) => {
+        assert.deepEqual(downloadedAppearance[index], element, `Elemento ${index} (${element.tag})`);
+    });
+    assert.deepEqual(await Promise.all(volumeChartKeys.map(key =>
+        report.evaluate(readErrorChart, `finalReport${key}`))), previewVolumeCharts);
     const rendered = await report.evaluate(() => {
         const text = id => document.getElementById(id).textContent;
         return {

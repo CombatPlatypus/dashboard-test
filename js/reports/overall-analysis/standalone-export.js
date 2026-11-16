@@ -1,9 +1,34 @@
 import { isOverallAnalysisComplete } from "./completeness.js";
+import { formatOverallAnalysisDate } from "./view.js";
 
 const TEMPLATE_URL = new URL("../../../final-report.html", import.meta.url);
 const CHART_URL = new URL("../../libraries/chart.umd.min.js", import.meta.url);
 const RENDERER_URL = new URL("./standalone-renderer.js", import.meta.url);
 const SOURCE_ROOT = new URL("../../", import.meta.url);
+const REPORT_THEME_PROPERTIES = [
+    "--color-body",
+    "--color-container",
+    "--color-border",
+    "--color-text",
+    "--color-table-title",
+    "--color-table-th",
+    "--color-table-tr",
+    "--color-gray-p",
+    "--color-chart-base",
+    "--color-chart-empty",
+];
+
+function captureReportTheme() {
+    const root = globalThis.document?.documentElement;
+    if (!root || typeof globalThis.getComputedStyle !== "function") {
+        return {};
+    }
+
+    const style = globalThis.getComputedStyle(root);
+    return Object.fromEntries(REPORT_THEME_PROPERTIES
+        .map(name => [name, style.getPropertyValue(name).trim()])
+        .filter(([, value]) => value));
+}
 
 async function loadText(url, fetchResource) {
     const response = await fetchResource(url, { cache: "no-cache" });
@@ -107,9 +132,8 @@ async function createStandaloneOverallAnalysisHtml(data, {
     const snapshot = JSON.parse(JSON.stringify({
         schemaVersion: 1,
         generatedAt: generatedAt.toISOString(),
-        dateLabel: new Intl.DateTimeFormat("pt-BR", {
-            day: "2-digit", month: "2-digit", year: "numeric", weekday: "long",
-        }).format(generatedAt),
+        dateLabel: formatOverallAnalysisDate(generatedAt),
+        theme: captureReportTheme(),
         report: data,
     }));
     const [template, chartSource, rendererSource] = await Promise.all([

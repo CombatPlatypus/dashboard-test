@@ -1,6 +1,5 @@
-import { CHART_COLORS, CHART_TEXT_COLOR, CHART_VALUE_FONT } from "../../charts/theme.js";
+import { CHART_COLORS, CHART_TEXT_COLOR } from "../../charts/theme.js";
 import { createDashboardChart } from "../../charts/standard.js";
-import { getHorizontalBarLabelPosition } from "../core/horizontal-bars-3d.js";
 import { DOUGHNUT_3D_PADDING, drawDoughnut3D, drawDoughnut3DCenterText } from "../core/doughnut-3d.js";
 import { createErrorBalanceChart } from "../expedition/error-balance-chart.js";
 import {
@@ -13,6 +12,7 @@ import {
     updateConsolidatedCompositionChart,
 } from "../damage-and-losses/consolidated-charts.js";
 import { REVERSE_TYPE_KEYS, REVERSE_TYPE_DEFINITIONS } from "../reverse/model.js";
+import { createOverallAnalysisVolumeChart } from "./volume-chart.js";
 import { getOverallAnalysisViewElements, renderOverallAnalysisView, formatOverallAnalysisQuantity } from "./view.js";
 
 // O modelo mantém seus próprios IDs; as mesmas regras da Análise Geral
@@ -42,41 +42,6 @@ function fillStandaloneFields(data, snapshot, root) {
     renderOverallAnalysisView(data, elements, new Date(snapshot.generatedAt));
     // O destinatário pode estar em outro fuso; preserva a data da geração.
     elements.date.textContent = snapshot.dateLabel;
-}
-
-const barValues = {
-    id: "standaloneBarValues",
-    afterDatasetsDraw(chart) {
-        const context = chart.ctx;
-        context.save();
-        context.letterSpacing = "1px";
-        context.font = CHART_VALUE_FONT;
-        context.fillStyle = CHART_TEXT_COLOR;
-        context.textBaseline = "middle";
-        chart.getDatasetMeta(0).data.forEach((bar, index) => {
-            const position = getHorizontalBarLabelPosition(bar);
-            context.fillText(formatOverallAnalysisQuantity(chart.data.datasets[0].data[index]), position.x, position.y);
-        });
-        context.restore();
-    },
-};
-
-function createBarChart(canvas, labels, values, colors) {
-    return createDashboardChart(canvas, {
-        type: "bar",
-        data: { labels, datasets: [{ label: "Pacotes", data: values, backgroundColor: colors }] },
-        plugins: [barValues],
-        options: {
-            indexAxis: "y", responsive: true, maintainAspectRatio: false, animation: false,
-            plugins: { legend: { display: false }, tooltip: { enabled: false } },
-            scales: {
-                x: { beginAtZero: true, grace: "15%", ticks: { precision: 0,
-                    callback: formatOverallAnalysisQuantity },
-                    title: { display: true, text: "Quantidade de pacotes" } },
-                y: { ticks: { autoSkip: false } },
-            },
-        },
-    });
 }
 
 function createCompositionChart(canvas, labels, values, colors, centerText, centerLabel) {
@@ -134,6 +99,9 @@ function createCompositionChart(canvas, labels, values, colors, centerText, cent
 
 async function renderStandaloneReport(snapshot, root = document) {
     const data = snapshot.report;
+    for (const [name, color] of Object.entries(snapshot.theme ?? {})) {
+        document.documentElement.style.setProperty(name, color);
+    }
     fillStandaloneFields(data, snapshot, root);
     if (document.fonts?.load) {
         await Promise.all([400, 600, 800].map(weight =>
@@ -159,11 +127,14 @@ async function renderStandaloneReport(snapshot, root = document) {
     const charts = [
         damageAndLossesComposition,
         lossesRateHistory,
-        createBarChart(canvas("finalReportReceiptChart"), ["Volume Esperado", "Volume Recebido", "Gap"],
-            [data.processing.expectedVolume, data.processing.receivedVolume, data.processing.gap],
-            ["#bdbdbd", CHART_COLORS.green, CHART_COLORS.yellow]),
-        createBarChart(canvas("finalReportExpeditionChart"), ["Volume Expedido", "Volume no Piso"],
-            [data.expedition.volumeChecked, data.expedition.floorVolume], [CHART_COLORS.green, CHART_COLORS.yellow]),
+        createOverallAnalysisVolumeChart(canvas("finalReportReceiptChart"), "processing", {
+            values: [data.processing.expectedVolume, data.processing.receivedVolume, data.processing.gap],
+            animate: false,
+        }),
+        createOverallAnalysisVolumeChart(canvas("finalReportExpeditionChart"), "expedition", {
+            values: [data.expedition.volumeChecked, data.expedition.floorVolume],
+            animate: false,
+        }),
         createErrorBalanceChart(canvas("finalReportErrorBalanceChart"), {
             analysis: data.expeditionErrors,
             animate: false,

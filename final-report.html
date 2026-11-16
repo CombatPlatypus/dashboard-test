@@ -282,6 +282,8 @@
                 --color-container-houver: #262626;
                 --color-container-focus: #262626;
                 --color-border: #626262;
+                --color-chart-base: var(--color-container-focus);
+                --color-chart-empty: var(--color-border);
                 --color-text: #e4e6eb;
                 --color-table-title: #262626;
                 --color-table-th: #262626;
@@ -302,12 +304,12 @@
                 -moz-osx-font-smoothing: grayscale;
             }
             .main-structure {
-                max-width: 1600px;
+                width: 100%;
                 height: auto;
                 margin: 0 auto;
                 padding: 30px 30px;
             }
-            .main-structure > div {
+            .main-structure > .preview-style {
                 display: flex;
                 flex-direction: column;
                 row-gap: 20px;
@@ -316,7 +318,7 @@
                 border: 2px solid var(--color-border);
                 border-radius: 5px;
             }
-            .main-structure > div .main-title {
+            .preview-style > .title {
                 width: 100%;
                 padding: 12px 20px;
                 text-align: center;
@@ -324,7 +326,7 @@
                 border: 1px solid var(--color-border);
                 border-radius: 5px 5px 0 0;
             }
-            .main-structure > div .main-title > h2 {
+            .preview-style > .title > h2 {
                 margin-bottom: 0;
                 font-size: 20px;
                 text-transform: uppercase;
@@ -333,7 +335,7 @@
 
             /* MÍDIA */
 
-            img {
+            img, svg {
                 display: inline-block;
                 max-width: 100%;
                 height: auto;
@@ -652,14 +654,14 @@
 
             /* TITULOS */
 
-            .title {
+            .final-report-title {
                 padding: 0.5rem 0.625rem 0.625rem;
                 background-color: var(--color-table-th);
                 border-right: 1px solid var(--color-border);
                 border-left: 1px solid var(--color-border);
                 border-top: 1px solid var(--color-border);
             }
-            .title h4 {
+            .final-report-title h4 {
                 letter-spacing: 1.5px;
                 font-size: 15px;
                 margin: 0;
@@ -667,21 +669,20 @@
 
             /* HEADER */
 
-            .header {
+            .final-report-header {
                 padding: 15px 20px;
                 border: 1px solid var(--color-border);
                 align-items: center;
             }
-            .header .flex-box-start {
+            .final-report-header .flex-box-start {
                 column-gap: 15px;
                 align-items: center;
             }
-            .header img,
-            .header svg {
+            .final-report-header svg {
                 width: 35px;
                 height: 35px;
             }
-            .header p {
+            .final-report-header p {
                 margin-bottom: 0;
                 line-height: 1;
             }
@@ -717,16 +718,13 @@
                 margin: 0;
                 line-height: 1;
             }
-            .cards svg {
-                width: 25px;
-                height: 25px;
+            .cards > div > .flex-box-start > svg {
+                width: 35px;
             }
-            .cards p {
+            .cards > div > p {
                 font-size: 14px;
-                color: var(--color-gray-p);
                 line-height: 1;
                 margin: 0;
-                text-align: center;
             }
 
             /* FLUXO DA JANELA */
@@ -832,16 +830,16 @@
 
     <body>
         <div class="main-structure">
-            <div>
+            <div class="preview-style">
                 <!-- TITULO PRINCIPAL -->
 
-                <div class="main-title">
+                <div class="title">
                     <h2>Relatório Final - LM HUB SP Santos Praia Grande 02</h2>
                 </div>
 
                 <!-- HEADER DO RELATÓRIO -->
 
-                <div class="header flex-box-between">
+                <div class="final-report-header flex-box-between">
                     <div class="flex-box-start">
                         <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="512" x="0" y="0" viewBox="0 0 34 34" style="enable-background:new 0 0 512 512" xml:space="preserve" class=""><g transform="matrix(1.05,0,0,1.05,-0.8525000572204533,-0.8500000000000014)"><path d="M29.6 2h-3v3c0 .6-.5 1-1 1s-1-.4-1-1V2h-16v3c0 .6-.5 1-1 1s-1-.4-1-1V2h-3C2.1 2 1 3.3 1 5v3.6h32V5c0-1.7-1.8-3-3.4-3M1 10.7V29c0 1.8 1.1 3 2.7 3h26c1.6 0 3.4-1.3 3.4-3V10.7zm8.9 16.8H7.5c-.4 0-.8-.3-.8-.8v-2.5c0-.4.3-.8.8-.8H10c.4 0 .8.3.8.8v2.5c-.1.5-.4.8-.9.8m0-9H7.5c-.4 0-.8-.3-.8-.8v-2.5c0-.4.3-.8.8-.8H10c.4 0 .8.3.8.8v2.5c-.1.5-.4.8-.9.8m8 9h-2.5c-.4 0-.8-.3-.8-.8v-2.5c0-.4.3-.8.8-.8h2.5c.4 0 .8.3.8.8v2.5c0 .5-.3.8-.8.8m0-9h-2.5c-.4 0-.8-.3-.8-.8v-2.5c0-.4.3-.8.8-.8h2.5c.4 0 .8.3.8.8v2.5c0 .5-.3.8-.8.8m8 9h-2.5c-.4 0-.8-.3-.8-.8v-2.5c0-.4.3-.8.8-.8h2.5c.4 0 .8.3.8.8v2.5c0 .5-.3.8-.8.8m0-9h-2.5c-.4 0-.8-.3-.8-.8v-2.5c0-.4.3-.8.8-.8h2.5c.4 0 .8.3.8.8v2.5c0 .5-.3.8-.8.8" fill="#e4e6eb" opacity="1" data-original="#000000" class=""></path></g></svg>
                         <p><span id="finalReportWindow"></span> — <span id="finalReportDate"></span></p>
@@ -853,7 +851,7 @@
                 <!-- CARDS PRINCIPAIS -->
 
                 <div>
-                    <div class="title">
+                    <div class="final-report-title">
                         <h4>Análise das Avarias e Perdas</h4>
                     </div>
 
@@ -1069,7 +1067,7 @@
                 <!-- FLUXO DA JANELA -->
 
                 <div>
-                    <div class="title">
+                    <div class="final-report-title">
                         <h4>Fluxo da Janela</h4>
                     </div>
 
