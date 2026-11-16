@@ -1351,7 +1351,7 @@
         #overall-analysis .expedition-errors-summary .flex-box-start > .chart {
             justify-content: center;
         }
-        .expedition-error-balance-chart > .chart-canvas-container {
+        #overall-analysis .expedition-error-balance-chart > .chart-canvas-container {
             margin: 20px !important;
             height: 452px !important;
         }
