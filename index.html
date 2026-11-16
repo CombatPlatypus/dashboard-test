@@ -2832,595 +2832,657 @@
 
                         <div class="tabs-panel" id="overall-analysis">
 
-                            <!-- BARRA DE NOTIFICAÇÕES E BOTÕES DE AÇÃO -->
+                            <!-- TABS DO RELATÓRIO -->
 
-                            <div class="flex-box-start">
-                                <div class="warning" id="overallAnalysisNotification" role="status" aria-live="polite" aria-atomic="true" data-notification-type="idle">
+                            <ul class="tabs flex-box-start" data-tabs id="overall-tabs">
+                                <li class="tabs-title is-active">
+                                    <a href="#final-report">
+                                        <h4>Relatório Final</h4>
+                                    </a>
+                                </li> 
+
+                                <li class="tabs-title">
+                                    <a href="#employee-ranking">
+                                        <h4>Ranking de Colaboradores</h4>
+                                    </a>
+                                </li>
+                            </ul> 
+
+                            <div class="tabs-content" data-tabs-content="overall-tabs">
+                                <div class="tabs-panel" id="final-report">
+
+                                    <!-- BARRA DE NOTIFICAÇÕES E BOTÕES DE AÇÃO -->
+
                                     <div class="flex-box-start">
-                                        <img id="overallAnalysisNotificationIcon" src="images/geral-icons/bell-icon.svg">
+                                        <div class="warning" id="overallAnalysisNotification" role="status" aria-live="polite" aria-atomic="true" data-notification-type="idle">
+                                            <div class="flex-box-start">
+                                                <img id="overallAnalysisNotificationIcon" src="images/geral-icons/bell-icon.svg">
 
-                                        <h4 id="overallAnalysisNotificationText">
-                                            Preencha os relatórios para completar a análise geral. Todas as informações serão atualizadas automaticamente.
-                                        </h4>
-                                    </div>
-                                </div>
-
-                                <div class="report-actions">
-                                    <button id="overallAnalysisExportHtmlButton" type="button" title="Complete a análise geral para gerar o resumo HTML" aria-label="Baixar resumo HTML interativo da análise geral" disabled>
-                                        <img src="images/files-icons/html-icon.svg" alt="">
-                                    </button>
-
-                                    <button id="overallAnalysisCopyReportButton" type="button">
-                                        <img src="images/geral-icons/image-icon.svg">
-                                    </button>
-
-                                    <button id="overallAnalysisClearReportButton" type="button">
-                                        <img src="images/geral-icons/trash-basket-icon.svg">
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- PPÉVIA DO RELATÓRIO -->
-
-                            <div class="preview">
-                                <div class="preview-style" id="overallAnalysisReportExportArea">
-                                    <div class="title">
-                                        <h2>Relatório Final - LM HUB SP Santos Praia Grande 02</h2>
-                                    </div>
-
-                                    <!-- HEADER -->
-
-                                    <div class="final-report-header flex-box-between">
-                                        <div class="flex-box-start">
-                                            <img src="images/geral-icons/calendar-icon.svg">
-                                            <p><span id="overallAnalysisWindow"></span> — <span id="overallAnalysisDate"></span></p>
+                                                <h4 id="overallAnalysisNotificationText">
+                                                    Preencha os relatórios para completar a análise geral. Todas as informações serão atualizadas automaticamente.
+                                                </h4>
+                                            </div>
                                         </div>
 
-                                       <p>Analista do turno: <span id="overallAnalysisAnalyst">—</span></p>
-                                    </div>
+                                        <div class="report-actions">
+                                            <button id="overallAnalysisExportHtmlButton" type="button" title="Complete a análise geral para gerar o resumo HTML" aria-label="Baixar resumo HTML interativo da análise geral" disabled>
+                                                <img src="images/files-icons/html-icon.svg" alt="">
+                                            </button>
 
-                                    <!-- CARDS -->
+                                            <button id="overallAnalysisCopyReportButton" type="button">
+                                                <img src="images/geral-icons/image-icon.svg">
+                                            </button>
 
-                                    <div>
-                                        <div class="final-report-title">
-                                            <h4>Análise das Avarias e Perdas</h4>
-                                        </div>
-
-                                        <div class="cards" id="overallAnalysisIndicators">
-                                            <div>
-                                                <div class="flex-box-start">
-                                                    <img src="images/geral-icons/hub-icon.svg">
-                                                    <h4 id="overallAnalysisDamageHub">—</h4>
-                                                </div>
-
-                                                <p>Avarias do Hub</p>
-                                            </div>
-
-                                            <div>
-                                                <div class="flex-box-start">
-                                                    <img src="images/geral-icons/truck-icon.svg">
-                                                    <h4 id="overallAnalysisDamageSoc">—</h4>
-                                                </div>
-
-                                                <p>Avarias do SOC</p>
-                                            </div>
-
-
-                                            <div>
-                                                <div class="flex-box-start">
-                                                    <img src="images/geral-icons/percentage-icon.svg">
-                                                    <h4 id="overallAnalysisLossRate">—</h4>
-                                                </div>
-
-                                                <p>Taxa de Perdas</p>
-                                            </div>
-
-
-                                            <div>
-                                                <div class="flex-box-start">
-                                                    <img src="images/geral-icons/clock-icon.svg">
-                                                    <h4 id="overallAnalysisPackagesUnderReview">—</h4>
-                                                </div>
-
-                                                <p>Pacotes em Análise</p>
-                                            </div>
-
-                                            <div>
-                                                <div class="flex-box-start">
-                                                    <img src="images/geral-icons/alert-icon.svg">
-                                                    <h4 id="overallAnalysisConfirmedLosses">—</h4>
-                                                </div>
-
-                                                <p>Perdas Confirmadas</p>
-                                            </div>
+                                            <button id="overallAnalysisClearReportButton" type="button">
+                                                <img src="images/geral-icons/trash-basket-icon.svg">
+                                            </button>
                                         </div>
                                     </div>
 
-                                    <!-- AVARIAS E PERDAS -->
+                                    <!-- PPÉVIA DO RELATÓRIO -->
 
-                                    <div class="losses-rate-charts flex-box-start">
-                                        <div class="chart doughnut-chart">
-                                            <div class="chart-canvas-container">
-                                                <canvas id="overallAnalysisDamageAndLossesCompositionChart" role="img" aria-label="Composição das ocorrências">
-                                                    Seu navegador não suporta gráficos em canvas.
-                                                </canvas>
+                                    <div class="preview">
+                                        <div class="preview-style" id="overallAnalysisReportExportArea">
+                                            <div class="title">
+                                                <h2>Relatório Final - LM HUB SP Santos Praia Grande 02</h2>
                                             </div>
 
-                                            <div class="chart-label" id="overallAnalysisDamageAndLossesLegend">
-                                                <div class="type">
-                                                    <div style="background-color: #2538a5;"></div>
-                                                    <p>Em Análise <span id="overallAnalysisDamageAndLossesCompositionUnderReview">—</span></p>
+                                            <!-- HEADER -->
+
+                                            <div class="final-report-header flex-box-between">
+                                                <div class="flex-box-start">
+                                                    <img src="images/geral-icons/calendar-icon.svg">
+                                                    <p><span id="overallAnalysisWindow"></span> — <span id="overallAnalysisDate"></span></p>
                                                 </div>
 
-                                                <div class="type">
-                                                    <div style="background-color: #8B0000;"></div>
-                                                    <p>Lost <span id="overallAnalysisDamageAndLossesCompositionLost">—</span></p>
-                                                </div>
-
-                                                <div class="type">
-                                                    <div style="background-color: #007A48;"></div>
-                                                    <p>Avarias (Hub) <span id="overallAnalysisDamageAndLossesCompositionDamage">—</span></p>
-                                                </div>
-
-                                                <div class="type">
-                                                    <div style="background-color: #f99400;"></div>
-                                                    <p>Avarias (SOC) <span id="overallAnalysisDamageAndLossesCompositionSoc">—</span></p>
-                                                </div>
+                                            <p>Analista do turno: <span id="overallAnalysisAnalyst">—</span></p>
                                             </div>
-                                        </div>
 
-                                        <div class="chart line-chart">
-                                            <div class="chart-canvas-container">
-                                                <canvas id="overallAnalysisLossesRateHistoryChart" role="img" aria-label="Histórico da taxa de perdas">
-                                                    Seu navegador não suporta gráficos em canvas.
-                                                </canvas>
-                                            </div>
-                                        </div>
-                                    </div>
+                                            <!-- CARDS -->
 
-                                    <table id="overallAnalysisDamageAndLossesTable">
-                                        <thead>
-                                            <tr>
-                                                <th scope="col" style="width: 230px;">Ocorrência</th>
-                                                <th scope="col">Hoje</th>
-                                                <th scope="col">Ontem</th>
-                                                <th scope="col">Anteontem</th>
-                                                <th scope="col">De 3 a 7<br>Dias Atrás</th>
-                                                <th scope="col">De 8 a 14<br>Dias Atrás</th>
-                                                <th scope="col">De 15 Dias Atrás<br>Até o Começo do Mês</th>
-                                                <th scope="col">Total do Mês</th>
-                                            </tr>
-                                        </thead>
+                                            <div>
+                                                <div class="final-report-title">
+                                                    <h4>Análise das Avarias e Perdas</h4>
+                                                </div>
 
-                                        <tbody>
-                                            <tr data-overall-damage-losses-field="hub">
-                                                <th scope="row">Avarias do Hub</th>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                            </tr>
-                                        </tbody>
-
-                                        <tbody>
-                                            <tr data-overall-damage-losses-field="soc">
-                                                <th scope="row">Avarias do SOC</th>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                            </tr>
-                                        </tbody>
-
-                                        <tbody>
-                                            <tr data-overall-damage-losses-field="underReview">
-                                                <th scope="row">Pacotes em Análise</th>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                            </tr>
-                                        </tbody>
-
-                                        <tbody>
-                                            <tr data-overall-damage-losses-field="confirmedLosses">
-                                                <th scope="row">Perdas Confirmadas</th>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                            </tr>
-                                        </tbody>
-
-                                        <tbody>
-                                            <tr data-overall-damage-losses-field="returnedPackages">
-                                                <th scope="row">Pacotes Retornados</th>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-
-                                    <!-- FLUXO DO DIA E DASTAQUES DA OPERAÇÃO -->
-
-                                    <div class="final-report-flow">
-                                        <div class="final-report-title">
-                                            <h4>Fluxo da Janela</h4>
-                                        </div>
-
-                                        <div class="flow">
-                                            <div class="mini-cards">
-                                                <div class="flex-box-center">
-                                                    <img src="images/geral-icons/clipboard-icon.svg">
-
+                                                <div class="cards" id="overallAnalysisIndicators">
                                                     <div>
-                                                        <h4>Planejado</h4>
-                                                        <p id="overallAnalysisPlanned">—</p>
+                                                        <div class="flex-box-start">
+                                                            <img src="images/geral-icons/hub-icon.svg">
+                                                            <h4 id="overallAnalysisDamageHub">—</h4>
+                                                        </div>
+
+                                                        <p>Avarias do Hub</p>
                                                     </div>
-                                                </div>
-
-                                                <div class="flex-box-center">
-                                                    <img src="images/geral-icons/barcode-scanner-icon.svg">
 
                                                     <div>
-                                                        <h4>Processado</h4>
-                                                        <p id="overallAnalysisProcessed">—</p>
+                                                        <div class="flex-box-start">
+                                                            <img src="images/geral-icons/truck-icon.svg">
+                                                            <h4 id="overallAnalysisDamageSoc">—</h4>
+                                                        </div>
+
+                                                        <p>Avarias do SOC</p>
                                                     </div>
-                                                </div>
 
-                                                <div class="flex-box-center">
-                                                    <img src="images/geral-icons/van-icon.svg" style="width: 40px;height: 40px;">
 
                                                     <div>
-                                                        <h4>Expedido</h4>
-                                                        <p id="overallAnalysisExpedited">—</p>
+                                                        <div class="flex-box-start">
+                                                            <img src="images/geral-icons/percentage-icon.svg">
+                                                            <h4 id="overallAnalysisLossRate">—</h4>
+                                                        </div>
+
+                                                        <p>Taxa de Perdas</p>
                                                     </div>
-                                                </div>
 
-                                                <div class="flex-box-center">
-                                                    <img src="images/geral-icons/forklift-icon.svg">
 
                                                     <div>
-                                                        <h4>Backlog no Piso</h4>
-                                                        <p id="overallAnalysisFloor">—</p>
+                                                        <div class="flex-box-start">
+                                                            <img src="images/geral-icons/clock-icon.svg">
+                                                            <h4 id="overallAnalysisPackagesUnderReview">—</h4>
+                                                        </div>
+
+                                                        <p>Pacotes em Análise</p>
+                                                    </div>
+
+                                                    <div>
+                                                        <div class="flex-box-start">
+                                                            <img src="images/geral-icons/alert-icon.svg">
+                                                            <h4 id="overallAnalysisConfirmedLosses">—</h4>
+                                                        </div>
+
+                                                        <p>Perdas Confirmadas</p>
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            <div class="dashed-border"></div>
+                                            <!-- AVARIAS E PERDAS -->
 
-                                            <h5 id="overallAnalysisFlowStatus">—</h5>
-                                        </div>
-                                    </div>
+                                            <div class="losses-rate-charts flex-box-start">
+                                                <div class="chart doughnut-chart">
+                                                    <div class="chart-canvas-container">
+                                                        <canvas id="overallAnalysisDamageAndLossesCompositionChart" role="img" aria-label="Composição das ocorrências">
+                                                            Seu navegador não suporta gráficos em canvas.
+                                                        </canvas>
+                                                    </div>
 
-                                    <!-- RECEBIMENTO E EXPEDIÇÃO -->
+                                                    <div class="chart-label" id="overallAnalysisDamageAndLossesLegend">
+                                                        <div class="type">
+                                                            <div style="background-color: #2538a5;"></div>
+                                                            <p>Em Análise <span id="overallAnalysisDamageAndLossesCompositionUnderReview">—</span></p>
+                                                        </div>
 
-                                    <div class="tables-and-charts flex-box-start">
-                                        <div>
-                                            <table>
-                                                <caption>Processamento</caption>
+                                                        <div class="type">
+                                                            <div style="background-color: #8B0000;"></div>
+                                                            <p>Lost <span id="overallAnalysisDamageAndLossesCompositionLost">—</span></p>
+                                                        </div>
 
+                                                        <div class="type">
+                                                            <div style="background-color: #007A48;"></div>
+                                                            <p>Avarias (Hub) <span id="overallAnalysisDamageAndLossesCompositionDamage">—</span></p>
+                                                        </div>
+
+                                                        <div class="type">
+                                                            <div style="background-color: #f99400;"></div>
+                                                            <p>Avarias (SOC) <span id="overallAnalysisDamageAndLossesCompositionSoc">—</span></p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="chart line-chart">
+                                                    <div class="chart-canvas-container">
+                                                        <canvas id="overallAnalysisLossesRateHistoryChart" role="img" aria-label="Histórico da taxa de perdas">
+                                                            Seu navegador não suporta gráficos em canvas.
+                                                        </canvas>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <table id="overallAnalysisDamageAndLossesTable">
                                                 <thead>
                                                     <tr>
-                                                        <th>Volume Esperado</th>
-                                                        <th>Volume Recebido</th>
-                                                        <th>Total de Erros</th>
-                                                        <th>Taxa de Erros</th>
+                                                        <th scope="col" style="width: 230px;">Ocorrência</th>
+                                                        <th scope="col">Hoje</th>
+                                                        <th scope="col">Ontem</th>
+                                                        <th scope="col">Anteontem</th>
+                                                        <th scope="col">De 3 a 7<br>Dias Atrás</th>
+                                                        <th scope="col">De 8 a 14<br>Dias Atrás</th>
+                                                        <th scope="col">De 15 Dias Atrás<br>Até o Começo do Mês</th>
+                                                        <th scope="col">Total do Mês</th>
                                                     </tr>
                                                 </thead>
 
                                                 <tbody>
-                                                    <tr>
-                                                        <td id="overallAnalysisExpectedVolume">—</td>
-                                                        <td id="overallAnalysisReceivedVolume">—</td>
-                                                        <td id="overallAnalysisReceiptErrors">—</td>
-                                                        <td id="overallAnalysisReceiptErrorRate">—</td>
+                                                    <tr data-overall-damage-losses-field="hub">
+                                                        <th scope="row">Avarias do Hub</th>
+                                                        <td>—</td>
+                                                        <td>—</td>
+                                                        <td>—</td>
+                                                        <td>—</td>
+                                                        <td>—</td>
+                                                        <td>—</td>
+                                                        <td>—</td>
                                                     </tr>
                                                 </tbody>
-                                            </table>
-
-                                            <div class="chart horizontal-bars-chart">
-                                                <div class="chart-canvas-container">
-                                                    <canvas id="overallAnalysisReceiptChart" role="img">
-                                                        Seu navegador não suporta gráficos em canvas.
-                                                    </canvas>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <table>
-                                                <caption>Expedição</caption>
-
-                                                <thead>
-                                                    <tr>
-                                                        <th>Rotas Conferidas</th>
-                                                        <th>Volume Expedido</th>
-                                                        <th>Volume no Piso</th>
-                                                        <th>Duração</th>
-                                                    </tr>
-                                                </thead>
 
                                                 <tbody>
-                                                    <tr>
-                                                        <td id="overallAnalysisRoutesChecked">—</td>
-                                                        <td id="overallAnalysisVolumeChecked">—</td>
-                                                        <td id="overallAnalysisFloorVolume">—</td>
-                                                        <td id="overallAnalysisExpeditionTime">—</td>
+                                                    <tr data-overall-damage-losses-field="soc">
+                                                        <th scope="row">Avarias do SOC</th>
+                                                        <td>—</td>
+                                                        <td>—</td>
+                                                        <td>—</td>
+                                                        <td>—</td>
+                                                        <td>—</td>
+                                                        <td>—</td>
+                                                        <td>—</td>
+                                                    </tr>
+                                                </tbody>
+
+                                                <tbody>
+                                                    <tr data-overall-damage-losses-field="underReview">
+                                                        <th scope="row">Pacotes em Análise</th>
+                                                        <td>—</td>
+                                                        <td>—</td>
+                                                        <td>—</td>
+                                                        <td>—</td>
+                                                        <td>—</td>
+                                                        <td>—</td>
+                                                        <td>—</td>
+                                                    </tr>
+                                                </tbody>
+
+                                                <tbody>
+                                                    <tr data-overall-damage-losses-field="confirmedLosses">
+                                                        <th scope="row">Perdas Confirmadas</th>
+                                                        <td>—</td>
+                                                        <td>—</td>
+                                                        <td>—</td>
+                                                        <td>—</td>
+                                                        <td>—</td>
+                                                        <td>—</td>
+                                                        <td>—</td>
+                                                    </tr>
+                                                </tbody>
+
+                                                <tbody>
+                                                    <tr data-overall-damage-losses-field="returnedPackages">
+                                                        <th scope="row">Pacotes Retornados</th>
+                                                        <td>—</td>
+                                                        <td>—</td>
+                                                        <td>—</td>
+                                                        <td>—</td>
+                                                        <td>—</td>
+                                                        <td>—</td>
+                                                        <td>—</td>
                                                     </tr>
                                                 </tbody>
                                             </table>
 
-                                            <div class="chart horizontal-bars-chart">
-                                                <div class="chart-canvas-container">
-                                                    <canvas id="overallAnalysisExpeditionChart" role="img">
-                                                        Seu navegador não suporta gráficos em canvas.
-                                                    </canvas>
+                                            <!-- FLUXO DO DIA E DASTAQUES DA OPERAÇÃO -->
+
+                                            <div class="final-report-flow">
+                                                <div class="final-report-title">
+                                                    <h4>Fluxo da Janela</h4>
                                                 </div>
-                                            </div>
-                                        </div>
-                                    </div>
 
-                                    <!-- ANÁLISE DE ERROS -->
+                                                <div class="flow">
+                                                    <div class="mini-cards">
+                                                        <div class="flex-box-center">
+                                                            <img src="images/geral-icons/clipboard-icon.svg">
 
-                                    <div class="expedition-errors-summary">
-                                        <table>
-                                            <caption>Análise de Erros</caption>
+                                                            <div>
+                                                                <h4>Planejado</h4>
+                                                                <p id="overallAnalysisPlanned">—</p>
+                                                            </div>
+                                                        </div>
 
-                                            <thead>
-                                                <tr>
-                                                    <th>Erros de Sorting</th>
-                                                    <th>Erros de Etiquetagem</th>
-                                                    <th>Total de Erros</th>
-                                                    <th>Taxa de Erros</th>
-                                                </tr>
-                                            </thead>
+                                                        <div class="flex-box-center">
+                                                            <img src="images/geral-icons/barcode-scanner-icon.svg">
 
-                                            <tbody>
-                                                <tr>
-                                                    <td id="overallAnalysisExpeditionSortingErrors">—</td>
-                                                    <td id="overallAnalysisExpeditionLabelingErrors">—</td>
-                                                    <td id="overallAnalysisExpeditionTotalErrors">—</td>
-                                                    <td id="overallAnalysisExpeditionErrorRate">—</td>
-                                                </tr>
+                                                            <div>
+                                                                <h4>Processado</h4>
+                                                                <p id="overallAnalysisProcessed">—</p>
+                                                            </div>
+                                                        </div>
 
-                                                <tr>
-                                                    <th id="expeditionRevertedErrorsHeading" scope="col">Erros Revertidos</th>
-                                                    <th id="expeditionRevertedRateHeading" scope="col">Taxa de Revertidos</th>
-                                                    <th id="expeditionFinalErrorsHeading" scope="col">Total Final de Erros</th>
-                                                    <th id="expeditionFinalRateHeading" scope="col">Taxa Final</th>
-                                                </tr>
+                                                        <div class="flex-box-center">
+                                                            <img src="images/geral-icons/van-icon.svg" style="width: 40px;height: 40px;">
 
-                                                <tr>
-                                                    <td id="overallAnalysisExpeditionRevertedErrors" headers="expeditionRevertedErrorsHeading">—</td>
-                                                    <td id="overallAnalysisExpeditionRevertedRate" headers="expeditionRevertedRateHeading">—</td>
-                                                    <td id="overallAnalysisExpeditionFinalErrors" headers="expeditionFinalErrorsHeading">—</td>
-                                                    <td id="overallAnalysisExpeditionFinalRate" headers="expeditionFinalRateHeading">—</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                                            <div>
+                                                                <h4>Expedido</h4>
+                                                                <p id="overallAnalysisExpedited">—</p>
+                                                            </div>
+                                                        </div>
 
-                                        <div class="flex-box-start">
-                                            <div class="chart horizontal-bars-chart expedition-error-balance-chart">
-                                                <div class="chart-canvas-container">
-                                                    <canvas id="overallAnalysisErrorBalanceChart" role="img" aria-label="Acompanhamento dos Erros"></canvas>
+                                                        <div class="flex-box-center">
+                                                            <img src="images/geral-icons/forklift-icon.svg">
+
+                                                            <div>
+                                                                <h4>Backlog no Piso</h4>
+                                                                <p id="overallAnalysisFloor">—</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="dashed-border"></div>
+
+                                                    <h5 id="overallAnalysisFlowStatus">—</h5>
                                                 </div>
                                             </div>
 
-                                            <div>
+                                            <!-- RECEBIMENTO E EXPEDIÇÃO -->
+
+                                            <div class="tables-and-charts flex-box-start">
+                                                <div>
+                                                    <table>
+                                                        <caption>Processamento</caption>
+
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Volume Esperado</th>
+                                                                <th>Volume Recebido</th>
+                                                                <th>Total de Erros</th>
+                                                                <th>Taxa de Erros</th>
+                                                            </tr>
+                                                        </thead>
+
+                                                        <tbody>
+                                                            <tr>
+                                                                <td id="overallAnalysisExpectedVolume">—</td>
+                                                                <td id="overallAnalysisReceivedVolume">—</td>
+                                                                <td id="overallAnalysisReceiptErrors">—</td>
+                                                                <td id="overallAnalysisReceiptErrorRate">—</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+
+                                                    <div class="chart horizontal-bars-chart">
+                                                        <div class="chart-canvas-container">
+                                                            <canvas id="overallAnalysisReceiptChart" role="img">
+                                                                Seu navegador não suporta gráficos em canvas.
+                                                            </canvas>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div>
+                                                    <table>
+                                                        <caption>Expedição</caption>
+
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Rotas Conferidas</th>
+                                                                <th>Volume Expedido</th>
+                                                                <th>Volume no Piso</th>
+                                                                <th>Duração</th>
+                                                            </tr>
+                                                        </thead>
+
+                                                        <tbody>
+                                                            <tr>
+                                                                <td id="overallAnalysisRoutesChecked">—</td>
+                                                                <td id="overallAnalysisVolumeChecked">—</td>
+                                                                <td id="overallAnalysisFloorVolume">—</td>
+                                                                <td id="overallAnalysisExpeditionTime">—</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+
+                                                    <div class="chart horizontal-bars-chart">
+                                                        <div class="chart-canvas-container">
+                                                            <canvas id="overallAnalysisExpeditionChart" role="img">
+                                                                Seu navegador não suporta gráficos em canvas.
+                                                            </canvas>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- ANÁLISE DE ERROS -->
+
+                                            <div class="expedition-errors-summary">
                                                 <table>
+                                                    <caption>Análise de Erros</caption>
+
                                                     <thead>
                                                         <tr>
-                                                            <th>Rua</th>
-                                                            <th>Pacotes Ausentes</th>
-                                                            <th>Erros da Rua</th>
+                                                            <th>Erros de Sorting</th>
+                                                            <th>Erros de Etiquetagem</th>
+                                                            <th>Total de Erros</th>
                                                             <th>Taxa de Erros</th>
                                                         </tr>
                                                     </thead>
 
-                                                    <tbody id="overallAnalysisExpeditionStreetBody">
+                                                    <tbody>
                                                         <tr>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
+                                                            <td id="overallAnalysisExpeditionSortingErrors">—</td>
+                                                            <td id="overallAnalysisExpeditionLabelingErrors">—</td>
+                                                            <td id="overallAnalysisExpeditionTotalErrors">—</td>
+                                                            <td id="overallAnalysisExpeditionErrorRate">—</td>
                                                         </tr>
 
                                                         <tr>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
+                                                            <th id="expeditionRevertedErrorsHeading" scope="col">Erros Revertidos</th>
+                                                            <th id="expeditionRevertedRateHeading" scope="col">Taxa de Revertidos</th>
+                                                            <th id="expeditionFinalErrorsHeading" scope="col">Total Final de Erros</th>
+                                                            <th id="expeditionFinalRateHeading" scope="col">Taxa Final</th>
                                                         </tr>
 
                                                         <tr>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                        </tr>
-
-                                                        <tr>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                        </tr>
-
-                                                        <tr>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                        </tr>
-
-                                                        <tr>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                        </tr>
-
-                                                        <tr>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                        </tr>
-
-                                                        <tr>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                        </tr>
-
-                                                        <tr>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                        </tr>
-
-                                                        <tr>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                        </tr>
-
-                                                        <tr>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                        </tr>
-
-                                                        <tr>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
-                                                            <td>—</td>
+                                                            <td id="overallAnalysisExpeditionRevertedErrors" headers="expeditionRevertedErrorsHeading">—</td>
+                                                            <td id="overallAnalysisExpeditionRevertedRate" headers="expeditionRevertedRateHeading">—</td>
+                                                            <td id="overallAnalysisExpeditionFinalErrors" headers="expeditionFinalErrorsHeading">—</td>
+                                                            <td id="overallAnalysisExpeditionFinalRate" headers="expeditionFinalRateHeading">—</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
+
+                                                <div class="flex-box-start">
+                                                    <div class="chart horizontal-bars-chart expedition-error-balance-chart">
+                                                        <div class="chart-canvas-container">
+                                                            <canvas id="overallAnalysisErrorBalanceChart" role="img" aria-label="Acompanhamento dos Erros"></canvas>
+                                                        </div>
+                                                    </div>
+
+                                                    <div>
+                                                        <table>
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Rua</th>
+                                                                    <th>Pacotes Ausentes</th>
+                                                                    <th>Erros da Rua</th>
+                                                                    <th>Taxa de Erros</th>
+                                                                </tr>
+                                                            </thead>
+
+                                                            <tbody id="overallAnalysisExpeditionStreetBody">
+                                                                <tr>
+                                                                    <td>—</td>
+                                                                    <td>—</td>
+                                                                    <td>—</td>
+                                                                    <td>—</td>
+                                                                </tr>
+
+                                                                <tr>
+                                                                    <td>—</td>
+                                                                    <td>—</td>
+                                                                    <td>—</td>
+                                                                    <td>—</td>
+                                                                </tr>
+
+                                                                <tr>
+                                                                    <td>—</td>
+                                                                    <td>—</td>
+                                                                    <td>—</td>
+                                                                    <td>—</td>
+                                                                </tr>
+
+                                                                <tr>
+                                                                    <td>—</td>
+                                                                    <td>—</td>
+                                                                    <td>—</td>
+                                                                    <td>—</td>
+                                                                </tr>
+
+                                                                <tr>
+                                                                    <td>—</td>
+                                                                    <td>—</td>
+                                                                    <td>—</td>
+                                                                    <td>—</td>
+                                                                </tr>
+
+                                                                <tr>
+                                                                    <td>—</td>
+                                                                    <td>—</td>
+                                                                    <td>—</td>
+                                                                    <td>—</td>
+                                                                </tr>
+
+                                                                <tr>
+                                                                    <td>—</td>
+                                                                    <td>—</td>
+                                                                    <td>—</td>
+                                                                    <td>—</td>
+                                                                </tr>
+
+                                                                <tr>
+                                                                    <td>—</td>
+                                                                    <td>—</td>
+                                                                    <td>—</td>
+                                                                    <td>—</td>
+                                                                </tr>
+
+                                                                <tr>
+                                                                    <td>—</td>
+                                                                    <td>—</td>
+                                                                    <td>—</td>
+                                                                    <td>—</td>
+                                                                </tr>
+
+                                                                <tr>
+                                                                    <td>—</td>
+                                                                    <td>—</td>
+                                                                    <td>—</td>
+                                                                    <td>—</td>
+                                                                </tr>
+
+                                                                <tr>
+                                                                    <td>—</td>
+                                                                    <td>—</td>
+                                                                    <td>—</td>
+                                                                    <td>—</td>
+                                                                </tr>
+
+                                                                <tr>
+                                                                    <td>—</td>
+                                                                    <td>—</td>
+                                                                    <td>—</td>
+                                                                    <td>—</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- PARCEL E REVERSA -->
+
+                                            <div class="tables-and-charts flex-box-start">
+                                                <div>
+                                                    <table>
+                                                        <caption>Parcel Sweeper</caption>
+
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Total de Bipado</th>
+                                                                <th>Pacotes Backlog</th>
+                                                                <th>Pacotes Exception</th>
+                                                                <th>Pacotes Missorted</th>
+                                                            </tr>
+                                                        </thead>
+
+                                                        <tbody>
+                                                            <tr>
+                                                                <td id="overallAnalysisParcelScanned">—</td>
+                                                                <td id="overallAnalysisParcelBacklog">—</td>
+                                                                <td id="overallAnalysisParcelException">—</td>
+                                                                <td id="overallAnalysisParcelMissorted">—</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+
+                                                    <div class="chart doughnut-chart">
+                                                        <div class="chart-canvas-container" id="overallAnalysisParcelCoverageChartContainer">
+                                                            <canvas id="overallAnalysisParcelCoverageChart" role="img" aria-label="Cobertura da varredura entre pacotes escaneados e não escaneados"></canvas>
+                                                        </div>
+
+                                                        <div class="chart-label">
+                                                            <div class="type">
+                                                                <div style="background-color: #2538a5;"></div>
+                                                                <p>Escaneados <span id="overallAnalysisParcelCoverageScanned">—</span></p>
+                                                            </div>
+
+                                                            <div class="type">
+                                                                <div style="background-color: #e4e6eb;"></div>
+                                                                <p>Não Escaneados <span id="overallAnalysisParcelCoverageUnscanned">—</span></p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div>
+                                                    <table>
+                                                        <caption>Reversa</caption>
+
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Return</th>
+                                                                <th>Missorted</th>
+                                                                <th>Liquidate</th>
+                                                                <th>Confiscado</th>
+                                                            </tr>
+                                                        </thead>
+
+                                                        <tbody>
+                                                            <tr>
+                                                                <td id="overallAnalysisReverseReturn">—</td>
+                                                                <td id="overallAnalysisReverseMissorted">—</td>
+                                                                <td id="overallAnalysisReverseLiquidate">—</td>
+                                                                <td id="overallAnalysisReverseConfiscated">—</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+
+                                                    <div class="chart doughnut-chart">
+                                                        <div class="chart-canvas-container" id="overallAnalysisReverseCompositionChartContainer">
+                                                            <canvas id="overallAnalysisReverseCompositionChart" role="img" aria-label="Composição da reversa por tipo"></canvas>
+                                                        </div>
+
+                                                        <div class="chart-label">
+                                                            <div class="type">
+                                                                <div style="background-color: #007A48;"></div>
+                                                                <p>Return <span id="overallAnalysisReverseCompositionReturn">—</span></p>
+                                                            </div>
+
+                                                            <div class="type">
+                                                                <div style="background-color: #8B0000;"></div>
+                                                                <p>Missorted <span id="overallAnalysisReverseCompositionMissorted">—</span></p>
+                                                            </div>
+
+                                                            <div class="type">
+                                                                <div style="background-color: #2538a5;"></div>
+                                                                <p>Liquidate <span id="overallAnalysisReverseCompositionLiquidate">—</span></p>
+                                                            </div>
+
+                                                            <div class="type">
+                                                                <div style="background-color: #f99400;"></div>
+                                                                <p>Confiscado <span id="overallAnalysisReverseCompositionConfiscated">—</span></p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
+                                </div>
 
-                                    <!-- PARCEL E REVERSA -->
+                                <div class="tabs-panel" id="employee-ranking">
 
-                                    <div class="tables-and-charts flex-box-start">
-                                        <div>
-                                            <table>
-                                                <caption>Parcel Sweeper</caption>
+                                    <!-- BARRA DE NOTIFICAÇÕES E BOTÕES DE AÇÃO -->
 
-                                                <thead>
-                                                    <tr>
-                                                        <th>Total de Bipado</th>
-                                                        <th>Pacotes Backlog</th>
-                                                        <th>Pacotes Exception</th>
-                                                        <th>Pacotes Missorted</th>
-                                                    </tr>
-                                                </thead>
+                                    <div class="flex-box-start">
+                                        <div class="warning" id="" role="status" aria-live="polite" aria-atomic="true" data-notification-type="idle">
+                                            <div class="flex-box-start">
+                                                <img id="" src="images/geral-icons/bell-icon.svg">
 
-                                                <tbody>
-                                                    <tr>
-                                                        <td id="overallAnalysisParcelScanned">—</td>
-                                                        <td id="overallAnalysisParcelBacklog">—</td>
-                                                        <td id="overallAnalysisParcelException">—</td>
-                                                        <td id="overallAnalysisParcelMissorted">—</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-
-                                            <div class="chart doughnut-chart">
-                                                <div class="chart-canvas-container" id="overallAnalysisParcelCoverageChartContainer">
-                                                    <canvas id="overallAnalysisParcelCoverageChart" role="img" aria-label="Cobertura da varredura entre pacotes escaneados e não escaneados"></canvas>
-                                                </div>
-
-                                                <div class="chart-label">
-                                                    <div class="type">
-                                                        <div style="background-color: #2538a5;"></div>
-                                                        <p>Escaneados <span id="overallAnalysisParcelCoverageScanned">—</span></p>
-                                                    </div>
-
-                                                    <div class="type">
-                                                        <div style="background-color: #e4e6eb;"></div>
-                                                        <p>Não Escaneados <span id="overallAnalysisParcelCoverageUnscanned">—</span></p>
-                                                    </div>
-                                                </div>
+                                                <h4 id="">
+                                                    Preencha os relatórios para completar o ranking de colaboradores. Todas as informações serão atualizadas automaticamente.
+                                                </h4>
                                             </div>
                                         </div>
-                                        
-                                        <div>
-                                            <table>
-                                                <caption>Reversa</caption>
 
-                                                <thead>
-                                                    <tr>
-                                                        <th>Return</th>
-                                                        <th>Missorted</th>
-                                                        <th>Liquidate</th>
-                                                        <th>Confiscado</th>
-                                                    </tr>
-                                                </thead>
+                                        <div class="report-actions">
+                                            <button id="" type="button">
+                                                <img src="images/geral-icons/copy-icon.svg" alt="">
+                                            </button>
 
-                                                <tbody>
-                                                    <tr>
-                                                        <td id="overallAnalysisReverseReturn">—</td>
-                                                        <td id="overallAnalysisReverseMissorted">—</td>
-                                                        <td id="overallAnalysisReverseLiquidate">—</td>
-                                                        <td id="overallAnalysisReverseConfiscated">—</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
+                                            <button id="" type="button">
+                                                <img src="images/geral-icons/image-icon.svg">
+                                            </button>
 
-                                            <div class="chart doughnut-chart">
-                                                <div class="chart-canvas-container" id="overallAnalysisReverseCompositionChartContainer">
-                                                    <canvas id="overallAnalysisReverseCompositionChart" role="img" aria-label="Composição da reversa por tipo"></canvas>
-                                                </div>
-
-                                                <div class="chart-label">
-                                                    <div class="type">
-                                                        <div style="background-color: #007A48;"></div>
-                                                        <p>Return <span id="overallAnalysisReverseCompositionReturn">—</span></p>
-                                                    </div>
-
-                                                    <div class="type">
-                                                        <div style="background-color: #8B0000;"></div>
-                                                        <p>Missorted <span id="overallAnalysisReverseCompositionMissorted">—</span></p>
-                                                    </div>
-
-                                                    <div class="type">
-                                                        <div style="background-color: #2538a5;"></div>
-                                                        <p>Liquidate <span id="overallAnalysisReverseCompositionLiquidate">—</span></p>
-                                                    </div>
-
-                                                    <div class="type">
-                                                        <div style="background-color: #f99400;"></div>
-                                                        <p>Confiscado <span id="overallAnalysisReverseCompositionConfiscated">—</span></p>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            <button id="" type="button">
+                                                <img src="images/geral-icons/trash-basket-icon.svg">
+                                            </button>
                                         </div>
+                                    </div>
+
+                                    <!-- PPÉVIA DO RELATÓRIO -->
+
+                                    <div class="preview">
+
+
+
+
+
                                     </div>
                                 </div>
                             </div>
