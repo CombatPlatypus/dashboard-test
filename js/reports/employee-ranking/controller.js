@@ -3,6 +3,7 @@ import {
     getExpeditionOperatorRanking,
     subscribeExpeditionState,
 } from "../expedition/state.js";
+import { getDamageAndLossesState, subscribeDamageAndLossesState } from "../damage-and-losses/state.js";
 import { getLossesState, subscribeLossesState } from "../damage-and-losses/losses-state.js";
 import { requestReportUpdate } from "../core/report-updates.js";
 import {
@@ -19,7 +20,7 @@ import {
     parseEmployeeRankingClipboard,
     readEmployeeRankingClipboard,
 } from "./clipboard.js";
-import { buildEmployeeExpeditionRanking, buildEmployeeOffPackagesRanking, formatEmployeeRankingDuration } from "./model.js";
+import { buildEmployeeExpeditionRanking, buildEmployeeOccurrenceRanking, formatEmployeeRankingDuration } from "./model.js";
 import {
     getEmployeeRankingHistory,
     replaceEmployeeRankingHistory,
@@ -64,25 +65,30 @@ function initializeEmployeeRankingController(root) {
     const panel = root.querySelector("#employee-ranking");
     const area = panel?.querySelector("#employeeRankingExportArea");
     const tables = area?.querySelector(".employee-ranking");
+    const receivedDamageBody = area?.querySelector("#employeeRankingReceivedDamageBody");
     const expeditionBody = area?.querySelector("#employeeRankingExpeditionBody");
     const offPackagesBody = area?.querySelector("#employeeRankingOffPackagesBody");
     const copyButton = panel?.querySelector("#employeeRankingCopyButton");
     const imageButton = panel?.querySelector("#employeeRankingImageButton");
     const importButton = panel?.querySelector("#employeeRankingImportButton");
     const clearButton = panel?.querySelector("#employeeRankingClearButton");
-    if (!tables || !expeditionBody || !offPackagesBody || !copyButton || !imageButton || !importButton || !clearButton) {
+    if (!tables || !receivedDamageBody || !expeditionBody || !offPackagesBody ||
+        !copyButton || !imageButton || !importButton || !clearButton) {
         return false;
     }
 
+    const monthlyTables = {
+        receivedDamageRanking: { body: receivedDamageBody, label: "Avarias Recebidas" },
+        offPackagesRanking: { body: offPackagesBody, label: "Pacotes OFF" },
+    };
+    const monthlySources = {};
+    const rankings = { receivedDamageRanking: [], expeditionRanking: [], offPackagesRanking: [] };
     let current = getExpeditionOperatorRanking();
-    let offPackages = getLossesState().offPackages;
-    let expeditionRanking = [];
-    let offPackagesRanking = [];
     let busy = false;
     let clipboardRowCount = 0;
 
     function renderActions() {
-        const hasData = expeditionRanking.length > 0 || offPackagesRanking.length > 0;
+        const hasData = Object.values(rankings).some(ranking => ranking.length > 0);
         copyButton.disabled = busy || !hasData;
         imageButton.disabled = busy || !hasData;
         importButton.disabled = busy;
@@ -90,7 +96,8 @@ function initializeEmployeeRankingController(root) {
     }
 
     function renderExpeditionRanking() {
-        expeditionRanking = buildEmployeeExpeditionRanking(current, getEmployeeRankingHistory());
+        const expeditionRanking = buildEmployeeExpeditionRanking(current, getEmployeeRankingHistory());
+        rankings.expeditionRanking = expeditionRanking;
         clipboardRowCount = Math.max(clipboardRowCount, expeditionRanking.length);
         renderRankingRows(expeditionBody, expeditionRanking, entry =>
             `${numberFormat.format(entry.routesChecked)} / ${formatEmployeeRankingDuration(entry.averageDurationSeconds)}`,
@@ -99,19 +106,34 @@ function initializeEmployeeRankingController(root) {
         return true;
     }
 
-    function renderOffPackagesRanking() {
-        offPackagesRanking = buildEmployeeOffPackagesRanking(offPackages?.operators ?? []);
-        clipboardRowCount = Math.max(clipboardRowCount, offPackagesRanking.length);
-        renderRankingRows(offPackagesBody, offPackagesRanking);
+    function renderMonthlyRankings(changes, announce = true) {
+        for (const [section, data] of Object.entries(changes)) {
+            monthlySources[section] = data;
+            const ranking = buildEmployeeOccurrenceRanking(data?.operators ?? []);
+            rankings[section] = ranking;
+            clipboardRowCount = Math.max(clipboardRowCount, ranking.length);
+            renderRankingRows(monthlyTables[section].body, ranking);
+        }
         renderActions();
+        if (announce) {
+            const message = getMonthlyRankingMessage();
+            if (message) notify("info", message);
+            else notifyCurrentRanking();
+        }
         return true;
     }
 
-    function notifyOffPackages() {
-        const month = monthFormat.format(new Date(`${offPackages.month}-01T00:00:00Z`));
-        notify("info", offPackages.operators.length
-            ? `Pacotes OFF atualizados para ${month}.`
-            : `Sem Pacotes OFF atribuídos em ${month}.`);
+    function getMonthlyRankingMessage() {
+        const messages = [];
+        for (const [section, data] of Object.entries(monthlySources)) {
+            if (!data) continue;
+            const { label } = monthlyTables[section];
+            const month = monthFormat.format(new Date(`${data.month}-01T00:00:00Z`));
+            messages.push(data.operators.length
+                ? `Ranking de ${label} atualizado para ${month}.`
+                : `Sem registros atribuídos em ${label} para ${month}.`);
+        }
+        return messages.join(" ");
     }
 
     function notifyCurrentRanking() {
@@ -119,10 +141,8 @@ function initializeEmployeeRankingController(root) {
             notify("info", "Ranking atualizado com os dados de Expedição.");
         } else if (getEmployeeRankingHistory().length) {
             notify("info", "Ranking mostra o acumulado importado de Expedição.");
-        } else if (offPackages) {
-            notifyOffPackages();
         } else {
-            notify("info", emptyRankingMessage);
+            notify("info", getMonthlyRankingMessage() || emptyRankingMessage);
         }
     }
 
@@ -166,7 +186,7 @@ function initializeEmployeeRankingController(root) {
 
     copyButton.addEventListener("click", () => runAction(copyButton, async () => {
         try {
-            await writeSummaryClipboard(createEmployeeRankingClipboard({ expeditionRanking, offPackagesRanking }, clipboardRowCount));
+            await writeSummaryClipboard(createEmployeeRankingClipboard(rankings, clipboardRowCount));
         } catch {
             throw new Error("Não foi possível copiar o ranking com formatação. Verifique a permissão da área de transferência.");
         }
@@ -200,7 +220,7 @@ function initializeEmployeeRankingController(root) {
     });
 
     for (const body of area.querySelectorAll("tbody")) {
-        if (body !== expeditionBody && body !== offPackagesBody) renderRankingRows(body);
+        if (body !== receivedDamageBody && body !== expeditionBody && body !== offPackagesBody) renderRankingRows(body);
     }
     subscribeExpeditionState((_, change, derived) => {
         if (!getExpeditionChangeScope(change).routes) return;
@@ -209,17 +229,22 @@ function initializeEmployeeRankingController(root) {
         requestReportUpdate(renderExpeditionRanking);
         notifyCurrentRanking();
     });
+    subscribeDamageAndLossesState((damage, change) => {
+        if (change.receivedDamageChanged) {
+            requestReportUpdate(renderMonthlyRankings, { receivedDamageRanking: damage.receivedDamage });
+        }
+    });
     subscribeLossesState((losses, change) => {
-        if (!change.offPackagesChanged) return;
-
-        offPackages = losses.offPackages;
-        requestReportUpdate(renderOffPackagesRanking);
-        if (offPackages) notifyOffPackages();
-        else notifyCurrentRanking();
+        if (change.offPackagesChanged) {
+            requestReportUpdate(renderMonthlyRankings, { offPackagesRanking: losses.offPackages });
+        }
     });
     subscribeEmployeeRankingHistory(() => requestReportUpdate(renderExpeditionRanking));
     renderExpeditionRanking();
-    initialized = renderOffPackagesRanking();
+    initialized = renderMonthlyRankings({
+        receivedDamageRanking: getDamageAndLossesState().receivedDamage,
+        offPackagesRanking: getLossesState().offPackages,
+    }, false);
     return initialized;
 }
 

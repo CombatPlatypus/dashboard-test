@@ -99,6 +99,7 @@ function populateMissingReports() {
             socStations: [{ name: "SOC_SP_Cajamar", count: 3 }] }],
         socStations: [{ name: "SOC_SP_Cajamar", count: 3 }],
         history: [{ date: "2026-10-14", packageCode: "AV1", situation: "Recebido" }],
+        receivedDamage: { month: "2026-10", operators: [{ operator: "João de Souza Lima", quantity: 1 }] },
     });
     Object.assign(damage.losses, {
         monthIndex: 9, year: 2026, sourceFileName: "avarias.xlsx", sourceSheetName: "Histórico de Avarias e Perdas",
@@ -214,6 +215,9 @@ test("arquivo salvo restaura os sete relatórios e o histórico do Ranking de Co
     assert.equal(original.reports.parcel.operatorKindOverrides["[ops1]ana"], true);
     assert.equal(original.reports["damage-and-losses"].losses.days[0].confirmedLosses, 2);
     assert.equal(original.reports["damage-and-losses"].losses.days[0].recoveryPending, 1);
+    assert.deepEqual(original.reports["damage-and-losses"].receivedDamage, {
+        month: "2026-10", operators: [{ operator: "João de Souza Lima", quantity: 1 }],
+    });
     assert.deepEqual(original.reports["damage-and-losses"].losses.offPackages, {
         month: "2026-10", operators: [{ operator: "Ana Rosa Silva", quantity: 2 }],
     });
@@ -262,6 +266,9 @@ test("valida dados adicionais antes de alterar os relatórios da sessão", t => 
     for (const [id, report, message] of [
         ["damage-and-losses", { days: {} }, /Avarias e Perdas/],
         ["damage-and-losses", { days: [], losses: { days: null } }, /Avarias e Perdas/],
+        ["damage-and-losses", { days: [], receivedDamage: {
+            month: "2026-10", operators: [{ operator: "João de Souza Lima", quantity: -1 }],
+        } }, /Avarias e Perdas/],
         ["parcel", { rows: null }, /Parcel Sweeper/],
         ["parcel", { rows: [], operatorKindOverrides: { ana: "sim" } }, /Parcel Sweeper/],
         ["reverse", { transfers: [{ quantities: null }] }, /Reversa/],

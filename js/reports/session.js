@@ -23,7 +23,8 @@ import { subscribeExpeditionState } from "./expedition/state.js";
 import { subscribeEmployeeRankingHistory } from "./employee-ranking/state.js";
 import { subscribeLossesRateState } from "./losses-rate/state.js";
 import { subscribeDamageAndLossesState } from "./damage-and-losses/state.js";
-import { isValidOffPackagesData, subscribeLossesState } from "./damage-and-losses/losses-state.js";
+import { subscribeLossesState } from "./damage-and-losses/losses-state.js";
+import { isValidMonthlyOperatorCounts } from "./damage-and-losses/monthly-operator-counts.js";
 import { getParcelSnapshot, hasParcelRowsChanged, subscribeParcelState } from "./parcel-sweeper/state.js";
 import { subscribeReverseState } from "./reverse/state.js";
 
@@ -216,7 +217,8 @@ const sessionReportValidators = {
         const damage = state.damage || state;
         return validOccurrenceDays(damage) &&
             (damage.socStations === undefined || isSessionObjectList(damage.socStations)) &&
-            (state.losses === undefined || (validOccurrenceDays(state.losses) && isValidOffPackagesData(state.losses.offPackages)));
+            isValidMonthlyOperatorCounts(damage.receivedDamage) &&
+            (state.losses === undefined || (validOccurrenceDays(state.losses) && isValidMonthlyOperatorCounts(state.losses.offPackages)));
     }],
     parcel: ["do Parcel Sweeper", state => {
         const overrides = state.operatorKindOverrides;

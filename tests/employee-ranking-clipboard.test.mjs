@@ -4,7 +4,7 @@ import {
     createEmployeeRankingClipboard,
     parseEmployeeRankingClipboard,
 } from "../js/reports/employee-ranking/clipboard.js";
-import { buildEmployeeExpeditionRanking, buildEmployeeOffPackagesRanking } from "../js/reports/employee-ranking/model.js";
+import { buildEmployeeExpeditionRanking, buildEmployeeOccurrenceRanking } from "../js/reports/employee-ranking/model.js";
 
 test("imports only the expedition block from the complete ranking worksheet", () => {
     const worksheet = [
@@ -28,11 +28,15 @@ test("copies the formatted ranking from B2 and keeps short names in the visible 
         { operator: "Maria da Silva Souza", routesChecked: 4, totalDurationSeconds: 1200, routesWithDuration: 4 },
     ];
     const ranking = buildEmployeeExpeditionRanking(operators);
-    const offPackagesRanking = buildEmployeeOffPackagesRanking([
+    const receivedDamageRanking = buildEmployeeOccurrenceRanking([
+        { operator: "João de Souza Lima", quantity: 4 },
+        { operator: "Maria da Silva Costa", quantity: 1 },
+    ]);
+    const offPackagesRanking = buildEmployeeOccurrenceRanking([
         { operator: "Maria da Silva Souza", quantity: 5 },
         { operator: "Ana da Rocha Costa", quantity: 1 },
     ]);
-    const { text, html } = createEmployeeRankingClipboard({ expeditionRanking: ranking, offPackagesRanking }, 153);
+    const { text, html } = createEmployeeRankingClipboard({ receivedDamageRanking, expeditionRanking: ranking, offPackagesRanking }, 153);
     const rows = text.split("\n").map(row => row.split("\t"));
 
     assert.equal(rows.length, 158);
@@ -41,6 +45,9 @@ test("copies the formatted ranking from B2 and keeps short names in the visible 
     assert.deepEqual([0, 3, 6, 9, 13].map(column => rows[3][column]), [
         "Recebimento", "Erros de Etiquetagem", "Avarias Recebidas", "Rotas Conferidas e Tempo Médio", "Pacotes OFF",
     ]);
+    assert.deepEqual(rows[4].slice(6, 8), ["Colaborador", "Quantidade"]);
+    assert.deepEqual(rows[5].slice(6, 8), ["Maria Silva", "1"]);
+    assert.deepEqual(rows[6].slice(6, 8), ["João Souza", "4"]);
     assert.deepEqual(rows[4].slice(9, 12), ["Colaborador", "Quantidade", "Tempo"]);
     assert.deepEqual(rows[5].slice(9, 12), ["Maria Silva", "12", "00:05:29"]);
     assert.deepEqual(rows[6].slice(9, 12), ["Maria Silva", "4", "00:05:00"]);
@@ -56,6 +63,7 @@ test("copies the formatted ranking from B2 and keeps short names in the visible 
     assert.doesNotMatch(text, /Nome completo do conferente/);
     assert.match(html, /data-sheets-formula="=&quot;Maria Silva&quot;&amp;T\(N\(&quot;Nome completo do conferente: Maria da Silva Costa&quot;\)\)">Maria Silva/);
     assert.match(html, /data-sheets-formula="=&quot;Maria Silva&quot;&amp;T\(N\(&quot;Nome completo do conferente: Maria da Silva Souza&quot;\)\)">Maria Silva/);
+    assert.match(html, /data-sheets-formula="=&quot;João Souza&quot;&amp;T\(N\(&quot;Nome completo do conferente: João de Souza Lima&quot;\)\)">João Souza/);
     assert.doesNotMatch(html, /data-sheets-userformat/);
     const cellStyles = new Map(Array.from(html.matchAll(/<td\b[^>]*style="([^"]+)"[^>]*>([^<]*)<\/td>/g),
         ([, style, text]) => [text, style]));
@@ -64,6 +72,7 @@ test("copies the formatted ranking from B2 and keeps short names in the visible 
         ["Rotas Conferidas e Tempo Médio", 12],
         ["Colaborador", 11],
         ["Maria Silva", 10],
+        ["João Souza", 10],
         ["00:05:29", 10],
     ]) {
         assert.match(cellStyles.get(text), new RegExp(`font-size:${fontSize}pt;`));

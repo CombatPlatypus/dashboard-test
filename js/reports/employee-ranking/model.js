@@ -70,7 +70,7 @@ function buildEmployeeExpeditionRanking(currentRanking, importedRanking = []) {
     ));
 }
 
-function buildEmployeeOffPackagesRanking(operators) {
+function buildEmployeeOccurrenceRanking(operators) {
     return operators.map(entry => ({
         ...entry,
         displayName: formatEmployeeRankingName(entry.operator),
@@ -83,7 +83,7 @@ function buildEmployeeOffPackagesRanking(operators) {
 
 export {
     buildEmployeeExpeditionRanking,
-    buildEmployeeOffPackagesRanking,
+    buildEmployeeOccurrenceRanking,
     formatEmployeeRankingDuration,
     formatEmployeeRankingName,
     normalizeEmployeeRankingName,

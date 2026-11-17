@@ -1,4 +1,5 @@
 import { normalizeOccurrenceHistory } from "./history.js";
+import { cloneMonthlyOperatorCounts, isValidMonthlyOperatorCounts } from "./monthly-operator-counts.js";
 
 const DAMAGE_MONTH_NAMES =
     Object.freeze([
@@ -230,6 +231,7 @@ function createInitialDamageState() {
         days: [],
         socStations: [],
         history: [],
+        receivedDamage: null,
     };
 }
 
@@ -239,6 +241,7 @@ const damageAndLossesState =
 function getDamageAndLossesState() {
     return {
         history: damageAndLossesState.history.map(record => ({ ...record })),
+        receivedDamage: cloneMonthlyOperatorCounts(damageAndLossesState.receivedDamage),
         monthIndex:
             damageAndLossesState
                 .monthIndex,
@@ -366,6 +369,12 @@ function replaceDamageAndLossesData(
             "O período das avarias é inválido.",
         );
     }
+
+    if (!isValidMonthlyOperatorCounts(values.receivedDamage)) {
+        throw new TypeError("Os dados de Avarias Recebidas são inválidos.");
+    }
+    const receivedDamage = cloneMonthlyOperatorCounts(values.receivedDamage);
+    const receivedDamageChanged = JSON.stringify(receivedDamage) !== JSON.stringify(damageAndLossesState.receivedDamage);
 
     const daysByDate =
         new Map();
@@ -525,9 +534,11 @@ function replaceDamageAndLossesData(
         );
 
     damageAndLossesState.history = normalizeOccurrenceHistory(values.history);
+    damageAndLossesState.receivedDamage = receivedDamage;
 
     notifyDamageAndLossesState({
         type: "damage-data-replaced",
+        receivedDamageChanged,
     });
 
     return true;
@@ -986,6 +997,7 @@ function restoreDamageAndLossesState(
 }
 
 function resetDamageAndLossesState() {
+    const receivedDamageChanged = damageAndLossesState.receivedDamage !== null;
     const initialState =
         createInitialDamageState();
 
@@ -996,6 +1008,7 @@ function resetDamageAndLossesState() {
 
     notifyDamageAndLossesState({
         type: "damage-report-reset",
+        receivedDamageChanged,
     });
 
     return true;

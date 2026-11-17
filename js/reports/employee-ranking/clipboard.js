@@ -5,12 +5,13 @@ import { formatEmployeeRankingName, normalizeEmployeeRankingName } from "./model
 const MIN_EMPLOYEE_RANKING_ROWS = 150;
 const rankingTitle = "RANKING MENSAL DE DESEMPENHO";
 const commonHeaders = ["Colaborador", "Quantidade"];
+const receivedDamage = { title: "Avarias Recebidas", headers: commonHeaders };
 const expedition = { title: "Rotas Conferidas e Tempo Médio", headers: [...commonHeaders, "Tempo"] };
 const offPackages = { title: "Pacotes OFF", headers: commonHeaders };
 const rankingSections = [
     { title: "Recebimento", headers: commonHeaders },
     { title: "Erros de Etiquetagem", headers: commonHeaders },
-    { title: "Avarias Recebidas", headers: commonHeaders },
+    receivedDamage,
     expedition,
     offPackages,
 ];
@@ -207,8 +208,13 @@ function createRankingNameCell(entry, style) {
     };
 }
 
-function createEmployeeRankingClipboard({ expeditionRanking = [], offPackagesRanking = [] }, previousRowCount = 0) {
-    const rowCount = Math.max(expeditionRanking.length, offPackagesRanking.length, MIN_EMPLOYEE_RANKING_ROWS, previousRowCount);
+function createEmployeeRankingClipboard({ receivedDamageRanking = [], expeditionRanking = [], offPackagesRanking = [] }, previousRowCount = 0) {
+    const rowCount = Math.max(receivedDamageRanking.length, expeditionRanking.length, offPackagesRanking.length,
+        MIN_EMPLOYEE_RANKING_ROWS, previousRowCount);
+    const countsBySection = new Map([
+        [receivedDamage, receivedDamageRanking],
+        [offPackages, offPackagesRanking],
+    ]);
     const emptyCell = cell(null, blankStyle);
     const sectionGap = cell(null, blankStyle, 1, rowCount + 2);
     const sectionRow = (createSectionCells, gap = null) => rankingSections.flatMap((section, index) =>
@@ -224,7 +230,6 @@ function createEmployeeRankingClipboard({ expeditionRanking = [], offPackagesRan
 
     for (let index = 0; index < rowCount; index += 1) {
         const entry = expeditionRanking[index];
-        const offEntry = offPackagesRanking[index];
         const style = rowStyles[index % rowStyles.length];
         const expeditionCells = [
             createRankingNameCell(entry, style),
@@ -234,8 +239,8 @@ function createEmployeeRankingClipboard({ expeditionRanking = [], offPackagesRan
         ];
         rows.push(sectionRow(section => {
             if (section === expedition) return expeditionCells;
-            if (section === offPackages) return [createRankingNameCell(offEntry, style), cell(offEntry?.quantity, style)];
-            return section.headers.map(() => cell(null, style));
+            const occurrence = countsBySection.get(section)?.[index];
+            return [createRankingNameCell(occurrence, style), cell(occurrence?.quantity, style)];
         }));
     }
 

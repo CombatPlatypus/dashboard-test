@@ -9,8 +9,9 @@ import {
     findLossesMonthSource,
     readDamageAndLossesFile,
 } from "../js/reports/damage-and-losses/import.js";
+import { getDamageAndLossesState, replaceDamageAndLossesData, resetDamageAndLossesState, subscribeDamageAndLossesState } from "../js/reports/damage-and-losses/state.js";
 import { getLossesState, replaceLossesData, resetLossesState, subscribeLossesState } from "../js/reports/damage-and-losses/losses-state.js";
-import { buildEmployeeOffPackagesRanking } from "../js/reports/employee-ranking/model.js";
+import { buildEmployeeOccurrenceRanking } from "../js/reports/employee-ranking/model.js";
 import {
     createDamageAndLossesWorkbook,
 } from "./fixtures/damage-and-losses-workbook.mjs";
@@ -55,6 +56,7 @@ test("importa o novo XLSX completo sem misturar os históricos lado a lado", asy
     assert.deepEqual(result.damage.socStations, [
         { name: "SOC_SP_Cajamar", count: 1 },
     ]);
+    assert.equal(result.damage.receivedDamage, null);
     assert.equal(result.losses.importedRows, 4);
     assert.equal(result.losses.returnedImportedRows, 2);
     assert.equal(result.losses.offPackages, null);
@@ -91,7 +93,7 @@ test("conta Pacotes OFF por linha, Log e mês da expedição em São Paulo", asy
     const file = createFile(workbook);
     const result = await readDamageAndLossesFile(file, new Date("2026-11-16T15:00:00Z"));
     assert.equal(result.losses.offPackages.month, "2026-11");
-    assert.deepEqual(buildEmployeeOffPackagesRanking(result.losses.offPackages.operators).map(entry => [
+    assert.deepEqual(buildEmployeeOccurrenceRanking(result.losses.offPackages.operators).map(entry => [
         entry.displayName, entry.quantity,
     ]), [
         ["Ana Rocha", 1],
@@ -117,6 +119,53 @@ test("conta Pacotes OFF por linha, Log e mês da expedição em São Paulo", asy
     resetLossesState();
     assert.equal(getLossesState().offPackages, null);
     assert.deepEqual(offChanges, [true, false, true]);
+});
+
+test("conta Avarias Recebidas por Data e Log no mês, independentemente do turno", async t => {
+    const workbook = createDamageAndLossesWorkbook();
+    const novemberSerial = Date.UTC(2026, 10, 15) / 86_400_000 + 25569;
+    workbook.Sheets["Histórico de Avarias Recebidas"] = XLSX.utils.aoa_to_sheet([
+        ["", "Histórico de Avarias Recebidas"],
+        ["", "Semana", "Data", "Código BR", "Turno", "Tipo de Produto", "Local de Apuração", "Log"],
+        ["", "W44", "31/10/2026", "AV1", "AM", "Líquido", "Recebimento", "Ana da Rocha Lima"],
+        ["", "W46", "15/11/2026", "AV2", "AM", "Vidro", "Recebimento", " MARIA da SILVA Santos "],
+        ["", "W46", new Date(2026, 10, 16, 12), "AV2", "PM2", "Vidro", "Expedição", "Maria   da Silva Santos"],
+        ["", "W46", novemberSerial, "AV3", "PM1", "Líquido", "Sorting/Alocação", "João de Souza Assis"],
+        ["", "W46", "2026-11-16", "AV4", "AM", "Vidro", "Recebimento", "Ana da Rocha Lima"],
+        ["", "W46", "16/11/2025", "AV5", "AM", "Vidro", "Recebimento", "Outro Ano"],
+        ["", "W46", "16/11/2026", "AV6", "AM", "Vidro", "Recebimento", " "],
+        ["", "W46", "", "AV7", "AM", "Vidro", "Recebimento", "Sem Data"],
+    ]);
+    const file = createFile(workbook);
+    const { damage, losses } = await readDamageAndLossesFile(file, new Date("2026-11-16T15:00:00Z"));
+    assert.equal(damage.receivedDamage.month, "2026-11");
+    assert.equal(losses.offPackages, null);
+    assert.deepEqual(buildEmployeeOccurrenceRanking(damage.receivedDamage.operators).map(entry => [
+        entry.displayName, entry.quantity,
+    ]), [
+        ["Ana Rocha", 1],
+        ["João Souza", 1],
+        ["Maria Silva", 2],
+    ]);
+
+    const beginningOfMonthUtc = await readDamageAndLossesFile(file, new Date("2026-11-01T01:00:00Z"));
+    assert.deepEqual(beginningOfMonthUtc.damage.receivedDamage, {
+        month: "2026-10", operators: [{ operator: "Ana da Rocha Lima", quantity: 1 }],
+    });
+
+    const receivedDamageChanges = [];
+    const unsubscribe = subscribeDamageAndLossesState((_, change) => receivedDamageChanges.push(change.receivedDamageChanged));
+    t.after(() => {
+        unsubscribe();
+        resetDamageAndLossesState();
+    });
+    replaceDamageAndLossesData(damage);
+    assert.deepEqual(getDamageAndLossesState().receivedDamage, damage.receivedDamage);
+    replaceDamageAndLossesData({ ...damage, sourceFileName: "Outra cópia.xlsx" });
+    assert.deepEqual(receivedDamageChanges, [true, false]);
+    resetDamageAndLossesState();
+    assert.equal(getDamageAndLossesState().receivedDamage, null);
+    assert.deepEqual(receivedDamageChanges, [true, false, true]);
 });
 
 test("prioriza Histórico de Avarias Recebidas e aceita o nome anterior em arquivos antigos", () => {

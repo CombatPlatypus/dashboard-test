@@ -3,6 +3,7 @@ import {
 } from "./state.js";
 
 import { normalizeOccurrenceHistory } from "./history.js";
+import { cloneMonthlyOperatorCounts, isValidMonthlyOperatorCounts } from "./monthly-operator-counts.js";
 
 const lossesStateListeners =
     new Set();
@@ -65,23 +66,6 @@ function createLossesDayRecord(values = {}) {
     };
 }
 
-function isValidOffPackagesData(value) {
-    return value == null || (
-        typeof value.month === "string" && /^\d{4}-(0[1-9]|1[0-2])$/.test(value.month) &&
-        Array.isArray(value.operators) && value.operators.every(entry => (
-            typeof entry?.operator === "string" && entry.operator.trim() !== "" &&
-            Number.isSafeInteger(entry.quantity) && entry.quantity > 0
-        ))
-    );
-}
-
-function cloneOffPackagesData(value) {
-    return value ? {
-        month: value.month,
-        operators: value.operators.map(({ operator, quantity }) => ({ operator, quantity })),
-    } : null;
-}
-
 function createInitialLossesState() {
     const now = new Date();
 
@@ -104,7 +88,7 @@ const lossesState =
 function getLossesState() {
     return {
         history: lossesState.history.map(record => ({ ...record })),
-        offPackages: cloneOffPackagesData(lossesState.offPackages),
+        offPackages: cloneMonthlyOperatorCounts(lossesState.offPackages),
         monthIndex: lossesState.monthIndex,
         monthName: lossesState.monthName,
         year: lossesState.year,
@@ -175,10 +159,10 @@ function replaceLossesData(values = {}) {
         );
     }
 
-    if (!isValidOffPackagesData(values.offPackages)) {
+    if (!isValidMonthlyOperatorCounts(values.offPackages)) {
         throw new TypeError("Os dados de Pacotes OFF são inválidos.");
     }
-    const offPackages = cloneOffPackagesData(values.offPackages);
+    const offPackages = cloneMonthlyOperatorCounts(values.offPackages);
     const offPackagesChanged = JSON.stringify(offPackages) !== JSON.stringify(lossesState.offPackages);
     const daysByDate =
         new Map();
@@ -537,7 +521,6 @@ function resetLossesState() {
 export {
     getLossesState,
     getLossesSummary,
-    isValidOffPackagesData,
     replaceLossesData,
     resetLossesState,
     restoreLossesState,

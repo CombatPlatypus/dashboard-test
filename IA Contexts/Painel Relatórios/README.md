@@ -72,7 +72,7 @@ Mostra Avarias do Mês, Perdas do Mês e Histórico Consolidado. O [importador](
 
 O importador converte a aba de histórico uma vez e lê os dois blocos a partir das mesmas linhas. Aplica Avarias, Perdas e Taxa em lote e atualiza o Consolidado e o Final uma vez por arquivo. Se a série anual mudar isoladamente, o Consolidado atualiza somente a célula da taxa. [Importação](../../js/reports/damage-and-losses/import.js) · [Consolidado](../../js/reports/damage-and-losses/consolidated-view.js)
 
-As colunas **Expedição** e **Log** do **Histórico de Retornados** alimentam o bloco de [Pacotes OFF do Ranking Mensal](ranking-de-colaboradores.md#pacotes-off). O recorte mensal acompanha o estado de Perdas na sessão.
+As colunas **Data** e **Log** do **Histórico de Avarias Recebidas** alimentam Avarias Recebidas no [Ranking Mensal](ranking-de-colaboradores.md#avarias-recebidas-e-pacotes-off). As colunas **Expedição** e **Log** do **Histórico de Retornados** alimentam Pacotes OFF. Os recortes mensais acompanham os estados de Avarias e de Perdas na sessão.
 
 Em **Perdas do Mês**, o gráfico **Pack Recovery** cruza os códigos BR do histórico com a coluna Pack Recovery da **Base de Análises**. A contagem do período selecionado usa **Feito**, **ID Inválido**, **Sem Dados** e **Aguardando**. Células vazias e pacotes sem correspondência na base entram em **Sem Dados**. Rótulos preenchidos fora da lista ficam fora da contagem do gráfico. [Importação](../../js/reports/damage-and-losses/import.js) · [Gráfico](../../js/reports/damage-and-losses/losses-charts.js) · [Testes](../../tests/damage-and-losses-losses.test.mjs)
 
@@ -128,4 +128,4 @@ Verifique indicadores e critérios de exportação em [overall-analysis-cards.te
 
 ### Ranking Mensal de Colaboradores
 
-A subaba [Ranking Mensal de Colaboradores](ranking-de-colaboradores.md) apresenta cinco blocos. Expedição combina os dados atuais com o acumulado importado do Resumo da Operação. Pacotes OFF usa o Histórico de Retornados e apresenta os colaboradores em ordem crescente de ocorrências. Recebimento, Erros de Etiquetagem e Avarias Recebidas exibem linhas de preenchimento.
+A subaba [Ranking Mensal de Colaboradores](ranking-de-colaboradores.md) apresenta cinco blocos. Expedição combina os dados atuais com o acumulado importado do Resumo da Operação. Avarias Recebidas e Pacotes OFF usam os históricos da planilha de Avarias e Perdas e exibem os colaboradores em ordem crescente de ocorrências. Recebimento e Erros de Etiquetagem exibem linhas de preenchimento.

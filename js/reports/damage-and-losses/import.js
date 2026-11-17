@@ -145,11 +145,15 @@ const lossesReturnedColumnAliases =
             lossesColumnAliases.packageCode,
     });
 
-const offPackagesColumnAliases = {
-    expeditionDate: ["expedicao", "data da expedicao", "data de expedicao"],
+const receivedDamageColumnAliases = {
+    date: damageColumnAliases.date,
     operator: ["log"],
 };
-const offPackagesMonthFormatter = new Intl.DateTimeFormat("pt-BR", {
+const offPackagesColumnAliases = {
+    date: ["expedicao", "data da expedicao", "data de expedicao"],
+    operator: ["log"],
+};
+const operatorCountMonthFormatter = new Intl.DateTimeFormat("pt-BR", {
     year: "numeric", month: "2-digit", timeZone: "America/Sao_Paulo",
 });
 
@@ -445,6 +449,9 @@ function findDamageProductSource(
             return {
                 sheetName,
                 valuesByPackageCode,
+                rows,
+                headerRowIndex: rowIndex,
+                operatorCountColumns: findColumnsByAliases(rows[rowIndex], receivedDamageColumnAliases),
             };
         }
     }
@@ -929,7 +936,7 @@ function findLossesReturnedSource(workbook) {
                 rows,
                 columns,
                 headerRowIndex: rowIndex,
-                offPackagesColumns: findColumnsByAliases(rows[rowIndex], offPackagesColumnAliases),
+                operatorCountColumns: findColumnsByAliases(rows[rowIndex], offPackagesColumnAliases),
             };
         }
     }
@@ -939,19 +946,19 @@ function findLossesReturnedSource(workbook) {
     );
 }
 
-function createOffPackagesMonthData({ rows, headerRowIndex, offPackagesColumns }, date) {
-    if (!offPackagesColumns) return null;
+function createMonthlyOperatorCounts({ rows, headerRowIndex, operatorCountColumns }, date) {
+    if (!operatorCountColumns) return null;
 
-    const { expeditionDate, operator: operatorColumn } = offPackagesColumns;
-    const parts = offPackagesMonthFormatter.formatToParts(date);
+    const { date: dateColumn, operator: operatorColumn } = operatorCountColumns;
+    const parts = operatorCountMonthFormatter.formatToParts(date);
     const year = Number(parts.find(part => part.type === "year").value);
     const month = Number(parts.find(part => part.type === "month").value);
     const operators = new Map();
 
     for (let index = headerRowIndex + 1; index < rows.length; index += 1) {
         const row = rows[index];
-        const shipped = parseDamageDate(row[expeditionDate]);
-        if (shipped?.year !== year || shipped.month !== month) continue;
+        const occurrenceDate = parseDamageDate(row[dateColumn]);
+        if (occurrenceDate?.year !== year || occurrenceDate.month !== month) continue;
 
         const operator = normalizeEmployeeRankingName(row[operatorColumn]);
         if (!operator || /^[-–—]$/.test(operator)) continue;
@@ -1634,6 +1641,7 @@ async function readDamageAndLossesFile(
             ),
 
             history: createOccurrenceHistory(source),
+            receivedDamage: createMonthlyOperatorCounts(source.productSource, date),
 
             sourceFileName:
                 file.name,
@@ -1650,7 +1658,7 @@ async function readDamageAndLossesFile(
             ),
 
             history: createOccurrenceHistory(lossesSource),
-            offPackages: createOffPackagesMonthData(lossesSource.returnedSource, date),
+            offPackages: createMonthlyOperatorCounts(lossesSource.returnedSource, date),
 
             sourceFileName:
                 file.name,
