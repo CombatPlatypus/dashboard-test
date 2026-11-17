@@ -105,6 +105,7 @@ function populateMissingReports() {
         days: [{ date: "2026-10-15", underReview: 4, confirmedLosses: 2, returnedPackages: 1,
             recoveryDone: 2, recoveryPending: 1, recoveryInvalidId: 1, recoveryUninformed: 2 }],
         history: [{ date: "2026-10-15", packageCode: "BRL1", situation: "Lost" }],
+        offPackages: { month: "2026-10", operators: [{ operator: "Ana Rosa Silva", quantity: 2 }] },
     });
     payload.reports.parcel = {
         rows: [
@@ -213,6 +214,9 @@ test("arquivo salvo restaura os sete relatórios e o histórico do Ranking de Co
     assert.equal(original.reports.parcel.operatorKindOverrides["[ops1]ana"], true);
     assert.equal(original.reports["damage-and-losses"].losses.days[0].confirmedLosses, 2);
     assert.equal(original.reports["damage-and-losses"].losses.days[0].recoveryPending, 1);
+    assert.deepEqual(original.reports["damage-and-losses"].losses.offPackages, {
+        month: "2026-10", operators: [{ operator: "Ana Rosa Silva", quantity: 2 }],
+    });
     const saved = parseReportSession(serializeReportSession(original));
     for (const report of reportModules) if (report.id !== "overall-analysis") report.reset();
     replaceEmployeeRankingHistory([]);

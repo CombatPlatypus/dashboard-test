@@ -6,12 +6,13 @@ const MIN_EMPLOYEE_RANKING_ROWS = 150;
 const rankingTitle = "RANKING MENSAL DE DESEMPENHO";
 const commonHeaders = ["Colaborador", "Quantidade"];
 const expedition = { title: "Rotas Conferidas e Tempo Médio", headers: [...commonHeaders, "Tempo"] };
+const offPackages = { title: "Pacotes OFF", headers: commonHeaders };
 const rankingSections = [
     { title: "Recebimento", headers: commonHeaders },
     { title: "Erros de Etiquetagem", headers: commonHeaders },
     { title: "Avarias Recebidas", headers: commonHeaders },
     expedition,
-    { title: "Pacotes OFF", headers: commonHeaders },
+    offPackages,
 ];
 const operatorHeader = "Nome completo do conferente";
 const operatorFormulaPrefix = `${operatorHeader}: `;
@@ -193,7 +194,7 @@ function cell(value, style, span = 1, rowSpan = 1) {
     return { value, style, span, rowSpan };
 }
 
-function createExpeditionNameCell(entry, style) {
+function createRankingNameCell(entry, style) {
     if (!entry) return cell(null, style);
 
     const { displayName, operator } = entry;
@@ -206,8 +207,8 @@ function createExpeditionNameCell(entry, style) {
     };
 }
 
-function createEmployeeRankingClipboard(ranking, previousRowCount = 0) {
-    const rowCount = Math.max(ranking.length, MIN_EMPLOYEE_RANKING_ROWS, previousRowCount);
+function createEmployeeRankingClipboard({ expeditionRanking = [], offPackagesRanking = [] }, previousRowCount = 0) {
+    const rowCount = Math.max(expeditionRanking.length, offPackagesRanking.length, MIN_EMPLOYEE_RANKING_ROWS, previousRowCount);
     const emptyCell = cell(null, blankStyle);
     const sectionGap = cell(null, blankStyle, 1, rowCount + 2);
     const sectionRow = (createSectionCells, gap = null) => rankingSections.flatMap((section, index) =>
@@ -222,15 +223,20 @@ function createEmployeeRankingClipboard(ranking, previousRowCount = 0) {
     ];
 
     for (let index = 0; index < rowCount; index += 1) {
-        const entry = ranking[index];
+        const entry = expeditionRanking[index];
+        const offEntry = offPackagesRanking[index];
         const style = rowStyles[index % rowStyles.length];
         const expeditionCells = [
-            createExpeditionNameCell(entry, style),
+            createRankingNameCell(entry, style),
             cell(entry?.routesChecked, style),
             // Let the spreadsheet recognize hh:mm:ss as a time value, as in text paste.
             { ...cell(formatSpreadsheetDuration(entry?.averageDurationSeconds), style), inferValueType: true },
         ];
-        rows.push(sectionRow(section => section === expedition ? expeditionCells : section.headers.map(() => cell(null, style))));
+        rows.push(sectionRow(section => {
+            if (section === expedition) return expeditionCells;
+            if (section === offPackages) return [createRankingNameCell(offEntry, style), cell(offEntry?.quantity, style)];
+            return section.headers.map(() => cell(null, style));
+        }));
     }
 
     return createClipboardTable(rows, { columnWidths });

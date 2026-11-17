@@ -9,6 +9,8 @@ import {
     findLossesMonthSource,
     readDamageAndLossesFile,
 } from "../js/reports/damage-and-losses/import.js";
+import { getLossesState, replaceLossesData, resetLossesState, subscribeLossesState } from "../js/reports/damage-and-losses/losses-state.js";
+import { buildEmployeeOffPackagesRanking } from "../js/reports/employee-ranking/model.js";
 import {
     createDamageAndLossesWorkbook,
 } from "./fixtures/damage-and-losses-workbook.mjs";
@@ -55,6 +57,7 @@ test("importa o novo XLSX completo sem misturar os históricos lado a lado", asy
     ]);
     assert.equal(result.losses.importedRows, 4);
     assert.equal(result.losses.returnedImportedRows, 2);
+    assert.equal(result.losses.offPackages, null);
     assert.deepEqual(result.losses.days, [
         { date: "2026-10-01", underReview: 0, confirmedLosses: 1, returnedPackages: 0, recoveryDone: 1, recoveryPending: 0, recoveryInvalidId: 0, recoveryUninformed: 0 },
         { date: "2026-10-02", underReview: 1, confirmedLosses: 0, returnedPackages: 1, recoveryDone: 0, recoveryPending: 1, recoveryInvalidId: 0, recoveryUninformed: 0 },
@@ -67,6 +70,53 @@ test("importa o novo XLSX completo sem misturar os históricos lado a lado", asy
     assert.deepEqual(result.lossesRate.history[0], {
         possibleLosses: 0, lost: 0, damage: 0, moved: 0,
     });
+});
+
+test("conta Pacotes OFF por linha, Log e mês da expedição em São Paulo", async t => {
+    const returnedName = "Histórico de Retornados";
+    const workbook = createDamageAndLossesWorkbook(returnedName);
+    const novemberSerial = Date.UTC(2026, 10, 15) / 86_400_000 + 25569;
+    workbook.Sheets[returnedName] = XLSX.utils.aoa_to_sheet([
+        ["", "Histórico de Retornados - Novembro"],
+        ["", "Semana", "Devolução", "Expedição", "Código BR", "Rota Embarcada", "Rota Correta", "AT Embarcada", "Log", "Turno"],
+        ["", "W44", "01/11/2026", "31/10/2026", "R1", "", "", "", "Antônio da Costa", "AM"],
+        ["", "W46", "16/11/2026", "15/11/2026", "R2", "", "", "", "  MARIA da SILVA Santos ", "AM"],
+        ["", "W46", "16/11/2026", new Date(2026, 10, 16, 12), "R2", "", "", "", "Maria   da Silva Santos", "PM2"],
+        ["", "W46", "01/12/2026", novemberSerial, "R3", "", "", "", "João de Souza Assis", "AM"],
+        ["", "W46", "", "2026-11-16", "", "", "", "", "Ana da Rocha Costa", ""],
+        ["", "W46", "16/11/2026", "", "R4", "", "", "", "Fora da Contagem", "AM"],
+        ["", "W46", "16/11/2026", "15/11/2026", "R5", "", "", "", " ", "PM2"],
+        ["", "W46", "16/11/2026", "16/11/2025", "R6", "", "", "", "Outro Ano", "AM"],
+    ]);
+    const file = createFile(workbook);
+    const result = await readDamageAndLossesFile(file, new Date("2026-11-16T15:00:00Z"));
+    assert.equal(result.losses.offPackages.month, "2026-11");
+    assert.deepEqual(buildEmployeeOffPackagesRanking(result.losses.offPackages.operators).map(entry => [
+        entry.displayName, entry.quantity,
+    ]), [
+        ["Ana Rocha", 1],
+        ["João Souza", 1],
+        ["Maria Silva", 2],
+    ]);
+
+    const beginningOfMonthUtc = await readDamageAndLossesFile(file, new Date("2026-11-01T01:00:00Z"));
+    assert.deepEqual(beginningOfMonthUtc.losses.offPackages, {
+        month: "2026-10", operators: [{ operator: "Antônio da Costa", quantity: 1 }],
+    });
+
+    const offChanges = [];
+    const unsubscribe = subscribeLossesState((_, change) => offChanges.push(change.offPackagesChanged));
+    t.after(() => {
+        unsubscribe();
+        resetLossesState();
+    });
+    replaceLossesData(result.losses);
+    assert.deepEqual(getLossesState().offPackages, result.losses.offPackages);
+    replaceLossesData(result.losses);
+    assert.deepEqual(offChanges, [true, false]);
+    resetLossesState();
+    assert.equal(getLossesState().offPackages, null);
+    assert.deepEqual(offChanges, [true, false, true]);
 });
 
 test("prioriza Histórico de Avarias Recebidas e aceita o nome anterior em arquivos antigos", () => {

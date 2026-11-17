@@ -20,6 +20,7 @@ import {
 } from "../losses-rate/workbook.js";
 
 import { batchReportUpdates } from "../core/report-updates.js";
+import { normalizeEmployeeRankingName } from "../employee-ranking/model.js";
 
 const MAX_DAMAGE_HEADER_SEARCH_ROWS =
     50;
@@ -143,6 +144,14 @@ const lossesReturnedColumnAliases =
         packageCode:
             lossesColumnAliases.packageCode,
     });
+
+const offPackagesColumnAliases = {
+    expeditionDate: ["expedicao", "data da expedicao", "data de expedicao"],
+    operator: ["log"],
+};
+const offPackagesMonthFormatter = new Intl.DateTimeFormat("pt-BR", {
+    year: "numeric", month: "2-digit", timeZone: "America/Sao_Paulo",
+});
 
 function normalizeDamageText(
     value,
@@ -920,6 +929,7 @@ function findLossesReturnedSource(workbook) {
                 rows,
                 columns,
                 headerRowIndex: rowIndex,
+                offPackagesColumns: findColumnsByAliases(rows[rowIndex], offPackagesColumnAliases),
             };
         }
     }
@@ -927,6 +937,35 @@ function findLossesReturnedSource(workbook) {
     throw new Error(
         `A aba ${sheetName} não possui as colunas Devolução e Código BR.`,
     );
+}
+
+function createOffPackagesMonthData({ rows, headerRowIndex, offPackagesColumns }, date) {
+    if (!offPackagesColumns) return null;
+
+    const { expeditionDate, operator: operatorColumn } = offPackagesColumns;
+    const parts = offPackagesMonthFormatter.formatToParts(date);
+    const year = Number(parts.find(part => part.type === "year").value);
+    const month = Number(parts.find(part => part.type === "month").value);
+    const operators = new Map();
+
+    for (let index = headerRowIndex + 1; index < rows.length; index += 1) {
+        const row = rows[index];
+        const shipped = parseDamageDate(row[expeditionDate]);
+        if (shipped?.year !== year || shipped.month !== month) continue;
+
+        const operator = normalizeEmployeeRankingName(row[operatorColumn]);
+        if (!operator || /^[-–—]$/.test(operator)) continue;
+
+        const key = operator.toLocaleLowerCase("pt-BR");
+        const record = operators.get(key) ?? { operator, quantity: 0 };
+        record.quantity += 1;
+        operators.set(key, record);
+    }
+
+    return {
+        month: `${year}-${String(month).padStart(2, "0")}`,
+        operators: Array.from(operators.values()),
+    };
 }
 
 function findLossesMonthSource(
@@ -1611,6 +1650,7 @@ async function readDamageAndLossesFile(
             ),
 
             history: createOccurrenceHistory(lossesSource),
+            offPackages: createOffPackagesMonthData(lossesSource.returnedSource, date),
 
             sourceFileName:
                 file.name,

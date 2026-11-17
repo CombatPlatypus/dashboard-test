@@ -4,7 +4,7 @@ import {
     createEmployeeRankingClipboard,
     parseEmployeeRankingClipboard,
 } from "../js/reports/employee-ranking/clipboard.js";
-import { buildEmployeeExpeditionRanking } from "../js/reports/employee-ranking/model.js";
+import { buildEmployeeExpeditionRanking, buildEmployeeOffPackagesRanking } from "../js/reports/employee-ranking/model.js";
 
 test("imports only the expedition block from the complete ranking worksheet", () => {
     const worksheet = [
@@ -28,7 +28,11 @@ test("copies the formatted ranking from B2 and keeps short names in the visible 
         { operator: "Maria da Silva Souza", routesChecked: 4, totalDurationSeconds: 1200, routesWithDuration: 4 },
     ];
     const ranking = buildEmployeeExpeditionRanking(operators);
-    const { text, html } = createEmployeeRankingClipboard(ranking, 153);
+    const offPackagesRanking = buildEmployeeOffPackagesRanking([
+        { operator: "Maria da Silva Souza", quantity: 5 },
+        { operator: "Ana da Rocha Costa", quantity: 1 },
+    ]);
+    const { text, html } = createEmployeeRankingClipboard({ expeditionRanking: ranking, offPackagesRanking }, 153);
     const rows = text.split("\n").map(row => row.split("\t"));
 
     assert.equal(rows.length, 158);
@@ -41,6 +45,8 @@ test("copies the formatted ranking from B2 and keeps short names in the visible 
     assert.deepEqual(rows[5].slice(9, 12), ["Maria Silva", "12", "00:05:29"]);
     assert.deepEqual(rows[6].slice(9, 12), ["Maria Silva", "4", "00:05:00"]);
     assert.deepEqual(rows[4].slice(13), ["Colaborador", "Quantidade"]);
+    assert.deepEqual(rows[5].slice(13), ["Ana Rocha", "1"]);
+    assert.deepEqual(rows[6].slice(13), ["Maria Silva", "5"]);
     assert.ok(rows.at(-1).every(cell => cell === ""));
 
     assert.match(html, /<google-sheets-html-origin>/);

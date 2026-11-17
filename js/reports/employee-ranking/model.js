@@ -70,8 +70,20 @@ function buildEmployeeExpeditionRanking(currentRanking, importedRanking = []) {
     ));
 }
 
+function buildEmployeeOffPackagesRanking(operators) {
+    return operators.map(entry => ({
+        ...entry,
+        displayName: formatEmployeeRankingName(entry.operator),
+    })).sort((first, second) => (
+        first.quantity - second.quantity ||
+        first.displayName.localeCompare(second.displayName, "pt-BR") ||
+        first.operator.localeCompare(second.operator, "pt-BR")
+    ));
+}
+
 export {
     buildEmployeeExpeditionRanking,
+    buildEmployeeOffPackagesRanking,
     formatEmployeeRankingDuration,
     formatEmployeeRankingName,
     normalizeEmployeeRankingName,
