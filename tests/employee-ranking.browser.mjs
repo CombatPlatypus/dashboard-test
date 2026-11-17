@@ -238,7 +238,7 @@ try {
             table.rows[index].insertCell();
             table.rows[index].insertCell().textContent = value;
         }
-        return parseEmployeeRankingClipboard({ ...clipboard, html: table.outerHTML }).slice(0, 2);
+        return parseEmployeeRankingClipboard({ ...clipboard, html: table.outerHTML }).expedition.slice(0, 2);
     });
     assert.deepEqual(operatorsFromCopy.map(entry => [entry.operator, entry.routesChecked]), [
         ["Maria da Silva Santos", 14], ["Maria da Silva Rodrigues", 9],

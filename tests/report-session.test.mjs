@@ -68,7 +68,7 @@ function registerReports(t) {
     reportManager.reports.clear();
     reportManager.initializedReports.clear();
     restoredEvents.length = 0;
-    replaceEmployeeRankingHistory([]);
+    replaceEmployeeRankingHistory({});
     for (const report of reportModules) {
         if (report.id !== "overall-analysis") report.reset();
         // Exercise the real state import/export without initializing charts or DOM controls.
@@ -79,7 +79,7 @@ function registerReports(t) {
     }
     t.after(() => {
         for (const report of reportModules) if (report.id !== "overall-analysis") report.reset();
-        replaceEmployeeRankingHistory([]);
+        replaceEmployeeRankingHistory({});
         reportManager.reports.clear();
         reportManager.initializedReports.clear();
         restoreReportContext(context);
@@ -122,9 +122,15 @@ function populateMissingReports() {
         quantities: { return: 2, missorted: 1, liquidate: 0, confiscated: 0 },
         packages: { return: ["BRR1", "BRR2"], missorted: ["BRR3"], liquidate: [], confiscated: [] },
     }] };
-    payload.reports["overall-analysis"] = { employeeRanking: [{
-        operator: "Ana Rosa Silva", routesChecked: 10, routesWithDuration: 8, totalDurationSeconds: 2400,
-    }] };
+    payload.reports["overall-analysis"] = {
+        employeeRanking: [{
+            operator: "Ana Rosa Silva", routesChecked: 10, routesWithDuration: 8, totalDurationSeconds: 2400,
+        }],
+        processingRanking: {
+            receipt: [{ operator: "Ana Rosa Silva", quantity: 160 }],
+            labelingErrors: [{ operator: "João de Souza Lima", quantity: 3 }],
+        },
+    };
     reportManager.importSession(payload.reports);
     restoreReportContext(payload.context);
     importDashboardSettings(payload.settings, { applyProfileToReports: false });
@@ -223,7 +229,7 @@ test("arquivo salvo restaura os sete relatórios e o histórico do Ranking de Co
     });
     const saved = parseReportSession(serializeReportSession(original));
     for (const report of reportModules) if (report.id !== "overall-analysis") report.reset();
-    replaceEmployeeRankingHistory([]);
+    replaceEmployeeRankingHistory({});
     restoreReportContext({ window: "AM", plannedVolume: 1 });
     importDashboardSettings({ ...original.settings, theme: "blue" }, { applyProfileToReports: false });
     assert.equal(restoreReportSession(saved), true);
@@ -275,6 +281,9 @@ test("valida dados adicionais antes de alterar os relatórios da sessão", t => 
         ["reverse", { transfers: [{ quantities: {}, packages: { return: "BRR1" } }] }, /Reversa/],
         ["overall-analysis", { employeeRanking: [{ operator: "Ana Rosa Silva", routesChecked: 2,
             routesWithDuration: 3, totalDurationSeconds: 900 }] }, /Ranking de Colaboradores/],
+        ["overall-analysis", { processingRanking: {
+            receipt: [{ operator: "Ana Rosa Silva", quantity: -1 }], labelingErrors: [],
+        } }, /Ranking de Colaboradores/],
     ]) {
         const invalid = structuredClone(original);
         invalid.reports[id] = report;

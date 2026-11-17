@@ -5,12 +5,14 @@ import { formatEmployeeRankingName, normalizeEmployeeRankingName } from "./model
 const MIN_EMPLOYEE_RANKING_ROWS = 150;
 const rankingTitle = "RANKING MENSAL DE DESEMPENHO";
 const commonHeaders = ["Colaborador", "Quantidade"];
+const receipt = { title: "Recebimento", headers: commonHeaders, alternateTitle: "Recebimento de Pacotes" };
+const labelingErrors = { title: "Erros de Etiquetagem", headers: commonHeaders };
 const receivedDamage = { title: "Avarias Recebidas", headers: commonHeaders };
 const expedition = { title: "Rotas Conferidas e Tempo Médio", headers: [...commonHeaders, "Tempo"] };
 const offPackages = { title: "Pacotes OFF", headers: commonHeaders };
 const rankingSections = [
-    { title: "Recebimento", headers: commonHeaders },
-    { title: "Erros de Etiquetagem", headers: commonHeaders },
+    receipt,
+    labelingErrors,
     receivedDamage,
     expedition,
     offPackages,
@@ -28,34 +30,49 @@ const rowStyles = [
     { ...blankStyle, background: "#1b1b1b", border: true },
 ];
 
-function isExpeditionHeader(row, column) {
-    return expedition.headers.every((header, index) => normalizeText(row?.[column + index]) === normalizeText(header));
+function isRankingHeader(section, row, column) {
+    return section.headers.every((header, index) => {
+        const value = normalizeText(row?.[column + index]);
+        return value === normalizeText(header) ||
+            (header === "Quantidade" && value === "qtd") ||
+            (section === receipt && header === "Quantidade" && value === "total recebido");
+    });
 }
 
-function findExpeditionClipboardBlock(rows) {
+function findRankingClipboardBlock(rows, section) {
+    const titles = [section.title, section.alternateTitle].filter(Boolean).map(normalizeText);
     for (const [rowIndex, row] of rows.entries()) {
-        const column = row.findIndex(value => normalizeText(value) === normalizeText(expedition.title));
-        const headers = rows[rowIndex + 1];
-        if (column !== -1 && isExpeditionHeader(headers, column)) {
-            const operatorColumn = headers.findIndex(value => normalizeText(value) === normalizeText(operatorHeader));
-            return { column, operatorColumn, startRow: rowIndex + 2 };
-        }
-    }
+        const column = row.findIndex(value => titles.includes(normalizeText(value)));
+        if (column === -1) continue;
 
+        const headers = rows[rowIndex + 1];
+        if (!isRankingHeader(section, headers, column)) {
+            throw new Error(`Confira os cabeçalhos de ${section.title} na seleção copiada.`);
+        }
+        const operatorColumn = section === expedition
+            ? headers.findIndex(value => normalizeText(value) === normalizeText(operatorHeader))
+            : -1;
+        return { column, operatorColumn, startRow: rowIndex + 2 };
+    }
+    return null;
+}
+
+function findLegacyExpeditionClipboardBlock(rows) {
     if (rows.every(row => row.length <= expedition.headers.length)) {
         const firstRow = rows.findIndex(row => row.some(value => normalizeText(value)));
         return {
             column: 0,
             operatorColumn: -1,
-            startRow: isExpeditionHeader(rows[firstRow], 0) ? firstRow + 1 : 0,
+            startRow: isRankingHeader(expedition, rows[firstRow], 0) ? firstRow + 1 : 0,
         };
     }
 
     throw new Error("Copie a aba Ranking de Colaboradores ou as três colunas do bloco Rotas Conferidas e Tempo Médio.");
 }
 
-function parseRouteCount(value) {
-    const digits = /^\d{1,3}(?:[. ]\d{3})+$/.test(value) ? value.replace(/[. ]/g, "") : value;
+function parseRankingQuantity(value) {
+    const normalized = value.replace(/[\u00a0\u202f]/g, " ");
+    const digits = /^\d{1,3}(?:[. ]\d{3})+$/.test(normalized) ? normalized.replace(/[. ]/g, "") : normalized;
     return /^\d+$/.test(digits) && Number.isSafeInteger(Number(digits)) ? Number(digits) : null;
 }
 
@@ -137,18 +154,14 @@ async function readEmployeeRankingClipboard(clipboard = navigator.clipboard) {
     return { text: await clipboard.readText(), html: "" };
 }
 
-function parseEmployeeRankingClipboard({ text, html = "" }) {
-    const htmlRows = parseRankingHtmlRows(html);
-    const rows = htmlRows.length ? htmlRows : parseClipboardRows(text);
-    if (rows.length === 0) throw new Error("A área de transferência está vazia.");
-
-    const { column, operatorColumn, startRow } = findExpeditionClipboardBlock(rows);
-    const hasOperatorFormulas = rows.slice(startRow).some(row => readOperatorFormula(readClipboardName(row[column])) !== null);
+function parseRankingClipboardBlock(rows, section, { column, operatorColumn, startRow }) {
+    const hasOperatorFormulas = operatorColumn !== -1 &&
+        rows.slice(startRow).some(row => readOperatorFormula(readClipboardName(row[column])) !== null);
     const legacyNameColumn = hasOperatorFormulas ? -1 : operatorColumn;
     const ranking = [];
     for (let rowIndex = startRow; rowIndex < rows.length; rowIndex += 1) {
         const row = rows[rowIndex];
-        const cells = expedition.headers.map((_, index) => String(row[column + index] ?? "").trim());
+        const cells = section.headers.map((_, index) => String(row[column + index] ?? "").trim());
         const [name, quantity, time] = cells;
         const fullName = readClipboardName(row[legacyNameColumn]);
         if (cells.every(isEmptyCell) && isEmptyCell(fullName)) continue;
@@ -163,23 +176,46 @@ function parseEmployeeRankingClipboard({ text, html = "" }) {
                 throw new Error(`Confira o nome completo do conferente na coluna R, na linha ${rowIndex + 1} da seleção copiada.`);
             }
         }
-        const routesChecked = parseRouteCount(quantity.replace(/[\u00a0\u202f]/g, " "));
+        const count = parseRankingQuantity(quantity);
+        if (isEmptyCell(operator) || count === null) {
+            throw new Error(`Revise o colaborador e a quantidade de ${section.title} na linha ${rowIndex + 1} da seleção copiada.`);
+        }
+        if (section !== expedition) {
+            ranking.push({ operator, quantity: count });
+            continue;
+        }
+
         const hasTime = !isEmptyCell(time);
         const averageDuration = hasTime ? parseAverageDuration(time) : 0;
-        const totalDurationSeconds = averageDuration * routesChecked;
-        if (isEmptyCell(operator) || routesChecked === null || averageDuration === null || !Number.isSafeInteger(totalDurationSeconds)) {
-            throw new Error(`Revise o colaborador, a quantidade e o tempo na linha ${rowIndex + 1} da seleção copiada.`);
+        const totalDurationSeconds = averageDuration * count;
+        if (averageDuration === null || !Number.isSafeInteger(totalDurationSeconds)) {
+            throw new Error(`Revise o tempo de Expedição na linha ${rowIndex + 1} da seleção copiada.`);
         }
 
         ranking.push({
             operator,
-            routesChecked,
+            routesChecked: count,
             totalDurationSeconds,
-            routesWithDuration: hasTime ? routesChecked : 0,
+            routesWithDuration: hasTime ? count : 0,
         });
     }
 
     return ranking;
+}
+
+function parseEmployeeRankingClipboard({ text, html = "" }) {
+    const htmlRows = parseRankingHtmlRows(html);
+    const rows = htmlRows.length ? htmlRows : parseClipboardRows(text);
+    if (rows.length === 0) throw new Error("A área de transferência está vazia.");
+
+    const history = {};
+    for (const [key, section] of Object.entries({ receipt, labelingErrors, expedition })) {
+        const block = findRankingClipboardBlock(rows, section);
+        if (block) history[key] = parseRankingClipboardBlock(rows, section, block);
+    }
+    if (Object.keys(history).length > 0) return history;
+
+    return { expedition: parseRankingClipboardBlock(rows, expedition, findLegacyExpeditionClipboardBlock(rows)) };
 }
 
 function formatSpreadsheetDuration(seconds) {
@@ -208,13 +244,18 @@ function createRankingNameCell(entry, style) {
     };
 }
 
-function createEmployeeRankingClipboard({ receivedDamageRanking = [], expeditionRanking = [], offPackagesRanking = [] }, previousRowCount = 0) {
-    const rowCount = Math.max(receivedDamageRanking.length, expeditionRanking.length, offPackagesRanking.length,
-        MIN_EMPLOYEE_RANKING_ROWS, previousRowCount);
+function createEmployeeRankingClipboard({
+    receiptRanking = [], labelingErrorsRanking = [], receivedDamageRanking = [],
+    expeditionRanking = [], offPackagesRanking = [],
+}, previousRowCount = 0) {
     const countsBySection = new Map([
+        [receipt, receiptRanking],
+        [labelingErrors, labelingErrorsRanking],
         [receivedDamage, receivedDamageRanking],
         [offPackages, offPackagesRanking],
     ]);
+    const rowCount = Math.max(MIN_EMPLOYEE_RANKING_ROWS, previousRowCount, expeditionRanking.length,
+        ...Array.from(countsBySection.values(), ranking => ranking.length));
     const emptyCell = cell(null, blankStyle);
     const sectionGap = cell(null, blankStyle, 1, rowCount + 2);
     const sectionRow = (createSectionCells, gap = null) => rankingSections.flatMap((section, index) =>

@@ -6,7 +6,7 @@ import {
 } from "../js/reports/employee-ranking/clipboard.js";
 import { buildEmployeeExpeditionRanking, buildEmployeeOccurrenceRanking } from "../js/reports/employee-ranking/model.js";
 
-test("imports only the expedition block from the complete ranking worksheet", () => {
+test("imports the three accumulated blocks from the complete ranking worksheet", () => {
     const worksheet = [
         "\tRANKING MENSAL DE DESEMPENHO",
         "\tRecebimento de Pacotes\t\t\tErros de Etiquetagem\t\t\tAvarias Recebidas\t\t\tRotas Conferidas e Tempo Médio\t\t\t\tPacotes OFF",
@@ -16,10 +16,14 @@ test("imports only the expedition block from the complete ranking worksheet", ()
         "\t\t\t\t\t\t\t\t\t\tJoão de Souza\t1.234\t\t\t\t",
     ].join("\r\n");
 
-    assert.deepEqual(parseEmployeeRankingClipboard({ text: worksheet }), [
-        { operator: "Maria da Silva Costa", routesChecked: 12, totalDurationSeconds: 3948, routesWithDuration: 12 },
-        { operator: "João de Souza", routesChecked: 1234, totalDurationSeconds: 0, routesWithDuration: 0 },
-    ]);
+    assert.deepEqual(parseEmployeeRankingClipboard({ text: worksheet }), {
+        receipt: [{ operator: "Ana Santos", quantity: 100 }, { operator: "Ana Santos", quantity: 80 }],
+        labelingErrors: [{ operator: "Ana Santos", quantity: 2 }],
+        expedition: [
+            { operator: "Maria da Silva Costa", routesChecked: 12, totalDurationSeconds: 3948, routesWithDuration: 12 },
+            { operator: "João de Souza", routesChecked: 1234, totalDurationSeconds: 0, routesWithDuration: 0 },
+        ],
+    });
 });
 
 test("copies the formatted ranking from B2 and keeps short names in the visible table", () => {
@@ -36,7 +40,11 @@ test("copies the formatted ranking from B2 and keeps short names in the visible 
         { operator: "Maria da Silva Souza", quantity: 5 },
         { operator: "Ana da Rocha Costa", quantity: 1 },
     ]);
-    const { text, html } = createEmployeeRankingClipboard({ receivedDamageRanking, expeditionRanking: ranking, offPackagesRanking }, 153);
+    const receiptRanking = [{ operator: "Ana da Rocha Costa", displayName: "Ana Rocha", quantity: 1234 }];
+    const labelingErrorsRanking = [{ operator: "Pedro da Costa Santos", displayName: "Pedro Costa", quantity: 0 }];
+    const { text, html } = createEmployeeRankingClipboard({
+        receiptRanking, labelingErrorsRanking, receivedDamageRanking, expeditionRanking: ranking, offPackagesRanking,
+    }, 153);
     const rows = text.split("\n").map(row => row.split("\t"));
 
     assert.equal(rows.length, 158);
@@ -45,6 +53,8 @@ test("copies the formatted ranking from B2 and keeps short names in the visible 
     assert.deepEqual([0, 3, 6, 9, 13].map(column => rows[3][column]), [
         "Recebimento", "Erros de Etiquetagem", "Avarias Recebidas", "Rotas Conferidas e Tempo Médio", "Pacotes OFF",
     ]);
+    assert.deepEqual(rows[5].slice(0, 5), ["Ana Rocha", "1234", "", "Pedro Costa", "0"]);
+    assert.deepEqual(rows[6].slice(0, 5), ["", "", "", "", ""]);
     assert.deepEqual(rows[4].slice(6, 8), ["Colaborador", "Quantidade"]);
     assert.deepEqual(rows[5].slice(6, 8), ["Maria Silva", "1"]);
     assert.deepEqual(rows[6].slice(6, 8), ["João Souza", "4"]);
@@ -64,6 +74,7 @@ test("copies the formatted ranking from B2 and keeps short names in the visible 
     assert.match(html, /data-sheets-formula="=&quot;Maria Silva&quot;&amp;T\(N\(&quot;Nome completo do conferente: Maria da Silva Costa&quot;\)\)">Maria Silva/);
     assert.match(html, /data-sheets-formula="=&quot;Maria Silva&quot;&amp;T\(N\(&quot;Nome completo do conferente: Maria da Silva Souza&quot;\)\)">Maria Silva/);
     assert.match(html, /data-sheets-formula="=&quot;João Souza&quot;&amp;T\(N\(&quot;Nome completo do conferente: João de Souza Lima&quot;\)\)">João Souza/);
+    assert.match(html, /data-sheets-formula="=&quot;Pedro Costa&quot;&amp;T\(N\(&quot;Nome completo do conferente: Pedro da Costa Santos&quot;\)\)">Pedro Costa/);
     assert.doesNotMatch(html, /data-sheets-userformat/);
     const cellStyles = new Map(Array.from(html.matchAll(/<td\b[^>]*style="([^"]+)"[^>]*>([^<]*)<\/td>/g),
         ([, style, text]) => [text, style]));
@@ -72,6 +83,8 @@ test("copies the formatted ranking from B2 and keeps short names in the visible 
         ["Rotas Conferidas e Tempo Médio", 12],
         ["Colaborador", 11],
         ["Maria Silva", 10],
+        ["Ana Rocha", 10],
+        ["Pedro Costa", 10],
         ["João Souza", 10],
         ["00:05:29", 10],
     ]) {
@@ -88,7 +101,7 @@ test("still imports full names from the auxiliary column in previously copied wo
         ["Maria Silva", "4", "00:05:00", "", "", "", "", "Maria da Silva Souza"],
     ];
     const clipboard = () => ({ text: legacyWorksheet.map(row => row.join("\t")).join("\n") });
-    assert.deepEqual(parseEmployeeRankingClipboard(clipboard()), [
+    assert.deepEqual(parseEmployeeRankingClipboard(clipboard()).expedition, [
         { operator: "Maria da Silva Costa", routesChecked: 12, totalDurationSeconds: 3948, routesWithDuration: 12 },
         { operator: "Maria da Silva Souza", routesChecked: 4, totalDurationSeconds: 1200, routesWithDuration: 4 },
     ]);
@@ -100,4 +113,17 @@ test("still imports full names from the auxiliary column in previously copied wo
 test("rejects invalid historical rows instead of adding partial totals", () => {
     assert.throws(() => parseEmployeeRankingClipboard({ text: "Ana Santos\t4\t00:05:29\nJoão Souza\t6\t05:80" }), /linha 2/);
     assert.throws(() => parseEmployeeRankingClipboard({ text: "Nome\tTurno\tLocal\tObservação" }), /Copie a aba Ranking de Colaboradores/);
+    assert.throws(() => parseEmployeeRankingClipboard({
+        text: "Recebimento\t\t\tErros de Etiquetagem\t\nColaborador\tQuantidade\t\tColaborador\tQuantidade\nAna Santos\t100\t\tPedro Costa\t-1",
+    }), /Erros de Etiquetagem na linha 3/);
+});
+
+test("inclui todos os recebedores na cópia e mantém os blocos vazios com seus cabeçalhos", () => {
+    const receiptRanking = Array.from({ length: 151 }, () =>
+        ({ operator: "Ana da Rocha Costa", displayName: "Ana Rocha", quantity: 12 }));
+    const { text } = createEmployeeRankingClipboard({ receiptRanking });
+    const rows = text.split("\n");
+    assert.equal(rows.length, 156);
+    assert.equal(rows.at(-1).split("\t")[1], "12");
+    assert.deepEqual(parseEmployeeRankingClipboard({ text }).labelingErrors, []);
 });

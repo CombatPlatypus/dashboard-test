@@ -30,6 +30,8 @@ Para cada CPT, vale o primeiro bloco elegível na ordem em que aparece nos dados
 
 Acompanha **Descarregamento de LHs**, **Mesa de Recebimento** e **Ranking de Recebedores**. O [importador de LHs](../../js/reports/receipt/linehaul-import.js) trata a leitura e a seleção da janela. O [estado de LHs](../../js/reports/receipt/linehaul-state.js) deriva o volume restante a partir do volume esperado e dos LHs marcados como descarregados. O [importador de recebimento](../../js/reports/receipt/import.js) agrupa os registros por operador para a mesa e o ranking. A sessão reúne os dois estados no [controlador](../../js/reports/receipt/controller.js).
 
+Os pacotes recebidos por operador e os erros preenchidos na Mesa de Recebimento alimentam Recebimento e Erros de Etiquetagem no [Ranking Mensal de Colaboradores](ranking-de-colaboradores.md#recebimento-e-erros-de-etiquetagem). Cada quantidade de erros fica com o etiquetador indicado ou, quando o campo estiver vazio, com o recebedor.
+
 Verifique alinhamento, confirmação da importação e recálculo de volume em [linehaul-import-alignment.test.mjs](../../tests/linehaul-import-alignment.test.mjs), [linehaul-import-confirmation.test.mjs](../../tests/linehaul-import-confirmation.test.mjs) e [receipt-linehaul-remaining.test.mjs](../../tests/receipt-linehaul-remaining.test.mjs).
 
 O [exportador de Processamento](../../js/reports/receipt/export.js) usa os dados da subaba ativa tanto para habilitar o botão de imagem quanto para executar a captura. Descarregamento de LHs pode ser copiado assim que houver LHs cadastrados. Mesa de Recebimento e Ranking de Recebedores usam a validação dos dados de recebimento.
@@ -128,4 +130,4 @@ Verifique indicadores e critérios de exportação em [overall-analysis-cards.te
 
 ### Ranking Mensal de Colaboradores
 
-A subaba [Ranking Mensal de Colaboradores](ranking-de-colaboradores.md) apresenta cinco blocos. Expedição combina os dados atuais com o acumulado importado do Resumo da Operação. Avarias Recebidas e Pacotes OFF usam os históricos da planilha de Avarias e Perdas e exibem os colaboradores em ordem crescente de ocorrências. Recebimento e Erros de Etiquetagem exibem linhas de preenchimento.
+A subaba [Ranking Mensal de Colaboradores](ranking-de-colaboradores.md) apresenta cinco blocos. Recebimento, Erros de Etiquetagem e Expedição combinam os dados atuais com o acumulado importado do Resumo da Operação. Avarias Recebidas e Pacotes OFF usam os históricos da planilha de Avarias e Perdas e exibem os colaboradores em ordem crescente de ocorrências.

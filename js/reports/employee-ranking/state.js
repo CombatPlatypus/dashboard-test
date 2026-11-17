@@ -1,22 +1,30 @@
-let history = [];
+const fieldsBySection = {
+    receipt: ["operator", "quantity"],
+    labelingErrors: ["operator", "quantity"],
+    expedition: ["operator", "routesChecked", "totalDurationSeconds", "routesWithDuration"],
+};
+let history = { receipt: [], labelingErrors: [], expedition: [] };
 const historyListeners = new Set();
 
 function getEmployeeRankingHistory() {
     return history;
 }
 
-function replaceEmployeeRankingHistory(rows) {
-    const unchanged = rows.length === history.length && rows.every((row, index) => {
-        const previous = history[index];
-        return row.operator === previous.operator &&
-            row.routesChecked === previous.routesChecked &&
-            row.totalDurationSeconds === previous.totalDurationSeconds &&
-            row.routesWithDuration === previous.routesWithDuration;
-    });
-    if (unchanged) return;
+function replaceEmployeeRankingHistory(nextHistory) {
+    const changes = {};
+    for (const [section, fields] of Object.entries(fieldsBySection)) {
+        const rows = nextHistory[section] ?? [];
+        const previous = history[section];
+        if (rows.length === previous.length && rows.every((row, index) =>
+            fields.every(field => row[field] === previous[index][field]))) continue;
 
-    history = rows;
-    historyListeners.forEach(listener => listener());
+        changes[section] = rows;
+    }
+    if (Object.keys(changes).length === 0) return;
+
+    history = { ...history, ...changes };
+    const scope = Object.fromEntries(Object.keys(changes).map(section => [section, true]));
+    historyListeners.forEach(listener => listener(history, scope));
 }
 
 function subscribeEmployeeRankingHistory(listener) {

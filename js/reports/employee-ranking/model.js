@@ -70,20 +70,53 @@ function buildEmployeeExpeditionRanking(currentRanking, importedRanking = []) {
     ));
 }
 
-function buildEmployeeOccurrenceRanking(operators) {
-    return operators.map(entry => ({
+function buildEmployeeOccurrenceRanking(current, imported = [], { descending = false } = {}) {
+    const collaborators = new Map();
+    for (const entry of [...current, ...imported]) {
+        const operator = normalizeEmployeeRankingName(entry.operator);
+        if (!operator || /^[-–—]$/.test(operator) || !Number.isSafeInteger(entry.quantity) || entry.quantity < 0) continue;
+
+        const key = operator.toLocaleLowerCase("pt-BR");
+        const collaborator = collaborators.get(key) ?? { operator, quantity: 0 };
+        collaborator.quantity += entry.quantity;
+        collaborators.set(key, collaborator);
+    }
+
+    const direction = descending ? -1 : 1;
+    return Array.from(collaborators.values(), entry => ({
         ...entry,
         displayName: formatEmployeeRankingName(entry.operator),
     })).sort((first, second) => (
-        first.quantity - second.quantity ||
+        direction * (first.quantity - second.quantity) ||
         first.displayName.localeCompare(second.displayName, "pt-BR") ||
         first.operator.localeCompare(second.operator, "pt-BR")
     ));
 }
 
+function buildEmployeeReceiptRanking(operators, imported) {
+    const current = operators.map(({ receiver, packagesReceived }) => ({
+        operator: receiver,
+        quantity: packagesReceived,
+    }));
+    return buildEmployeeOccurrenceRanking(current, imported, { descending: true });
+}
+
+function buildEmployeeLabelingErrorRanking(operators, imported) {
+    const current = operators.map(({ receiver, labeler, errorQuantity }) => {
+        const labelerName = normalizeEmployeeRankingName(labeler);
+        return {
+            operator: labelerName && !/^[-–—]$/.test(labelerName) ? labelerName : receiver,
+            quantity: errorQuantity,
+        };
+    });
+    return buildEmployeeOccurrenceRanking(current, imported);
+}
+
 export {
     buildEmployeeExpeditionRanking,
+    buildEmployeeLabelingErrorRanking,
     buildEmployeeOccurrenceRanking,
+    buildEmployeeReceiptRanking,
     formatEmployeeRankingDuration,
     formatEmployeeRankingName,
     normalizeEmployeeRankingName,

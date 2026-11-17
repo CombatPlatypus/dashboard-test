@@ -5,6 +5,7 @@ import {
 } from "../expedition/state.js";
 import { getDamageAndLossesState, subscribeDamageAndLossesState } from "../damage-and-losses/state.js";
 import { getLossesState, subscribeLossesState } from "../damage-and-losses/losses-state.js";
+import { getReceiptState, subscribeReceiptState } from "../receipt/state.js";
 import { requestReportUpdate } from "../core/report-updates.js";
 import {
     bindReportImageExportButton,
@@ -20,7 +21,13 @@ import {
     parseEmployeeRankingClipboard,
     readEmployeeRankingClipboard,
 } from "./clipboard.js";
-import { buildEmployeeExpeditionRanking, buildEmployeeOccurrenceRanking, formatEmployeeRankingDuration } from "./model.js";
+import {
+    buildEmployeeExpeditionRanking,
+    buildEmployeeLabelingErrorRanking,
+    buildEmployeeOccurrenceRanking,
+    buildEmployeeReceiptRanking,
+    formatEmployeeRankingDuration,
+} from "./model.js";
 import {
     getEmployeeRankingHistory,
     replaceEmployeeRankingHistory,
@@ -29,14 +36,18 @@ import {
 
 const numberFormat = new Intl.NumberFormat("pt-BR");
 const monthFormat = new Intl.DateTimeFormat("pt-BR", { month: "long", year: "numeric", timeZone: "UTC" });
-const emptyRankingMessage = "Importe Expedição ou a planilha de Avarias e Perdas para preencher o ranking.";
+const emptyRankingMessage = "Importe dados de Processamento, Expedição ou Avarias e Perdas para preencher o ranking.";
 let initialized = false;
 
 function notify(type, message) {
     setReportNotification({ reportId: "employee-ranking", type, message });
 }
 
-function renderRankingRows(body, ranking = [], formatStats = entry => numberFormat.format(entry.quantity)) {
+function hasRankingRows(rankings) {
+    return Object.values(rankings).some(ranking => ranking.length > 0);
+}
+
+function renderRankingRows(body, ranking, formatStats = entry => numberFormat.format(entry.quantity)) {
     const rowCount = Math.max(MIN_EMPLOYEE_RANKING_ROWS, ranking.length);
     while (body.rows.length > rowCount) body.deleteRow(-1);
 
@@ -65,6 +76,8 @@ function initializeEmployeeRankingController(root) {
     const panel = root.querySelector("#employee-ranking");
     const area = panel?.querySelector("#employeeRankingExportArea");
     const tables = area?.querySelector(".employee-ranking");
+    const receiptBody = area?.querySelector("#employeeRankingReceiptBody");
+    const labelingErrorsBody = area?.querySelector("#employeeRankingLabelingErrorsBody");
     const receivedDamageBody = area?.querySelector("#employeeRankingReceivedDamageBody");
     const expeditionBody = area?.querySelector("#employeeRankingExpeditionBody");
     const offPackagesBody = area?.querySelector("#employeeRankingOffPackagesBody");
@@ -72,7 +85,7 @@ function initializeEmployeeRankingController(root) {
     const imageButton = panel?.querySelector("#employeeRankingImageButton");
     const importButton = panel?.querySelector("#employeeRankingImportButton");
     const clearButton = panel?.querySelector("#employeeRankingClearButton");
-    if (!tables || !receivedDamageBody || !expeditionBody || !offPackagesBody ||
+    if (!tables || !receiptBody || !labelingErrorsBody || !receivedDamageBody || !expeditionBody || !offPackagesBody ||
         !copyButton || !imageButton || !importButton || !clearButton) {
         return false;
     }
@@ -82,27 +95,45 @@ function initializeEmployeeRankingController(root) {
         offPackagesRanking: { body: offPackagesBody, label: "Pacotes OFF" },
     };
     const monthlySources = {};
-    const rankings = { receivedDamageRanking: [], expeditionRanking: [], offPackagesRanking: [] };
-    let current = getExpeditionOperatorRanking();
+    const rankings = {};
+    let receiptOperators = getReceiptState().operators;
+    let expeditionOperators = getExpeditionOperatorRanking();
     let busy = false;
     let clipboardRowCount = 0;
 
     function renderActions() {
-        const hasData = Object.values(rankings).some(ranking => ranking.length > 0);
+        const hasData = hasRankingRows(rankings);
         copyButton.disabled = busy || !hasData;
         imageButton.disabled = busy || !hasData;
         importButton.disabled = busy;
-        clearButton.disabled = busy || getEmployeeRankingHistory().length === 0;
+        clearButton.disabled = busy || !hasRankingRows(getEmployeeRankingHistory());
     }
 
-    function renderExpeditionRanking() {
-        const expeditionRanking = buildEmployeeExpeditionRanking(current, getEmployeeRankingHistory());
-        rankings.expeditionRanking = expeditionRanking;
-        clipboardRowCount = Math.max(clipboardRowCount, expeditionRanking.length);
-        renderRankingRows(expeditionBody, expeditionRanking, entry =>
-            `${numberFormat.format(entry.routesChecked)} / ${formatEmployeeRankingDuration(entry.averageDurationSeconds)}`,
-        );
+    function updateRanking(section, body, ranking, formatStats) {
+        if (JSON.stringify(rankings[section]) === JSON.stringify(ranking)) return;
+
+        rankings[section] = ranking;
+        clipboardRowCount = Math.max(clipboardRowCount, ranking.length);
+        renderRankingRows(body, ranking, formatStats);
+    }
+
+    function renderOperationalRankings({ receipt, labelingErrors, expedition, announce }) {
+        const history = getEmployeeRankingHistory();
+        if (receipt) {
+            updateRanking("receiptRanking", receiptBody, buildEmployeeReceiptRanking(receiptOperators, history.receipt));
+        }
+        if (labelingErrors) {
+            updateRanking("labelingErrorsRanking", labelingErrorsBody,
+                buildEmployeeLabelingErrorRanking(receiptOperators, history.labelingErrors));
+        }
+        if (expedition) {
+            const ranking = buildEmployeeExpeditionRanking(expeditionOperators, history.expedition);
+            updateRanking("expeditionRanking", expeditionBody, ranking, entry =>
+                `${numberFormat.format(entry.routesChecked)} / ${formatEmployeeRankingDuration(entry.averageDurationSeconds)}`,
+            );
+        }
         renderActions();
+        if (announce) notifyCurrentRanking();
         return true;
     }
 
@@ -110,9 +141,7 @@ function initializeEmployeeRankingController(root) {
         for (const [section, data] of Object.entries(changes)) {
             monthlySources[section] = data;
             const ranking = buildEmployeeOccurrenceRanking(data?.operators ?? []);
-            rankings[section] = ranking;
-            clipboardRowCount = Math.max(clipboardRowCount, ranking.length);
-            renderRankingRows(monthlyTables[section].body, ranking);
+            updateRanking(section, monthlyTables[section].body, ranking);
         }
         renderActions();
         if (announce) {
@@ -137,10 +166,13 @@ function initializeEmployeeRankingController(root) {
     }
 
     function notifyCurrentRanking() {
-        if (current.length) {
-            notify("info", "Ranking atualizado com os dados de Expedição.");
-        } else if (getEmployeeRankingHistory().length) {
-            notify("info", "Ranking mostra o acumulado importado de Expedição.");
+        const sources = [];
+        if (receiptOperators.length) sources.push("Processamento");
+        if (expeditionOperators.length) sources.push("Expedição");
+        if (sources.length) {
+            notify("info", `Ranking atualizado com os dados de ${sources.join(" e ")}.`);
+        } else if (hasRankingRows(getEmployeeRankingHistory())) {
+            notify("info", "Ranking mostra o acumulado importado da planilha.");
         } else {
             notify("info", getMonthlyRankingMessage() || emptyRankingMessage);
         }
@@ -206,28 +238,33 @@ function initializeEmployeeRankingController(root) {
             throw new Error("Não foi possível ler a área de transferência. Permita o acesso e clique novamente.");
         }
         const history = parseEmployeeRankingClipboard(clipboard);
-        replaceEmployeeRankingHistory(history);
-        if (history.length) {
-            notify("success", "Acumulado anterior de Expedição importado.");
+        replaceEmployeeRankingHistory({ ...getEmployeeRankingHistory(), ...history });
+        if (hasRankingRows(history)) {
+            notify("success", "Acumulado anterior do ranking importado.");
         } else {
-            notify("info", "A planilha está sem registros acumulados de Expedição.");
+            notify("info", "A seleção copiada está sem registros acumulados.");
         }
     }));
 
     clearButton.addEventListener("click", () => {
-        replaceEmployeeRankingHistory([]);
-        notify("info", "Acumulado descartado. O ranking mostra os dados atuais de Expedição.");
+        replaceEmployeeRankingHistory({});
+        notify("info", "Acumulado descartado. O ranking mostra os dados atuais dos relatórios.");
     });
 
-    for (const body of area.querySelectorAll("tbody")) {
-        if (body !== receivedDamageBody && body !== expeditionBody && body !== offPackagesBody) renderRankingRows(body);
-    }
+    subscribeReceiptState(({ operators }, change) => {
+        if (change.type === "operator-field-updated") {
+            receiptOperators = operators;
+            requestReportUpdate(renderOperationalRankings, { labelingErrors: true });
+        } else if (["operators-replaced", "receipt-reset", "receipt-session-imported"].includes(change.type)) {
+            receiptOperators = operators;
+            requestReportUpdate(renderOperationalRankings, { receipt: true, labelingErrors: true, announce: true });
+        }
+    });
     subscribeExpeditionState((_, change, derived) => {
         if (!getExpeditionChangeScope(change).routes) return;
 
-        current = derived.getRanking();
-        requestReportUpdate(renderExpeditionRanking);
-        notifyCurrentRanking();
+        expeditionOperators = derived.getRanking();
+        requestReportUpdate(renderOperationalRankings, { expedition: true, announce: true });
     });
     subscribeDamageAndLossesState((damage, change) => {
         if (change.receivedDamageChanged) {
@@ -239,8 +276,8 @@ function initializeEmployeeRankingController(root) {
             requestReportUpdate(renderMonthlyRankings, { offPackagesRanking: losses.offPackages });
         }
     });
-    subscribeEmployeeRankingHistory(() => requestReportUpdate(renderExpeditionRanking));
-    renderExpeditionRanking();
+    subscribeEmployeeRankingHistory((_, scope) => requestReportUpdate(renderOperationalRankings, scope));
+    renderOperationalRankings({ receipt: true, labelingErrors: true, expedition: true });
     initialized = renderMonthlyRankings({
         receivedDamageRanking: getDamageAndLossesState().receivedDamage,
         offPackagesRanking: getLossesState().offPackages,

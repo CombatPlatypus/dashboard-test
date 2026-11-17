@@ -107,7 +107,7 @@ const DEFAULT_REPORT_NOTIFICATIONS =
             OVERALL_ANALYSIS_NOTIFICATION,
         "employee-ranking": {
             type: "idle",
-            message: "Importe Expedição ou a planilha de Avarias e Perdas para preencher o ranking.",
+            message: "Importe dados de Processamento, Expedição ou Avarias e Perdas para preencher o ranking.",
         },
     });
 

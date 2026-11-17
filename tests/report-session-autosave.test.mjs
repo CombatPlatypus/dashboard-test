@@ -5,6 +5,7 @@ import { reportManager } from "../js/reports/core/report-manager.js";
 import { getReportContext, updateReportContextField } from "../js/reports/core/report-context.js";
 import { addPlanningLh, getPlanningState, resetPlanningReport } from "../js/reports/planning/state.js";
 import { getReceiptLinehaulState, replaceReceiptLinehauls } from "../js/reports/receipt/linehaul-state.js";
+import { replaceReceiptOperators } from "../js/reports/receipt/state.js";
 import { replaceExpeditionRoutes } from "../js/reports/expedition/state.js";
 import { replaceEmployeeRankingHistory } from "../js/reports/employee-ranking/state.js";
 import { replaceParcelRows, updateParcelFilter } from "../js/reports/parcel-sweeper/state.js";
@@ -190,11 +191,29 @@ test("restaura, salva alterações automaticamente e usa o botão apenas para ba
     reportExports.length = 0;
     writes.length = 0;
     const ranking = [{ operator: "Ana Rosa Silva", routesChecked: 10, routesWithDuration: 8, totalDurationSeconds: 2400 }];
-    replaceEmployeeRankingHistory(ranking);
+    const processingRanking = {
+        receipt: [{ operator: "Ana Rosa Silva", quantity: 120 }],
+        labelingErrors: [{ operator: "Ana Rosa Silva", quantity: 2 }],
+    };
+    const history = { expedition: ranking, ...processingRanking };
+    replaceEmployeeRankingHistory(history);
     await Promise.resolve();
     assert.deepEqual(reportExports, ["overall-analysis"]);
     assert.deepEqual(writes, [partKey("overall-analysis", readIndex().parts["overall-analysis"])]);
-    assert.deepEqual(readPart("overall-analysis"), { employeeRanking: ranking });
+    assert.deepEqual(readPart("overall-analysis"), { employeeRanking: ranking, processingRanking });
+
+    reportExports.length = 0;
+    writes.length = 0;
+    replaceEmployeeRankingHistory(structuredClone(history));
+    await Promise.resolve();
+    assert.deepEqual(reportExports, []);
+    assert.deepEqual(writes, []);
+
+    replaceReceiptOperators([{ receiver: "Ana Rosa Silva", packagesReceived: 100, errorQuantity: 1 }]);
+    await Promise.resolve();
+    assert.deepEqual(reportExports, ["receipt"]);
+    assert.deepEqual(writes, [partKey("receipt", readIndex().parts.receipt)]);
+    assert.deepEqual(readPart("overall-analysis"), { employeeRanking: ranking, processingRanking });
 
     reportExports.length = 0;
     writes.length = 0;
@@ -202,9 +221,9 @@ test("restaura, salva alterações automaticamente e usa o botão apenas para ba
     await Promise.resolve();
     assert.deepEqual(reportExports, ["expedition"]);
     assert.deepEqual(writes, [partKey("expedition", readIndex().parts.expedition)]);
-    assert.deepEqual(readPart("overall-analysis"), { employeeRanking: ranking });
+    assert.deepEqual(readPart("overall-analysis"), { employeeRanking: ranking, processingRanking });
 
-    replaceEmployeeRankingHistory([]);
+    replaceEmployeeRankingHistory({});
     await Promise.resolve();
     assert.deepEqual(readPart("overall-analysis"), {});
 });

@@ -12,7 +12,7 @@ Ao recarregar a aba, o dashboard restaura os dados gravados e o Relatório Final
 
 As bases importadas em [Análises](../Painel%20An%C3%A1lises/README.md) e [Filtragem](../Painel%20Filtragem/README.md) também são guardadas na aba em chaves próprias.
 
-O [Ranking Mensal de Colaboradores](../Painel%20Relat%C3%B3rios/ranking-de-colaboradores.md) grava o acumulado importado na parte `overall-analysis` quando ele muda ou é descartado. A prévia recupera as rotas atuais da parte de Expedição e os recortes mensais de Avarias Recebidas e Pacotes OFF da parte de Avarias e Perdas.
+O [Ranking Mensal de Colaboradores](../Painel%20Relat%C3%B3rios/ranking-de-colaboradores.md) grava o acumulado de Recebimento, Erros de Etiquetagem e Expedição na parte `overall-analysis` quando ele muda ou é descartado. Os registros anteriores de Expedição continuam disponíveis em `employeeRanking` e o acumulado de Processamento fica em `processingRanking`. A prévia recupera os dados atuais das partes de Processamento e Expedição e os recortes mensais da parte de Avarias e Perdas.
 
 ## Arquivo de sessão
 

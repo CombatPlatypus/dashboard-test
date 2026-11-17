@@ -203,6 +203,10 @@ function createReportSessionPayload({ includeAllReports = false } = {}) {
 const validOccurrenceDays = state => isSessionObject(state) && isSessionObjectList(state.days) &&
     (state.history === undefined || isSessionObjectList(state.history));
 
+const validRankingCounts = rows => isSessionObjectList(rows) && rows.every(row =>
+    typeof row.operator === "string" && row.operator.trim() !== "" &&
+    Number.isSafeInteger(row.quantity) && row.quantity >= 0);
+
 const sessionReportValidators = {
     planning: ["do Planejamento", state =>
         isSessionObjectList(state.lhs) && state.lhs.every(linehaul => isSessionObjectList(linehaul.tos)) &&
@@ -230,13 +234,17 @@ const sessionReportValidators = {
         return transfer.packages === undefined || (isSessionObject(transfer.packages) && Object.values(transfer.packages)
             .every(codes => Array.isArray(codes) && codes.every(code => typeof code === "string")));
     })],
-    "overall-analysis": ["do Ranking de Colaboradores", state => state.employeeRanking === undefined ||
-        (isSessionObjectList(state.employeeRanking) && state.employeeRanking.every(row =>
+    "overall-analysis": ["do Ranking de Colaboradores", state => {
+        const { employeeRanking, processingRanking } = state;
+        const validExpedition = employeeRanking === undefined || (isSessionObjectList(employeeRanking) && employeeRanking.every(row =>
             typeof row.operator === "string" && row.operator.trim() !== "" &&
             Number.isSafeInteger(row.routesChecked) && row.routesChecked >= 0 &&
             Number.isSafeInteger(row.routesWithDuration) && row.routesWithDuration >= 0 &&
             row.routesWithDuration <= row.routesChecked &&
-            Number.isFinite(row.totalDurationSeconds) && row.totalDurationSeconds >= 0))],
+            Number.isFinite(row.totalDurationSeconds) && row.totalDurationSeconds >= 0));
+        return validExpedition && (processingRanking === undefined || (isSessionObject(processingRanking) &&
+            validRankingCounts(processingRanking.receipt) && validRankingCounts(processingRanking.labelingErrors)));
+    }],
 };
 
 function validateSessionReport(reportId, state) {
