@@ -26,18 +26,6 @@ function formatEmployeeRankingName(name) {
         .join(" ");
 }
 
-function formatEmployeeRankingDuration(seconds) {
-    if (!Number.isFinite(seconds)) {
-        return "—";
-    }
-
-    const totalSeconds = Math.round(seconds);
-    const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, "0");
-    const remainingSeconds = String(totalSeconds % 60).padStart(2, "0");
-
-    return `${minutes}:${remainingSeconds}`;
-}
-
 function createEmployeeRankingEntry(record, fromHistory = false) {
     const operator = normalizeEmployeeRankingName(record.operator);
     const opsCode = readEmployeeOpsCode(record.opsCode) || readEmployeeOpsCode(record.operator);
@@ -47,7 +35,7 @@ function createEmployeeRankingEntry(record, fromHistory = false) {
     return { record, operator, opsCode, name, abbreviation, abbreviated, fromHistory };
 }
 
-function matchEmployeeRankingEntries(current, imported, knownOperators = []) {
+function resolveEmployeeRankingEntries(current, imported, knownOperators) {
     const validName = ({ operator }) => operator && !/^[-–—]$/.test(operator);
     const entries = [
         ...current.map(record => createEmployeeRankingEntry(record)),
@@ -70,16 +58,12 @@ function matchEmployeeRankingEntries(current, imported, knownOperators = []) {
         if (abbreviated) continue;
 
         const codes = codesByName.get(name);
-        if (!entry.opsCode && codes?.size > 1) {
-            entry.key = Symbol(name);
-            entry.nameStatus = "ambiguous";
-            continue;
-        }
-        entry.opsCode ||= codes?.values().next().value || "";
-        entry.key = entry.opsCode || "name:" + name;
+        if (!entry.opsCode && codes?.size === 1) entry.opsCode = codes.values().next().value;
 
+        // Uncoded names still help detect ambiguity in a copied abbreviation.
+        const key = entry.opsCode || "name:" + name;
         const employees = employeesByAbbreviation.get(abbreviation) ?? new Map();
-        if (!employees.has(entry.key)) employees.set(entry.key, entry);
+        if (!employees.has(key)) employees.set(key, entry);
         employeesByAbbreviation.set(abbreviation, employees);
     }
 
@@ -87,68 +71,21 @@ function matchEmployeeRankingEntries(current, imported, knownOperators = []) {
         if (!entry.abbreviated) continue;
 
         const employees = employeesByAbbreviation.get(entry.abbreviation);
-        if (historyCounts.get(entry.abbreviation) > 1 || employees?.size > 1) {
-            entry.key = Symbol(entry.abbreviation);
-            entry.nameStatus = "ambiguous";
-        } else if (employees?.size === 1) {
-            const { key, operator, opsCode } = employees.values().next().value;
-            Object.assign(entry, { key, operator, opsCode });
-        } else {
-            entry.key = "name:" + entry.name;
-            entry.nameStatus = "abbreviated";
+        if (historyCounts.get(entry.abbreviation) === 1 && employees?.size === 1) {
+            const { operator, opsCode } = employees.values().next().value;
+            if (opsCode) Object.assign(entry, { operator, opsCode });
         }
     }
     return entries;
 }
 
-function buildEmployeeExpeditionRanking(currentRanking, importedRanking = [], operatorDirectory = []) {
-    const collaborators = new Map();
-
-    for (const { record, operator, key, opsCode, nameStatus } of matchEmployeeRankingEntries(currentRanking, importedRanking, operatorDirectory)) {
-        if (!collaborators.has(key)) {
-            collaborators.set(key, {
-                operator,
-                ...(opsCode && { opsCode }),
-                ...(nameStatus && { nameStatus }),
-                routesChecked: 0,
-                totalDurationSeconds: 0,
-                routesWithDuration: 0,
-            });
-        }
-
-        const collaborator = collaborators.get(key);
-        collaborator.routesChecked += record.routesChecked;
-        collaborator.totalDurationSeconds += record.totalDurationSeconds;
-        collaborator.routesWithDuration += record.routesWithDuration;
-    }
-
-    return Array.from(collaborators.values(), collaborator => ({
-        ...collaborator,
-        displayName: formatEmployeeRankingName(collaborator.operator),
-        averageDurationSeconds: collaborator.routesWithDuration > 0
-            ? collaborator.totalDurationSeconds / collaborator.routesWithDuration
-            : null,
-    })).sort((first, second) => (
-        second.routesChecked - first.routesChecked ||
-        (first.averageDurationSeconds ?? Infinity) - (second.averageDurationSeconds ?? Infinity) ||
-        first.operator.localeCompare(second.operator, "pt-BR")
-    ));
+function hasQuantity(value) {
+    return Number.isSafeInteger(value) && value >= 0;
 }
 
-function buildEmployeeOccurrenceRanking(current, imported = [], { descending = false, knownOperators = [] } = {}) {
-    const collaborators = new Map();
-    for (const { record, operator, key, opsCode, nameStatus } of matchEmployeeRankingEntries(current, imported, knownOperators)) {
-        if (!Number.isSafeInteger(record.quantity) || record.quantity < 0) continue;
-
-        const collaborator = collaborators.get(key) ?? {
-            operator, quantity: 0, ...(opsCode && { opsCode }), ...(nameStatus && { nameStatus }),
-        };
-        collaborator.quantity += record.quantity;
-        collaborators.set(key, collaborator);
-    }
-
+function sortEmployeeQuantities(entries, descending = false) {
     const direction = descending ? -1 : 1;
-    return Array.from(collaborators.values(), entry => ({
+    return Array.from(entries, entry => ({
         ...entry,
         displayName: formatEmployeeRankingName(entry.operator),
     })).sort((first, second) => (
@@ -158,12 +95,52 @@ function buildEmployeeOccurrenceRanking(current, imported = [], { descending = f
     ));
 }
 
+function buildOperationalRanking(current, imported = [], { descending = false, knownOperators = [] } = {}) {
+    const collaborators = new Map();
+    const pending = [];
+    for (const { record, operator, opsCode } of resolveEmployeeRankingEntries(current, imported, knownOperators)) {
+        if (!hasQuantity(record.quantity)) continue;
+        if (!opsCode) {
+            pending.push({ operator, quantity: record.quantity });
+            continue;
+        }
+
+        const collaborator = collaborators.get(opsCode) ?? { operator, opsCode, quantity: 0 };
+        collaborator.quantity += record.quantity;
+        collaborators.set(opsCode, collaborator);
+    }
+    return { ranking: sortEmployeeQuantities(collaborators.values(), descending), pending };
+}
+
+function buildEmployeeOccurrenceRanking(operators) {
+    const collaborators = new Map();
+    for (const { operator: rawName, quantity } of operators) {
+        const operator = normalizeEmployeeRankingName(rawName);
+        if (!operator || /^[-–—]$/.test(operator) || !hasQuantity(quantity)) continue;
+
+        const key = operator.toLocaleLowerCase("pt-BR");
+        const collaborator = collaborators.get(key) ?? { operator, quantity: 0 };
+        collaborator.quantity += quantity;
+        collaborators.set(key, collaborator);
+    }
+    return sortEmployeeQuantities(collaborators.values());
+}
+
+function buildEmployeeExpeditionRanking(currentRanking, importedRanking = [], operatorDirectory = []) {
+    const routesToQuantity = ({ operator, opsCode, fullNameConfirmed, routesChecked }) => ({
+        operator, opsCode, fullNameConfirmed, quantity: routesChecked,
+    });
+    return buildOperationalRanking(currentRanking.map(routesToQuantity), importedRanking.map(routesToQuantity), {
+        descending: true, knownOperators: operatorDirectory,
+    });
+}
+
 function buildEmployeeReceiptRanking(operators, imported, operatorDirectory) {
     const current = operators.map(({ receiver, packagesReceived }) => ({
         operator: receiver,
         quantity: packagesReceived,
     }));
-    return buildEmployeeOccurrenceRanking(current, imported, { descending: true, knownOperators: operatorDirectory });
+    return buildOperationalRanking(current, imported, { descending: true, knownOperators: operatorDirectory });
 }
 
 function buildEmployeeLabelingErrorRanking(operators, imported, operatorDirectory = []) {
@@ -175,7 +152,7 @@ function buildEmployeeLabelingErrorRanking(operators, imported, operatorDirector
         };
     });
     const knownOperators = [...operators.map(({ receiver }) => ({ operator: receiver })), ...operatorDirectory];
-    return buildEmployeeOccurrenceRanking(current, imported, { knownOperators });
+    return buildOperationalRanking(current, imported, { knownOperators });
 }
 
 export {
@@ -183,7 +160,6 @@ export {
     buildEmployeeLabelingErrorRanking,
     buildEmployeeOccurrenceRanking,
     buildEmployeeReceiptRanking,
-    formatEmployeeRankingDuration,
     formatEmployeeRankingName,
     normalizeEmployeeRankingName,
     readEmployeeOpsCode,

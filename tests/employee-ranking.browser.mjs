@@ -54,13 +54,14 @@ function createHistoricalRanking() {
     }
 
     const operators = Array.from({ length: 151 }, (_, index) => [
-        `Colaborador ${index + 1} Teste`, 1, "01:00",
+        `[ops${1000 + index}] Colaborador ${index + 1} Teste`, 1, "01:00",
     ]);
     return [
         spreadsheetRow(["Rotas Conferidas e Tempo Médio", "", ""]),
         spreadsheetRow(["Colaborador", "Quantidade", "Tempo"]),
         spreadsheetRow(["maria da silva santos", 2, "05:36"]),
-        spreadsheetRow(["Maria da Silva Rodrigues", 9, "03:00"]),
+        spreadsheetRow(["[ops321] Maria da Silva Rodrigues", 9, "03:00"]),
+        spreadsheetRow(["João de Souza Barbosa", 100, "03:00"]),
         ...operators.map(spreadsheetRow),
     ].join("\n");
 }
@@ -151,20 +152,22 @@ try {
     for (const table of await rankingTables.all()) {
         assert.equal(await table.locator("tbody tr").count(), 150);
     }
+    assert.equal(await page.locator('table:has(#employeeRankingExpeditionBody) caption').textContent(), "Rotas Conferidas");
+    assert.deepEqual(await page.locator('table:has(#employeeRankingExpeditionBody) thead th').allTextContents(), ["Colaborador", "Qtd"]);
 
     if (process.argv[2]) {
         await importExpedition(process.argv[2]);
         const entries = (await readRanking()).filter(([name]) => name !== "—");
         assert.equal(entries.length, 23);
-        assert.ok(entries.every(([, value]) => /^\d+ \/ \d{2}:\d{2}$/.test(value)));
-        assert.equal(entries.reduce((sum, [, value]) => sum + Number(value.split(" / ")[0]), 0), 172);
+        assert.ok(entries.every(([, value]) => /^\d+$/.test(value)));
+        assert.equal(entries.reduce((sum, [, value]) => sum + Number(value), 0), 172);
         console.log("Expedição.csv: 172 rotas, 23 conferentes.");
     }
 
     await importExpedition(createExpeditionFile());
     const currentRanking = await readRanking();
     assert.equal(currentRanking.length, 150);
-    assert.deepEqual(currentRanking[0], ["Maria Silva", "12 / 05:29"]);
+    assert.deepEqual(currentRanking[0], ["Maria Silva", "12"]);
     assert.deepEqual(currentRanking[149], ["—", "—"]);
     assert.equal(await clearButton.isDisabled(), true);
 
@@ -190,8 +193,9 @@ try {
     await page.locator("#employeeRankingImportButton").click();
     await page.waitForFunction(selector => document.querySelector(selector).rows.length === 153, bodySelector);
     const monthlyRanking = await readRanking();
-    assert.deepEqual(monthlyRanking[0], ["Maria Silva", "14 / 05:30"]);
-    assert.deepEqual(monthlyRanking[1], ["Maria Silva", "9 / 03:00"]);
+    assert.deepEqual(monthlyRanking[0], ["Maria Silva", "14"]);
+    assert.deepEqual(monthlyRanking[1], ["Maria Silva", "9"]);
+    assert.match(await page.locator("#employeeRankingNotificationText").textContent(), /1 registro ficou fora da soma por falta de OPS/);
     const otherRowCounts = await rankingTables.evaluateAll(tables => tables
         .filter(table => !table.querySelector("#employeeRankingExpeditionBody"))
         .map(table => table.tBodies[0].rows.length));
@@ -204,19 +208,19 @@ try {
     await page.waitForFunction(() => window.rankingClipboard.text.startsWith("RANKING MENSAL DE DESEMPENHO\t"));
     const copied = await page.evaluate(() => window.rankingClipboard.text.split("\n").map(row => row.split("\t")));
     assert.equal(copied.length, 158);
-    assert.ok(copied.every(row => row.length === 18));
-    assert.deepEqual(copied[3].slice(16), ["Base de Colaboradores", ""]);
-    assert.deepEqual(copied[4].slice(16), ["Código Ops", "Nome do Colaborador"]);
-    assert.deepEqual(copied[5].slice(16), ["ops123", "Maria da Silva Santos"]);
-    assert.deepEqual(copied[5].slice(9, 12), ["Maria Silva", "14", "00:05:30"]);
-    assert.deepEqual(copied[6].slice(9, 12), ["Maria Silva", "9", "00:03:00"]);
+    assert.ok(copied.every(row => row.length === 17));
+    assert.deepEqual(copied[3].slice(15), ["Base de Colaboradores", ""]);
+    assert.deepEqual(copied[4].slice(15), ["Código Ops", "Nome do Colaborador"]);
+    assert.deepEqual(copied[5].slice(15), ["ops1000", "Colaborador 1 Teste"]);
+    assert.deepEqual(copied[5].slice(9, 12), ["Maria Silva", "14", ""]);
+    assert.deepEqual(copied[6].slice(9, 12), ["Maria Silva", "9", ""]);
     assert.match(await page.locator("#employeeRankingNotificationText").textContent(), /B2/);
 
     const copiedFormat = await page.evaluate(() => {
         const doc = new DOMParser().parseFromString(window.rankingClipboard.html, "text/html");
         const table = doc.querySelector("google-sheets-html-origin table");
         const title = table.rows[0].cells[0];
-        const expeditionCells = Array.from(table.rows[5].cells).slice(6, 9);
+        const expeditionCells = Array.from(table.rows[5].cells).slice(6, 8);
         return {
             titleSpan: [title.colSpan, title.rowSpan],
             formula: expeditionCells[0].getAttribute("data-sheets-formula"),
@@ -225,9 +229,9 @@ try {
         };
     });
     assert.deepEqual(copiedFormat, {
-        titleSpan: [18, 2],
+        titleSpan: [17, 2],
         formula: '="Maria Silva"&T(N("Nome e id do conferente: [ops123] Maria da Silva Santos"))',
-        centerAligned: true, values: ["Maria Silva", "14", "00:05:30"],
+        centerAligned: true, values: ["Maria Silva", "14"],
     });
 
     const operatorsFromCopy = await page.evaluate(async () => {
@@ -244,7 +248,7 @@ try {
         return parseEmployeeRankingClipboard({ ...clipboard, html: table.outerHTML }).expedition.slice(0, 2);
     });
     assert.deepEqual(operatorsFromCopy.map(entry => [entry.operator, entry.opsCode, entry.routesChecked]), [
-        ["Maria da Silva Santos", "ops123", 14], ["Maria da Silva Rodrigues", undefined, 9],
+        ["Maria da Silva Santos", "ops123", 14], ["Maria da Silva Rodrigues", "ops321", 9],
     ]);
 
     await page.reload();
@@ -262,7 +266,7 @@ try {
     await copyButton.click();
     await page.waitForFunction(() => window.rankingClipboard.text.startsWith("RANKING MENSAL DE DESEMPENHO\t"));
     const copiedAfterClear = await page.evaluate(() => window.rankingClipboard.text.split("\n").map(row => row.split("\t")));
-    assert.deepEqual(copiedAfterClear[5].slice(9, 12), ["Maria Silva", "12", "00:05:29"]);
+    assert.deepEqual(copiedAfterClear[5].slice(9, 12), ["Maria Silva", "12", ""]);
     assert.equal(copiedAfterClear.length, 158);
     assert.ok(copiedAfterClear.slice(6).every(row => row.every(value => value === "")));
 

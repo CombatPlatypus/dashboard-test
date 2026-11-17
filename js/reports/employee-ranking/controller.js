@@ -26,7 +26,6 @@ import {
     buildEmployeeLabelingErrorRanking,
     buildEmployeeOccurrenceRanking,
     buildEmployeeReceiptRanking,
-    formatEmployeeRankingDuration,
 } from "./model.js";
 import {
     getEmployeeRankingHistory,
@@ -47,7 +46,7 @@ function hasRankingRows(rankings) {
     return Object.values(rankings).some(ranking => ranking.length > 0);
 }
 
-function renderRankingRows(body, ranking, formatStats = entry => numberFormat.format(entry.quantity)) {
+function renderRankingRows(body, ranking) {
     const rowCount = Math.max(MIN_EMPLOYEE_RANKING_ROWS, ranking.length);
     while (body.rows.length > rowCount) body.deleteRow(-1);
 
@@ -62,7 +61,7 @@ function renderRankingRows(body, ranking, formatStats = entry => numberFormat.fo
             addedRows.append(row);
         }
         const name = entry?.displayName ?? "—";
-        const stats = entry ? formatStats(entry) : "—";
+        const stats = entry ? numberFormat.format(entry.quantity) : "—";
         if (row.cells[0].textContent !== name) row.cells[0].textContent = name;
         if (row.cells[1].textContent !== stats) row.cells[1].textContent = stats;
         row.toggleAttribute("data-placeholder", !entry);
@@ -96,6 +95,7 @@ function initializeEmployeeRankingController(root) {
     };
     const monthlySources = {};
     const rankings = {};
+    const pendingBySection = {};
     let receiptOperators = getReceiptState().operators;
     let expeditionOperators = getExpeditionOperatorRanking();
     let busy = false;
@@ -109,32 +109,36 @@ function initializeEmployeeRankingController(root) {
         clearButton.disabled = busy || !hasRankingRows(getEmployeeRankingHistory());
     }
 
-    function updateRanking(section, body, ranking, formatStats) {
+    function updateRanking(section, body, ranking) {
         if (JSON.stringify(rankings[section]) === JSON.stringify(ranking)) return;
 
         rankings[section] = ranking;
         clipboardRowCount = Math.max(clipboardRowCount, ranking.length);
-        renderRankingRows(body, ranking, formatStats);
+        renderRankingRows(body, ranking);
+    }
+
+    function updateOperationalRanking(section, body, { ranking, pending }) {
+        pendingBySection[section] = pending.length;
+        updateRanking(section, body, ranking);
     }
 
     function renderOperationalRankings({ receipt, labelingErrors, expedition, operatorDirectory, announce }) {
         const history = getEmployeeRankingHistory();
+        const previousPending = countPendingOps();
         if (receipt || operatorDirectory) {
-            updateRanking("receiptRanking", receiptBody,
+            updateOperationalRanking("receiptRanking", receiptBody,
                 buildEmployeeReceiptRanking(receiptOperators, history.receipt, history.operatorDirectory));
         }
         if (labelingErrors || operatorDirectory) {
-            updateRanking("labelingErrorsRanking", labelingErrorsBody,
+            updateOperationalRanking("labelingErrorsRanking", labelingErrorsBody,
                 buildEmployeeLabelingErrorRanking(receiptOperators, history.labelingErrors, history.operatorDirectory));
         }
         if (expedition || operatorDirectory) {
-            const ranking = buildEmployeeExpeditionRanking(expeditionOperators, history.expedition, history.operatorDirectory);
-            updateRanking("expeditionRanking", expeditionBody, ranking, entry =>
-                `${numberFormat.format(entry.routesChecked)} / ${formatEmployeeRankingDuration(entry.averageDurationSeconds)}`,
-            );
+            updateOperationalRanking("expeditionRanking", expeditionBody,
+                buildEmployeeExpeditionRanking(expeditionOperators, history.expedition, history.operatorDirectory));
         }
         renderActions();
-        if (announce) notifyCurrentRanking();
+        if (announce || previousPending !== countPendingOps()) notifyCurrentRanking();
         return true;
     }
 
@@ -145,9 +149,9 @@ function initializeEmployeeRankingController(root) {
             updateRanking(section, monthlyTables[section].body, ranking);
         }
         renderActions();
-        if (announce && !notifyAmbiguousNames()) {
+        if (announce) {
             const message = getMonthlyRankingMessage();
-            if (message) notify("info", message);
+            if (message) notifyWithPendingOps("info", message);
             else notifyCurrentRanking();
         }
         return true;
@@ -167,28 +171,33 @@ function initializeEmployeeRankingController(root) {
     }
 
     function notifyCurrentRanking() {
-        if (notifyAmbiguousNames()) return;
-
         const { operatorDirectory, ...accumulated } = getEmployeeRankingHistory();
         const sources = [];
         if (receiptOperators.length) sources.push("Processamento");
         if (expeditionOperators.length) sources.push("Expedição");
         if (sources.length) {
-            notify("info", `Ranking atualizado com os dados de ${sources.join(" e ")}.`);
+            notifyWithPendingOps("info", `Ranking atualizado com os dados de ${sources.join(" e ")}.`);
         } else if (hasRankingRows(accumulated)) {
-            notify("info", "Ranking mostra o acumulado importado da planilha.");
+            notifyWithPendingOps("info", "Ranking mostra o acumulado importado da planilha.");
         } else if (operatorDirectory.length) {
-            notify("info", "Lista de códigos OPS importada.");
+            notifyWithPendingOps("info", "Lista de códigos OPS importada.");
         } else {
-            notify("info", getMonthlyRankingMessage() || emptyRankingMessage);
+            notifyWithPendingOps("info", getMonthlyRankingMessage() || emptyRankingMessage);
         }
     }
 
-    function notifyAmbiguousNames() {
-        if (!Object.values(rankings).some(ranking => ranking.some(entry => entry.nameStatus === "ambiguous"))) return false;
+    function countPendingOps() {
+        return Object.values(pendingBySection).reduce((total, count) => total + count, 0);
+    }
 
-        notify("warning", "Há nomes iguais sem código OPS. Copie as células com a fórmula do OPS ou inclua o código junto do nome e importe novamente.");
-        return true;
+    function notifyWithPendingOps(type, message) {
+        const count = countPendingOps();
+        if (!count) {
+            notify(type, message);
+            return;
+        }
+        const pending = count === 1 ? "1 registro ficou fora da soma" : `${numberFormat.format(count)} registros ficaram fora da soma`;
+        notify("warning", `${message} ${pending} por falta de OPS identificado. Confira os códigos na Base de Colaboradores em Q:R.`);
     }
 
     async function runAction(button, action) {
@@ -238,7 +247,7 @@ function initializeEmployeeRankingController(root) {
         } catch {
             throw new Error("Não foi possível copiar o ranking com formatação. Verifique a permissão da área de transferência.");
         }
-        notify("success", "Ranking copiado. Cole em B2. A lista de OPS fica em R:S.");
+        notifyWithPendingOps("success", "Ranking copiado. Cole em B2 com Ctrl+V. A lista de OPS fica em Q:R.");
     }));
 
     bindReportImageExportButton(imageButton, {
@@ -255,21 +264,19 @@ function initializeEmployeeRankingController(root) {
         }
         const history = parseEmployeeRankingClipboard(clipboard);
         replaceEmployeeRankingHistory({ ...getEmployeeRankingHistory(), ...history });
-        if (notifyAmbiguousNames()) return;
-
         const { operatorDirectory, ...accumulated } = history;
         if (hasRankingRows(accumulated)) {
-            notify("success", "Acumulado anterior do ranking importado.");
+            notifyWithPendingOps("success", "Acumulado anterior do ranking importado.");
         } else if (operatorDirectory?.length) {
-            notify("success", "Lista de códigos OPS importada.");
+            notifyWithPendingOps("success", "Lista de códigos OPS importada.");
         } else {
-            notify("info", "A seleção copiada está sem registros acumulados.");
+            notifyWithPendingOps("info", "A seleção copiada está sem registros acumulados.");
         }
     }));
 
     clearButton.addEventListener("click", () => {
         replaceEmployeeRankingHistory({});
-        notify("info", "Acumulado descartado. O ranking mostra os dados atuais dos relatórios.");
+        notifyWithPendingOps("info", "Acumulado descartado. O ranking mostra os dados atuais dos relatórios.");
     });
 
     subscribeReceiptState(({ operators }, change) => {

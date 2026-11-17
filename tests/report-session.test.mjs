@@ -125,6 +125,8 @@ function populateMissingReports() {
     payload.reports["overall-analysis"] = {
         employeeRanking: [{
             operator: "Ana Rosa Silva", routesChecked: 10, routesWithDuration: 8, totalDurationSeconds: 2400,
+        }, {
+            operator: "João de Souza Lima", opsCode: "ops34", routesChecked: 4,
         }],
         processingRanking: {
             receipt: [{ operator: "Ana Rosa", fullNameConfirmed: true, opsCode: "ops28", quantity: 160 }],
@@ -280,8 +282,7 @@ test("valida dados adicionais antes de alterar os relatórios da sessão", t => 
         ["parcel", { rows: [], operatorKindOverrides: { ana: "sim" } }, /Parcel Sweeper/],
         ["reverse", { transfers: [{ quantities: null }] }, /Reversa/],
         ["reverse", { transfers: [{ quantities: {}, packages: { return: "BRR1" } }] }, /Reversa/],
-        ["overall-analysis", { employeeRanking: [{ operator: "Ana Rosa Silva", routesChecked: 2,
-            routesWithDuration: 3, totalDurationSeconds: 900 }] }, /Ranking de Colaboradores/],
+        ["overall-analysis", { employeeRanking: [{ operator: "Ana Rosa Silva", opsCode: "ops28", routesChecked: -2 }] }, /Ranking de Colaboradores/],
         ["overall-analysis", { processingRanking: {
             receipt: [{ operator: "Ana Rosa Silva", quantity: -1 }], labelingErrors: [],
         } }, /Ranking de Colaboradores/],

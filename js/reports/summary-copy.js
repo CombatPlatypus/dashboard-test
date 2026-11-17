@@ -53,17 +53,15 @@ function sheetsColor(hex) {
     return { "1": 2, "2": Number.parseInt(hex.slice(1), 16) };
 }
 
-function createStyledCellAttributes({ background, fontSize, bold, border, borderRight = true, bottom, inlineFormattingOnly }) {
+function createStyledCellAttributes({
+    background, fontSize, bold, border, borderSides, borderColor = "#626262", bottom, inlineFormattingOnly,
+}) {
     const color = "#e4e6eb";
-    const borderColor = "#626262";
     const alignment = bottom ? "bottom" : "middle";
-    let borderCss = "border:none";
-    if (border) {
-        const stroke = `1px solid ${borderColor}`;
-        borderCss = borderRight
-            ? `border:${stroke}`
-            : `border-top:${stroke};border-bottom:${stroke};border-left:${stroke};border-right:none`;
-    }
+    const stroke = `1px solid ${borderColor}`;
+    const borderCss = borderSides
+        ? ["top", "right", "bottom", "left"].map(side => `border-${side}:${borderSides.includes(side) ? stroke : "none"}`).join(";")
+        : `border:${border ? stroke : "none"}`;
     const css = [
         `background-color:${background}`, `color:${color}`, "font-family:Open Sans",
         `font-size:${fontSize}pt`, `font-weight:${bold ? "bold" : "normal"}`,

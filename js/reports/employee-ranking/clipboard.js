@@ -4,29 +4,25 @@ import { formatEmployeeRankingName, normalizeEmployeeRankingName, readEmployeeOp
 
 const MIN_EMPLOYEE_RANKING_ROWS = 150;
 const rankingTitle = "RANKING MENSAL DE DESEMPENHO";
-const commonHeaders = ["Colaborador", "Quantidade"];
-const receipt = { title: "Recebimento", headers: commonHeaders, alternateTitle: "Recebimento de Pacotes" };
-const labelingErrors = { title: "Erros de Etiquetagem", headers: commonHeaders };
-const receivedDamage = { title: "Avarias Recebidas", headers: commonHeaders };
-const expedition = { title: "Rotas Conferidas e Tempo Médio", headers: [...commonHeaders, "Tempo"] };
-const offPackages = { title: "Pacotes OFF", headers: commonHeaders };
-const rankingSections = [
-    receipt,
-    labelingErrors,
-    receivedDamage,
-    expedition,
-    offPackages,
-];
+const rankingHeaders = ["Colaborador", "Quantidade"];
+const receipt = { title: "Recebimento", alternateTitle: "Recebimento de Pacotes" };
+const labelingErrors = { title: "Erros de Etiquetagem" };
+const receivedDamage = { title: "Avarias Recebidas" };
+const expedition = { title: "Rotas Conferidas", alternateTitle: "Rotas Conferidas e Tempo Médio" };
+const offPackages = { title: "Pacotes OFF" };
+const rankingSections = [receipt, labelingErrors, receivedDamage, expedition, offPackages];
 const operatorHeader = "Nome completo do conferente";
 const operatorFormulaPrefix = "Nome e id do conferente: ";
 const operatorFormulaPrefixes = [operatorFormulaPrefix, `${operatorHeader}: `];
 const directoryHeaders = ["Código Ops", "Nome do Colaborador"];
-const columnWidths = [181, 121, 20, 181, 121, 20, 181, 121, 20, 181, 121, 81, 20, 201, 121, 21, 121, 301];
+const columnWidths = [181, 121, 21, 181, 121, 21, 181, 141, 21, 181, 121, 21, 201, 121, 21, 121, 301];
 // Match the inline cell formatting copied by Google Sheets from the ranking template.
 const blankStyle = { background: "#121212", fontSize: 10, inlineFormattingOnly: true };
-const titleStyle = { ...blankStyle, background: "#323232", fontSize: 20, bold: true, border: true };
+const titleStyle = {
+    ...blankStyle, background: "#323232", fontSize: 20, bold: true, borderSides: ["top", "right", "bottom", "left"],
+};
 const sectionStyle = { ...titleStyle, fontSize: 12, bold: false };
-const sectionStyleWithoutRightBorder = { ...sectionStyle, borderRight: false };
+const gapStyle = { ...blankStyle, borderSides: ["top", "bottom"], borderColor: "#101010" };
 const headerStyle = { ...blankStyle, background: "#242424", fontSize: 11, border: true };
 const rowStyles = [
     { ...blankStyle, border: true },
@@ -34,7 +30,7 @@ const rowStyles = [
 ];
 
 function isRankingHeader(section, row, column) {
-    return section.headers.every((header, index) => {
+    return rankingHeaders.every((header, index) => {
         const value = normalizeText(row?.[column + index]);
         return value === normalizeText(header) ||
             (header === "Quantidade" && value === "qtd") ||
@@ -61,7 +57,8 @@ function findRankingClipboardBlock(rows, section) {
 }
 
 function findLegacyExpeditionClipboardBlock(rows) {
-    if (rows.every(row => row.length <= expedition.headers.length)) {
+    // An isolated block from the previous model can still have a third column for time.
+    if (rows.every(row => row.length <= 3)) {
         const firstRow = rows.findIndex(row => row.some(value => normalizeText(value)));
         return {
             column: 0,
@@ -70,22 +67,13 @@ function findLegacyExpeditionClipboardBlock(rows) {
         };
     }
 
-    throw new Error("Copie a aba Ranking de Colaboradores ou as três colunas do bloco Rotas Conferidas e Tempo Médio.");
+    throw new Error("Copie a aba Ranking de Colaboradores ou o bloco Rotas Conferidas.");
 }
 
 function parseRankingQuantity(value) {
     const normalized = value.replace(/[\u00a0\u202f]/g, " ");
     const digits = /^\d{1,3}(?:[. ]\d{3})+$/.test(normalized) ? normalized.replace(/[. ]/g, "") : normalized;
     return /^\d+$/.test(digits) && Number.isSafeInteger(Number(digits)) ? Number(digits) : null;
-}
-
-function parseAverageDuration(value) {
-    const match = /^(?:(\d+):([0-5]\d)|(\d+)):([0-5]\d)$/.exec(value);
-    if (!match) return null;
-
-    const [, hours, minutesAfterHour, minutes, seconds] = match;
-    const duration = Number(hours ?? 0) * 3600 + Number(minutes ?? minutesAfterHour) * 60 + Number(seconds);
-    return Number.isSafeInteger(duration) ? duration : null;
 }
 
 function isEmptyCell(value) {
@@ -214,10 +202,10 @@ function parseRankingClipboardBlock(rows, section, { column, operatorColumn, sta
     const ranking = [];
     for (let rowIndex = startRow; rowIndex < rows.length; rowIndex += 1) {
         const row = rows[rowIndex];
-        const cells = section.headers.map((_, index) => String(row[column + index] ?? "").trim());
-        const [name, quantity, time] = cells;
+        const name = String(row[column] ?? "").trim();
+        const quantity = String(row[column + 1] ?? "").trim();
         const legacyName = readClipboardName(row[legacyNameColumn]);
-        if (cells.every(isEmptyCell) && isEmptyCell(legacyName)) continue;
+        if (isEmptyCell(name) && isEmptyCell(quantity) && isEmptyCell(legacyName)) continue;
 
         const displayValue = readClipboardName(name);
         const identity = readRankingIdentity(displayValue, legacyName, {
@@ -228,24 +216,7 @@ function parseRankingClipboardBlock(rows, section, { column, operatorColumn, sta
         if (isEmptyCell(identity.operator) || count === null) {
             throw new Error(`Revise o colaborador e a quantidade de ${section.title} na linha ${rowIndex + 1} da seleção copiada.`);
         }
-        if (section !== expedition) {
-            ranking.push({ ...identity, quantity: count });
-            continue;
-        }
-
-        const hasTime = !isEmptyCell(time);
-        const averageDuration = hasTime ? parseAverageDuration(time) : 0;
-        const totalDurationSeconds = averageDuration * count;
-        if (averageDuration === null || !Number.isSafeInteger(totalDurationSeconds)) {
-            throw new Error(`Revise o tempo de Expedição na linha ${rowIndex + 1} da seleção copiada.`);
-        }
-
-        ranking.push({
-            ...identity,
-            routesChecked: count,
-            totalDurationSeconds,
-            routesWithDuration: hasTime ? count : 0,
-        });
+        ranking.push(section === expedition ? { ...identity, routesChecked: count } : { ...identity, quantity: count });
     }
 
     return ranking;
@@ -269,21 +240,11 @@ function parseEmployeeRankingClipboard({ text, html = "" }) {
     return { expedition: parseRankingClipboardBlock(rows, expedition, findLegacyExpeditionClipboardBlock(rows)) };
 }
 
-function formatSpreadsheetDuration(seconds) {
-    if (!Number.isFinite(seconds)) return "";
-
-    const total = Math.round(seconds);
-    const hours = Math.floor(total / 3600);
-    const minutes = Math.floor(total % 3600 / 60);
-    return [hours, minutes, total % 60].map(value => String(value).padStart(2, "0")).join(":");
-}
-
 function cell(value, style, span = 1, rowSpan = 1) {
     return { value, style, span, rowSpan };
 }
 
 function formatStoredRankingIdentity(entry) {
-    if (!entry || entry.nameStatus) return "";
     return entry.opsCode ? `[${entry.opsCode}] ${entry.operator}` : entry.operator;
 }
 
@@ -337,7 +298,7 @@ function createEmployeeRankingClipboard({
     const rowCount = Math.max(MIN_EMPLOYEE_RANKING_ROWS, previousRowCount, directory.length,
         ...Array.from(rankingsBySection.values(), ranking => ranking.length));
     const emptyCell = cell(null, blankStyle);
-    const sectionGap = cell(null, blankStyle, 1, rowCount + 2);
+    const sectionGap = cell(null, gapStyle, 1, rowCount + 2);
     const sectionRow = (createSectionCells, gap = null) => rankingSections.flatMap((section, index) =>
         index === 0 ? createSectionCells(section) : [gap, ...createSectionCells(section)],
     );
@@ -345,30 +306,18 @@ function createEmployeeRankingClipboard({
         [cell(rankingTitle, titleStyle, columnWidths.length, 2)],
         Array(columnWidths.length).fill(null),
         Array(columnWidths.length).fill(emptyCell),
-        [...sectionRow(section => {
-            const style = section === receivedDamage || section === offPackages
-                ? sectionStyleWithoutRightBorder
-                : sectionStyle;
-            return [cell(section.title, style, section.headers.length)];
-        }, sectionGap), sectionGap, cell("Base de Colaboradores", sectionStyle, directoryHeaders.length)],
-        [...sectionRow(section => section.headers.map(header => cell(header, headerStyle))), null,
-            ...directoryHeaders.map(header => cell(header, sectionStyle))],
+        [...sectionRow(section => [cell(section.title, sectionStyle, rankingHeaders.length)], sectionGap),
+            sectionGap, cell("Base de Colaboradores", sectionStyle, directoryHeaders.length)],
+        [...sectionRow(() => rankingHeaders.map(header => cell(header, headerStyle))), null,
+            ...directoryHeaders.map(header => cell(header, headerStyle))],
     ];
 
     for (let index = 0; index < rowCount; index += 1) {
-        const entry = expeditionRanking[index];
         const style = rowStyles[index % rowStyles.length];
-        const expeditionCells = [
-            createRankingNameCell(entry, style),
-            cell(entry?.routesChecked, style),
-            // Let the spreadsheet recognize hh:mm:ss as a time value, as in text paste.
-            { ...cell(formatSpreadsheetDuration(entry?.averageDurationSeconds), style), inferValueType: true },
-        ];
         const operator = directory[index];
         rows.push([...sectionRow(section => {
-            if (section === expedition) return expeditionCells;
-            const occurrence = rankingsBySection.get(section)[index];
-            return [createRankingNameCell(occurrence, style), cell(occurrence?.quantity, style)];
+            const entry = rankingsBySection.get(section)[index];
+            return [createRankingNameCell(entry, style), cell(entry?.quantity, style)];
         }), null, cell(operator?.opsCode, style), nameCell(operator?.operator, style)]);
     }
 

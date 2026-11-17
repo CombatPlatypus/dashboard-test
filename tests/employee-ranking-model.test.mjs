@@ -5,12 +5,11 @@ import {
     buildEmployeeExpeditionRanking,
     buildEmployeeLabelingErrorRanking,
     buildEmployeeReceiptRanking,
-    formatEmployeeRankingDuration,
 } from "../js/reports/employee-ranking/model.js";
 import { getExpeditionOperatorRanking } from "../js/reports/expedition/state.js";
 import { parseEmployeeRankingClipboard } from "../js/reports/employee-ranking/clipboard.js";
 
-test("mescla pelo nome completo e exibe os dois primeiros nomes sem preposições", () => {
+test("soma rotas pelo OPS identificado e exibe os dois primeiros nomes sem preposições", () => {
     const current = getExpeditionOperatorRanking({
         routes: [
             { status: "Validated", validationOperator: "[ops123] MARIA DA SILVA NUNES", validationDurationSeconds: 300 },
@@ -27,38 +26,35 @@ test("mescla pelo nome completo e exibe os dois primeiros nomes sem preposiçõe
         routesWithDuration: 10,
     }];
 
-    const ranking = buildEmployeeExpeditionRanking(current, imported);
-    assert.deepEqual(ranking.map(({ displayName, routesChecked }) => [displayName, routesChecked]), [
-        ["Maria Silva", 12],
-        ["Maria Silva", 1],
-    ]);
-    assert.equal(ranking[0].operator, "MARIA DA SILVA NUNES");
-    assert.equal(ranking[0].routesWithDuration, 11);
-    assert.equal(ranking[0].averageDurationSeconds, 3900 / 11);
-    assert.equal(formatEmployeeRankingDuration(ranking[0].averageDurationSeconds), "05:55");
+    assert.deepEqual(buildEmployeeExpeditionRanking(current, imported), {
+        ranking: [
+            { operator: "MARIA DA SILVA NUNES", opsCode: "ops123", displayName: "Maria Silva", quantity: 12 },
+            { operator: "Maria da Silva Reis", opsCode: "ops456", displayName: "Maria Silva", quantity: 1 },
+        ],
+        pending: [],
+    });
 
-    const resetRanking = buildEmployeeExpeditionRanking(current);
-    assert.equal(resetRanking[0].routesChecked, 2);
-    assert.equal(formatEmployeeRankingDuration(resetRanking[0].averageDurationSeconds), "05:00");
+    const { ranking: resetRanking } = buildEmployeeExpeditionRanking(current);
+    assert.equal(resetRanking[0].quantity, 2);
 });
 
-test("mantém as rotas sem tempo e ordena empates por tempo e nome inteiro", () => {
-    const ranking = buildEmployeeExpeditionRanking([
-        { operator: "Fabio de Almeida", routesChecked: 12, totalDurationSeconds: 3948, routesWithDuration: 12 },
-        { operator: "Ana Rosa", routesChecked: 12, totalDurationSeconds: 3948, routesWithDuration: 12 },
-        { operator: "Bruno Gomes", routesChecked: 12, totalDurationSeconds: 0, routesWithDuration: 0 },
-        { operator: "Caio Lopes", routesChecked: 12, totalDurationSeconds: 60, routesWithDuration: 1 },
+test("ordena rotas por quantidade e nome, independentemente das durações", () => {
+    const { ranking } = buildEmployeeExpeditionRanking([
+        { operator: "[ops11] Fabio de Almeida", routesChecked: 12, totalDurationSeconds: 3948, routesWithDuration: 12 },
+        { operator: "[ops12] Ana Rosa", routesChecked: 12, totalDurationSeconds: 3948, routesWithDuration: 12 },
+        { operator: "[ops13] Bruno Gomes", routesChecked: 12 },
+        { operator: "[ops14] Caio Lopes", routesChecked: 12, totalDurationSeconds: 60, routesWithDuration: 1 },
     ]);
 
-    assert.deepEqual(ranking.map(({ displayName, averageDurationSeconds }) => `${displayName} / ${formatEmployeeRankingDuration(averageDurationSeconds)}`), [
-        "Caio Lopes / 01:00",
-        "Ana Rosa / 05:29",
-        "Fabio Almeida / 05:29",
-        "Bruno Gomes / —",
+    assert.deepEqual(ranking.map(({ displayName, quantity }) => [displayName, quantity]), [
+        ["Ana Rosa", 12],
+        ["Bruno Gomes", 12],
+        ["Caio Lopes", 12],
+        ["Fabio Almeida", 12],
     ]);
 });
 
-test("Recebimento soma por nome completo e inclui todos os recebedores importados", () => {
+test("Recebimento soma por código e deixa recebedores sem OPS pendentes", () => {
     const current = [
         { receiver: "[ops123] MARIA DA SILVA NUNES", packagesReceived: 1000, selected: false },
         { receiver: "Maria da Silva Reis", packagesReceived: 200 },
@@ -69,32 +65,38 @@ test("Recebimento soma por nome completo e inclui todos os recebedores importado
         { operator: "José de Oliveira Santos", quantity: 300 },
     ];
 
-    assert.deepEqual(buildEmployeeReceiptRanking(current, historical), [
-        { operator: "MARIA DA SILVA NUNES", opsCode: "ops123", displayName: "Maria Silva", quantity: 1800 },
-        { operator: "José de Oliveira Santos", displayName: "José Oliveira", quantity: 300 },
-        { operator: "Maria da Silva Reis", displayName: "Maria Silva", quantity: 200 },
-    ]);
+    assert.deepEqual(buildEmployeeReceiptRanking(current, historical), {
+        ranking: [{ operator: "MARIA DA SILVA NUNES", opsCode: "ops123", displayName: "Maria Silva", quantity: 1800 }],
+        pending: [
+            { operator: "Maria da Silva Reis", quantity: 200 },
+            { operator: "José de Oliveira Santos", quantity: 300 },
+        ],
+    });
 });
 
 test("Erros de Etiquetagem somam por etiquetador e recorrem ao recebedor quando o nome está vazio", () => {
     const current = [
         { receiver: "Recebedor Andrade", labeler: " Pedro da Costa Santos ", errorQuantity: 3, selected: false },
         { receiver: "Recebedor Bastos", labeler: "[ops123] PEDRO DA COSTA SANTOS", errorQuantity: 2 },
-        { receiver: "João de Souza Lima", labeler: " ", errorQuantity: 2 },
-        { receiver: "Zélia da Silva Alves", labeler: "—", errorQuantity: 0 },
+        { receiver: "[ops20] João de Souza Lima", labeler: " ", errorQuantity: 2 },
+        { receiver: "[ops21] Zélia da Silva Alves", labeler: "—", errorQuantity: 0 },
         { receiver: "Ana da Rocha", labeler: "", errorQuantity: null },
+        { receiver: "[ops22] Recebedor Costa", labeler: "Bruno Rodrigues Lima", errorQuantity: 3 },
     ];
     const historical = [
         { operator: "Pedro da Costa Santos", quantity: 10 },
-        { operator: "Ana Rosa Lima", quantity: 2 },
+        { operator: "Ana Rosa Lima", opsCode: "ops23", quantity: 2 },
     ];
 
-    assert.deepEqual(buildEmployeeLabelingErrorRanking(current, historical), [
-        { operator: "Zélia da Silva Alves", displayName: "Zélia Silva", quantity: 0 },
-        { operator: "Ana Rosa Lima", displayName: "Ana Rosa", quantity: 2 },
-        { operator: "João de Souza Lima", displayName: "João Souza", quantity: 2 },
-        { operator: "Pedro da Costa Santos", opsCode: "ops123", displayName: "Pedro Costa", quantity: 15 },
-    ]);
+    assert.deepEqual(buildEmployeeLabelingErrorRanking(current, historical), {
+        ranking: [
+            { operator: "Zélia da Silva Alves", opsCode: "ops21", displayName: "Zélia Silva", quantity: 0 },
+            { operator: "Ana Rosa Lima", opsCode: "ops23", displayName: "Ana Rosa", quantity: 2 },
+            { operator: "João de Souza Lima", opsCode: "ops20", displayName: "João Souza", quantity: 2 },
+            { operator: "Pedro da Costa Santos", opsCode: "ops123", displayName: "Pedro Costa", quantity: 15 },
+        ],
+        pending: [{ operator: "Bruno Rodrigues Lima", quantity: 3 }],
+    });
 });
 
 test("soma o nome abreviado da cópia em texto com o único nome correspondente do relatório", () => {
@@ -106,57 +108,61 @@ test("soma o nome abreviado da cópia em texto com o único nome correspondente 
     const history = parseEmployeeRankingClipboard({ text });
     const operators = [
         { receiver: "[ops123] MARIANE RAMOS DE OLIVEIRA", packagesReceived: 1949,
-            labeler: "Pedro da Costa Santos", errorQuantity: 5 },
+            labeler: "[ops124] Pedro da Costa Santos", errorQuantity: 5 },
     ];
-    assert.deepEqual(buildEmployeeReceiptRanking(operators, history.receipt), [
+    assert.deepEqual(buildEmployeeReceiptRanking(operators, history.receipt).ranking, [
         { operator: "MARIANE RAMOS DE OLIVEIRA", opsCode: "ops123", displayName: "Mariane Ramos", quantity: 3898 },
     ]);
-    assert.deepEqual(buildEmployeeLabelingErrorRanking(operators, history.labelingErrors), [
-        { operator: "Pedro da Costa Santos", displayName: "Pedro Costa", quantity: 15 },
+    assert.deepEqual(buildEmployeeLabelingErrorRanking(operators, history.labelingErrors).ranking, [
+        { operator: "Pedro da Costa Santos", opsCode: "ops124", displayName: "Pedro Costa", quantity: 15 },
     ]);
-    const ranking = buildEmployeeExpeditionRanking([
-        { operator: "Elizangela Aparecida do Brasil", routesChecked: 1, totalDurationSeconds: 240, routesWithDuration: 1 },
+    const { ranking } = buildEmployeeExpeditionRanking([
+        { operator: "[ops125] Elizangela Aparecida do Brasil", routesChecked: 1 },
     ], history.expedition);
     assert.deepEqual(ranking, [{
-        operator: "Elizangela Aparecida do Brasil", displayName: "Elizangela Aparecida",
-        routesChecked: 4, totalDurationSeconds: 600, routesWithDuration: 4, averageDurationSeconds: 150,
+        operator: "Elizangela Aparecida do Brasil", opsCode: "ops125", displayName: "Elizangela Aparecida", quantity: 4,
     }]);
 });
 
-test("preserva homônimos e mantém separadas as linhas abreviadas sem correspondência única", () => {
-    const current = [{ receiver: "Karina Santos de Lima", packagesReceived: 100 }];
+test("preserva homônimos e deixa linhas abreviadas ambíguas fora da soma", () => {
+    const current = [{ receiver: "[ops30] Karina Santos de Lima", packagesReceived: 100 }];
     const historical = [
         { operator: "Karina Santos", quantity: 40 },
         { operator: "Karina Santos", quantity: 30 },
     ];
-    assert.deepEqual(buildEmployeeReceiptRanking(current, historical), [
-        { operator: "Karina Santos de Lima", displayName: "Karina Santos", quantity: 100 },
-        { operator: "Karina Santos", displayName: "Karina Santos", quantity: 40, nameStatus: "ambiguous" },
-        { operator: "Karina Santos", displayName: "Karina Santos", quantity: 30, nameStatus: "ambiguous" },
-    ]);
+    assert.deepEqual(buildEmployeeReceiptRanking(current, historical), {
+        ranking: [{ operator: "Karina Santos de Lima", opsCode: "ops30", displayName: "Karina Santos", quantity: 100 }],
+        pending: historical,
+    });
 
-    const homonyms = [...current, { receiver: "Karina Santos da Costa", packagesReceived: 10 }];
-    assert.equal(buildEmployeeReceiptRanking(homonyms, [historical[0]])[1].nameStatus, "ambiguous");
-    assert.deepEqual(buildEmployeeReceiptRanking(homonyms, [
+    const homonyms = [...current, { receiver: "[ops31] Karina Santos da Costa", packagesReceived: 10 }];
+    assert.deepEqual(buildEmployeeReceiptRanking(homonyms, [historical[0]]).pending, [historical[0]]);
+    const { ranking, pending } = buildEmployeeReceiptRanking(homonyms, [
         { operator: "Karina Santos de Lima", quantity: 40, fullNameConfirmed: true },
         { operator: "Karina Santos da Costa", quantity: 30, fullNameConfirmed: true },
         { operator: "Karina Santos", quantity: 4, fullNameConfirmed: true },
-    ]).map(entry => [entry.operator, entry.quantity, entry.nameStatus]), [
-        ["Karina Santos de Lima", 140, undefined],
-        ["Karina Santos da Costa", 40, undefined],
-        ["Karina Santos", 4, undefined],
     ]);
+    assert.deepEqual(ranking.map(entry => [entry.opsCode, entry.quantity]), [
+        ["ops30", 140],
+        ["ops31", 40],
+    ]);
+    assert.deepEqual(pending, [{ operator: "Karina Santos", quantity: 4 }]);
 });
 
-test("mantém um colaborador abreviado no histórico até que o relatório forneça o nome completo", () => {
+test("mantém um colaborador do histórico pendente até identificar seu OPS", () => {
     const historical = [{ operator: "João Souza", quantity: 20 }];
-    assert.deepEqual(buildEmployeeReceiptRanking([], historical), [
-        { operator: "João Souza", displayName: "João Souza", quantity: 20, nameStatus: "abbreviated" },
-    ]);
-    assert.deepEqual(buildEmployeeReceiptRanking([
+    assert.deepEqual(buildEmployeeReceiptRanking([], historical), { ranking: [], pending: historical });
+    const uncoded = buildEmployeeReceiptRanking([
         { receiver: "João de Souza Assis", packagesReceived: 15 },
-    ], historical), [
-        { operator: "João de Souza Assis", displayName: "João Souza", quantity: 35 },
+    ], historical);
+    assert.deepEqual(uncoded, {
+        ranking: [],
+        pending: [{ operator: "João de Souza Assis", quantity: 15 }, ...historical],
+    });
+    assert.deepEqual(buildEmployeeReceiptRanking([
+        { receiver: "[ops32] João de Souza Assis", packagesReceived: 15 },
+    ], historical).ranking, [
+        { operator: "João de Souza Assis", opsCode: "ops32", displayName: "João Souza", quantity: 35 },
     ]);
 });
 
@@ -166,15 +172,15 @@ test("OPS iguais acumulam mesmo com grafias diferentes e OPS diferentes mantêm 
         { operator: "[ops105] Cayo Bispo", routesChecked: 1, totalDurationSeconds: 240, routesWithDuration: 1 },
     ];
     const history = [{ operator: "Cayo", opsCode: "ops114012", routesChecked: 1, totalDurationSeconds: 240, routesWithDuration: 1 }];
-    assert.deepEqual(buildEmployeeExpeditionRanking(current, history).map(entry =>
-        [entry.opsCode, entry.displayName, entry.routesChecked, entry.averageDurationSeconds]), [
-        ["ops114012", "Cayo Bispo", 4, 210],
-        ["ops105", "Cayo Bispo", 1, 240],
+    assert.deepEqual(buildEmployeeExpeditionRanking(current, history).ranking.map(entry =>
+        [entry.opsCode, entry.displayName, entry.quantity]), [
+        ["ops114012", "Cayo Bispo", 4],
+        ["ops105", "Cayo Bispo", 1],
     ]);
 
     const receipt = current.map(({ operator }) => ({ receiver: operator, packagesReceived: 10 }));
     assert.deepEqual(buildEmployeeReceiptRanking(receipt, [{ operator: "Cayo", opsCode: "ops114012", quantity: 5 }])
-        .map(entry => [entry.opsCode, entry.quantity]), [["ops114012", 15], ["ops105", 10]]);
+        .ranking.map(entry => [entry.opsCode, entry.quantity]), [["ops114012", 15], ["ops105", 10]]);
 });
 
 test("usa a lista de OPS para identificar um nome abreviado e sinaliza quando a lista contém homônimos", () => {
@@ -182,10 +188,11 @@ test("usa a lista de OPS para identificar um nome abreviado e sinaliza quando a 
     const history = [{ operator: "Cayo Bispo", quantity: 5 }];
     const person = { opsCode: "ops114012", operator: "Cayo Bispo Oliveira" };
     const other = { opsCode: "ops105", operator: "Cayo Bispo Santos" };
-    assert.deepEqual(buildEmployeeReceiptRanking(current, history, [person]).map(entry => [entry.opsCode, entry.quantity]),
+    assert.deepEqual(buildEmployeeReceiptRanking(current, history, [person]).ranking.map(entry => [entry.opsCode, entry.quantity]),
         [["ops114012", 15]]);
-    assert.deepEqual(buildEmployeeReceiptRanking(current, history, [person, other]).map(entry => [entry.opsCode, entry.quantity, entry.nameStatus]),
-        [["ops114012", 10, undefined], [undefined, 5, "ambiguous"]]);
+    const { ranking, pending } = buildEmployeeReceiptRanking(current, history, [person, other]);
+    assert.deepEqual(ranking.map(entry => [entry.opsCode, entry.quantity]), [["ops114012", 10]]);
+    assert.deepEqual(pending, history);
 });
 
 test("atribui o OPS do etiquetador pelo nome completo cadastrado", () => {
@@ -193,5 +200,20 @@ test("atribui o OPS do etiquetador pelo nome completo cadastrado", () => {
     const directory = [{ opsCode: "ops222", operator: "Pedro da Costa Santos" }];
     assert.deepEqual(buildEmployeeLabelingErrorRanking(operators, [
         { operator: "Pedro Costa", opsCode: "ops222", quantity: 10 },
-    ], directory).map(entry => [entry.opsCode, entry.quantity]), [["ops222", 15]]);
+    ], directory).ranking.map(entry => [entry.opsCode, entry.quantity]), [["ops222", 15]]);
+});
+
+test("deixa rotas de nomes completos iguais pendentes até identificar o OPS de cada registro", () => {
+    const current = [{ operator: "Cayo Bispo Silva", routesChecked: 3 }];
+    const historical = [{ operator: "Cayo Bispo Silva", routesChecked: 7, fullNameConfirmed: true }];
+    const pending = [{ operator: "Cayo Bispo Silva", quantity: 3 }, { operator: "Cayo Bispo Silva", quantity: 7 }];
+    assert.deepEqual(buildEmployeeExpeditionRanking(current, historical), { ranking: [], pending });
+
+    const person = { operator: "Cayo Bispo Silva", opsCode: "ops114012" };
+    assert.deepEqual(buildEmployeeExpeditionRanking(current, historical, [person]), {
+        ranking: [{ ...person, displayName: "Cayo Bispo", quantity: 10 }],
+        pending: [],
+    });
+    assert.deepEqual(buildEmployeeExpeditionRanking(current, historical, [person, { ...person, opsCode: "ops105" }]),
+        { ranking: [], pending });
 });

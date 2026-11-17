@@ -241,11 +241,7 @@ const sessionReportValidators = {
     "overall-analysis": ["do Ranking de Colaboradores", state => {
         const { employeeRanking, processingRanking, operatorDirectory } = state;
         const validExpedition = employeeRanking === undefined || (isSessionObjectList(employeeRanking) && employeeRanking.every(row =>
-            validRankingIdentity(row) &&
-            Number.isSafeInteger(row.routesChecked) && row.routesChecked >= 0 &&
-            Number.isSafeInteger(row.routesWithDuration) && row.routesWithDuration >= 0 &&
-            row.routesWithDuration <= row.routesChecked &&
-            Number.isFinite(row.totalDurationSeconds) && row.totalDurationSeconds >= 0));
+            validRankingIdentity(row) && Number.isSafeInteger(row.routesChecked) && row.routesChecked >= 0));
         const validDirectory = operatorDirectory === undefined || (isSessionObjectList(operatorDirectory) &&
             operatorDirectory.every(row => validRankingIdentity(row) && validOpsCode(row.opsCode)));
         return validExpedition && validDirectory && (processingRanking === undefined || (isSessionObject(processingRanking) &&
