@@ -1,9 +1,10 @@
 const fieldsBySection = {
-    receipt: ["operator", "fullNameConfirmed", "quantity"],
-    labelingErrors: ["operator", "fullNameConfirmed", "quantity"],
-    expedition: ["operator", "fullNameConfirmed", "routesChecked", "totalDurationSeconds", "routesWithDuration"],
+    receipt: ["operator", "opsCode", "fullNameConfirmed", "quantity"],
+    labelingErrors: ["operator", "opsCode", "fullNameConfirmed", "quantity"],
+    expedition: ["operator", "opsCode", "fullNameConfirmed", "routesChecked", "totalDurationSeconds", "routesWithDuration"],
+    operatorDirectory: ["operator", "opsCode"],
 };
-let history = { receipt: [], labelingErrors: [], expedition: [] };
+let history = { receipt: [], labelingErrors: [], expedition: [], operatorDirectory: [] };
 const historyListeners = new Set();
 
 function getEmployeeRankingHistory() {

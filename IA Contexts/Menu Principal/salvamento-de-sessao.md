@@ -14,7 +14,7 @@ As bases importadas em [Análises](../Painel%20An%C3%A1lises/README.md) e [Filtr
 
 O [Ranking Mensal de Colaboradores](../Painel%20Relat%C3%B3rios/ranking-de-colaboradores.md) grava o acumulado de Recebimento, Erros de Etiquetagem e Expedição na parte `overall-analysis` quando ele muda ou é descartado. Os registros anteriores de Expedição continuam disponíveis em `employeeRanking` e o acumulado de Processamento fica em `processingRanking`. A prévia recupera os dados atuais das partes de Processamento e Expedição e os recortes mensais da parte de Avarias e Perdas.
 
-O campo opcional `fullNameConfirmed` registra quando o nome completo foi recuperado da fórmula da célula ou da coluna R do formato anterior. A sessão conserva essa informação para distinguir uma abreviação de um nome completo com duas partes.
+As linhas do acumulado guardam `opsCode` quando ele está disponível. O campo opcional `fullNameConfirmed` registra quando o nome completo foi recuperado da fórmula da célula ou da coluna R do formato anterior. A lista R:S importada fica em `operatorDirectory` para ajudar a identificar linhas sem o código na célula. As sessões anteriores continuam legíveis com esses campos ausentes.
 
 ## Arquivo de sessão
 

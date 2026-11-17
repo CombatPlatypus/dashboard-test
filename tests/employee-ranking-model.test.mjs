@@ -70,7 +70,7 @@ test("Recebimento soma por nome completo e inclui todos os recebedores importado
     ];
 
     assert.deepEqual(buildEmployeeReceiptRanking(current, historical), [
-        { operator: "MARIA DA SILVA NUNES", displayName: "Maria Silva", quantity: 1800 },
+        { operator: "MARIA DA SILVA NUNES", opsCode: "ops123", displayName: "Maria Silva", quantity: 1800 },
         { operator: "José de Oliveira Santos", displayName: "José Oliveira", quantity: 300 },
         { operator: "Maria da Silva Reis", displayName: "Maria Silva", quantity: 200 },
     ]);
@@ -93,7 +93,7 @@ test("Erros de Etiquetagem somam por etiquetador e recorrem ao recebedor quando 
         { operator: "Zélia da Silva Alves", displayName: "Zélia Silva", quantity: 0 },
         { operator: "Ana Rosa Lima", displayName: "Ana Rosa", quantity: 2 },
         { operator: "João de Souza Lima", displayName: "João Souza", quantity: 2 },
-        { operator: "Pedro da Costa Santos", displayName: "Pedro Costa", quantity: 15 },
+        { operator: "Pedro da Costa Santos", opsCode: "ops123", displayName: "Pedro Costa", quantity: 15 },
     ]);
 });
 
@@ -109,7 +109,7 @@ test("soma o nome abreviado da cópia em texto com o único nome correspondente 
             labeler: "Pedro da Costa Santos", errorQuantity: 5 },
     ];
     assert.deepEqual(buildEmployeeReceiptRanking(operators, history.receipt), [
-        { operator: "MARIANE RAMOS DE OLIVEIRA", displayName: "Mariane Ramos", quantity: 3898 },
+        { operator: "MARIANE RAMOS DE OLIVEIRA", opsCode: "ops123", displayName: "Mariane Ramos", quantity: 3898 },
     ]);
     assert.deepEqual(buildEmployeeLabelingErrorRanking(operators, history.labelingErrors), [
         { operator: "Pedro da Costa Santos", displayName: "Pedro Costa", quantity: 15 },
@@ -158,4 +158,40 @@ test("mantém um colaborador abreviado no histórico até que o relatório forne
     ], historical), [
         { operator: "João de Souza Assis", displayName: "João Souza", quantity: 35 },
     ]);
+});
+
+test("OPS iguais acumulam mesmo com grafias diferentes e OPS diferentes mantêm homônimos separados", () => {
+    const current = [
+        { operator: "[OPS114012] Cayo Bispo", routesChecked: 3, totalDurationSeconds: 600, routesWithDuration: 3 },
+        { operator: "[ops105] Cayo Bispo", routesChecked: 1, totalDurationSeconds: 240, routesWithDuration: 1 },
+    ];
+    const history = [{ operator: "Cayo", opsCode: "ops114012", routesChecked: 1, totalDurationSeconds: 240, routesWithDuration: 1 }];
+    assert.deepEqual(buildEmployeeExpeditionRanking(current, history).map(entry =>
+        [entry.opsCode, entry.displayName, entry.routesChecked, entry.averageDurationSeconds]), [
+        ["ops114012", "Cayo Bispo", 4, 210],
+        ["ops105", "Cayo Bispo", 1, 240],
+    ]);
+
+    const receipt = current.map(({ operator }) => ({ receiver: operator, packagesReceived: 10 }));
+    assert.deepEqual(buildEmployeeReceiptRanking(receipt, [{ operator: "Cayo", opsCode: "ops114012", quantity: 5 }])
+        .map(entry => [entry.opsCode, entry.quantity]), [["ops114012", 15], ["ops105", 10]]);
+});
+
+test("usa a lista de OPS para identificar um nome abreviado e sinaliza quando a lista contém homônimos", () => {
+    const current = [{ receiver: "[ops114012] Cayo Bispo Silva", packagesReceived: 10 }];
+    const history = [{ operator: "Cayo Bispo", quantity: 5 }];
+    const person = { opsCode: "ops114012", operator: "Cayo Bispo Oliveira" };
+    const other = { opsCode: "ops105", operator: "Cayo Bispo Santos" };
+    assert.deepEqual(buildEmployeeReceiptRanking(current, history, [person]).map(entry => [entry.opsCode, entry.quantity]),
+        [["ops114012", 15]]);
+    assert.deepEqual(buildEmployeeReceiptRanking(current, history, [person, other]).map(entry => [entry.opsCode, entry.quantity, entry.nameStatus]),
+        [["ops114012", 10, undefined], [undefined, 5, "ambiguous"]]);
+});
+
+test("atribui o OPS do etiquetador pelo nome completo cadastrado", () => {
+    const operators = [{ receiver: "[ops111] Ana Rocha Silva", labeler: "Pedro da Costa Santos", errorQuantity: 5 }];
+    const directory = [{ opsCode: "ops222", operator: "Pedro da Costa Santos" }];
+    assert.deepEqual(buildEmployeeLabelingErrorRanking(operators, [
+        { operator: "Pedro Costa", opsCode: "ops222", quantity: 10 },
+    ], directory).map(entry => [entry.opsCode, entry.quantity]), [["ops222", 15]]);
 });

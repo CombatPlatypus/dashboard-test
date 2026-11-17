@@ -117,17 +117,18 @@ function initializeEmployeeRankingController(root) {
         renderRankingRows(body, ranking, formatStats);
     }
 
-    function renderOperationalRankings({ receipt, labelingErrors, expedition, announce }) {
+    function renderOperationalRankings({ receipt, labelingErrors, expedition, operatorDirectory, announce }) {
         const history = getEmployeeRankingHistory();
-        if (receipt) {
-            updateRanking("receiptRanking", receiptBody, buildEmployeeReceiptRanking(receiptOperators, history.receipt));
+        if (receipt || operatorDirectory) {
+            updateRanking("receiptRanking", receiptBody,
+                buildEmployeeReceiptRanking(receiptOperators, history.receipt, history.operatorDirectory));
         }
-        if (labelingErrors) {
+        if (labelingErrors || operatorDirectory) {
             updateRanking("labelingErrorsRanking", labelingErrorsBody,
-                buildEmployeeLabelingErrorRanking(receiptOperators, history.labelingErrors));
+                buildEmployeeLabelingErrorRanking(receiptOperators, history.labelingErrors, history.operatorDirectory));
         }
-        if (expedition) {
-            const ranking = buildEmployeeExpeditionRanking(expeditionOperators, history.expedition);
+        if (expedition || operatorDirectory) {
+            const ranking = buildEmployeeExpeditionRanking(expeditionOperators, history.expedition, history.operatorDirectory);
             updateRanking("expeditionRanking", expeditionBody, ranking, entry =>
                 `${numberFormat.format(entry.routesChecked)} / ${formatEmployeeRankingDuration(entry.averageDurationSeconds)}`,
             );
@@ -168,13 +169,16 @@ function initializeEmployeeRankingController(root) {
     function notifyCurrentRanking() {
         if (notifyAmbiguousNames()) return;
 
+        const { operatorDirectory, ...accumulated } = getEmployeeRankingHistory();
         const sources = [];
         if (receiptOperators.length) sources.push("Processamento");
         if (expeditionOperators.length) sources.push("Expedição");
         if (sources.length) {
             notify("info", `Ranking atualizado com os dados de ${sources.join(" e ")}.`);
-        } else if (hasRankingRows(getEmployeeRankingHistory())) {
+        } else if (hasRankingRows(accumulated)) {
             notify("info", "Ranking mostra o acumulado importado da planilha.");
+        } else if (operatorDirectory.length) {
+            notify("info", "Lista de códigos OPS importada.");
         } else {
             notify("info", getMonthlyRankingMessage() || emptyRankingMessage);
         }
@@ -183,7 +187,7 @@ function initializeEmployeeRankingController(root) {
     function notifyAmbiguousNames() {
         if (!Object.values(rankings).some(ranking => ranking.some(entry => entry.nameStatus === "ambiguous"))) return false;
 
-        notify("warning", "Há abreviações que podem identificar pessoas diferentes. Use os nomes completos nessas linhas e importe a planilha novamente.");
+        notify("warning", "Há nomes iguais sem código OPS. Copie as células com a fórmula do OPS ou inclua o código junto do nome e importe novamente.");
         return true;
     }
 
@@ -227,11 +231,14 @@ function initializeEmployeeRankingController(root) {
 
     copyButton.addEventListener("click", () => runAction(copyButton, async () => {
         try {
-            await writeSummaryClipboard(createEmployeeRankingClipboard(rankings, clipboardRowCount));
+            const { operatorDirectory } = getEmployeeRankingHistory();
+            const clipboard = createEmployeeRankingClipboard({ ...rankings, operatorDirectory }, clipboardRowCount);
+            await writeSummaryClipboard(clipboard);
+            clipboardRowCount = clipboard.rowCount;
         } catch {
             throw new Error("Não foi possível copiar o ranking com formatação. Verifique a permissão da área de transferência.");
         }
-        notify("success", "Ranking copiado. Use Ctrl+V na célula B2 da aba Ranking de Colaboradores.");
+        notify("success", "Ranking copiado. Cole em B2. A lista de OPS fica em R:S.");
     }));
 
     bindReportImageExportButton(imageButton, {
@@ -250,8 +257,11 @@ function initializeEmployeeRankingController(root) {
         replaceEmployeeRankingHistory({ ...getEmployeeRankingHistory(), ...history });
         if (notifyAmbiguousNames()) return;
 
-        if (hasRankingRows(history)) {
+        const { operatorDirectory, ...accumulated } = history;
+        if (hasRankingRows(accumulated)) {
             notify("success", "Acumulado anterior do ranking importado.");
+        } else if (operatorDirectory?.length) {
+            notify("success", "Lista de códigos OPS importada.");
         } else {
             notify("info", "A seleção copiada está sem registros acumulados.");
         }

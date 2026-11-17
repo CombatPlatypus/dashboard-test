@@ -127,9 +127,10 @@ function populateMissingReports() {
             operator: "Ana Rosa Silva", routesChecked: 10, routesWithDuration: 8, totalDurationSeconds: 2400,
         }],
         processingRanking: {
-            receipt: [{ operator: "Ana Rosa", fullNameConfirmed: true, quantity: 160 }],
+            receipt: [{ operator: "Ana Rosa", fullNameConfirmed: true, opsCode: "ops28", quantity: 160 }],
             labelingErrors: [{ operator: "João de Souza Lima", quantity: 3 }],
         },
+        operatorDirectory: [{ opsCode: "ops28", operator: "Ana Rosa" }],
     };
     reportManager.importSession(payload.reports);
     restoreReportContext(payload.context);
@@ -287,6 +288,7 @@ test("valida dados adicionais antes de alterar os relatórios da sessão", t => 
         ["overall-analysis", { processingRanking: {
             receipt: [{ operator: "Ana Rosa", fullNameConfirmed: "sim", quantity: 160 }], labelingErrors: [],
         } }, /Ranking de Colaboradores/],
+        ["overall-analysis", { operatorDirectory: [{ opsCode: "incorreto", operator: "Ana Rosa" }] }, /Ranking de Colaboradores/],
     ]) {
         const invalid = structuredClone(original);
         invalid.reports[id] = report;

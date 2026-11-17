@@ -204,7 +204,10 @@ try {
     await page.waitForFunction(() => window.rankingClipboard.text.startsWith("RANKING MENSAL DE DESEMPENHO\t"));
     const copied = await page.evaluate(() => window.rankingClipboard.text.split("\n").map(row => row.split("\t")));
     assert.equal(copied.length, 158);
-    assert.ok(copied.every(row => row.length === 15));
+    assert.ok(copied.every(row => row.length === 18));
+    assert.deepEqual(copied[3].slice(16), ["Base de Colaboradores", ""]);
+    assert.deepEqual(copied[4].slice(16), ["Código Ops", "Nome do Colaborador"]);
+    assert.deepEqual(copied[5].slice(16), ["ops123", "Maria da Silva Santos"]);
     assert.deepEqual(copied[5].slice(9, 12), ["Maria Silva", "14", "00:05:30"]);
     assert.deepEqual(copied[6].slice(9, 12), ["Maria Silva", "9", "00:03:00"]);
     assert.match(await page.locator("#employeeRankingNotificationText").textContent(), /B2/);
@@ -222,8 +225,8 @@ try {
         };
     });
     assert.deepEqual(copiedFormat, {
-        titleSpan: [15, 2],
-        formula: '="Maria Silva"&T(N("Nome completo do conferente: Maria da Silva Santos"))',
+        titleSpan: [18, 2],
+        formula: '="Maria Silva"&T(N("Nome e id do conferente: [ops123] Maria da Silva Santos"))',
         centerAligned: true, values: ["Maria Silva", "14", "00:05:30"],
     });
 
@@ -240,8 +243,8 @@ try {
         }
         return parseEmployeeRankingClipboard({ ...clipboard, html: table.outerHTML }).expedition.slice(0, 2);
     });
-    assert.deepEqual(operatorsFromCopy.map(entry => [entry.operator, entry.routesChecked]), [
-        ["Maria da Silva Santos", 14], ["Maria da Silva Rodrigues", 9],
+    assert.deepEqual(operatorsFromCopy.map(entry => [entry.operator, entry.opsCode, entry.routesChecked]), [
+        ["Maria da Silva Santos", "ops123", 14], ["Maria da Silva Rodrigues", undefined, 9],
     ]);
 
     await page.reload();

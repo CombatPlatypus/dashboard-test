@@ -203,7 +203,9 @@ function createReportSessionPayload({ includeAllReports = false } = {}) {
 const validOccurrenceDays = state => isSessionObject(state) && isSessionObjectList(state.days) &&
     (state.history === undefined || isSessionObjectList(state.history));
 
+const validOpsCode = value => typeof value === "string" && /^ops\d+$/i.test(value);
 const validRankingIdentity = row => typeof row.operator === "string" && row.operator.trim() !== "" &&
+    (row.opsCode === undefined || validOpsCode(row.opsCode)) &&
     (row.fullNameConfirmed === undefined || typeof row.fullNameConfirmed === "boolean");
 
 const validRankingCounts = rows => isSessionObjectList(rows) && rows.every(row => validRankingIdentity(row) &&
@@ -237,14 +239,16 @@ const sessionReportValidators = {
             .every(codes => Array.isArray(codes) && codes.every(code => typeof code === "string")));
     })],
     "overall-analysis": ["do Ranking de Colaboradores", state => {
-        const { employeeRanking, processingRanking } = state;
+        const { employeeRanking, processingRanking, operatorDirectory } = state;
         const validExpedition = employeeRanking === undefined || (isSessionObjectList(employeeRanking) && employeeRanking.every(row =>
             validRankingIdentity(row) &&
             Number.isSafeInteger(row.routesChecked) && row.routesChecked >= 0 &&
             Number.isSafeInteger(row.routesWithDuration) && row.routesWithDuration >= 0 &&
             row.routesWithDuration <= row.routesChecked &&
             Number.isFinite(row.totalDurationSeconds) && row.totalDurationSeconds >= 0));
-        return validExpedition && (processingRanking === undefined || (isSessionObject(processingRanking) &&
+        const validDirectory = operatorDirectory === undefined || (isSessionObjectList(operatorDirectory) &&
+            operatorDirectory.every(row => validRankingIdentity(row) && validOpsCode(row.opsCode)));
+        return validExpedition && validDirectory && (processingRanking === undefined || (isSessionObject(processingRanking) &&
             validRankingCounts(processingRanking.receipt) && validRankingCounts(processingRanking.labelingErrors)));
     }],
 };

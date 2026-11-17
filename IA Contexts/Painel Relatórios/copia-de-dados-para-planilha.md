@@ -26,11 +26,13 @@ No [Ranking Mensal de Colaboradores](ranking-de-colaboradores.md), cole o bloco 
 
 Recebimento ocupa B:C, Erros de Etiquetagem ocupa E:F e Avarias Recebidas ocupa H:I. As colunas K, L e M recebem o nome abreviado da prévia, o total de rotas e o tempo médio como `hh:mm:ss`. Pacotes OFF ocupa O:P. Os blocos levam os nomes abreviados e a ordem exibida na prévia.
 
+No novo modelo, a cópia termina em S e o título ocupa a mesclagem B2:S3. **Base de Colaboradores** ocupa a mesclagem R5:S5. Os cabeçalhos **Código Ops** e **Nome do Colaborador** ficam em R6 e S6, e os registros começam em R7:S7. Cada OPS aparece uma vez. As colunas R:S podem ficar ocultas na aba. Para reimportar, copie uma seleção que inclua R:S.
+
 Os títulos de Avarias Recebidas (H5:I5) e Pacotes OFF (O5:P5) são mesclados. A cópia define as bordas superior, inferior e esquerda nas células iniciais H5 e O5 e limpa a borda direita dessas células, seguindo o modelo na junção entre as colunas.
 
-O bloco tem pelo menos 150 linhas de dados. Se o ranking já exibiu mais linhas na aba do navegador, a cópia inclui vazios até esse tamanho para sobrescrever a colagem anterior. Use a colagem normal em B2 para preservar as fórmulas dos nomes. Depois, copie a aba com `Ctrl+C` para reimportar o acumulado de Recebimento, Erros de Etiquetagem e Expedição com os nomes completos. [Cópia do ranking](../../js/reports/employee-ranking/clipboard.js)
+O bloco tem pelo menos 150 linhas de dados. Se as tabelas ou a lista de OPS já ocuparam mais linhas na aba do navegador, a cópia inclui vazios até esse tamanho para sobrescrever a colagem anterior. A colagem normal em B2 preserva a fórmula `="Cayo"&T(N("Nome e id do conferente: [ops114012] Cayo"))`. A célula mostra `Cayo` e a fórmula conserva o OPS junto do nome do colaborador. [Cópia do ranking](../../js/reports/employee-ranking/clipboard.js)
 
-Uma linha do acumulado cujo nome completo ainda precisa ser identificado é exportada com o nome exibido em texto. Assim, uma próxima importação pode resolver a abreviação com os nomes completos dos relatórios.
+Uma linha do acumulado cujo nome ainda precisa ser identificado é exportada em texto. Assim, uma próxima importação pode resolver a abreviação com os nomes completos dos relatórios e a lista de OPS.
 
 ## Listas de pacotes da Reversa
 

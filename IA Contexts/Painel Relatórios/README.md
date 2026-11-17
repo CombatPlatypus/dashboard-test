@@ -130,4 +130,4 @@ Verifique indicadores e critérios de exportação em [overall-analysis-cards.te
 
 ### Ranking Mensal de Colaboradores
 
-A subaba [Ranking Mensal de Colaboradores](ranking-de-colaboradores.md) apresenta cinco blocos. Recebimento, Erros de Etiquetagem e Expedição combinam os dados atuais com o acumulado importado do Resumo da Operação. Avarias Recebidas e Pacotes OFF usam os históricos da planilha de Avarias e Perdas e exibem os colaboradores em ordem crescente de ocorrências.
+A subaba [Ranking Mensal de Colaboradores](ranking-de-colaboradores.md) apresenta cinco blocos. Recebimento, Erros de Etiquetagem e Expedição combinam os dados atuais com o acumulado importado do Resumo da Operação pelo OPS quando disponível. Avarias Recebidas e Pacotes OFF usam os históricos da planilha de Avarias e Perdas e exibem os colaboradores em ordem crescente de ocorrências.
