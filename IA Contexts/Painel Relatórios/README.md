@@ -58,7 +58,7 @@ Os ouvintes usam o tipo da alteração para decidir se atualizam progresso, rank
 
 Verifique o botão de importação nas quatro abas em [expedition-import-tabs.test.mjs](../../tests/expedition-import-tabs.test.mjs), o progresso por status em [expedition-progress.test.mjs](../../tests/expedition-progress.test.mjs) e o volume de retirados em [expedition-withdrawn.test.mjs](../../tests/expedition-withdrawn.test.mjs).
 
-O ranking de conferentes fornece as rotas e durações ao [Ranking Mensal de Colaboradores](ranking-de-colaboradores.md). Os filtros da tabela de Expedição são locais.
+O ranking de conferentes fornece a quantidade de rotas validadas ao [Ranking Mensal de Colaboradores](ranking-de-colaboradores.md). Os filtros da tabela de Expedição são locais.
 
 ## Planejamento
 
@@ -130,4 +130,4 @@ Verifique indicadores e critérios de exportação em [overall-analysis-cards.te
 
 ### Ranking Mensal de Colaboradores
 
-A subaba [Ranking Mensal de Colaboradores](ranking-de-colaboradores.md) apresenta cinco blocos. Recebimento, Erros de Etiquetagem e Expedição combinam os dados atuais com o acumulado importado do Resumo da Operação pelo OPS quando disponível. Avarias Recebidas e Pacotes OFF usam os históricos da planilha de Avarias e Perdas e exibem os colaboradores em ordem crescente de ocorrências.
+A subaba [Ranking Mensal de Colaboradores](ranking-de-colaboradores.md) apresenta cinco blocos. Recebimento, Erros de Etiquetagem e Rotas Conferidas combinam os dados atuais com o acumulado do Resumo da Operação somente por OPS identificado. Avarias Recebidas e Pacotes OFF usam os históricos da planilha de Avarias e Perdas e exibem os colaboradores em ordem crescente de ocorrências.
