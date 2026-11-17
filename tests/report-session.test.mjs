@@ -127,7 +127,7 @@ function populateMissingReports() {
             operator: "Ana Rosa Silva", routesChecked: 10, routesWithDuration: 8, totalDurationSeconds: 2400,
         }],
         processingRanking: {
-            receipt: [{ operator: "Ana Rosa Silva", quantity: 160 }],
+            receipt: [{ operator: "Ana Rosa", fullNameConfirmed: true, quantity: 160 }],
             labelingErrors: [{ operator: "João de Souza Lima", quantity: 3 }],
         },
     };
@@ -283,6 +283,9 @@ test("valida dados adicionais antes de alterar os relatórios da sessão", t => 
             routesWithDuration: 3, totalDurationSeconds: 900 }] }, /Ranking de Colaboradores/],
         ["overall-analysis", { processingRanking: {
             receipt: [{ operator: "Ana Rosa Silva", quantity: -1 }], labelingErrors: [],
+        } }, /Ranking de Colaboradores/],
+        ["overall-analysis", { processingRanking: {
+            receipt: [{ operator: "Ana Rosa", fullNameConfirmed: "sim", quantity: 160 }], labelingErrors: [],
         } }, /Ranking de Colaboradores/],
     ]) {
         const invalid = structuredClone(original);

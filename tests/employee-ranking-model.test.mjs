@@ -8,6 +8,7 @@ import {
     formatEmployeeRankingDuration,
 } from "../js/reports/employee-ranking/model.js";
 import { getExpeditionOperatorRanking } from "../js/reports/expedition/state.js";
+import { parseEmployeeRankingClipboard } from "../js/reports/employee-ranking/clipboard.js";
 
 test("mescla pelo nome completo e exibe os dois primeiros nomes sem preposições", () => {
     const current = getExpeditionOperatorRanking({
@@ -93,5 +94,68 @@ test("Erros de Etiquetagem somam por etiquetador e recorrem ao recebedor quando 
         { operator: "Ana Rosa Lima", displayName: "Ana Rosa", quantity: 2 },
         { operator: "João de Souza Lima", displayName: "João Souza", quantity: 2 },
         { operator: "Pedro da Costa Santos", displayName: "Pedro Costa", quantity: 15 },
+    ]);
+});
+
+test("soma o nome abreviado da cópia em texto com o único nome correspondente do relatório", () => {
+    const text = [
+        "Recebimento\t\t\tErros de Etiquetagem\t\t\tAvarias Recebidas\t\t\tRotas Conferidas e Tempo Médio\t\t",
+        "Colaborador\tQuantidade\t\tColaborador\tQuantidade\t\tColaborador\tQuantidade\t\tColaborador\tQuantidade\tTempo",
+        "Mariane Ramos\t1.949\t\tPedro Costa\t10\t\t\t\t\tElizangela Aparecida\t3\t02:00",
+    ].join("\n");
+    const history = parseEmployeeRankingClipboard({ text });
+    const operators = [
+        { receiver: "[ops123] MARIANE RAMOS DE OLIVEIRA", packagesReceived: 1949,
+            labeler: "Pedro da Costa Santos", errorQuantity: 5 },
+    ];
+    assert.deepEqual(buildEmployeeReceiptRanking(operators, history.receipt), [
+        { operator: "MARIANE RAMOS DE OLIVEIRA", displayName: "Mariane Ramos", quantity: 3898 },
+    ]);
+    assert.deepEqual(buildEmployeeLabelingErrorRanking(operators, history.labelingErrors), [
+        { operator: "Pedro da Costa Santos", displayName: "Pedro Costa", quantity: 15 },
+    ]);
+    const ranking = buildEmployeeExpeditionRanking([
+        { operator: "Elizangela Aparecida do Brasil", routesChecked: 1, totalDurationSeconds: 240, routesWithDuration: 1 },
+    ], history.expedition);
+    assert.deepEqual(ranking, [{
+        operator: "Elizangela Aparecida do Brasil", displayName: "Elizangela Aparecida",
+        routesChecked: 4, totalDurationSeconds: 600, routesWithDuration: 4, averageDurationSeconds: 150,
+    }]);
+});
+
+test("preserva homônimos e mantém separadas as linhas abreviadas sem correspondência única", () => {
+    const current = [{ receiver: "Karina Santos de Lima", packagesReceived: 100 }];
+    const historical = [
+        { operator: "Karina Santos", quantity: 40 },
+        { operator: "Karina Santos", quantity: 30 },
+    ];
+    assert.deepEqual(buildEmployeeReceiptRanking(current, historical), [
+        { operator: "Karina Santos de Lima", displayName: "Karina Santos", quantity: 100 },
+        { operator: "Karina Santos", displayName: "Karina Santos", quantity: 40, nameStatus: "ambiguous" },
+        { operator: "Karina Santos", displayName: "Karina Santos", quantity: 30, nameStatus: "ambiguous" },
+    ]);
+
+    const homonyms = [...current, { receiver: "Karina Santos da Costa", packagesReceived: 10 }];
+    assert.equal(buildEmployeeReceiptRanking(homonyms, [historical[0]])[1].nameStatus, "ambiguous");
+    assert.deepEqual(buildEmployeeReceiptRanking(homonyms, [
+        { operator: "Karina Santos de Lima", quantity: 40, fullNameConfirmed: true },
+        { operator: "Karina Santos da Costa", quantity: 30, fullNameConfirmed: true },
+        { operator: "Karina Santos", quantity: 4, fullNameConfirmed: true },
+    ]).map(entry => [entry.operator, entry.quantity, entry.nameStatus]), [
+        ["Karina Santos de Lima", 140, undefined],
+        ["Karina Santos da Costa", 40, undefined],
+        ["Karina Santos", 4, undefined],
+    ]);
+});
+
+test("mantém um colaborador abreviado no histórico até que o relatório forneça o nome completo", () => {
+    const historical = [{ operator: "João Souza", quantity: 20 }];
+    assert.deepEqual(buildEmployeeReceiptRanking([], historical), [
+        { operator: "João Souza", displayName: "João Souza", quantity: 20, nameStatus: "abbreviated" },
+    ]);
+    assert.deepEqual(buildEmployeeReceiptRanking([
+        { receiver: "João de Souza Assis", packagesReceived: 15 },
+    ], historical), [
+        { operator: "João de Souza Assis", displayName: "João Souza", quantity: 35 },
     ]);
 });

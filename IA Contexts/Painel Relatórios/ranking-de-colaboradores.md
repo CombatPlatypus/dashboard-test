@@ -35,6 +35,8 @@ O mesmo importador lê **Expedição** e **Log** do **Histórico de Retornados**
 - **Imagem** copia o ranking para a área de transferência. Segure o botão para baixar o PNG. A imagem inclui todas as linhas com dados.
 - **Lixeira** descarta o acumulado importado e recalcula o ranking com os dados atuais dos relatórios. Ao limpar Processamento ou Expedição na aba de origem, os blocos correspondentes passam a mostrar o acumulado carregado.
 
+Quando a área de transferência contém apenas o nome abreviado, o [modelo](../../js/reports/employee-ranking/model.js) procura um único nome completo correspondente no mesmo bloco. A soma usa essa identidade quando a abreviação identifica uma única linha do acumulado. Se houver conflito entre nomes ou linhas, o ranking preserva as quantidades separadas e pede os nomes completos.
+
 ## Atualização e sessão
 
 O [controlador](../../js/reports/employee-ranking/controller.js) reaproveita o resumo derivado de Expedição e observa a lista de recebedores de Processamento. Editar o etiquetador ou a quantidade de erros atualiza apenas Erros de Etiquetagem no ranking. O [estado do ranking](../../js/reports/employee-ranking/state.js) guarda o acumulado dos três blocos. O salvamento automático grava a parte do Relatório Final quando essa base muda. [Salvamento de sessão](../Menu%20Principal/salvamento-de-sessao.md)

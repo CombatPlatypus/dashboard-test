@@ -32,19 +32,56 @@ function formatEmployeeRankingDuration(seconds) {
     return `${minutes}:${remainingSeconds}`;
 }
 
+function matchEmployeeRankingEntries(current, imported) {
+    const entries = [...current, ...imported].map((record, index) => {
+        const operator = normalizeEmployeeRankingName(record.operator);
+        return { record, operator, key: operator.toLocaleLowerCase("pt-BR"), fromHistory: index >= current.length };
+    }).filter(({ operator }) => operator && !/^[-–—]$/.test(operator));
+    if (imported.length === 0) return entries;
+
+    const namesByAbbreviation = new Map();
+    const historyCounts = new Map();
+    for (const entry of entries) {
+        const { operator, key, fromHistory, record } = entry;
+        const abbreviation = formatEmployeeRankingName(operator).toLocaleLowerCase("pt-BR");
+        if (fromHistory) {
+            historyCounts.set(abbreviation, (historyCounts.get(abbreviation) ?? 0) + 1);
+            if (!record.fullNameConfirmed && key === abbreviation) {
+                entry.abbreviation = abbreviation;
+                continue;
+            }
+        }
+
+        const names = namesByAbbreviation.get(abbreviation) ?? new Map();
+        if (!names.has(key)) names.set(key, operator);
+        namesByAbbreviation.set(abbreviation, names);
+    }
+
+    for (const entry of entries) {
+        if (!entry.abbreviation) continue;
+
+        const names = namesByAbbreviation.get(entry.abbreviation);
+        if (historyCounts.get(entry.abbreviation) > 1 || names?.size > 1) {
+            // Keep each unverified line when the abbreviation can stand for different people.
+            entry.key = Symbol(entry.abbreviation);
+            entry.nameStatus = "ambiguous";
+        } else if (names?.size === 1) {
+            [entry.key, entry.operator] = names.entries().next().value;
+        } else {
+            entry.nameStatus = "abbreviated";
+        }
+    }
+    return entries;
+}
+
 function buildEmployeeExpeditionRanking(currentRanking, importedRanking = []) {
     const collaborators = new Map();
 
-    for (const entry of [...currentRanking, ...importedRanking]) {
-        const operator = normalizeEmployeeRankingName(entry.operator);
-        if (!operator) {
-            continue;
-        }
-
-        const key = operator.toLocaleLowerCase("pt-BR");
+    for (const { record, operator, key, nameStatus } of matchEmployeeRankingEntries(currentRanking, importedRanking)) {
         if (!collaborators.has(key)) {
             collaborators.set(key, {
                 operator,
+                ...(nameStatus && { nameStatus }),
                 routesChecked: 0,
                 totalDurationSeconds: 0,
                 routesWithDuration: 0,
@@ -52,9 +89,9 @@ function buildEmployeeExpeditionRanking(currentRanking, importedRanking = []) {
         }
 
         const collaborator = collaborators.get(key);
-        collaborator.routesChecked += entry.routesChecked;
-        collaborator.totalDurationSeconds += entry.totalDurationSeconds;
-        collaborator.routesWithDuration += entry.routesWithDuration;
+        collaborator.routesChecked += record.routesChecked;
+        collaborator.totalDurationSeconds += record.totalDurationSeconds;
+        collaborator.routesWithDuration += record.routesWithDuration;
     }
 
     return Array.from(collaborators.values(), collaborator => ({
@@ -72,13 +109,11 @@ function buildEmployeeExpeditionRanking(currentRanking, importedRanking = []) {
 
 function buildEmployeeOccurrenceRanking(current, imported = [], { descending = false } = {}) {
     const collaborators = new Map();
-    for (const entry of [...current, ...imported]) {
-        const operator = normalizeEmployeeRankingName(entry.operator);
-        if (!operator || /^[-–—]$/.test(operator) || !Number.isSafeInteger(entry.quantity) || entry.quantity < 0) continue;
+    for (const { record, operator, key, nameStatus } of matchEmployeeRankingEntries(current, imported)) {
+        if (!Number.isSafeInteger(record.quantity) || record.quantity < 0) continue;
 
-        const key = operator.toLocaleLowerCase("pt-BR");
-        const collaborator = collaborators.get(key) ?? { operator, quantity: 0 };
-        collaborator.quantity += entry.quantity;
+        const collaborator = collaborators.get(key) ?? { operator, quantity: 0, ...(nameStatus && { nameStatus }) };
+        collaborator.quantity += record.quantity;
         collaborators.set(key, collaborator);
     }
 

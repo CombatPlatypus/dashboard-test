@@ -1,7 +1,7 @@
 const fieldsBySection = {
-    receipt: ["operator", "quantity"],
-    labelingErrors: ["operator", "quantity"],
-    expedition: ["operator", "routesChecked", "totalDurationSeconds", "routesWithDuration"],
+    receipt: ["operator", "fullNameConfirmed", "quantity"],
+    labelingErrors: ["operator", "fullNameConfirmed", "quantity"],
+    expedition: ["operator", "fullNameConfirmed", "routesChecked", "totalDurationSeconds", "routesWithDuration"],
 };
 let history = { receipt: [], labelingErrors: [], expedition: [] };
 const historyListeners = new Set();

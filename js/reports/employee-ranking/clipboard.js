@@ -97,7 +97,7 @@ function readClipboardName(value) {
 }
 
 function readOperatorFormula(formula) {
-    const match = /^=\s*"(?:[^"]|"")*"\s*&\s*T\(\s*N\(\s*"((?:[^"]|"")*)"\s*\)\s*\)$/i.exec(formula);
+    const match = /^\s*=?\s*"(?:[^"]|"")*"\s*&\s*T\(\s*N\(\s*"((?:[^"]|"")*)"\s*\)\s*\)\s*$/i.exec(formula);
     return match?.[1].startsWith(operatorFormulaPrefix)
         ? match[1].slice(operatorFormulaPrefix.length).replaceAll('""', '"')
         : null;
@@ -138,21 +138,26 @@ function parseRankingHtmlRows(html) {
 }
 
 async function readEmployeeRankingClipboard(clipboard = navigator.clipboard) {
+    let text = "";
     if (typeof clipboard?.read === "function") {
-        try {
-            const items = await clipboard.read({ unsanitized: ["text/html"] });
-            const item = items.find(item => item.types.includes("text/html") || item.types.includes("text/plain"));
-            if (item) {
-                const readType = async type => item.types.includes(type) ? (await item.getType(type)).text() : "";
-                const [text, html] = await Promise.all([readType("text/plain"), readType("text/html")]);
-                if (text || html) return { text, html };
+        for (const options of [{ unsanitized: ["text/html"] }, undefined]) {
+            try {
+                const items = options ? await clipboard.read(options) : await clipboard.read();
+                const readType = async type => {
+                    const item = items.find(candidate => candidate.types.includes(type));
+                    return item ? (await item.getType(type)).text() : "";
+                };
+                const [plain, rich] = await Promise.allSettled([readType("text/plain"), readType("text/html")]);
+                if (plain.status === "fulfilled" && plain.value) text = plain.value;
+                if (rich.status === "fulfilled" && (rich.value || (!options && text))) return { text, html: rich.value };
+            } catch (error) {
+                if (error?.name === "NotAllowedError") break;
+                // Try the standard read() when the unsanitized format option is unavailable.
             }
-        } catch {
-            // Browsers with text-only clipboard access can still read the earlier format.
         }
     }
 
-    return { text: await clipboard.readText(), html: "" };
+    return { text: text || await clipboard.readText(), html: "" };
 }
 
 function parseRankingClipboardBlock(rows, section, { column, operatorColumn, startRow }) {
@@ -168,8 +173,8 @@ function parseRankingClipboardBlock(rows, section, { column, operatorColumn, sta
         if (cells.every(isEmptyCell) && isEmptyCell(fullName)) continue;
 
         const displayValue = readClipboardName(name);
-        const originalName = readOperatorFormula(displayValue) ?? (legacyNameColumn === -1 ? displayValue : fullName);
-        const operator = normalizeEmployeeRankingName(originalName);
+        const storedName = readOperatorFormula(displayValue) ?? (legacyNameColumn === -1 ? null : fullName);
+        const operator = normalizeEmployeeRankingName(storedName ?? displayValue);
         if (legacyNameColumn !== -1) {
             const displayedName = normalizeText(displayValue);
             if (isEmptyCell(operator) || (displayedName !== normalizeText(formatEmployeeRankingName(operator)) &&
@@ -181,8 +186,9 @@ function parseRankingClipboardBlock(rows, section, { column, operatorColumn, sta
         if (isEmptyCell(operator) || count === null) {
             throw new Error(`Revise o colaborador e a quantidade de ${section.title} na linha ${rowIndex + 1} da seleção copiada.`);
         }
+        const identity = storedName ? { operator, fullNameConfirmed: true } : { operator };
         if (section !== expedition) {
-            ranking.push({ operator, quantity: count });
+            ranking.push({ ...identity, quantity: count });
             continue;
         }
 
@@ -194,7 +200,7 @@ function parseRankingClipboardBlock(rows, section, { column, operatorColumn, sta
         }
 
         ranking.push({
-            operator,
+            ...identity,
             routesChecked: count,
             totalDurationSeconds,
             routesWithDuration: hasTime ? count : 0,
@@ -236,10 +242,15 @@ function createRankingNameCell(entry, style) {
     if (!entry) return cell(null, style);
 
     const { displayName, operator } = entry;
-    const escapeFormulaText = value => value.replaceAll('"', '""');
-    return {
+    const nameCell = {
         ...cell(displayName, style),
         textValue: /^[=+@-]/.test(displayName) ? `'${displayName}` : displayName,
+    };
+    if (entry.nameStatus) return nameCell;
+
+    const escapeFormulaText = value => value.replaceAll('"', '""');
+    return {
+        ...nameCell,
         // T(N(text)) is empty in Sheets, so the formula keeps the full name without displaying it.
         formula: `="${escapeFormulaText(displayName)}"&T(N("${operatorFormulaPrefix}${escapeFormulaText(operator)}"))`,
     };

@@ -144,7 +144,7 @@ function initializeEmployeeRankingController(root) {
             updateRanking(section, monthlyTables[section].body, ranking);
         }
         renderActions();
-        if (announce) {
+        if (announce && !notifyAmbiguousNames()) {
             const message = getMonthlyRankingMessage();
             if (message) notify("info", message);
             else notifyCurrentRanking();
@@ -166,6 +166,8 @@ function initializeEmployeeRankingController(root) {
     }
 
     function notifyCurrentRanking() {
+        if (notifyAmbiguousNames()) return;
+
         const sources = [];
         if (receiptOperators.length) sources.push("Processamento");
         if (expeditionOperators.length) sources.push("Expedição");
@@ -176,6 +178,13 @@ function initializeEmployeeRankingController(root) {
         } else {
             notify("info", getMonthlyRankingMessage() || emptyRankingMessage);
         }
+    }
+
+    function notifyAmbiguousNames() {
+        if (!Object.values(rankings).some(ranking => ranking.some(entry => entry.nameStatus === "ambiguous"))) return false;
+
+        notify("warning", "Há abreviações que podem identificar pessoas diferentes. Use os nomes completos nessas linhas e importe a planilha novamente.");
+        return true;
     }
 
     async function runAction(button, action) {
@@ -239,6 +248,8 @@ function initializeEmployeeRankingController(root) {
         }
         const history = parseEmployeeRankingClipboard(clipboard);
         replaceEmployeeRankingHistory({ ...getEmployeeRankingHistory(), ...history });
+        if (notifyAmbiguousNames()) return;
+
         if (hasRankingRows(history)) {
             notify("success", "Acumulado anterior do ranking importado.");
         } else {

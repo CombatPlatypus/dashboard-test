@@ -203,8 +203,10 @@ function createReportSessionPayload({ includeAllReports = false } = {}) {
 const validOccurrenceDays = state => isSessionObject(state) && isSessionObjectList(state.days) &&
     (state.history === undefined || isSessionObjectList(state.history));
 
-const validRankingCounts = rows => isSessionObjectList(rows) && rows.every(row =>
-    typeof row.operator === "string" && row.operator.trim() !== "" &&
+const validRankingIdentity = row => typeof row.operator === "string" && row.operator.trim() !== "" &&
+    (row.fullNameConfirmed === undefined || typeof row.fullNameConfirmed === "boolean");
+
+const validRankingCounts = rows => isSessionObjectList(rows) && rows.every(row => validRankingIdentity(row) &&
     Number.isSafeInteger(row.quantity) && row.quantity >= 0);
 
 const sessionReportValidators = {
@@ -237,7 +239,7 @@ const sessionReportValidators = {
     "overall-analysis": ["do Ranking de Colaboradores", state => {
         const { employeeRanking, processingRanking } = state;
         const validExpedition = employeeRanking === undefined || (isSessionObjectList(employeeRanking) && employeeRanking.every(row =>
-            typeof row.operator === "string" && row.operator.trim() !== "" &&
+            validRankingIdentity(row) &&
             Number.isSafeInteger(row.routesChecked) && row.routesChecked >= 0 &&
             Number.isSafeInteger(row.routesWithDuration) && row.routesWithDuration >= 0 &&
             row.routesWithDuration <= row.routesChecked &&

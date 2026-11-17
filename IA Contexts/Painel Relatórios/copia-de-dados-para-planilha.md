@@ -30,6 +30,8 @@ Os títulos de Avarias Recebidas (H5:I5) e Pacotes OFF (O5:P5) são mesclados. A
 
 O bloco tem pelo menos 150 linhas de dados. Se o ranking já exibiu mais linhas na aba do navegador, a cópia inclui vazios até esse tamanho para sobrescrever a colagem anterior. Use a colagem normal em B2 para preservar as fórmulas dos nomes. Depois, copie a aba com `Ctrl+C` para reimportar o acumulado de Recebimento, Erros de Etiquetagem e Expedição com os nomes completos. [Cópia do ranking](../../js/reports/employee-ranking/clipboard.js)
 
+Uma linha do acumulado cujo nome completo ainda precisa ser identificado é exportada com o nome exibido em texto. Assim, uma próxima importação pode resolver a abreviação com os nomes completos dos relatórios.
+
 ## Listas de pacotes da Reversa
 
 O botão ao lado do título de Return, Missorted, Liquidate ou Confiscado copia os pares da tabela correspondente em texto tabulado. A colagem começa pelo primeiro pacote e preenche **Código BR** na primeira coluna e **Respectiva TO** na segunda. [Implementação](../../js/reports/reverse/package-copy.js) · [Teste](../../tests/reverse-packages.test.mjs)

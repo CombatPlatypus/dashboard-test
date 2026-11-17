@@ -3,6 +3,7 @@ import test from "node:test";
 import {
     createEmployeeRankingClipboard,
     parseEmployeeRankingClipboard,
+    readEmployeeRankingClipboard,
 } from "../js/reports/employee-ranking/clipboard.js";
 import { buildEmployeeExpeditionRanking, buildEmployeeOccurrenceRanking } from "../js/reports/employee-ranking/model.js";
 
@@ -112,8 +113,8 @@ test("still imports full names from the auxiliary column in previously copied wo
     ];
     const clipboard = () => ({ text: legacyWorksheet.map(row => row.join("\t")).join("\n") });
     assert.deepEqual(parseEmployeeRankingClipboard(clipboard()).expedition, [
-        { operator: "Maria da Silva Costa", routesChecked: 12, totalDurationSeconds: 3948, routesWithDuration: 12 },
-        { operator: "Maria da Silva Souza", routesChecked: 4, totalDurationSeconds: 1200, routesWithDuration: 4 },
+        { operator: "Maria da Silva Costa", fullNameConfirmed: true, routesChecked: 12, totalDurationSeconds: 3948, routesWithDuration: 12 },
+        { operator: "Maria da Silva Souza", fullNameConfirmed: true, routesChecked: 4, totalDurationSeconds: 1200, routesWithDuration: 4 },
     ]);
 
     legacyWorksheet[2][7] = "";
@@ -136,4 +137,40 @@ test("inclui todos os recebedores na cópia e mantém os blocos vazios com seus 
     assert.equal(rows.length, 156);
     assert.equal(rows.at(-1).split("\t")[1], "12");
     assert.deepEqual(parseEmployeeRankingClipboard({ text }).labelingErrors, []);
+});
+
+test("preserva o nome da fórmula mesmo quando o conteúdo vem sem o sinal de igual", () => {
+    const text = [
+        "Recebimento\t",
+        "Colaborador\tQuantidade",
+        '"Maria Silva"&T(N("Nome completo do conferente: Maria Silva"))\t25',
+    ].join("\n");
+    assert.deepEqual(parseEmployeeRankingClipboard({ text }).receipt, [
+        { operator: "Maria Silva", fullNameConfirmed: true, quantity: 25 },
+    ]);
+});
+
+test("tenta a leitura padrão e recupera o HTML quando o navegador rejeita a opção sem sanitização", async () => {
+    const clipboardItem = (type, value) => ({ types: [type], getType: async () => new Blob([value], { type }) });
+    const clipboard = {
+        async read(options) {
+            if (options) throw new TypeError("Opção sem suporte");
+            return [clipboardItem("text/plain", "Maria Silva\t25"), clipboardItem("text/html", "<table></table>")];
+        },
+        readText() { assert.fail("A leitura com formatos já retornou os dados"); },
+    };
+    assert.deepEqual(await readEmployeeRankingClipboard(clipboard), { text: "Maria Silva\t25", html: "<table></table>" });
+});
+
+test("mantém nomes não identificados disponíveis para uma próxima soma", () => {
+    const receiptRanking = [
+        { operator: "Maria Silva", displayName: "Maria Silva", quantity: 25, nameStatus: "abbreviated" },
+        { operator: "Karina Santos", displayName: "Karina Santos", quantity: 60, nameStatus: "ambiguous" },
+    ];
+    const { text, html } = createEmployeeRankingClipboard({ receiptRanking });
+    assert.doesNotMatch(html, /data-sheets-formula/);
+    assert.deepEqual(parseEmployeeRankingClipboard({ text }).receipt, [
+        { operator: "Maria Silva", quantity: 25 },
+        { operator: "Karina Santos", quantity: 60 },
+    ]);
 });
