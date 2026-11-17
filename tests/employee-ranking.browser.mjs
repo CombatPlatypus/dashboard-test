@@ -87,6 +87,12 @@ try {
         };
         Object.defineProperty(navigator, "clipboard", {
             value: {
+                read: async () => {
+                    const { html, text } = window.rankingClipboard;
+                    const formats = { "text/plain": new Blob([text], { type: "text/plain" }) };
+                    if (html) formats["text/html"] = new Blob([html], { type: "text/html" });
+                    return [new ClipboardItem(formats)];
+                },
                 readText: async () => window.rankingClipboard.text,
                 write: async items => {
                     for (const item of items) {
@@ -198,10 +204,9 @@ try {
     await page.waitForFunction(() => window.rankingClipboard.text.startsWith("RANKING MENSAL DE DESEMPENHO\t"));
     const copied = await page.evaluate(() => window.rankingClipboard.text.split("\n").map(row => row.split("\t")));
     assert.equal(copied.length, 158);
+    assert.ok(copied.every(row => row.length === 15));
     assert.deepEqual(copied[5].slice(9, 12), ["Maria Silva", "14", "00:05:30"]);
     assert.deepEqual(copied[6].slice(9, 12), ["Maria Silva", "9", "00:03:00"]);
-    assert.equal(copied[5][16], "Maria da Silva Santos");
-    assert.equal(copied[6][16], "Maria da Silva Rodrigues");
     assert.match(await page.locator("#employeeRankingNotificationText").textContent(), /B2/);
 
     const copiedFormat = await page.evaluate(() => {
@@ -211,13 +216,33 @@ try {
         const expeditionCells = Array.from(table.rows[5].cells).slice(6, 9);
         return {
             titleSpan: [title.colSpan, title.rowSpan],
+            formula: expeditionCells[0].getAttribute("data-sheets-formula"),
             centerAligned: expeditionCells.every(cell => cell.style.textAlign === "center" && cell.style.verticalAlign === "middle"),
             values: expeditionCells.map(cell => cell.textContent),
         };
     });
     assert.deepEqual(copiedFormat, {
-        titleSpan: [15, 2], centerAligned: true, values: ["Maria Silva", "14", "00:05:30"],
+        titleSpan: [15, 2],
+        formula: '="Maria Silva"&T(N("Nome completo do conferente: Maria da Silva Santos"))',
+        centerAligned: true, values: ["Maria Silva", "14", "00:05:30"],
     });
+
+    const operatorsFromCopy = await page.evaluate(async () => {
+        const { parseEmployeeRankingClipboard, readEmployeeRankingClipboard } =
+            await import("/js/reports/employee-ranking/clipboard.js");
+        const clipboard = await readEmployeeRankingClipboard();
+        const doc = new DOMParser().parseFromString(clipboard.html, "text/html");
+        const table = doc.querySelector("table");
+        // An older paste can leave a spare column in the destination sheet.
+        for (const [index, value] of [[4, "Nome completo do conferente"], [5, "Conferente de outra linha"]]) {
+            table.rows[index].insertCell();
+            table.rows[index].insertCell().textContent = value;
+        }
+        return parseEmployeeRankingClipboard({ ...clipboard, html: table.outerHTML }).slice(0, 2);
+    });
+    assert.deepEqual(operatorsFromCopy.map(entry => [entry.operator, entry.routesChecked]), [
+        ["Maria da Silva Santos", 14], ["Maria da Silva Rodrigues", 9],
+    ]);
 
     await page.reload();
     await page.waitForFunction(() => document.querySelectorAll("#switch-spreadsheet .tabs-title").length > 0);

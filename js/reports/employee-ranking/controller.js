@@ -15,7 +15,8 @@ import { writeSummaryClipboard } from "../summary-copy.js";
 import {
     MIN_EMPLOYEE_RANKING_ROWS,
     createEmployeeRankingClipboard,
-    parseEmployeeRankingClipboardText,
+    parseEmployeeRankingClipboard,
+    readEmployeeRankingClipboard,
 } from "./clipboard.js";
 import { buildEmployeeExpeditionRanking, formatEmployeeRankingDuration } from "./model.js";
 import {
@@ -144,13 +145,13 @@ function initializeEmployeeRankingController(root) {
     });
 
     importButton.addEventListener("click", () => runAction(importButton, async () => {
-        let text;
+        let clipboard;
         try {
-            text = await navigator.clipboard.readText();
+            clipboard = await readEmployeeRankingClipboard();
         } catch {
             throw new Error("Não foi possível ler a área de transferência. Permita o acesso e clique novamente.");
         }
-        const history = parseEmployeeRankingClipboardText(text);
+        const history = parseEmployeeRankingClipboard(clipboard);
         replaceEmployeeRankingHistory(history);
         if (history.length) {
             notify("success", "Acumulado anterior de Expedição importado.");

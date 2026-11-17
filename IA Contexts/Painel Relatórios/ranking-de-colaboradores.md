@@ -10,8 +10,8 @@ Abra **Relatórios > Relatório Final > Ranking Mensal de Colaboradores**. A imp
 
 ## Botões
 
-- **Importar** lê a aba **Ranking de Colaboradores**, incluindo a coluna R com os nomes completos. O formato anterior, com nomes completos no bloco de Expedição, também pode ser importado. Use o acumulado anterior aos dados da Expedição carregada. O cálculo soma essa base com os dados atuais. Repetir a importação da mesma base produz os mesmos totais.
-- **Copiar** prepara o ranking formatado para colar em **B2**. As células levam alinhamento horizontal e vertical centralizado e os tamanhos de fonte do modelo. O nome exibido segue a prévia. A quantidade e o tempo médio ocupam células próprias. A coluna R guarda o nome completo para a reimportação. [Formato da cópia](copia-de-dados-para-planilha.md#expedição-do-ranking-mensal)
+- **Importar** lê a aba **Ranking de Colaboradores**. No formato atual, o HTML da área de transferência traz o nome completo na fórmula da célula do colaborador. A importação também aceita os formatos anteriores com o nome completo no bloco de Expedição ou na antiga coluna R. Use o acumulado anterior aos dados da Expedição carregada. O cálculo soma essa base com os dados atuais. Repetir a importação da mesma base produz os mesmos totais.
+- **Copiar** prepara o ranking formatado para colar em **B2**, com o último bloco na coluna P. As células levam alinhamento horizontal e vertical centralizado e os tamanhos de fonte do modelo. A célula do colaborador em K exibe o nome abreviado da prévia e guarda o nome completo na fórmula. A quantidade e o tempo médio ocupam células próprias. [Formato da cópia](copia-de-dados-para-planilha.md#expedição-do-ranking-mensal)
 - **Imagem** copia o ranking para a área de transferência. Segure o botão para baixar o PNG. A imagem inclui todas as linhas com dados.
 - **Lixeira** descarta o acumulado importado e recalcula a tabela com a Expedição atual. Ao limpar a Expedição na aba de origem, o ranking passa a mostrar o acumulado que estiver carregado.
 

@@ -24,9 +24,9 @@ Parcel Sweeper e Reversa usam o dia da cópia no horário de São Paulo e os tot
 
 No [Ranking Mensal de Colaboradores](ranking-de-colaboradores.md), cole o bloco em `B2` da aba **Ranking de Colaboradores** com `Ctrl+V`. O HTML aplica o alinhamento horizontal e vertical e a fonte diretamente às células, conforme a cópia nativa do Google Planilhas. A fonte Open Sans usa 20 pt no título mesclado, 12 pt nos títulos dos cinco blocos, 11 pt nos cabeçalhos das colunas e 10 pt nos dados.
 
-As colunas K, L e M recebem o nome abreviado da prévia, o total de rotas e o tempo médio como `hh:mm:ss`. As células de dados dos outros blocos vão vazias.
+As colunas K, L e M recebem o nome abreviado da prévia, o total de rotas e o tempo médio como `hh:mm:ss`. As células de dados dos outros blocos vão vazias. O intervalo copiado termina em P.
 
-O bloco tem pelo menos 150 linhas de dados. Se o ranking já exibiu mais linhas na aba do navegador, a cópia inclui vazios até esse tamanho para sobrescrever a colagem anterior. A coluna R guarda o nome completo do conferente, fora dos cinco blocos. Para reimportar o acumulado, copie a aba inteira incluindo R. [Cópia do ranking](../../js/reports/employee-ranking/clipboard.js)
+O bloco tem pelo menos 150 linhas de dados. Se o ranking já exibiu mais linhas na aba do navegador, a cópia inclui vazios até esse tamanho para sobrescrever a colagem anterior. Use a colagem normal em B2 para preservar as fórmulas dos nomes em K. Depois, copie a aba com `Ctrl+C` para reimportar o acumulado com os nomes completos. [Cópia do ranking](../../js/reports/employee-ranking/clipboard.js)
 
 ## Listas de pacotes da Reversa
 

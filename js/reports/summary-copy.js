@@ -75,14 +75,15 @@ function createStyledCellAttributes({ background, fontSize, bold, border, bottom
     return `data-sheets-userformat='${JSON.stringify(format)}' align="center" valign="${alignment}" style="${css}"`;
 }
 
-function createStyledClipboardCell({ value, span, rowSpan, style, inferValueType }, attributes) {
+function createStyledClipboardCell({ value, span, rowSpan, style, inferValueType, formula }, attributes) {
     if (!attributes.has(style)) attributes.set(style, createStyledCellAttributes(style));
     let typedValue = "";
     if (!inferValueType && value != null && value !== "") {
         const data = typeof value === "number" ? { "1": 3, "3": value } : { "1": 2, "2": String(value) };
         typedValue = ` data-sheets-value="${escapeHtml(JSON.stringify(data))}"`;
     }
-    return `<td rowspan="${rowSpan}" colspan="${span}" ${attributes.get(style)}${typedValue}>${escapeHtml(value)}</td>`;
+    const formulaAttribute = formula ? ` data-sheets-formula="${escapeHtml(formula)}"` : "";
+    return `<td rowspan="${rowSpan}" colspan="${span}" ${attributes.get(style)}${typedValue}${formulaAttribute}>${escapeHtml(value)}</td>`;
 }
 
 // HTML carries the template's merges; TSV keeps a placeholder for every physical column.

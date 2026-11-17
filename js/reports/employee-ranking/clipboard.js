@@ -14,8 +14,8 @@ const rankingSections = [
     { title: "Pacotes OFF", headers: commonHeaders },
 ];
 const operatorHeader = "Nome completo do conferente";
-// B:P contains the report, Q is the existing border, R keeps the full name for reimport.
-const columnWidths = [181, 121, 20, 181, 121, 20, 181, 121, 20, 181, 121, 81, 20, 201, 121, 50, 260];
+const operatorFormulaPrefix = `${operatorHeader}: `;
+const columnWidths = [181, 121, 20, 181, 121, 20, 181, 121, 20, 181, 121, 81, 20, 201, 121];
 // Match the inline cell formatting copied by Google Sheets from the ranking template.
 const blankStyle = { background: "#121212", fontSize: 10, inlineFormattingOnly: true };
 const titleStyle = { ...blankStyle, background: "#323232", fontSize: 20, bold: true, border: true };
@@ -76,22 +76,86 @@ function readClipboardName(value) {
         .replace(/^'(?=[=+@-])/, "");
 }
 
-function parseEmployeeRankingClipboardText(text) {
-    const rows = parseClipboardRows(text);
+function readOperatorFormula(formula) {
+    const match = /^=\s*"(?:[^"]|"")*"\s*&\s*T\(\s*N\(\s*"((?:[^"]|"")*)"\s*\)\s*\)$/i.exec(formula);
+    return match?.[1].startsWith(operatorFormulaPrefix)
+        ? match[1].slice(operatorFormulaPrefix.length).replaceAll('""', '"')
+        : null;
+}
+
+function parseRankingHtmlRows(html) {
+    if (!html.includes("data-sheets-formula")) return [];
+
+    // The clipboard HTML stays in an inert template and is read as data.
+    const template = document.createElement("template");
+    template.innerHTML = html;
+    const tableRows = Array.from(template.content.querySelector("table")?.rows ?? []);
+    const rows = tableRows.map(() => []);
+    let hasOperatorFormulas = false;
+
+    for (const [rowIndex, row] of tableRows.entries()) {
+        let column = 0;
+        for (const cell of row.cells) {
+            while (rows[rowIndex][column] !== undefined) column += 1;
+
+            const rowEnd = Math.min(rowIndex + (cell.rowSpan || 1), rows.length);
+            const columnEnd = column + cell.colSpan;
+            for (let index = rowIndex; index < rowEnd; index += 1) {
+                for (let slot = column; slot < columnEnd; slot += 1) {
+                    rows[index][slot] = "";
+                }
+            }
+            const formula = cell.getAttribute("data-sheets-formula") ??
+                cell.querySelector("[data-sheets-formula]")?.getAttribute("data-sheets-formula");
+            const isOperatorFormula = readOperatorFormula(formula) !== null;
+            hasOperatorFormulas ||= isOperatorFormula;
+            rows[rowIndex][column] = isOperatorFormula ? formula : cell.textContent;
+            column = columnEnd;
+        }
+    }
+
+    return hasOperatorFormulas ? rows : [];
+}
+
+async function readEmployeeRankingClipboard(clipboard = navigator.clipboard) {
+    if (typeof clipboard?.read === "function") {
+        try {
+            const items = await clipboard.read({ unsanitized: ["text/html"] });
+            const item = items.find(item => item.types.includes("text/html") || item.types.includes("text/plain"));
+            if (item) {
+                const readType = async type => item.types.includes(type) ? (await item.getType(type)).text() : "";
+                const [text, html] = await Promise.all([readType("text/plain"), readType("text/html")]);
+                if (text || html) return { text, html };
+            }
+        } catch {
+            // Browsers with text-only clipboard access can still read the earlier format.
+        }
+    }
+
+    return { text: await clipboard.readText(), html: "" };
+}
+
+function parseEmployeeRankingClipboard({ text, html = "" }) {
+    const htmlRows = parseRankingHtmlRows(html);
+    const rows = htmlRows.length ? htmlRows : parseClipboardRows(text);
     if (rows.length === 0) throw new Error("A área de transferência está vazia.");
 
     const { column, operatorColumn, startRow } = findExpeditionClipboardBlock(rows);
+    const hasOperatorFormulas = rows.slice(startRow).some(row => readOperatorFormula(readClipboardName(row[column])) !== null);
+    const legacyNameColumn = hasOperatorFormulas ? -1 : operatorColumn;
     const ranking = [];
     for (let rowIndex = startRow; rowIndex < rows.length; rowIndex += 1) {
         const row = rows[rowIndex];
         const cells = expedition.headers.map((_, index) => String(row[column + index] ?? "").trim());
         const [name, quantity, time] = cells;
-        const fullName = readClipboardName(row[operatorColumn]);
+        const fullName = readClipboardName(row[legacyNameColumn]);
         if (cells.every(isEmptyCell) && isEmptyCell(fullName)) continue;
 
-        const operator = normalizeEmployeeRankingName(operatorColumn === -1 ? readClipboardName(name) : fullName);
-        if (operatorColumn !== -1) {
-            const displayedName = normalizeText(readClipboardName(name));
+        const displayValue = readClipboardName(name);
+        const originalName = readOperatorFormula(displayValue) ?? (legacyNameColumn === -1 ? displayValue : fullName);
+        const operator = normalizeEmployeeRankingName(originalName);
+        if (legacyNameColumn !== -1) {
+            const displayedName = normalizeText(displayValue);
             if (isEmptyCell(operator) || (displayedName !== normalizeText(formatEmployeeRankingName(operator)) &&
                 displayedName !== normalizeText(operator))) {
                 throw new Error(`Confira o nome completo do conferente na coluna R, na linha ${rowIndex + 1} da seleção copiada.`);
@@ -129,10 +193,16 @@ function cell(value, style, span = 1, rowSpan = 1) {
     return { value, style, span, rowSpan };
 }
 
-function nameCell(value, style) {
+function createExpeditionNameCell(entry, style) {
+    if (!entry) return cell(null, style);
+
+    const { displayName, operator } = entry;
+    const escapeFormulaText = value => value.replaceAll('"', '""');
     return {
-        ...cell(value, style),
-        textValue: /^[=+@-]/.test(value ?? "") ? `'${value}` : value,
+        ...cell(displayName, style),
+        textValue: /^[=+@-]/.test(displayName) ? `'${displayName}` : displayName,
+        // T(N(text)) is empty in Sheets, so the formula keeps the full name without displaying it.
+        formula: `="${escapeFormulaText(displayName)}"&T(N("${operatorFormulaPrefix}${escapeFormulaText(operator)}"))`,
     };
 }
 
@@ -140,34 +210,30 @@ function createEmployeeRankingClipboard(ranking, previousRowCount = 0) {
     const rowCount = Math.max(ranking.length, MIN_EMPLOYEE_RANKING_ROWS, previousRowCount);
     const emptyCell = cell(null, blankStyle);
     const sectionGap = cell(null, blankStyle, 1, rowCount + 2);
+    const sectionRow = (createSectionCells, gap = null) => rankingSections.flatMap((section, index) =>
+        index === 0 ? createSectionCells(section) : [gap, ...createSectionCells(section)],
+    );
     const rows = [
-        [cell(rankingTitle, titleStyle, 15, 2), cell(null, blankStyle, 1, 2), emptyCell],
-        [...Array(16).fill(null), emptyCell],
+        [cell(rankingTitle, titleStyle, columnWidths.length, 2)],
+        Array(columnWidths.length).fill(null),
         Array(columnWidths.length).fill(emptyCell),
-        [...rankingSections.flatMap(section => [cell(section.title, sectionStyle, section.headers.length), sectionGap]), emptyCell],
-        [...rankingSections.flatMap(section => [...section.headers.map(header => cell(header, headerStyle)), null]),
-            cell(operatorHeader, headerStyle)],
+        sectionRow(section => [cell(section.title, sectionStyle, section.headers.length)], sectionGap),
+        sectionRow(section => section.headers.map(header => cell(header, headerStyle))),
     ];
 
     for (let index = 0; index < rowCount; index += 1) {
         const entry = ranking[index];
         const style = rowStyles[index % rowStyles.length];
         const expeditionCells = [
-            nameCell(entry?.displayName, style),
+            createExpeditionNameCell(entry, style),
             cell(entry?.routesChecked, style),
             // Let the spreadsheet recognize hh:mm:ss as a time value, as in text paste.
             { ...cell(formatSpreadsheetDuration(entry?.averageDurationSeconds), style), inferValueType: true },
         ];
-        rows.push([
-            ...rankingSections.flatMap(section => [
-                ...(section === expedition ? expeditionCells : section.headers.map(() => cell(null, style))),
-                null,
-            ]),
-            nameCell(entry?.operator, style),
-        ]);
+        rows.push(sectionRow(section => section === expedition ? expeditionCells : section.headers.map(() => cell(null, style))));
     }
 
     return createClipboardTable(rows, { columnWidths });
 }
 
-export { MIN_EMPLOYEE_RANKING_ROWS, createEmployeeRankingClipboard, parseEmployeeRankingClipboardText };
+export { MIN_EMPLOYEE_RANKING_ROWS, createEmployeeRankingClipboard, parseEmployeeRankingClipboard, readEmployeeRankingClipboard };

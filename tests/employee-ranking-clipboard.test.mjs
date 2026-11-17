@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
     createEmployeeRankingClipboard,
-    parseEmployeeRankingClipboardText,
+    parseEmployeeRankingClipboard,
 } from "../js/reports/employee-ranking/clipboard.js";
 import { buildEmployeeExpeditionRanking } from "../js/reports/employee-ranking/model.js";
 
@@ -16,7 +16,7 @@ test("imports only the expedition block from the complete ranking worksheet", ()
         "\t\t\t\t\t\t\t\t\t\tJoão de Souza\t1.234\t\t\t\t",
     ].join("\r\n");
 
-    assert.deepEqual(parseEmployeeRankingClipboardText(worksheet), [
+    assert.deepEqual(parseEmployeeRankingClipboard({ text: worksheet }), [
         { operator: "Maria da Silva Costa", routesChecked: 12, totalDurationSeconds: 3948, routesWithDuration: 12 },
         { operator: "João de Souza", routesChecked: 1234, totalDurationSeconds: 0, routesWithDuration: 0 },
     ]);
@@ -32,7 +32,7 @@ test("copies the formatted ranking from B2 and keeps short names in the visible 
     const rows = text.split("\n").map(row => row.split("\t"));
 
     assert.equal(rows.length, 158);
-    assert.ok(rows.every(row => row.length === 17));
+    assert.ok(rows.every(row => row.length === 15));
     assert.equal(rows[0][0], "RANKING MENSAL DE DESEMPENHO");
     assert.deepEqual([0, 3, 6, 9, 13].map(column => rows[3][column]), [
         "Recebimento", "Erros de Etiquetagem", "Avarias Recebidas", "Rotas Conferidas e Tempo Médio", "Pacotes OFF",
@@ -40,13 +40,16 @@ test("copies the formatted ranking from B2 and keeps short names in the visible 
     assert.deepEqual(rows[4].slice(9, 12), ["Colaborador", "Quantidade", "Tempo"]);
     assert.deepEqual(rows[5].slice(9, 12), ["Maria Silva", "12", "00:05:29"]);
     assert.deepEqual(rows[6].slice(9, 12), ["Maria Silva", "4", "00:05:00"]);
-    assert.equal(rows[5][16], "Maria da Silva Costa");
-    assert.equal(rows[6][16], "Maria da Silva Souza");
+    assert.deepEqual(rows[4].slice(13), ["Colaborador", "Quantidade"]);
     assert.ok(rows.at(-1).every(cell => cell === ""));
 
     assert.match(html, /<google-sheets-html-origin>/);
     assert.match(html, /<td rowspan="2" colspan="15"[^>]*>RANKING MENSAL DE DESEMPENHO<\/td>/);
     assert.match(html, /<td rowspan="155" colspan="1"/);
+    assert.equal([...html.matchAll(/<col width="/g)].length, 15);
+    assert.doesNotMatch(text, /Nome completo do conferente/);
+    assert.match(html, /data-sheets-formula="=&quot;Maria Silva&quot;&amp;T\(N\(&quot;Nome completo do conferente: Maria da Silva Costa&quot;\)\)">Maria Silva/);
+    assert.match(html, /data-sheets-formula="=&quot;Maria Silva&quot;&amp;T\(N\(&quot;Nome completo do conferente: Maria da Silva Souza&quot;\)\)">Maria Silva/);
     assert.doesNotMatch(html, /data-sheets-userformat/);
     const cellStyles = new Map(Array.from(html.matchAll(/<td\b[^>]*style="([^"]+)"[^>]*>([^<]*)<\/td>/g),
         ([, style, text]) => [text, style]));
@@ -60,16 +63,26 @@ test("copies the formatted ranking from B2 and keeps short names in the visible 
         assert.match(cellStyles.get(text), new RegExp(`font-size:${fontSize}pt;`));
         assert.match(cellStyles.get(text), /text-align:center;vertical-align:middle;/);
     }
-    assert.deepEqual(parseEmployeeRankingClipboardText(text), operators);
+});
 
-    const fullWorksheet = rows.map(row => ["", ...row].join("\t")).join("\n");
-    assert.deepEqual(parseEmployeeRankingClipboardText(fullWorksheet), operators);
+test("still imports full names from the auxiliary column in previously copied worksheets", () => {
+    const legacyWorksheet = [
+        ["Rotas Conferidas e Tempo Médio", "", "", "", "Pacotes OFF", "", "", ""],
+        ["Colaborador", "Quantidade", "Tempo", "", "Colaborador", "Quantidade", "", "Nome completo do conferente"],
+        ["Maria Silva", "12", "00:05:29", "", "", "", "", "Maria da Silva Costa"],
+        ["Maria Silva", "4", "00:05:00", "", "", "", "", "Maria da Silva Souza"],
+    ];
+    const clipboard = () => ({ text: legacyWorksheet.map(row => row.join("\t")).join("\n") });
+    assert.deepEqual(parseEmployeeRankingClipboard(clipboard()), [
+        { operator: "Maria da Silva Costa", routesChecked: 12, totalDurationSeconds: 3948, routesWithDuration: 12 },
+        { operator: "Maria da Silva Souza", routesChecked: 4, totalDurationSeconds: 1200, routesWithDuration: 4 },
+    ]);
 
-    rows[5][16] = "";
-    assert.throws(() => parseEmployeeRankingClipboardText(rows.map(row => row.join("\t")).join("\n")), /coluna R/);
+    legacyWorksheet[2][7] = "";
+    assert.throws(() => parseEmployeeRankingClipboard(clipboard()), /coluna R/);
 });
 
 test("rejects invalid historical rows instead of adding partial totals", () => {
-    assert.throws(() => parseEmployeeRankingClipboardText("Ana Santos\t4\t00:05:29\nJoão Souza\t6\t05:80"), /linha 2/);
-    assert.throws(() => parseEmployeeRankingClipboardText("Nome\tTurno\tLocal\tObservação"), /Copie a aba Ranking de Colaboradores/);
+    assert.throws(() => parseEmployeeRankingClipboard({ text: "Ana Santos\t4\t00:05:29\nJoão Souza\t6\t05:80" }), /linha 2/);
+    assert.throws(() => parseEmployeeRankingClipboard({ text: "Nome\tTurno\tLocal\tObservação" }), /Copie a aba Ranking de Colaboradores/);
 });
