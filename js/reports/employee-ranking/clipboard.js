@@ -24,6 +24,7 @@ const columnWidths = [181, 121, 20, 181, 121, 20, 181, 121, 20, 181, 121, 81, 20
 const blankStyle = { background: "#121212", fontSize: 10, inlineFormattingOnly: true };
 const titleStyle = { ...blankStyle, background: "#323232", fontSize: 20, bold: true, border: true };
 const sectionStyle = { ...titleStyle, fontSize: 12, bold: false };
+const sectionStyleWithoutRightBorder = { ...sectionStyle, borderRight: false };
 const headerStyle = { ...blankStyle, background: "#242424", fontSize: 11, border: true };
 const rowStyles = [
     { ...blankStyle, border: true },
@@ -265,7 +266,12 @@ function createEmployeeRankingClipboard({
         [cell(rankingTitle, titleStyle, columnWidths.length, 2)],
         Array(columnWidths.length).fill(null),
         Array(columnWidths.length).fill(emptyCell),
-        sectionRow(section => [cell(section.title, sectionStyle, section.headers.length)], sectionGap),
+        sectionRow(section => {
+            const style = section === receivedDamage || section === offPackages
+                ? sectionStyleWithoutRightBorder
+                : sectionStyle;
+            return [cell(section.title, style, section.headers.length)];
+        }, sectionGap),
         sectionRow(section => section.headers.map(header => cell(header, headerStyle))),
     ];
 

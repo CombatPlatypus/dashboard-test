@@ -26,6 +26,8 @@ No [Ranking Mensal de Colaboradores](ranking-de-colaboradores.md), cole o bloco 
 
 Recebimento ocupa B:C, Erros de Etiquetagem ocupa E:F e Avarias Recebidas ocupa H:I. As colunas K, L e M recebem o nome abreviado da prévia, o total de rotas e o tempo médio como `hh:mm:ss`. Pacotes OFF ocupa O:P. Os blocos levam os nomes abreviados e a ordem exibida na prévia.
 
+Os títulos de Avarias Recebidas (H5:I5) e Pacotes OFF (O5:P5) são mesclados. A cópia define as bordas superior, inferior e esquerda nas células iniciais H5 e O5 e limpa a borda direita dessas células, seguindo o modelo na junção entre as colunas.
+
 O bloco tem pelo menos 150 linhas de dados. Se o ranking já exibiu mais linhas na aba do navegador, a cópia inclui vazios até esse tamanho para sobrescrever a colagem anterior. Use a colagem normal em B2 para preservar as fórmulas dos nomes. Depois, copie a aba com `Ctrl+C` para reimportar o acumulado de Recebimento, Erros de Etiquetagem e Expedição com os nomes completos. [Cópia do ranking](../../js/reports/employee-ranking/clipboard.js)
 
 ## Listas de pacotes da Reversa

@@ -78,9 +78,19 @@ test("copies the formatted ranking from B2 and keeps short names in the visible 
     assert.doesNotMatch(html, /data-sheets-userformat/);
     const cellStyles = new Map(Array.from(html.matchAll(/<td\b[^>]*style="([^"]+)"[^>]*>([^<]*)<\/td>/g),
         ([, style, text]) => [text, style]));
+    for (const title of ["Avarias Recebidas", "Pacotes OFF"]) {
+        assert.match(html, new RegExp("<td rowspan=\"1\" colspan=\"2\"[^>]*>" + title + "</td>"));
+        const style = cellStyles.get(title);
+        assert.match(style, /border-top:1px solid #626262;border-bottom:1px solid #626262;border-left:1px solid #626262;border-right:none$/);
+    }
+    for (const title of ["Recebimento", "Erros de Etiquetagem", "Rotas Conferidas e Tempo Médio", "Colaborador"]) {
+        assert.match(cellStyles.get(title), /;border:1px solid #626262$/);
+    }
     for (const [text, fontSize] of [
         ["RANKING MENSAL DE DESEMPENHO", 20],
+        ["Avarias Recebidas", 12],
         ["Rotas Conferidas e Tempo Médio", 12],
+        ["Pacotes OFF", 12],
         ["Colaborador", 11],
         ["Maria Silva", 10],
         ["Ana Rocha", 10],
