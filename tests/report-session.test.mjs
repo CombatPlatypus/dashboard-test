@@ -132,7 +132,6 @@ function populateMissingReports() {
             receipt: [{ operator: "Ana Rosa", fullNameConfirmed: true, opsCode: "ops28", quantity: 160 }],
             labelingErrors: [{ operator: "João de Souza Lima", quantity: 3 }],
         },
-        operatorDirectory: [{ opsCode: "ops28", operator: "Ana Rosa" }],
     };
     reportManager.importSession(payload.reports);
     restoreReportContext(payload.context);
@@ -230,7 +229,12 @@ test("arquivo salvo restaura os sete relatórios e o histórico do Ranking de Co
     assert.deepEqual(original.reports["damage-and-losses"].losses.offPackages, {
         month: "2026-10", operators: [{ operator: "Ana Rosa Silva", quantity: 2 }],
     });
-    const saved = parseReportSession(serializeReportSession(original));
+    const legacy = structuredClone(original);
+    legacy.reports["overall-analysis"].operatorDirectory = [
+        { operator: "Ana Rosa Silva", opsCode: "ops28" },
+        { operator: "Cadastro com OPS incompleto" },
+    ];
+    const saved = parseReportSession(serializeReportSession(legacy));
     for (const report of reportModules) if (report.id !== "overall-analysis") report.reset();
     replaceEmployeeRankingHistory({});
     restoreReportContext({ window: "AM", plannedVolume: 1 });
@@ -287,9 +291,8 @@ test("valida dados adicionais antes de alterar os relatórios da sessão", t => 
             receipt: [{ operator: "Ana Rosa Silva", quantity: -1 }], labelingErrors: [],
         } }, /Ranking de Colaboradores/],
         ["overall-analysis", { processingRanking: {
-            receipt: [{ operator: "Ana Rosa", fullNameConfirmed: "sim", quantity: 160 }], labelingErrors: [],
+            receipt: [{ operator: "Ana Rosa", opsCode: "incorreto", quantity: 160 }], labelingErrors: [],
         } }, /Ranking de Colaboradores/],
-        ["overall-analysis", { operatorDirectory: [{ opsCode: "incorreto", operator: "Ana Rosa" }] }, /Ranking de Colaboradores/],
     ]) {
         const invalid = structuredClone(original);
         invalid.reports[id] = report;

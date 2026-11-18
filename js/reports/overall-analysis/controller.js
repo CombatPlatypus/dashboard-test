@@ -258,11 +258,10 @@ function importOverallAnalysisData() {
 }
 
 function exportOverallAnalysisSession() {
-    const { expedition, receipt, labelingErrors, operatorDirectory } = getEmployeeRankingHistory();
+    const { expedition, receipt, labelingErrors } = getEmployeeRankingHistory();
     const session = {};
     if (expedition.length) session.employeeRanking = expedition;
     if (receipt.length || labelingErrors.length) session.processingRanking = { receipt, labelingErrors };
-    if (operatorDirectory.length) session.operatorDirectory = operatorDirectory;
     return session;
 }
 
@@ -270,7 +269,6 @@ function importOverallAnalysisSession(session = {}) {
     replaceEmployeeRankingHistory({
         ...session.processingRanking,
         expedition: session.employeeRanking,
-        operatorDirectory: session.operatorDirectory,
     });
     return renderOverallAnalysisController();
 }

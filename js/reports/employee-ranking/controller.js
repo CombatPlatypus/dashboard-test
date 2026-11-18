@@ -122,20 +122,20 @@ function initializeEmployeeRankingController(root) {
         updateRanking(section, body, ranking);
     }
 
-    function renderOperationalRankings({ receipt, labelingErrors, expedition, operatorDirectory, announce }) {
+    function renderOperationalRankings({ receipt, labelingErrors, expedition, announce }) {
         const history = getEmployeeRankingHistory();
         const previousPending = countPendingOps();
-        if (receipt || operatorDirectory) {
+        if (receipt) {
             updateOperationalRanking("receiptRanking", receiptBody,
-                buildEmployeeReceiptRanking(receiptOperators, history.receipt, history.operatorDirectory));
+                buildEmployeeReceiptRanking(receiptOperators, history.receipt));
         }
-        if (labelingErrors || operatorDirectory) {
+        if (labelingErrors) {
             updateOperationalRanking("labelingErrorsRanking", labelingErrorsBody,
-                buildEmployeeLabelingErrorRanking(receiptOperators, history.labelingErrors, history.operatorDirectory));
+                buildEmployeeLabelingErrorRanking(receiptOperators, history.labelingErrors));
         }
-        if (expedition || operatorDirectory) {
+        if (expedition) {
             updateOperationalRanking("expeditionRanking", expeditionBody,
-                buildEmployeeExpeditionRanking(expeditionOperators, history.expedition, history.operatorDirectory));
+                buildEmployeeExpeditionRanking(expeditionOperators, history.expedition));
         }
         renderActions();
         if (announce || previousPending !== countPendingOps()) notifyCurrentRanking();
@@ -171,16 +171,13 @@ function initializeEmployeeRankingController(root) {
     }
 
     function notifyCurrentRanking() {
-        const { operatorDirectory, ...accumulated } = getEmployeeRankingHistory();
         const sources = [];
         if (receiptOperators.length) sources.push("Processamento");
         if (expeditionOperators.length) sources.push("Expedição");
         if (sources.length) {
             notifyWithPendingOps("info", `Ranking atualizado com os dados de ${sources.join(" e ")}.`);
-        } else if (hasRankingRows(accumulated)) {
+        } else if (hasRankingRows(getEmployeeRankingHistory())) {
             notifyWithPendingOps("info", "Ranking mostra o acumulado importado da planilha.");
-        } else if (operatorDirectory.length) {
-            notifyWithPendingOps("info", "Lista de códigos OPS importada.");
         } else {
             notifyWithPendingOps("info", getMonthlyRankingMessage() || emptyRankingMessage);
         }
@@ -197,7 +194,7 @@ function initializeEmployeeRankingController(root) {
             return;
         }
         const pending = count === 1 ? "1 registro ficou fora da soma" : `${numberFormat.format(count)} registros ficaram fora da soma`;
-        notify("warning", `${message} ${pending} por falta de OPS identificado. Confira os códigos na Base de Colaboradores em Q:R.`);
+        notify("warning", `${message} ${pending} por falta de OPS identificado. Confira os códigos nos relatórios e nas fórmulas das células copiadas.`);
     }
 
     async function runAction(button, action) {
@@ -240,14 +237,13 @@ function initializeEmployeeRankingController(root) {
 
     copyButton.addEventListener("click", () => runAction(copyButton, async () => {
         try {
-            const { operatorDirectory } = getEmployeeRankingHistory();
-            const clipboard = createEmployeeRankingClipboard({ ...rankings, operatorDirectory }, clipboardRowCount);
+            const clipboard = createEmployeeRankingClipboard(rankings, clipboardRowCount);
             await writeSummaryClipboard(clipboard);
             clipboardRowCount = clipboard.rowCount;
         } catch {
             throw new Error("Não foi possível copiar o ranking com formatação. Verifique a permissão da área de transferência.");
         }
-        notifyWithPendingOps("success", "Ranking copiado. Cole em B2 com Ctrl+V. A lista de OPS fica em Q:R.");
+        notifyWithPendingOps("success", "Ranking copiado. Cole em B2 com Ctrl+V.");
     }));
 
     bindReportImageExportButton(imageButton, {
@@ -264,11 +260,8 @@ function initializeEmployeeRankingController(root) {
         }
         const history = parseEmployeeRankingClipboard(clipboard);
         replaceEmployeeRankingHistory({ ...getEmployeeRankingHistory(), ...history });
-        const { operatorDirectory, ...accumulated } = history;
-        if (hasRankingRows(accumulated)) {
+        if (hasRankingRows(history)) {
             notifyWithPendingOps("success", "Acumulado anterior do ranking importado.");
-        } else if (operatorDirectory?.length) {
-            notifyWithPendingOps("success", "Lista de códigos OPS importada.");
         } else {
             notifyWithPendingOps("info", "A seleção copiada está sem registros acumulados.");
         }

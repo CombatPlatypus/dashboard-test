@@ -24,13 +24,13 @@ Parcel Sweeper e Reversa usam o dia da cópia no horário de São Paulo e os tot
 
 No [Ranking Mensal de Colaboradores](ranking-de-colaboradores.md), cole o bloco em `B2` da aba **Ranking de Colaboradores** com `Ctrl+V`. O HTML aplica o alinhamento horizontal e vertical centralizado e a fonte diretamente às células. A fonte Open Sans usa 20 pt no título mesclado, 12 pt nos títulos das seções, 11 pt nos cabeçalhos das colunas e 10 pt nos dados.
 
-Recebimento ocupa B:C, Erros de Etiquetagem ocupa E:F e Avarias Recebidas ocupa H:I. **Rotas Conferidas** ocupa K:L com o nome abreviado e a quantidade de rotas. Pacotes OFF ocupa N:O. Os blocos levam os nomes abreviados e a ordem exibida na prévia.
+Mesa de Recebimento ocupa C:D, Erros de Etiquetagem ocupa F:G, Rotas Conferidas ocupa I:J, Avarias Recebidas ocupa L:M e Pacotes OFF ocupa O:P. Cada bloco leva os nomes abreviados e as quantidades na ordem exibida na prévia.
 
-A cópia termina em R e o título ocupa a mesclagem B2:R3. **Base de Colaboradores** ocupa a mesclagem Q5:R5. Os cabeçalhos **Código Ops** e **Nome do Colaborador** ficam em Q6 e R6, e os registros começam em Q7:R7. Cada OPS aparece uma vez. As colunas Q:R podem ficar ocultas na aba. Para reimportar, copie uma seleção que inclua Q:R.
+A cópia começa em B2 e termina em Q. O título está mesclado em C2:P3. B e Q são as margens do modelo. Os títulos dos blocos ficam na linha 5, os cabeçalhos de coluna na linha 6 e os dados começam na linha 7.
 
-A cópia define as quatro bordas externas de cada título mesclado e as quatro bordas de cada célula nos cabeçalhos e dados. As colunas separadoras D, G, J, M e P usam a mesclagem vertical e as bordas superior e inferior do modelo.
+A cópia define as quatro bordas externas de cada título mesclado e as quatro bordas de cada célula nos cabeçalhos e dados. Os separadores E, H, K e N e as margens B e Q levam as mesclagens e as bordas do modelo.
 
-O bloco tem pelo menos 150 linhas de dados. Se as tabelas ou a lista de OPS já ocuparam mais linhas na aba do navegador, a cópia inclui vazios até esse tamanho para sobrescrever a colagem anterior. A colagem normal em B2 preserva a fórmula `="Cayo"&T(N("Nome e id do conferente: [ops114012] Cayo"))`. A célula mostra `Cayo` e a fórmula conserva o OPS junto do nome do colaborador. [Cópia do ranking](../../js/reports/employee-ranking/clipboard.js)
+O bloco tem pelo menos 150 linhas de dados. Se as tabelas já ocuparam mais linhas na aba do navegador, a cópia inclui vazios até esse tamanho para sobrescrever a colagem anterior. O HTML dos três blocos acumuláveis leva fórmulas como `="Cayo"&T(N("Nome e id do conferente: [ops114012] Cayo"))`. A célula mostra `Cayo` e a fórmula conserva o OPS junto do nome para a reimportação. [Cópia do ranking](../../js/reports/employee-ranking/clipboard.js)
 
 Recebimento, Erros de Etiquetagem e Rotas Conferidas incluem apenas os totais com OPS identificado. Um aviso junto da confirmação da cópia indica quando há registros pendentes na fonte.
 

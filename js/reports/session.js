@@ -205,8 +205,7 @@ const validOccurrenceDays = state => isSessionObject(state) && isSessionObjectLi
 
 const validOpsCode = value => typeof value === "string" && /^ops\d+$/i.test(value);
 const validRankingIdentity = row => typeof row.operator === "string" && row.operator.trim() !== "" &&
-    (row.opsCode === undefined || validOpsCode(row.opsCode)) &&
-    (row.fullNameConfirmed === undefined || typeof row.fullNameConfirmed === "boolean");
+    (row.opsCode === undefined || validOpsCode(row.opsCode));
 
 const validRankingCounts = rows => isSessionObjectList(rows) && rows.every(row => validRankingIdentity(row) &&
     Number.isSafeInteger(row.quantity) && row.quantity >= 0);
@@ -239,12 +238,10 @@ const sessionReportValidators = {
             .every(codes => Array.isArray(codes) && codes.every(code => typeof code === "string")));
     })],
     "overall-analysis": ["do Ranking de Colaboradores", state => {
-        const { employeeRanking, processingRanking, operatorDirectory } = state;
+        const { employeeRanking, processingRanking } = state;
         const validExpedition = employeeRanking === undefined || (isSessionObjectList(employeeRanking) && employeeRanking.every(row =>
             validRankingIdentity(row) && Number.isSafeInteger(row.routesChecked) && row.routesChecked >= 0));
-        const validDirectory = operatorDirectory === undefined || (isSessionObjectList(operatorDirectory) &&
-            operatorDirectory.every(row => validRankingIdentity(row) && validOpsCode(row.opsCode)));
-        return validExpedition && validDirectory && (processingRanking === undefined || (isSessionObject(processingRanking) &&
+        return validExpedition && (processingRanking === undefined || (isSessionObject(processingRanking) &&
             validRankingCounts(processingRanking.receipt) && validRankingCounts(processingRanking.labelingErrors)));
     }],
 };
