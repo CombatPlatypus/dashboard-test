@@ -4,15 +4,18 @@ import { normalizeEmployeeRankingName, readEmployeeOpsCode } from "./model.js";
 
 const MIN_EMPLOYEE_RANKING_ROWS = 150;
 const rankingTitle = "RANKING MENSAL DE DESEMPENHO";
-const rankingHeaders = ["Colaborador", "Quantidade"];
+const opsHeader = "ID OPS";
+const operatorHeaders = ["Colaborador", "Quantidade"];
+const rankingHeaders = [opsHeader, ...operatorHeaders];
 const receipt = { title: "Mesa de Recebimento", previousTitles: ["Recebimento", "Recebimento de Pacotes"] };
 const labelingErrors = { title: "Erros de Etiquetagem" };
 const receivedDamage = { title: "Avarias Recebidas" };
 const expedition = { title: "Rotas Conferidas", previousTitles: ["Rotas Conferidas e Tempo Médio"] };
 const offPackages = { title: "Pacotes OFF" };
-const operatorFormulaPrefix = "Nome e id do conferente: ";
-const operatorFormulaPrefixes = [operatorFormulaPrefix, "Nome completo do conferente: "];
-const columnWidths = [181, 121, 21, 181, 121, 21, 181, 121, 21, 181, 121, 21, 201, 121];
+const operatorFormulaPrefixes = ["Nome e id do conferente: ", "Nome completo do conferente: "];
+const columnWidths = [
+    101, 181, 121, 21, 101, 181, 121, 21, 101, 181, 121, 21, 181, 181, 121, 21, 201, 201, 121,
+];
 // Match the inline cell formatting copied by Google Sheets from the ranking template.
 const blankStyle = { background: "#121212", fontSize: 10, inlineFormattingOnly: true };
 const titleStyle = {
@@ -21,18 +24,26 @@ const titleStyle = {
 const sectionStyle = { ...titleStyle, fontSize: 12, bold: false };
 const gapStyle = { ...blankStyle, borderSides: ["top", "bottom"], borderColor: "#101010" };
 const headerStyle = { ...blankStyle, background: "#242424", fontSize: 11, border: true };
+const offPackagesRowStyle = { ...blankStyle, border: true };
 const rowStyles = [
-    { ...blankStyle, border: true },
+    { ...blankStyle, background: "#101010", border: true },
     { ...blankStyle, background: "#1b1b1b", border: true },
 ];
 
-function isRankingHeader(section, row, column) {
-    return rankingHeaders.every((header, index) => {
-        const value = normalizeText(row?.[column + index]);
+function isOpsHeader(value) {
+    return normalizeText(value) === "id ops";
+}
+
+function getRankingHeaderColumns(section, row, column) {
+    const opsColumn = isOpsHeader(row?.[column]) ? column : -1;
+    const nameColumn = opsColumn === -1 ? column : column + 1;
+    const hasHeaders = operatorHeaders.every((header, index) => {
+        const value = normalizeText(row?.[nameColumn + index]);
         return value === normalizeText(header) ||
             (header === "Quantidade" && value === "qtd") ||
             (section === receipt && header === "Quantidade" && value === "total recebido");
     });
+    return hasHeaders ? { nameColumn, opsColumn } : null;
 }
 
 function findRankingClipboardBlock(rows, section) {
@@ -41,26 +52,25 @@ function findRankingClipboardBlock(rows, section) {
         const column = row.findIndex(value => titles.includes(normalizeText(value)));
         if (column === -1) continue;
 
-        const headers = rows[rowIndex + 1];
-        if (!isRankingHeader(section, headers, column)) {
+        const columns = getRankingHeaderColumns(section, rows[rowIndex + 1], column);
+        if (!columns) {
             throw new Error(`Confira os cabeçalhos de ${section.title} na seleção copiada.`);
         }
-        return { column, startRow: rowIndex + 2 };
+        return { ...columns, startRow: rowIndex + 2 };
     }
     return null;
 }
 
-function findLegacyExpeditionClipboardBlock(rows) {
+function findIsolatedExpeditionClipboardBlock(rows) {
     // An isolated block from the previous model can still have a third column for time.
     if (rows.every(row => row.length <= 3)) {
         const firstRow = rows.findIndex(row => row.some(value => normalizeText(value)));
-        return {
-            column: 0,
-            startRow: isRankingHeader(expedition, rows[firstRow], 0) ? firstRow + 1 : 0,
-        };
+        const columns = getRankingHeaderColumns(expedition, rows[firstRow], 0);
+        if (columns) return { ...columns, startRow: firstRow + 1 };
+        return { nameColumn: 0, opsColumn: -1, startRow: 0 };
     }
 
-    throw new Error("Copie a aba Ranking de Colaboradores ou o bloco Rotas Conferidas.");
+    throw new Error("Copie a aba Ranking de Colaboradores com os títulos e as colunas ID OPS (C, G e K). Se estiverem ocultas, reexiba essas colunas antes de copiar.");
 }
 
 function parseRankingQuantity(value) {
@@ -87,7 +97,7 @@ function readOperatorFormula(formula) {
 }
 
 function parseRankingHtmlRows(html) {
-    if (!html.includes("data-sheets-formula")) return [];
+    if (!html || typeof document === "undefined") return { rows: [], hasOperatorFormulas: false };
 
     // The clipboard HTML stays in an inert template and is read as data.
     const template = document.createElement("template");
@@ -117,7 +127,11 @@ function parseRankingHtmlRows(html) {
         }
     }
 
-    return hasOperatorFormulas ? rows : [];
+    return { rows, hasOperatorFormulas };
+}
+
+function countOpsHeaders(rows) {
+    return rows.reduce((total, row) => total + row.filter(isOpsHeader).length, 0);
 }
 
 async function readEmployeeRankingClipboard(clipboard = navigator.clipboard) {
@@ -143,22 +157,24 @@ async function readEmployeeRankingClipboard(clipboard = navigator.clipboard) {
     return { text: text || await clipboard.readText(), html: "" };
 }
 
-function readRankingIdentity(value) {
+function readRankingIdentity(value, id) {
     const source = readOperatorFormula(value) ?? value;
-    const opsCode = readEmployeeOpsCode(source);
+    const columnOpsCode = /^\d+$/.test(id) ? `ops${id}` : readEmployeeOpsCode(id);
+    const opsCode = columnOpsCode || readEmployeeOpsCode(source);
     const name = normalizeEmployeeRankingName(source);
     return { operator: isEmptyCell(name) && opsCode ? opsCode : name, ...(opsCode && { opsCode }) };
 }
 
-function parseRankingClipboardBlock(rows, section, { column, startRow }) {
+function parseRankingClipboardBlock(rows, section, { nameColumn, opsColumn, startRow }) {
     const ranking = [];
     for (let rowIndex = startRow; rowIndex < rows.length; rowIndex += 1) {
         const row = rows[rowIndex];
-        const name = readClipboardName(row[column]);
-        const quantity = String(row[column + 1] ?? "").trim();
-        if (isEmptyCell(name) && isEmptyCell(quantity)) continue;
+        const id = readClipboardName(row[opsColumn]);
+        const name = readClipboardName(row[nameColumn]);
+        const quantity = String(row[nameColumn + 1] ?? "").trim();
+        if (isEmptyCell(id) && isEmptyCell(name) && isEmptyCell(quantity)) continue;
 
-        const identity = readRankingIdentity(name);
+        const identity = readRankingIdentity(name, id);
         const count = parseRankingQuantity(quantity);
         if (isEmptyCell(identity.operator) || count === null) {
             throw new Error(`Revise o colaborador e a quantidade de ${section.title} na linha ${rowIndex + 1} da seleção copiada.`);
@@ -170,8 +186,12 @@ function parseRankingClipboardBlock(rows, section, { column, startRow }) {
 }
 
 function parseEmployeeRankingClipboard({ text, html = "" }) {
-    const htmlRows = parseRankingHtmlRows(html);
-    const rows = htmlRows.length ? htmlRows : parseClipboardRows(text);
+    const textRows = parseClipboardRows(text);
+    const { rows: htmlRows, hasOperatorFormulas } = parseRankingHtmlRows(html);
+    const htmlOpsHeaders = countOpsHeaders(htmlRows);
+    const useHtml = htmlRows.length > 0 && (textRows.length === 0 ||
+        ((hasOperatorFormulas || htmlOpsHeaders > 0) && htmlOpsHeaders >= countOpsHeaders(textRows)));
+    const rows = useHtml ? htmlRows : textRows;
     if (rows.length === 0) throw new Error("A área de transferência está vazia.");
 
     const history = {};
@@ -181,7 +201,7 @@ function parseEmployeeRankingClipboard({ text, html = "" }) {
     }
     if (Object.keys(history).length > 0) return history;
 
-    return { expedition: parseRankingClipboardBlock(rows, expedition, findLegacyExpeditionClipboardBlock(rows)) };
+    return { expedition: parseRankingClipboardBlock(rows, expedition, findIsolatedExpeditionClipboardBlock(rows)) };
 }
 
 function cell(value, style, span = 1, rowSpan = 1) {
@@ -192,22 +212,6 @@ function nameCell(value, style) {
     return {
         ...cell(value, style),
         textValue: /^[=+@-]/.test(value ?? "") ? `'${value}` : value,
-    };
-}
-
-function createRankingNameCell(entry, style) {
-    if (!entry) return cell(null, style);
-
-    const { displayName, opsCode, operator } = entry;
-    const displayed = nameCell(displayName, style);
-    if (!opsCode) return displayed;
-
-    const identity = `[${opsCode}] ${operator}`;
-    const escapeFormulaText = value => value.replaceAll('"', '""');
-    return {
-        ...displayed,
-        // T(N(text)) keeps the OPS and full name in the formula while displaying only the short name.
-        formula: `="${escapeFormulaText(displayName)}"&T(N("${operatorFormulaPrefix}${escapeFormulaText(identity)}"))`,
     };
 }
 
@@ -239,10 +243,11 @@ function createEmployeeRankingClipboard({
     ];
 
     for (let index = 0; index < rowCount; index += 1) {
-        const style = rowStyles[index % rowStyles.length];
-        rows.push(sectionRow((_, ranking) => {
+        const stripe = index % rowStyles.length;
+        rows.push(sectionRow((section, ranking) => {
             const entry = ranking[index];
-            return [createRankingNameCell(entry, style), cell(entry?.quantity, style)];
+            const style = section === offPackages && stripe === 0 ? offPackagesRowStyle : rowStyles[stripe];
+            return [cell(entry?.opsCode, style), nameCell(entry?.displayName, style), cell(entry?.quantity, style)];
         }));
     }
 

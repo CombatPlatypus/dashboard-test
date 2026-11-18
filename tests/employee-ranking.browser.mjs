@@ -49,21 +49,17 @@ function createExpeditionFile() {
 }
 
 function createHistoricalRanking() {
-    function spreadsheetRow(expedition) {
-        return ["", "", "", "", "", "", "", "", "", "", ...expedition, "", "", "", ""].join("\t");
-    }
-
     const operators = Array.from({ length: 151 }, (_, index) => [
-        `[ops${1000 + index}] Colaborador ${index + 1} Teste`, 1, "01:00",
+        `ops${1000 + index}`, `Colaborador ${index + 1} Teste`, 1,
     ]);
     return [
-        spreadsheetRow(["Rotas Conferidas e Tempo Médio", "", ""]),
-        spreadsheetRow(["Colaborador", "Quantidade", "Tempo"]),
-        spreadsheetRow(['="Maria Silva"&T(N("Nome e id do conferente: [ops123] Maria Silva"))', 2, "05:36"]),
-        spreadsheetRow(["[ops321] Maria da Silva Rodrigues", 9, "03:00"]),
-        spreadsheetRow(["João de Souza Barbosa", 100, "03:00"]),
-        ...operators.map(spreadsheetRow),
-    ].join("\n");
+        ["Rotas Conferidas", "", ""],
+        ["ID OPS", "Colaborador", "Quantidade"],
+        ["ops123", "Maria Silva", 2],
+        ["ops321", "Maria Silva", 9],
+        ["", "João de Souza Barbosa", 100],
+        ...operators,
+    ].map(row => row.join("\t")).join("\n");
 }
 
 await new Promise(resolve => server.listen(0, "127.0.0.1", resolve));
@@ -208,47 +204,45 @@ try {
     await page.waitForFunction(() => window.rankingClipboard.text.startsWith("RANKING MENSAL DE DESEMPENHO\t"));
     const copied = await page.evaluate(() => window.rankingClipboard.text.split("\n").map(row => row.split("\t")));
     assert.equal(copied.length, 158);
-    assert.ok(copied.every(row => row.length === 14));
-    assert.deepEqual([0, 3, 6, 9, 12].map(column => copied[3][column]),
+    assert.ok(copied.every(row => row.length === 19));
+    assert.deepEqual([0, 4, 8, 12, 16].map(column => copied[3][column]),
         ["Mesa de Recebimento", "Erros de Etiquetagem", "Rotas Conferidas", "Avarias Recebidas", "Pacotes OFF"]);
-    assert.deepEqual(copied[5].slice(6, 8), ["Maria Silva", "14"]);
-    assert.deepEqual(copied[6].slice(6, 8), ["Maria Silva", "9"]);
-    assert.match(await page.locator("#employeeRankingNotificationText").textContent(), /C2:P3/);
+    assert.deepEqual(copied[5].slice(8, 11), ["ops123", "Maria Silva", "14"]);
+    assert.deepEqual(copied[6].slice(8, 11), ["ops321", "Maria Silva", "9"]);
+    assert.match(await page.locator("#employeeRankingNotificationText").textContent(), /C2:U3/);
 
     const copiedFormat = await page.evaluate(() => {
         const doc = new DOMParser().parseFromString(window.rankingClipboard.html, "text/html");
         const table = doc.querySelector("google-sheets-html-origin table");
         const title = table.rows[0].cells[0];
-        const expeditionCells = Array.from(table.rows[5].cells).slice(4, 6);
+        const expeditionCells = Array.from(table.rows[5].cells).slice(6, 9);
         return {
             titleSpan: [title.colSpan, title.rowSpan],
-            formula: expeditionCells[0].getAttribute("data-sheets-formula"),
             centerAligned: expeditionCells.every(cell => cell.style.textAlign === "center" && cell.style.verticalAlign === "middle"),
             values: expeditionCells.map(cell => cell.textContent),
         };
     });
     assert.deepEqual(copiedFormat, {
-        titleSpan: [14, 2],
-        formula: '="Maria Silva"&T(N("Nome e id do conferente: [ops123] Maria da Silva Santos"))',
-        centerAligned: true, values: ["Maria Silva", "14"],
+        titleSpan: [19, 2],
+        centerAligned: true, values: ["ops123", "Maria Silva", "14"],
     });
 
     const operatorsFromCopy = await page.evaluate(async () => {
         const { parseEmployeeRankingClipboard, readEmployeeRankingClipboard } =
             await import("/js/reports/employee-ranking/clipboard.js");
         const clipboard = await readEmployeeRankingClipboard();
-        const doc = new DOMParser().parseFromString(clipboard.html, "text/html");
-        const table = doc.querySelector("table");
-        // An older paste can leave a spare column in the destination sheet.
-        for (const [index, value] of [[4, "Nome completo do conferente"], [5, "Conferente de outra linha"]]) {
-            table.rows[index].insertCell();
-            table.rows[index].insertCell().textContent = value;
-        }
-        return parseEmployeeRankingClipboard({ ...clipboard, html: table.outerHTML }).expedition.slice(0, 2);
+        const textWithoutIds = clipboard.text.split("\n")
+            .map(row => row.split("\t").filter((_, index) => index % 4 !== 0).join("\t")).join("\n");
+        return [
+            parseEmployeeRankingClipboard({ text: clipboard.text }).expedition.slice(0, 2),
+            parseEmployeeRankingClipboard({ text: textWithoutIds, html: clipboard.html }).expedition.slice(0, 2),
+        ];
     });
-    assert.deepEqual(operatorsFromCopy.map(entry => [entry.operator, entry.opsCode, entry.routesChecked]), [
-        ["Maria da Silva Santos", "ops123", 14], ["Maria da Silva Rodrigues", "ops321", 9],
-    ]);
+    for (const records of operatorsFromCopy) {
+        assert.deepEqual(records.map(entry => [entry.operator, entry.opsCode, entry.routesChecked]), [
+            ["Maria Silva", "ops123", 14], ["Maria Silva", "ops321", 9],
+        ]);
+    }
 
     await page.reload();
     await page.waitForFunction(() => document.querySelectorAll("#switch-spreadsheet .tabs-title").length > 0);
@@ -265,7 +259,7 @@ try {
     await copyButton.click();
     await page.waitForFunction(() => window.rankingClipboard.text.startsWith("RANKING MENSAL DE DESEMPENHO\t"));
     const copiedAfterClear = await page.evaluate(() => window.rankingClipboard.text.split("\n").map(row => row.split("\t")));
-    assert.deepEqual(copiedAfterClear[5].slice(6, 8), ["Maria Silva", "12"]);
+    assert.deepEqual(copiedAfterClear[5].slice(8, 11), ["ops123", "Maria Silva", "12"]);
     assert.equal(copiedAfterClear.length, 158);
     assert.ok(copiedAfterClear.slice(6).every(row => row.every(value => value === "")));
 
