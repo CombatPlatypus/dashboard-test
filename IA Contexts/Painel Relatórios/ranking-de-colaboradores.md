@@ -35,7 +35,7 @@ O mesmo importador lê **Expedição** e **Log** do **Histórico de Retornados**
 ## Botões
 
 - **Importar** lê os acumulados de Mesa de Recebimento, Erros de Etiquetagem e Rotas Conferidas da aba **Ranking de Colaboradores**. Copie o acumulado anterior com as fórmulas das células. O cálculo soma esse histórico com os dados atuais e mantém os OPS presentes só no histórico. Repetir a importação do mesmo acumulado produz os mesmos totais. A importação também lê os títulos antigos e a quantidade do bloco de Expedição com a coluna de tempo.
-- **Copiar** prepara o ranking formatado para colar em **B2**, com Mesa de Recebimento em C:D, Erros de Etiquetagem em F:G, Rotas Conferidas em I:J, Avarias Recebidas em L:M e Pacotes OFF em O:P. As células dos três blocos acumuláveis exibem o nome abreviado da prévia e guardam a identificação na fórmula. [Formato da cópia](copia-de-dados-para-planilha.md#expedição-do-ranking-mensal)
+- **Copiar** prepara o ranking formatado para colar a partir do título mesclado **C2:P3**, com Mesa de Recebimento em C:D, Erros de Etiquetagem em F:G, Rotas Conferidas em I:J, Avarias Recebidas em L:M e Pacotes OFF em O:P. As células dos três blocos acumuláveis exibem o nome abreviado da prévia e guardam a identificação na fórmula. [Formato da cópia](copia-de-dados-para-planilha.md#expedição-do-ranking-mensal)
 - **Imagem** copia o ranking para a área de transferência. Segure o botão para baixar o PNG. A imagem inclui todas as linhas com dados.
 - **Lixeira** descarta o acumulado e recalcula o ranking com os dados atuais dos relatórios. Ao limpar Processamento ou Expedição na aba de origem, os blocos correspondentes passam a mostrar o acumulado carregado.
 

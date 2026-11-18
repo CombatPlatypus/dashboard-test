@@ -3,6 +3,8 @@ import {
     subscribeReceiptState,
 } from "../receipt/state.js";
 
+import { getReceiptLinehaulState, subscribeReceiptLinehaulState } from "../receipt/linehaul-state.js";
+
 import {
     getExpeditionChangeScope,
     getExpeditionState,
@@ -87,6 +89,7 @@ function getCurrentOverallAnalysisData(date = new Date()) {
         getParcelSnapshot(),
         getReverseSnapshot(),
         date,
+        getReceiptLinehaulState(),
     );
 }
 
@@ -223,6 +226,10 @@ function initializeOverallAnalysisController() {
             receipt.operators.find(operator => operator.id === change.operatorId)?.selected === false) return;
         requestOverallAnalysisUpdate({ receipt });
     });
+    subscribeReceiptLinehaulState((linehaul, change) => {
+        if (change.type === "linehaul-record-updated" && ["driver", "origin"].includes(change.field)) return;
+        requestOverallAnalysisUpdate({ linehaul });
+    });
     subscribeExpeditionState(onExpeditionChange);
     subscribeLossesRateState((lossesRate, change) => {
         if (change.type !== "active-month-changed") {
@@ -279,6 +286,7 @@ function canExportOverallAnalysisController(
     return [
         data.flow.planned,
         data.flow.processed,
+        data.processing.unloadedCount ?? null,
         data.flow.expedited,
         data.flow.floor,
         data.expeditionErrors.totalErrors,

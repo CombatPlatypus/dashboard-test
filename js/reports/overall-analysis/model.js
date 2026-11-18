@@ -2,6 +2,8 @@ import {
     getReceiptSummary,
 } from "../receipt/state.js";
 
+import { getReceiptLinehaulSummary } from "../receipt/linehaul-state.js";
+
 import {
     createExpeditionDerivations,
 } from "../expedition/state.js";
@@ -304,7 +306,17 @@ function getOverallReverse(state) {
 function updateOverallAnalysisSources(data, sources, referenceDate = new Date()) {
     const next = { ...data };
     if ("receipt" in sources) {
-        next.processing = getOverallProcessing(sources.receipt);
+        next.processing = { ...data.processing, ...getOverallProcessing(sources.receipt) };
+    }
+    if ("linehaul" in sources) {
+        const summary = getReceiptLinehaulSummary(sources.linehaul ?? {});
+        const unloadedCount = summary.hasData ? summary.unloadedCount : null;
+        const unloadedVolume = summary.hasData ? summary.unloadedVolume : null;
+        if (unloadedCount !== data.processing?.unloadedCount || unloadedVolume !== data.processing?.unloadedVolume) {
+            next.processing = { ...next.processing, unloadedCount, unloadedVolume };
+        } else if (Object.keys(sources).length === 1) {
+            return data;
+        }
     }
     if (sources.expeditionSummary || sources.expeditionErrors) {
         const derived = sources.expeditionDerived ?? createExpeditionDerivations(sources.expedition);
@@ -373,6 +385,7 @@ function createOverallAnalysisData(
     parcelState = null,
     reverseState = null,
     referenceDate = new Date(),
+    linehaulState = null,
 ) {
     const context = createOverallAnalysisContext(reportContext);
     return updateOverallAnalysisSources({
@@ -381,6 +394,7 @@ function createOverallAnalysisData(
         flow: { planned: context.plannedVolume },
     }, {
         receipt: receiptState,
+        linehaul: linehaulState,
         expedition: expeditionState,
         expeditionSummary: true,
         occurrences: { damage: damageState, losses: lossesState },

@@ -12,7 +12,7 @@ const expedition = { title: "Rotas Conferidas", previousTitles: ["Rotas Conferid
 const offPackages = { title: "Pacotes OFF" };
 const operatorFormulaPrefix = "Nome e id do conferente: ";
 const operatorFormulaPrefixes = [operatorFormulaPrefix, "Nome completo do conferente: "];
-const columnWidths = [80, 181, 121, 21, 181, 121, 21, 181, 121, 21, 181, 121, 21, 201, 121, 80];
+const columnWidths = [181, 121, 21, 181, 121, 21, 181, 121, 21, 181, 121, 21, 201, 121];
 // Match the inline cell formatting copied by Google Sheets from the ranking template.
 const blankStyle = { background: "#121212", fontSize: 10, inlineFormattingOnly: true };
 const titleStyle = {
@@ -20,9 +20,6 @@ const titleStyle = {
 };
 const sectionStyle = { ...titleStyle, fontSize: 12, bold: false };
 const gapStyle = { ...blankStyle, borderSides: ["top", "bottom"], borderColor: "#101010" };
-const marginStyle = { ...blankStyle, background: "#101010" };
-const titleMarginStyle = { ...marginStyle, borderSides: ["top"], borderColor: "#101010" };
-const sectionMarginStyle = { ...gapStyle, background: "#101010" };
 const headerStyle = { ...blankStyle, background: "#242424", fontSize: 11, border: true };
 const rowStyles = [
     { ...blankStyle, border: true },
@@ -226,25 +223,18 @@ function createEmployeeRankingClipboard({
         [offPackages, offPackagesRanking],
     ];
     const rowCount = Math.max(MIN_EMPLOYEE_RANKING_ROWS, previousRowCount, ...sections.map(([, ranking]) => ranking.length));
-    const innerWidth = columnWidths.length - 2;
-    const titleMargin = cell(null, titleMarginStyle, 1, 2);
     const emptyCell = cell(null, blankStyle);
-    const emptyMargin = cell(null, marginStyle);
     const sectionGap = cell(null, gapStyle, 1, rowCount + 2);
-    const sectionMargin = cell(null, sectionMarginStyle, 1, rowCount + 2);
-    const sectionRow = (createSectionCells, gap = null, margin = null) => [
-        margin,
-        ...sections.flatMap(([section, ranking], index) => {
+    const sectionRow = (createSectionCells, gap = null) =>
+        sections.flatMap(([section, ranking], index) => {
             const cells = createSectionCells(section, ranking);
             return index === 0 ? cells : [gap, ...cells];
-        }),
-        margin,
-    ];
+        });
     const rows = [
-        [titleMargin, cell(rankingTitle, titleStyle, innerWidth, 2), titleMargin],
+        [cell(rankingTitle, titleStyle, columnWidths.length, 2)],
         Array(columnWidths.length).fill(null),
-        [emptyMargin, ...Array(innerWidth).fill(emptyCell), emptyMargin],
-        sectionRow(section => [cell(section.title, sectionStyle, rankingHeaders.length)], sectionGap, sectionMargin),
+        Array(columnWidths.length).fill(emptyCell),
+        sectionRow(section => [cell(section.title, sectionStyle, rankingHeaders.length)], sectionGap),
         sectionRow(() => rankingHeaders.map(header => cell(header, headerStyle))),
     ];
 

@@ -7,12 +7,48 @@ import { getOverallAnalysisMissingSections, isOverallAnalysisComplete } from "..
 import {
     createStandaloneOverallAnalysisHtml, createStandaloneOverallAnalysisFileName,
 } from "../js/reports/overall-analysis/standalone-export.js";
-import { createOverallAnalysisData } from "../js/reports/overall-analysis/model.js";
+import { createOverallAnalysisData, updateOverallAnalysisSources } from "../js/reports/overall-analysis/model.js";
+import { renderOverallAnalysisChanges } from "../js/reports/overall-analysis/view.js";
 import {
     initializeOverallAnalysisActions, renderOverallAnalysisActions, runOverallAnalysisHtmlExport,
 } from "../js/reports/overall-analysis/actions.js";
 
 const readResource = async url => ({ ok: true, text: () => readFile(url, "utf8") });
+
+test("Processamento exibe e exporta a contagem e o volume dos LHs descarregados", async () => {
+    const initial = createCompleteAnalysis();
+    const linehauls = [
+        { code: "LH1", loadedOrders: 5250, selected: true },
+        { code: "LH2", loadedOrders: 6000, selected: true },
+        { code: "LH3", loadedOrders: 750, selected: false },
+    ];
+    const withUnloading = updateOverallAnalysisSources(initial, { linehaul: { linehauls } });
+    assert.equal(withUnloading.flow, initial.flow);
+    assert.equal(withUnloading.expeditionErrors, initial.expeditionErrors);
+    const elements = { unloadedCount: { textContent: "—" }, unloadedVolume: { textContent: "—" } };
+    const displayed = () => [elements.unloadedCount.textContent, elements.unloadedVolume.textContent];
+    assert.equal(renderOverallAnalysisChanges(withUnloading, initial, elements), true);
+    assert.deepEqual(displayed(), ["2", "11.250"]);
+
+    const html = await createStandaloneOverallAnalysisHtml(withUnloading, { fetchResource: readResource });
+    const { report } = JSON.parse(html.match(/<script id="finalReportData"[^>]*>([\s\S]*?)<\/script>/)[1]);
+    assert.deepEqual(["unloadedCount", "expectedVolume", "unloadedVolume", "receivedVolume"]
+        .map(key => report.processing[key]), [2, 12000, 11250, 11500]);
+
+    const updatedReceipt = updateOverallAnalysisSources(withUnloading, { receipt: {
+        expectedVolume: 12000, operators: [{ packagesReceived: 11750, errorQuantity: 12 }],
+    } });
+    assert.deepEqual([updatedReceipt.processing.unloadedCount, updatedReceipt.processing.unloadedVolume], [2, 11250]);
+    const unchecked = updateOverallAnalysisSources(updatedReceipt, { linehaul: {
+        linehauls: linehauls.map(linehaul => ({ ...linehaul, selected: false })),
+    } });
+    renderOverallAnalysisChanges(unchecked, updatedReceipt, elements);
+    assert.deepEqual(displayed(), ["0", "0"]);
+    const cleared = updateOverallAnalysisSources(unchecked, { linehaul: { linehauls: [] } });
+    renderOverallAnalysisChanges(cleared, unchecked, elements);
+    assert.deepEqual(displayed(), ["—", "—"]);
+    assert.equal(updateOverallAnalysisSources(cleared, { linehaul: { linehauls: [] } }), cleared);
+});
 
 test("somente a análise completa libera HTML; cada bloco ausente bloqueia a geração", async () => {
     assert.equal(isOverallAnalysisComplete(createCompleteAnalysis()), true);

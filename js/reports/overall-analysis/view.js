@@ -303,15 +303,8 @@ function getOverallAnalysisViewElements(
                 "overallAnalysisReceivedVolume",
             ),
 
-        receiptErrors:
-            getElement(
-                "overallAnalysisReceiptErrors",
-            ),
-
-        receiptErrorRate:
-            getElement(
-                "overallAnalysisReceiptErrorRate",
-            ),
+        unloadedCount: getElement("overallAnalysisUnloadedCount"),
+        unloadedVolume: getElement("overallAnalysisUnloadedVolume"),
 
         routesChecked:
             getElement(
@@ -566,11 +559,11 @@ function renderOverallAnalysisChanges(data, previous, elements = overallAnalysis
         elements.processed.textContent = formatOverallAnalysisQuantity(data.flow.processed);
         elements.receivedVolume.textContent = formatOverallAnalysisQuantity(data.processing.receivedVolume);
     }
-    if (data.processing.totalErrors !== previous?.processing.totalErrors) {
-        elements.receiptErrors.textContent = formatOverallAnalysisQuantity(data.processing.totalErrors);
+    if (data.processing.unloadedCount !== previous?.processing.unloadedCount) {
+        elements.unloadedCount.textContent = formatOverallAnalysisQuantity(data.processing.unloadedCount);
     }
-    if (data.processing.errorRate !== previous?.processing.errorRate) {
-        elements.receiptErrorRate.textContent = formatOverallAnalysisRate(data.processing.errorRate);
+    if (data.processing.unloadedVolume !== previous?.processing.unloadedVolume) {
+        elements.unloadedVolume.textContent = formatOverallAnalysisQuantity(data.processing.unloadedVolume);
     }
     if (data.expedition !== previous?.expedition) {
         const { routesChecked, volumeChecked, floorVolume, durationSeconds } = data.expedition;

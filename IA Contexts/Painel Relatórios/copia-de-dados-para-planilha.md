@@ -22,13 +22,13 @@ Parcel Sweeper e Reversa usam o dia da cópia no horário de São Paulo e os tot
 
 ### Expedição do Ranking Mensal
 
-No [Ranking Mensal de Colaboradores](ranking-de-colaboradores.md), cole o bloco em `B2` da aba **Ranking de Colaboradores** com `Ctrl+V`. O HTML aplica o alinhamento horizontal e vertical centralizado e a fonte diretamente às células. A fonte Open Sans usa 20 pt no título mesclado, 12 pt nos títulos das seções, 11 pt nos cabeçalhos das colunas e 10 pt nos dados.
+No [Ranking Mensal de Colaboradores](ranking-de-colaboradores.md), selecione o título mesclado `C2:P3` da aba **Ranking de Colaboradores** e cole com `Ctrl+V`. O HTML aplica o alinhamento horizontal e vertical centralizado e a fonte diretamente às células. A fonte Open Sans usa 20 pt no título mesclado, 12 pt nos títulos das seções, 11 pt nos cabeçalhos das colunas e 10 pt nos dados.
 
 Mesa de Recebimento ocupa C:D, Erros de Etiquetagem ocupa F:G, Rotas Conferidas ocupa I:J, Avarias Recebidas ocupa L:M e Pacotes OFF ocupa O:P. Cada bloco leva os nomes abreviados e as quantidades na ordem exibida na prévia.
 
-A cópia começa em B2 e termina em Q. O título está mesclado em C2:P3. B e Q são as margens do modelo. Os títulos dos blocos ficam na linha 5, os cabeçalhos de coluna na linha 6 e os dados começam na linha 7.
+A cópia ocupa as colunas C a P, a partir da linha 2. Os títulos dos blocos ficam na linha 5, os cabeçalhos de coluna na linha 6 e os dados começam na linha 7.
 
-A cópia define as quatro bordas externas de cada título mesclado e as quatro bordas de cada célula nos cabeçalhos e dados. Os separadores E, H, K e N e as margens B e Q levam as mesclagens e as bordas do modelo.
+A cópia define as quatro bordas externas de cada título mesclado e as quatro bordas de cada célula nos cabeçalhos e dados. Os separadores E, H, K e N levam as mesclagens e as bordas do modelo.
 
 O bloco tem pelo menos 150 linhas de dados. Se as tabelas já ocuparam mais linhas na aba do navegador, a cópia inclui vazios até esse tamanho para sobrescrever a colagem anterior. O HTML dos três blocos acumuláveis leva fórmulas como `="Cayo"&T(N("Nome e id do conferente: [ops114012] Cayo"))`. A célula mostra `Cayo` e a fórmula conserva o OPS junto do nome para a reimportação. [Cópia do ranking](../../js/reports/employee-ranking/clipboard.js)
 

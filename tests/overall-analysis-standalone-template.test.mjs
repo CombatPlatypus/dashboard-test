@@ -118,6 +118,10 @@ test("as tabelas do HTML mantêm a estrutura e os estilos de célula do Relatór
     const previewTables = tables(preview);
     assert.equal(previewTables.length, 7);
     assert.deepEqual(tables(template), previewTables);
+    const processingTable = previewTables.find(table => table.includes("<caption>Processamento</caption>"));
+    assert.deepEqual(Array.from(processingTable.matchAll(/<th>([^<]+)<\/th>/g), ([, label]) => label), [
+        "LHs Descarregados", "Volume Esperado", "Volume Descarregado", "Volume Recebido",
+    ]);
 
     const dashboardCss = readFileSync(new URL("../css/dashboard-style.css", import.meta.url), "utf8");
     const reportsCss = readFileSync(new URL("../css/reports-style.css", import.meta.url), "utf8");
