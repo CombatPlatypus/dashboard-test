@@ -191,7 +191,8 @@ try {
     const monthlyRanking = await readRanking();
     assert.deepEqual(monthlyRanking[0], ["Maria Silva", "14"]);
     assert.deepEqual(monthlyRanking[1], ["Maria Silva", "9"]);
-    assert.match(await page.locator("#employeeRankingNotificationText").textContent(), /1 registro ficou fora da soma por falta de OPS/);
+    assert.equal(await page.locator("#employeeRankingNotificationText").textContent(),
+        "Acumulado anterior do ranking importado. 1 registro ficou fora da soma por falta de OPS identificado.");
     const otherRowCounts = await rankingTables.evaluateAll(tables => tables
         .filter(table => !table.querySelector("#employeeRankingExpeditionBody"))
         .map(table => table.tBodies[0].rows.length));

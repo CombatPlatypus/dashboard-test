@@ -23,6 +23,7 @@ Para manutenção no código, siga o [fluxo do repositório](../AGENTS.md) e con
 - [Página de Configurações](P%C3%A1gina%20de%20Configura%C3%A7%C3%B5es/README.md) cobre perfil, tema, planilhas e atalhos do rodapé.
 - [Footer](Footer/README.md) cobre visibilidade, configuração e abertura dos links externos.
 - [Gráficos](graficos.md) registra o padrão obrigatório dos gráficos atuais, futuros e exportados.
+- [Barra de notificações](arquitetura.md#barra-de-notificações) registra o limite de caracteres das mensagens exibidas no dashboard.
 
 ## Como registrar uma função
 

@@ -194,7 +194,7 @@ function initializeEmployeeRankingController(root) {
             return;
         }
         const pending = count === 1 ? "1 registro ficou fora da soma" : `${numberFormat.format(count)} registros ficaram fora da soma`;
-        notify("warning", `${message} ${pending} por falta de OPS identificado. Confira os códigos nos relatórios e inclua as colunas ID OPS (C, G e K) ao copiar o acumulado.`);
+        notify("warning", `${message} ${pending} por falta de OPS identificado.`);
     }
 
     async function runAction(button, action) {

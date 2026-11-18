@@ -6,7 +6,7 @@ Abra **Relatórios > Relatório Final > Ranking Mensal de Colaboradores**. **Pro
 
 Recebimento, Erros de Etiquetagem e Rotas Conferidas somam por OPS. O [modelo do ranking](../../js/reports/employee-ranking/model.js) cruza o código nos registros atuais com o da coluna **ID OPS** na mesma linha do acumulado. Cópias antigas podem fornecer o código junto do nome ou na fórmula da célula. Os nomes servem para exibição e desempate.
 
-OPS diferentes mantêm quantidades separadas mesmo para homônimos. Registros com quantidade e sem OPS ficam pendentes no relatório ou no acumulado de origem. O dashboard avisa quantos ficaram fora da soma. A importação lê os blocos do ranking e ignora listas auxiliares de colaboradores em versões antigas.
+OPS diferentes mantêm quantidades separadas mesmo para homônimos. Registros com quantidade e sem OPS ficam pendentes no relatório ou no acumulado de origem. A notificação da ação informa quantos registros ficaram fora da soma por falta de OPS identificado. A importação lê os blocos do ranking e ignora listas auxiliares de colaboradores em versões antigas.
 
 ## Recebimento e Erros de Etiquetagem
 

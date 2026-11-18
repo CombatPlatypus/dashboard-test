@@ -35,6 +35,10 @@ Esta regra vale para funções atuais e futuras em todos os painéis. Ao conecta
 2. O estado conta como feitas as rotas cujo status é `Validated` ou `Validado`. Se 8 de 10 rotas tiverem esses status, a prévia mostra **8 feitas, 2 pendentes e 80%** em **Progresso da Conferência**. O filtro por conferente afeta a tabela, enquanto a barra de progresso usa todas as rotas importadas. [Estado](../js/reports/expedition/state.js) · [Prévia](../js/reports/expedition/view.js) · [Teste do progresso](../tests/expedition-progress.test.mjs)
 3. A alteração no estado também atualiza os dados de Expedição usados pelo Relatório Final e aciona o salvamento automático na aba. [Controlador do Relatório Final](../js/reports/overall-analysis/controller.js) · [Gerenciador de sessão](../js/reports/session.js)
 
+## Barra de notificações
+
+O texto completo de cada mensagem exibida na barra de notificações deve ter no máximo **146 caracteres**, incluindo espaços, pontuação e trechos dinâmicos. Verifique o limite depois de montar a mensagem final.
+
 ## Sessão da aba e arquivos baixados
 
 - **Salvamento automático.** O `sessionStorage` guarda os dados para restaurar o trabalho ao recarregar a mesma aba. Relatórios, Análises, Filtragem e Configurações gravam em chaves próprias. [Salvamento e importação de sessão](Menu%20Principal/salvamento-de-sessao.md)
