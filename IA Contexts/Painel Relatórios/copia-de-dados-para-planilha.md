@@ -22,13 +22,13 @@ Parcel Sweeper e Reversa usam o dia da cópia no horário de São Paulo e os tot
 
 ### Expedição do Ranking Mensal
 
-No [Ranking Mensal de Colaboradores](ranking-de-colaboradores.md), selecione o título mesclado `C2:U3` da aba **Ranking de Colaboradores** e cole com `Ctrl+V`. O HTML aplica o alinhamento horizontal e vertical centralizado e a fonte diretamente às células. A fonte Open Sans usa 20 pt no título mesclado, 12 pt nos títulos das seções, 11 pt nos cabeçalhos das colunas e 10 pt nos dados.
+No [Ranking Mensal de Colaboradores](ranking-de-colaboradores.md), selecione o título mesclado `C2:S3` da aba **Ranking de Colaboradores** e cole com `Ctrl+V`. O HTML aplica o alinhamento horizontal e vertical centralizado e a fonte diretamente às células. A fonte Open Sans usa 20 pt no título mesclado, 12 pt nos títulos das seções, 11 pt nos cabeçalhos das colunas e 10 pt nos dados.
 
-Mesa de Recebimento ocupa C:E, Erros de Etiquetagem ocupa G:I, Rotas Conferidas ocupa K:M, Avarias Recebidas ocupa O:Q e Pacotes OFF ocupa S:U. Cada bloco contém **ID OPS**, **Colaborador** e **Quantidade**. Os IDs são preenchidos em C, G e K. Avarias Recebidas e Pacotes OFF usam nomes da planilha de Avarias e Perdas e deixam O e S vazias.
+Mesa de Recebimento ocupa C:E, Erros de Etiquetagem ocupa G:I e Rotas Conferidas ocupa K:M. Esses blocos têm **ID OPS**, **Colaborador** e **Quantidade**. Os IDs são preenchidos em C, G e K. Avarias Recebidas ocupa O:P e Pacotes OFF ocupa R:S. Esses blocos têm **Colaborador** e **Quantidade**.
 
-A cópia ocupa as colunas C a U, a partir da linha 2. Os títulos dos blocos ficam na linha 5, os cabeçalhos de coluna na linha 6 e os dados começam na linha 7.
+A cópia ocupa as colunas C a S, a partir da linha 2. Os títulos dos blocos ficam na linha 5, os cabeçalhos de coluna na linha 6 e os dados começam na linha 7.
 
-A cópia define as quatro bordas externas de cada título mesclado e as quatro bordas de cada célula nos cabeçalhos e dados. Os separadores F, J, N e R levam as mesclagens e as bordas do modelo.
+A cópia define as quatro bordas externas de cada título mesclado e as quatro bordas de cada célula nos cabeçalhos e dados. Os separadores F, J, N e Q levam as mesclagens e as bordas do modelo.
 
 O bloco tem pelo menos 150 linhas de dados. Se as tabelas já ocuparam mais linhas na aba do navegador, a cópia inclui vazios até esse tamanho para sobrescrever a colagem anterior. Os nomes abreviados e os IDs são gravados como valores também na cópia em texto. Na reimportação, a área de transferência precisa incluir os IDs. Se a planilha copiar apenas os nomes, reexiba C, G e K e copie novamente. [Cópia do ranking](../../js/reports/employee-ranking/clipboard.js)
 

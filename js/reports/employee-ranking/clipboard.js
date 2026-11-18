@@ -6,15 +6,19 @@ const MIN_EMPLOYEE_RANKING_ROWS = 150;
 const rankingTitle = "RANKING MENSAL DE DESEMPENHO";
 const opsHeader = "ID OPS";
 const operatorHeaders = ["Colaborador", "Quantidade"];
-const rankingHeaders = [opsHeader, ...operatorHeaders];
-const receipt = { title: "Mesa de Recebimento", previousTitles: ["Recebimento", "Recebimento de Pacotes"] };
-const labelingErrors = { title: "Erros de Etiquetagem" };
-const receivedDamage = { title: "Avarias Recebidas" };
-const expedition = { title: "Rotas Conferidas", previousTitles: ["Rotas Conferidas e Tempo Médio"] };
-const offPackages = { title: "Pacotes OFF" };
+const opsRankingHeaders = [opsHeader, ...operatorHeaders];
+const receipt = {
+    title: "Mesa de Recebimento", headers: opsRankingHeaders, previousTitles: ["Recebimento", "Recebimento de Pacotes"],
+};
+const labelingErrors = { title: "Erros de Etiquetagem", headers: opsRankingHeaders };
+const receivedDamage = { title: "Avarias Recebidas", headers: operatorHeaders };
+const expedition = {
+    title: "Rotas Conferidas", headers: opsRankingHeaders, previousTitles: ["Rotas Conferidas e Tempo Médio"],
+};
+const offPackages = { title: "Pacotes OFF", headers: operatorHeaders };
 const operatorFormulaPrefixes = ["Nome e id do conferente: ", "Nome completo do conferente: "];
 const columnWidths = [
-    101, 181, 121, 21, 101, 181, 121, 21, 101, 181, 121, 21, 181, 181, 121, 21, 201, 201, 121,
+    101, 181, 121, 21, 101, 181, 121, 21, 101, 181, 121, 21, 181, 121, 21, 201, 121,
 ];
 // Match the inline cell formatting copied by Google Sheets from the ranking template.
 const blankStyle = { background: "#121212", fontSize: 10, inlineFormattingOnly: true };
@@ -238,8 +242,8 @@ function createEmployeeRankingClipboard({
         [cell(rankingTitle, titleStyle, columnWidths.length, 2)],
         Array(columnWidths.length).fill(null),
         Array(columnWidths.length).fill(emptyCell),
-        sectionRow(section => [cell(section.title, sectionStyle, rankingHeaders.length)], sectionGap),
-        sectionRow(() => rankingHeaders.map(header => cell(header, headerStyle))),
+        sectionRow(section => [cell(section.title, sectionStyle, section.headers.length)], sectionGap),
+        sectionRow(section => section.headers.map(header => cell(header, headerStyle))),
     ];
 
     for (let index = 0; index < rowCount; index += 1) {
@@ -247,7 +251,9 @@ function createEmployeeRankingClipboard({
         rows.push(sectionRow((section, ranking) => {
             const entry = ranking[index];
             const style = section === offPackages && stripe === 0 ? offPackagesRowStyle : rowStyles[stripe];
-            return [cell(entry?.opsCode, style), nameCell(entry?.displayName, style), cell(entry?.quantity, style)];
+            const cells = [nameCell(entry?.displayName, style), cell(entry?.quantity, style)];
+            if (section.headers[0] === opsHeader) cells.unshift(cell(entry?.opsCode, style));
+            return cells;
         }));
     }
 
