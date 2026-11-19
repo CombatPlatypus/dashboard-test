@@ -26,6 +26,10 @@ function formatEmployeeRankingName(name) {
         .join(" ");
 }
 
+function formatRankedEmployeeName(name, position) {
+    return name ? `${position}º ${name}` : "";
+}
+
 function hasQuantity(value) {
     return Number.isSafeInteger(value) && value >= 0;
 }
@@ -103,6 +107,7 @@ export {
     buildEmployeeLabelingErrorRanking,
     buildEmployeeOccurrenceRanking,
     buildEmployeeReceiptRanking,
+    formatRankedEmployeeName,
     normalizeEmployeeRankingName,
     readEmployeeOpsCode,
 };

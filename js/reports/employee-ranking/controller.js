@@ -26,6 +26,7 @@ import {
     buildEmployeeLabelingErrorRanking,
     buildEmployeeOccurrenceRanking,
     buildEmployeeReceiptRanking,
+    formatRankedEmployeeName,
 } from "./model.js";
 import {
     getEmployeeRankingHistory,
@@ -60,7 +61,7 @@ function renderRankingRows(body, ranking) {
             row.insertCell();
             addedRows.append(row);
         }
-        const name = entry?.displayName ?? "—";
+        const name = formatRankedEmployeeName(entry?.displayName, index + 1) || "—";
         const stats = entry ? numberFormat.format(entry.quantity) : "—";
         if (row.cells[0].textContent !== name) row.cells[0].textContent = name;
         if (row.cells[1].textContent !== stats) row.cells[1].textContent = stats;

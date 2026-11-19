@@ -30,7 +30,7 @@ A cópia ocupa as colunas C a S, a partir da linha 2. Os títulos dos blocos fic
 
 A cópia define as quatro bordas externas de cada título mesclado e as quatro bordas de cada célula nos cabeçalhos e dados. Os separadores F, J, N e Q levam as mesclagens e as bordas do modelo.
 
-O bloco tem pelo menos 150 linhas de dados. Se as tabelas já ocuparam mais linhas na aba do navegador, a cópia inclui vazios até esse tamanho para sobrescrever a colagem anterior. Os nomes abreviados e os IDs são gravados como valores também na cópia em texto. Na reimportação, a área de transferência precisa incluir os IDs. Se a planilha copiar apenas os nomes, reexiba C, G e K e copie novamente. [Cópia do ranking](../../js/reports/employee-ranking/clipboard.js)
+O bloco tem pelo menos 150 linhas de dados. Se as tabelas já ocuparam mais linhas na aba do navegador, a cópia inclui vazios até esse tamanho para sobrescrever a colagem anterior. A célula de colaborador leva a posição seguida do nome abreviado, como `1º Bruno Santos`, em HTML e texto tabulado. Na reimportação, a área de transferência precisa incluir os IDs. Se a planilha copiar apenas os nomes, reexiba C, G e K e copie novamente. [Cópia do ranking](../../js/reports/employee-ranking/clipboard.js)
 
 Recebimento, Erros de Etiquetagem e Rotas Conferidas incluem apenas os totais com OPS identificado. Um aviso junto da confirmação da cópia indica quando há registros pendentes na fonte.
 

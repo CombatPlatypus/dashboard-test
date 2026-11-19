@@ -42,7 +42,7 @@ test("copia o ranking a partir de C2:S3 com ID OPS nos três acumulados", () => 
         { operator: "Maria da Silva Costa", quantity: 1 },
     ]);
     const offPackagesRanking = buildEmployeeOccurrenceRanking([
-        { operator: "Maria da Silva Souza", quantity: 5 },
+        { operator: "Maria da Silva Souza", quantity: 1 },
         { operator: "Ana da Rocha Costa", quantity: 1 },
     ]);
     const receiptRanking = [{ operator: "Ana da Rocha Costa", opsCode: "ops25", displayName: "Ana Rocha", quantity: 1234 }];
@@ -59,12 +59,12 @@ test("copia o ranking a partir de C2:S3 com ID OPS nos três acumulados", () => 
         "Mesa de Recebimento", "Erros de Etiquetagem", "Rotas Conferidas", "Avarias Recebidas", "Pacotes OFF",
     ]);
     assert.deepEqual(rows[5], [
-        "ops25", "Ana Rocha", "1234", "", "ops90", "Pedro Costa", "0", "", "ops123", "Maria Silva", "12", "",
-        "Maria Silva", "1", "", "Ana Rocha", "1",
+        "ops25", "1º Ana Rocha", "1234", "", "ops90", "1º Pedro Costa", "0", "", "ops123", "1º Maria Silva", "12", "",
+        "1º Maria Silva", "1", "", "1º Ana Rocha", "1",
     ]);
     assert.deepEqual(rows[6], [
-        "", "", "", "", "", "", "", "", "ops124", "Maria Silva", "4", "",
-        "João Souza", "4", "", "Maria Silva", "5",
+        "", "", "", "", "", "", "", "", "ops124", "2º Maria Silva", "4", "",
+        "2º João Souza", "4", "", "2º Maria Silva", "1",
     ]);
     for (const column of [0, 4, 8]) {
         assert.deepEqual(rows[4].slice(column, column + 3), ["ID OPS", "Colaborador", "Quantidade"]);
@@ -95,7 +95,7 @@ test("copia o ranking a partir de C2:S3 com ID OPS nos três acumulados", () => 
     for (const title of ["RANKING MENSAL DE DESEMPENHO", ...mergedTitles.map(([title]) => title)]) {
         assert.match(cellStyles.get(title), /;border-top:1px solid #626262;border-right:1px solid #626262;border-bottom:1px solid #626262;border-left:1px solid #626262$/);
     }
-    for (const cell of ["ID OPS", "Colaborador", "Quantidade", "ops123", "Maria Silva", "12"]) {
+    for (const cell of ["ID OPS", "Colaborador", "Quantidade", "ops123", "1º Maria Silva", "12"]) {
         assert.match(cellStyles.get(cell), /;border:1px solid #626262$/);
     }
     for (const [text, fontSize] of [
@@ -105,10 +105,10 @@ test("copia o ranking a partir de C2:S3 com ID OPS nos três acumulados", () => 
         ["Pacotes OFF", 12],
         ["ID OPS", 11],
         ["Colaborador", 11],
-        ["Maria Silva", 10],
-        ["Ana Rocha", 10],
-        ["Pedro Costa", 10],
-        ["João Souza", 10],
+        ["1º Maria Silva", 10],
+        ["1º Ana Rocha", 10],
+        ["1º Pedro Costa", 10],
+        ["2º João Souza", 10],
     ]) {
         assert.match(cellStyles.get(text), new RegExp(`font-size:${fontSize}pt;`));
         assert.match(cellStyles.get(text), /text-align:center;vertical-align:middle;/);
@@ -144,6 +144,7 @@ test("imports the quantity from an isolated expedition block and ignores legacy 
         "Colaborador\tQuantidade\tTempo\n[ops123] Ana Santos\t4\t05:80",
         "ID OPS\tColaborador\tQuantidade\n[OPS123]\tAna Santos\t4",
         "ID OPS\tColaborador\tQuantidade\n123\tAna Santos\t4",
+        "ID OPS\tColaborador\tQuantidade\n123\t1º\u00a0Ana Santos\t4",
     ]) {
         assert.deepEqual(parseEmployeeRankingClipboard({ text }).expedition,
             [{ operator: "Ana Santos", opsCode: "ops123", routesChecked: 4 }]);
@@ -156,7 +157,7 @@ test("inclui todos os recebedores na cópia e mantém os blocos vazios com seus 
     const { text } = createEmployeeRankingClipboard({ receiptRanking });
     const rows = text.split("\n");
     assert.equal(rows.length, 156);
-    assert.equal(rows.at(-1).split("\t")[2], "12");
+    assert.deepEqual(rows.at(-1).split("\t").slice(0, 3), ["ops151", "151º Ana Rocha", "12"]);
     assert.deepEqual(parseEmployeeRankingClipboard({ text }).labelingErrors, []);
 });
 
@@ -208,7 +209,7 @@ test("usa a versão da área de transferência que contém as colunas ID OPS", t
     const withIds = [
         { cells: [cell("Rotas Conferidas", 3)] },
         { cells: ["ID OPS", "Colaborador", "Quantidade"].map(value => cell(value)) },
-        { cells: ["ops123", "Maria Silva", "12"].map(value => cell(value)) },
+        { cells: ["ops123", "1º Maria Silva", "12"].map(value => cell(value)) },
     ];
     const visibleOnly = [
         { cells: [cell("Rotas Conferidas", 2)] },
@@ -226,7 +227,7 @@ test("usa a versão da área de transferência que contém as colunas ID OPS", t
     });
     const html = "<table></table>";
     const expected = [{ operator: "Maria Silva", opsCode: "ops123", routesChecked: 12 }];
-    const textWithoutIds = "Rotas Conferidas\t\nColaborador\tQuantidade\nMaria Silva\t12";
+    const textWithoutIds = "Rotas Conferidas\t\nColaborador\tQuantidade\n1º Maria Silva\t12";
     assert.deepEqual(parseEmployeeRankingClipboard({ text: textWithoutIds, html }).expedition, expected);
 
     tableRows = visibleOnly;

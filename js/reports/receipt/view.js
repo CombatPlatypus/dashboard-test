@@ -12,6 +12,9 @@ import {
     resetReceiptLinehaulState,
 } from "./linehaul-state.js";
 
+import { findReceiptLabelerOps, parseReceiptLabelerDirectory } from "./labeler-lookup.js";
+import { batchReportUpdates } from "../core/report-updates.js";
+
 import {
     formatReportPersonFirstName,
     formatReportPersonWithOps,
@@ -190,6 +193,12 @@ function getReceiptElements(rootElement) {
                 "receiptOperatorControls",
             ),
 
+        labelerLookupButton:
+            getReceiptElementById(
+                rootElement,
+                "receiptLabelerLookupButton",
+            ),
+
         viewTabs:
             getReceiptElementById(
                 rootElement,
@@ -271,6 +280,11 @@ function getReceiptOperatorInputs(
                 "[data-receipt-operator-label]",
             ),
 
+        labelerOps:
+            row.querySelector(
+                '[data-receipt-operator-field="labelerOps"]',
+            ),
+
         labeler:
             row.querySelector(
                 '[data-receipt-operator-field="labeler"]',
@@ -291,6 +305,75 @@ function getReceiptOperatorInputs(
                 ".checkbox > label",
             ),
     };
+}
+
+function formatReceiptLabelerValue(ops, name) {
+    const prefix = /^\d+$/.test(ops) ? `[ops${ops}]` : "";
+    return [prefix, name.trim()].filter(Boolean).join(" ");
+}
+
+function readReceiptLabelerInputs({ labelerOps, labeler }) {
+    return formatReceiptLabelerValue(labelerOps.value, labeler.value);
+}
+
+function splitReceiptLabelerValue(value) {
+    const match = /^(?:\[\s*ops(\d+)\s*\]\s*|ops(\d+)$)/i.exec(value);
+    const prefixLength = match?.[0].length ?? 0;
+    return { ops: match?.[1] ?? match?.[2] ?? "", name: value.slice(prefixLength) };
+}
+
+function setReceiptLabelerInputs({ labelerOps, labeler }, value) {
+    const { ops, name } = splitReceiptLabelerValue(value);
+    setReceiptInputValue(labelerOps, ops);
+    setReceiptInputValue(labeler, name);
+}
+
+function getReceiptLabelersWithoutOps() {
+    return getReceiptState().operators.flatMap(({ id, labeler }) => {
+        const { ops, name } = splitReceiptLabelerValue(labeler);
+        return name && !ops ? [{ id, name }] : [];
+    });
+}
+
+async function fillReceiptLabelerOps(button) {
+    if (button.disabled) return;
+
+    const notify = (type, message) => setReportNotification({ reportId: "receipt", type, message });
+    if (getReceiptLabelersWithoutOps().length === 0) {
+        notify("info", "Preencha o nome de um etiquetador com o OPS em branco.");
+        return;
+    }
+
+    let text;
+    button.disabled = true;
+    try {
+        text = await navigator.clipboard.readText();
+    } catch {
+        notify("error", "Não foi possível ler a área de transferência.");
+        return;
+    } finally {
+        button.disabled = false;
+    }
+
+    const labelers = getReceiptLabelersWithoutOps();
+    if (labelers.length === 0) return;
+
+    const directory = parseReceiptLabelerDirectory(text);
+    let missing = 0;
+    batchReportUpdates(() => {
+        for (const { id, name } of labelers) {
+            const ops = findReceiptLabelerOps(name, directory);
+            if (ops) updateReceiptOperator(id, "labeler", formatReceiptLabelerValue(ops, name));
+            else missing += 1;
+        }
+    });
+
+    if (missing > 0) {
+        notify("warning", missing === 1 ? "1 Código OPS não encontrado." : `${missing} Códigos OPS não encontrados.`);
+        return;
+    }
+
+    notify("success", labelers.length === 1 ? "1 Código OPS preenchido." : `${labelers.length} Códigos OPS preenchidos.`);
 }
 
 function configureReceiptErrorSelect(
@@ -385,31 +468,25 @@ function createReceiptOperatorControl(
         getReceiptReceiverFirstName(
             operator.receiver,
         );
+    const labelerContext = receiverName ? ` de ${receiverName}` : "";
 
     row.dataset.receiptOperatorId =
         String(
             operator.id,
         );
 
-    inputs.title.textContent =
-        receiverName
-            ? `Etiquetador de ${receiverName}`
-            : "Etiquetador";
+    inputs.title.textContent = `Etiquetador${labelerContext}`;
 
-    inputs.labeler.value =
-        operator.labeler;
-
-    inputs.labeler.disabled =
-        false;
-
-    inputs.labeler.autocomplete =
-        "off";
-
+    setReceiptLabelerInputs(inputs, operator.labeler);
+    inputs.labelerOps.disabled = false;
+    inputs.labeler.disabled = false;
+    inputs.labelerOps.setAttribute(
+        "aria-label",
+        `Código OPS do etiquetador${labelerContext}`,
+    );
     inputs.labeler.setAttribute(
         "aria-label",
-        receiverName
-            ? `Etiquetador de ${receiverName}`
-            : "Etiquetador",
+        `Nome do etiquetador${labelerContext}`,
     );
 
     configureReceiptErrorSelect(
@@ -422,9 +499,7 @@ function createReceiptOperatorControl(
 
     inputs.errorQuantity.setAttribute(
         "aria-label",
-        receiverName
-            ? `Erros do etiquetador de ${receiverName}`
-            : "Erros do etiquetador",
+        `Erros do etiquetador${labelerContext}`,
     );
 
     const selectionId =
@@ -472,15 +547,13 @@ function createEmptyReceiptOperatorControl(
     inputs.title.textContent =
         `Etiquetador ${position}`;
 
-    inputs.labeler.value =
-        "";
-
-    inputs.labeler.disabled =
-        true;
-
+    setReceiptLabelerInputs(inputs, "");
+    inputs.labelerOps.disabled = true;
+    inputs.labeler.disabled = true;
+    inputs.labelerOps.setAttribute("aria-label", `Código OPS do etiquetador ${position}`);
     inputs.labeler.setAttribute(
         "aria-label",
-        `Etiquetador ${position}`,
+        `Nome do etiquetador ${position}`,
     );
 
     configureReceiptErrorSelect(
@@ -555,10 +628,7 @@ function synchronizeReceiptOperatorControls(
                     row,
                 );
 
-            setReceiptInputValue(
-                inputs.labeler,
-                operator.labeler,
-            );
+            setReceiptLabelerInputs(inputs, operator.labeler);
 
             configureReceiptErrorSelect(
                 inputs.errorQuantity,
@@ -939,7 +1009,10 @@ function updateReceiptOperatorField(elements, state, selectedOperators, { operat
     const preview = elements.previewOperatorBody.rows[index];
 
     if (field === "labeler") {
-        setReceiptInputValue(inputs.labeler, operator.labeler);
+        // Preserve espaços e posição do cursor durante a digitação.
+        if (readReceiptLabelerInputs(inputs) !== operator.labeler) {
+            setReceiptLabelerInputs(inputs, operator.labeler);
+        }
         if (preview) preview.cells[1].textContent = formatReportPersonWithOps(operator.labeler) || "—";
         return;
     }
@@ -1042,13 +1115,6 @@ function handleReceiptOperatorFieldEvent(
         input.dataset
             .receiptOperatorField;
 
-    if (
-        field !== "labeler" &&
-        field !== "errorQuantity"
-    ) {
-        return;
-    }
-
     const row =
         input.closest(
             "[data-receipt-operator-id]",
@@ -1068,11 +1134,22 @@ function handleReceiptOperatorFieldEvent(
         return;
     }
 
-    updateReceiptOperator(
-        operatorId,
-        field,
-        input.value,
-    );
+    if (field === "labelerOps") {
+        const value = input.value;
+        const digits = value.replace(/\D/g, "");
+        if (value !== digits) {
+            const cursor = value.slice(0, input.selectionStart).replace(/\D/g, "").length;
+            input.value = digits;
+            input.setSelectionRange(cursor, cursor);
+        }
+    }
+
+    if (field === "labeler" || field === "labelerOps") {
+        const labeler = readReceiptLabelerInputs(getReceiptOperatorInputs(row));
+        updateReceiptOperator(operatorId, "labeler", labeler);
+    } else if (field === "errorQuantity") {
+        updateReceiptOperator(operatorId, field, input.value);
+    }
 }
 
 function bindReceiptOperatorControls(
@@ -1380,6 +1457,10 @@ function initializeReceiptView(
             HTMLElement
         ) ||
         !(
+            templateInputs.labelerOps instanceof
+            HTMLInputElement
+        ) ||
+        !(
             templateInputs.labeler instanceof
             HTMLInputElement
         ) ||
@@ -1427,6 +1508,8 @@ function initializeReceiptView(
     bindReceiptOperatorControls(
         elements,
     );
+
+    elements.labelerLookupButton.addEventListener("click", () => fillReceiptLabelerOps(elements.labelerLookupButton));
 
     initializeReceiptControlPanels(
         elements,

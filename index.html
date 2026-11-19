@@ -599,8 +599,8 @@
                                         <div class="title">
                                             <h4>Defina os Etiquetadores</h4>
 
-                                            <button id="" type="button" title="" aria-label="">
-                                                <img src="images/geral-icons/user-add-icon.svg">
+                                            <button id="receiptLabelerLookupButton" type="button" title="Preencher códigos OPS pela lista copiada" aria-label="Preencher códigos OPS pela lista copiada">
+                                                <img src="images/geral-icons/user-add-icon.svg" alt="">
                                             </button>
                                         </div>
 
@@ -611,7 +611,9 @@
                                                     <h4 data-receipt-operator-label>Etiquetador</h4>
 
                                                     <div class="flex-box-start">
-                                                        <input type="text" data-receipt-operator-field="labeler" placeholder="[ops123] Nome" autocomplete="off" disabled>
+                                                        <input type="text" data-receipt-operator-field="labelerOps" inputmode="numeric" pattern="[0-9]*" placeholder="123" autocomplete="off" disabled style="flex: 0 0 100px !important; text-align: center!important;">
+
+                                                        <input type="text" data-receipt-operator-field="labeler" placeholder="Nome" autocomplete="off" disabled>
 
                                                         <select class="standard-select" data-receipt-operator-field="errorQuantity" autocomplete="off" disabled style="width: 86px;">
                                                             <option value="">—</option>

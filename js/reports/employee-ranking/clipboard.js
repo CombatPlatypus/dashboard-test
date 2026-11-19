@@ -1,6 +1,6 @@
 import { normalizeText, parseClipboardRows } from "../../filter/clipboard-source.js";
 import { createClipboardTable } from "../summary-copy.js";
-import { normalizeEmployeeRankingName, readEmployeeOpsCode } from "./model.js";
+import { formatRankedEmployeeName, normalizeEmployeeRankingName, readEmployeeOpsCode } from "./model.js";
 
 const MIN_EMPLOYEE_RANKING_ROWS = 150;
 const rankingTitle = "RANKING MENSAL DE DESEMPENHO";
@@ -162,7 +162,7 @@ async function readEmployeeRankingClipboard(clipboard = navigator.clipboard) {
 }
 
 function readRankingIdentity(value, id) {
-    const source = readOperatorFormula(value) ?? value;
+    const source = (readOperatorFormula(value) ?? value).replace(/^\d+º\s+/, "");
     const columnOpsCode = /^\d+$/.test(id) ? `ops${id}` : readEmployeeOpsCode(id);
     const opsCode = columnOpsCode || readEmployeeOpsCode(source);
     const name = normalizeEmployeeRankingName(source);
@@ -212,13 +212,6 @@ function cell(value, style, span = 1, rowSpan = 1) {
     return { value, style, span, rowSpan };
 }
 
-function nameCell(value, style) {
-    return {
-        ...cell(value, style),
-        textValue: /^[=+@-]/.test(value ?? "") ? `'${value}` : value,
-    };
-}
-
 function createEmployeeRankingClipboard({
     receiptRanking = [], labelingErrorsRanking = [], receivedDamageRanking = [],
     expeditionRanking = [], offPackagesRanking = [],
@@ -251,7 +244,8 @@ function createEmployeeRankingClipboard({
         rows.push(sectionRow((section, ranking) => {
             const entry = ranking[index];
             const style = section === offPackages && stripe === 0 ? offPackagesRowStyle : rowStyles[stripe];
-            const cells = [nameCell(entry?.displayName, style), cell(entry?.quantity, style)];
+            const name = formatRankedEmployeeName(entry?.displayName, index + 1);
+            const cells = [cell(name, style), cell(entry?.quantity, style)];
             if (section.headers[0] === opsHeader) cells.unshift(cell(entry?.opsCode, style));
             return cells;
         }));

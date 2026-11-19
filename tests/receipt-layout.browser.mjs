@@ -105,13 +105,67 @@ try {
 
     // Reach a row below the scrollport and exercise the real Select2 dropdown.
     const lastControl = page.locator("#receiptOperatorControls [data-receipt-operator-id]").last();
-    await lastControl.locator('[data-receipt-operator-field="labeler"]').fill("Etiquetador teste");
+    const lastLabelerOps = lastControl.locator('[data-receipt-operator-field="labelerOps"]');
+    const lastLabeler = lastControl.locator('[data-receipt-operator-field="labeler"]');
+    const lastPreviewLabeler = page.locator("#receiptPreviewOperatorBody tr").last().locator("td").nth(1);
+    await lastLabelerOps.pressSequentially("0a1-2.3");
+    assert.equal(await lastLabelerOps.inputValue(), "0123");
+    await lastLabelerOps.fill("[ops123]");
+    assert.equal(await lastLabelerOps.inputValue(), "123");
+    await lastLabeler.pressSequentially("Pablo da Silva");
+    assert.equal(await lastLabeler.inputValue(), "Pablo da Silva");
+    assert.equal(await lastPreviewLabeler.textContent(), "[ops123] Pablo");
     await lastControl.locator(".select2-selection").click();
     await page.getByRole("option", { name: "2", exact: true }).click();
     assert.equal(await lastControl.locator("select").inputValue(), "2");
     assert.equal(await page.locator("#receiptPreviewErrors").textContent(), "2");
     assert.ok(await page.locator("#receiptOperatorControls").evaluate(element => element.scrollTop > 0));
     await assertPageEndsAtFooter("scroll e edição no Select2");
+
+    const savedLabeler = await page.evaluate(async () => {
+        const { getReceiptState, restoreReceiptState } = await import("/js/reports/receipt/state.js");
+        const state = getReceiptState();
+        restoreReceiptState(state);
+        return state.operators.at(-1).labeler;
+    });
+    assert.equal(savedLabeler, "[ops123] Pablo da Silva");
+    assert.equal(await lastLabelerOps.inputValue(), "123");
+    assert.equal(await lastLabeler.inputValue(), "Pablo da Silva");
+    await lastLabelerOps.clear();
+    assert.equal(await lastPreviewLabeler.textContent(), "Pablo");
+
+    const lookupButton = page.locator("#receiptLabelerLookupButton");
+    const receiptNotification = page.locator("#receiptNotificationText");
+    const controls = page.locator("#receiptOperatorControls [data-receipt-operator-id]");
+    const manualOps = controls.first().locator('[data-receipt-operator-field="labelerOps"]');
+    const ambiguousName = controls.nth(1).locator('[data-receipt-operator-field="labeler"]');
+    const ambiguousOps = controls.nth(1).locator('[data-receipt-operator-field="labelerOps"]');
+    await manualOps.fill("777");
+    await controls.first().locator('[data-receipt-operator-field="labeler"]').fill("Bruno Balula");
+    await ambiguousName.fill("Bruno Santos");
+    await lastLabeler.fill("Luana Tosin");
+    await page.evaluate(directory => {
+        Object.defineProperty(navigator, "clipboard", { configurable: true, value: { readText: async () => directory } });
+    }, [
+        "\tANÁLISE DE COLABORADORES\t\t",
+        "\tID [OPS]\tNome do Colaborador\tRank de Etiquetagem",
+        "\tops42\tLuana Tosin\t",
+        "\tops11\tBruno Santos Balula\t",
+        "\tops12\tBruno Martinelli dos Santos\t",
+    ].join("\n"));
+
+    await lookupButton.click();
+    assert.equal(await receiptNotification.textContent(), "1 Código OPS não encontrado.");
+    assert.equal(await lastLabelerOps.inputValue(), "42");
+    assert.equal(await lastPreviewLabeler.textContent(), "[ops42] Luana");
+    assert.equal(await ambiguousOps.inputValue(), "");
+    assert.equal(await manualOps.inputValue(), "777");
+    assert.equal(await page.locator("#employeeRankingLabelingErrorsBody tr").first().locator("td").first().textContent(), "1º Luana Tosin");
+
+    await ambiguousName.fill("Bruno Balula");
+    await lookupButton.click();
+    assert.equal(await ambiguousOps.inputValue(), "11");
+    assert.equal(await receiptNotification.textContent(), "1 Código OPS preenchido.");
 
     await page.setViewportSize({ width: 1280, height: 800 });
     await assertPageEndsAtFooter("janela menor");
@@ -125,6 +179,7 @@ try {
     page.once("dialog", dialog => dialog.accept());
     await page.locator("#receiptClearReportButton").click();
     assert.equal(await page.locator("#receiptOperatorControls select:disabled").count(), 9);
+    assert.equal(await page.locator('#receiptOperatorControls input[data-receipt-operator-field="labelerOps"]:disabled').count(), 9);
     await assertPageEndsAtFooter("limpeza do relatório");
 
     assert.deepEqual(errors, []);

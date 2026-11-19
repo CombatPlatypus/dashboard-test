@@ -2,6 +2,8 @@
 
 Abra **Relatórios > Relatório Final > Ranking Mensal de Colaboradores**. **Processamento** alimenta Recebimento e Erros de Etiquetagem, **Expedição** alimenta Rotas Conferidas, e a planilha de **Avarias e Perdas** alimenta Avarias Recebidas e Pacotes OFF. As tabelas têm pelo menos 150 linhas de dados e crescem para acomodar o ranking completo. [HTML](../../index.html) · [Estilos](../../css/reports-style.css)
 
+Cada bloco numera os colaboradores a partir de `1º`, na ordem exibida. Colaboradores com a mesma quantidade recebem posições consecutivas conforme o desempate do bloco. A posição aparece antes do nome abreviado na coluna **Colaborador**. As linhas vazias mostram travessões. [Prévia](../../js/reports/employee-ranking/controller.js)
+
 ## Identificação por OPS
 
 Recebimento, Erros de Etiquetagem e Rotas Conferidas somam por OPS. O [modelo do ranking](../../js/reports/employee-ranking/model.js) cruza o código nos registros atuais com o da coluna **ID OPS** na mesma linha do acumulado. Cópias antigas podem fornecer o código junto do nome ou na fórmula da célula. Os nomes servem para exibição e desempate.
@@ -12,7 +14,7 @@ OPS diferentes mantêm quantidades separadas mesmo para homônimos. Registros co
 
 Importe o arquivo de recebimento do SPX em **Processamento > Mesa de Recebimento**. O [importador](../../js/reports/receipt/import.js) conta os pacotes únicos por recebedor. O ranking reúne os recebedores identificados e ordena do maior para o menor volume.
 
-Na mesma subaba, preencha **Erros** e informe o etiquetador com seu OPS em **Etiquetador**, como `[ops123] Nome`. A quantidade fica com o OPS do etiquetador quando o campo contém um código válido. Quando o campo estiver vazio ou sem OPS válido, o ranking atribui os erros ao OPS do recebedor. O ranking ordena do menor para o maior total de erros. Uma quantidade informada como zero entra na contagem.
+Na mesma subaba, preencha **Erros** e informe o nome do etiquetador em **Defina os Etiquetadores**. Digite o OPS ou preencha pelo botão de Processamento a partir da lista copiada. A quantidade fica com o OPS do etiquetador quando há um código válido. Sem esse código, o ranking atribui os erros ao OPS do recebedor. O ranking ordena do menor para o maior total de erros. Uma quantidade informada como zero entra na contagem. [Controles de Processamento](README.md#processamento)
 
 O ranking considera todos os turnos e mantém os recebedores identificados independentemente da seleção na prévia de Processamento. O nome abreviado aparece na tabela e desempata as quantidades iguais.
 
@@ -34,8 +36,8 @@ O mesmo importador lê **Expedição** e **Log** do **Histórico de Retornados**
 
 ## Botões
 
-- **Importar** lê os acumulados de Mesa de Recebimento, Erros de Etiquetagem e Rotas Conferidas da aba **Ranking de Colaboradores**. Copie o acumulado anterior incluindo as colunas **ID OPS** em C, G e K. Se a cópia trouxer somente os nomes, reexiba essas colunas e copie novamente. O cálculo mantém os OPS presentes só no histórico. Repetir a importação do mesmo acumulado produz os mesmos totais. A importação também lê os títulos antigos e a quantidade do bloco de Expedição com a coluna de tempo.
-- **Copiar** prepara o ranking para colar a partir do título mesclado **C2:S3**, com Mesa de Recebimento em C:E, Erros de Etiquetagem em G:I, Rotas Conferidas em K:M, Avarias Recebidas em O:P e Pacotes OFF em R:S. Os três blocos acumuláveis levam o ID OPS como valor e o nome abreviado da prévia como texto. [Formato da cópia](copia-de-dados-para-planilha.md#expedição-do-ranking-mensal)
+- **Importar** lê os acumulados de Mesa de Recebimento, Erros de Etiquetagem e Rotas Conferidas da aba **Ranking de Colaboradores**. Copie o acumulado anterior incluindo as colunas **ID OPS** em C, G e K. Se a cópia trouxer somente os nomes, reexiba essas colunas e copie novamente. A leitura remove o prefixo da posição antes de recuperar o nome. O cálculo mantém os OPS presentes só no histórico. Repetir a importação do mesmo acumulado produz os mesmos totais. A importação também lê os títulos antigos e a quantidade do bloco de Expedição com a coluna de tempo.
+- **Copiar** prepara o ranking para colar a partir do título mesclado **C2:S3**, com Mesa de Recebimento em C:E, Erros de Etiquetagem em G:I, Rotas Conferidas em K:M, Avarias Recebidas em O:P e Pacotes OFF em R:S. Os cinco blocos levam a posição e o nome abreviado da prévia na coluna **Colaborador**. Os três blocos acumuláveis levam o ID OPS na coluna própria. [Formato da cópia](copia-de-dados-para-planilha.md#expedição-do-ranking-mensal)
 - **Imagem** copia o ranking para a área de transferência. Segure o botão para baixar o PNG. A imagem inclui todas as linhas com dados.
 - **Lixeira** descarta o acumulado e recalcula o ranking com os dados atuais dos relatórios. Ao limpar Processamento ou Expedição na aba de origem, os blocos correspondentes passam a mostrar o acumulado carregado.
 
