@@ -4,6 +4,7 @@ import { test } from "node:test";
 import {
     buildEmployeeExpeditionRanking,
     buildEmployeeLabelingErrorRanking,
+    buildEmployeeOccurrenceRanking,
     buildEmployeeReceiptRanking,
 } from "../js/reports/employee-ranking/model.js";
 import { getExpeditionOperatorRanking } from "../js/reports/expedition/state.js";
@@ -205,4 +206,42 @@ test("separa rotas pendentes da soma mesmo com nomes completos iguais", () => {
         ranking: [{ operator: "Cayo Bispo Silva", opsCode: "ops114012", displayName: "Cayo Bispo", quantity: 3 }],
         pending: [{ operator: "Cayo Bispo Silva", quantity: 7 }],
     });
+});
+
+test("contas @shopee.com ficam fora das posições e das pendências de OPS", () => {
+    const current = getExpeditionOperatorRanking({ routes: [
+        { status: "Validated", validationOperator: "analista.turno@SHOPEE.COM" },
+        { status: "Validated", validationOperator: "[ops30] Ana Maria Lima" },
+    ] });
+    assert.equal(current.find(({ operator }) => operator === "analista.turno@SHOPEE.COM").routesChecked, 1);
+    assert.deepEqual(buildEmployeeExpeditionRanking(current, [{ operator: "lider@shopee.com", routesChecked: 9 }]), {
+        ranking: [{ operator: "Ana Maria Lima", opsCode: "ops30", displayName: "Ana Maria", quantity: 1 }],
+        pending: [],
+    });
+    assert.deepEqual(buildEmployeeReceiptRanking([
+        { receiver: "  analista.turno@SHOPEE.COM  ", packagesReceived: 10 },
+        { receiver: "Ana Maria Lima", packagesReceived: 20 },
+    ], [{ operator: "lider@shopee.com", quantity: 50 }]), {
+        ranking: [],
+        pending: [{ operator: "Ana Maria Lima", quantity: 20 }],
+    });
+});
+
+test("desconsidera a conta interna ao aplicar a atribuição de erros de etiquetagem", () => {
+    const operators = [
+        { receiver: "analista@shopee.com", labeler: "", errorQuantity: 6 },
+        { receiver: "analista@shopee.com", labeler: "[ops30] Ana Maria Lima", errorQuantity: 2 },
+        { receiver: "[ops30] Ana Maria Lima", labeler: "lider@shopee.com", errorQuantity: 1 },
+    ];
+    assert.deepEqual(buildEmployeeLabelingErrorRanking(operators), {
+        ranking: [{ operator: "Ana Maria Lima", opsCode: "ops30", displayName: "Ana Maria", quantity: 3 }],
+        pending: [],
+    });
+});
+
+test("ignora e-mails @shopee.com nos blocos que agrupam colaboradores pelo nome", () => {
+    assert.deepEqual(buildEmployeeOccurrenceRanking([
+        { operator: "  analista.turno@SHOPEE.COM ", quantity: 12 },
+        { operator: "Ana Maria Lima", quantity: 3 },
+    ]), [{ operator: "Ana Maria Lima", displayName: "Ana Maria", quantity: 3 }]);
 });

@@ -37,9 +37,10 @@ function createExpeditionFile() {
         "Missing Orders", "Validation Start Time", "Validation End Time", "Validation Operator",
         "Revalidation Operator", "Revalidated Count", "AT/TO Validation Status", "Remark",
     ];
-    const routes = Array.from({ length: 12 }, (_, index) => [
+    const routes = Array.from({ length: 13 }, (_, index) => [
         `AT${index + 1}`, "A-01", 50, 50, 50, 0, 0, "2026-11-16 10:00:00",
-        "2026-11-16 10:05:29", "[ops123] Maria da Silva Santos", "", 0, "Validated", "",
+        "2026-11-16 10:05:29", index === 12 ? "analista.turno@shopee.com" : "[ops123] Maria da Silva Santos",
+        "", 0, "Validated", "",
     ]);
     return {
         name: "expedicao-teste.csv",
@@ -58,6 +59,7 @@ function createHistoricalRanking() {
         ["ops123", "Maria Silva", 2],
         ["ops321", "Maria Silva", 9],
         ["", "João de Souza Barbosa", 100],
+        ["", "lider.turno@shopee.com", 8],
         ...operators,
     ].map(row => row.join("\t")).join("\n");
 }
@@ -164,8 +166,11 @@ try {
     await importExpedition(createExpeditionFile());
     const currentRanking = await readRanking();
     assert.equal(currentRanking.length, 150);
-    assert.deepEqual(currentRanking[0], ["1º Maria Silva", "12"]);
+    assert.deepEqual(currentRanking.filter(([name]) => name !== "—"), [["1º Maria Silva", "12"]]);
     assert.deepEqual(currentRanking[149], ["—", "—"]);
+    assert.equal(await page.locator("#expeditionPreviewValidatedRoutes").textContent(), "13");
+    assert.equal(await page.locator("#employeeRankingNotificationText").textContent(),
+        "Ranking atualizado com os dados de Expedição.");
     assert.equal(await clearButton.isDisabled(), true);
 
     const hasStickyHeader = await page.locator(bodySelector).evaluate(body => {
@@ -279,6 +284,31 @@ try {
     const download = await pendingDownload;
     await page.mouse.up();
     assert.equal(download.suggestedFilename(), "ranking-de-colaboradores.png");
+
+    await page.locator('a[href="#receipt"]').click();
+    await page.locator('a[href="#receipt-tables"]').click();
+    await page.locator("#receiptFileInput").setInputFiles({
+        name: "recebimento-teste.csv",
+        mimeType: "text/csv",
+        buffer: Buffer.from([
+            "SPX Tracking Number,Order Status,Task ID,Operator",
+            "BR1,LMHub_Received,RT001,analista.turno@shopee.com",
+            "BR2,LMHub_Received,RT001,[ops30] Ana Maria Lima",
+        ].join("\n")),
+    });
+    await page.waitForFunction(() => document.querySelector("#receiptNotification").dataset.notificationType === "success");
+    assert.equal(await page.locator("#receiptPreviewReceived").textContent(), "2");
+    await page.locator('select[aria-label="Erros do etiquetador de Analista"]').evaluate(select => {
+        select.value = "1";
+        select.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+    assert.equal(await page.locator("#receiptPreviewErrors").textContent(), "1");
+    await openRanking();
+    assert.deepEqual(await page.locator('#employeeRankingReceiptBody tr:not([data-placeholder]) td').allTextContents(),
+        ["1º Ana Maria", "1"]);
+    assert.equal(await page.locator('#employeeRankingLabelingErrorsBody tr:not([data-placeholder])').count(), 0);
+    assert.equal(await page.locator("#employeeRankingNotificationText").textContent(),
+        "Ranking atualizado com os dados de Processamento e Expedição.");
 
     assert.deepEqual(errors, []);
     console.log("Ranking de Colaboradores: importação, expansão, cópia, imagem e restauração verificadas.");

@@ -611,7 +611,7 @@
                                                     <h4 data-receipt-operator-label>Etiquetador</h4>
 
                                                     <div class="flex-box-start">
-                                                        <input type="text" data-receipt-operator-field="labelerOps" inputmode="numeric" pattern="[0-9]*" placeholder="123" autocomplete="off" disabled style="flex: 0 0 100px !important; text-align: center!important;">
+                                                        <input type="text" data-receipt-operator-field="labelerOps" inputmode="numeric" pattern="[0-9]*" placeholder="[123]" autocomplete="off" disabled style="flex: 0 0 100px !important; text-align: center!important;">
 
                                                         <input type="text" data-receipt-operator-field="labeler" placeholder="Nome" autocomplete="off" disabled>
 
@@ -1146,7 +1146,7 @@
                                 </div>
 
                                 <div class="report-actions">
-                                    <button id="planningCopySummaryButton" type="button" title="Copiar planejamento para B2 da aba Modelo" aria-label="Copiar planejamento para B2 da aba Modelo" disabled>
+                                    <button id="planningCopySummaryButton" type="button" title="Copiar planejamento para C2:L3 da aba Modelo" aria-label="Copiar planejamento para C2:L3 da aba Modelo" disabled>
                                         <img src="images/geral-icons/copy-icon.svg" alt="">
                                     </button>
 
@@ -2403,7 +2403,7 @@
 
                                                 <thead>
                                                     <tr>
-                                                        <th>Operador</th>
+                                                        <th style="width: 210px;">Operador</th>
                                                         <th>Quantidade</th>
                                                         <th>Percentual</th>
                                                         <th>Volumoso?</th>
@@ -2452,7 +2452,7 @@
                                         </button>
 
                                         <button type="button" role="tab" aria-selected="false" data-parcel-filter="exception" disabled>
-                                            <span>Exception</span>
+                                            <span>Exception (LMHub_Received)</span>
                                         </button>
                                     </div>
 

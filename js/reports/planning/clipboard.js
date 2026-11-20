@@ -11,18 +11,30 @@ import {
 
 const modelLastRow = 6000;
 const backlogStart = 7;
-const scheduledStart = 19;
-const segregatedStart = 41;
-const tosStart = 63;
-const columnWidths = [252, 302, 280, 21, 280, 280];
+const scheduledStart = 7;
+const segregatedStart = 29;
+const tosStart = 51;
+const columnWidths = [252, 302, 101, 21, 181, 181, 21, 101, 101, 101];
+const dateFormat = new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit", month: "2-digit", timeZone: "America/Sao_Paulo",
+});
+const timeFormat = new Intl.DateTimeFormat("pt-BR", {
+    hour: "2-digit", minute: "2-digit", hourCycle: "h23", timeZone: "America/Sao_Paulo",
+});
 
-const blank = { background: "#101010", fontSize: 10 };
-const title = { background: "#333333", fontSize: 22, bold: true, border: true };
-const section = { background: "#333333", fontSize: 12, border: true };
-const heading = { background: "#262626", fontSize: 11, border: true };
+const blank = { background: "#101010", fontSize: 10, inlineFormattingOnly: true };
+const section = { ...blank, background: "#333333", fontSize: 12, border: true };
+const title = { ...section, fontSize: 20, bold: true };
+const heading = { ...blank, background: "#262626", fontSize: 11, border: true };
 const segregationHeading = { ...heading, fontSize: 12 };
-const data = { ...blank, border: true, bottom: true };
+const data = { ...blank, border: true };
 const stripedData = { ...data, background: "#1b1b1b" };
+const summaryLabel = { ...data, textAlign: "left" };
+const stripedSummaryLabel = { ...stripedData, textAlign: "left" };
+const gap = { ...blank, borderColor: "#101010", borderSides: ["left", "right"] };
+const blankSummary = { ...blank, border: true, borderColor: "#101010" };
+const separatorTop = { ...blank, borderColor: "#101010", borderSides: ["top"] };
+const separatorBottom = { ...blank, borderColor: "#101010", borderSides: ["bottom"] };
 
 function hasPlanningLhInformation(lh) {
     return Boolean(lh.code?.trim() || lh.origin?.trim() || Number.isFinite(lh.quantity)
@@ -31,7 +43,7 @@ function hasPlanningLhInformation(lh) {
 
 function getPlanningClipboardData(state) {
     const status = {
-        target: "B2", sheet: "Modelo", label: "Relatório de planejamento",
+        target: "C2:L3", sheet: "Modelo", label: "Relatório de planejamento",
         shift: null, hasData: canExportPlanningReport(state), copyError: "",
     };
     const lhs = [...state.lhs];
@@ -76,46 +88,58 @@ function recordCells(record, row) {
     return cells(values, dataStyle(row));
 }
 
-function createPlanningClipboardRows(state, { lhs, segregated, tos, packages, bulky }) {
+function createPlanningSummaryRows(state, lhs) {
+    const sections = [
+        [5, "Resumo do Planejamento", [
+            ["Volume Estimado", calculatePlanningEstimatedVolume(state)],
+            ["SPR Médio", calculatePlanningAverageSpr(state)],
+            ["Cap do Dia", state.dailyCapacity],
+        ]],
+        [10, "Valores da Collection Pool", [
+            ["Qtd Backlog Pacotes", getPlanningPoolQuantity(state, "backlogPackages")],
+            ["Qtd Backlog Volumosos", getPlanningPoolQuantity(state, "backlogBulky")],
+            ["Qtd dentro dos LHs", getPlanningLhQuantity(lhs)],
+        ]],
+        [15, "Operações na Collection Pool", [
+            ["Qtd Pacotes Inseridos", getPlanningPoolQuantity(state, "added")],
+            ["Qtd Pacotes Retirados", getPlanningPoolQuantity(state, "removed")],
+            ["Qtd Pacotes com Erros", getPlanningPoolQuantity(state, "errors")],
+        ]],
+    ];
+    const rows = new Map();
+    for (const [start, label, metrics] of sections) {
+        rows.set(start, [cell(label, section, 3)]);
+        for (const [index, [name, value]] of metrics.entries()) {
+            const striped = index % 2 !== 0;
+            rows.set(start + index + 1, [
+                cell(name, striped ? stripedSummaryLabel : summaryLabel, 2),
+                cell(value, striped ? stripedData : data),
+            ]);
+        }
+        rows.set(start + metrics.length + 1, [cell("", gap, 3)]);
+    }
+    return rows;
+}
+
+function createPlanningClipboardRows(state, { lhs, segregated, tos, packages, bulky }, { shift, now }) {
     const lastUsedRow = Math.max(
-        15,
+        18,
         scheduledStart + lhs.length - 1,
         segregated.length > 0 ? segregatedStart + segregated.length - 1 : 0,
         tos.length > 0 ? tosStart + tos.length - 1 : 0,
         backlogStart + Math.max(packages.length, bulky.length) - 1,
     );
     const left = new Map([
-        [4, cells(["", "", ""], blank)],
-        [5, [cell("Resumo do Planejamento", section, 3)]],
-        [6, cells(["Volume Estimado", "SPR Médio", "Cap do Dia"], heading)],
-        [7, cells([calculatePlanningEstimatedVolume(state), calculatePlanningAverageSpr(state), state.dailyCapacity], data)],
-        [8, [cell("", blank, 3)]],
-        [9, [cell("Valores da Collection Pool", section, 3)]],
-        [10, cells(["Qtd Backlog Pacotes", "Qtd Backlog Volumosos", "Qtd dentro dos LHs"], heading)],
-        [11, cells([
-            getPlanningPoolQuantity(state, "backlogPackages"),
-            getPlanningPoolQuantity(state, "backlogBulky"),
-            getPlanningLhQuantity(lhs),
-        ], data)],
-        [12, [cell("", blank, 3)]],
-        [13, [cell("Operações na Collection Pool", section, 3)]],
-        [14, cells(["Inseridos", "Retirados", "Erros"], heading)],
-        [15, cells([
-            getPlanningPoolQuantity(state, "added"),
-            getPlanningPoolQuantity(state, "removed"),
-            getPlanningPoolQuantity(state, "errors"),
-        ], data)],
-        [16, [cell("", blank, 3)]],
-        [17, [cell("LHs Programados", section, 3)]],
-        [18, cells(["LHs Programados", "Origem", "QTD"], heading)],
-        [39, [cell("", blank, 3)]],
-        [40, cells(["LHs a Segregar", "Origem", "QTD"], segregationHeading)],
-        [61, [cell("", blank, 3)]],
-        [62, cells(["TOs para Segregar", "LH", "QTD"], segregationHeading)],
+        [5, [cell("LHs Programados", section, 3)]],
+        [6, cells(["LHs Programados", "Origem", "QTD"], heading)],
+        [27, [cell("", gap, 3)]],
+        [28, cells(["LHs a Segregar", "Origem", "QTD"], segregationHeading)],
+        [49, [cell("", gap, 3)]],
+        [50, cells(["TOs para Segregar", "LH", "QTD"], segregationHeading)],
     ]);
     const recordSections = [
-        [scheduledStart, 38, lhs.map(lh => [lh.code, lh.origin, lh.quantity])],
-        [segregatedStart, 60, segregated.map(lh => [lh.code, lh.origin, getPlanningLhSegregatedQuantity(lh)])],
+        [scheduledStart, 26, lhs.map(lh => [lh.code, lh.origin, lh.quantity])],
+        [segregatedStart, 48, segregated.map(lh => [lh.code, lh.origin, getPlanningLhSegregatedQuantity(lh)])],
         [tosStart, modelLastRow, tos],
     ];
     for (const [start, end, records] of recordSections) {
@@ -125,18 +149,25 @@ function createPlanningClipboardRows(state, { lhs, segregated, tos, packages, bu
         }
     }
 
+    const reportTitle = `PLANEJAMENTO LM HUB SP 63 - ${shift} ${dateFormat.format(now)} ${timeFormat.format(now)}`;
     const rows = [
-        [cell("PLANEJAMENTO", title, 6, 2)],
-        Array(6).fill(null),
-        [...left.get(4), ...cells(["", "", ""], blank)],
-        [...left.get(5), cell("", blank), cell("Backlog Adicionado", section, 2)],
-        [...left.get(6), cell("", blank), ...cells(["Pacotes Normais", "Pacotes Volumosos"], heading)],
+        [cell(reportTitle, title, columnWidths.length, 2)],
+        Array(columnWidths.length).fill(null),
+        [...cells(["", "", "", ""], blank), cell("", blank, 2), ...cells(["", "", "", ""], blank)],
     ];
-    // Use individual cells in column E so the separator cannot extend the paste range.
-    const separator = cell("", blank);
-    for (let row = backlogStart; row <= lastUsedRow; row += 1) {
-        const index = row - backlogStart;
-        rows.push([...left.get(row), separator, ...cells([packages[index], bulky[index]], dataStyle(row))]);
+    const summary = createPlanningSummaryRows(state, lhs);
+    const emptySummary = [cell("", blankSummary, 3)];
+    const backlogHeadings = new Map([
+        [5, [cell("Backlog Adicionado", section, 2)]],
+        [6, cells(["Pacotes Normais", "Pacotes Volumosos"], heading)],
+    ]);
+    for (let row = 5; row <= lastUsedRow; row += 1) {
+        const backlogIndex = row - backlogStart;
+        const backlog = backlogHeadings.get(row) ?? cells([packages[backlogIndex], bulky[backlogIndex]], dataStyle(row));
+        // As faixas F e I são separadores vazios dentro das linhas copiadas.
+        const separatorStyle = row === 5 ? separatorTop : row === modelLastRow ? separatorBottom : blank;
+        const separator = cell("", separatorStyle);
+        rows.push([...left.get(row), separator, ...backlog, separator, ...(summary.get(row) ?? emptySummary)]);
     }
     return rows;
 }

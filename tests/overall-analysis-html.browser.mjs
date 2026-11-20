@@ -214,7 +214,8 @@ try {
     assert.deepEqual(importCharts.filter(id => id.startsWith("overallAnalysis")).sort(),
         ["overallAnalysisDamageAndLossesCompositionChart", "overallAnalysisLossesRateHistoryChart"]);
     await page.locator('a[href="#overall-analysis"]').click();
-    assert.equal(await legendWidth(), "443px");
+    const populatedLegendMaxWidth = await legendWidth();
+    assert.equal(populatedLegendMaxWidth, "500px");
     const cardText = suffix => page.locator(`#overallAnalysis${suffix}`).textContent();
     assert.equal(await page.locator("#overallAnalysisIndicators > div").count(), 5);
     assert.equal(await page.locator(".final-report-cards, #overallAnalysisDamageChart, #overallAnalysisLossRateChart, #overallAnalysisPackagesAnalysisChart").count(), 0);
@@ -310,7 +311,7 @@ try {
     const streetValues = ["A", "7", "56", "100,00%"];
     assert.equal(await streetRows.count(), 12);
     assert.deepEqual(await streetRows.first().locator("td").allTextContents(), streetValues);
-    assert.equal(await legendWidth(), "443px");
+    assert.equal(await legendWidth(), populatedLegendMaxWidth);
     assert.deepEqual(await page.evaluate(readErrorChart, "overallAnalysisErrorBalanceChart"), sourceChart);
     await page.waitForFunction(errorBarsDrawn, "overallAnalysisErrorBalanceChart", { timeout: 5000 });
     assert.deepEqual(await page.evaluate(readErrorBarColors, "overallAnalysisErrorBalanceChart"), errorBarColors);
@@ -458,7 +459,7 @@ try {
         report.locator(`#finalReportExpedition${field}`).textContent())), sourceErrors);
     assert.deepEqual(await report.locator("#finalReportExpeditionStreetBody tr").first().locator("td").allTextContents(), streetValues);
     assert.equal(await report.locator(".losses-rate-charts .doughnut-chart .chart-label")
-        .evaluate(element => getComputedStyle(element).maxWidth), "443px");
+        .evaluate(element => getComputedStyle(element).maxWidth), populatedLegendMaxWidth);
     assert.deepEqual(await report.evaluate(readErrorChart, "finalReportErrorBalanceChart"), sourceChart);
     assert.deepEqual(await report.evaluate(readErrorBarColors, "finalReportErrorBalanceChart"), errorBarColors);
     assert.ok(rendered.sizes.every(([width, height]) => width > 0 && height > 0));

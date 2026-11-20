@@ -55,6 +55,7 @@ function sheetsColor(hex) {
 
 function createStyledCellAttributes({
     background, fontSize, bold, border, borderSides, borderColor = "#626262", bottom, inlineFormattingOnly,
+    textAlign = "center",
 }) {
     const color = "#e4e6eb";
     const alignment = bottom ? "bottom" : "middle";
@@ -65,7 +66,7 @@ function createStyledCellAttributes({
     const css = [
         `background-color:${background}`, `color:${color}`, "font-family:Open Sans",
         `font-size:${fontSize}pt`, `font-weight:${bold ? "bold" : "normal"}`,
-        "text-align:center", `vertical-align:${alignment}`, "white-space:nowrap",
+        `text-align:${textAlign}`, `vertical-align:${alignment}`, "white-space:nowrap",
         borderCss,
     ].join(";");
     if (inlineFormattingOnly) return `style="${css}"`;
@@ -92,7 +93,7 @@ function createStyledClipboardCell({ value, span, rowSpan, style, inferValueType
 }
 
 // HTML carries the template's merges; TSV keeps a placeholder for every physical column.
-function createClipboardTable(rows, { columnWidth = 150, columnWidths, palette } = {}) {
+function createClipboardTable(rows, { columnWidth = 150, columnWidths, palette, getRowHeight = () => 25 } = {}) {
     const text = rows.map(row => row.flatMap(cell => {
         if (!cell) return [""];
         const { value, span, style } = cell;
@@ -118,8 +119,8 @@ function createClipboardTable(rows, { columnWidth = 150, columnWidths, palette }
     const html = '<html><head><meta charset="utf-8"></head><body><!--StartFragment-->' +
         '<google-sheets-html-origin><table xmlns="http://www.w3.org/1999/xhtml" data-sheets-root="1" data-sheets-baot="1" ' +
         'cellspacing="0" cellpadding="0" dir="ltr" style="table-layout:fixed;border-collapse:collapse;font-family:Roboto;font-size:10pt">' +
-        columns + '<tbody>' + rows.map(row =>
-        '<tr style="height:25px">' + row.map(cell => {
+        columns + '<tbody>' + rows.map((row, index) =>
+        `<tr style="height:${getRowHeight(index)}px">` + row.map(cell => {
             if (!cell) return "";
             if (cell.style) return createStyledClipboardCell(cell, styledAttributes);
             const { value, span, fontSize, fontFamily } = cell;
@@ -179,8 +180,10 @@ function createReportSummaryClipboard(kind, {
         const data = getPlanningClipboardData(state);
         const { status } = data;
         if (!status.hasData || status.copyError) return { ...status, text: "", html: "" };
-        const rows = createPlanningClipboardRows(state, data);
-        return { ...status, ...createClipboardTable(rows, { columnWidths: planningColumnWidths }) };
+        const rows = createPlanningClipboardRows(state, data, { shift: context?.window ?? getReportContext().window, now });
+        return { ...status, ...createClipboardTable(rows, {
+            columnWidths: planningColumnWidths, getRowHeight: index => index === 2 ? 20 : 30,
+        }) };
     }
     if (kind === "parcel") {
         const summary = getParcelStateSummary(parcel ?? getParcelSnapshot());

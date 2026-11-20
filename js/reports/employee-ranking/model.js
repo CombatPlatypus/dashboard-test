@@ -2,6 +2,7 @@ import { formatReportPersonFirstName } from "../core/person-name.js";
 
 const NAME_PREPOSITIONS = new Set(["da", "das", "de", "do", "dos"]);
 const OPS_PREFIX = /^\[\s*(ops\d+)\s*\]\s*/i;
+const SHOPEE_ACCOUNT_EMAIL = /^[^\s@]+@shopee\.com$/i;
 
 function readEmployeeOpsCode(value) {
     const text = String(value ?? "").trim();
@@ -51,8 +52,10 @@ function buildOperationalRanking(current, imported = [], { descending = false } 
     const pending = [];
     for (const { operator: source, opsCode: code, quantity } of [...current, ...imported]) {
         if (!hasQuantity(quantity)) continue;
-        const opsCode = readEmployeeOpsCode(code) || readEmployeeOpsCode(source);
         const name = normalizeEmployeeRankingName(source);
+        if (SHOPEE_ACCOUNT_EMAIL.test(name)) continue;
+
+        const opsCode = readEmployeeOpsCode(code) || readEmployeeOpsCode(source);
         const operator = name && !/^[-–—]$/.test(name) ? name : opsCode;
         if (!operator) continue;
         if (!opsCode) {
@@ -71,7 +74,7 @@ function buildEmployeeOccurrenceRanking(operators) {
     const collaborators = new Map();
     for (const { operator: rawName, quantity } of operators) {
         const operator = normalizeEmployeeRankingName(rawName);
-        if (!operator || /^[-–—]$/.test(operator) || !hasQuantity(quantity)) continue;
+        if (!operator || /^[-–—]$/.test(operator) || SHOPEE_ACCOUNT_EMAIL.test(operator) || !hasQuantity(quantity)) continue;
 
         const key = operator.toLocaleLowerCase("pt-BR");
         const collaborator = collaborators.get(key) ?? { operator, quantity: 0 };

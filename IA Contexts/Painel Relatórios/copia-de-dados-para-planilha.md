@@ -40,6 +40,8 @@ O botão ao lado do título de Return, Missorted, Liquidate ou Confiscado copia 
 
 ## Planejamento
 
-A cópia de Planejamento começa em `B2` da aba **Modelo**, na planilha própria do relatório. Ela usa os dados da prévia e termina na última linha ocupada pelas listas de LHs, segregação ou backlog. [Montagem do bloco](../../js/reports/planning/clipboard.js)
+Selecione o título mesclado `C2:L3` da aba **Modelo** na planilha de Planejamento e cole com `Ctrl+V`. O título usa o turno selecionado e a data e hora da cópia no horário de São Paulo, como `PLANEJAMENTO LM HUB SP 63 - AM 19/11 23:07`. [Montagem do bloco](../../js/reports/planning/clipboard.js)
 
-Os [testes da cópia](../../tests/report-summary-copy.test.mjs) verificam os destinos, a ordem dos campos, as mesclagens e o texto tabulado.
+LHs programados, LHs a segregar e TOs ocupam C:E e começam nas linhas 7, 29 e 51. O backlog começa na linha 7 em G:H. Os resumos e os valores da Collection Pool ficam em J:L até a linha 18, com os rótulos mesclados em J:K e os valores em L. A cópia termina na última linha necessária para incluir esses resumos e as listas preenchidas. F e I funcionam como separadores dentro desse recorte.
+
+O HTML reproduz as bordas da grade e dos títulos mesclados, aplica Open Sans de 20 pt no título, 12 pt nos títulos das seções e nos cabeçalhos de segregação, 11 pt nos demais cabeçalhos e 10 pt nos dados e rótulos dos resumos. Os rótulos dos resumos ficam à esquerda e os dados são centralizados verticalmente. [Testes da cópia](../../tests/report-summary-copy.test.mjs)

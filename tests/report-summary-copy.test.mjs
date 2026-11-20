@@ -84,41 +84,58 @@ function createPlanningState() {
     };
 }
 
-test("planejamento preenche o Modelo a partir de B2, com mesclagens, cores e valores tipados", () => {
-    const payload = createReportSummaryClipboard("planning", { planning: createPlanningState() });
-    assert.equal(payload.target, "B2");
+test("planejamento preenche o Modelo a partir de C2:L3, com mesclagens, fontes, bordas e valores tipados", () => {
+    const payload = createReportSummaryClipboard("planning", {
+        planning: createPlanningState(), context: { window: "AM" }, now: new Date("2026-11-20T02:07:00Z"),
+    });
+    assert.equal(payload.target, "C2:L3");
     assert.equal(payload.sheet, "Modelo");
     assert.equal(payload.hasData, true);
     const rows = matrix(payload);
-    assert.equal(rows.length, 63);
-    assert.ok(rows.every(row => row.length === 6));
+    assert.equal(rows.length, 51);
+    assert.ok(rows.every(row => row.length === 10));
     for (const [row, values] of [
-        [2, ["PLANEJAMENTO", "", "", "", "", ""]],
-        [5, ["Resumo do Planejamento", "", "", "", "Backlog Adicionado", ""]],
-        [7, ["3289", "95", "20000", "", "br001", "BR003"]],
-        [8, ["", "", "", "", "BR002", ""]],
-        [11, ["2", "1", "3286", "", "", ""]],
-        [15, ["3", "2", "0", "", "", ""]],
-        [18, ["LHs Programados", "Origem", "QTD", "", "", ""]],
-        [19, ["LtA", "São Bernardo & Hub", "2786", "", "", ""]],
-        [40, ["LHs a Segregar", "Origem", "QTD", "", "", ""]],
-        [41, ["LtA", "São Bernardo & Hub", "20", "", "", ""]],
-        [42, ["LtB", "Guarulhos", "500", "", "", ""]],
-        [62, ["TOs para Segregar", "LH", "QTD", "", "", ""]],
-        [63, ["To-A", "LtA", "20", "", "", ""]],
-        [64, ["To-B", "LtA", "0", "", "", ""]],
+        [2, ["PLANEJAMENTO LM HUB SP 63 - AM 19/11 23:07", "", "", "", "", "", "", "", "", ""]],
+        [5, ["LHs Programados", "", "", "", "Backlog Adicionado", "", "", "Resumo do Planejamento", "", ""]],
+        [6, ["LHs Programados", "Origem", "QTD", "", "Pacotes Normais", "Pacotes Volumosos", "", "Volume Estimado", "", "3289"]],
+        [7, ["LtA", "São Bernardo & Hub", "2786", "", "br001", "BR003", "", "SPR Médio", "", "95"]],
+        [8, ["LtB", "Guarulhos", "500", "", "BR002", "", "", "Cap do Dia", "", "20000"]],
+        [10, ["", "", "", "", "", "", "", "Valores da Collection Pool", "", ""]],
+        [11, ["", "", "", "", "", "", "", "Qtd Backlog Pacotes", "", "2"]],
+        [12, ["", "", "", "", "", "", "", "Qtd Backlog Volumosos", "", "1"]],
+        [13, ["", "", "", "", "", "", "", "Qtd dentro dos LHs", "", "3286"]],
+        [15, ["", "", "", "", "", "", "", "Operações na Collection Pool", "", ""]],
+        [16, ["", "", "", "", "", "", "", "Qtd Pacotes Inseridos", "", "3"]],
+        [17, ["", "", "", "", "", "", "", "Qtd Pacotes Retirados", "", "2"]],
+        [18, ["", "", "", "", "", "", "", "Qtd Pacotes com Erros", "", "0"]],
+        [28, ["LHs a Segregar", "Origem", "QTD", "", "", "", "", "", "", ""]],
+        [29, ["LtA", "São Bernardo & Hub", "20", "", "", "", "", "", "", ""]],
+        [30, ["LtB", "Guarulhos", "500", "", "", "", "", "", "", ""]],
+        [50, ["TOs para Segregar", "LH", "QTD", "", "", "", "", "", "", ""]],
+        [51, ["To-A", "LtA", "20", "", "", "", "", "", "", ""]],
+        [52, ["To-B", "LtA", "0", "", "", "", "", "", "", ""]],
     ]) assert.deepEqual(rows[row - 2], values, `Linha ${row}`);
 
     const sheet = XLSX.read(payload.html, { type: "string" }).Sheets.Sheet1;
-    assert.deepEqual(sheet["!merges"].map(XLSX.utils.encode_range), [
-        "A1:F2", "A4:C4", "E4:F4", "A7:C7", "A8:C8", "A11:C11", "A12:C12",
-        "A15:C15", "A16:C16", "A38:C38", "A60:C60",
+    const merges = sheet["!merges"].map(XLSX.utils.encode_range);
+    assert.deepEqual(merges.slice(0, 18), [
+        "A1:J2", "E3:F3", "A4:C4", "E4:F4", "H4:J4", "H5:I5", "H6:I6", "H7:I7", "H8:J8", "H9:J9",
+        "H10:I10", "H11:I11", "H12:I12", "H13:J13", "H14:J14", "H15:I15", "H16:I16", "H17:I17",
     ]);
-    assert.equal(sheet.B18.v, "São Bernardo & Hub");
-    assert.equal(sheet.C63.v, 0);
-    assert.match(payload.html, /<td rowspan="2" colspan="6" [^>]+font-size:22pt;font-weight:bold;[^>]+>PLANEJAMENTO<\/td>/);
-    assert.match(payload.html, /<td[^>]+background-color:#262626;[^>]+vertical-align:middle[^>]+>Cap do Dia<\/td>/);
-    assert.match(payload.html, /<td[^>]+background-color:#1b1b1b;color:#e4e6eb;[^>]+vertical-align:bottom[^>]+>To-B<\/td>/);
+    assert.deepEqual(merges.filter(merge => merge.startsWith("A")), ["A1:J2", "A4:C4", "A26:C26", "A48:C48"]);
+    assert.equal(merges.at(-1), "H51:J51");
+    assert.equal(sheet.B6.v, "São Bernardo & Hub");
+    assert.equal(sheet.C51.v, 0);
+    assert.match(payload.html, /<td rowspan="2" colspan="10" [^>]+font-size:20pt;font-weight:bold;[^>]+border:1px solid #626262[^>]+>PLANEJAMENTO LM HUB SP 63 - AM 19\/11 23:07<\/td>/);
+    assert.match(payload.html, /<td rowspan="1" colspan="3" [^>]+font-size:12pt;[^>]+border:1px solid #626262[^>]+>Resumo do Planejamento<\/td>/);
+    assert.match(payload.html, /<td[^>]+background-color:#262626;[^>]+font-size:11pt;[^>]+border:1px solid #626262[^>]+>Origem<\/td>/);
+    assert.match(payload.html, /<td[^>]+background-color:#262626;[^>]+font-size:12pt;[^>]+border:1px solid #626262[^>]+>TOs para Segregar<\/td>/);
+    assert.match(payload.html, /<td rowspan="1" colspan="2" [^>]+font-size:10pt;[^>]+text-align:left;vertical-align:middle;[^>]+border:1px solid #626262[^>]+>Cap do Dia<\/td>/);
+    assert.match(payload.html, /<td[^>]+background-color:#1b1b1b;color:#e4e6eb;[^>]+font-size:10pt;[^>]+vertical-align:middle;[^>]+border:1px solid #626262[^>]+>To-B<\/td>/);
+    assert.deepEqual([...payload.html.matchAll(/<col width="(\d+)"/g)].map(([, width]) => Number(width)),
+        [252, 302, 101, 21, 181, 181, 21, 101, 101, 101]);
+    assert.deepEqual([...payload.html.matchAll(/<tr style="height:(\d+)px"/g)].slice(0, 5).map(([, height]) => height),
+        ["30", "30", "20", "30", "30"]);
     assert.match(payload.html, /data-sheets-value="\{&quot;1&quot;:3,&quot;3&quot;:20000\}">20000<\/td>/);
     assert.match(payload.html, /data-sheets-value="\{&quot;1&quot;:2,&quot;2&quot;:&quot;br001&quot;\}">br001<\/td>/);
 });
@@ -133,19 +150,19 @@ test("a cópia de planejamento termina na última linha usada por LHs, segregaç
     const copy = () => createReportSummaryClipboard("planning", { planning: state });
 
     const scheduled = copy();
-    assert.equal(matrix(scheduled).length, 19);
-    assert.deepEqual(matrix(scheduled).at(-1), ["LtB", "Guarulhos", "500", "", "", ""]);
-    assert.equal((scheduled.html.match(/<tr\b/g) ?? []).length, 19);
+    assert.equal(matrix(scheduled).length, 17);
+    assert.deepEqual(matrix(scheduled).at(-1), ["", "", "", "", "", "", "", "Qtd Pacotes com Erros", "", "0"]);
+    assert.equal((scheduled.html.match(/<tr\b/g) ?? []).length, 17);
 
     state.lhs[1].segregate = true;
     const segregated = matrix(copy());
-    assert.equal(segregated.length, 40);
-    assert.deepEqual(segregated.at(-1), ["LtB", "Guarulhos", "500", "", "", ""]);
+    assert.equal(segregated.length, 28);
+    assert.deepEqual(segregated.at(-1), ["LtB", "Guarulhos", "500", "", "", "", "", "", "", ""]);
 
     state.backlog.bulky = Array.from({ length: 61 }, (_, index) => `BRV${index + 1}`).join("\n");
     const backlog = matrix(copy());
     assert.equal(backlog.length, 66);
-    assert.deepEqual(backlog.at(-1), ["", "", "", "", "", "BRV61"]);
+    assert.deepEqual(backlog.at(-1), ["", "", "", "", "", "BRV61", "", "", "", ""]);
 });
 
 test("planejamento preenche as últimas células permitidas e informa quando as listas excedem o modelo", () => {
@@ -153,19 +170,19 @@ test("planejamento preenche as últimas células permitidas e informa quando as 
     state.lhs = Array.from({ length: 20 }, (_, index) => ({
         ...state.lhs[0], code: `LH${index + 1}`, quantity: 6000, tos: [],
     }));
-    state.lhs[0].tos = Array.from({ length: 5938 }, (_, index) => ({ code: `TO${index + 1}`, quantity: 1 }));
+    state.lhs[0].tos = Array.from({ length: 5950 }, (_, index) => ({ code: `TO${index + 1}`, quantity: 1 }));
     state.backlog.packages = Array.from({ length: 5994 }, (_, index) => `BRN${index + 1}`).join("\n");
     state.backlog.bulky = Array.from({ length: 5994 }, (_, index) => `BRV${index + 1}`).join("\n");
     const payload = createReportSummaryClipboard("planning", { planning: state });
     const rows = matrix(payload);
     assert.equal(payload.copyError, "");
-    assert.equal(rows[38 - 2][0], "LH20");
-    assert.equal(rows[60 - 2][0], "LH20");
-    assert.deepEqual(rows.at(-1), ["TO5938", "LH1", "1", "", "BRN5994", "BRV5994"]);
+    assert.equal(rows[26 - 2][0], "LH20");
+    assert.equal(rows[48 - 2][0], "LH20");
+    assert.deepEqual(rows.at(-1), ["TO5950", "LH1", "1", "", "BRN5994", "BRV5994", "", "", "", ""]);
 
     for (const [overflow, error] of [
         [{ ...state, lhs: [...state.lhs, state.lhs.at(-1)] }, /20 LHs programados/],
-        [{ ...state, lhs: [{ ...state.lhs[0], tos: [...state.lhs[0].tos, { code: "TO5939", quantity: 1 }] }] }, /5938 TOs/],
+        [{ ...state, lhs: [{ ...state.lhs[0], tos: [...state.lhs[0].tos, { code: "TO5951", quantity: 1 }] }] }, /5950 TOs/],
         [{ ...state, backlog: { ...state.backlog, packages: `${state.backlog.packages}\nBRN5995` } }, /5994 pacotes normais/],
         [{ ...state, backlog: { ...state.backlog, bulky: `${state.backlog.bulky}\nBRV5995` } }, /5994 pacotes volumosos/],
     ]) {
@@ -742,20 +759,21 @@ const receiptBinding = {
     subscribe: [subscribeReceiptState, subscribeReceiptLinehaulState, subscribeReportContext],
 };
 
-test("botão de planejamento copia o relatório atual e indica B2 da aba Modelo", async t => {
+test("botão de planejamento copia o relatório atual e indica C2:L3 da aba Modelo", async t => {
     const { planningNotification, planningText, nativeCopies } = setup(t, {}, { nativeCopy: true });
     const { planning, root } = createCopyButtons();
     assert.equal(initializeReportSummaryCopy(root), true);
     assert.equal(planning.disabled, true);
     restorePlanningState(createPlanningState());
     assert.equal(planning.disabled, false);
-    assert.match(planning.title, /B2 da aba Modelo/);
+    assert.match(planning.title, /C2:L3 da aba Modelo/);
+    updateReportContextField("window", "PM2");
     await planning.fire();
     assert.equal(nativeCopies.length, 1);
-    assert.match(nativeCopies[0]["text/plain"], /^PLANEJAMENTO\t/);
+    assert.match(nativeCopies[0]["text/plain"], /^PLANEJAMENTO LM HUB SP 63 - PM2 \d{2}\/\d{2} \d{2}:\d{2}\t/);
     assert.match(nativeCopies[0]["text/html"], /google-sheets-html-origin/);
     assert.equal(planningNotification.dataset.notificationType, "success");
-    assert.match(planningText.textContent, /Cole em B2 da aba Modelo/);
+    assert.match(planningText.textContent, /Cole em C2:L3 da aba Modelo/);
     resetPlanningReport();
     assert.equal(planning.disabled, true);
 });
